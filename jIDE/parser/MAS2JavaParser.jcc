@@ -1,0 +1,628 @@
+//----------------------------------------------------------------------------
+// Copyright (C) 2003  Rafael H. Bordini, Jomi F. Hubner, et al.
+// 
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// 
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+// 
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// 
+// To contact the authors:
+// http://www.csc.liv.ac.uk/~bordini
+// http://www.inf.furb.br/~jomi
+//----------------------------------------------------------------------------
+
+
+options {
+  STATIC=false;
+}
+
+PARSER_BEGIN(mas2j)
+
+package jIDE.parser;
+
+import java.util.*;
+import java.io.*;
+
+public class mas2j {
+
+    PrintWriter out;
+    boolean noOut = false; // do not output anything to files, just parse
+    String soc;
+    String envClass; 
+    String controlClass; 
+    boolean debug = false;
+
+    String architecture = "Centralised";
+    String destDir = "";
+    String saciHome = "";
+    String jasonHome = "..";
+    String controlPart = null; // this string has the ag control creation (to be added at the end of the script)
+    
+    Map    agArchFiles;
+    Map    agClassFiles;
+    Map    agASFiles;
+
+    // Run the parser
+    public static void main (String args[]) {
+
+      String name;
+      mas2j parser;
+
+      if (args.length==3) {
+        name = args[0];
+        System.err.println("mas2j: reading from file " + name + " ..." );
+		try {
+		  parser = new mas2j(new java.io.FileInputStream(name));
+          parser.setJasonHome(args[1]);
+          parser.setSaciHome(args[2]);
+		} catch(java.io.FileNotFoundException e){
+		  System.err.println("mas2j: file \"" + name + "\" not found.");
+		  return;
+        }
+      } else {
+		System.out.println("mas2j: usage must be:");
+		System.out.println("      java mas2j <MASConfFile> <jasonHome> <SACIHome>");
+		System.out.println("         Output to file <MASName>.xml");
+        return;
+      }
+
+      // parsing
+      try {
+		parser.mas();
+		System.out.println("mas2j: "+name+" parsed successfully!\n");
+        parser.writeScripts();
+
+        System.out.println("To run your MAS:");
+        //System.out.println("  1. chmod u+x *.sh");
+        //System.out.println("  2. compile the generated java files (script ./c"+parser.soc+".sh)");
+        int step = 1;
+        if (parser.architecture.equals("Saci")) {
+             System.out.println("  "+step+". run saci (script ./saci-"+parser.soc+".sh)");
+             step++;
+        }
+        System.out.println("  "+step+". run your agents (script ./"+parser.soc+".sh)");
+      }
+      catch(ParseException e){
+		System.err.println("mas2j: parsing errors found... \n" + e);
+      }
+    }
+
+    public void setDestDir(String d) {
+        if (d != null) {
+            destDir = d;
+            if (destDir.length() > 0) {
+                if (! destDir.endsWith( File.separator )) {
+                    destDir += File.separator;
+                }
+            }
+        }
+    }
+
+    public void setNoOut(boolean noOut) {
+        this.noOut = noOut;
+    }
+
+    public String getOutputFile() {
+        return destDir+soc+".xml";
+    }
+
+    public void setOut(String id) {
+        try {
+            if (noOut) {
+                out = new PrintWriter(new StringWriter());
+                //System.out.println("mas2j: output to null"); 
+            } else {
+                out = new PrintWriter(new FileWriter(destDir+id+".xml"));
+                //System.out.println("mas2j: output to file " + id + ".xml ..."); 
+            }
+        } catch (Exception e) {
+            System.err.println("mas2j: could not open " + id + ".xml\".");
+        }
+    }
+
+    public void close() {
+	    	out.close();
+    }
+
+    public void setSaciHome(String s) {
+        saciHome = new File(s).getAbsolutePath();
+    }
+
+    public void setJasonHome(String s) {
+        jasonHome = new File(s).getAbsolutePath();
+    }
+
+    public String getArchitecture() {
+        return architecture;
+    }
+
+    public String getEnvClass() {
+        return envClass;
+    }
+    
+    public String getSocName() {
+    	return soc;
+    }
+
+    public String getControlClass() {
+        return controlClass;
+    }
+    
+    public void setControlClass(String sControl) {
+    		controlClass = sControl;
+    }
+    
+    public void debugOn() {
+    		debug = true;
+    }
+    
+    public void debugOff() {
+    		debug = false;
+    }
+
+    public Map getAgArchFiles() {
+        return agArchFiles;
+    }
+
+    public Map getAgClassFiles() {
+        return agClassFiles;
+    }
+
+    public Map getAgASFiles() {
+        return agASFiles;
+    }
+    
+    public Set getAllUserJavaFiles() {
+				Set files = new HashSet();
+				files.addAll(getAgArchFiles().values());
+				files.addAll(getAgClassFiles().values());
+				files.add(getEnvClass().replace('.', '/'));
+				return files;
+	}
+	
+    public Set getAllUserJavaDirectories() {
+				Set directories = new HashSet();
+				Iterator ifiles = getAllUserJavaFiles().iterator();
+				while (ifiles.hasNext()) {
+					String dir = new File(ifiles.next()+".java").getParent();
+					if (dir == null) { // no parent
+						dir = ".";
+					}
+					directories.add(dir);
+				}
+				return directories;
+	}
+    
+    public void writeInit() {
+	    	out.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+        String extraSlash = "";
+        if (System.getProperty("os.name").indexOf("indows") > 0) {
+            extraSlash = "/";
+        }
+    		out.println("<!DOCTYPE saci SYSTEM \"file:"+extraSlash+saciHome+File.separator+"bin"+File.separator+"applications.dtd\">");
+	    	out.println("<?xml-stylesheet href=\"file:"+extraSlash+saciHome+File.separator+"bin"+File.separator+"applications.xsl\" type=\"text/xsl\" ?>");
+    		out.println("<saci>");
+		out.println("<application id=\""+ soc +"\">");
+
+		out.println("<script id=\"run\">\n");
+
+		out.println("\t<killSocietyAgents society.name=\""+ soc +"\" />");
+		out.println("\t<killFacilitator society.name=\""+ soc +"\" />");
+		out.println("\t<startSociety society.name=\""+ soc +"\" />\n");
+
+		out.println("\t<killSocietyAgents society.name=\""+ soc +"-env\" />");
+		out.println("\t<killFacilitator society.name=\""+ soc +"-env\" />");
+		out.println("\t<startSociety society.name=\""+ soc +"-env\" />\n");
+    }
+
+    public void writeEnd() {
+        if (controlPart != null) {
+    			out.println(controlPart);
+	    	}
+		out.println("\n</script>");
+		out.println("</application>");
+	    	out.println("</saci>");
+    }
+
+
+    public String getJasonClasspath() {
+        return jasonHome+File.separator+"bin"+File.separator+"classes"; 
+    }
+
+    public String getJasonClasspathURL() {
+        return "file:"+jasonHome+"/bin/classes/"; 
+    }
+
+    public String getFullClassPath() {
+        String clPath = "\"$CLASSPATH\"";
+        String indelim = "\"";
+        String outdelim = "";
+        if (System.getProperty("os.name").indexOf("indows") > 0) {
+            clPath = "%CLASSPATH%";
+	        indelim = "";
+    		    outdelim = "\"";
+        }
+
+		String dDir = destDir;
+		if (dDir.endsWith(File.separator)) {
+			dDir = dDir.substring(0, dDir.length()-1);
+		}
+        return outdelim+
+               "."+File.pathSeparator+
+               indelim+getJasonClasspath()+indelim+File.pathSeparator+
+               indelim+saciHome+File.separator+"bin"+File.separator+"saci.jar"+indelim+File.pathSeparator+
+               indelim+dDir+indelim+File.pathSeparator+
+               clPath+
+               outdelim;
+    }
+
+    public void writeScripts() {
+        try {
+
+			String classPath = getFullClassPath();
+			
+			String dirsToCompile = "";
+			Iterator i = getAllUserJavaDirectories().iterator();
+			while (i.hasNext()) {
+				dirsToCompile += " " + i.next() + File.separator + "*.java";
+			}
+			
+			
+            	PrintWriter out;
+            
+            // -- windows scripts
+            if (System.getProperty("os.name").indexOf("indows") > 0) {
+                out = new PrintWriter(new FileWriter(destDir+soc+".bat"));
+                out.println("@echo off\n");
+                out.println("rem this file was generated by mas2j parser\n");
+                if (architecture.equals("Saci")) {
+                    out.println("java -classpath "+classPath+" "+saci.tools.runApplicationScript.class.getName()+" \""+soc+".xml\""); 
+                } else if (architecture.equals("Centralised")) {
+                    out.println("java -classpath "+classPath+" "+jIDE.RunCentralisedMAS.class.getName()+" \""+soc+".xml\""); 
+                }
+                out.close();
+
+
+                out = new PrintWriter(new FileWriter(destDir+"compile-"+soc+".bat"));
+                out.println("@echo off\n");
+                out.println("rem  this file was generated by mas2j parser\n");
+                out.println("echo compiling user classes...");
+                if (dirsToCompile.length() > 0) {
+	                out.println("javac -classpath "+classPath+" "+dirsToCompile+"\n\n"); 
+	            }
+                out.println("echo ok");
+                out.close();
+
+
+                if (architecture.equals("Saci")) {
+                    out = new PrintWriter(new FileWriter(destDir+"saci-"+soc+".bat"));
+                    out.println("@echo off");
+                    out.println("rem this file was generated by mas2j parser\n");
+                    out.println("set CLASSPATH="+classPath);
+                    out.println("cd \""+saciHome+"\\bin\"");
+                    out.println("saci &"); 
+                    out.close();
+                }
+            } else {
+            // ---- unix scripts
+            //if (System.getProperty("os.name").indexOf("inux") > 0) {
+                // the script to run the MAS                   
+                out = new PrintWriter(new FileWriter(destDir+soc+".sh"));
+                out.println("#!/bin/sh\n");
+                out.println("# this file was generated by mas2j parser\n");
+                if (architecture.equals("Saci")) {
+                    out.println("java -classpath "+classPath+" "+saci.tools.runApplicationScript.class.getName()+" \""+soc+".xml\""); 
+                } else if (architecture.equals("Centralised")) {
+                    out.println("java -classpath "+classPath+" "+jIDE.RunCentralisedMAS.class.getName()+" \""+soc+".xml\""); 
+                }
+                out.close();
+
+            
+                //out = new PrintWriter(new FileWriter(destDir+"c"+soc+".sh"));
+                out = new PrintWriter(new FileWriter(destDir+"compile-"+soc+".sh"));
+                out.println("#!/bin/sh\n");
+                out.println("# this file was generated by mas2j parser\n");
+                out.println("echo -n \"        compiling user classes...\"");
+                if (dirsToCompile.length() > 0) {
+	                out.println("javac -classpath "+classPath+" "+dirsToCompile+"\n\n"); 
+	            }
+                out.println("echo ok");
+                out.close();
+
+
+                if (architecture.equals("Saci")) {
+                    out = new PrintWriter(new FileWriter(destDir+"saci-"+soc+".sh"));
+                    out.println("#!/bin/sh");
+                    out.println("# this file was generated by mas2j parser\n");
+                    //out.println("CURDIR=`pwd`");
+                    //out.println("cd "+destDir);
+                    //out.println("APPDIR=`pwd`");
+                    //out.println("export CLASSPATH=$APPDIR:$CURDIR:"+classPath);
+                    out.println("export CLASSPATH="+classPath);
+                    out.println("cd \""+saciHome+"/bin\""); 
+                    out.println("./saci &"); 
+                    out.close();
+                }
+            //}
+            }
+        } catch (Exception e) {
+            System.err.println("mas2j: could not write" + soc + ".sh");
+        }
+    }
+
+    String getOptsStr(Map opts) {
+        String s = "";
+        Iterator i = opts.keySet().iterator();
+        while (i.hasNext()) {
+            if (s.length() == 0) {
+                s = " options ";
+            }
+            String key = (String)i.next();
+            s += key + "=" + opts.get(key);
+            if (i.hasNext()) {
+                s += ",";
+            }
+        }
+        return s;
+    }
+}
+
+PARSER_END(mas2j)
+
+SKIP : {
+ " "
+|  "\t"
+|  "\n"
+|  "\r"
+|  <"//" (~["\n","\r"])* ("\n" | "\r" | "\r\n")>
+|  <"/*" (~["*"])* "*" ("*" | ~["*","/"] (~["*"])* "*")* "/">
+}
+
+TOKEN : {
+
+// Predefined
+   <MAS:         "MAS">
+|  <AGS:         "agents">
+|  <ENV:         "environment">
+|  <CONTROL:     "executionControl">
+|  <AT:          "at">
+|  <ARCH:        "architecture" >
+|  <ARCHV:       ("Centralised" | "Saci") >
+
+|  <ASOEE:       "events" >
+|  <ASOEEV:      ("discard"|"requeue"|"retrieve") >
+
+|  <ASOIB:       "intBels">
+|  <ASOIBV:      ("sameFocus"|"newFocus") >
+
+|  <ASOV:        "verbose" >
+
+|  <ASOSYNC:     "synchronized" >
+|  <ASOBOOL:     ("true" | "false" ) >
+
+|  <ASAGCLASS:      "agentClass" >
+|  <ASAGARCHCLASS:  "agentArchClass" >
+
+// Numbers
+|  <NUMBER: ["0"-"9"] (["0"-"9"])* >
+
+// Identifiers
+|  <ASID: <LC_LETTER> (<LETTER>|<DIGIT>|"_")* >
+|  <CLASSID: <LETTER> (<LETTER>|<DIGIT>|"_")* >
+
+// Path
+|  <PATH: ( "./" | "/" | "\\" | (<DRIVER>) ) ( (<LETTER>|<DIGIT>|"_")* ( "/" | "\\" ) )* >
+|  <DRIVER: (<LETTER> ":")>
+
+|  <LETTER: ( <LC_LETTER> | <UP_LETTER> )>
+|  <LC_LETTER: ["a"-"z"]>
+|  <UP_LETTER: ["A"-"Z"]>
+|  <DIGIT: ["0"-"9"]>
+}
+
+
+
+/* Configuration Grammar */
+
+void mas() :                   {  }
+{
+  <MAS>
+  soc = sId()                  { setOut(soc); 
+                                 writeInit();}
+  "{" 
+  
+  arch()
+
+  environment()
+
+  control()
+  
+  agents()
+
+  "}"
+                               { writeEnd(); 
+                                 close(); }
+}
+
+void arch() : {Token t;}
+{                           { architecture = "Centralised"; }
+  [ <ARCH> ":" t = <ARCHV>  { architecture = t.image; } ]
+}
+
+
+void agents() :             { agArchFiles = new HashMap();
+                              agClassFiles = new HashMap();
+                              agASFiles = new HashMap();
+                            }
+{
+  <AGS> ":"
+  ( agent() )+
+}
+
+
+void agent() :              { Token agName; 
+                              File source; 
+                              Token qty; Token value; String host; Map opts; 
+                            }
+{
+  agName = <ASID>           { out.print("\t<startAgent "); 
+                              out.print("\n\t\tname=\""+agName.image+"\" "); 
+                              out.print("\n\t\tsociety.name=\""+soc+"\" "); } 
+
+                            { source = new File(destDir+agName.image+".asl"); }
+  [ source = fileName() ]
+
+  opts = ASoptions()        
+
+
+                            { String agClass = jason.asSemantics.Agent.class.getName();
+                              String agArchClass = jason.architecture.SaciAgArch.class.getName();
+
+                              if (architecture.equals("Centralised")) {
+                                  agArchClass = jason.architecture.CentralisedAgArch.class.getName();
+                              }
+                            }
+
+
+  [ <ASAGARCHCLASS> agArchClass = className()  
+                            { agArchFiles.put(agName.image, agArchClass.replace('.', '/')); } 
+  ]
+
+  [ <ASAGCLASS> agClass = className()
+                            { agClassFiles.put(agName.image, agClass.replace('.', '/')); }  
+  ]
+
+                            {
+                              agASFiles.put(agName.image, source.getAbsolutePath());
+                              out.print("\n\t\tclass=\""+agArchClass+"\""); 
+                              out.print("\n\t\targs=\""+agClass+" '"+source.getAbsolutePath()+"' '"+jasonHome+"' "+getOptsStr(opts)+"\""); 
+                              //out.print("\n\t\tclasspath=\""+getASClasspathURL()+"\" "); 
+                            } 
+
+  [ "#" qty = <NUMBER>      { out.print("\n\t\tqty=\""+qty.image+"\" "); } ]
+
+  [ <AT> host = sId()       { out.print("\n\t\thost=\""+host+"\" "); } ]
+
+  ";"
+                            { out.println("/>"); }
+}
+
+
+File fileName() :           { String path = ""; 
+                              Token t; 
+                              String i; 
+                              String ext = ".asl"; }
+{
+  [ t = <PATH>              { path = t.image; } ]
+    i = sId()               
+  [ "." ext = sId()         { ext = "." + ext; } ]
+                            { if (!path.startsWith(File.separator)) {
+                                path = destDir + path;
+                              }
+                              return new File( path + i + ext);
+                            }
+}
+
+
+String className() :       {Token c; String p = "";}
+{
+   (c = <CLASSID> | c = <ASID> )
+   [ "." p = className()   { return c.image + "." + p; } ]
+                           { return c.image; }
+}
+
+Map ASoptions() :          { Map opts = new HashMap(); }
+{
+  [ "[" opts = procOption(opts) ( "," opts = procOption(opts) )* "]" ]
+  {
+   if (controlClass != null) {
+     // if there is some control, all agents have sync option
+     opts.put("synchronized","true");
+   }
+   return opts; 
+  }
+}
+
+Map procOption(Map opts): { Token opt; Token oval; }
+{
+  ( opt=<ASOEE>   "=" oval=<ASOEEV>  {opts.put(opt.image,oval.image);}
+  | opt=<ASOIB>   "=" oval=<ASOIBV>  {opts.put(opt.image,oval.image);}
+  | opt=<ASOSYNC> "=" oval=<ASOBOOL> {opts.put(opt.image,oval.image);}
+  | opt=<ASOV>    "=" oval=<NUMBER>  {opts.put(opt.image,oval.image);} 
+  )
+  { return opts; }
+}
+
+
+void environment() :        { String host; }
+{
+
+  <ENV> ":"
+  envClass = className()    { out.print("\t<startAgent "); 
+                              out.print("\n\t\tname=\"environment\" "); 
+                              out.print("\n\t\tsociety.name=\""+soc+"-env\" "); 
+
+                              String fEnvClass = envClass;
+                              if (architecture.equals("Saci")) {
+                                  fEnvClass = jason.environment.SaciEnvironment.class.getName();
+                                  out.print("\n\t\targs=\""+envClass+"\" ");
+                              }
+                              
+                              out.print("\n\t\tclass=\""+fEnvClass+"\" ");
+                              //out.print("\n\t\tclasspath=\"file:"+new File(".").getAbsolutePath()+"/#"+getASClasspathURL()+"\" "); 
+                            }
+  [ <AT> host = sId()       { out.print("\n\t\thost=\""+host+"\" "); } ]
+                            { out.println("/>"); }
+}
+
+
+void control() :            { String host =  null; }
+{
+                            { controlClass = null; 
+                              controlPart = null;
+                            }
+                            
+  [ <CONTROL> ":" controlClass = className() 
+    [ <AT> host = sId() ]
+  ]
+                            { if (debug) {
+                            	controlClass = jason.control.ExecutionControlGUI.class.getName();
+                              }
+                              if (controlClass != null) {
+	                              controlPart =  "\t<startAgent "; 
+	                              controlPart += "\n\t\tname=\"controller\" "; 
+	                              controlPart += "\n\t\tsociety.name=\""+soc+"-env\" "; 
+	
+			                      String tArgs = "\n\t\targs=\"'"+jasonHome+"'";
+	                              String fControlClass = controlClass;
+	                              if (architecture.equals("Saci")) {
+	                                  fControlClass = jason.control.SaciExecutionControl.class.getName();
+	                                  tArgs += " "+controlClass;
+	                              }
+                                  controlPart += tArgs+"\"";
+	                              
+	                              controlPart += "\n\t\tclass=\""+fControlClass+"\" ";
+	                              
+	                              if (host != null) {
+	                                 controlPart += "\n\t\thost=\""+host+"\" ";
+	                              }
+	                              controlPart += "/>";
+                              }
+                            }
+}
+
+
+/* string from ID */
+String sId() : { Token t; }
+{
+    t = <ASID>   { return(t.image); }
+}

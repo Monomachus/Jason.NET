@@ -1,0 +1,51 @@
+// ----------------------------------------------------------------------------
+// Copyright (C) 2003 Rafael H. Bordini, Jomi F. Hubner, et al.
+// 
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// 
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+// Lesser General Public License for more details.
+// 
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+// 
+// To contact the authors:
+// http://www.csc.liv.ac.uk/~bordini
+// http://www.inf.furb.br/~jomi
+//----------------------------------------------------------------------------
+
+package jason.stdlib;
+
+import jason.JasonException;
+import jason.asSemantics.TransitionSystem;
+import jason.asSemantics.Unifier;
+import jason.asSyntax.Term;
+
+public class print {
+
+	public static boolean execute(TransitionSystem ts, Unifier un, String[] args)
+			throws Exception {
+		if (args.length == 0) {
+			throw new JasonException("ASJI: print without parameters!");
+		}
+
+		System.out.print("Agent " + ts.getAgArch().getName() + " is saying: ");
+		for (int i = 0; i < args.length; i++) {
+			if (args[i].charAt(0) != '\"') {
+				Term t = Term.parse(args[i]);
+				un.apply(t);
+				System.out.print(t.toString());
+			} else
+				System.out.print(args[i]);
+		}
+		System.out.println();
+
+		return true;
+	}
+}

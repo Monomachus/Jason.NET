@@ -1,0 +1,384 @@
+// Copyright (C) 2003  Rafael H. Bordini, Jomi F. Hubner, et al.
+// 
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// 
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+// 
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// 
+// To contact the authors:
+// http://www.csc.liv.ac.uk/~bordini
+// http://www.inf.furb.br/~jomi
+//----------------------------------------------------------------------------
+
+
+options {
+  //LOOKAHEAD=5;
+  STATIC=false;
+}
+
+PARSER_BEGIN(as2j)
+
+  package jason.asSyntax.parser;
+
+  import java.util.*;
+  import java.io.*;
+  import jason.asSyntax.*;
+  import jason.asSemantics.Agent;
+  import jason.D;
+
+  public class as2j {
+
+    private String name;
+    private File source = null;
+
+    private PrintStream out = System.out;
+
+    // Run the parser
+    public static void main ( String args[] ) {
+      as2j parser;
+
+      if(args.length==1) {
+        String name = args[0];
+		try {
+		  parser = new as2j(new java.io.FileInputStream(name+".asl"));
+		  parser.setName(name);
+		}
+		catch(java.io.FileNotFoundException e){
+		  System.err.println("as2j: file \"" + name + ".asl\" not found.");
+		  return ;
+        }
+        System.out.println("as2j: Creating Jason agent for \"" + name + ".asl\" ..." );
+		try {
+           parser.bs(); // just to let the user know in advance there is ...
+           parser.ps(); // ... any syntax error. Can't use ag() as there isn't an agent to create.
+		}
+        catch (Exception e) {
+          System.err.println("as2j: parsing error in file \"" + name + ".asl\"\n" + e );
+          System.err.println("as2j: generating java files anyway.");
+        }
+      }
+      else {
+		System.err.println("as2j: usage must be:");
+		System.err.println("      java as2j <AgentName>");
+		System.err.println("         Input from <AgentName>.asl");
+		System.err.println("         Output to file Agent_<AgentName>.java");
+        return ;
+      }
+    }
+
+    /* Auxiliary Functions */
+
+    void setName(String n) {
+    	name = n;
+    }
+
+    void setSource(File f) {
+        source = f;
+    }
+  }
+
+PARSER_END(as2j)
+
+SKIP : {
+ " "
+|  "\t"
+|  "\n"
+|  "\r"
+|  <"//" (~["\n","\r"])* ("\n" | "\r" | "\r\n")>
+|  <"/*" (~["*"])* "*" ("*" | ~["*","/"] (~["*"])* "*")* "/">
+}
+
+TOKEN : {
+// Predefined
+  <TK_TRUE: "true">
+| <TK_FALSE: "false">
+| <TK_NOT:  "not">
+| <TK_NEG:  "~">
+
+// Numbers
+|   <NUMBER: ("-")? ["0"-"9"] (["0"-"9"])*
+          | (("-")? ["0"-"9"])* "." (["0"-"9"])+ (<EXPONENT>)?
+          | (("-")? ["0"-"9"])+ <EXPONENT> >
+|  <EXPONENT: ["e","E"] (["+","-"])? (["0"-"9"])+>
+
+// Strings
+|  <STRING: "\"" ( ~["\"","\\","\n","\r"]
+                 | "\\" ( ["n","t","b","r","f","\\","\'","\""]
+                        | ["0"-"7"] (["0"-"7"])?
+                        | ["0"-"3"] ["0"-"7"] ["0"-"7"]))* "\"">
+
+// Identifiers
+|  <ATOM: (<LC_LETTER> | "." <CHAR>) (<CHAR> | "." <CHAR>)*>
+|  <VAR:  <UP_LETTER> (<CHAR>)*>
+|  <CHAR: (<LETTER> | <DIGIT> | "_")>
+|  <LETTER: ( <LC_LETTER> | <UP_LETTER> )>
+|  <LC_LETTER: ["a"-"z"]>
+|  <UP_LETTER: ["A"-"Z"]>
+|  <DIGIT: ["0"-"9"]>
+}
+
+/* AgentSpeak Grammar */
+
+void ag(Agent a) : { BeliefBase bb; PlanLibrary pp;  }
+{
+  bb = bs() { a.addBS(bb); } 
+  pp = ps() { a.addPS(pp); }
+}
+
+BeliefBase bs() : { BeliefBase bb = new BeliefBase(); Literal F; }
+{
+  ( F=l() "."     {  if(!F.isGround()) {
+				         throw new ParseException("Error: Initial belief must be ground!\n       Cannot use "+F+" as initial belief.");
+                  }
+    // NB: initial beliefs are as percepts (not internal) by default!!!
+    F.addAnnot(D.TSelf);
+    bb.add(F); } 
+  )*
+  { return bb; }
+}
+
+PlanLibrary ps() : { PlanLibrary pp = new PlanLibrary(); Plan pl;  }
+{
+  ( pl = p() { pp.add(pl); } 
+  )+ 
+  { return pp; }
+}
+
+Plan p() : { Trigger T; ArrayList C; ArrayList H; Pred L = null; }
+{
+  [ "@" L=at() ] 
+    T=te() 
+    ":" C=ct() 
+    "<-" H=h() "." 
+                                 { return new Plan(L,T,C,H);  }
+}
+
+Trigger te() : { 
+                 boolean teType;
+			     byte    teGoal = D.TEBel;
+				 Literal F; 
+               }
+{
+  ( "+"    { teType = D.TEAdd; }
+  | "-"    { teType = D.TEDel; }
+  )
+  
+  [ ( "!"  { teGoal = D.TEAchvG; }
+    | "?"  { teGoal = D.TETestG; }
+    )
+  ]
+  
+  F=l()    { return new Trigger(teType,teGoal,F); }
+}
+
+Literal l() : { Pred F; Token k; boolean type = D.LPos; }
+{
+  ( ( [ <TK_NEG>              { type = D.LNeg; }
+      ]
+      F=at()                  { return new Literal(type,F); }
+    )
+  | k=<VAR>                   { return new Literal(type,new Pred(k.image));} 
+  | k=<TK_TRUE>               { return D.LTrue;}  // used when dl/body is true
+  )
+}
+
+
+
+ArrayList ct() :  { DefaultLiteral P; ArrayList C = new ArrayList(); List CT;}
+{
+   //( <TK_TRUE>   { return C; } TODO a literal may be true
+     //| 
+     P = dl()   { if (!P.equals(D.LTrue)) {
+                    C.add(P); 
+                  }
+                }
+   //)
+   [ "&" CT=ct()  { C.addAll(CT); } ]
+   { return C; }
+}
+
+
+DefaultLiteral dl() : { Literal L; 
+                        Term op1 = null;
+                        String operator = ""; 
+                        Term op2 = null; 
+                        boolean change = false;
+                        boolean isPos = D.LDefPos; 
+                        DefaultLiteral rel;
+                      }
+{
+  [ <TK_NOT>         { isPos = D.LDefNeg; }
+  ]
+  ( "(" L=dl() ")"   { return new DefaultLiteral(isPos,L); }
+  | ( op1 = l()      { rel = new DefaultLiteral(isPos,(Literal)op1); }
+    | op1 = value()  { rel = null; }
+    )
+                     
+    [
+       ( "<"         { operator = ".gt"; change = true; } 
+       | "<="        { operator = ".gte"; change = true; } 
+       | ">"         { operator = ".gt"; } 
+       | ">="        { operator = ".gte"; } 
+       | "=="        { operator = ".equals"; } 
+       | "\\=="      { operator = ".equals"; isPos = !isPos; } 
+       | "="         { operator = ".unifies"; } 
+       )
+                     { if (rel != null && operator.startsWith(".gt")) { // op1 is a l()
+                          if (! op1.isVar()) {
+					        throw new ParseException("Default literal: literal must not be followed by relational operator.");
+                          }
+                       }
+                     }
+                     
+       (op2 = l() | op2 = value())
+                     { rel = new DefaultLiteral(isPos, new Literal(true, new Pred(operator))); 
+                       if (!change) {
+   					      rel.addTerm(op1); 
+   					      rel.addTerm(op2); 
+   					   } else {
+   					      rel.addTerm(op2); 
+   					      rel.addTerm(op1); 
+   					   }
+   					 }
+    ]
+    { if (rel == null) {
+        throw new ParseException("Default literal: value must be followed by relational operator.");
+      } else {
+         return rel; 
+      }
+    }
+  )
+}
+
+Term value() : { Token k; }
+{
+     (   k  = <NUMBER> { return new Term(k.image); }
+       | k  = <STRING> { return new Term(k.image); }
+     ) 
+}
+
+// not used! use bd instead
+ArrayList h() : { ArrayList H; }
+{
+  ( //<TK_TRUE> { return new ArrayList(); } TODO: 
+  //| 
+  H=bd()
+  )
+  { return H; }
+}
+
+ArrayList bd() : { BodyLiteral F; 
+                   ArrayList BD = new ArrayList(); 
+                   List BD2;}
+{
+  F=f()          { if (! F.equalsAsLiteral(D.LTrue)) {
+                      BD.add(F); 
+                   } 
+                 }
+                 
+  [ ";" BD2=bd() { BD.addAll(BD2); } ]
+                 { return BD; }
+}
+
+
+BodyLiteral f() : { Literal A; 
+                    byte formType = D.HAction;
+                  }
+{
+  [ ( "!"  { formType = D.HAchieve; }
+    | "?"  { formType = D.HTest; }
+    | "+"  { formType = D.HAddBel; }
+    | "-"  { formType = D.HDelBel; }
+    )
+  ]
+  A=l()    { return new BodyLiteral(formType,A); }
+}
+
+
+
+/* Annotated Atomic Formulae */
+Pred at() : { Token K; Pred p = new Pred(); Term t; }
+{
+  K=<ATOM> { p.setFunctor(K.image); } 
+  [
+      "(" lt(p) ")"
+  ]
+  [ 
+      "[" la(p) "]"
+  ] 
+  { return p; }
+}
+
+
+/* Structures (no annotations here) */
+// not used!
+Term st() : { Token K; Term t = new Term(); }
+{
+  K=<ATOM>   { t.setFunctor(K.image); } 
+  [ 
+      "(" t=lt(t) ")"
+  ]
+  { return t; }
+}
+
+/* List of terms as parameters */
+Term lt(Term u) : { Term v; }
+{
+  v=t()       { u.addTerm(v); } 
+  ( "," v=t() { u.addTerm(v); }
+  )* 
+  { return u; }
+}
+
+/* List of terms as annotations */
+Pred la(Pred p) : { Term v; }
+{
+  v=t()       { // by Jomi: this check is moved to addBel. Since we can unify annots
+                // if(!v.isGround()) {
+                //  throw new ParseException("Error: Annotations must be ground!\n       Cannot use "+v+" as annotation.");
+                //}
+                p.addAnnot(v);
+              }
+  ( "," v=t() { //if(!v.isGround()) {
+                //  throw new ParseException("Error: Annotations must be ground!\n       Cannot use "+v+" as annotation.");
+                //}
+                p.addAnnot(v);
+              }
+  )* { return p; }
+}
+
+Term t() : { Token K; Term u; }
+{
+  ( //u=st()       { return u; } TODO: changed to at, is it ok? used in the terms of received(...Content...)
+  u=l()         { return u; }
+  | u=list()     { return u; } 
+  // alredy in at | K=<ATOM>     { return new Pred(K.image); }
+  //| K=<VAR>      { return new Literal(D.LPos, new Pred(K.image)); } // it need to unify with ~a in communication
+  | K=<NUMBER>   { return new Term(K.image); }
+  | K=<STRING>   { return new Term(K.image.replaceAll("\"", "\\\"")); } 
+  //| K=<TK_TRUE>  { return D.LTrue; } 
+  | K=<TK_FALSE> { return new Term(K.image); } 
+  )
+}
+
+Term list() : { Token K; Term f; Term p = new Term(); Term l; Term a; }
+{
+  "["
+  ( f=t() { p.setFunctor(D.ListCons); p.addTerm(f); a=p; }
+    ( ( "," f=t() { l=new Term(D.ListCons); a.addTerm(l); a=l; a.addTerm(f); } )*
+      "]" { a.addTerm(new Term(D.EmptyList)); return p; }
+    | "|"
+      ( l=list() "]" { p.addTerm(l); return p; }
+      | K=<VAR>  "]" { p.addTerm(new Term(K.image)); return p; } )
+    )
+  | "]" { p.setFunctor(D.EmptyList); return p; } )
+}
