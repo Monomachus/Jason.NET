@@ -32,12 +32,12 @@ public class BeliefBaseTest extends TestCase {
 		assertFalse(bb.add(l3));
 
 		l3 = new Literal(true, new Pred("pos"));
-		l3.addAnnot(new Term("source(ag1)"));
+		l3.addSource("ag1");
 		assertTrue(bb.add(l3));
 
 		// same as above, must not insert
 		l3 = new Literal(true, new Pred("pos"));
-		l3.addAnnot(new Term("source(ag1)"));
+		l3.addSource("ag1");
 		assertFalse(bb.add(l3));
 		
 		l4 = new Literal(true, new Pred("pos"));
@@ -64,6 +64,7 @@ public class BeliefBaseTest extends TestCase {
 		
 		System.out.println("BB="+bb);
 		System.out.println("Percepts="+bb.getPercepts());
+		assertEquals(bb.getPercepts().size(), 3);
 		
 		Literal lRel1 = new Literal(true, new Pred("pos"));
 		System.out.println("Rel "+lRel1.getFunctorArity()+"="+bb.getRelevant(lRel1));
@@ -72,6 +73,7 @@ public class BeliefBaseTest extends TestCase {
 		lRel2.addTerm(new Term("X"));
 		lRel2.addTerm(new Term("Y"));
 		System.out.println("Rel "+lRel2.getFunctorArity()+"="+bb.getRelevant(lRel2));
+
 		
 		// remove
 		l5 = new Literal(true, new Pred("garb"));
@@ -85,7 +87,12 @@ public class BeliefBaseTest extends TestCase {
 		l4.addAnnot(D.TPercept);
 		assertTrue(bb.remove(l4));
 		assertEquals(bb.getRelevant(l4).size(), 1);
-		
+
+		System.out.println("remove grab(r1), pos(5,6)");
+		System.out.println("BB="+bb);
+		System.out.println("Percepts="+bb.getPercepts());
+		assertEquals(bb.getPercepts().size(), 2);
+	
 		l4 = new Literal(true, new Pred("pos"));
 		l4.addTerm(new Term("1"));
 		l4.addTerm(new Term("2"));
@@ -93,7 +100,7 @@ public class BeliefBaseTest extends TestCase {
 		assertTrue(bb.remove(l4));
 		assertEquals(bb.getRelevant(l4), null);
 
-		System.out.println("remove grab(r1), pos(5,6), pos(1,2)");
+		System.out.println("remove pos(1,2)");
 		System.out.println("BB="+bb);
 		System.out.println("Percepts="+bb.getPercepts());
 		
@@ -105,7 +112,7 @@ public class BeliefBaseTest extends TestCase {
 
 		l2.addAnnot(new Term("b"));
 		l2.addAnnot(D.TPercept);
-		l2.addAnnot(new Term("source(ag1)"));
+		l2.addSource("ag1");
 		bb.remove(l2);
 		
 		System.out.println("remove "+l2);

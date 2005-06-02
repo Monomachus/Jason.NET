@@ -58,7 +58,7 @@ class RunMAS extends AbstractAction {
 	MASConsole masConsole;
 
 	RunMAS(JasonID jID) {
-		super("Run MAS...", new ImageIcon(JasonID.jasonHome+"/bin/resources/images/execute.gif"));
+		super("Run MAS...", new ImageIcon(JasonID.class.getResource("/images/execute.gif")));
 		jasonID = jID;
 		javaHomeJavac = JasonID.javaHome + File.separator + "bin"
 				+ File.separator + "javac";
@@ -69,6 +69,8 @@ class RunMAS extends AbstractAction {
 	public void actionPerformed(ActionEvent e) {
 		try {
 			jasonID.output.setText("");
+			jasonID.saveAllAct.actionPerformed(null);
+			
 			boolean ok = jasonID.fMAS2jThread.foregroundCompile();
 			if (ok) {
 				jasonID.openAllASFiles(jasonID.fMAS2jThread.fParserMAS2J.getAgASFiles().values());

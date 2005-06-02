@@ -23,7 +23,6 @@
 
 package jason.asSemantics;
 
-import jason.D;
 import jason.asSyntax.Plan;
 
 import java.io.Serializable;

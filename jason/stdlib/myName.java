@@ -20,33 +20,37 @@
 // http://www.inf.furb.br/~jomi
 //----------------------------------------------------------------------------
 
-
 package jason.stdlib;
 
 import jason.JasonException;
+import jason.asSemantics.InternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.Term;
 
-public class myName {
-    
-    public static boolean execute(TransitionSystem ts, Unifier un, String[] args) throws Exception {
-        Term name  = null;
-        
-        try {
-            name  = Term.parse(args[0]);
-            if (name == null) {
-                throw new JasonException("The parameter Name of internal action 'myName' is not a term!");            	
-            }
-            if (! name.isVar()) {
-                throw new JasonException("The parameter Name of internal action 'myName' is not a variable!");            	
-            }
+public class myName implements InternalAction {
 
-        } catch (ArrayIndexOutOfBoundsException e) {
-            throw new JasonException("The internal action 'myName' has not received one argument");
-        } 
-        un.unifies(name,new Term(ts.getAgArch().getName()));
-        return true;
-    }
-    
+	public boolean execute(TransitionSystem ts, Unifier un, Term[] args)
+			throws Exception {
+		
+		Term name = null;
+		try {
+			name = args[0];
+			if (name == null) {
+				throw new JasonException(
+						"The parameter Name of internal action 'myName' is not a term!");
+			}
+			if (!name.isVar()) {
+				throw new JasonException(
+						"The parameter Name of internal action 'myName' is not a variable!");
+			}
+
+		} catch (ArrayIndexOutOfBoundsException e) {
+			throw new JasonException(
+					"The internal action 'myName' has not received one argument");
+		}
+		un.unifies(name, new Term(ts.getAgArch().getName()));
+		return true;
+	}
+
 }

@@ -34,11 +34,6 @@ import saci.MessageHandler;
 
 public class SaciEnvironment extends saci.Agent implements EnvironmentInterface {
 
-	/**
-	 *  
-	 * @uml.property name="userEnv"
-	 * @uml.associationEnd inverse="saciEnvironment:jason.environment.Environment" multiplicity="(0 1)"
-	 */
 	private Environment userEnv;
 
     
@@ -98,16 +93,18 @@ public class SaciEnvironment extends saci.Agent implements EnvironmentInterface 
             mbox.addMessageHandler("getPercepts", "ask-all", null, "AS-Perception", new MessageHandler() {
                 public boolean processMessage(saci.Message m) {
                     try {
-                        saci.Message r = new saci.Message("(tell)");
-                        r.put("receiver", m.get("sender"));
-                        r.put("in-reply-to", m.get("reply-with"));
-                        r.put("ontology", m.get("ontology"));
+						saci.Message r = new saci.Message("(tell)");
+						r.put("receiver", m.get("sender"));
+						r.put("in-reply-to", m.get("reply-with"));
+						r.put("ontology", m.get("ontology"));
                         
-                        List percepts = userEnv.getPercepts(m.get("sender").toString()); 
-                        synchronized(percepts) {
-                            r.put("content", percepts.toString());
-                        }
-                        mbox.sendMsg(r);
+						List percepts = userEnv.getPercepts(m.get("sender").toString());
+						if (percepts != null) { 
+							synchronized(percepts) {
+								r.put("content", percepts.toString());
+							}
+						}
+						mbox.sendMsg(r);
                         
                     } catch (Exception e) {
                         System.err.println("Error sending message\n");
@@ -117,6 +114,7 @@ public class SaciEnvironment extends saci.Agent implements EnvironmentInterface 
                 }
             });
             
+			/*
             // add a message handler to answer perception asks
             // this handler filter is
             //  . content: getNegativePercepts
@@ -144,7 +142,8 @@ public class SaciEnvironment extends saci.Agent implements EnvironmentInterface 
                     return true; // no other message handler gives this message
                 }
             });
-            
+            */
+			
             // add a message handler to answer action asks
             // this handler filter is
             //  . content: execute

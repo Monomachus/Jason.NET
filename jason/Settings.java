@@ -24,6 +24,7 @@
 package jason;
 
 import jIDE.parser.mas2j;
+
 import java.io.StringReader;
 import java.util.Map;
 

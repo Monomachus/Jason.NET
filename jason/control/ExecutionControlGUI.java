@@ -159,7 +159,8 @@ public class ExecutionControlGUI extends ExecutionControl {
 		}
 		if (agTransformer == null) {
 			try {
-				agTransformer = TransformerFactory.newInstance().newTransformer(new StreamSource(jasonDir+"/bin/xml/agInspection.xsl"));
+				agTransformer = TransformerFactory.newInstance().newTransformer(
+						new StreamSource( ExecutionControlGUI.class.getResource("/xml/agInspection.xsl").openStream()));
 			} catch (Exception e) {
 				jTA.setText("Error initializing XML transformer");
 				e.printStackTrace();
@@ -171,7 +172,8 @@ public class ExecutionControlGUI extends ExecutionControl {
 
 		StringWriter so = new StringWriter();
 		try {
-			agTransformer.transform(new DOMSource(agState),	new StreamResult(so));
+			agTransformer.transform(new DOMSource(agState),
+					                new StreamResult(so));
 			jTA.setText(so.toString());
 		} catch (Exception e) {
 			jTA.setText("Error in XML transformation!" + e + "\n");

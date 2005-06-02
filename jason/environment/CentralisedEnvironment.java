@@ -25,9 +25,7 @@ package jason.environment;
 
 import jason.JasonException;
 import jason.architecture.CentralisedAgArch;
-import jason.asSyntax.Term;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -47,14 +45,7 @@ public class CentralisedEnvironment implements EnvironmentInterface {
     private Map mboxes;
     private Map agents;
     
-	/**
-	 *  
-	 * @uml.property name="userEnv"
-	 * @uml.associationEnd inverse="centralisedEnvironment:jason.environment.Environment" multiplicity="(0 1)"
-	 */
 	private Environment fUserEnv;
-
-
     
     public CentralisedEnvironment(String userEnvClassName) throws JasonException {
         mboxes      = Collections.synchronizedMap(new HashMap());
@@ -75,6 +66,7 @@ public class CentralisedEnvironment implements EnvironmentInterface {
     }
     
     /** make a copy of the percepts with synchronized access to the percepts list */
+	/*
     public List getSafePerceptsCopy(String agName) {
     	List userPercepts = fUserEnv.getPercepts(agName);
         synchronized (userPercepts) {
@@ -84,20 +76,23 @@ public class CentralisedEnvironment implements EnvironmentInterface {
         	while (i.hasNext()) {
         		l.add( ((Term)i.next()).clone());
         	}
-            return l;
+			return l;
         }
     	
     }
+    */
 
 
     /** make a copy of the neg percepts with synchronized access to the percepts list */
-    public List getSafeNegPerceptsCopy(String agName) {
+    /*
+     public List getSafeNegPerceptsCopy(String agName) {
     	List userNegPercepts = fUserEnv.getNegativePercepts(agName);
         synchronized (userNegPercepts) {
             // make a local copy of the environment percepts
             return new ArrayList(userNegPercepts);
         }
     }
+    */
 
 	/**
 	 * @see jason.environment.EnvironmentInterface#informAgsEnvironmentChanged()
@@ -148,7 +143,8 @@ public class CentralisedEnvironment implements EnvironmentInterface {
         return (List) mboxes.get(name);
     }
     
-    /** return the agents map, key is the agent name (String) and value 
+    /** 
+     * returns the agents map, key is the agent name (String) and value 
      * is the CentralisedAgArch agent object.
      */
     public Map getAgents() {

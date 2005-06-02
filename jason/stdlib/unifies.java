@@ -23,14 +23,13 @@
 
 package jason.stdlib;
 
+import jason.asSemantics.InternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.Term;
 
-public class unifies {
-    public static boolean execute(TransitionSystem ts, Unifier un, String[] args) throws Exception {
-        Term xp = Term.parse(args[0]);
-        Term yp = Term.parse(args[1]);
-        return un.unifies(xp, yp);
+public class unifies implements InternalAction {
+    public boolean execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
+        return un.unifies(args[0], args[1]);
     }
 }

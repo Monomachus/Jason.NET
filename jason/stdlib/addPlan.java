@@ -24,24 +24,33 @@
 package jason.stdlib;
 
 import jason.JasonException;
+import jason.asSemantics.InternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
-import jason.asSyntax.ParseList;
+import jason.asSyntax.ListTerm;
+import jason.asSyntax.StringTerm;
+import jason.asSyntax.Term;
 
 import java.util.Iterator;
 
-public class addPlan {
+public class addPlan implements InternalAction {
     
-    public static boolean execute(TransitionSystem ts, Unifier un, String[] args) throws Exception {
+	/**
+	 * args[0] = plan or list of plans
+	 * args[1] = source
+	 */
+    public boolean execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         try {
-        	if (args[0].startsWith("[")) { // if arg[0] is a list
-        		ParseList pl = new ParseList(args[0]);
-        		Iterator i = pl.getAsList().iterator();
+			Term source = args[1];
+        	if (args[0].isList()) { // if arg[0] is a list
+				ListTerm lt = (ListTerm)args[0];
+        		Iterator i = lt.iterator();
         		while (i.hasNext()) {
-            		ts.getAg().addPlan(i.next().toString(), args[1]);
+					lt = (ListTerm)i.next();
+            		ts.getAg().addPlan( (StringTerm)lt.getTerm(), source);
         		}
         	} else { // args[0] is a plan
-        		ts.getAg().addPlan(args[0], args[1]);
+        		ts.getAg().addPlan((StringTerm)args[0], source);
         	}
             return true;
         } catch (ArrayIndexOutOfBoundsException e) {

@@ -20,27 +20,27 @@
 // http://www.inf.furb.br/~jomi
 //----------------------------------------------------------------------------
 
-
 package jason.stdlib;
 
+import jason.asSemantics.InternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.Term;
 
-public class plus { 
+public class plus implements InternalAction {
 
-    public static  boolean execute(TransitionSystem ts, Unifier un, String[] args) throws Exception
-    {
-        Term xp = Term.parse(args[0]);
-        Term yp = Term.parse(args[1]);
-        Term rp = Term.parse(args[2]);
-        un.apply(xp);
-        un.apply(yp);
-        Integer x = new Integer(xp.toString());
-        Integer y = new Integer(yp.toString());
-        Integer r = new Integer(x.intValue()+y.intValue());
-        Term rsp  = Term.parse(r.toString());
-        un.unifies(rp,rsp);
-        return(true);
-    }
+	public boolean execute(TransitionSystem ts, Unifier un, Term[] args)
+			throws Exception {
+		
+		Term xp = (Term) args[0].clone();
+		Term yp = (Term) args[1].clone();
+		Term rp = (Term) args[2].clone();
+		un.apply(xp);
+		un.apply(yp);
+		int x = Integer.parseInt(xp.toString());
+		int y = Integer.parseInt(yp.toString());
+		int r = x + y;
+		Term rsp = new Term(r+"");
+		return un.unifies(rp, rsp);
+	}
 }

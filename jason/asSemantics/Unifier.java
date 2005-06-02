@@ -31,6 +31,7 @@ import jason.asSyntax.Trigger;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -48,20 +49,18 @@ public class Unifier implements Cloneable {
             }
             return;
         }
-        if (t.getTerms() != null) {
-        	for (int i = 0; i < t.getTerms().size(); i++) {
-        		apply((Term) t.getTerms().get(i));
-        	}
-        }
+    	for (int i = 0; i < t.getTermsSize(); i++) {
+    		apply(t.getTerm(i));
+    	}
     }
 
     public void apply(Pred p) {
-    	apply((Term)p);
-        if (p.getAnnots() != null) {
-        	for (int i = 0; i < p.getAnnots().size(); i++) {
-        		apply((Term) p.getAnnots().get(i));
-        	}
-        }
+    	apply((Term) p);
+		if (p.getAnnots() != null) {
+			for (int i = 0; i < p.getAnnots().size(); i++) {
+				apply((Term) p.getAnnots().get(i));
+			}
+		}
     }
 
     public Term get(String var) {
@@ -86,12 +85,14 @@ public class Unifier implements Cloneable {
     }
     
     public boolean unifies(Term t1, Term t2) {
-        Term t1g, t2g;
-        t1g = (Term) t1.clone();
+        Term t1g = (Term)t1.clone();
         apply(t1g);
-        t2g = (Term) t2.clone();
+        Term t2g = (Term)t2.clone();
         apply(t2g);
         
+		List t1gl = t1g.getTerms();
+		List t2gl = t2g.getTerms();
+		
         // identical variables or constants
         if (t1g.equals(t2g)) {
             return true;
@@ -100,16 +101,18 @@ public class Unifier implements Cloneable {
         // if two atoms or structures
         else if (!t1g.isVar() && !t2g.isVar()) {
             // different funcSymb in atoms or structures
-            if (!t1g.getFunctor().equals(t2g.getFunctor())) {
+            if (t1g.getFunctor() != null && !t1g.getFunctor().equals(t2g.getFunctor())) {
                 return false;
             }
-            // different arities
-            else if ( (t1.getTerms()!=null && t2.getTerms()!=null &&
-                       t1.getTerms().size() != t2.getTerms().size()) ||
-                      (t1.getTerms()==null && t2.getTerms()!=null)   ||
-                      (t1.getTerms()!=null && t2.getTerms()==null) ) {
+            
+			// different arities
+            if ( (t1gl==null && t2gl!=null)   ||
+                 (t1gl!=null && t2gl==null) ) {
                 return false;
             }
+			if (t1g.getTermsSize() != t2g.getTermsSize()) {
+				return false;
+			}
         }
         
         // t1 is var that doesn't occur in t2
@@ -122,40 +125,36 @@ public class Unifier implements Cloneable {
             function.put(t2g.getFunctor(), t1g);
             return true;
         }
+		
         // both are structures, same funcSymb, same arity
         else {
-            if (t1g.getTerms() == null && t2g.getTerms() == null) {
-                return true;
-            } else if (t1g.getTerms() == null || t2g.getTerms() == null) {
-                return false;
-            } else {
-            	for (int i=0; i < t1g.getTerms().size(); i++) {
-                    if (!unifies((Term)t1g.getTerms().get(i),(Term)t2g.getTerms().get(i)))
-                        return false;
-                }
-                return true;
-            }
+			if (!t1g.isList() && !t2g.isList()) { // lists have always terms == null
+	            if (t1gl == null &&  t2gl == null) {
+	                return true;
+	            }
+			} 
+						    
+			for (int i=0; i < t1g.getTermsSize(); i++) {
+                if (!unifies(t1g.getTerm(i),t2g.getTerm(i)))
+                    return false;
+			}
+			return true;
+            
         }
     }
     
-    public boolean unifies(Pred p1, Pred p2) {
-        if (!unifies((Term)p1, (Term)p2))
-            return false;
+   	public boolean unifies(Pred p1, Pred p2) {
         // unification with annotation:
         // terms unify and annotations are subset
-        return p1.hasSubsetAnnot(p2, this);        
+        return unifies((Term)p1, (Term)p2) && p1.hasSubsetAnnot(p2, this);        
     }
     
     public boolean unifies(Literal l1, Literal l2) {
-        if (l1.negated()!=l2.negated())
-            return false;
-        return unifies((Pred)l1,(Pred)l2);
+        return l1.negated()==l2.negated() && unifies((Pred)l1,(Pred)l2);
     }
     
     public boolean unifies(DefaultLiteral d1, DefaultLiteral d2) {
-        if (d1.isDefaultNegated()!=d2.isDefaultNegated())
-            return false;
-        return unifies((Literal)d1,(Literal)d2);
+        return d1.isDefaultNegated()==d2.isDefaultNegated() && unifies((Literal)d1,(Literal)d2);
     }
     
     public boolean unifies(Trigger te1, Trigger te2) {

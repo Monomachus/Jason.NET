@@ -32,9 +32,6 @@ public final class D {
     public static final Intention EmptyInt   = null;
     public static final String    SEmptyInt  = "TRUE";
 
-    public static final String    ListCons   = "__jason_List_Cons";
-    public static final String    EmptyList  = "__jason_Empty_List";
-
     public static final byte      TEBel      = 0;
     public static final byte      TEAchvG    = 1;
     public static final byte      TETestG    = 2;
@@ -47,7 +44,6 @@ public final class D {
     public static final boolean   LDefNeg    = false;
 
     public static final Literal   LTrue      = new Literal(LPos, new Pred("true"));
-
 
     public static final byte      HAction    = 0;
     public static final byte      HAchieve   = 1;

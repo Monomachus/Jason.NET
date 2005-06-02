@@ -24,10 +24,10 @@ public class SaciExecutionControl extends saci.Agent implements ExecutionControl
     public void initAg(String[] args) throws JasonException {
         // create the user controller
         try {
-        	System.out.println("Creating controller from "+args[1]+" asHome is "+args[0]);
-        	fUserControl = (ExecutionControl)Class.forName(args[1]).newInstance();
+        	System.out.println("Creating controller from "+args[0]);//+" Jason Home is "+args[0]);
+        	fUserControl = (ExecutionControl)Class.forName(args[0]).newInstance();
         	fUserControl.setJasonExecutionControl(this);
-        	fUserControl.setJasonDir(args[0]);
+        	//fUserControl.setJasonDir(args[0]);
         	fUserControl.init();
         } catch (Exception e) {
             System.err.println("Error "+e);
@@ -51,7 +51,12 @@ public class SaciExecutionControl extends saci.Agent implements ExecutionControl
         }
     }
     
-    public void run() {
+    public void stopAg() {
+		super.stopAg();
+		fUserControl.stop();
+	}
+
+	public void run() {
     	try {
     		Thread.sleep(1000); // gives a time to agents enter in wait
     	} catch (Exception e) {}

@@ -17,12 +17,12 @@ public class CentralisedExecutionControl implements ExecutionControlInterface {
 	private CentralisedEnvironment    fEnv;
 	private ExecutionControl          fUserControl;
 	
-	public CentralisedExecutionControl(CentralisedEnvironment env, String userControlClass, String jasonDir) throws JasonException {
+	public CentralisedExecutionControl(CentralisedEnvironment env, String userControlClass) throws JasonException {
 		fEnv = env;
         try {
         	fUserControl = (ExecutionControl)Class.forName(userControlClass).newInstance();
         	fUserControl.setJasonExecutionControl(this);
-        	fUserControl.setJasonDir(jasonDir);
+        	//fUserControl.setJasonDir(jasonDir);
         	fUserControl.init();
         } catch (Exception e) {
             System.err.println("Error "+e);
@@ -30,6 +30,15 @@ public class CentralisedExecutionControl implements ExecutionControlInterface {
             throw new JasonException("The user execution control class instantiation '"+userControlClass+"' has failed!"+e.getMessage());
         }
 	}
+	
+	/**
+	 * This method is called when MAS execution is being finished
+	 */
+	public void stop() {
+		fUserControl.stop();
+	}
+
+
 	
 	public ExecutionControl getUserControl() {
 		return fUserControl;

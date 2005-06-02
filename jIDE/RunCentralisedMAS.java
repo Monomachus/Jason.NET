@@ -49,6 +49,9 @@ public class RunCentralisedMAS {
     
     CentralisedEnvironment env = null;
     CentralisedExecutionControl control = null;
+    List ags = new ArrayList();
+
+	
     public static void main(String[] args) {
         if (args.length != 1) {
             System.err.println("You must inform only the MAS XML script.");
@@ -58,8 +61,8 @@ public class RunCentralisedMAS {
         Document docDOM = parse(args[0]);
         if (docDOM != null) {
 			RunCentralisedMAS r = new RunCentralisedMAS();
-			List lags = r.createAg(docDOM);
-            r.startAgs(lags);
+			r.createAg(docDOM);
+			r.startAgs();
 			
 			r.startSyncMode();   
 			r.waitEnd();
@@ -84,8 +87,7 @@ public class RunCentralisedMAS {
         }
     }
 
-	List createAg(Document docDOM) {
-	    List ags = new ArrayList();
+	void createAg(Document docDOM) {
         
         // create the agentes
         NodeList listAg = docDOM.getElementsByTagName("startAgent");
@@ -99,7 +101,7 @@ public class RunCentralisedMAS {
                     env = new CentralisedEnvironment(sAg.getAttribute("class"));
                 } else if (agName.equals("controller")) {
                 	System.out.println("Creating controller "+sAg.getAttribute("class"));
-                	control = new CentralisedExecutionControl(env, sAg.getAttribute("class"), sAg.getAttribute("args"));
+                	control = new CentralisedExecutionControl(env, sAg.getAttribute("class"));
                 } else {
                     // it is an agent
                     int qty = 1;
@@ -129,10 +131,9 @@ public class RunCentralisedMAS {
                 System.exit(0);
             }
         } // for
-		return ags;
 	}
 
-	void startAgs(List ags) {
+	void startAgs() {
         // run the agents
         Iterator i = ags.iterator();
         while (i.hasNext()) {
@@ -142,6 +143,15 @@ public class RunCentralisedMAS {
         }
 	}
 	
+	void stopAgs() {
+        // run the agents
+        Iterator i = ags.iterator();
+        while (i.hasNext()) {
+            CentralisedAgArch ag = (CentralisedAgArch)i.next();
+            ag.stopAg();
+        }
+	}
+
 	void startSyncMode() {
         if (control != null) {
             // start the execution, if it is controlled
@@ -161,6 +171,13 @@ public class RunCentralisedMAS {
 			while (! line.equals("quit")) {
 				line = in.readLine();
 			}
+			
+			stopAgs();
+			
+			if (control != null) {
+				control.stop();
+			}
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

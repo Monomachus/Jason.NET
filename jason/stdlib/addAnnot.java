@@ -20,49 +20,49 @@
 // http://www.inf.furb.br/~jomi
 //----------------------------------------------------------------------------
 
-
 package jason.stdlib;
 
 import jason.JasonException;
+import jason.asSemantics.InternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
-import jason.asSyntax.Literal;
 import jason.asSyntax.Pred;
 import jason.asSyntax.Term;
 
-public class addAnnot {
-    
-    public static boolean execute(TransitionSystem ts, Unifier un, String[] args) throws Exception {
-        try {
-            Term bel  = Literal.parse(args[0]);
-            if (bel == null) {
-                throw new JasonException("The first parameter of internal action 'addAnnot' is not a term!");            	
-            }
-            if (bel.isVar()) {
-            	un.apply(bel);
-            }
-        	if (args[0].startsWith("[")) {
-        		// TODO: add annot on all list members that are predicate!!!!
-        		return true;
-        	} else {
-        		try {
-        			// in case it is a predicate, add annot
-        			Pred p = (Pred)bel;
-                    p.addAnnot(Term.parse(args[1]));
-        		} catch (Exception e) {
-        			// no problem, the content is not a pred (is a number, string, ....) received in a message, for instance
-        		}
-        	}
-            Literal result = Literal.parseLiteral(args[2]);
-            if (result == null || !result.isVar()) {
-                throw new JasonException("The third parameter of internal action 'addAnnot' is not a variable!");            	
-            }
-            un.unifies(bel, result);
-            //System.out.println("result = "+result+"/"+un);
-        } catch (ArrayIndexOutOfBoundsException e) {
-            throw new JasonException("The internal action 'myName' has not received one argument");
-        } 
-        return true;
-    }
-    
+public class addAnnot implements InternalAction {
+
+	public boolean execute(TransitionSystem ts, Unifier un, Term[] args)
+			throws Exception {
+		try {
+			Term bel = (Term) args[0].clone();
+			if (bel.isVar()) {
+				un.apply(bel);
+			}
+			if (args[0].isList()) {
+				// TODO: add annot on all list members that are predicate!!!!
+				return true;
+			} else {
+				try {
+					// in case it is a predicate, add annot
+					Pred p = (Pred) bel;
+					p.addAnnot((Term) args[1].clone());
+				} catch (Exception e) {
+					// no problem, the content is not a pred (is a number,
+					// string, ....) received in a message, for instance
+				}
+			}
+			Term result = args[2]; // Literal.parseLiteral(args[2]);
+			if (result == null || !result.isVar()) {
+				throw new JasonException(
+						"The third parameter of internal action 'addAnnot' is not a variable!");
+			}
+			un.unifies(bel, result);
+			// System.out.println("result = "+result+"/"+un);
+		} catch (ArrayIndexOutOfBoundsException e) {
+			throw new JasonException(
+					"The internal action 'myName' has not received one argument");
+		}
+		return true;
+	}
+
 }

@@ -23,26 +23,28 @@
 package jason.stdlib;
 
 import jason.JasonException;
+import jason.asSemantics.InternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.Term;
 
-public class print {
+public class print implements InternalAction {
 
-	public static boolean execute(TransitionSystem ts, Unifier un, String[] args)
+	public boolean execute(TransitionSystem ts, Unifier un, Term[] args)
 			throws Exception {
 		if (args.length == 0) {
-			throw new JasonException("ASJI: print without parameters!");
+			throw new JasonException(".print without parameters!");
 		}
 
 		System.out.print("Agent " + ts.getAgArch().getName() + " is saying: ");
 		for (int i = 0; i < args.length; i++) {
-			if (args[i].charAt(0) != '\"') {
-				Term t = Term.parse(args[i]);
-				un.apply(t);
-				System.out.print(t.toString());
-			} else
+			if (args[i].isString()) {
 				System.out.print(args[i]);
+			} else {
+				Term t = (Term)args[i].clone();
+				un.apply(t);
+				System.out.print(t);
+			}
 		}
 		System.out.println();
 

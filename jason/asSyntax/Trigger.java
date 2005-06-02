@@ -22,10 +22,10 @@
 
 package jason.asSyntax;
 
-import java.io.StringReader;
-
 import jason.D;
 import jason.asSyntax.parser.as2j;
+
+import java.io.StringReader;
 
 public class Trigger extends Literal implements Cloneable {
 

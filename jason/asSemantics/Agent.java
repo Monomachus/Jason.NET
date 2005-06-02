@@ -22,15 +22,16 @@
 
 package jason.asSemantics;
 
+import jIDE.JasonID;
 import jason.D;
 import jason.JasonException;
 import jason.Settings;
 import jason.architecture.AgentArchitecture;
 import jason.asSyntax.BeliefBase;
 import jason.asSyntax.Literal;
-import jason.asSyntax.ParseList;
 import jason.asSyntax.Plan;
 import jason.asSyntax.PlanLibrary;
+import jason.asSyntax.StringTerm;
 import jason.asSyntax.Term;
 import jason.asSyntax.Trigger;
 import jason.asSyntax.parser.ParseException;
@@ -38,7 +39,9 @@ import jason.asSyntax.parser.as2j;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.util.Iterator;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -49,53 +52,33 @@ import org.w3c.dom.Element;
 
 public class Agent {
 
-	/**
-	 * 
-	 * @uml.property name="bs"
-	 * @uml.associationEnd multiplicity="(0 1)"
-	 */
 	// Members
 	protected BeliefBase bs = new BeliefBase();
-
-	/**
-	 * 
-	 * @uml.property name="ps"
-	 * @uml.associationEnd multiplicity="(0 1)"
-	 */
 	protected PlanLibrary ps = new PlanLibrary();
 
-	/**
-	 * 
-	 * @uml.property name="ts"
-	 * @uml.associationEnd multiplicity="(0 1)"
-	 */
 	protected TransitionSystem ts = null;
 
 	/**
 	 * args[0] is the user Agent class (ignored here)
 	 * args[1] is the AgentSpeak source file
-	 * args[2] is the Jason directory
 	 */
     public TransitionSystem initAg(String[] args, AgentArchitecture arch) throws JasonException {
         // set the agent
         try {
             String asSource = null;
-            String jasonHome = null;
-            if (args.length < 3) { // error
-                throw new JasonException("The AS source file and the jason dir were not informed for the Agent creation!");
+            if (args.length < 2) { // error
+                throw new JasonException("The AS source file was not informed for the Agent creation!");
             } else {
                 asSource = args[1].trim();
-                jasonHome = args[2].trim();
             }
             parseAS(asSource);
             // kqml Plans at the end of the ag PS
-            parseAS(jasonHome+"/bin/resources/kqmlPlans.asl");
-            
+			parseAS(JasonID.class.getResource("/asl/kqmlPlans.asl"));            
             Circumstance C = new Circumstance();
             Settings setts = new Settings();
-            if (args.length > 3) {
-                if (args[3].equals("options")) {
-                    setts.setOptions("["+args[4]+"]");
+            if (args.length > 2) {
+                if (args[2].equals("options")) {
+                    setts.setOptions("["+args[3]+"]");
                 }
             }
             setTS(new TransitionSystem(this,C,setts,arch));
@@ -105,27 +88,36 @@ public class Agent {
         }
     }
 	
-	
-	public void parseAS(String asFileName) {
-		as2j parser;
+
+	public void parseAS(URL asURL) {
 		try {
-			parser = new as2j(new FileInputStream(asFileName));
+			parseAS(asURL.openStream());
+			//System.out.println("as2j: AgentSpeak program '"+asURL+"' parsed successfully!");
+		} catch (IOException e) {
+			System.err.println("as2j: the AS source file was not found\n" + e);
+		} catch (ParseException e) {
+			System.err.println("as2j: error parsing \"" + asURL + "\"\n" + e);
+		}
+	}
+	public void parseAS(String asFileName) {
+		try {
+			parseAS(new FileInputStream(asFileName));
+			//System.out.println("as2j: AgentSpeak program '"+asFileName+"' parsed successfully!");
 		} catch (FileNotFoundException e) {
 			System.err.println("as2j: the AS source file was not found\n" + e);
-			return;
-		}
-
-		try {
-			parser.ag(this);
-			System.out.println("as2j: AgentSpeak program '"+asFileName+"' parsed successfully!");
 		} catch (ParseException e) {
 			System.err.println("as2j: error parsing \"" + asFileName + "\"\n" + e);
 		}
 	}
+	void parseAS(InputStream asIn) throws ParseException {
+		as2j parser = new as2j(asIn);
+		parser.ag(this);
+	}
 
-	// Follows the default implementation for the agent's
-	// message acceptance relation and selection functions
-
+	
+	/** Follows the default implementation for the agent's
+	 *  message acceptance relation and selection functions
+	 */
 	public boolean socAcc(Message m) {
 		return true;
 	}
@@ -228,6 +220,7 @@ public class Agent {
 	}
 	
 	
+	/*
 	public boolean addBel(String sl, String sSource, Circumstance c) {
 		return addBel(Literal.parseLiteral(sl), Term.parse("source("+sSource+")"), c, D.EmptyInt);
 	}
@@ -239,14 +232,15 @@ public class Agent {
 	public boolean addBel(Literal l, Term source, Circumstance c) {
 		return addBel(l, source, c, D.EmptyInt);
 	}
+	*/
 
+	/** the Literal will be cloned before added in the BB */
 	public boolean addBel(Literal l, Term source, Circumstance c, Intention focus) {
 		if (source != null && !source.isGround()) {
 			System.err.println("Error: Annotations must be ground!\n Cannot use "+source+" as annotation.");
 		} else {
+			l = (Literal)l.clone();
 			if (source != null) {
-				//l.clearAnnot(); TODO: think better about annots
-				//l.addAnnot(0,source);
 				l.addAnnot(source);
 			}
 			if (bs.add(l)) {
@@ -254,9 +248,11 @@ public class Agent {
 				updateEvents(new Event(new Trigger(D.TEAdd, D.TEBel, l), focus), c);
 				return true;
 			}
+			return false;
 		}
 		return false;
 	}
+
 	
 	public boolean delBel(String sl, String sSource, Circumstance c) {
 		return delBel(Literal.parseLiteral(sl), Term.parse("source("+sSource+")"), c);
@@ -276,6 +272,7 @@ public class Agent {
 			}
 			//System.out.println("removing "+l);
 			if (bs.remove(l)) {
+				//System.out.println("removed "+l);
 				updateEvents(new Event(new Trigger(D.TEDel, D.TEBel, l), focus), c);
 				return true;
 			}
@@ -290,12 +287,10 @@ public class Agent {
 	}
 
 	// IMPORTANT: this is not making sure the label of the new plan is unique!!!
-	// TODO: use pl contains (to have only a MAP in pl)
-	public void addPlan(String sPlan, String sSource) {
+	// TODO: use pl contains (to have only a MAP in plan library)
+	public void addPlan(StringTerm stPlan, Term tSource) {
+		String sPlan = stPlan.getString();
 		try {
-			if (sPlan.startsWith("\"")) {
-				sPlan = sPlan.substring(1, sPlan.length()-1);
-			}
 			// remove \" -> "
 			StringBuffer sTemp = new StringBuffer();
 			for (int c=0; c <sPlan.length(); c++) {
@@ -314,8 +309,11 @@ public class Agent {
 			if (p.getLabel() == null) {
 				p.setLabel("alabel");
 			}
-			p.getLabel().addAnnot(Term.parse("source("+sSource+")"));
-
+			//p.getLabel().addAnnot(Term.parse("source("+sSource+")"));
+			if (tSource != null) {
+				p.getLabel().addSource(tSource);
+			}
+			
 			//System.out.println("**** adding plan "+p+" from "+sSource);		
 
 			/*
@@ -349,16 +347,22 @@ public class Agent {
 		}
 	}
 
-	// TODO: fix the sources, it is not a list but many source(...)
-	public void removePlan(String sPlan, String sSource) {
-		if (sPlan.startsWith("\"")) {
-			sPlan = sPlan.substring(1, sPlan.length()-1);
-		}
-		Plan p = Plan.parse(sPlan);
-		Term tSource = new Term(sSource);
+	/** 
+	 * remove a plan represented by the string sPlan 
+	 * that comes from source (normally the agent name)
+	 */
+	public void removePlan(StringTerm sPlan, Term source) {
+		Plan p = Plan.parse(sPlan.getFunctor());
 		int i = ps.indexOf(p);
 		if (i >= 0) {
 			p = (Plan)ps.get(i);
+			boolean hasSource = p.getLabel().delSource(source);
+			
+			// if no source anymore, remove the plan
+			if (hasSource && ! p.getLabel().hasSource()) {
+				ps.remove(i);
+			}
+			/*
 			Iterator l = p.getLabel().getAnnots().iterator();
 			Term tPlanSources = null;
 			Term sourcesList = null;
@@ -382,6 +386,7 @@ public class Agent {
 					}
 				}
 			}
+			*/
 		}
 	}
 

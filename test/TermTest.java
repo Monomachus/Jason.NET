@@ -163,7 +163,7 @@ public class TermTest extends TestCase {
 	
 	public void testTriggetAnnot() {
 		Literal content = Literal.parseLiteral("~alliance");
-		content.addAnnot(Term.parse("source(ag1)"));
+		content.addSource("ag1");
 		Literal received = new Literal(D.LPos, new Pred("received"));
 		received.addTerm(new Term("ag1"));
 		received.addTerm(new Term("tell"));
@@ -193,7 +193,7 @@ public class TermTest extends TestCase {
 	
 	public void testLiteralUnify() {
 		Literal content = Literal.parseLiteral("~alliance");
-		content.addAnnot(Term.parse("source(ag1)"));
+		content.addSource("ag1");
 		Literal l1 = new Literal(D.LPos, new Pred("received"));
 		l1.addTerm(new Term("ag1"));
 		l1.addTerm(new Term("tell"));

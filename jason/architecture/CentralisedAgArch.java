@@ -30,7 +30,6 @@ import jason.asSemantics.Agent;
 import jason.asSemantics.Message;
 import jason.asSemantics.TransitionSystem;
 import jason.asSyntax.Literal;
-import jason.asSyntax.Pred;
 import jason.asSyntax.Term;
 import jason.control.CentralisedExecutionControl;
 import jason.environment.CentralisedEnvironment;
@@ -44,22 +43,11 @@ import java.util.List;
 public class CentralisedAgArch extends Thread implements AgentArchitecture {
     
     protected List percepts;     // the agent's percetions
-    protected List negPercepts;  // the agent's negative percetions
 
-	/**
-	 * 
-	 * @uml.property name="env"
-	 * @uml.associationEnd multiplicity="(0 1)"
-	 */
 	protected CentralisedEnvironment fEnv = null;
 	
 	private CentralisedExecutionControl fControl = null;
 
-	/**
-	 * 
-	 * @uml.property name="ts"
-	 * @uml.associationEnd multiplicity="(0 1)"
-	 */
 	protected TransitionSystem fTS = null;
 
     private boolean running = true;
@@ -90,10 +78,6 @@ public class CentralisedAgArch extends Thread implements AgentArchitecture {
     	return fTS;
     }
 
-	/**
-	 * 
-	 * @uml.property name="env"
-	 */
 	public void setEnv(CentralisedEnvironment env) {
 		fEnv = env;
 	}
@@ -128,15 +112,17 @@ public class CentralisedAgArch extends Thread implements AgentArchitecture {
     
     // Default perception assumes Complete and Accurate sensing.
     public void perceive() {
-    	percepts = fEnv.getSafePerceptsCopy(getName());
+    	percepts = fEnv.getUserEnvironment().getPercepts(getName());
         if (fTS.getSettings().verbose()>=5) {
             System.out.println("Agent "+getName() + " received percepts: "+percepts);
         }
         
+		/*
         negPercepts = fEnv.getSafeNegPerceptsCopy(fTS.getAgArch().getName());
         if (fTS.getSettings().verbose()>=5) {
             System.out.println("Agent "+getName() + " received negative percepts: "+negPercepts);
         }
+        */
     }
     
     // this is used by the .send internal action in stdlib
@@ -188,10 +174,10 @@ public class CentralisedAgArch extends Thread implements AgentArchitecture {
 
     // TODO: could it be place in Agent class? (this code is the same for cent/saci code)
     public void brf() {
-        if (! running) {
+        if (! running || percepts == null) {
             return;
         }
-
+		
         // deleting percepts in the BB that is not percepted anymore
         List perceptsInBB = fTS.getAg().getBS().getPercepts();
         for (int i=0; i<perceptsInBB.size(); i++) { 
@@ -212,15 +198,25 @@ public class CentralisedAgArch extends Thread implements AgentArchitecture {
         }
 
         // addBel only adds a belief when appropriate
-        // checking all percpets for new beliefs
+        // checking all percepts for new beliefs
         Iterator i = percepts.iterator();
         while (i.hasNext()) {
-            fTS.getAg().addBel(new Literal(D.LPos, new Pred((Term)i.next())),D.TPercept, fTS.getC());
+            //fTS.getAg().addBel(new Literal(D.LPos, new Pred((Term)i.next())),D.TPercept, fTS.getC());
+			Literal l = (Literal)i.next();
+			try {
+				fTS.getAg().addBel( l, D.TPercept, fTS.getC(), D.EmptyInt);
+			} catch (Exception e) {
+				System.err.println("Error adding percetion "+l+"\n");
+				e.printStackTrace();
+			}
         }
+
+		/*
         i = negPercepts.iterator();
         while (i.hasNext()) {
             fTS.getAg().addBel(new Literal(D.LNeg, new Pred((Term)i.next())),D.TPercept, fTS.getC());
         }
+        */
     }
     
     /*

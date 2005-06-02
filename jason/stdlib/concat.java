@@ -1,35 +1,36 @@
 package jason.stdlib;
 
-import jason.D;
+import jason.JasonException;
+import jason.asSemantics.InternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
+import jason.asSyntax.ListTerm;
 import jason.asSyntax.Term;
 
-public class concat { 
+public class concat implements InternalAction {
 
-    public static  boolean execute(TransitionSystem ts, Unifier un, String[] args) throws Exception  {
-        Term l1 = Term.parse(args[0]);
-		Term l2 = Term.parse(args[1]);
-		Term l3 = Term.parse(args[2]);
+	/**
+	 * Concat list args[0] with args[1] and unifies with args[2]
+	 */
+	public boolean execute(TransitionSystem ts, Unifier un, Term[] args)	throws Exception {
+		Term l1 = (Term)args[0].clone();
+		Term l2 = (Term)args[1].clone();
+		Term l3 = (Term)args[2].clone();
 		un.apply(l1);
 		un.apply(l2);
 		un.apply(l3);
-		if (!l1.isList())
-			return false;
-		if (!l2.isList())
-			return false;
-		if (!l3.isVar())
-			return false;
-
-		Term c1 = (Term) l1.clone();
-		Term c2 = (Term) l2.clone();
-		Term t = c1;
-		while (!t.getFunctor().equals(D.EmptyList)) {
-			t = (Term) t.getTerms().get(1);
+		if (!l1.isList()) {
+			throw new JasonException("arg[0] is not a list (concat)");
 		}
-		t.set(c2);
-		un.unifies(l3, c1);
-		return (true);
-    }
+		if (!l2.isList()) {
+			throw new JasonException("arg[1] is not a list (concat)");
+		}
+		if (!l3.isVar() && !l3.isList()) {
+			throw new JasonException("arg[2] is not a list or variable (concat)");
+		}
+		
+		ListTerm l1l = (ListTerm)l1;
+		l1l.concat((ListTerm)l2);
+		return un.unifies(l3, l1l);
+	}
 }
-

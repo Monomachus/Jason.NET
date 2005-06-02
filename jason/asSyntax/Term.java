@@ -22,7 +22,6 @@
 
 package jason.asSyntax;
 
-import jason.D;
 import jason.asSyntax.parser.as2j;
 
 import java.io.Serializable;
@@ -33,15 +32,8 @@ import java.util.List;
 
 public class Term implements Cloneable, Comparable, Serializable {
 
-	String funcSymb = null;
-
-
-	/**
-	 *  
-	 * @uml.property name="terms"
-	 * @uml.associationEnd aggregation="aggregate" inverse="term1:jason.asSyntax.Term" multiplicity="(0 -1)" ordering="ordered"
-	 */
-	List terms;
+	protected String funcSymb = null;
+	protected List terms;
 
 	public Term() {
 	}
@@ -57,7 +49,7 @@ public class Term implements Cloneable, Comparable, Serializable {
 	public static Term parse(String sTerm) {
 		as2j parser = new as2j(new StringReader(sTerm));
 		try {
-			return parser.t(); // TODO: parse.t() may returns a Pred!!!!
+			return parser.t(); // parse.t() may returns a Pred/List...
 		} catch (Exception e) {
 			System.err.println("Error parsing term " + sTerm);
 			e.printStackTrace();
@@ -108,11 +100,13 @@ public class Term implements Cloneable, Comparable, Serializable {
 		return getFunctorArity().hashCode();
 	}
 
+	/** returns the i-th term */
 	public Term getTerm(int i) {
-		if (i == 0)
-			return new Term(getFunctor());
-		else
-			return (Term)terms.get(i - 1);
+		if (terms != null && terms.size() > i) {
+			return (Term)terms.get(i);
+		} else {
+			return null;
+		}
 	}
 
 	public void addTerm(Term t) {
@@ -122,8 +116,30 @@ public class Term implements Cloneable, Comparable, Serializable {
 		functorArityBak = null;
 	}
 
+	public int getTermsSize() {
+		if (terms != null) {
+			return terms.size();
+		} else {
+			return 0;
+		}
+	}
 	public List getTerms() {
 		return terms;
+	}
+	
+	public Term[] getTermsArray() {
+		Term ts[] = null;
+		if (terms == null) {
+			ts = new Term[0];
+		} else {
+			ts = new Term[terms.size()];
+			int i = 0;
+			Iterator j = terms.iterator();
+			while (j.hasNext()) {
+				ts[i++] = (Term)j.next();
+			}
+		}
+		return ts;
 	}
 
 	public boolean isVar() {
@@ -135,7 +151,10 @@ public class Term implements Cloneable, Comparable, Serializable {
 	}
 
 	public boolean isList() {
-		return funcSymb.equals(D.EmptyList) || funcSymb.equals(D.ListCons);		
+		return false;
+	}
+	public boolean isString() {
+		return false;
 	}
 	
 	public boolean isGround() {
@@ -145,10 +164,11 @@ public class Term implements Cloneable, Comparable, Serializable {
 			return false;
 		if (terms == null) // atom
 			return true;
-		Iterator i = terms.iterator(); // structure
-		while (i.hasNext()) {
-			if (!((Term) i.next()).isGround())
+		
+		for (int i=0; i<getTermsSize(); i++) {
+			if (!getTerm(i).isGround()) {
 				return false;
+			}
 		}
 		return true;
 	}
@@ -156,11 +176,9 @@ public class Term implements Cloneable, Comparable, Serializable {
 	public boolean hasVar(Term t) {
 		if (this.equals(t))
 			return true;
-		if (terms != null) {
-			Iterator i = terms.iterator();
-			while (i.hasNext()) {
-				if (((Term) i.next()).hasVar(t))
-					return true;
+		for (int i=0; i<getTermsSize(); i++) {
+			if (getTerm(i).hasVar(t)) {
+				return true;
 			}
 		}
 		return false;
@@ -171,7 +189,10 @@ public class Term implements Cloneable, Comparable, Serializable {
 			return false;
 		try {
 			Term tAsTerm = (Term)t;
-			if (!funcSymb.equals(tAsTerm.funcSymb))
+			if (funcSymb == null && tAsTerm.funcSymb != null) {
+				return false;
+			}
+			if (funcSymb != null && !funcSymb.equals(tAsTerm.funcSymb))
 				return false;
 			if (terms == null && tAsTerm.terms == null)
 				return true;
@@ -179,8 +200,9 @@ public class Term implements Cloneable, Comparable, Serializable {
 				return false;
 			if (terms.size() != tAsTerm.terms.size())
 				return false;
-			for (int i=0; i < terms.size(); i++) {
-				if (!( (Term)terms.get(i) ).equals(tAsTerm.terms.get(i))) {
+
+			for (int i=0; i<getTermsSize(); i++) {
+				if (!getTerm(i).equals(tAsTerm.getTerm(i))) {
 					return false;
 				}
 			}
@@ -238,51 +260,17 @@ public class Term implements Cloneable, Comparable, Serializable {
 	}
 	
 	public String toString() {
-		String s;
-		if (isList())
-			s = "[" + listToString("",this) + "]";
-		else {
-			s = funcSymb;
-			if (terms == null)
-				return s;
-			s += "(";
+		StringBuffer s = new StringBuffer(funcSymb);
+		if (terms != null) {
+			s.append("(");
 			Iterator i = terms.iterator();
 			while (i.hasNext()) {
-				s += (Term) i.next();
+				s.append((Term) i.next());
 				if (i.hasNext())
-					s += ",";
+					s.append(",");
 			}
-			s += ")";
+			s.append(")");
 		}
-		return (s);
+		return s.toString();
 	}
-
-	public String listToString(String s, Term t) {
-		if (t == null) {
-			return "";
-		}
-		if (!t.isList() && !t.isVar()) {
-			System.err.println("Error: not a proper list!");
-			return "error";
-		}
-		if (t.funcSymb.equals(D.EmptyList)) {
-			return s;
-		}
-		if (t.isVar()) {
-			return s+t;
-		}
-		s += t.terms.get(0).toString();
-		Term u = null;
-		if (t.terms.size() > 0) {
-			u = (Term)t.terms.get(1);
-			if (u.funcSymb.equals(D.EmptyList))
-				return s;
-			if (!u.isVar())
-				s += ",";
-			else
-				s += "|";
-			}
-		return listToString(s, u);
-	}
-
 }

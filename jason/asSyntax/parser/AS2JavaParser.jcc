@@ -262,7 +262,7 @@ DefaultLiteral dl() : { Literal L;
 Term value() : { Token k; }
 {
      (   k  = <NUMBER> { return new Term(k.image); }
-       | k  = <STRING> { return new Term(k.image); }
+       | k  = <STRING> { return new StringTerm(k.image); }
      ) 
 }
 
@@ -364,12 +364,13 @@ Term t() : { Token K; Term u; }
   // alredy in at | K=<ATOM>     { return new Pred(K.image); }
   //| K=<VAR>      { return new Literal(D.LPos, new Pred(K.image)); } // it need to unify with ~a in communication
   | K=<NUMBER>   { return new Term(K.image); }
-  | K=<STRING>   { return new Term(K.image.replaceAll("\"", "\\\"")); } 
+  | K=<STRING>   { return new StringTerm(K.image.replaceAll("\"", "\\\"")); } 
   //| K=<TK_TRUE>  { return D.LTrue; } 
   | K=<TK_FALSE> { return new Term(K.image); } 
   )
 }
 
+/*
 Term list() : { Token K; Term f; Term p = new Term(); Term l; Term a; }
 {
   "["
@@ -381,4 +382,19 @@ Term list() : { Token K; Term f; Term p = new Term(); Term l; Term a; }
       | K=<VAR>  "]" { p.addTerm(new Term(K.image)); return p; } )
     )
   | "]" { p.setFunctor(D.EmptyList); return p; } )
+}
+*/
+
+ListTerm list() : { ListTerm lt; ListTerm last; Token K; Term f; }
+{
+  "["
+  f=t()               { lt = new ListTerm(f); last = lt; }
+  ( "," f=t()         { last = last.append(f); }
+  )*
+  [ "|"  ( K=<VAR>    { last.setTail(new Term(K.image)); }
+         | f=list()   { last.setTail(f); }
+         )            { return lt; } 
+  ]
+  "]"                 { last.append(new ListTerm()); // empty list 
+                        return lt; } 
 }

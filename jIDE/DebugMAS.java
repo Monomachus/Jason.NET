@@ -33,7 +33,7 @@ class DebugMAS extends AbstractAction {
 	JasonID jasonID;
 
 	DebugMAS(JasonID jID) {
-		super("Debug MAS...", new ImageIcon(JasonID.jasonHome+"/bin/resources/images/startDebugger.gif"));
+		super("Debug MAS...", new ImageIcon(JasonID.class.getResource("/images/startDebugger.gif")));
 		jasonID = jID; 
 	}
 

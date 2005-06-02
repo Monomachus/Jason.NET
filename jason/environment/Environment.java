@@ -23,17 +23,25 @@
 
 package jason.environment;
 
+import jason.D;
+import jason.asSyntax.Literal;
+import jason.asSyntax.Pred;
 import jason.asSyntax.Term;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * An abstract adapter class for Environment.
  * 
- * It is overriden by the user application to define the environment "behavior".
+ * It is overriden by the user application to define the environment "behaviour".
  * 
  * <p>An example of interaction:
  * <img src="../../../uml/environmentInteraction.gif" />
@@ -42,23 +50,22 @@ import java.util.List;
  * <img src="../../../uml/jason.environment.gif" />
  *  
  */
-public abstract class Environment { //implements EnvironmentInterface {
+public abstract class Environment { 
 
-	// TODO: why to list? Could it be just one list of literals (not preds anymore)?
-    private List percepts = Collections.synchronizedList(new ArrayList());
-    private List negPercepts = Collections.synchronizedList(new ArrayList());
+	private List percepts = Collections.synchronizedList(new ArrayList());
+	private Map  agPercepts = Collections.synchronizedMap(new HashMap());
+	
+	// TODO: remove in v 0.8
+	private List oldPercepts = Collections.synchronizedList(new ArrayList());
+    private List oldNegPercepts = Collections.synchronizedList(new ArrayList());
 
-	/**
-	 * 
-	 * @uml.property name="jasonEnvironment"
-	 * @uml.associationEnd multiplicity="(0 1)"
-	 */
 	private EnvironmentInterface jasonEnvironment = null;
 
+	// set of agents that already received the last version of perception
+	private Set uptodateAgs = Collections.synchronizedSet(new HashSet());
+	
 	/**
 	 * sets the jason part of the environment (saci or centralised)
-	 * 
-	 * @uml.property name="jasonEnvironment"
 	 */
 	protected void setJasonEnvironment(EnvironmentInterface je) {
 		jasonEnvironment = je;
@@ -86,38 +93,147 @@ public abstract class Environment { //implements EnvironmentInterface {
         }
     }
 
-	/**
-	 * Returns percepts list.
-	 * 
-	 * @uml.property name="percepts"
+	/** 
+	 * @deprecated use add/rem Percept to change the perceptions, this method will be
+	 * removed in the future a version
 	 */
 	public List getPercepts() {
-		return percepts;
+		return oldPercepts;
+	}
+	/** 
+	 * @deprecated use add/rem Percept to change the perceptions, this method will be
+	 * removed in the future a version
+	 */
+	public List getNegativePercepts() {
+		return oldNegPercepts;
 	}
 
 	/**
-	 * Returns percepts list for an agent.
+	 * Returns perceptions for an agent.
+	 * A full copy of both common and agent perceptions lists is returned.
 	 * 
-	 * @uml.property name="percepts"
+	 * TODO: turn it final in the v 0.8
 	 */
     public List getPercepts(String agName) {
-        return percepts;
+		
+		// check whether this agent needs the current version of perception
+		if (uptodateAgs.contains(agName) && !oldNegPercepts.isEmpty() && !oldPercepts.isEmpty()) {
+			return null;
+		}
+		// add agName in the set of uptodate agents
+		uptodateAgs.add(agName);
+		
+		int size = percepts.size();
+		List agl = (List)agPercepts.get(agName);
+		if (agl != null) {
+			size += agl.size();
+		}
+		List p = new ArrayList(size);
+		
+        synchronized (percepts) {
+            // make a local copy of the environment percepts
+			// Note: a deep copy will be done by BB.add
+			p.addAll(percepts);
+        }
+		if (agl != null) {
+	        synchronized (agl) {
+				p.addAll(agl);
+	        }
+		}
+		
+		// add old style perceptions (where they are Terms)
+		// TODO: remove it in v 0.8
+		if (!oldPercepts.isEmpty()) {
+			synchronized (oldPercepts) {
+				Iterator i = oldPercepts.iterator();
+				while (i.hasNext()) {
+					p.add( new Literal(D.LPos, new Pred((Term)i.next())));
+				}
+			}
+		}
+		if (!oldNegPercepts.isEmpty()) {
+			synchronized (oldNegPercepts) {
+				Iterator i = oldNegPercepts.iterator();
+				while (i.hasNext()) {
+					p.add( new Literal(D.LNeg, new Pred((Term)i.next())));
+				}
+			}
+		}
+		
+        return p;
     }
 
-    /** Returns negative percepts list.  */
-    public List getNegativePercepts() {
-        return negPercepts;
-    }
+	/** add a perception for all agents */
+	public void addPercept(Literal per) {
+		if (per != null) {
+			if (! percepts.contains(per)) {
+				percepts.add(per);
+				uptodateAgs.clear();
+			}
+		}
+	}
+	/** remove a perception in the commom perception list */
+	public boolean removePercept(Literal per) {
+		if (per != null) {
+			uptodateAgs.clear();
+			return percepts.remove(per);
+		} 
+		return false;
+	}
+	public void clearPercepts() {
+		uptodateAgs.clear();
+		percepts.clear();
+	}
+	
+	public boolean containsPercept(Literal per) {
+		if (per != null) {
+			return percepts.contains(per);
+		} 
+		return false;
+	}
+	
+	
+	
+	/** add a perception for a specific agent */
+	public void addPercept(String agName, Literal per) {
+		if (per != null && agName != null) {
+			List agl = (List)agPercepts.get(agName);
+			if (agl == null) {
+				agl = Collections.synchronizedList(new ArrayList());
+				uptodateAgs.remove(agName);
+				agl.add(per);
+				agPercepts.put( agName, agl);
+			} else {
+				if (! agl.contains(per)) {
+					uptodateAgs.remove(agName);
+					agl.add(per);
+				}
+			}
+		}
+	}
+	
+	/** remove a perception for one agent */
+	public boolean removePercept(String agName, Literal per) {
+		if (per != null && agName != null) {
+			List agl = (List)agPercepts.get(agName);
+			if (agl != null) {
+				uptodateAgs.remove(agName);
+				return agl.remove(per);
+			}
+		}
+		return false;
+	}
 
-	/**
-	 * Returns negative percepts list for an agent.
-	 * 
-	 * @uml.property name="percepts"
-	 */
-    public List getNegativePercepts(String agName) {
-        return negPercepts;
-    }
-
+	public boolean containsPercept(String agName, Literal per) {
+		if (per != null && agName != null) {
+			List agl = (List)agPercepts.get(agName);
+			if (agl != null) {
+				return agl.contains(per);
+			}
+		}
+		return false;
+	}
+	
     /**
      * called by the agent architecture to execute an action on the environment.
      */

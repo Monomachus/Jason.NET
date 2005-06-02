@@ -20,7 +20,7 @@ public class ExecutionControl {
 	private Object syncAgFinished = new Object();
 	//private Object syncAllAgFinished = new Object();
 
-	protected String jasonDir = "..";
+	//private String jasonDir = "..";
 
 
 	public ExecutionControl() {
@@ -90,13 +90,19 @@ public class ExecutionControl {
 		return fJasonControl;
 	}
 
+	/*
 	public void setJasonDir(String dir) {
 		if (dir.startsWith("'")) {
 			dir = dir.substring(1, dir.length()-1);
 		}
 		jasonDir = dir;
 	}
+	public String getJasonDir() {
+		return jasonDir;
+	}
+	*/
 
+	
 	/**
 	 * This method is called when setJasonExecutionControl and setJasonDir was already called
 	 */
@@ -104,6 +110,13 @@ public class ExecutionControl {
 		
 	}
 	
+	/**
+	 * This method is called when MAS execution is being finished
+	 */
+	public void stop() {
+		
+	}
+
 	/*
 	private void waitAgFinish() {
 		try {

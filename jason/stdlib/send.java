@@ -24,23 +24,33 @@
 package jason.stdlib;
 
 import jason.JasonException;
+import jason.asSemantics.InternalAction;
 import jason.asSemantics.Message;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.Term;
 
-public class send {
+public class send implements InternalAction {
     
-    public static boolean execute(TransitionSystem ts, Unifier un, String[] args) throws Exception {
-        Term to  = null;
-        Term ilf = null;
-        Term pcnt  = null;
-        
+	/**
+	 * arg[0] is receiver 
+	 * arg[1] is illocucionary force
+	 * arg[2] is content
+	 *  
+	 */
+    public boolean execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
+        Term to   = null;
+        Term ilf  = null;
+        Term pcnt = null;
+		// check parameters
         try {
-            to  = Term.parse(args[0]);
-            if (to == null) {
-                throw new JasonException("The TO parameter of the internal action 'send' is not a term!");            	
-            }
+	        to   = (Term)args[0].clone();
+	        ilf  = (Term)args[1].clone();
+	        pcnt = (Term)args[2].clone();
+            //to  = Term.parse(args[0]);
+            //if (to == null) {
+            //    throw new JasonException("The TO parameter of the internal action 'send' is not a term!");            	
+            //}
             if (to.isVar()) {
             	un.apply(to);
             }
@@ -48,10 +58,10 @@ public class send {
                 throw new JasonException("The TO parameter of the internal action 'send' is not a ground term!");            	
             }
 
-            ilf = Term.parse(args[1]);
-            if (ilf == null) {
-                throw new JasonException("The Ilf Force parameter of the internal action 'send' is not a term!");            	
-            }
+            //ilf = Term.parse(args[1]);
+            //if (ilf == null) {
+            //    throw new JasonException("The Ilf Force parameter of the internal action 'send' is not a term!");            	
+            //}
             if (ilf.isVar()) {
             	un.apply(ilf);
             }
@@ -70,12 +80,12 @@ public class send {
             //if (args[2].startsWith("~")) {
             //	pcnt = Literal.parseLiteral(args[2]);
             //} else {
-            	pcnt = Term.parse(args[2]);
+            //pcnt = Term.parse(args[2]);
             //}
+	        un.apply(pcnt);
         } catch (ArrayIndexOutOfBoundsException e) {
             throw new JasonException("The internal action 'send' has not received three arguments");
         } 
-        un.apply(pcnt);
         
         /* it may be not ground in ask
         if (!pcnt.isGround()) {
@@ -88,10 +98,10 @@ public class send {
         // ask must have a fourth argument
         if (m.isAsk()) {
             try {
-                Term ans = Term.parse(args[3]);
-                if (ans == null) {
-                    throw new JasonException("The VAR parameter of the internal action 'send' is not a term!");            	
-                }
+                Term ans = (Term)args[3]; // just to test 3rd argument
+                //if (ans == null) {
+                //    throw new JasonException("The VAR parameter of the internal action 'send' is not a term!");            	
+                //}
                 //m.setAskArg(ans.toString());
             } catch (ArrayIndexOutOfBoundsException e) {
                 throw new JasonException("The internal action 'send-ask' has not received four arguments");
@@ -101,10 +111,10 @@ public class send {
         // tell with 4 args is a reply to
         if (m.isTell() && args.length > 3) {
             try {
-                Term mid = Term.parse(args[3]);
-                if (mid == null) {
-                    throw new JasonException("The Message ID parameter of the internal action 'send' is not a term!");            	
-                }
+                Term mid = (Term)args[3].clone();
+                //if (mid == null) {
+                //    throw new JasonException("The Message ID parameter of the internal action 'send' is not a term!");            	
+                //}
                 if (mid.isVar()) {
                 	un.apply(mid);
                 }
@@ -114,8 +124,7 @@ public class send {
                 m.setInReplyTo(mid.toString());
             } catch (ArrayIndexOutOfBoundsException e) {
                 throw new JasonException("The internal action 'send-ask' has not received four arguments");
-            } 
-        	
+            }
         }
         
         try {

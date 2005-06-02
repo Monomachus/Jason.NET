@@ -23,30 +23,38 @@
 
 package jason.stdlib;
 
-import java.util.Iterator;
-
 import jason.JasonException;
+import jason.asSemantics.InternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
-import jason.asSyntax.ParseList;
+import jason.asSyntax.ListTerm;
+import jason.asSyntax.StringTerm;
+import jason.asSyntax.Term;
 
-public class removePlan {
-    
-    public static boolean execute(TransitionSystem ts, Unifier un, String[] args) throws Exception {
+import java.util.Iterator;
+
+public class removePlan implements InternalAction {
+
+	/**
+	 * args[0] = list of plans (a ListTerm), each element is a StringTerm 
+	 *           that represent a plan to be removed
+	 *           or only one plan (as StringTerm)
+	 * args[1] = source (the name of the agent, for instance)
+	 */
+    public boolean execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         try {
-        	if (args[0].startsWith("[")) { // if arg[0] is a list
-        		ParseList pl = new ParseList(args[0]);
-        		Iterator i = pl.getAsList().iterator();
+        	if (args[0].isList()) { // if arg[0] is a list
+        		ListTerm lt = (ListTerm)args[0];
+        		Iterator i = lt.iterator();
         		while (i.hasNext()) {
-            		ts.getAg().removePlan(i.next().toString(), args[1]);
+            		ts.getAg().removePlan( (StringTerm)i.next(), args[1]);
         		}
         	} else { // args[0] is a plan
-        		ts.getAg().removePlan(args[0], args[1]);
+        		ts.getAg().removePlan((StringTerm)args[0], args[1]);
         	}
             return true;
         } catch (ArrayIndexOutOfBoundsException e) {
             throw new JasonException("The internal action 'removePlan' has not received two arguments (plan's string and source)");
         } 
     }
-    
 }

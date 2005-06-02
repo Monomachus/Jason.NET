@@ -82,14 +82,15 @@ public class JasonID extends EditorPane {
     
     //HashMap editorFiles = new HashMap();
     
-    AbstractAction newAct      = new NewProject();
-    OpenProject    openAct     = new OpenProject();
-    AbstractAction saveAct     = new Save();
-    AbstractAction saveAsAct   = new SaveAs();
+    AbstractAction newAct;
+    OpenProject    openAct;
+    Save           saveAct;
+    AbstractAction saveAsAct;
+	SaveAll        saveAllAct;
     RunMAS         runMASAct;
     DebugMAS       debugMASAct;
-    AbstractAction stopMASAct  = new StopMAS();
-    AbstractAction exitAppAct  = new ExitApp();
+    AbstractAction stopMASAct;
+    AbstractAction exitAppAct;
     
     public static void main(String[] args) {
         try {
@@ -262,8 +263,16 @@ public class JasonID extends EditorPane {
         super();
         mainID = this;
         extension   = "mas2j";
-        runMASAct   = new RunMAS(this);
+
+		newAct      = new NewProject();
+	    openAct     = new OpenProject();
+	    saveAct     = new Save();
+	    saveAsAct   = new SaveAs();
+		saveAllAct  = new SaveAll();
+		runMASAct   = new RunMAS(this);
         debugMASAct = new DebugMAS(this);
+	    stopMASAct  = new StopMAS();
+	    exitAppAct  = new ExitApp();
     }
     
     
@@ -440,6 +449,7 @@ public class JasonID extends EditorPane {
         jMenuProject.add(openAct);
         jMenuProject.add(saveAct);
         jMenuProject.add(saveAsAct);
+        jMenuProject.add(saveAllAct);
         
         jMenuProject.addSeparator();
         
@@ -482,12 +492,12 @@ public class JasonID extends EditorPane {
         return null;
     }
     
-    protected void updateTabTitle(int index, EditorPane text, String error) {
+    protected void updateTabTitle(int index, EditorPane pane, String error) {
         String title = "";
-        if (text.getFileName().length() > 0) {
-            title = text.getFileName() + "." + text.extension;
+        if (pane.getFileName().length() > 0) {
+            title = pane.getFileName() + "." + pane.extension;
         }
-        if (text.modified) {
+        if (pane.modified) {
             title += " [*]";
         }
         if (error != null) {
@@ -533,7 +543,7 @@ public class JasonID extends EditorPane {
     
     class NewProject extends AbstractAction {
         NewProject() {
-            super("New project", new ImageIcon(jasonHome+"/bin/resources/images/new.gif"));
+            super("New project", new ImageIcon( JasonID.class.getResource("/images/new.gif")));
         }
         
         public void actionPerformed(ActionEvent e) {
@@ -558,7 +568,7 @@ public class JasonID extends EditorPane {
     class OpenProject extends AbstractAction {
         JFileChooser chooser;
         OpenProject() {
-            super("Open project", new ImageIcon(jasonHome+"/bin/resources/images/openProject.gif"));
+            super("Open project", new ImageIcon(JasonID.class.getResource("/images/openProject.gif")));
             chooser = new JFileChooser(".");
             chooser.setFileFilter(new JasonFileFilter());
         }
@@ -640,13 +650,16 @@ public class JasonID extends EditorPane {
     
     class Save extends AbstractAction {
         Save() {
-            super("Save", new ImageIcon(jasonHome+"/bin/resources/images/save.gif"));
+            super("Save", new ImageIcon(JasonID.class.getResource("/images/save.gif")));
         }
         
         public void actionPerformed(ActionEvent e) {
-            EditorPane pane = (EditorPane)tab.getSelectedComponent();
+            savePane(tab.getSelectedIndex(), (EditorPane)tab.getSelectedComponent());
+        }
+		
+		public void savePane(int index, EditorPane pane) {
             if (pane.getFileName().length() == 0) {
-                saveAsAct.actionPerformed(e);
+                saveAsAct.actionPerformed(null);
             } else {
                 File f = new File(projectDirectory+File.separatorChar+pane.getFileName()+"."+pane.extension);
                 output.append("Saving to "+f.getPath()+"\n");
@@ -668,15 +681,31 @@ public class JasonID extends EditorPane {
                     System.err.println(ex.getMessage());
                 }
                 pane.modified = false;
-                updateTabTitle(tab.getSelectedIndex(), pane, null);
+                updateTabTitle(index, pane, null);
             }
         }
     }
-    
+
+    class SaveAll extends AbstractAction {
+        SaveAll() {
+            super("Save all", new ImageIcon(JasonID.class.getResource("/images/save.gif")));
+        }
+        
+        public void actionPerformed(ActionEvent e) {
+	        for (int i = 0; i<tab.getComponentCount(); i++) {
+				EditorPane pane = (EditorPane)tab.getComponentAt(i);
+		        if (pane.modified) {
+					saveAct.savePane(i,pane);
+		        }
+			}
+        }
+    }
+	
+	
     class SaveAs extends AbstractAction {
         JFileChooser chooser;
         SaveAs() {
-            super("Save as ...", new ImageIcon(jasonHome+"/bin/resources/images/save.gif"));
+            super("Save as ...", new ImageIcon(JasonID.class.getResource("/images/save.gif")));
             chooser = new JFileChooser(".");
             chooser.setFileFilter(new JasonFileFilter());
         }
@@ -706,7 +735,7 @@ public class JasonID extends EditorPane {
     
     class StopMAS extends AbstractAction {
         StopMAS() {
-            super("Stop MAS", new ImageIcon(jasonHome+"/bin/resources/images/suspend.gif"));
+            super("Stop MAS", new ImageIcon(JasonID.class.getResource("/images/suspend.gif")));
         }
         
         public void actionPerformed(ActionEvent e) {
@@ -757,7 +786,7 @@ public class JasonID extends EditorPane {
             "http://www.inf.furb.br/~jomi",
             "JasonID - About",
             JOptionPane.INFORMATION_MESSAGE,
-            new ImageIcon(jasonHome+"/bin/resources/images/Jason-GMoreau-Small.jpg"));
+            new ImageIcon(JasonID.class.getResource("/images/Jason-GMoreau-Small.jpg")));
         }
     }
     

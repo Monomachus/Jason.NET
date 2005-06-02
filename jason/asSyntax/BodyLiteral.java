@@ -56,7 +56,7 @@ public class BodyLiteral extends Literal implements Cloneable {
     	if (! getFunctorArity().equals(".send/4")) {
     		return false;
     	}
-    	if (getTerm(2).toString().startsWith("ask")) {
+    	if (getTerm(1).toString().startsWith("ask")) {
     		return true;
     	} else {
     		return false;

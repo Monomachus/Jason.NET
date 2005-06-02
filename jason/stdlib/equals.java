@@ -23,15 +23,16 @@
 
 package jason.stdlib;
 
+import jason.asSemantics.InternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.Term;
 
-public class equals {
+public class equals implements InternalAction {
     
-    public static boolean execute(TransitionSystem ts, Unifier un, String[] args) throws Exception {
-        Term xp = Term.parse(args[0]);
-        Term yp = Term.parse(args[1]);
+    public boolean execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
+        Term xp = (Term)args[0].clone();
+        Term yp = (Term)args[1].clone();
         un.apply(xp);
         un.apply(yp);
         return xp.equals(yp);

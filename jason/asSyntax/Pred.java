@@ -34,11 +34,6 @@ import java.util.List;
 
 public class Pred extends Term implements Cloneable, Comparable, Serializable {
 
-	/**
-	 *  
-	 * @uml.property name="annots"
-	 * @uml.associationEnd aggregation="aggregate" inverse="pred:jason.asSyntax.Term" multiplicity="(0 -1)" ordering="ordered"
-	 */
 	private ArrayList annots;
 
 	public Pred() {
@@ -127,9 +122,89 @@ public class Pred extends Term implements Cloneable, Comparable, Serializable {
 		else
 			return annots.isEmpty();
 	}
+	
+	/**
+	 * Add a source annotation like "source(<s>)". 
+	 */
+	public void addSource(String s) {
+		Term ts = new Term("source");
+		ts.addTerm(new Term(s));
+		addAnnot(ts);
+	}
 
-	/** "import" Annotations from another Predicate, the annots not imported are 
-	 * removed from p */
+	/**
+	 * Add a source annotation like "source(<t>)". 
+	 */
+	public void addSource(Term t) {
+		Term ts = new Term("source");
+		ts.addTerm(t);
+		addAnnot(ts);
+	}
+
+	/** del source(<s>) */
+	public boolean delSource(Term s) {
+		if (annots != null) {	
+			Iterator i = annots.iterator();
+			while (i.hasNext()) {
+				Term t = (Term)i.next();
+				if (t.getFunctor().equals("source") && t.getTerm(0).equals(s)) {
+					i.remove();
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
+	/** 
+	 * return the sources of this Pred as a list.
+	 * from annots [souce(a), source(b)]
+	 * it returns [a,b] 
+	 */
+	public ListTerm getSources() {
+		ListTerm ls = new ListTerm();
+		if (annots != null) {
+			Iterator i = annots.iterator();
+			while (i.hasNext()) {
+				Term t = (Term)i.next();
+				if (t.getFunctor().equals("source")) {
+					ls.add( t.getTerm(0) );
+				}
+			}
+		}
+		return ls;
+	}
+	
+	
+	/** del all sources annotations */
+	public void delSources() {
+		if (annots != null) {
+			Iterator i = annots.iterator();
+			while (i.hasNext()) {
+				Term t = (Term)i.next();
+				if (t.getFunctor().equals("source")) {
+					i.remove();
+				}
+			}
+		}
+	}
+	
+	public boolean hasSource() {
+		if (annots != null) {
+			Iterator i = annots.iterator();
+			while (i.hasNext()) {
+				Term t = (Term)i.next();
+				if (t.getFunctor().equals("sources")) {
+					return true;
+				}
+			}
+		}
+		return false;		
+	}
+
+	/** 
+	 * "import" Annotations from another Predicate
+	 */
 	public void addAnnot(Pred p) {
 		if (p.annots == null) {
 			return;
@@ -141,10 +216,12 @@ public class Pred extends Term implements Cloneable, Comparable, Serializable {
 			Term t = (Term) p.annots.get(i);
 			// p will only contain the annots actually added (for Event)
 			if (!annots.contains(t)) {
-				annots.add(t);
+				annots.add(t.clone());
 			} else {
-				p.delAnnot(t);
-				i--;
+				// TODO: why del? (jomi has removed it since it causes concurrent problems): 
+				// Remove what is not new from l 
+				//p.delAnnot(t);
+				//i--;
 			}
 		}
 	}

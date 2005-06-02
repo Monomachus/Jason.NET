@@ -29,9 +29,8 @@ import jason.JasonException;
 import jason.asSemantics.ActionExec;
 import jason.asSemantics.Agent;
 import jason.asSemantics.TransitionSystem;
+import jason.asSyntax.ListTerm;
 import jason.asSyntax.Literal;
-import jason.asSyntax.ParseList;
-import jason.asSyntax.Pred;
 import jason.asSyntax.Term;
 
 import java.util.Iterator;
@@ -57,16 +56,11 @@ public class SaciAgArch extends saci.Agent implements AgentArchitecture {
     // needed in perceive() and brf(), must be called "percepts"
     // as the user may want to alter it for agent-specific perception
     protected List percepts;
-    protected List negPercepts;
+    //protected List negPercepts;
     
     // to get the percepts via SACI (the normal mbox is used for inter-agent com.)
     private MBoxSAg mboxPercept = null;
 
-	/**
-	 * 
-	 * @uml.property name="ts"
-	 * @uml.associationEnd multiplicity="(0 1)"
-	 */
 	private TransitionSystem fTS = null;
 
     
@@ -194,11 +188,18 @@ public class SaciAgArch extends saci.Agent implements AgentArchitecture {
             e.printStackTrace();
         }
         if (m != null) {
-            percepts = new ParseList((String) m.get("content")).getAsList();
-            if (fTS.getSettings().verbose()>=5)
-                System.out.println("Agent " + mboxPercept.getName() + " received percepts: "+percepts);
+			String content = (String) m.get("content");
+			if (content != null) {
+				percepts = ListTerm.parseList(content).getAsList();
+				if (fTS.getSettings().verbose()>=5) {
+					System.out.println("Agent " + mboxPercept.getName() + " received percepts: "+percepts);
+				}
+			} else {
+				percepts = null; // used to indicate that are nothing new in the environment, no BRF needed
+			}
         }
         
+		/*
         askMsg = new saci.Message("(ask-all :receiver environment :ontology AS-Perception :content getNegativePercepts)");
         
         // asks current environment state (negative percepts)
@@ -214,7 +215,8 @@ public class SaciAgArch extends saci.Agent implements AgentArchitecture {
             if (fTS.getSettings().verbose()>=5)
                 System.out.println("Agent " + mboxPercept.getName() + " received negative percepts: "+negPercepts);
         }
-        
+        */
+		
         // check if there are feedbacks on requested action executions
         try {
             do {
@@ -323,9 +325,10 @@ public class SaciAgArch extends saci.Agent implements AgentArchitecture {
     
     /** same code than CentalisedAgArch */
     public void brf() {
-        if (! running) {
+        if (! running || percepts == null) {
             return;
         }
+
 
         // deleting percepts in the BB that is not percepted anymore
         List perceptsInBB = fTS.getAg().getBS().getPercepts();
@@ -350,13 +353,14 @@ public class SaciAgArch extends saci.Agent implements AgentArchitecture {
         // checking all percpets for new beliefs
         Iterator i = percepts.iterator();
         while (i.hasNext()) {
-            fTS.getAg().addBel(new Literal(D.LPos, new Pred((Term)i.next())),D.TPercept, fTS.getC());
+			Literal l = (Literal)i.next();
+			try {
+				fTS.getAg().addBel( l, D.TPercept, fTS.getC(), D.EmptyInt);
+			} catch (Exception e) {
+				System.err.println("Error adding percetion "+l+"\n");
+				e.printStackTrace();
+			}
         }
-        i = negPercepts.iterator();
-        while (i.hasNext()) {
-            fTS.getAg().addBel(new Literal(D.LNeg, new Pred((Term)i.next())),D.TPercept, fTS.getC());
-        }
-
     }
 
     /*

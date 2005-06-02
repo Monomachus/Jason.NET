@@ -42,7 +42,7 @@ public class mas2j implements mas2jConstants {
         }
       } else {
                 System.out.println("mas2j: usage must be:");
-                System.out.println("      java mas2j <MASConfFile> <jasonHome> <SACIHome>");
+                System.out.println("      java mas2j <MASConfFile> <JasonHome> <SACIHome>");
                 System.out.println("         Output to file <MASName>.xml");
         return;
       }
@@ -175,14 +175,14 @@ public class mas2j implements mas2jConstants {
         }
 
     public void writeInit() {
-                out.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+            out.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
         String extraSlash = "";
         if (System.getProperty("os.name").indexOf("indows") > 0) {
             extraSlash = "/";
         }
-                out.println("<!DOCTYPE saci SYSTEM \"file:"+extraSlash+saciHome+File.separator+"bin"+File.separator+"applications.dtd\">");
-                out.println("<?xml-stylesheet href=\"file:"+extraSlash+saciHome+File.separator+"bin"+File.separator+"applications.xsl\" type=\"text/xsl\" ?>");
-                out.println("<saci>");
+        out.println("<!DOCTYPE saci SYSTEM \"file:"+extraSlash+saciHome+File.separator+"bin"+File.separator+"applications.dtd\">");
+            out.println("<?xml-stylesheet href=\"file:"+extraSlash+saciHome+File.separator+"bin"+File.separator+"applications.xsl\" type=\"text/xsl\" ?>");
+        out.println("<saci>");
                 out.println("<application id=\""+ soc +"\">");
 
                 out.println("<script id=\"run\">\n");
@@ -198,20 +198,20 @@ public class mas2j implements mas2jConstants {
 
     public void writeEnd() {
         if (controlPart != null) {
-                        out.println(controlPart);
-                }
+                out.println(controlPart);
+            }
                 out.println("\n</script>");
                 out.println("</application>");
-                out.println("</saci>");
+            out.println("</saci>");
     }
 
 
     public String getJasonClasspath() {
-        return jasonHome+File.separator+"bin"+File.separator+"classes";
+        return jasonHome+File.separator+"bin"+File.separator+"jason.jar";
     }
 
     public String getJasonClasspathURL() {
-        return "file:"+jasonHome+"/bin/classes/";
+        return "file:"+jasonHome+"/bin/jason.jar";
     }
 
     public String getFullClassPath() {
@@ -446,9 +446,7 @@ public class mas2j implements mas2jConstants {
     }
                               agASFiles.put(agName.image, source.getAbsolutePath());
                               out.print("\n\t\tclass=\""+agArchClass+"\"");
-                              out.print("\n\t\targs=\""+agClass+" '"+source.getAbsolutePath()+"' '"+jasonHome+"' "+getOptsStr(opts)+"\"");
-                              //out.print("\n\t\tclasspath=\""+getASClasspathURL()+"\" "); 
-
+                              out.print("\n\t\targs=\""+agClass+" '"+source.getAbsolutePath()+"' "+getOptsStr(opts)+"\"");
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case 35:
       jj_consume_token(35);
@@ -664,13 +662,13 @@ public class mas2j implements mas2jConstants {
                                       controlPart += "\n\t\tname=\"controller\" ";
                                       controlPart += "\n\t\tsociety.name=\""+soc+"-env\" ";
 
-                                              String tArgs = "\n\t\targs=\"'"+jasonHome+"'";
+                                              String tArgs = "";
                                       String fControlClass = controlClass;
                                       if (architecture.equals("Saci")) {
                                           fControlClass = jason.control.SaciExecutionControl.class.getName();
-                                          tArgs += " "+controlClass;
+                                          tArgs = "\n\t\targs=\""+controlClass+"\"";
                                       }
-                                  controlPart += tArgs+"\"";
+                                  controlPart += tArgs;
 
                                       controlPart += "\n\t\tclass=\""+fControlClass+"\" ";
 

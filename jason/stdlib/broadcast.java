@@ -20,49 +20,52 @@
 // http://www.inf.furb.br/~jomi
 //----------------------------------------------------------------------------
 
-
 package jason.stdlib;
 
 import jason.JasonException;
+import jason.asSemantics.InternalAction;
 import jason.asSemantics.Message;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
-import jason.asSyntax.Literal;
-import jason.asSyntax.Pred;
 import jason.asSyntax.Term;
 
-public class broadcast {
-    
-    public static boolean execute(TransitionSystem ts, Unifier un, String[] args) throws Exception {
-        Term ilf = null;
-        Pred pcnt  = null;
-        
-        try {
-            ilf = Term.parse(args[0]);
-            if (ilf == null) {
-                throw new JasonException("The Ilf Force parameter of the internal action 'broadcast' is not a term!");            	
-            }
-            if (! ilf.isGround()) {
-                throw new JasonException("The Ilf Force parameter of the internal action 'broadcast' is not a ground term!");            	            	
-            }
-            
-            pcnt  = Literal.parseLiteral(args[1]);
-        } catch (ArrayIndexOutOfBoundsException e) {
-            throw new JasonException("The internal action 'broadcast' has not received two arguments");
-        }
-        un.apply(pcnt);
-        if (!pcnt.isGround()) {
-            throw new JasonException("The content of the message '"+pcnt+"' is not ground!");        	
-        }
-        
-        Message m = new Message(ilf.toString(), null, null, pcnt.toString());
-        
-        try {
-            ts.getAgArch().broadcast(m);
-            return true;
-        } catch (Exception e) {
-            throw new JasonException("Error broadcasting message "+pcnt);
-        }
-    }
-    
+public class broadcast implements InternalAction {
+
+	public boolean execute(TransitionSystem ts, Unifier un, Term[] args)
+			throws Exception {
+		Term ilf = null;
+		Term pcnt = null;
+
+		try {
+			ilf = (Term) args[0].clone();
+			// if (ilf == null) {
+			// throw new JasonException("The Ilf Force parameter of the internal
+			// action 'broadcast' is not a term!");
+			// }
+			if (!ilf.isGround()) {
+				throw new JasonException(
+						"The Ilf Force parameter of the internal action 'broadcast' is not a ground term!");
+			}
+
+			pcnt = (Term)args[1].clone();
+		} catch (ArrayIndexOutOfBoundsException e) {
+			throw new JasonException(
+					"The internal action 'broadcast' has not received two arguments");
+		}
+		un.apply(pcnt);
+		if (!pcnt.isGround()) {
+			throw new JasonException("The content of the message '" + pcnt
+					+ "' is not ground!");
+		}
+
+		Message m = new Message(ilf.toString(), null, null, pcnt.toString());
+
+		try {
+			ts.getAgArch().broadcast(m);
+			return true;
+		} catch (Exception e) {
+			throw new JasonException("Error broadcasting message " + pcnt);
+		}
+	}
+
 }

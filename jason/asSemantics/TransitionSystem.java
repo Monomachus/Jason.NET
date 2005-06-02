@@ -38,8 +38,10 @@ import jason.asSyntax.Trigger;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 public class TransitionSystem {
 
@@ -126,7 +128,7 @@ public class TransitionSystem {
             	// unify the answer with the parameter
             	Term ans = Term.parse(m.getPropCont());
             	BodyLiteral send = (BodyLiteral)intention.peek().getPlan().getBody().remove(0);
-            	intention.peek().getUnif().unifies(send.getTerm(4),ans);
+            	intention.peek().getUnif().unifies(send.getTerm(3),ans);
                 getC().getIntentions().add(intention);
                 
             // the message is not an ask answer
@@ -318,35 +320,50 @@ public class TransitionSystem {
 
 
 	static Class classParameters[] = { jason.asSemantics.TransitionSystem.class, jason.asSemantics.Unifier.class, (new String[3]).getClass() };
+	private Map agInternalAction = new HashMap(); // this agent internal actions (key->IA'name, value->InternalAction object)
+	
 	public boolean execInternalAction(Pred action, Unifier un) throws JasonException {
 		String name = action.getFunctor();
 		if (name.indexOf('.') == 0)
 			name = "jason.stdlib" + name;
 		
-		String pars[] = null;
-		if (action.getTerms() == null) {
-			pars = new String[0];
-		} else {
-			pars = new String[action.getTerms().size()];
-			int i = 0;
-			Iterator j = action.getTerms().iterator();
-			while (j.hasNext()) {
-				pars[i++] = j.next().toString();
-			}
-		}
-
+		// if it implements InternalAction
 		try {
-			Class classDef = Class.forName(name);
-			// TODO: create a HashMap to cache classes and methods. (synchronized access)
-			Method executeMethod = classDef.getDeclaredMethod("execute", classParameters);
-
-			Object objectParameters[] = { this, un, pars };
-
-			// Static method, no instance needed
-			return ((Boolean) executeMethod.invoke(null, objectParameters)).booleanValue();
-		} catch (NoSuchMethodException e) {
-			throw new JasonException(
-					"The method execute does not exists in class " + name);
+			// check if  the agent already has this InternalAction object
+			InternalAction objIA = (InternalAction)agInternalAction.get(name);
+			if (objIA == null) {
+				objIA = (InternalAction)Class.forName(name).newInstance();
+				agInternalAction.put(name, objIA);
+			}
+			// calls execute
+			return objIA.execute(this, un, action.getTermsArray());
+			
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+			return false;
+		} catch (ClassCastException e) {
+			// tries it as old internal action (static + string pars)
+			String pars[] = null;
+			if (action.getTerms() == null) {
+				pars = new String[0];
+			} else {
+				pars = new String[action.getTerms().size()];
+				int i = 0;
+				Iterator j = action.getTerms().iterator();
+				while (j.hasNext()) {
+					pars[i++] = j.next().toString();
+				}
+			}
+			try {
+				Class classDef = Class.forName(name);
+				Method executeMethod = classDef.getDeclaredMethod("execute", classParameters);
+				Object objectParameters[] = { this, un, pars };
+				// Static method, no instance needed
+				return ((Boolean) executeMethod.invoke(null, objectParameters)).booleanValue();
+			} catch (Exception e2) {
+				throw new JasonException("The method execute does not exists in class " + name);
+			}
+	
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
@@ -429,8 +446,10 @@ public class TransitionSystem {
 					u.apply(l);
 				}
 				ubel = conf.ag.believes(l, u);
+				//System.out.println("****00-"+ubel);
 				if (ubel != null) {
 					ubel.apply(l);
+					//System.out.println("****11-"+l);
 					if (setts.sameFocus())
 						conf.ag.delBel(l, D.TSelf, conf.C, conf.C.SI);
 					else {

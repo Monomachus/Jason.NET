@@ -383,7 +383,7 @@
       break;
     case STRING:
       k = jj_consume_token(STRING);
-                         {if (true) return new Term(k.image);}
+                         {if (true) return new StringTerm(k.image);}
       break;
     default:
       jj_la1[15] = jj_gen;
@@ -588,7 +588,7 @@
       break;
     case STRING:
       K = jj_consume_token(STRING);
-                   {if (true) return new Term(K.image.replaceAll("\"", "\\\""));}
+                   {if (true) return new StringTerm(K.image.replaceAll("\"", "\\\""));}
       break;
     case TK_FALSE:
       K = jj_consume_token(TK_FALSE);
@@ -602,74 +602,65 @@
     throw new Error("Missing return statement in function");
   }
 
-  final public Term list() throws ParseException {
-                Token K; Term f; Term p = new Term(); Term l; Term a;
+/*
+Term list() : { Token K; Term f; Term p = new Term(); Term l; Term a; }
+{
+  "["
+  ( f=t() { p.setFunctor(D.ListCons); p.addTerm(f); a=p; }
+    ( ( "," f=t() { l=new Term(D.ListCons); a.addTerm(l); a=l; a.addTerm(f); } )*
+      "]" { a.addTerm(new Term(D.EmptyList)); return p; }
+    | "|"
+      ( l=list() "]" { p.addTerm(l); return p; }
+      | K=<VAR>  "]" { p.addTerm(new Term(K.image)); return p; } )
+    )
+  | "]" { p.setFunctor(D.EmptyList); return p; } )
+}
+*/
+  final public ListTerm list() throws ParseException {
+                    ListTerm lt; ListTerm last; Token K; Term f;
     jj_consume_token(40);
-    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case TK_TRUE:
-    case TK_FALSE:
-    case TK_NEG:
-    case NUMBER:
-    case STRING:
-    case ATOM:
-    case VAR:
-    case 40:
-      f = t();
-            p.setFunctor(D.ListCons); p.addTerm(f); a=p;
+    f = t();
+                        lt = new ListTerm(f); last = lt;
+    label_5:
+    while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case 41:
       case 42:
-        label_5:
-        while (true) {
-          switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-          case 42:
-            ;
-            break;
-          default:
-            jj_la1[25] = jj_gen;
-            break label_5;
-          }
-          jj_consume_token(42);
-          f = t();
-                    l=new Term(D.ListCons); a.addTerm(l); a=l; a.addTerm(f);
-        }
-        jj_consume_token(41);
-            a.addTerm(new Term(D.EmptyList)); {if (true) return p;}
-        break;
-      case 43:
-        jj_consume_token(43);
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-        case 40:
-          l = list();
-          jj_consume_token(41);
-                       p.addTerm(l); {if (true) return p;}
-          break;
-        case VAR:
-          K = jj_consume_token(VAR);
-          jj_consume_token(41);
-                       p.addTerm(new Term(K.image)); {if (true) return p;}
-          break;
-        default:
-          jj_la1[26] = jj_gen;
-          jj_consume_token(-1);
-          throw new ParseException();
-        }
+        ;
         break;
       default:
-        jj_la1[27] = jj_gen;
+        jj_la1[25] = jj_gen;
+        break label_5;
+      }
+      jj_consume_token(42);
+      f = t();
+                        last = last.append(f);
+    }
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case 43:
+      jj_consume_token(43);
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case VAR:
+        K = jj_consume_token(VAR);
+                        last.setTail(new Term(K.image));
+        break;
+      case 40:
+        f = list();
+                        last.setTail(f);
+        break;
+      default:
+        jj_la1[26] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
-      break;
-    case 41:
-      jj_consume_token(41);
-          p.setFunctor(D.EmptyList); {if (true) return p;}
+                        {if (true) return lt;}
       break;
     default:
-      jj_la1[28] = jj_gen;
-      jj_consume_token(-1);
-      throw new ParseException();
+      jj_la1[27] = jj_gen;
+      ;
     }
+    jj_consume_token(41);
+                        last.append(new ListTerm()); // empty list 
+                        {if (true) return lt;}
     throw new Error("Missing return statement in function");
   }
 
@@ -678,7 +669,7 @@
   public Token token, jj_nt;
   private int jj_ntk;
   private int jj_gen;
-  final private int[] jj_la1 = new int[29];
+  final private int[] jj_la1 = new int[28];
   static private int[] jj_la1_0;
   static private int[] jj_la1_1;
   static {
@@ -686,10 +677,10 @@
       jj_la1_1();
    }
    private static void jj_la1_0() {
-      jj_la1_0 = new int[] {0xc480,0x6400000,0x400000,0x6000000,0x18000000,0x18000000,0x400,0xc480,0x20000000,0x200,0xec80,0x0,0xec80,0x0,0x4000ec80,0x2800,0x0,0x1e000000,0x1e000000,0x40000000,0x0,0x40000000,0x0,0x0,0xed80,0x0,0x8000,0x0,0xed80,};
+      jj_la1_0 = new int[] {0xc480,0x6400000,0x400000,0x6000000,0x18000000,0x18000000,0x400,0xc480,0x20000000,0x200,0xec80,0x0,0xec80,0x0,0x4000ec80,0x2800,0x0,0x1e000000,0x1e000000,0x40000000,0x0,0x40000000,0x0,0x0,0xed80,0x0,0x8000,0x0,};
    }
    private static void jj_la1_1() {
-      jj_la1_1 = new int[] {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x7f,0x0,0x7f,0x0,0x0,0x80,0x0,0x0,0x0,0x100,0x0,0x400,0x400,0x100,0x400,0x100,0xe00,0x300,};
+      jj_la1_1 = new int[] {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x7f,0x0,0x7f,0x0,0x0,0x80,0x0,0x0,0x0,0x100,0x0,0x400,0x400,0x100,0x400,0x100,0x800,};
    }
 
   public as2j(java.io.InputStream stream) {
@@ -698,7 +689,7 @@
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 29; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 28; i++) jj_la1[i] = -1;
   }
 
   public void ReInit(java.io.InputStream stream) {
@@ -707,7 +698,7 @@
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 29; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 28; i++) jj_la1[i] = -1;
   }
 
   public as2j(java.io.Reader stream) {
@@ -716,7 +707,7 @@
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 29; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 28; i++) jj_la1[i] = -1;
   }
 
   public void ReInit(java.io.Reader stream) {
@@ -725,7 +716,7 @@
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 29; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 28; i++) jj_la1[i] = -1;
   }
 
   public as2j(as2jTokenManager tm) {
@@ -733,7 +724,7 @@
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 29; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 28; i++) jj_la1[i] = -1;
   }
 
   public void ReInit(as2jTokenManager tm) {
@@ -741,7 +732,7 @@
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 29; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 28; i++) jj_la1[i] = -1;
   }
 
   final private Token jj_consume_token(int kind) throws ParseException {
@@ -796,7 +787,7 @@
       la1tokens[jj_kind] = true;
       jj_kind = -1;
     }
-    for (int i = 0; i < 29; i++) {
+    for (int i = 0; i < 28; i++) {
       if (jj_la1[i] == jj_gen) {
         for (int j = 0; j < 32; j++) {
           if ((jj_la1_0[i] & (1<<j)) != 0) {

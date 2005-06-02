@@ -24,12 +24,14 @@
 package jason.stdlib;
 
 import jason.asSemantics.BDIlogic;
+import jason.asSemantics.InternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
+import jason.asSyntax.Term;
 
-public class dropAllIntentions {
+public class dropAllIntentions implements InternalAction {
     
-    public static boolean execute(TransitionSystem ts, Unifier un, String[] args) throws Exception {
+    public boolean execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         BDIlogic.dropAllInt(ts);
         return true;
     }
