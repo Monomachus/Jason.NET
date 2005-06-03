@@ -260,7 +260,10 @@ public class Term implements Cloneable, Comparable, Serializable {
 	}
 	
 	public String toString() {
-		StringBuffer s = new StringBuffer(funcSymb);
+		StringBuffer s = new StringBuffer();
+		if (funcSymb != null) {
+			s.append(funcSymb);
+		}
 		if (terms != null) {
 			s.append("(");
 			Iterator i = terms.iterator();
