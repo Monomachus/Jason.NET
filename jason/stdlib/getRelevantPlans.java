@@ -39,7 +39,7 @@ public class getRelevantPlans implements InternalAction {
 
 	/**
 	 * args[0] = trigger event (as a StringTerm)
-	 * args[1] = variable (Term) that will be unified with a ListTerm
+	 * args[1] = variable or list (Term) that will be unified with a ListTerm
 	 *           that contains all plans (as StringTerms)
 	 *           (the splans'sources in this list are empty)
 	 */
@@ -68,16 +68,14 @@ public class getRelevantPlans implements InternalAction {
 
 			// second arg is a var
 			Term listVar = args[1];
-			if (listVar == null || !listVar.isVar()) {
-				throw new JasonException("The second argument '" + args[1]
-						+ "' is not a VAR (getRelevantPlans internal action)");
-			}
+			//if (listVar == null || !listVar.isVar()) {
+			//	throw new JasonException("The second argument '" + args[1]
+			//			+ "' is not a VAR (getRelevantPlans internal action)");
+			//}
 
 			// un.unifies(new Term(sPlanList.toString()), listVar);
-			un.unifies(lt, listVar);
+			return un.unifies(lt, listVar);
 			// System.out.println("*** un = "+un);
-
-			return true;
 		} catch (ArrayIndexOutOfBoundsException e) {
 			throw new JasonException(
 					"The internal action 'getRelevantPlans' has not received two arguments (TE and a VAR)");

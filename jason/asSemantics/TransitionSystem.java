@@ -35,6 +35,7 @@ import jason.asSyntax.Plan;
 import jason.asSyntax.Pred;
 import jason.asSyntax.Term;
 import jason.asSyntax.Trigger;
+import jason.asSyntax.VarTerm;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -128,7 +129,7 @@ public class TransitionSystem {
             	// unify the answer with the parameter
             	Term ans = Term.parse(m.getPropCont());
             	BodyLiteral send = (BodyLiteral)intention.peek().getPlan().getBody().remove(0);
-            	intention.peek().getUnif().unifies(send.getTerm(3),ans);
+            	intention.peek().getUnif().unifies(send.getBody().getTerm(3),ans);
                 getC().getIntentions().add(intention);
                 
             // the message is not an ask answer
@@ -322,7 +323,7 @@ public class TransitionSystem {
 	static Class classParameters[] = { jason.asSemantics.TransitionSystem.class, jason.asSemantics.Unifier.class, (new String[3]).getClass() };
 	private Map agInternalAction = new HashMap(); // this agent internal actions (key->IA'name, value->InternalAction object)
 	
-	public boolean execInternalAction(Pred action, Unifier un) throws JasonException {
+	public boolean execInternalAction(Term action, Unifier un) throws JasonException {
 		String name = action.getFunctor();
 		if (name.indexOf('.') == 0)
 			name = "jason.stdlib" + name;
@@ -377,15 +378,24 @@ public class TransitionSystem {
 		if (im.getPlan().getBody().size() == 0) { // for empty plans! may need unnif, etc
 			updateIntention();
 		} else {
+			Unifier     u = im.unif;
 			BodyLiteral h = (BodyLiteral) im.getPlan().getBody().get(0);
-			Literal l = new Literal((Literal)h);
-			Unifier u = im.unif;
+		
+			Term bodyTerm = (Term)h.getBody().clone();
+			Literal l;
+			if (bodyTerm.isVar()) {
+				u.apply(bodyTerm);
+				l = (Literal) ((VarTerm)bodyTerm).getValue();
+			} else {
+				l = (Literal) bodyTerm;
+			}
+			u.apply(l);
+			
 			switch (h.getType()) {
 			
 			// Rule Action
 			case D.HAction:
-				u.apply(l);
-				if (h.isInternalAction()) {
+				if (l.isInternalAction()) {
 					execInternalAction(l, u);
 					// TODO: IMPORTANT: what to do if it fails!
 					// implemente plan failure
@@ -399,15 +409,11 @@ public class TransitionSystem {
 				
 			// Rule Achieve
 			case D.HAchieve:
-				u.apply(l);
 				conf.C.addAchvGoal(l, conf.C.SI);
 				break;
 				
 			// Rule Test
 			case D.HTest:
-				if (l.isVar()) {
-					u.apply(l);
-				}
 				Unifier ubel = conf.ag.believes(l, u);
 				if (ubel != null) {
 					im = conf.C.SI.peek();
@@ -422,8 +428,6 @@ public class TransitionSystem {
 				
 			// Rule AddBel
 			case D.HAddBel:
-				
-				u.apply(l);
 				
 				// translate l to a string and parse again to identify
 				// problems like
@@ -440,12 +444,10 @@ public class TransitionSystem {
 					}
 				}
 				break;
+				
 			// Rule DelBel
 			case D.HDelBel:
-				if (l.isVar()) {
-					u.apply(l);
-				}
-				ubel = conf.ag.believes(l, u);
+				ubel = conf.ag.believes((Literal)l, u);
 				//System.out.println("****00-"+ubel);
 				if (ubel != null) {
 					ubel.apply(l);
@@ -471,9 +473,9 @@ public class TransitionSystem {
 			if (conf.C.SI.size() > 1) {
 				IntendedMeans oldim = confP.C.SI.pop();
 				im = conf.C.SI.peek();
-				Literal g = (Literal) im.getPlan().getBody().remove(0);
+				BodyLiteral g = (BodyLiteral) im.getPlan().getBody().remove(0);
 				// use unifier of finished plan accordingly
-				im.unif.compose((Pred) g, oldim.unif);
+				im.unif.compose(g.getBody(), oldim.unif);
 				confP.step = D.SClrInt; // the new top may have become
 				// empty! need to keep checking.
 			} else {
@@ -499,13 +501,14 @@ public class TransitionSystem {
 			Plan pl = (Plan) candidateRPs.get(i);
 			Unifier relUn = pl.relevant(te);
 			if (relUn != null) {
+				//System.out.println("Add="+te+"|"+pl+"|"+relUn);
 				rp.add(new Option(pl, relUn));
 			}
 		}
 		return rp;
 	}
 
-	private List applicablePlans(List rp) throws JasonException {
+	public List applicablePlans(List rp) throws JasonException {
 		for (Iterator i = rp.iterator(); i.hasNext();) {
 			Option opt = (Option) i.next();
 			opt.unif = logCons(opt.plan.getContext().iterator(), opt.unif);

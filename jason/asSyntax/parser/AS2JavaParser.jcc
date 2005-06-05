@@ -158,14 +158,14 @@ Plan p() : { Trigger T; ArrayList C; ArrayList H; Pred L = null; }
   [ "@" L=at() ] 
     T=te() 
     ":" C=ct() 
-    "<-" H=h() "." 
+    "<-" H=bd() "." 
                                  { return new Plan(L,T,C,H);  }
 }
 
 Trigger te() : { 
-                 boolean teType;
-			     byte    teGoal = D.TEBel;
-				 Literal F; 
+               		boolean teType;
+			    	byte    teGoal = D.TEBel;
+				 	Literal F; 
                }
 {
   ( "+"    { teType = D.TEAdd; }
@@ -186,7 +186,7 @@ Literal l() : { Pred F; Token k; boolean type = D.LPos; }
       ]
       F=at()                  { return new Literal(type,F); }
     )
-  | k=<VAR>                   { return new Literal(type,new Pred(k.image));} 
+  // moved to a more specifig place (dl, t, ...) | k=<VAR>                   { return new VarTerm(k.image); }//return new Literal(type,new Pred(k.image));} 
   | k=<TK_TRUE>               { return D.LTrue;}  // used when dl/body is true
   )
 }
@@ -195,19 +195,16 @@ Literal l() : { Pred F; Token k; boolean type = D.LPos; }
 
 ArrayList ct() :  { DefaultLiteral P; ArrayList C = new ArrayList(); List CT;}
 {
-   //( <TK_TRUE>   { return C; } TODO a literal may be true
-     //| 
      P = dl()   { if (!P.equals(D.LTrue)) {
                     C.add(P); 
                   }
                 }
-   //)
-   [ "&" CT=ct()  { C.addAll(CT); } ]
-   { return C; }
+     [ "&" CT=ct()  { C.addAll(CT); } ]
+     { return C; }
 }
 
 
-DefaultLiteral dl() : { Literal L; 
+DefaultLiteral dl() : { Literal L; Token k;
                         Term op1 = null;
                         String operator = ""; 
                         Term op2 = null; 
@@ -221,6 +218,8 @@ DefaultLiteral dl() : { Literal L;
   ( "(" L=dl() ")"   { return new DefaultLiteral(isPos,L); }
   | ( op1 = l()      { rel = new DefaultLiteral(isPos,(Literal)op1); }
     | op1 = value()  { rel = null; }
+    | k = <VAR>      { op1 = new VarTerm(k.image); 
+                       rel = new DefaultLiteral(isPos, (VarTerm)op1); }
     )
                      
     [
@@ -232,14 +231,17 @@ DefaultLiteral dl() : { Literal L;
        | "\\=="      { operator = ".equals"; isPos = !isPos; } 
        | "="         { operator = ".unifies"; } 
        )
-                     { if (rel != null && operator.startsWith(".gt")) { // op1 is a l()
-                          if (! op1.isVar()) {
-					        throw new ParseException("Default literal: literal must not be followed by relational operator.");
-                          }
-                       }
-                     }
+                     //{ if (rel != null && operator.startsWith(".gt")) { // op1 is a l()
+                     //     if (! op1.isVar()) {
+					  //      throw new ParseException("Default literal: literal must not be followed by relational operator.");
+                     //     }
+                     //  }
+                     //}
                      
-       (op2 = l() | op2 = value())
+       ( op2 = l() 
+       | op2 = value()
+       | k = <VAR>   { op2 = new VarTerm(k.image); }
+       )
                      { rel = new DefaultLiteral(isPos, new Literal(true, new Pred(operator))); 
                        if (!change) {
    					      rel.addTerm(op1); 
@@ -253,7 +255,7 @@ DefaultLiteral dl() : { Literal L;
     { if (rel == null) {
         throw new ParseException("Default literal: value must be followed by relational operator.");
       } else {
-         return rel; 
+        return rel; 
       }
     }
   )
@@ -261,20 +263,11 @@ DefaultLiteral dl() : { Literal L;
 
 Term value() : { Token k; }
 {
-     (   k  = <NUMBER> { return new Term(k.image); }
-       | k  = <STRING> { return new StringTerm(k.image); }
+     (   k = <NUMBER> { return new Term(k.image); }
+       | k = <STRING> { return new StringTerm(k.image); }
      ) 
 }
 
-// not used! use bd instead
-ArrayList h() : { ArrayList H; }
-{
-  ( //<TK_TRUE> { return new ArrayList(); } TODO: 
-  //| 
-  H=bd()
-  )
-  { return H; }
-}
 
 ArrayList bd() : { BodyLiteral F; 
                    ArrayList BD = new ArrayList(); 
@@ -290,7 +283,7 @@ ArrayList bd() : { BodyLiteral F;
 }
 
 
-BodyLiteral f() : { Literal A; 
+BodyLiteral f() : { Literal A; Token k;
                     byte formType = D.HAction;
                   }
 {
@@ -300,7 +293,9 @@ BodyLiteral f() : { Literal A;
     | "-"  { formType = D.HDelBel; }
     )
   ]
-  A=l()    { return new BodyLiteral(formType,A); }
+  ( A=l()       { return new BodyLiteral(formType,A); }
+  | k = <VAR>   { return new BodyLiteral(formType,new VarTerm(k.image)); } // used in communication "+C"
+  )
 }
 
 
@@ -319,16 +314,6 @@ Pred at() : { Token K; Pred p = new Pred(); Term t; }
 }
 
 
-/* Structures (no annotations here) */
-// not used!
-Term st() : { Token K; Term t = new Term(); }
-{
-  K=<ATOM>   { t.setFunctor(K.image); } 
-  [ 
-      "(" t=lt(t) ")"
-  ]
-  { return t; }
-}
 
 /* List of terms as parameters */
 Term lt(Term u) : { Term v; }
@@ -359,31 +344,17 @@ Pred la(Pred p) : { Term v; }
 Term t() : { Token K; Term u; }
 {
   ( //u=st()       { return u; } TODO: changed to at, is it ok? used in the terms of received(...Content...)
-  u=l()         { return u; }
+    u=l()        { return u; }
   | u=list()     { return u; } 
-  // alredy in at | K=<ATOM>     { return new Pred(K.image); }
-  //| K=<VAR>      { return new Literal(D.LPos, new Pred(K.image)); } // it need to unify with ~a in communication
+  | K=<VAR>      { return new VarTerm(K.image); }
   | K=<NUMBER>   { return new Term(K.image); }
   | K=<STRING>   { return new StringTerm(K.image.replaceAll("\"", "\\\"")); } 
-  //| K=<TK_TRUE>  { return D.LTrue; } 
+  // alredy in at | K=<ATOM>     { return new Pred(K.image); }
+  // in literal | K=<TK_TRUE>  { return D.LTrue; } 
   | K=<TK_FALSE> { return new Term(K.image); } 
   )
 }
 
-/*
-Term list() : { Token K; Term f; Term p = new Term(); Term l; Term a; }
-{
-  "["
-  ( f=t() { p.setFunctor(D.ListCons); p.addTerm(f); a=p; }
-    ( ( "," f=t() { l=new Term(D.ListCons); a.addTerm(l); a=l; a.addTerm(f); } )*
-      "]" { a.addTerm(new Term(D.EmptyList)); return p; }
-    | "|"
-      ( l=list() "]" { p.addTerm(l); return p; }
-      | K=<VAR>  "]" { p.addTerm(new Term(K.image)); return p; } )
-    )
-  | "]" { p.setFunctor(D.EmptyList); return p; } )
-}
-*/
 
 ListTerm list() : { ListTerm lt; ListTerm last; Token K; Term f; }
 {
@@ -391,7 +362,7 @@ ListTerm list() : { ListTerm lt; ListTerm last; Token K; Term f; }
   f=t()               { lt = new ListTerm(f); last = lt; }
   ( "," f=t()         { last = last.append(f); }
   )*
-  [ "|"  ( K=<VAR>    { last.setTail(new Term(K.image)); }
+  [ "|"  ( K=<VAR>    { last.setTail(new VarTerm(K.image)); }
          | f=list()   { last.setTail(f); }
          )            { return lt; } 
   ]

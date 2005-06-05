@@ -25,38 +25,48 @@ package jason.asSyntax;
 
 import jason.D;
 
-public class BodyLiteral extends Literal implements Cloneable {
+public class BodyLiteral implements Cloneable {
     
+	Term body;
     byte formType;
 
     public BodyLiteral(byte t, Literal l) {
-        super(l);
+        body = (Term)l.clone();
         formType = t;
+    }
+    public BodyLiteral(byte t, VarTerm v) {
+        //super((Term)v);
+		body = (Term)v.clone();
+		formType = t;
     }
 
     public byte getType() {
-        return(formType);
+        return formType;
     }
+	
+	public Term getBody() {
+		return body;
+	}
     
     public boolean equals(Object o) {
     	try {
     		BodyLiteral b = (BodyLiteral) o;
-    		return (formType==b.formType && super.equals(b));
+    		return formType==b.formType && body.equals(b.body);
     	} catch (Exception e) {
     		return false;
     	}
     }
 
     public boolean equalsAsLiteral(Object o) {
-    	return super.equals(o);
+    	return body.equals(o);
     }
     
     
     public boolean isAsk() {
-    	if (! getFunctorArity().equals(".send/4")) {
+    	if (! body.getFunctorArity().equals(".send/4")) {
     		return false;
     	}
-    	if (getTerm(1).toString().startsWith("ask")) {
+    	if (body.getTerm(1).toString().startsWith("ask")) {
     		return true;
     	} else {
     		return false;
@@ -64,21 +74,25 @@ public class BodyLiteral extends Literal implements Cloneable {
     }
     
     public Object clone() {
-        return new BodyLiteral(formType, (Literal)super.clone());
+		if (body.isVar()) {
+			return new BodyLiteral(formType, (VarTerm)body);			
+		} else {
+			return new BodyLiteral(formType, (Literal)body);
+		}
     }
     
     public String toString() {
         switch(formType) {
             case D.HAction :
-                return super.toString();
+                return body.toString();
             case D.HAchieve :
-                return "!" + super.toString();
+                return "!" + body.toString();
             case D.HTest :
-                return "?" + super.toString();
+                return "?" + body.toString();
             case D.HAddBel :
-                return "+" + super.toString();
+                return "+" + body.toString();
             case D.HDelBel :
-                return "-" + super.toString();
+                return "-" + body.toString();
         }
         // What to do here???
         return("ERROR in Literal to String");

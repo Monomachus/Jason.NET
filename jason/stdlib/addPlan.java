@@ -41,16 +41,17 @@ public class addPlan implements InternalAction {
 	 */
     public boolean execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         try {
+			Term plans = Term.parse(args[0].toString());
 			Term source = args[1];
-        	if (args[0].isList()) { // if arg[0] is a list
-				ListTerm lt = (ListTerm)args[0];
+        	if (plans.isList()) { // if arg[0] is a list
+				ListTerm lt = (ListTerm)plans;
         		Iterator i = lt.iterator();
         		while (i.hasNext()) {
 					lt = (ListTerm)i.next();
-            		ts.getAg().addPlan( (StringTerm)lt.getTerm(), source);
+					ts.getAg().addPlan( (StringTerm)lt.getTerm(), source);
         		}
         	} else { // args[0] is a plan
-        		ts.getAg().addPlan((StringTerm)args[0], source);
+        		ts.getAg().addPlan((StringTerm)plans, source);
         	}
             return true;
         } catch (ArrayIndexOutOfBoundsException e) {

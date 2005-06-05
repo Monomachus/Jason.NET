@@ -26,11 +26,17 @@ package jason.asSyntax;
 import jason.D;
 
 public class DefaultLiteral extends Literal implements Cloneable {
-    
-    boolean defType;
+
+	// TODO: not extends Literal (because of the VarTerm), same solution than BodyLiteral
+
+	boolean defType;
 
     public DefaultLiteral(boolean t, Literal l) {
         super(l);
+        defType = t;
+    }
+    public DefaultLiteral(boolean t, VarTerm v) {
+        super(v);
         defType = t;
     }
 

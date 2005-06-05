@@ -10,10 +10,10 @@ public class StringTerm extends Term {
 		super();
 	}
 	public StringTerm(String fs) {
-		super(fs);
+		setFunctor(fs);
 	}
 	public StringTerm(StringTerm t) {
-		super(t);
+		setFunctor(t.getFunctor());
 	}
 	
 	public void setFunctor(String fs) {

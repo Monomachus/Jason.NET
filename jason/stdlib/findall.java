@@ -35,26 +35,17 @@ import java.util.List;
 public class findall implements InternalAction {
 
 	/** .findall(Var, a(Var), List) */
-	public boolean execute(TransitionSystem ts, Unifier un, Term[] args)
-			throws Exception {
+	public boolean execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
 		try {
 			Term var = (Term) args[0].clone();
-			if (var == null || !var.isVar()) {
-				throw new JasonException(
-						"The first parameter of the internal action 'findAll' is not a Variable!");
+			if (!var.isVar()) {
+				throw new JasonException("The first parameter ('"+args[0]+"') of the internal action 'findAll' is not a Variable!");
 			}
 			Literal bel = Literal.parseLiteral(args[1].toString());
 			if (bel == null) {
-				throw new JasonException(
-						"The second parameter of the internal action 'findAll' is not a literal!");
+				throw new JasonException("The second parameter ('"+args[1]+"') of the internal action 'findAll' is not a literal!");
 			}
 			un.apply(bel);
-
-			Term list = (Term)args[2].clone();
-			//if (list == null || !list.isVar()) {
-			//	throw new JasonException(
-			//			"The third parameter of the internal action 'findAll' is not a Variable!");
-			//}
 
 			// find all bel in belief base and build a list with them
 			ListTerm all = new ListTerm();
@@ -62,9 +53,9 @@ public class findall implements InternalAction {
 			if (relB != null) {
 				for (int i = 0; i < relB.size(); i++) {
 					Literal b = (Literal) relB.get(i);
-					Unifier newUn = (un == null) ? new Unifier() : (Unifier) un
-							.clone();
+					Unifier newUn = (un == null) ? new Unifier() : (Unifier) un.clone();
 					// recall that order is important because of annotations!
+					//System.out.println("b="+b+"="+bel);
 					if (newUn.unifies(bel, b)) {
 						// get the val value and add it in the list
 						Term vl = newUn.get(var.toString());
@@ -74,14 +65,15 @@ public class findall implements InternalAction {
 					}
 				}
 			}
-
+			Term list = args[2];
+			//System.out.println("all="+all);
 			return un.unifies(list, all);
 		} catch (ArrayIndexOutOfBoundsException e) {
-			throw new JasonException(
-					"The internal action 'findall' has not received three arguments");
+			throw new JasonException("The internal action 'findall' has not received three arguments");
 		} catch (Exception e) {
 			throw new JasonException("Error in internal action 'findall': " + e);
+		//} finally {
+		//	System.out.println("u="+un);
 		}
 	}
-
 }

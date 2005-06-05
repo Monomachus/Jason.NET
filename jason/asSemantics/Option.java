@@ -46,6 +46,10 @@ public class Option implements Serializable {
         plan = p;
         unif = u;
     }
+	
+	public Object clone() {
+		return new Option( (Plan)plan.clone(), (Unifier)unif.clone());
+	}
 
     public String toString() {
         return "("+plan+","+unif+")";

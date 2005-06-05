@@ -74,7 +74,6 @@
       case TK_TRUE:
       case TK_NEG:
       case ATOM:
-      case VAR:
         ;
         break;
       default:
@@ -130,16 +129,16 @@
     jj_consume_token(23);
     C = ct();
     jj_consume_token(24);
-    H = h();
+    H = bd();
     jj_consume_token(21);
                                    {if (true) return new Plan(L,T,C,H);}
     throw new Error("Missing return statement in function");
   }
 
   final public Trigger te() throws ParseException {
-                 boolean teType;
-                             byte    teGoal = D.TEBel;
-                                 Literal F;
+                        boolean teType;
+                                byte    teGoal = D.TEBel;
+                                        Literal F;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case 25:
       jj_consume_token(25);
@@ -198,10 +197,6 @@
       F = at();
                                 {if (true) return new Literal(type,F);}
       break;
-    case VAR:
-      k = jj_consume_token(VAR);
-                                {if (true) return new Literal(type,new Pred(k.image));}
-      break;
     case TK_TRUE:
       k = jj_consume_token(TK_TRUE);
                                 {if (true) return D.LTrue;}
@@ -216,9 +211,7 @@
 
   final public ArrayList ct() throws ParseException {
                     DefaultLiteral P; ArrayList C = new ArrayList(); List CT;
-    //( <TK_TRUE>   { return C; } TODO a literal may be true
-         //| 
-         P = dl();
+    P = dl();
                   if (!P.equals(D.LTrue)) {
                     C.add(P);
                   }
@@ -226,18 +219,18 @@
     case 29:
       jj_consume_token(29);
       CT = ct();
-                    C.addAll(CT);
+                      C.addAll(CT);
       break;
     default:
       jj_la1[8] = jj_gen;
       ;
     }
-     {if (true) return C;}
+       {if (true) return C;}
     throw new Error("Missing return statement in function");
   }
 
   final public DefaultLiteral dl() throws ParseException {
-                        Literal L;
+                        Literal L; Token k;
                         Term op1 = null;
                         String operator = "";
                         Term op2 = null;
@@ -270,7 +263,6 @@
       case TK_TRUE:
       case TK_NEG:
       case ATOM:
-      case VAR:
         op1 = l();
                        rel = new DefaultLiteral(isPos,(Literal)op1);
         break;
@@ -278,6 +270,11 @@
       case STRING:
         op1 = value();
                        rel = null;
+        break;
+      case VAR:
+        k = jj_consume_token(VAR);
+                       op1 = new VarTerm(k.image);
+                       rel = new DefaultLiteral(isPos, (VarTerm)op1);
         break;
       default:
         jj_la1[10] = jj_gen;
@@ -326,21 +323,19 @@
           jj_consume_token(-1);
           throw new ParseException();
         }
-                       if (rel != null && operator.startsWith(".gt")) { // op1 is a l()
-                          if (! op1.isVar()) {
-                                                {if (true) throw new ParseException("Default literal: literal must not be followed by relational operator.");}
-                          }
-                       }
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case TK_TRUE:
         case TK_NEG:
         case ATOM:
-        case VAR:
           op2 = l();
           break;
         case NUMBER:
         case STRING:
           op2 = value();
+          break;
+        case VAR:
+          k = jj_consume_token(VAR);
+                       op2 = new VarTerm(k.image);
           break;
         default:
           jj_la1[12] = jj_gen;
@@ -363,7 +358,7 @@
       if (rel == null) {
         {if (true) throw new ParseException("Default literal: value must be followed by relational operator.");}
       } else {
-         {if (true) return rel;}
+        {if (true) return rel;}
       }
       break;
     default:
@@ -379,27 +374,17 @@
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case NUMBER:
       k = jj_consume_token(NUMBER);
-                         {if (true) return new Term(k.image);}
+                        {if (true) return new Term(k.image);}
       break;
     case STRING:
       k = jj_consume_token(STRING);
-                         {if (true) return new StringTerm(k.image);}
+                        {if (true) return new StringTerm(k.image);}
       break;
     default:
       jj_la1[15] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
-    throw new Error("Missing return statement in function");
-  }
-
-// not used! use bd instead
-  final public ArrayList h() throws ParseException {
-                  ArrayList H;
-    //<TK_TRUE> { return new ArrayList(); } TODO: 
-      //| 
-      H = bd();
-    {if (true) return H;}
     throw new Error("Missing return statement in function");
   }
 
@@ -426,7 +411,7 @@
   }
 
   final public BodyLiteral f() throws ParseException {
-                    Literal A;
+                    Literal A; Token k;
                     byte formType = D.HAction;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case 25:
@@ -460,8 +445,22 @@
       jj_la1[18] = jj_gen;
       ;
     }
-    A = l();
-             {if (true) return new BodyLiteral(formType,A);}
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case TK_TRUE:
+    case TK_NEG:
+    case ATOM:
+      A = l();
+                  {if (true) return new BodyLiteral(formType,A);}
+      break;
+    case VAR:
+      k = jj_consume_token(VAR);
+                  {if (true) return new BodyLiteral(formType,new VarTerm(k.image));}
+      break;
+    default:
+      jj_la1[19] = jj_gen;
+      jj_consume_token(-1);
+      throw new ParseException();
+    }
     throw new Error("Missing return statement in function");
   }
 
@@ -477,7 +476,7 @@
       jj_consume_token(31);
       break;
     default:
-      jj_la1[19] = jj_gen;
+      jj_la1[20] = jj_gen;
       ;
     }
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -487,7 +486,7 @@
       jj_consume_token(41);
       break;
     default:
-      jj_la1[20] = jj_gen;
+      jj_la1[21] = jj_gen;
       ;
     }
     {if (true) return p;}
@@ -496,23 +495,16 @@
 
 /* Structures (no annotations here) */
 // not used!
-  final public Term st() throws ParseException {
-              Token K; Term t = new Term();
-    K = jj_consume_token(ATOM);
-               t.setFunctor(K.image);
-    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case 30:
-      jj_consume_token(30);
-      t = lt(t);
-      jj_consume_token(31);
-      break;
-    default:
-      jj_la1[21] = jj_gen;
-      ;
-    }
-    {if (true) return t;}
-    throw new Error("Missing return statement in function");
-  }
+/*
+Term st() : { Token K; Term t = new Term(); }
+{
+  K=<ATOM>   { t.setFunctor(K.image); } 
+  [ 
+      "(" t=lt(t) ")"
+  ]
+  { return t; }
+}
+*/
 
 /* List of terms as parameters */
   final public Term lt(Term u) throws ParseException {
@@ -573,14 +565,17 @@
     case TK_TRUE:
     case TK_NEG:
     case ATOM:
-    case VAR:
       //u=st()       { return u; } TODO: changed to at, is it ok? used in the terms of received(...Content...)
-        u = l();
-                  {if (true) return u;}
+          u = l();
+                   {if (true) return u;}
       break;
     case 40:
       u = list();
                    {if (true) return u;}
+      break;
+    case VAR:
+      K = jj_consume_token(VAR);
+                   {if (true) return new VarTerm(K.image);}
       break;
     case NUMBER:
       K = jj_consume_token(NUMBER);
@@ -602,20 +597,6 @@
     throw new Error("Missing return statement in function");
   }
 
-/*
-Term list() : { Token K; Term f; Term p = new Term(); Term l; Term a; }
-{
-  "["
-  ( f=t() { p.setFunctor(D.ListCons); p.addTerm(f); a=p; }
-    ( ( "," f=t() { l=new Term(D.ListCons); a.addTerm(l); a=l; a.addTerm(f); } )*
-      "]" { a.addTerm(new Term(D.EmptyList)); return p; }
-    | "|"
-      ( l=list() "]" { p.addTerm(l); return p; }
-      | K=<VAR>  "]" { p.addTerm(new Term(K.image)); return p; } )
-    )
-  | "]" { p.setFunctor(D.EmptyList); return p; } )
-}
-*/
   final public ListTerm list() throws ParseException {
                     ListTerm lt; ListTerm last; Token K; Term f;
     jj_consume_token(40);
@@ -641,7 +622,7 @@ Term list() : { Token K; Term f; Term p = new Term(); Term l; Term a; }
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case VAR:
         K = jj_consume_token(VAR);
-                        last.setTail(new Term(K.image));
+                        last.setTail(new VarTerm(K.image));
         break;
       case 40:
         f = list();
@@ -677,10 +658,10 @@ Term list() : { Token K; Term f; Term p = new Term(); Term l; Term a; }
       jj_la1_1();
    }
    private static void jj_la1_0() {
-      jj_la1_0 = new int[] {0xc480,0x6400000,0x400000,0x6000000,0x18000000,0x18000000,0x400,0xc480,0x20000000,0x200,0xec80,0x0,0xec80,0x0,0x4000ec80,0x2800,0x0,0x1e000000,0x1e000000,0x40000000,0x0,0x40000000,0x0,0x0,0xed80,0x0,0x8000,0x0,};
+      jj_la1_0 = new int[] {0x4480,0x6400000,0x400000,0x6000000,0x18000000,0x18000000,0x400,0x4480,0x20000000,0x200,0xec80,0x0,0xec80,0x0,0x4000ec80,0x2800,0x0,0x1e000000,0x1e000000,0xc480,0x40000000,0x0,0x0,0x0,0xed80,0x0,0x8000,0x0,};
    }
    private static void jj_la1_1() {
-      jj_la1_1 = new int[] {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x7f,0x0,0x7f,0x0,0x0,0x80,0x0,0x0,0x0,0x100,0x0,0x400,0x400,0x100,0x400,0x100,0x800,};
+      jj_la1_1 = new int[] {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x7f,0x0,0x7f,0x0,0x0,0x80,0x0,0x0,0x0,0x0,0x100,0x400,0x400,0x100,0x400,0x100,0x800,};
    }
 
   public as2j(java.io.InputStream stream) {

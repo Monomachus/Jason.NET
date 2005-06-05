@@ -50,10 +50,6 @@ public class Trigger extends Literal implements Cloneable {
 		}
 	}
 
-	/**
-	 * 
-	 * @uml.property name="trigType"
-	 */
 	public void setTrigType(boolean t) {
 		trigType = t;
 	}

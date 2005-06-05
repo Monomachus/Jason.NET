@@ -47,6 +47,11 @@ public class send implements InternalAction {
 	        to   = (Term)args[0].clone();
 	        ilf  = (Term)args[1].clone();
 	        pcnt = (Term)args[2].clone();
+
+			//System.out.println("Send un="+un);
+			//System.out.println("To="+to);
+			//System.out.println("Content="+pcnt);
+			
             //to  = Term.parse(args[0]);
             //if (to == null) {
             //    throw new JasonException("The TO parameter of the internal action 'send' is not a term!");            	
@@ -55,7 +60,7 @@ public class send implements InternalAction {
             	un.apply(to);
             }
             if (! to.isGround()) {
-                throw new JasonException("The TO parameter of the internal action 'send' is not a ground term!");            	
+                throw new JasonException("The TO parameter ('"+to+"') of the internal action 'send' is not a ground term!");            	
             }
 
             //ilf = Term.parse(args[1]);
@@ -66,7 +71,7 @@ public class send implements InternalAction {
             	un.apply(ilf);
             }
             if (! ilf.isGround()) {
-                throw new JasonException("The Ilf Force parameter of the internal action 'send' is not a ground term!");            	            	
+                throw new JasonException("The Ilf Force parameter ('"+ilf+"') of the internal action 'send' is not a ground term!");            	            	
             }
             /*
             try {

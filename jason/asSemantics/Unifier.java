@@ -28,9 +28,9 @@ import jason.asSyntax.Literal;
 import jason.asSyntax.Pred;
 import jason.asSyntax.Term;
 import jason.asSyntax.Trigger;
+import jason.asSyntax.VarTerm;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 import org.w3c.dom.Document;
@@ -43,15 +43,20 @@ public class Unifier implements Cloneable {
     
     public void apply(Term t) {
         if (t.isVar()) {
-            if (function.containsKey(t.getFunctor())) {
-                t.set(function.get(t.getFunctor()));
-                apply(t); // in case t has var args
-            }
-            return;
-        }
-    	for (int i = 0; i < t.getTermsSize(); i++) {
-    		apply(t.getTerm(i));
-    	}
+			VarTerm vt = (VarTerm) t;
+			if (! vt.hasValue()) { 
+				Term vl = get(vt.getFunctor());
+				//System.out.println("appling="+t+"="+vl+" un="+this);
+				if (vl != null) {
+					vt.setValue(vl);
+					apply(vt); // in case t has var args
+				}
+			}
+			return;
+		}
+		for (int i = 0; i < t.getTermsSize(); i++) {
+			apply(t.getTerm(i));
+		}
     }
 
     public void apply(Pred p) {
@@ -63,24 +68,52 @@ public class Unifier implements Cloneable {
 		}
     }
 
+	/**
+	 * gets the value for a Var, if it is unified with another var, gets this
+	 * other's value
+	 */
     public Term get(String var) {
-        return (Term)function.get(var);
+		if (var == null) return null;
+		
+		Term vl = (Term)function.get(var);
+		if (vl == null) return null;
+		
+		// if vl is also a var, get this var value
+		try {
+			//System.out.println("*"+var+"*"+vl+" - "+this);
+			VarTerm vt = (VarTerm)vl;
+			Term vtvl = vt.getValue();
+			if (vtvl != null) { // the variable has value, is ground
+				return vtvl;
+			} else { // the variable is not ground, but could be unified
+				vtvl = get( vt.getFunctor() );
+				if (vtvl != null) {
+					return vtvl;
+				}
+			}
+	
+			return null; // no value!
+		} catch (StackOverflowError e) {
+			System.err.println("Stack overflow in unifier.get!\n\t"+this);
+			return null;
+		} catch (ClassCastException e) {
+			return vl;
+		}
     }
     
     public void compose(Term t, Unifier u) {
         if (t.isVar()) {
             if (u.function.containsKey(t.getFunctor())) {
                 function.put(t.getFunctor(),u.function.get(t.getFunctor()));
-            }
-            else {
+            } else {
                 // TODO: WHAT TO DO THEN?
             }
             return;
         }
         if (t.getTerms()==null)
             return;
-        for (Iterator i = t.getTerms().iterator(); i.hasNext(); ) {
-            compose((Term) i.next(), u);
+        for (int i=0; i < t.getTermsSize(); i++) {
+            compose(t.getTerm(i), u);
         }
     }
     
@@ -89,58 +122,76 @@ public class Unifier implements Cloneable {
         apply(t1g);
         Term t2g = (Term)t2.clone();
         apply(t2g);
+        //System.out.println(t1+"="+t2);
         
 		List t1gl = t1g.getTerms();
 		List t2gl = t2g.getTerms();
 		
         // identical variables or constants
-        if (t1g.equals(t2g)) {
-            return true;
-        }
+		if (t1g.equals(t2g)) {
+			//System.out.println("Equals." + t1 + "=" + t2 + "...." + this);
+			return true;
+		}
         
         // if two atoms or structures
-        else if (!t1g.isVar() && !t2g.isVar()) {
-            // different funcSymb in atoms or structures
-            if (t1g.getFunctor() != null && !t1g.getFunctor().equals(t2g.getFunctor())) {
-                return false;
-            }
+		if (!t1g.isVar() && !t2g.isVar()) {
+			// different funcSymb in atoms or structures
+        	if (t1g.getFunctor() != null && !t1g.getFunctor().equals(t2g.getFunctor())) {
+				return false;
+        	}
             
 			// different arities
-            if ( (t1gl==null && t2gl!=null)   ||
-                 (t1gl!=null && t2gl==null) ) {
-                return false;
-            }
+        	if ( (t1gl==null && t2gl!=null)   ||
+					(t1gl!=null && t2gl==null) ) {
+				return false;
+			}
 			if (t1g.getTermsSize() != t2g.getTermsSize()) {
 				return false;
 			}
         }
-        
+		
         // t1 is var that doesn't occur in t2
-        if (t1g.isVar() && !t2g.hasVar(t1g)) {
-            function.put(t1g.getFunctor(), t2g);
-            return true;
-        }
-        // t2 is var that doesn't occur in t1
-        else if (t2g.isVar() && !t1g.hasVar(t2g)) {
-            function.put(t2g.getFunctor(), t1g);
-            return true;
-        }
+		if (t1g.isVar() && !t2g.hasVar(t1g)) {
+			
+			// if t1g is unified with another var, also unify another
+			try {
+				VarTerm t1gvl = (VarTerm)function.get(t1g.getFunctor());
+				if (t1gvl != null) {
+					unifies(t1gvl,t2g);
+				}
+			} catch (Exception e) {}
+			
+			function.put(t1g.getFunctor(), t2g);
+			return true;
+		}
+
+		// t2 is var that doesn't occur in t1
+		if (t2g.isVar() && !t1g.hasVar(t2g)) {
+			// if t2g is unified with another var, also unify another
+			try {
+				VarTerm t2gvl = (VarTerm)function.get(t2g.getFunctor());
+				if (t2gvl != null) {
+					unifies(t2gvl,t1g);
+				}
+			} catch (Exception e) {}
+			
+			function.put(t2g.getFunctor(), t1g);
+			//System.out.println("Unified." + t1 + "=" + t2);
+			return true;
+		}
 		
         // both are structures, same funcSymb, same arity
-        else {
-			if (!t1g.isList() && !t2g.isList()) { // lists have always terms == null
-	            if (t1gl == null &&  t2gl == null) {
-	                return true;
-	            }
-			} 
-						    
-			for (int i=0; i < t1g.getTermsSize(); i++) {
-                if (!unifies(t1g.getTerm(i),t2g.getTerm(i)))
-                    return false;
-			}
-			return true;
-            
-        }
+		if (!t1g.isList() && !t2g.isList()) { // lists have always terms == null
+            if (t1gl == null &&  t2gl == null) {
+                return true;
+            }
+		} 
+					    
+		for (int i=0; i < t1g.getTermsSize(); i++) {
+            if (!unifies(t1g.getTerm(i),t2g.getTerm(i)))
+                return false;
+		}
+		return true;
     }
     
    	public boolean unifies(Pred p1, Pred p2) {
@@ -158,7 +209,7 @@ public class Unifier implements Cloneable {
     }
     
     public boolean unifies(Trigger te1, Trigger te2) {
-        return (te1.sameType(te2) && unifies((Literal)te1,(Literal)te2));
+        return te1.sameType(te2) && unifies((Literal)te1,(Literal)te2);
     }
     
     public void clear() {

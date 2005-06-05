@@ -89,25 +89,29 @@ public class Agent {
     }
 	
 
-	public void parseAS(URL asURL) {
+	public boolean parseAS(URL asURL) {
 		try {
 			parseAS(asURL.openStream());
+			return true;
 			//System.out.println("as2j: AgentSpeak program '"+asURL+"' parsed successfully!");
 		} catch (IOException e) {
 			System.err.println("as2j: the AS source file was not found\n" + e);
 		} catch (ParseException e) {
 			System.err.println("as2j: error parsing \"" + asURL + "\"\n" + e);
 		}
+		return false;
 	}
-	public void parseAS(String asFileName) {
+	public boolean parseAS(String asFileName) {
 		try {
 			parseAS(new FileInputStream(asFileName));
+			return true;
 			//System.out.println("as2j: AgentSpeak program '"+asFileName+"' parsed successfully!");
 		} catch (FileNotFoundException e) {
 			System.err.println("as2j: the AS source file was not found\n" + e);
 		} catch (ParseException e) {
 			System.err.println("as2j: error parsing \"" + asFileName + "\"\n" + e);
 		}
+		return false;
 	}
 	void parseAS(InputStream asIn) throws ParseException {
 		as2j parser = new as2j(asIn);

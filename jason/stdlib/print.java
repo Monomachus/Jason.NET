@@ -43,7 +43,11 @@ public class print implements InternalAction {
 			} else {
 				Term t = (Term)args[i].clone();
 				un.apply(t);
-				System.out.print(t);
+				if (! t.isVar()) {
+					System.out.print(t);
+				} else {
+					System.out.print(t+"<no-value>");
+				}
 			}
 		}
 		System.out.println();

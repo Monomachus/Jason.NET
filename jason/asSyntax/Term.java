@@ -39,6 +39,9 @@ public class Term implements Cloneable, Comparable, Serializable {
 	}
 
 	public Term(String fs) {
+		if (fs != null && Character.isUpperCase(fs.charAt(0))) {
+			System.err.println("Warning: are you sure to create a term that begins with upper case ("+fs+")? Should it be a VarTerm?");
+		}
 		setFunctor(fs);
 	}
 
@@ -143,11 +146,11 @@ public class Term implements Cloneable, Comparable, Serializable {
 	}
 
 	public boolean isVar() {
-		if (funcSymb == null) {
+		//if (funcSymb == null) {
 			return false;
-		} else {
-			return Character.isUpperCase(funcSymb.charAt(0));
-		}
+		//} else {
+		//	return Character.isUpperCase(funcSymb.charAt(0));
+		//}
 	}
 
 	public boolean isList() {
@@ -156,12 +159,15 @@ public class Term implements Cloneable, Comparable, Serializable {
 	public boolean isString() {
 		return false;
 	}
-	
+	public boolean isInternalAction() {
+		return false;
+	}
+
 	public boolean isGround() {
 		if (funcSymb == null) // empty predicate
 			return true;
-		if (isVar()) // variable
-			return false;
+		//if (isVar()) // variable
+		//	return false;
 		if (terms == null) // atom
 			return true;
 		
@@ -185,10 +191,19 @@ public class Term implements Cloneable, Comparable, Serializable {
 	}
 
 	public boolean equals(Object t) {
-		if (t == null)
-			return false;
+		if (t == null)	return false;
+		
+		
+		// it is a var, uses var's equals
+		try {
+			VarTerm vt = (VarTerm)t;
+			//System.out.println(this.funcSymb+" equals1 "+vt.funcSymb);
+			return vt.equals(this);
+		} catch (Exception e) {}
+
 		try {
 			Term tAsTerm = (Term)t;
+			//System.out.println(this.funcSymb+" equals2 "+tAsTerm.funcSymb);
 			if (funcSymb == null && tAsTerm.funcSymb != null) {
 				return false;
 			}

@@ -29,7 +29,7 @@ import java.io.StringReader;
 
 public class Literal extends Pred implements Cloneable {
 
-	boolean type;
+	boolean type = D.LPos;
 
 	/** if pos == true, the literal is positive, else it is negative */
 	public Literal(boolean pos, Pred p) {
@@ -40,6 +40,11 @@ public class Literal extends Pred implements Cloneable {
 	public Literal(Literal l) {
 		super((Pred) l);
 		type = l.type;
+	}
+	
+	public Literal(Term t) {
+		super(t);
+		type = D.LPos;
 	}
 
 	public static Literal parseLiteral(String sLiteral) {

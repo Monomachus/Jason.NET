@@ -80,15 +80,15 @@ public class Circumstance implements Serializable {
     public void addAchvGoal(Literal l, Intention i) {
         E.add(new Event(new Trigger(D.TEAdd,D.TEAchvG,l), i));
     }
-    public void addAchvGoal(String sl, Intention i) {
-        addAchvGoal(Literal.parseLiteral(sl), i);
-    }
+    //public void addAchvGoal(String sl, Intention i) {
+    //    addAchvGoal(Literal.parseLiteral(sl), i);
+    //}
     public void addTestGoal(Literal l, Intention i) {
         E.add(new Event(new Trigger(D.TEAdd,D.TETestG,l), i));
     }
-    public void addTestGoal(String sl, Intention i) {
-        addTestGoal(Literal.parseLiteral(sl), i);
-    }
+    //public void addTestGoal(String sl, Intention i) {
+    //    addTestGoal(Literal.parseLiteral(sl), i);
+    //}
 
     public void addGoal(byte g, Literal l, Intention i) throws JasonException {
         if (g==D.TEAchvG)

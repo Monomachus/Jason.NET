@@ -26,43 +26,50 @@ import jason.JasonException;
 import jason.asSemantics.InternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
-import jason.asSyntax.Pred;
+import jason.asSyntax.Literal;
 import jason.asSyntax.Term;
 
 public class addAnnot implements InternalAction {
 
+	/**
+	 * Example: .addAnnot(a,source(jomi),B)
+	 *          B will be a[source(jomi)]
+	 * 
+	 * args[0] is the literal that will be annotted
+	 * args[1] is the annot
+	 * args[2] is the result
+	 */
 	public boolean execute(TransitionSystem ts, Unifier un, Term[] args)
 			throws Exception {
 		try {
-			Term bel = (Term) args[0].clone();
-			if (bel.isVar()) {
-				un.apply(bel);
+			Term result = args[2]; // Literal.parseLiteral(args[2]);
+			// do not need to be a var!
+
+			Term l = (Term)args[0].clone();
+			if (l.isVar()) {
+				un.apply(l);
 			}
+
 			if (args[0].isList()) {
 				// TODO: add annot on all list members that are predicate!!!!
-				return true;
+				throw new JasonException("Not implemented!");
 			} else {
 				try {
-					// in case it is a predicate, add annot
-					Pred p = (Pred) bel;
-					p.addAnnot((Term) args[1].clone());
+					// in case it could be a literal (tested by parsing), add annot
+					Literal bel = Literal.parseLiteral(l.toString());
+					bel.addAnnot((Term)args[1].clone());
+					return un.unifies(bel, result);
 				} catch (Exception e) {
 					// no problem, the content is not a pred (is a number,
 					// string, ....) received in a message, for instance
 				}
 			}
-			Term result = args[2]; // Literal.parseLiteral(args[2]);
-			if (result == null || !result.isVar()) {
-				throw new JasonException(
-						"The third parameter of internal action 'addAnnot' is not a variable!");
-			}
-			un.unifies(bel, result);
-			// System.out.println("result = "+result+"/"+un);
+			return un.unifies(l, result);
 		} catch (ArrayIndexOutOfBoundsException e) {
-			throw new JasonException(
-					"The internal action 'myName' has not received one argument");
+			throw new JasonException("The internal action 'addAnnot' has not received three arguments.");
+		} finally {
+			//System.out.println("annot result = "+un);			
 		}
-		return true;
 	}
 
 }
