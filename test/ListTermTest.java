@@ -3,6 +3,7 @@ package test;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.ListTerm;
 import jason.asSyntax.Term;
+import jason.asSyntax.VarTerm;
 import junit.framework.TestCase;
 
 /** JUnit test case for syntax package */
@@ -18,7 +19,7 @@ public class ListTermTest extends TestCase {
 		l3 = ListTerm.parseList("[A|T]");
 		l4 = ListTerm.parseList("[X,b,T]");
 		l5 = ListTerm.parseList("[[b,c]]");
-		//System.out.println(l1+"\n"+l2+"\n"+l3+"\n"+l4);
+		//System.out.println("l1="+l1+"\nl2="+l2+"\nl3="+l3+"\nl4="+l4);
 		//System.out.println("l5="+l5);
 	}
 
@@ -43,7 +44,7 @@ public class ListTermTest extends TestCase {
 		assertFalse( new Unifier().unifies(l1,ListTerm.parseList("[a,b,d]")));
 
 		Unifier u2 = new Unifier();
-	    assertTrue(u2.unifies(l1,new Term("X")));
+	    assertTrue(u2.unifies(l1,new VarTerm("X")));
 		//System.out.println("u2="+u2);
 
 		Unifier u3 = new Unifier();
@@ -63,6 +64,7 @@ public class ListTermTest extends TestCase {
 		//System.out.println("u5="+u5);
 		
 	}
+	
 	
 	
 	public void testClone() {

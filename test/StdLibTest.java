@@ -1,5 +1,6 @@
 package test;
 
+import jason.D;
 import jason.asSemantics.Agent;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
@@ -8,6 +9,7 @@ import jason.asSyntax.Literal;
 import jason.asSyntax.Pred;
 import jason.asSyntax.StringTerm;
 import jason.asSyntax.Term;
+import jason.asSyntax.VarTerm;
 import jason.stdlib.addAnnot;
 import jason.stdlib.addPlan;
 import jason.stdlib.getRelevantPlans;
@@ -24,7 +26,7 @@ public class StdLibTest extends TestCase {
 		addAnnot aa = new addAnnot();
 		Unifier u = new Unifier();
 		Literal msg = Literal.parseLiteral("ok(10)");
-		Term X = new Term("X");
+		VarTerm X = new VarTerm("X");
 		Term annot = Term.parse("source(jomi)");
 		try {
 			aa.execute(null, u, new Term[] { msg, annot, X });
@@ -35,6 +37,31 @@ public class StdLibTest extends TestCase {
 		//System.out.println("u="+u);
 		assertEquals(msg.toString(), "ok(10)");
 		assertTrue( ((Pred)u.get("X")).hasAnnot(annot) );
+	}
+	
+	
+	public void testFindAll() {
+		Agent ag = new Agent();
+		ag.addBel(Literal.parseLiteral("a(10)"), D.TPercept, null, D.EmptyInt);
+		ag.addBel(Literal.parseLiteral("a(20)"), D.TPercept, null, D.EmptyInt);
+		ag.addBel(Literal.parseLiteral("a(30)"), D.TPercept, null, D.EmptyInt);
+
+		TransitionSystem ts = new TransitionSystem(ag, null, null, null);
+
+		Unifier u = new Unifier();
+		VarTerm X = new VarTerm("X");
+		Literal c = Literal.parseLiteral("a(X)");
+		c.addAnnot(D.TPercept);
+		VarTerm L = new VarTerm("L");
+		//System.out.println(ag.getPS().getAllRelevant(Trigger.parseTrigger(ste.getFunctor())));
+		try {
+			assertTrue(new jason.stdlib.findall().execute(ts, u, new Term[] { X, c, L }));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		//System.out.println("L="+L);
+		ListTerm lt = (ListTerm)u.get("L");
+		assertEquals(lt.size(),3);
 	}
 	
 	public void testGetRelevantPlansAndAddPlan() {
@@ -48,7 +75,7 @@ public class StdLibTest extends TestCase {
 
 		Unifier u = new Unifier();
 		StringTerm ste = new StringTerm("+a");
-		Term X = new Term("X");
+		VarTerm X = new VarTerm("X");
 		//System.out.println(ag.getPS().getAllRelevant(Trigger.parseTrigger(ste.getFunctor())));
 		try {
 			new getRelevantPlans().execute(ts, u, new Term[] { ste, X });
@@ -108,7 +135,7 @@ public class StdLibTest extends TestCase {
 		ListTerm l2 = ListTerm.parseList("[d,e,f]");
 		ListTerm l3 = ListTerm.parseList("[a,b,c,d,e,f]");
 
-		Term X = new Term("X");
+		VarTerm X = new VarTerm("X");
 		Unifier u = new Unifier();
 
 		try {

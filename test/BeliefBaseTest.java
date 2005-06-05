@@ -5,6 +5,7 @@ import jason.asSyntax.BeliefBase;
 import jason.asSyntax.Literal;
 import jason.asSyntax.Pred;
 import jason.asSyntax.Term;
+import jason.asSyntax.VarTerm;
 import junit.framework.TestCase;
 
 /** JUnit test case for syntax package */
@@ -70,8 +71,8 @@ public class BeliefBaseTest extends TestCase {
 		System.out.println("Rel "+lRel1.getFunctorArity()+"="+bb.getRelevant(lRel1));
 
 		Literal lRel2 = new Literal(true, new Pred("pos"));
-		lRel2.addTerm(new Term("X"));
-		lRel2.addTerm(new Term("Y"));
+		lRel2.addTerm(new VarTerm("X"));
+		lRel2.addTerm(new VarTerm("Y"));
 		System.out.println("Rel "+lRel2.getFunctorArity()+"="+bb.getRelevant(lRel2));
 
 		
