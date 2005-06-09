@@ -1,6 +1,3 @@
-//!!!!!!!!!!!!!!!!!!!
-
-
 package test;
 
 import jason.D;
