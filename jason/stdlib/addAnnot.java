@@ -21,9 +21,9 @@
 //----------------------------------------------------------------------------
 
 
-// TESTING!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
 package jason.stdlib;
+
+import java.util.Iterator;
 
 import jason.JasonException;
 import jason.asSemantics.InternalAction;
@@ -31,6 +31,7 @@ import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.Literal;
 import jason.asSyntax.Term;
+import jason.asSyntax.ListTerm;
 
 public class addAnnot implements InternalAction {
 
@@ -38,41 +39,52 @@ public class addAnnot implements InternalAction {
 	 * Example: .addAnnot(a,source(jomi),B)
 	 *          B will be a[source(jomi)]
 	 * 
-	 * args[0] is the literal that will be annotted
-	 * args[1] is the annot
-	 * args[2] is the result
+	 * args[0] is the literal to be annotted
+	 * args[1] is the annotation itself
+	 * args[2] is the result -- does't have to be a var!
 	 */
+
+	// TODO Jomi: implementei considerando se for lista tambem
+	// Da uma olhada se ta OK e se sim pode apagar este todo
+	
+	private Unifier unif;
+	
 	public boolean execute(TransitionSystem ts, Unifier un, Term[] args)
 			throws Exception {
 		try {
-			Term result = args[2]; // Literal.parseLiteral(args[2]);
-			// do not need to be a var!
-
+			unif = un;
 			Term l = (Term)args[0].clone();
-			if (l.isVar()) {
-				un.apply(l);
-			}
-
-			if (args[0].isList()) {
-				// TODO: add annot on all list members that are predicate!!!!
-				throw new JasonException("Not implemented!");
-			} else {
-				try {
-					// in case it could be a literal (tested by parsing), add annot
-					Literal bel = Literal.parseLiteral(l.toString());
-					bel.addAnnot((Term)args[1].clone());
-					return un.unifies(bel, result);
-				} catch (Exception e) {
-					// no problem, the content is not a pred (is a number,
-					// string, ....) received in a message, for instance
-				}
-			}
-			return un.unifies(l, result);
+			addAnnotToList(l,args[1]);
+			return un.unifies(l,args[2]);
 		} catch (ArrayIndexOutOfBoundsException e) {
-			throw new JasonException("The internal action 'addAnnot' has not received three arguments.");
-		} finally {
+			throw new JasonException("The internal action 'addAnnot' requires three arguments.");
+		} //finally {
 			//System.out.println("annot result = "+un);			
+		//}
+	}
+
+	public void addAnnotToList(Term l, Term annot) {
+		if (l.isVar()) {
+			unif.apply(l);
+		}
+		if (l.isList()) {
+			ListTerm lt = (ListTerm)l;
+			Iterator i = lt.iterator();
+			while (i.hasNext()) {
+				addAnnotToList((Term)i.next(),annot);
+			}
+		} else {
+			try {
+				// if it can be parsed as a literal, OK to add annot
+				Literal tmp = Literal.parseLiteral(l.toString());
+				tmp = (Literal)l;
+				tmp.addAnnot((Term) annot.clone());
+			} catch (Exception e) {
+				// no problem, the content is not a pred (is a number,
+				// string, ....) received in a message, for instance
+			}
 		}
 	}
 
+	
 }

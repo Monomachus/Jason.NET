@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * Each nth-ListTerm has a term and the next ListTerm.
  * The last ListTem is a emptyListTerm (term==null).
- * In lists with tail ([a,b|X]), next is the Tail (next=X).
+ * In lists with tail ([a|X]), next is the Tail (next=X).
 
  * @author jomi
  */

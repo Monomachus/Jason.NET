@@ -369,3 +369,16 @@ ListTerm list() : { ListTerm lt; ListTerm last; Token K; Term f; }
   "]"                 { last.append(new ListTerm()); // empty list 
                         return lt; } 
 }
+
+//Term list() : { Token K; Term f; Term p = new Term(); Term l; Term a; }
+//{
+//  "["
+//  ( f=t() { p.setFunctor(D.ListCons); p.addTerm(f); a=p; }
+//    ( ( "," f=t() { l=new Term(D.ListCons); a.addTerm(l); a=l; a.addTerm(f); } )*
+//      "]" { a.addTerm(new Term(D.EmptyList)); return p; }
+//    | "|"
+//      ( l=list() "]" { p.addTerm(l); return p; }
+//      | K=<VAR>  "]" { p.addTerm(new Term(K.image)); return p; } )
+//    )
+//  | "]" { p.setFunctor(D.EmptyList); return p; } )
+//}
