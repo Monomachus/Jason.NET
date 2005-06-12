@@ -71,7 +71,7 @@ public class addAnnot implements InternalAction {
 			ListTerm lt = (ListTerm)l;
 			Iterator i = lt.iterator();
 			while (i.hasNext()) {
-				addAnnotToList((Term)i.next(),annot);
+				addAnnotToList(((ListTerm) i.next()).getTerm(),annot);
 			}
 		} else {
 			try {

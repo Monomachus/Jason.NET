@@ -35,25 +35,21 @@ public class StdLibTest extends TestCase {
 			e.printStackTrace();
 		}
 		//System.out.println("X="+X);
-		System.out.println("u="+u);
+		//System.out.println("u="+u);
 		assertEquals(msg.toString(), "ok(10)");
 		assertTrue( ((Pred)u.get("X")).hasAnnot(annot) );
 
-		// TODO JOMI: este e' o exemplo que da pau
-		// ListTerm msgL = (ListTerm)Term.parse("[ok(10),[ok(20),ok(30),[ok(40)|[ok(50),ok(60)]]]]");
-		ListTerm msgL = (ListTerm)Term.parse("[ok(10),[ok(20),ok(30),[ok(40),ok(50),ok(60)]]]");
+		ListTerm msgL = (ListTerm)Term.parse("[ok(10),[ok(20),ok(30),[ok(40)|[ok(50),ok(60)]]]]");
 		VarTerm Y = new VarTerm("Y");
 		Term annotL = Term.parse("source(rafa)");
 		assertEquals(msgL.toString(), "[ok(10),[ok(20),ok(30),[ok(40),ok(50),ok(60)]]]");
-System.out.println("Aqui"+msgL);
 		try {
 			aa.execute(null, u, new Term[] { msgL, annotL, Y });
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		//System.out.println("X="+X);
-		System.out.println("u="+u);
-		assertEquals(((ListTerm)u.get("Y")).toString(), "[ok(10)[source(rafa)],[ok(20)[source(rafa)],ok(30)[source(rafa)],[ok(40)[source(rafa)],ok(50)[source(rafa)]]]]" );
+		//System.out.println("u="+u);
+		assertEquals(((ListTerm)u.get("Y")).toString(), "[ok(10)[source(rafa)],[ok(20)[source(rafa)],ok(30)[source(rafa)],[ok(40)[source(rafa)],ok(50)[source(rafa)],ok(60)[source(rafa)]]]]" );
 	}
 	
 	

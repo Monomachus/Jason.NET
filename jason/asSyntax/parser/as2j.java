@@ -493,19 +493,6 @@
     throw new Error("Missing return statement in function");
   }
 
-/* Structures (no annotations here) */
-// not used!
-/*
-Term st() : { Token K; Term t = new Term(); }
-{
-  K=<ATOM>   { t.setFunctor(K.image); } 
-  [ 
-      "(" t=lt(t) ")"
-  ]
-  { return t; }
-}
-*/
-
 /* List of terms as parameters */
   final public Term lt(Term u) throws ParseException {
                     Term v;
@@ -626,14 +613,16 @@ Term st() : { Token K; Term t = new Term(); }
         break;
       case 40:
         f = list();
-                        last.setTail(f);
+                        Iterator i = ((ListTerm)f).iterator();
+                                                while (i.hasNext()) {
+                                                           last = last.append(((ListTerm)i.next()).getTerm());
+                                                    }
         break;
       default:
         jj_la1[26] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
-                        {if (true) return lt;}
       break;
     default:
       jj_la1[27] = jj_gen;
