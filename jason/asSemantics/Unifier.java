@@ -40,7 +40,9 @@ public class Unifier implements Cloneable {
     
     private HashMap function = new HashMap();
     
-    
+    // TODO IMPORTANT: remove unnecessary tail symbols
+    // and accompanying extra list when grounding variables
+    // that are internal to a list
     public void apply(Term t) {
         if (t.isVar()) {
 			VarTerm vt = (VarTerm) t;

@@ -39,6 +39,7 @@ public class StdLibTest extends TestCase {
 		assertEquals(msg.toString(), "ok(10)");
 		assertTrue( ((Pred)u.get("X")).hasAnnot(annot) );
 
+		// testing addAnnot with list
 		ListTerm msgL = (ListTerm)Term.parse("[ok(10),[ok(20),ok(30),[ok(40)|[ok(50),ok(60)]]]]");
 		VarTerm Y = new VarTerm("Y");
 		Term annotL = Term.parse("source(rafa)");
