@@ -43,6 +43,12 @@ public class Unifier implements Cloneable {
     // TODO IMPORTANT: remove unnecessary tail symbols
     // and accompanying extra list when grounding variables
     // that are internal to a list
+
+// TODO JOMI: try to not clone and apply before unifing, since this method is 
+a bottleneck (clone/apply consumes memory/cpu). Initial proposal: use 
+"t1.equals(t2, this)", ie, the equals will consider the unifier to check 
+equality.
+
     public void apply(Term t) {
         if (t.isVar()) {
 			VarTerm vt = (VarTerm) t;
