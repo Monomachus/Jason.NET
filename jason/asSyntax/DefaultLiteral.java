@@ -28,6 +28,7 @@ import jason.D;
 public class DefaultLiteral extends Literal implements Cloneable {
 
 	// TODO: not extends Literal (because of the VarTerm), same solution than BodyLiteral
+	// JOMI: this is the one you wanted to do.
 
 	boolean defType;
 

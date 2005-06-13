@@ -74,9 +74,9 @@ public class TransitionSystem {
 		conf = confP = this;
 	}
 
-	/** ******************************************************************* */
+	/********************************************************************* */
 	/* SEMANTIC RULES */
-	/** ******************************************************************* */
+	/********************************************************************* */
 	private void applySemanticRule() throws JasonException {
 		// check the current step in the reasoning cycle
 		// only the main parts of the interpretation appear here
@@ -215,8 +215,7 @@ public class TransitionSystem {
 		//System.out.println("\tRP for "+conf.C.SE.trigger+" are "+confP.C.RP);
 		
 		// Rule Rel1
-		if (!confP.C.RP.isEmpty() || setts.retrieve()) { // changed by Jomi,
-			// needs verification
+		if (!confP.C.RP.isEmpty() || setts.retrieve()) { // retrieve is mainly for Coo-AgentSpeak
 			confP.step = D.SApplPl;
 		}
 		// Rule Rel2
@@ -234,7 +233,6 @@ public class TransitionSystem {
 			else if (setts.requeue()) {
 				confP.C.addEvent(conf.C.SE);
 			}
-			//
 			confP.step = D.SProcAct;
 		}
 	}
@@ -244,8 +242,7 @@ public class TransitionSystem {
 
 		//System.out.println("\tRP="+confP.C.RP+"\n\tAP="+confP.C.AP);
 		// Rule Appl1
-		if (!confP.C.AP.isEmpty() || setts.retrieve()) { // changed by Jomi,
-			// needs verification
+		if (!confP.C.AP.isEmpty() || setts.retrieve()) { // retrieve is mainly fo Coo-AgentSpeak
 			confP.step = D.SSelAppl;
 		} else { // Rule Appl2
 			generateGoalDeletionFromEvent(); // can't carry on, no applicable plan.
@@ -256,12 +253,11 @@ public class TransitionSystem {
 	private void applySelAppl() throws JasonException {
 		// Rule SelAppl
 		confP.C.SO = conf.ag.selectOption(confP.C.AP);
-		if (confP.C.SO != null) { // added by Jomi, needs verification
+		if (confP.C.SO != null) {
 			confP.step = D.SAddIM;
-		} else { // added by Jomi, needs verification
-			System.err.println("*** Warning! selectOption returns null");
-			generateGoalDeletionFromEvent(); // can't carry on, no applicable
-			// plan.
+		} else {
+			System.err.println("*** Warning! selectOption returned null.");
+			generateGoalDeletionFromEvent(); // can't carry on, no applicable plan.
 			confP.step = D.SProcAct;
 		}
 	}
@@ -301,7 +297,15 @@ public class TransitionSystem {
 
 	private void applySelInt() throws JasonException {
 
-		// TODO added by Jomi, Rafa needs to verify
+		// TODO we need to have a look if there isn't
+		// a more efficient way of doing the Atomic thing. This adds
+		// a search linear in the size of the set of intentions
+		// at every resoning cycle, right? can't we use a flag
+		// just to remember that there is an atomic to search for?
+
+		// TODO JOMI isn't it better if selectAtomicIntention() is defined
+		// in this class and not in the circumstance?
+		
 		// Rule for Atomic Intentions
 		confP.C.SI = conf.C.selectAtomicIntention();
 		if (confP.C.SI != null) {
@@ -396,11 +400,13 @@ public class TransitionSystem {
 			// Rule Action
 			case D.HAction:
 				if (l.isInternalAction()) {
-					execInternalAction(l, u);
-					// TODO: IMPORTANT: what to do if it fails!
-					// implemente plan failure
-					if (!h.isAsk()) {
-						updateIntention();
+					if (execInternalAction(l, u)) {
+						if (!h.isAsk()) {
+							updateIntention();
+						}
+					}
+					else {
+						generateGoalDeletion();
 					}
 				} else {
 					confP.C.A = new ActionExec((Pred) l, conf.C.SI);
@@ -430,7 +436,7 @@ public class TransitionSystem {
 			case D.HAddBel:
 				
 				// translate l to a string and parse again to identify
-				// problems like
+				// problems such as:
 				//    X = ~p(a); +p(X)
 				l = Literal.parseLiteral(l.toString());
 				if (l != null) {
@@ -439,6 +445,9 @@ public class TransitionSystem {
 						conf.ag.addBel(l, D.TSelf, conf.C, conf.C.SI);
 					else {
 						// TODO: Must COPY the whole intention, for the newFocus!!!!
+						// JOMI: acho que esta msg e' velha e nem faz sentido.
+						// Nao vejo porque copiar a intention se e' NewFocus
+						// Se concordas que isto nao deve ser feito, remove este todo.
 						conf.ag.addBel(l, D.TSelf, conf.C, D.EmptyInt);
 						updateIntention();
 					}
@@ -533,7 +542,7 @@ public class TransitionSystem {
 		DefaultLiteral l = (DefaultLiteral) ctxt.next();
 		if (l.isVar()) {
 			l = (DefaultLiteral)l.clone();
-			un.apply(l); // by Jomi for .. & X & ....
+			un.apply(l); // in case we have ... & X & ...
 		}
 		
 		if (l.isInternalAction()) {
@@ -753,8 +762,7 @@ public class TransitionSystem {
 					System.out.println(agArch.getName() + " Circumstance: " + C);
 				if (setts.verbose() >= 4)
 					System.out.println(agArch.getName() + " Step:         " + D.SRuleNames[conf.step]);
-				
-				
+
 				applySemanticRule();
 			} while (step != D.SStartRC); // finished a reasoning cycle
 

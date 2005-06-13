@@ -33,15 +33,17 @@ import java.util.Iterator;
 public final class BDIlogic {
 
 	// TODO: maybe these methods could be moved to TS class (or Agent class), since they use TS...
+	// JOMI: o TS ja e' enorme e eu preferia deixar estes metodos separados
+	// porque sao todos relacionados com as definicoes de BDI para AgentSpeak
+	// Faz muita diferenca de eficiencia tirar eles daqui?
 	
     public static final boolean Bel(TransitionSystem ts, Literal l) {
         return ts.ag.believes(l,null)!=null;
     }
 
     /** 
-     * Verifies if <i>l</i> is a desire. l is a desire either 
-     * if there is an event with l as trigger event or
-     * it is an Intention. 
+     * Checks if <i>l</i> is a desire: <i>l</i> is a desire either 
+     * if there is an event with +!l as triggering event or it is an Intention. 
      */
     public static final boolean Des(TransitionSystem ts, Literal l) {
     	Trigger teFromL = new Trigger(D.TEAdd,D.TEAchvG,l);
@@ -59,6 +61,11 @@ public final class BDIlogic {
         return Int(ts,l); // Int subset Des (see formal definitions)
     }
 
+    /** 
+     * Checks if <i>l</i> is an intention: <i>l</i> is an intention
+     * if there is a trigerring event +!l in any plan within an intention;
+     * just note that intentions can be suspended and appear in E or PA as well.
+     */
     public static final boolean Int(TransitionSystem ts, Literal l) {
         Trigger g = new Trigger(D.TEAdd,D.TEAchvG,l);
         for(Iterator i=ts.C.I.iterator(); i.hasNext(); ) {
@@ -84,6 +91,15 @@ public final class BDIlogic {
 
     // Changing the Agent's Circumstance!!!
 
+    /**
+     * This changes the agent's circumstance. Currently what it does
+     * is simply to change all +!l to -!l in events which would give
+     * true for Des(l) in the whole set of events.
+     * IMPORTANT: unlike Des() this only alters literals explicitly
+     * desired (rather than intended), that is, it does NOT consider
+     * intentions. You should use both dropDes() AND dropInt() to
+     * remove all desires and intentions of l.
+     */
     public static final void dropDes(TransitionSystem ts, Literal l) {
         Event e = new Event(new Trigger(D.TEAdd,D.TEAchvG,l),D.EmptyInt);
         for(Iterator i=ts.C.E.iterator(); i.hasNext(); ) {
@@ -99,6 +115,13 @@ public final class BDIlogic {
         }
     }
 
+    /**
+     * This changes the agent's circumstance. It removes an intention
+     * from I, E or PA and use that intention in a new event that is
+     * added to E with triggering event -!l. This is EXPERIMENTAL, in
+     * particular for intentions suspended in PA, this is bound to
+     * create problems at the moment.
+     */
     public static final void dropInt(TransitionSystem ts, Literal l) {
         Trigger g = new Trigger(D.TEAdd,D.TEAchvG,l);
         for(Iterator j=ts.C.I.iterator(); j.hasNext(); ) {
@@ -124,9 +147,11 @@ public final class BDIlogic {
         if (ts.C.PA!=null) {
             for(Iterator j=ts.C.PA.values().iterator(); j.hasNext(); ) {
             	Intention i = ((ActionExec)j.next()).getIntention();
-		// CAREFUL: The semantics for this isn't well defined yet.
+		// TODO CAREFUL: The semantics for this isn't well defined yet.
 		// The goal deletion on top of the intention will not get to know
 		// the result of the action, as it is removed from the PA set!
+       	// If left in PA, the action won't be the the top of
+       	// the stack (that might cause problems?)
                 if (i.hasTrigger(g)) {
                     Trigger ng = (Trigger) g.clone();
                     ng.setTrigType(D.TEDel);
@@ -137,10 +162,22 @@ public final class BDIlogic {
         }
     }
 
+    /**
+     * This changes the agent's circumstance by simply emptying
+     * the whole set of events (E). IMPORTANT: note that this
+     * is different from droping one desires, in which case a
+     * goal deletion event is generated.
+     */
     public static final void dropAllDes(TransitionSystem ts) {
         ts.C.E.clear();
     }
 
+    /**
+     * This changes the agent's circumstance by simply emptying
+     * the whole set of intentions (I). IMPORTANT: note that this
+     * is different from droping one intention, in which case a
+     * goal deletion event is generated.
+     */
     public static final void dropAllInt(TransitionSystem ts) {
         ts.C.I.clear();
     }

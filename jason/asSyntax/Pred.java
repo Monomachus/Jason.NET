@@ -219,6 +219,11 @@ public class Pred extends Term implements Cloneable, Comparable, Serializable {
 				annots.add(t.clone());
 			} else {
 				// TODO: why del? (jomi has removed it since it causes concurrent problems): 
+				// JOMI: o addBel vai precisar so da lista de anotacoes
+				// que foram anotadas pra gerer soment os eventos relativos
+				// aaquelas anotacoes. Eu acho que vai dar pau este teu comentario,
+				// so que nao temos teste pra estas coisas ainda -- ou temos teste
+				// e eu que nao entendo mais como funciona isto! :)))
 				// Remove what is not new from l 
 				//p.delAnnot(t);
 				//i--;

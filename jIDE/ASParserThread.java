@@ -157,6 +157,7 @@ public class ASParserThread extends Thread {
         compilationDone = false;
         // TODO: the following two lines (and the run method) was commented
         // since the AS online parsing does not work properly
+        // JOMI: nao mechi nisto, nao entendi este todo. 
         //stopWaiting(); // wakeup this thread
         //waitCompilation(); // waits the end of compilation
         parseAllTabs();

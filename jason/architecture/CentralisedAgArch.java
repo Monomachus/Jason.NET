@@ -173,6 +173,8 @@ public class CentralisedAgArch extends Thread implements AgentArchitecture {
     }
 
     // TODO: could it be place in Agent class? (this code is the same for cent/saci code)
+    // JOMI, to deixando isto pra tu fazer, se for igual mesmo
+    // e nao fizer diferenca, por mim pode passar pra la.
     public void brf() {
         if (! running || percepts == null) {
             return;

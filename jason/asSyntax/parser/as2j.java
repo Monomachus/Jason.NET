@@ -552,7 +552,8 @@
     case TK_TRUE:
     case TK_NEG:
     case ATOM:
-      //u=st()       { return u; } TODO: changed to at, is it ok? used in the terms of received(...Content...)
+      // u=st()       { return u; }
+      // changed to AT, used in the terms of received(...Content...)
           u = l();
                    {if (true) return u;}
       break;

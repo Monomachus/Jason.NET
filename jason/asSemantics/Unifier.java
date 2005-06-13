@@ -44,10 +44,10 @@ public class Unifier implements Cloneable {
     // and accompanying extra list when grounding variables
     // that are internal to a list
 
-// TODO JOMI: try to not clone and apply before unifing, since this method is 
-a bottleneck (clone/apply consumes memory/cpu). Initial proposal: use 
-"t1.equals(t2, this)", ie, the equals will consider the unifier to check 
-equality.
+    // TODO JOMI: try to not clone and apply before unifing, since this method is
+    // a bottleneck (clone/apply consumes memory/cpu). Initial proposal: use
+    // "t1.equals(t2, this)", ie, the equals will consider the unifier to check
+    // equality.
 
     public void apply(Term t) {
         if (t.isVar()) {
@@ -112,10 +112,17 @@ equality.
     public void compose(Term t, Unifier u) {
         if (t.isVar()) {
             if (u.function.containsKey(t.getFunctor())) {
+            	// Note we are losing any previous maping of that variable,
+            	// presumably this was either left unchanged or updated
+            	// by the plan execution
                 function.put(t.getFunctor(),u.function.get(t.getFunctor()));
-            } else {
-                // TODO: WHAT TO DO THEN?
-            }
+            } // else {
+                // Uninstantiated variables remain when the plan for a
+            	// goal has finished. Normally this shouldn't happend, but
+                // nothing necessarily wrong with it. If it was a programming
+                // mistake, an error will eventually occur (e.g., in an action
+            	// with an uninstantiated variable).
+            // }
             return;
         }
         if (t.getTerms()==null)

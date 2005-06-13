@@ -290,7 +290,7 @@ public class Agent {
 			c.E.add(e);
 	}
 
-	// IMPORTANT: this is not making sure the label of the new plan is unique!!!
+	// TODO IMPORTANT: this is not making sure the label of the new plan is unique!!!
 	// TODO: use pl contains (to have only a MAP in plan library)
 	public void addPlan(StringTerm stPlan, Term tSource) {
 		String sPlan = stPlan.getString();

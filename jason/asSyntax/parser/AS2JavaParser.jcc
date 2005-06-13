@@ -343,7 +343,8 @@ Pred la(Pred p) : { Term v; }
 
 Term t() : { Token K; Term u; }
 {
-  ( //u=st()       { return u; } TODO: changed to at, is it ok? used in the terms of received(...Content...)
+  ( // u=st()       { return u; }
+    // changed to AT, used in the terms of received(...Content...)
     u=l()        { return u; }
   | u=list()     { return u; } 
   | K=<VAR>      { return new VarTerm(K.image); }
