@@ -24,16 +24,13 @@
 package jason.architecture;
 
 
-import jason.D;
 import jason.JasonException;
 import jason.asSemantics.ActionExec;
 import jason.asSemantics.Agent;
 import jason.asSemantics.TransitionSystem;
 import jason.asSyntax.ListTerm;
-import jason.asSyntax.Literal;
 import jason.asSyntax.Term;
 
-import java.util.Iterator;
 import java.util.List;
 
 import javax.xml.transform.Transformer;
@@ -49,14 +46,11 @@ import saci.MessageHandler;
 
 /**
  * SACI Infra Structure for a Mulit-Agent Society of AgentSpeak Agents
+ * 
+ * Execution sequence: initAg, run (perceive, checkMail, act), stopAg.
  */
 
 public class SaciAgArch extends saci.Agent implements AgentArchitecture {
-    
-    // needed in perceive() and brf(), must be called "percepts"
-    // as the user may want to alter it for agent-specific perception
-    protected List percepts;
-    //protected List negPercepts;
     
     // to get the percepts via SACI (the normal mbox is used for inter-agent com.)
     private MBoxSAg mboxPercept = null;
@@ -172,10 +166,12 @@ public class SaciAgArch extends saci.Agent implements AgentArchitecture {
     // Default perception assumes Complete and Accurate sensing.
     // In the case of the SACI Architecture, the results of requests
     // for action execution is also recieved here.
-    public void perceive() {
+    public List perceive() {
         if (! running) {
-            return;
+            return null;
         }
+		
+		List percepts = null;
         
         saci.Message askMsg = new saci.Message("(ask-all :receiver environment :ontology AS-Perception :content getPercepts)");
         
@@ -252,6 +248,7 @@ public class SaciAgArch extends saci.Agent implements AgentArchitecture {
             System.err.println("Error receiving message.");
             e.printStackTrace();
         }
+		return percepts;
     }
     
     // this is used by the .send internal action in stdlib
@@ -322,76 +319,6 @@ public class SaciAgArch extends saci.Agent implements AgentArchitecture {
             }
         } while (m != null);
     }
-    
-    /** same code than CentalisedAgArch */
-    public void brf() {
-        if (! running || percepts == null) {
-            return;
-        }
-
-
-        // deleting percepts in the BB that is not percepted anymore
-        List perceptsInBB = fTS.getAg().getBS().getPercepts();
-        for (int i=0; i<perceptsInBB.size(); i++) { 
-            Literal l = (Literal)perceptsInBB.get(i);
-            // could not use percepts.contains(l), since equalsAsTerm must be used
-            boolean wasPercepted = false;
-            for (int j=0; j<percepts.size(); j++) {
-            	Term t = (Term)percepts.get(j); // it probably is a Pred
-            	if (l.equalsAsTerm(t)) { // if percept t already is in BB
-            		wasPercepted = true;
-            	}
-            }
-            if (!wasPercepted) {
-                if (fTS.getAg().delBel(l,D.TPercept,fTS.getC())) {
-                	i--;
-                }
-            }
-        }
-  	
-        // addBel only adds a belief when appropriate
-        // checking all percpets for new beliefs
-        Iterator i = percepts.iterator();
-        while (i.hasNext()) {
-			Literal l = (Literal)i.next();
-			try {
-				fTS.getAg().addBel( l, D.TPercept, fTS.getC(), D.EmptyInt);
-			} catch (Exception e) {
-				System.err.println("Error adding percetion "+l+"\n");
-				e.printStackTrace();
-			}
-        }
-    }
-
-    /*
-    // Default BRF (works both for Closed World Assumption and Open World)
-    public void brf() {
-        if (! running) {
-            return;
-        }
-        brfUpdate(percepts,fTS.getAg().getBS().getBels(),D.LPos);
-        brfUpdate(negPercepts,fTS.getAg().getBS().getNegBels(),D.LNeg);
-    }
-    
-    private void brfUpdate(List percepts, List beliefs, boolean type) {
-        Literal l;
-        // deleting first is more efficient
-        // delBel deletes as appropriate, delete all beliefs with a "percept" annotation
-        // which does not appear in the percepts anymore
-        // CAREFUL with clone!!! (if removing clone(), careful with p.clearAnnot
-        for(Iterator i=((List) ((ArrayList)beliefs).clone()).iterator(); i.hasNext(); ) {
-            l = (Literal)i.next();
-            if (l.hasAnnot(D.TPercept) && !percepts.contains(l)) {
-                fTS.getAg().delBel(l,D.TPercept,fTS.getC());
-            }
-        }
-        // addBel only adds a belief when appropriate
-        // checking all percpets for new beliefs
-        for(Iterator i=percepts.iterator(); i.hasNext(); ) {
-            fTS.getAg().addBel(new Literal(type, new Pred((Term)i.next())),D.TPercept,fTS.getC());
-        }
-    }
-    */
     
     // Default acting on the environment
     // it gets action from CA; it must be NULL after that!

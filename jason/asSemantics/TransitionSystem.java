@@ -503,7 +503,7 @@ public class TransitionSystem {
 
 	public List relevantPlans(Trigger te) throws JasonException {
 		List rp = new ArrayList();
-		List candidateRPs = conf.ag.ps.getAllRelevant(te);
+		List candidateRPs = conf.ag.fPS.getAllRelevant(te);
 		if (candidateRPs == null)
 			return rp;
 		for (int i=0; i < candidateRPs.size(); i++) {
@@ -737,7 +737,7 @@ public class TransitionSystem {
 			
 			if (setts.verbose() >= 5)
 				System.out.println(agArch.getName() + " perceiving...");
-			agArch.perceive();
+			List percept = agArch.perceive();
 
 			if (setts.verbose() >= 5)
 				System.out.println(agArch.getName() + " checking mail...");
@@ -745,14 +745,14 @@ public class TransitionSystem {
 
 			if (setts.verbose() >= 5)
 				System.out.println(agArch.getName() + " doing belief revision...");
-			agArch.brf();
+			ag.brf(percept);
 
 			if (setts.verbose() == 2) {
-				System.out.println(agArch.getName() + " Beliefs:    " + ag.bs);
+				System.out.println(agArch.getName() + " Beliefs:    " + ag.fBS);
 				System.out.println(agArch.getName() + " Intentions: " + C.I);
 			} else if (setts.verbose() >= 3) {
-				System.out.println(agArch.getName() + " Beliefs:      " + ag.bs);
-				System.out.println(agArch.getName() + " Plans:        " + ag.ps);
+				System.out.println(agArch.getName() + " Beliefs:      " + ag.fBS);
+				System.out.println(agArch.getName() + " Plans:        " + ag.fPS);
 				System.out.println(agArch.getName() + " Desires:      " + C.E);
 				System.out.println(agArch.getName() + " Intentions:   " + C.I);
 			}

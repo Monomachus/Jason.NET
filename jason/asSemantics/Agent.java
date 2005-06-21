@@ -42,6 +42,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -50,13 +51,19 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+
+/**
+ * Agent class has the belief base and plan library of an AgentSpeak agent.
+ * It also implements the default selection functions of the AgentSpeak semantics.
+ * 
+ */
 public class Agent {
 
 	// Members
-	protected BeliefBase bs = new BeliefBase();
-	protected PlanLibrary ps = new PlanLibrary();
+	protected BeliefBase fBS = new BeliefBase();
+	protected PlanLibrary fPS = new PlanLibrary();
 
-	protected TransitionSystem ts = null;
+	protected TransitionSystem fTS = null;
 
 	/**
 	 * args[0] is the user Agent class (ignored here)
@@ -82,13 +89,14 @@ public class Agent {
                 }
             }
             setTS(new TransitionSystem(this,C,setts,arch));
-            return ts;
+            return fTS;
         } catch (Exception e) {
             throw new JasonException("Error initializing creating the agent class! - "+e);
         }
     }
 	
 
+	/** add beliefs and plan form a URL */
 	public boolean parseAS(URL asURL) {
 		try {
 			parseAS(asURL.openStream());
@@ -101,6 +109,7 @@ public class Agent {
 		}
 		return false;
 	}
+	/** add beliefs and plan form a file */
 	public boolean parseAS(String asFileName) {
 		try {
 			parseAS(new FileInputStream(asFileName));
@@ -126,18 +135,6 @@ public class Agent {
 		return true;
 	}
 	
-	/*
-	public boolean acceptTell(String sender, String content) {
-		// docile agent
-		return (true);
-	}
-
-	public boolean acceptAchieve(String sender, String content) {
-		// benevolent agent
-		return (true);
-	}
-	*/
-
 	public Event selectEvent(List evList) {
 		// make sure the selected Event is removed from evList
 		return ((Event) evList.remove(0));
@@ -169,32 +166,72 @@ public class Agent {
 
 	/** Agent's Source Beliefs Initialisation (called by the parser) */
 	public void addBS(BeliefBase bb) {
-		bs.addAll(bb);
+		fBS.addAll(bb);
 	}
 
 	/** Agent's Source Plans Initialisation (called by the parser) */
 	public void addPS(PlanLibrary pp) {
-		ps.addAll(pp);
+		fPS.addAll(pp);
 	}
 
 	/** TS Initialisation (called by the AgArch) */
 	public void setTS(TransitionSystem ts) {
-		this.ts = ts;
+		this.fTS = ts;
 	}
 
 	// Accessing the agent's belief base and plans
 	public BeliefBase getBS() {
-		return bs;
+		return fBS;
 	}
 
 	public PlanLibrary getPS() {
-		return ps;
+		return fPS;
 	}
 
+
+	/** Belief Revision Function: add/remove perceptions into belief base */
+    public void brf(List percepts) {
+        if (percepts == null) {
+            return;
+        }
+		
+        // deleting percepts in the BB that is not percepted anymore
+        List perceptsInBB = getBS().getPercepts();
+        for (int i=0; i<perceptsInBB.size(); i++) { 
+            Literal l = (Literal)perceptsInBB.get(i);
+            // could not use percepts.contains(l), since equalsAsTerm must be used
+            boolean wasPercepted = false;
+            for (int j=0; j< percepts.size(); j++) {
+            	Term t = (Term)percepts.get(j); // it probably is a Pred
+            	if (l.equalsAsTerm(t)) { // if percept t already is in BB
+            		wasPercepted = true;
+            	}
+            }
+            if (!wasPercepted) {
+                if (delBel(l,D.TPercept,fTS.getC())) {
+                	i--;
+                }
+            }
+        }
+
+        // addBel only adds a belief when appropriate
+        // checking all percepts for new beliefs
+        Iterator i = percepts.iterator();
+        while (i.hasNext()) {
+			Literal l = (Literal)i.next();
+			try {
+				addBel( l, D.TPercept, fTS.getC(), D.EmptyInt);
+			} catch (Exception e) {
+				System.err.println("Error adding percetion "+l+"\n");
+				e.printStackTrace();
+			}
+        }
+    }
+	
 	// Other auxiliary methods
 
 	public Unifier believes(Literal l, Unifier un) {
-		List relB = bs.getRelevant(l);
+		List relB = fBS.getRelevant(l);
 		if (relB != null) {
 			for (int i=0; i < relB.size(); i++) {
 				Literal b = (Literal) relB.get(i);
@@ -209,7 +246,7 @@ public class Agent {
 	}
 
 	public Literal findBel(Literal l, Unifier un) {
-		List relB = bs.getRelevant(l);
+		List relB = fBS.getRelevant(l);
 		if (relB != null) {
 			for (int i=0; i < relB.size(); i++) {
 				Literal b = (Literal) relB.get(i);
@@ -247,7 +284,7 @@ public class Agent {
 			if (source != null) {
 				l.addAnnot(source);
 			}
-			if (bs.add(l)) {
+			if (fBS.add(l)) {
 				//System.out.println("*** adding "+l);
 				updateEvents(new Event(new Trigger(D.TEAdd, D.TEBel, l), focus), c);
 				return true;
@@ -275,7 +312,7 @@ public class Agent {
 				l.addAnnot(source);
 			}
 			//System.out.println("removing "+l);
-			if (bs.remove(l)) {
+			if (fBS.remove(l)) {
 				//System.out.println("removed "+l);
 				updateEvents(new Event(new Trigger(D.TEDel, D.TEBel, l), focus), c);
 				return true;
@@ -286,7 +323,7 @@ public class Agent {
 
 	// only add External Event if it is relevant in respect to the PlanLibrary
 	public void updateEvents(Event e, Circumstance c) {
-		if (e.isInternal() || ps.isRelevant(e.trigger))
+		if (e.isInternal() || fPS.isRelevant(e.trigger))
 			c.E.add(e);
 	}
 
@@ -304,11 +341,11 @@ public class Agent {
 			}
 			sPlan = sTemp.toString();
 			Plan p = Plan.parse(sPlan);
-			int i = ps.indexOf(p);
+			int i = fPS.indexOf(p);
 			if (i < 0) {
-				ps.add(p);
+				fPS.add(p);
 			} else {
-				p = (Plan) ps.get(i);
+				p = (Plan) fPS.get(i);
 			}
 			if (p.getLabel() == null) {
 				p.setLabel("alabel");
@@ -357,14 +394,14 @@ public class Agent {
 	 */
 	public void removePlan(StringTerm sPlan, Term source) {
 		Plan p = Plan.parse(sPlan.getFunctor());
-		int i = ps.indexOf(p);
+		int i = fPS.indexOf(p);
 		if (i >= 0) {
-			p = (Plan)ps.get(i);
+			p = (Plan)fPS.get(i);
 			boolean hasSource = p.getLabel().delSource(source);
 			
 			// if no source anymore, remove the plan
 			if (hasSource && ! p.getLabel().hasSource()) {
-				ps.remove(i);
+				fPS.remove(i);
 			}
 			/*
 			Iterator l = p.getLabel().getAnnots().iterator();
@@ -412,15 +449,15 @@ public class Agent {
 		Element ag = getAsDOM(document);
 		document.appendChild(ag);
 		
-		ag.appendChild(ts.getC().getAsDOM(document));
+		ag.appendChild(fTS.getC().getAsDOM(document));
 		return document;
 	}
 	
 	/** get the agent "mind" as XML */
 	public Element getAsDOM(Document document) {
 		Element ag = (Element) document.createElement("agent");
-		ag.setAttribute("name", ts.getAgArch().getName());
-		ag.appendChild(bs.getAsDOM(document));
+		ag.setAttribute("name", fTS.getAgArch().getName());
+		ag.appendChild(fBS.getAsDOM(document));
 		//ag.appendChild(ps.getAsDOM(document));
 		return ag;
 	}

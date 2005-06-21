@@ -25,25 +25,23 @@ package jason.architecture;
 
 import jason.asSemantics.Message;
 
+import java.util.List;
+
 
 
 /**
  * This interface should be used for defining the overall agent
  * architecture; the AS interpreter is only the reasoner (a kind of mind) within such
  * architecture (a kind of body).
+ * 
  **/
 
 public interface AgentArchitecture {
 
-    // a list called "percepts" must be defined as it is needed in
-    // perceive() and brf(), and the user may want to alter it for
-    // agent-specific perception
-
     // Default functions for the overall agent architecture
     // The user can always override them
-    public void perceive();
+    public List perceive();
     public void checkMail();
-    public void brf();
     public void act();
 
     public String getName();
