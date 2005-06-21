@@ -41,7 +41,9 @@ import java.util.Set;
 /**
  * An abstract adapter class for Environment.
  * 
- * It is overriden by the user application to define the environment "behaviour".
+ * It is overridden by the user application to define the environment "behaviour".
+ * 
+ * Execution sequence: 	setJasonEnvironment, init, (getPercept|executeAction)*, stop.
  * 
  * <p>An example of interaction:
  * <img src="../../../uml/environmentInteraction.gif" />

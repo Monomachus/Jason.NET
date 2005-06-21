@@ -9,6 +9,9 @@ package jason.control;
  * This default implementation synchronize the agents execution, i.e.,
  * each agent will perform its next reasoning cycle only when all agents have finished its 
  * reasoning cycle.
+ * 
+ * Execution sequence: 	setJasonExecutionControl, init, (receivedFinishedCycle)*, stop.
+ * 
  */
 public class ExecutionControl {
 

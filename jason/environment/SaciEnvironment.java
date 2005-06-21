@@ -35,7 +35,6 @@ import saci.MessageHandler;
 public class SaciEnvironment extends saci.Agent implements EnvironmentInterface {
 
 	private Environment fUserEnv;
-
     
     public SaciEnvironment() {
     }
