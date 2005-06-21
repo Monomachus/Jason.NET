@@ -52,14 +52,20 @@ public class CentralisedEnvironment implements EnvironmentInterface {
         agents      = Collections.synchronizedMap(new HashMap());
         
         try {
-            fUserEnv = (Environment)Class.forName(userEnvClassName).newInstance();
-            fUserEnv.setJasonEnvironment(this);
+			fUserEnv = (Environment) Class.forName(userEnvClassName).newInstance();
+			fUserEnv.setJasonEnvironment(this);
+			fUserEnv.init();
         } catch (Exception e) {
             System.err.println("Error "+e);
             e.printStackTrace();
             throw new JasonException("The user environment class instantiation '"+userEnvClassName+"' has failed!"+e.getMessage());
         }
     }
+	
+	/** called before the end of MAS execution, it just calls the user environment class stop method. */
+	public void stop() {
+		fUserEnv.stop();
+	}
 
     public Environment getUserEnvironment() {
     	return fUserEnv;

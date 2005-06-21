@@ -64,6 +64,16 @@ public abstract class Environment {
 	// set of agents that already received the last version of perception
 	private Set uptodateAgs = Collections.synchronizedSet(new HashSet());
 	
+	
+	/** called before the start of MAS execution, the user environment could overridden it */
+	public void init() {
+	}
+	
+	/** called before the end of MAS execution, the user environment could overridden it */
+	public void stop() {
+	}
+	
+	
 	/**
 	 * sets the jason part of the environment (saci or centralised)
 	 */

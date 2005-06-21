@@ -177,6 +177,9 @@ public class RunCentralisedMAS {
 			if (control != null) {
 				control.stop();
 			}
+			if (env != null) {
+				env.stop();
+			}
 			
 		} catch (Exception e) {
 			e.printStackTrace();

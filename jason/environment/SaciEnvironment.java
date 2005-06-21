@@ -34,7 +34,7 @@ import saci.MessageHandler;
 
 public class SaciEnvironment extends saci.Agent implements EnvironmentInterface {
 
-	private Environment userEnv;
+	private Environment fUserEnv;
 
     
     public SaciEnvironment() {
@@ -75,8 +75,9 @@ public class SaciEnvironment extends saci.Agent implements EnvironmentInterface 
     public void initAg(String[] args) throws JasonException {
         // create the user environment
         try {
-            userEnv = (Environment)Class.forName(args[0]).newInstance();
-            userEnv.setJasonEnvironment(this);
+            fUserEnv = (Environment)Class.forName(args[0]).newInstance();
+            fUserEnv.setJasonEnvironment(this);
+			fUserEnv.init();
         } catch (Exception e) {
             e.printStackTrace();
             throw new JasonException("The user environment class instantiation '"+args[0]+"' fail!"+e.getMessage());
@@ -98,7 +99,7 @@ public class SaciEnvironment extends saci.Agent implements EnvironmentInterface 
 						r.put("in-reply-to", m.get("reply-with"));
 						r.put("ontology", m.get("ontology"));
                         
-						List percepts = userEnv.getPercepts(m.get("sender").toString());
+						List percepts = fUserEnv.getPercepts(m.get("sender").toString());
 						if (percepts != null) { 
 							synchronized(percepts) {
 								r.put("content", percepts.toString());
@@ -163,7 +164,7 @@ public class SaciEnvironment extends saci.Agent implements EnvironmentInterface 
                         if (new Integer((String)m.get("verbose")).intValue()>=1)
                             System.out.println("Agent "+sender+" is doing: "+action);
                         
-                        if (userEnv.executeAction(sender, action)) {
+                        if (fUserEnv.executeAction(sender, action)) {
                             r.put("content", "ok");
                         } else {
                             r.put("content", "error");
@@ -184,7 +185,14 @@ public class SaciEnvironment extends saci.Agent implements EnvironmentInterface 
             e.printStackTrace();
         }
     }
+
+	public void stopAg() {
+		super.stopAg();
+		fUserEnv.stop();
+	}
     
+	
+	
     /*
     public boolean executeAction(String ag, Term act) {
         //synchronized(userEnv.getPercepts(ag)) {
