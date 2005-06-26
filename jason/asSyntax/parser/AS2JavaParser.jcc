@@ -360,17 +360,12 @@ Term t() : { Token K; Term u; }
 ListTerm list() : { ListTerm lt; ListTerm last; Token K; Term f; }
 {
   "["
-  f=t()               { lt = new ListTerm(f); last = lt; }
-  ( "," f=t()         { last = last.append(f); }
+  f=t()               { lt = new ListTerm(); last = lt.add(f); }
+  ( "," f=t()         { last = last.add(f); }
   )*
   [ "|"  ( K=<VAR>    { last.setTail(new VarTerm(K.image)); }
-         | f=list()   { Iterator i = ((ListTerm)f).iterator();
-					    	while (i.hasNext()) {
-							   last = last.append(((ListTerm)i.next()).getTerm());
-						    }
-					  }
+         | f=list()   { last = last.concat((ListTerm)f);	   }
          )           
   ]
-  "]"                 { last.append(new ListTerm()); // empty list 
-                        return lt; } 
+  "]"                 { return lt; } 
 }

@@ -553,7 +553,7 @@
     case TK_NEG:
     case ATOM:
       // u=st()       { return u; }
-      // changed to AT, used in the terms of received(...Content...)
+          // changed to AT, used in the terms of received(...Content...)
           u = l();
                    {if (true) return u;}
       break;
@@ -589,7 +589,7 @@
                     ListTerm lt; ListTerm last; Token K; Term f;
     jj_consume_token(40);
     f = t();
-                        lt = new ListTerm(f); last = lt;
+                        lt = new ListTerm(); last = lt.add(f);
     label_5:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -602,7 +602,7 @@
       }
       jj_consume_token(42);
       f = t();
-                        last = last.append(f);
+                        last = last.add(f);
     }
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case 43:
@@ -614,10 +614,13 @@
         break;
       case 40:
         f = list();
-                        Iterator i = ((ListTerm)f).iterator();
-                                                while (i.hasNext()) {
-                                                           last = last.append(((ListTerm)i.next()).getTerm());
-                                                    }
+                        last = last.concat((ListTerm)f);
+                          /*Iterator i = ((ListTerm)f).iterator();
+					    	while (i.hasNext()) {
+							   last = last.append(((ListTerm)i.next()).getTerm());
+						    }
+						    */
+
         break;
       default:
         jj_la1[26] = jj_gen;
@@ -630,7 +633,6 @@
       ;
     }
     jj_consume_token(41);
-                        last.append(new ListTerm()); // empty list 
                         {if (true) return lt;}
     throw new Error("Missing return statement in function");
   }

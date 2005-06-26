@@ -25,11 +25,6 @@ public class ListTerm extends Term {
 		super();
 	}
 
-	/** create a ListTerm with a term and no next ListTerm */
-	public ListTerm(Term t) {
-		term = t;
-	}
-
     public static ListTerm parseList(String sList) {
         as2j parser = new as2j(new StringReader(sList));
         try {
@@ -137,6 +132,8 @@ public class ListTerm extends Term {
 	public boolean isTail() {
 		return isTail;
 	}
+	
+	/** returns this ListTerm's tail element in case this ListTerm has the Tail, otherwise, returns null */
 	public Term getTail() {
 		if (isTail) {
 			return next;
@@ -145,40 +142,48 @@ public class ListTerm extends Term {
 		}
 	}
 	
+	/** get the last ListTerm of this List */
+	public ListTerm getLast() {
+		if (isEnd()) {
+			return this;
+		} else if (next != null) {
+			return getNext().getLast();
+		} 
+		return null; // !!! no last!!!!
+	}
 	
-	/** creates a ListTerm from Term t, 
-	 *  add it in this ListTerm, and
-	 *  returns this new ListTerm
+	
+	/** add a term in the end of the list
+	 * @return the ListTerm where the term was added
 	 */
-	public ListTerm append(Term t) {
-			ListTerm lt = new ListTerm(t);
-			next = lt;
-			return lt;
+	public ListTerm add(Term t) {
+		if (isEmpty()) {
+			term = t;
+			next = new ListTerm();
+			return this;
+		} else if (isTail()) {
+			// What to do?
+			return null;
+		} else {
+			return getNext().add(t);
+		}
 	}
-	public ListTerm append(ListTerm lt) {
-			next = lt;
-			return lt;
-	}
+
 	
-	/** add a list in the end of this list */
-	public void concat(ListTerm lt) {
+	/** Add a list in the end of this list.
+	 * This method do not clone <i>lt</i>.
+	 * @return the last ListTerm of the new list
+	 */
+	public ListTerm concat(ListTerm lt) {
 		if ( ((ListTerm)next).isEmpty() ) {
 			next = lt;
 		} else {
 			((ListTerm)next).concat(lt);
 		}
-	}
-	
-	/** add a term at the end of the list */
-	public void add(Term t) {
-		if (isEmpty()) {
-			term = t;
-			next = new ListTerm();
-		} else {
-			getNext().add(t);
-		}
+		return lt.getLast();
 	}
 
+	
 	public Iterator iterator() {
 		final ListTerm lt = this;
 		return new Iterator() {
