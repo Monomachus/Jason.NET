@@ -129,7 +129,7 @@ public class TransitionSystem {
             	// unify the answer with the parameter
             	Term ans = Term.parse(m.getPropCont());
             	BodyLiteral send = (BodyLiteral)intention.peek().getPlan().getBody().remove(0);
-            	intention.peek().getUnif().unifies(send.getBody().getTerm(3),ans);
+            	intention.peek().getUnif().unifies(send.getLiteral().getTerm(3),ans);
                 getC().getIntentions().add(intention);
                 
             // the message is not an ask answer
@@ -385,7 +385,7 @@ public class TransitionSystem {
 			Unifier     u = im.unif;
 			BodyLiteral h = (BodyLiteral) im.getPlan().getBody().get(0);
 		
-			Term bodyTerm = (Term)h.getBody().clone();
+			Term bodyTerm = (Term)h.getLiteral().clone();
 			Literal l;
 			if (bodyTerm.isVar()) {
 				u.apply(bodyTerm);
@@ -484,7 +484,7 @@ public class TransitionSystem {
 				im = conf.C.SI.peek();
 				BodyLiteral g = (BodyLiteral) im.getPlan().getBody().remove(0);
 				// use unifier of finished plan accordingly
-				im.unif.compose(g.getBody(), oldim.unif);
+				im.unif.compose(g.getLiteral(), oldim.unif);
 				confP.step = D.SClrInt; // the new top may have become
 				// empty! need to keep checking.
 			} else {
@@ -539,16 +539,22 @@ public class TransitionSystem {
 			return un;
 		}
 
-		DefaultLiteral l = (DefaultLiteral) ctxt.next();
-		if (l.isVar()) {
-			l = (DefaultLiteral)l.clone();
-			un.apply(l); // in case we have ... & X & ...
+		DefaultLiteral dfl = (DefaultLiteral) ctxt.next();
+
+		Term dflTerm = (Term)dfl.getLiteral().clone();
+		Literal l;
+		if (dflTerm.isVar()) {
+			un.apply(dflTerm);
+			l = (Literal) ((VarTerm)dflTerm).getValue();
+		} else {
+			l = (Literal) dflTerm;
 		}
+		un.apply(l); // in case we have ... & X & ...
 		
 		if (l.isInternalAction()) {
 			boolean execOk = execInternalAction((Pred) l, un);
-			if ((!execOk && !l.isDefaultNegated()) 
-				|| (execOk && l.isDefaultNegated())) {
+			if ((!execOk && !dfl.isDefaultNegated()) 
+				|| (execOk && dfl.isDefaultNegated())) {
 				return null;
 			} else { 
 				return logCons(ctxt, un);
@@ -557,10 +563,10 @@ public class TransitionSystem {
 
 		// is not an internal action
 		
-		List relB = ag.getBS().getRelevant((Literal) l);
+		List relB = ag.getBS().getRelevant(l);
 
 
-		if (l.isDefaultNegated()) {
+		if (dfl.isDefaultNegated()) {
 			if (relB != null) {
 				// only goes ahead (recursively) if can't unify with any
 				// predicate
