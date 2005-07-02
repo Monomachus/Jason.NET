@@ -27,16 +27,16 @@ import jason.D;
 
 public class BodyLiteral implements Cloneable {
     
-	Term body;
+	Term literal;
     byte formType;
 
     public BodyLiteral(byte t, Literal l) {
-        body = (Term)l.clone();
+        literal = (Term)l.clone();
         formType = t;
     }
     public BodyLiteral(byte t, VarTerm v) {
         //super((Term)v);
-		body = (Term)v.clone();
+		literal = (Term)v.clone();
 		formType = t;
     }
 
@@ -44,29 +44,29 @@ public class BodyLiteral implements Cloneable {
         return formType;
     }
 	
-	public Term getBody() {
-		return body;
+	public Term getLiteral() {
+		return literal;
 	}
     
     public boolean equals(Object o) {
     	try {
     		BodyLiteral b = (BodyLiteral) o;
-    		return formType==b.formType && body.equals(b.body);
+    		return formType==b.formType && literal.equals(b.literal);
     	} catch (Exception e) {
     		return false;
     	}
     }
 
     public boolean equalsAsLiteral(Object o) {
-    	return body.equals(o);
+    	return literal.equals(o);
     }
     
     
     public boolean isAsk() {
-    	if (! body.getFunctorArity().equals(".send/4")) {
+    	if (! literal.getFunctorArity().equals(".send/4")) {
     		return false;
     	}
-    	if (body.getTerm(1).toString().startsWith("ask")) {
+    	if (literal.getTerm(1).toString().startsWith("ask")) {
     		return true;
     	} else {
     		return false;
@@ -74,25 +74,25 @@ public class BodyLiteral implements Cloneable {
     }
     
     public Object clone() {
-		if (body.isVar()) {
-			return new BodyLiteral(formType, (VarTerm)body);			
+		if (literal.isVar()) {
+			return new BodyLiteral(formType, (VarTerm)literal);			
 		} else {
-			return new BodyLiteral(formType, (Literal)body);
+			return new BodyLiteral(formType, (Literal)literal);
 		}
     }
     
     public String toString() {
         switch(formType) {
             case D.HAction :
-                return body.toString();
+                return literal.toString();
             case D.HAchieve :
-                return "!" + body.toString();
+                return "!" + literal.toString();
             case D.HTest :
-                return "?" + body.toString();
+                return "?" + literal.toString();
             case D.HAddBel :
-                return "+" + body.toString();
+                return "+" + literal.toString();
             case D.HDelBel :
-                return "-" + body.toString();
+                return "-" + literal.toString();
         }
         // What to do here???
         return("ERROR in Literal to String");

@@ -25,25 +25,30 @@ package jason.asSyntax;
 
 import jason.D;
 
-public class DefaultLiteral extends Literal implements Cloneable {
+public class DefaultLiteral implements Cloneable {
 
 	// TODO: not extends Literal (because of the VarTerm), same solution than BodyLiteral
 	// JOMI: this is the one you wanted to do.
 
+	Term literal;
 	boolean defType;
 
     public DefaultLiteral(boolean t, Literal l) {
-        super(l);
+        literal = (Term)l.clone();
         defType = t;
     }
     public DefaultLiteral(boolean t, VarTerm v) {
-        super(v);
+        literal = (Term)v.clone();
         defType = t;
     }
 
     public boolean isDefaultNegated() {
-        return(defType==D.LDefNeg);
+        return defType==D.LDefNeg;
     }
+	
+	public Term getLiteral() {
+		return literal;
+	}
 
     public boolean equals(Object o) {
         try {
@@ -56,11 +61,15 @@ public class DefaultLiteral extends Literal implements Cloneable {
     }
 
     public Object clone() {
-        return new DefaultLiteral(defType, (Literal)super.clone());
+		if (literal.isVar()) {
+			return new DefaultLiteral(defType, (VarTerm)literal);			
+		} else {
+			return new DefaultLiteral(defType, (Literal)literal);
+		}
     }
     
     public String toString() {
-        if(defType==D.LDefPos)
+        if (defType==D.LDefPos)
             return super.toString();
         else
             return "not " + super.toString();
