@@ -86,7 +86,7 @@
                                          {if (true) throw new ParseException("Error: Initial belief must be ground!\n       Cannot use "+F+" as initial belief.");}
                   }
     // NB: initial beliefs are as percepts (not internal) by default!!!
-    F.addAnnot(D.TSelf);
+    F.addAnnot(BeliefBase.TSelf);
     bb.add(F);
     }
     {if (true) return bb;}
@@ -137,16 +137,16 @@
 
   final public Trigger te() throws ParseException {
                         boolean teType;
-                                byte    teGoal = D.TEBel;
+                                byte    teGoal = Trigger.TEBel;
                                         Literal F;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case 25:
       jj_consume_token(25);
-             teType = D.TEAdd;
+             teType = Trigger.TEAdd;
       break;
     case 26:
       jj_consume_token(26);
-             teType = D.TEDel;
+             teType = Trigger.TEDel;
       break;
     default:
       jj_la1[3] = jj_gen;
@@ -159,11 +159,11 @@
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case 27:
         jj_consume_token(27);
-             teGoal = D.TEAchvG;
+             teGoal = Trigger.TEAchvG;
         break;
       case 28:
         jj_consume_token(28);
-             teGoal = D.TETestG;
+             teGoal = Trigger.TETestG;
         break;
       default:
         jj_la1[4] = jj_gen;
@@ -181,14 +181,14 @@
   }
 
   final public Literal l() throws ParseException {
-                Pred F; Token k; boolean type = D.LPos;
+                Pred F; Token k; boolean type = Literal.LPos;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case TK_NEG:
     case ATOM:
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case TK_NEG:
         jj_consume_token(TK_NEG);
-                                type = D.LNeg;
+                                type = Literal.LNeg;
         break;
       default:
         jj_la1[6] = jj_gen;
@@ -199,7 +199,7 @@
       break;
     case TK_TRUE:
       k = jj_consume_token(TK_TRUE);
-                                {if (true) return D.LTrue;}
+                                {if (true) return Literal.LTrue;}
       break;
     default:
       jj_la1[7] = jj_gen;
@@ -212,7 +212,7 @@
   final public ArrayList ct() throws ParseException {
                     DefaultLiteral P; ArrayList C = new ArrayList(); List CT;
     P = dl();
-                  if (!P.equals(D.LTrue)) {
+                  if (!P.equals(Literal.LTrue)) {
                     C.add(P);
                   }
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -230,17 +230,18 @@
   }
 
   final public DefaultLiteral dl() throws ParseException {
-                        Literal L; Token k;
+                        DefaultLiteral L;
+                        Token k;
                         Term op1 = null;
                         String operator = "";
                         Term op2 = null;
                         boolean change = false;
-                        boolean isPos = D.LDefPos;
+                        boolean isPos = DefaultLiteral.LDefPos;
                         DefaultLiteral rel;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case TK_NOT:
       jj_consume_token(TK_NOT);
-                       isPos = D.LDefNeg;
+                       isPos = DefaultLiteral.LDefNeg;
       break;
     default:
       jj_la1[9] = jj_gen;
@@ -251,7 +252,7 @@
       jj_consume_token(30);
       L = dl();
       jj_consume_token(31);
-                       {if (true) return new DefaultLiteral(isPos,L);}
+                       {if (true) return new DefaultLiteral(isPos,(Literal)L.getLiteral());}
       break;
     case TK_TRUE:
     case TK_NEG:
@@ -393,7 +394,7 @@
                    ArrayList BD = new ArrayList();
                    List BD2;
     F = f();
-                   if (! F.equalsAsLiteral(D.LTrue)) {
+                   if (! F.equalsAsLiteral(Literal.LTrue)) {
                       BD.add(F);
                    }
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -412,7 +413,7 @@
 
   final public BodyLiteral f() throws ParseException {
                     Literal A; Token k;
-                    byte formType = D.HAction;
+                    byte formType = BodyLiteral.HAction;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case 25:
     case 26:
@@ -421,19 +422,19 @@
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case 27:
         jj_consume_token(27);
-             formType = D.HAchieve;
+             formType = BodyLiteral.HAchieve;
         break;
       case 28:
         jj_consume_token(28);
-             formType = D.HTest;
+             formType = BodyLiteral.HTest;
         break;
       case 25:
         jj_consume_token(25);
-             formType = D.HAddBel;
+             formType = BodyLiteral.HAddBel;
         break;
       case 26:
         jj_consume_token(26);
-             formType = D.HDelBel;
+             formType = BodyLiteral.HDelBel;
         break;
       default:
         jj_la1[17] = jj_gen;
@@ -615,12 +616,6 @@
       case 40:
         f = list();
                         last = last.concat((ListTerm)f);
-                          /*Iterator i = ((ListTerm)f).iterator();
-					    	while (i.hasNext()) {
-							   last = last.append(((ListTerm)i.next()).getTerm());
-						    }
-						    */
-
         break;
       default:
         jj_la1[26] = jj_gen;

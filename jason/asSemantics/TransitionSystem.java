@@ -22,12 +22,12 @@
 
 package jason.asSemantics;
 
-import jason.D;
 import jason.JasonException;
 import jason.Settings;
 import jason.architecture.AgentArchitecture;
 import jason.architecture.CentralisedAgArch;
 import jason.architecture.SaciAgArch;
+import jason.asSyntax.BeliefBase;
 import jason.asSyntax.BodyLiteral;
 import jason.asSyntax.DefaultLiteral;
 import jason.asSyntax.Literal;
@@ -46,6 +46,27 @@ import java.util.Map;
 
 public class TransitionSystem {
 
+
+    static final byte      SStartRC   = 0;
+    static final byte      SProcMsg   = 0;
+    static final byte      SSelEv     = 1;
+    static final byte      SRelPl     = 2;
+    static final byte      SApplPl    = 3;
+    static final byte      SSelAppl   = 4;
+    static final byte      SAddIM     = 5;
+    static final byte      SProcAct   = 6;
+    static final byte      SSelInt    = 7;
+    static final byte      SExecInt   = 8;
+    static final byte      SClrInt    = 9;
+
+    static final String[]  SRuleNames = { "ProcMsg", "SelEv", "RelPl",
+                                                 "ApplPl", "SelAppl", "AddIM",
+                                                 "ProcAct", "SelInt", "ExecInt",
+                                                 "ClrInt" };
+
+	
+	
+	
 	Agent ag = null;
 
 	Circumstance C = null;
@@ -54,7 +75,7 @@ public class TransitionSystem {
 
 	AgentArchitecture agArch = null;
 
-	byte step = D.SStartRC; // First step of the SOS
+	byte step = SStartRC; // First step of the SOS
 
 	// both configuration and configuration' point to this
 	// object, this is just to make it look more like the SOS
@@ -83,34 +104,34 @@ public class TransitionSystem {
 		// the individual semantic rules appear below
 		
 		switch (conf.step) {
-		case D.SProcMsg:
+		case SProcMsg:
 			applyProcMsg();
 			break;
-		case D.SSelEv:
+		case SSelEv:
 			applySelEv();
 			break;
-		case D.SRelPl:
+		case SRelPl:
 			applyRelPl();
 			break;
-		case D.SApplPl:
+		case SApplPl:
 			applyApplPl();
 			break;
-		case D.SSelAppl:
+		case SSelAppl:
 			applySelAppl();
 			break;
-		case D.SAddIM:
+		case SAddIM:
 			applyAddIM();
 			break;
-		case D.SProcAct:
+		case SProcAct:
 			applyProcAct();
 			break;
-		case D.SSelInt:
+		case SSelInt:
 			applySelInt();
 			break;
-		case D.SExecInt:
+		case SExecInt:
 			applyExecInt();
 			break;
-		case D.SClrInt:
+		case SClrInt:
 			applyClrInt();
 			break;
 		}
@@ -126,11 +147,14 @@ public class TransitionSystem {
             Intention intention = (Intention)getC().getPendingActions().remove(m.getInReplyTo());
             // is it a pending intention?
             if (intention != null) {
-            	// unify the answer with the parameter
+            	// unify the message answer with the .send fourth parameter
+				// the send that put the intention in Pending state was something like
+				//  .send(ask, ag1, value, X)
+				// if the answer was 3, unifies X=3
             	Term ans = Term.parse(m.getPropCont());
             	BodyLiteral send = (BodyLiteral)intention.peek().getPlan().getBody().remove(0);
             	intention.peek().getUnif().unifies(send.getLiteral().getTerm(3),ans);
-                getC().getIntentions().add(intention);
+				getC().getIntentions().add(intention);
                 
             // the message is not an ask answer
             } else if (conf.ag.socAcc(m)) {
@@ -141,16 +165,16 @@ public class TransitionSystem {
 				// if it has the source, the context fail for askIf/One.
 				// so, the source is added by the receiver plan
 	
-				Intention focus = D.EmptyInt;
+				Intention focus = Intention.EmptyInt;
 	
 				// generate an event
-				Literal received = new Literal(D.LPos, new Pred("received"));
+				Literal received = new Literal(Literal.LPos, new Pred("received"));
 				received.addTerm(new Term(m.getSender()));
 				received.addTerm(new Term(m.getIlForce()));
 				received.addTerm(content);
 				received.addTerm(new Term(m.getMsgId()));
 				
-				Event evt = new Event(new Trigger(D.TEAdd, D.TEBel, received), focus);
+				Event evt = new Event(new Trigger(Trigger.TEAdd, Trigger.TEBel, received), focus);
 				//System.out.println("event = "+evt);
 				conf.ag.updateEvents(evt, conf.C);
 			}
@@ -193,19 +217,19 @@ public class TransitionSystem {
 			}
 			*/
 		}
-		confP.step = D.SSelEv;
+		confP.step = SSelEv;
 	}
 
 	private void applySelEv() throws JasonException {
 		// Rule SelEv1
 		if (!conf.C.E.isEmpty()) {
 			confP.C.SE = conf.ag.selectEvent(confP.C.E);
-			confP.step = D.SRelPl;
+			confP.step = SRelPl;
 		}
 		// Rule SelEv2
 		else {
 			// directly to ProcAct if no event to handle
-			confP.step = D.SProcAct;
+			confP.step = SProcAct;
 		}
 	}
 
@@ -216,7 +240,7 @@ public class TransitionSystem {
 		
 		// Rule Rel1
 		if (!confP.C.RP.isEmpty() || setts.retrieve()) { // retrieve is mainly for Coo-AgentSpeak
-			confP.step = D.SApplPl;
+			confP.step = SApplPl;
 		}
 		// Rule Rel2
 		else {
@@ -233,7 +257,7 @@ public class TransitionSystem {
 			else if (setts.requeue()) {
 				confP.C.addEvent(conf.C.SE);
 			}
-			confP.step = D.SProcAct;
+			confP.step = SProcAct;
 		}
 	}
 
@@ -243,10 +267,10 @@ public class TransitionSystem {
 		//System.out.println("\tRP="+confP.C.RP+"\n\tAP="+confP.C.AP);
 		// Rule Appl1
 		if (!confP.C.AP.isEmpty() || setts.retrieve()) { // retrieve is mainly fo Coo-AgentSpeak
-			confP.step = D.SSelAppl;
+			confP.step = SSelAppl;
 		} else { // Rule Appl2
 			generateGoalDeletionFromEvent(); // can't carry on, no applicable plan.
-			confP.step = D.SProcAct;
+			confP.step = SProcAct;
 		}
 	}
 
@@ -254,11 +278,11 @@ public class TransitionSystem {
 		// Rule SelAppl
 		confP.C.SO = conf.ag.selectOption(confP.C.AP);
 		if (confP.C.SO != null) {
-			confP.step = D.SAddIM;
+			confP.step = SAddIM;
 		} else {
 			System.err.println("*** Warning! selectOption returned null.");
 			generateGoalDeletionFromEvent(); // can't carry on, no applicable plan.
-			confP.step = D.SProcAct;
+			confP.step = SProcAct;
 		}
 	}
 
@@ -267,7 +291,7 @@ public class TransitionSystem {
 		IntendedMeans im = new IntendedMeans(conf.C.SO);
 
 		// Rule ExtEv
-		if (conf.C.SE.intention == D.EmptyInt) {
+		if (conf.C.SE.intention == Intention.EmptyInt) {
 			Intention intention = new Intention();
 			intention.push(im);
 			confP.C.I.add(intention);
@@ -277,7 +301,7 @@ public class TransitionSystem {
 			confP.C.SE.intention.push(im);
 			confP.C.I.add(confP.C.SE.intention);
 		}
-		confP.step = D.SProcAct;
+		confP.step = SProcAct;
 	}
 
 	private void applyProcAct() throws JasonException {
@@ -289,9 +313,9 @@ public class TransitionSystem {
 			} else {
 				generateGoalDeletion();
 			}
-			confP.step = D.SClrInt;
+			confP.step = SClrInt;
 		} else {
-			confP.step = D.SSelInt;
+			confP.step = SSelInt;
 		}
 	}
 
@@ -303,24 +327,24 @@ public class TransitionSystem {
 		// at every resoning cycle, right? can't we use a flag
 		// just to remember that there is an atomic to search for?
 
-		// TODO JOMI isn't it better if selectAtomicIntention() is defined
+		// JOMI isn't it better if selectAtomicIntention() is defined
 		// in this class and not in the circumstance?
 		
 		// Rule for Atomic Intentions
 		confP.C.SI = conf.C.selectAtomicIntention();
 		if (confP.C.SI != null) {
-			confP.step = D.SExecInt;
+			confP.step = SExecInt;
 			return;
 		}
 
 		// Rule SelInt1
 		if (!conf.C.I.isEmpty()) {
 			confP.C.SI = conf.ag.selectIntention(conf.C.I);
-			confP.step = D.SExecInt;
+			confP.step = SExecInt;
 			return;
 		}
 		
-		confP.step = D.SStartRC;
+		confP.step = SStartRC;
 	}
 
 
@@ -398,7 +422,7 @@ public class TransitionSystem {
 			switch (h.getType()) {
 			
 			// Rule Action
-			case D.HAction:
+			case BodyLiteral.HAction:
 				if (l.isInternalAction()) {
 					if (execInternalAction(l, u)) {
 						if (!h.isAsk()) {
@@ -414,12 +438,12 @@ public class TransitionSystem {
 				break;
 				
 			// Rule Achieve
-			case D.HAchieve:
+			case BodyLiteral.HAchieve:
 				conf.C.addAchvGoal(l, conf.C.SI);
 				break;
 				
 			// Rule Test
-			case D.HTest:
+			case BodyLiteral.HTest:
 				Unifier ubel = conf.ag.believes(l, u);
 				if (ubel != null) {
 					im = conf.C.SI.peek();
@@ -433,7 +457,7 @@ public class TransitionSystem {
 				break;
 				
 			// Rule AddBel
-			case D.HAddBel:
+			case BodyLiteral.HAddBel:
 				
 				// translate l to a string and parse again to identify
 				// problems such as:
@@ -442,29 +466,29 @@ public class TransitionSystem {
 				if (l != null) {
 					//System.out.println("*** adding "+l);			
 					if (setts.sameFocus())
-						conf.ag.addBel(l, D.TSelf, conf.C, conf.C.SI);
+						conf.ag.addBel(l, BeliefBase.TSelf, conf.C, conf.C.SI);
 					else {
 						// TODO: Must COPY the whole intention, for the newFocus!!!!
 						// JOMI: acho que esta msg e' velha e nem faz sentido.
 						// Nao vejo porque copiar a intention se e' NewFocus
 						// Se concordas que isto nao deve ser feito, remove este todo.
-						conf.ag.addBel(l, D.TSelf, conf.C, D.EmptyInt);
+						conf.ag.addBel(l, BeliefBase.TSelf, conf.C, Intention.EmptyInt);
 						updateIntention();
 					}
 				}
 				break;
 				
 			// Rule DelBel
-			case D.HDelBel:
+			case BodyLiteral.HDelBel:
 				ubel = conf.ag.believes((Literal)l, u);
 				//System.out.println("****00-"+ubel);
 				if (ubel != null) {
 					ubel.apply(l);
 					//System.out.println("****11-"+l);
 					if (setts.sameFocus())
-						conf.ag.delBel(l, D.TSelf, conf.C, conf.C.SI);
+						conf.ag.delBel(l, BeliefBase.TSelf, conf.C, conf.C.SI);
 					else {
-						conf.ag.delBel(l, D.TSelf, conf.C, D.EmptyInt);
+						conf.ag.delBel(l, BeliefBase.TSelf, conf.C, Intention.EmptyInt);
 						updateIntention();
 					}
 				} else
@@ -472,7 +496,7 @@ public class TransitionSystem {
 				break;
 			}
 		}
-		confP.step = D.SClrInt;
+		confP.step = SClrInt;
 	}
 
 	private void applyClrInt() throws JasonException {
@@ -485,15 +509,15 @@ public class TransitionSystem {
 				BodyLiteral g = (BodyLiteral) im.getPlan().getBody().remove(0);
 				// use unifier of finished plan accordingly
 				im.unif.compose(g.getLiteral(), oldim.unif);
-				confP.step = D.SClrInt; // the new top may have become
+				confP.step = SClrInt; // the new top may have become
 				// empty! need to keep checking.
 			} else {
 				confP.C.I.remove(conf.C.SI);
 				conf.C.SI = null;
-				confP.step = D.SStartRC;
+				confP.step = SStartRC;
 			}
 		} else {
-			confP.step = D.SStartRC;
+			confP.step = SStartRC;
 		}
 	}
 
@@ -767,10 +791,10 @@ public class TransitionSystem {
 				if (setts.verbose() >= 6)
 					System.out.println(agArch.getName() + " Circumstance: " + C);
 				if (setts.verbose() >= 4)
-					System.out.println(agArch.getName() + " Step:         " + D.SRuleNames[conf.step]);
+					System.out.println(agArch.getName() + " Step:         " + SRuleNames[conf.step]);
 
 				applySemanticRule();
-			} while (step != D.SStartRC); // finished a reasoning cycle
+			} while (step != SStartRC); // finished a reasoning cycle
 
 			if (setts.verbose() >= 5)
 				System.out.println(agArch.getName() + " acting");

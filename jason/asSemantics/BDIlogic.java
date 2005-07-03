@@ -24,7 +24,6 @@
 package jason.asSemantics;
 
 
-import jason.D;
 import jason.asSyntax.Literal;
 import jason.asSyntax.Trigger;
 
@@ -46,11 +45,11 @@ public final class BDIlogic {
      * if there is an event with +!l as triggering event or it is an Intention. 
      */
     public static final boolean Des(TransitionSystem ts, Literal l) {
-    	Trigger teFromL = new Trigger(D.TEAdd,D.TEAchvG,l);
+    	Trigger teFromL = new Trigger(Trigger.TEAdd,Trigger.TEAchvG,l);
         for(Iterator i=ts.C.E.iterator(); i.hasNext(); ) {
             Event ei = (Event)i.next();
             Trigger t = (Trigger)ei.trigger;
-            if (ei.intention!=D.EmptyInt) {
+            if (ei.intention!=Intention.EmptyInt) {
                 t = (Trigger)t.clone();
                 ((IntendedMeans)ei.intention.peek()).unif.apply(t);
             }
@@ -67,7 +66,7 @@ public final class BDIlogic {
      * just note that intentions can be suspended and appear in E or PA as well.
      */
     public static final boolean Int(TransitionSystem ts, Literal l) {
-        Trigger g = new Trigger(D.TEAdd,D.TEAchvG,l);
+        Trigger g = new Trigger(Trigger.TEAdd,Trigger.TEAchvG,l);
         for(Iterator i=ts.C.I.iterator(); i.hasNext(); ) {
             if (((Intention)i.next()).hasTrigger(g))
                 return true;
@@ -101,16 +100,16 @@ public final class BDIlogic {
      * remove all desires and intentions of l.
      */
     public static final void dropDes(TransitionSystem ts, Literal l) {
-        Event e = new Event(new Trigger(D.TEAdd,D.TEAchvG,l),D.EmptyInt);
+        Event e = new Event(new Trigger(Trigger.TEAdd,Trigger.TEAchvG,l),Intention.EmptyInt);
         for(Iterator i=ts.C.E.iterator(); i.hasNext(); ) {
             Event ei = (Event)i.next();
             Trigger t = (Trigger)ei.trigger;
-            if (ei.intention!=D.EmptyInt) {
+            if (ei.intention!=Intention.EmptyInt) {
                 t = (Trigger)t.clone();
                 ((IntendedMeans)ei.intention.peek()).unif.apply(t);
             }
             if(new Unifier().unifies(t,e.trigger)) {
-                t.setTrigType(D.TEDel); // Just changing "+!g" to "-!g" !!!
+                t.setTrigType(Trigger.TEDel); // Just changing "+!g" to "-!g" !!!
             }
         }
     }
@@ -123,12 +122,12 @@ public final class BDIlogic {
      * create problems at the moment.
      */
     public static final void dropInt(TransitionSystem ts, Literal l) {
-        Trigger g = new Trigger(D.TEAdd,D.TEAchvG,l);
+        Trigger g = new Trigger(Trigger.TEAdd,Trigger.TEAchvG,l);
         for(Iterator j=ts.C.I.iterator(); j.hasNext(); ) {
         	Intention i = (Intention) j.next();
             if (i.hasTrigger(g)) {
                 Trigger ng = (Trigger) g.clone();
-                ng.setTrigType(D.TEDel);
+                ng.setTrigType(Trigger.TEDel);
                 ts.C.E.add(new Event(ng,i));
                 j.remove();
             }
@@ -138,7 +137,7 @@ public final class BDIlogic {
         	Intention i = ((Event)j.next()).intention;
             if (i.hasTrigger(g)) {
                 Trigger ng = (Trigger) g.clone();
-                ng.setTrigType(D.TEDel);
+                ng.setTrigType(Trigger.TEDel);
                 ts.C.E.add(new Event(ng,i));
                 j.remove();
             }
@@ -154,7 +153,7 @@ public final class BDIlogic {
        	// the stack (that might cause problems?)
                 if (i.hasTrigger(g)) {
                     Trigger ng = (Trigger) g.clone();
-                    ng.setTrigType(D.TEDel);
+                    ng.setTrigType(Trigger.TEDel);
                     ts.C.E.add(new Event(ng,i));
                     j.remove();
                 }

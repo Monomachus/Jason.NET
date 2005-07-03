@@ -1,7 +1,8 @@
 package test;
 
-import jason.D;
 import jason.asSemantics.Unifier;
+import jason.asSyntax.BeliefBase;
+import jason.asSyntax.DefaultLiteral;
 import jason.asSyntax.Literal;
 import jason.asSyntax.Pred;
 import jason.asSyntax.Term;
@@ -46,9 +47,9 @@ public class TermTest extends TestCase {
 		assertFalse(t1.equals(t3));
 		
 		Literal l3 = new Literal(true, new Pred("pos"));
-		l3.addAnnot(D.TPercept);
+		l3.addAnnot(BeliefBase.TPercept);
 		Literal l4 = new Literal(true, new Pred("pos"));
-		l4.addAnnot(D.TPercept);
+		l4.addAnnot(BeliefBase.TPercept);
 		assertEquals(l3, l4);
 		
 		assertTrue(l3.equals(new Term("pos")));
@@ -217,7 +218,7 @@ public class TermTest extends TestCase {
 		p1.addTerm(new VarTerm("X"));
 		p1.addTerm(new VarTerm("Y"));
 
-		Trigger g = new Trigger(D.TEAdd,D.TEAchvG,new Literal(D.LDefPos, p1));
+		Trigger g = new Trigger(Trigger.TEAdd,Trigger.TEAchvG,new Literal(DefaultLiteral.LDefPos, p1));
 		//System.out.println("g="+g);
 		
 	}
@@ -225,21 +226,21 @@ public class TermTest extends TestCase {
 	public void testTriggetAnnot() {
 		Literal content = Literal.parseLiteral("~alliance");
 		content.addSource("ag1");
-		Literal received = new Literal(D.LPos, new Pred("received"));
+		Literal received = new Literal(Literal.LPos, new Pred("received"));
 		received.addTerm(new Term("ag1"));
 		received.addTerm(new Term("tell"));
 		received.addTerm(content);
 		received.addTerm(new Term("id1"));
 		
-		Trigger t1 = new Trigger(D.TEAdd, D.TEBel, received);
+		Trigger t1 = new Trigger(Trigger.TEAdd, Trigger.TEBel, received);
 
-		Literal received2 = new Literal(D.LPos, new Pred("received"));
+		Literal received2 = new Literal(Literal.LPos, new Pred("received"));
 		received2.addTerm(new VarTerm("S"));
 		received2.addTerm(new Term("tell"));
 		received2.addTerm(new VarTerm("C"));
 		received2.addTerm(new VarTerm("M"));
 		
-		Trigger t2 = new Trigger(D.TEAdd, D.TEBel, received2);
+		Trigger t2 = new Trigger(Trigger.TEAdd, Trigger.TEBel, received2);
 		
 		//System.out.println("t1 = "+t1);
 		//System.out.println("t2 = "+t2);
@@ -263,7 +264,7 @@ public class TermTest extends TestCase {
 	public void testLiteralUnify() {
 		Literal content = Literal.parseLiteral("~alliance");
 		content.addSource("ag1");
-		Literal l1 = new Literal(D.LPos, new Pred("received"));
+		Literal l1 = new Literal(Literal.LPos, new Pred("received"));
 		l1.addTerm(new Term("ag1"));
 		l1.addTerm(new Term("tell"));
 		l1.addTerm(content);

@@ -22,14 +22,20 @@
 
 package jason.asSyntax;
 
-import jason.D;
 import jason.asSyntax.parser.as2j;
 
 import java.io.StringReader;
 
+/**
+ * A Literal is a Pred with strong negation (~).
+ */
 public class Literal extends Pred implements Cloneable {
 
-	boolean type = D.LPos;
+	public static final boolean   LPos       = true;
+    public static final boolean   LNeg       = false;
+    public static final Literal   LTrue      = new Literal(LPos, new Pred("true"));
+
+	boolean type = LPos;
 
 	/** if pos == true, the literal is positive, else it is negative */
 	public Literal(boolean pos, Pred p) {
@@ -44,7 +50,7 @@ public class Literal extends Pred implements Cloneable {
 	
 	public Literal(Term t) {
 		super(t);
-		type = D.LPos;
+		type = LPos;
 	}
 
 	public static Literal parseLiteral(String sLiteral) {
@@ -58,15 +64,10 @@ public class Literal extends Pred implements Cloneable {
 		}
 	}
 
-	public void set(Object o) {
-		super.set(o);
-		try {
-			Literal l = (Literal)o;
-			type = l.type;
-		} catch (Exception e) {
-			// no problem, o is not a literal, may be it is a pred and the
-			// super.set handle it
-		}
+	/** copy all attributes from literal <i>l</i> */
+	public void set(Literal l) {
+		super.set((Pred)l);
+		type = l.type;
 	}
 	
 	
@@ -75,7 +76,7 @@ public class Literal extends Pred implements Cloneable {
 	}
 
 	public boolean negated() {
-		return (type == D.LNeg);
+		return (type == LNeg);
 	}
 
 	public boolean equals(Object o) {
@@ -95,7 +96,7 @@ public class Literal extends Pred implements Cloneable {
 	/** return [~] super.getFucntorArity */
 	public String getFunctorArity() {
 		if (functorArityBak == null) {
-			functorArityBak = (type == D.LPos) ? super.getFunctorArity() : "~" + super.getFunctorArity(); 
+			functorArityBak = (type == LPos) ? super.getFunctorArity() : "~" + super.getFunctorArity(); 
 		}
 		return functorArityBak;
 	}
@@ -105,7 +106,7 @@ public class Literal extends Pred implements Cloneable {
 	}
 
 	public String toString() {
-		if (type == D.LPos)
+		if (type == LPos)
 			return super.toString();
 		else
 			return "~" + super.toString();

@@ -23,10 +23,15 @@
 
 package jason.asSyntax;
 
-import jason.D;
 
 public class BodyLiteral implements Cloneable {
     
+    public static final byte      HAction    = 0;
+    public static final byte      HAchieve   = 1;
+    public static final byte      HTest      = 2;
+    public static final byte      HAddBel    = 3;
+    public static final byte      HDelBel    = 4;	
+	
 	Term literal;
     byte formType;
 
@@ -83,15 +88,15 @@ public class BodyLiteral implements Cloneable {
     
     public String toString() {
         switch(formType) {
-            case D.HAction :
+            case HAction :
                 return literal.toString();
-            case D.HAchieve :
+            case HAchieve :
                 return "!" + literal.toString();
-            case D.HTest :
+            case HTest :
                 return "?" + literal.toString();
-            case D.HAddBel :
+            case HAddBel :
                 return "+" + literal.toString();
-            case D.HDelBel :
+            case HDelBel :
                 return "-" + literal.toString();
         }
         // What to do here???

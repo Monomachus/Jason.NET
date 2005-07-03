@@ -29,9 +29,18 @@ import java.io.StringReader;
 import java.util.Map;
 
 public class Settings {
-    byte    events    = D.ODiscard;
-    boolean intBels   = D.OSameFocus;
-    int     verbose   = D.ODefaultVerbose;
+	
+    public static final byte      ODiscard        = 1;
+    public static final byte      ORequeue        = 2;
+    public static final byte      ORetrieve       = 3;
+    public static final boolean   OSameFocus      = true;
+    public static final boolean   ONewFocus       = false;
+    public static final int       ODefaultVerbose = 1;
+	
+	
+    byte    events    = ODiscard;
+    boolean intBels   = OSameFocus;
+    int     verbose   = ODefaultVerbose;
     boolean sync      = false; 
     
     public Settings() {
@@ -59,20 +68,20 @@ public class Settings {
         String events = (String)options.get("events");
         if (events != null) {
             if (events.equals("discard")) {
-                setEvents(D.ODiscard);
+                setEvents(ODiscard);
             } else if (events.equals("requeue")) {
-                setEvents(D.ORequeue);
+                setEvents(ORequeue);
             } else if (events.equals("retrieve")) {
-                setEvents(D.ORetrieve);
+                setEvents(ORetrieve);
             }
         }
         
         String intBels = (String)options.get("intBels");
         if (intBels != null) {
             if (intBels.equals("sameFocus")) {
-                setIntBels(D.OSameFocus);
+                setIntBels(OSameFocus);
             } else if (intBels.equals("newFocus")) {
-            	setIntBels(D.ONewFocus);
+            	setIntBels(ONewFocus);
             }
         }
         
@@ -91,18 +100,10 @@ public class Settings {
         }
     }
 
-	/**
-	 * 
-	 * @uml.property name="events"
-	 */
 	public void setEvents(byte opt) {
 		events = opt;
 	}
 
-	/**
-	 * 
-	 * @uml.property name="intBels"
-	 */
 	public void setIntBels(boolean opt) {
 		intBels = opt;
 	}
@@ -116,24 +117,20 @@ public class Settings {
         }
     }
 
-	/**
-	 * 
-	 * @uml.property name="verbose"
-	 */
 	public void setVerbose(int opt) {
 		verbose = opt;
 	}
     
     public boolean discard() {
-        return events == D.ODiscard;
+        return events == ODiscard;
     }
 
     public boolean requeue() {
-        return events == D.ORequeue;
+        return events == ORequeue;
     }
     
     public boolean retrieve() {
-        return events == D.ORetrieve;
+        return events == ORetrieve;
     }
 
     public boolean sameFocus() {

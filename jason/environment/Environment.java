@@ -23,7 +23,6 @@
 
 package jason.environment;
 
-import jason.D;
 import jason.asSyntax.Literal;
 import jason.asSyntax.Pred;
 import jason.asSyntax.Term;
@@ -159,7 +158,7 @@ public abstract class Environment {
 			synchronized (oldPercepts) {
 				Iterator i = oldPercepts.iterator();
 				while (i.hasNext()) {
-					p.add( new Literal(D.LPos, new Pred((Term)i.next())));
+					p.add( new Literal(Literal.LPos, new Pred((Term)i.next())));
 				}
 			}
 		}
@@ -167,7 +166,7 @@ public abstract class Environment {
 			synchronized (oldNegPercepts) {
 				Iterator i = oldNegPercepts.iterator();
 				while (i.hasNext()) {
-					p.add( new Literal(D.LNeg, new Pred((Term)i.next())));
+					p.add( new Literal(Literal.LNeg, new Pred((Term)i.next())));
 				}
 			}
 		}

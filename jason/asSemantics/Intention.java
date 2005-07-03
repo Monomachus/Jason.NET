@@ -34,6 +34,8 @@ import org.w3c.dom.Element;
 
 public class Intention implements Serializable {
 
+	public static final Intention EmptyInt   = null;
+
 	private static int idCount = 1;
 	private int id;
 	

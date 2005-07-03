@@ -23,7 +23,6 @@
 
 package jason.asSemantics;
 
-import jason.D;
 import jason.asSyntax.Trigger;
 
 import java.io.Serializable;
@@ -33,24 +32,15 @@ import org.w3c.dom.Element;
 
 public class Event implements Serializable {
 
-	/**
-	 * 
-	 * @uml.property name="trigger"
-	 * @uml.associationEnd multiplicity="(0 1)"
-	 */
 	Trigger trigger = null;
 
-    Intention intention = D.EmptyInt;
+    Intention intention = Intention.EmptyInt;
     
     public Event(Trigger t, Intention i) {
         trigger = t;
         intention = i;
     }
 
-	/**
-	 * 
-	 * @uml.property name="trigger"
-	 */
 	public Trigger getTrigger() {
 		return trigger;
 	}
@@ -64,15 +54,15 @@ public class Event implements Serializable {
     }
 
     public boolean isExternal() {
-        return (intention==D.EmptyInt);
+        return (intention==Intention.EmptyInt);
     }
     public boolean isInternal() {
-        return (intention!=D.EmptyInt);
+        return (intention!=Intention.EmptyInt);
     }
 
     public String toString() {
-        if (intention == D.EmptyInt)
-            return("<"+trigger+","+D.SEmptyInt+">");
+        if (intention == Intention.EmptyInt)
+            return("<"+trigger+",TRUE>");
         else
             return("<"+trigger+","+intention+">");
     }
@@ -81,7 +71,7 @@ public class Event implements Serializable {
 	public Element getAsDOM(Document document) {
 		Element eevt = (Element) document.createElement("event");
 		eevt.setAttribute("trigger", trigger.toString());
-		if (intention != D.EmptyInt) {
+		if (intention != Intention.EmptyInt) {
 			eevt.setAttribute("intention", intention.getId()+"");
 		}
 		return eevt;

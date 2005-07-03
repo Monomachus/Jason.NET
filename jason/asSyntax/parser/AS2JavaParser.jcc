@@ -140,7 +140,7 @@ BeliefBase bs() : { BeliefBase bb = new BeliefBase(); Literal F; }
 				         throw new ParseException("Error: Initial belief must be ground!\n       Cannot use "+F+" as initial belief.");
                   }
     // NB: initial beliefs are as percepts (not internal) by default!!!
-    F.addAnnot(D.TSelf);
+    F.addAnnot(BeliefBase.TSelf);
     bb.add(F); } 
   )*
   { return bb; }
@@ -164,30 +164,31 @@ Plan p() : { Trigger T; ArrayList C; ArrayList H; Pred L = null; }
 
 Trigger te() : { 
                		boolean teType;
-			    	byte    teGoal = D.TEBel;
+			    	byte    teGoal = Trigger.TEBel;
 				 	Literal F; 
                }
 {
-  ( "+"    { teType = D.TEAdd; }
-  | "-"    { teType = D.TEDel; }
+  ( "+"    { teType = Trigger.TEAdd; }
+  | "-"    { teType = Trigger.TEDel; }
   )
   
-  [ ( "!"  { teGoal = D.TEAchvG; }
-    | "?"  { teGoal = D.TETestG; }
+  [ ( "!"  { teGoal = Trigger.TEAchvG; }
+    | "?"  { teGoal = Trigger.TETestG; }
     )
   ]
   
   F=l()    { return new Trigger(teType,teGoal,F); }
 }
 
-Literal l() : { Pred F; Token k; boolean type = D.LPos; }
+Literal l() : { Pred F; Token k; boolean type = Literal.LPos; }
 {
-  ( ( [ <TK_NEG>              { type = D.LNeg; }
+  ( ( [ <TK_NEG>              { type = Literal.LNeg; }
       ]
       F=at()                  { return new Literal(type,F); }
     )
   // moved to a more specifig place (dl, t, ...) | k=<VAR>                   { return new VarTerm(k.image); }//return new Literal(type,new Pred(k.image));} 
-  | k=<TK_TRUE>               { return D.LTrue;}  // used when dl/body is true
+  | k=<TK_TRUE>               { return Literal.LTrue;}  // used when dl/body is true
+// TODO: true should be a Term! I forgot why it is here! (jomi)
   )
 }
 
@@ -195,7 +196,7 @@ Literal l() : { Pred F; Token k; boolean type = D.LPos; }
 
 ArrayList ct() :  { DefaultLiteral P; ArrayList C = new ArrayList(); List CT;}
 {
-     P = dl()   { if (!P.equals(D.LTrue)) {
+     P = dl()   { if (!P.equals(Literal.LTrue)) {
                     C.add(P); 
                   }
                 }
@@ -204,18 +205,19 @@ ArrayList ct() :  { DefaultLiteral P; ArrayList C = new ArrayList(); List CT;}
 }
 
 
-DefaultLiteral dl() : { Literal L; Token k;
+DefaultLiteral dl() : { DefaultLiteral L; 
+                        Token k;
                         Term op1 = null;
                         String operator = ""; 
                         Term op2 = null; 
                         boolean change = false;
-                        boolean isPos = D.LDefPos; 
+                        boolean isPos = DefaultLiteral.LDefPos; 
                         DefaultLiteral rel;
                       }
 {
-  [ <TK_NOT>         { isPos = D.LDefNeg; }
+  [ <TK_NOT>         { isPos = DefaultLiteral.LDefNeg; }
   ]
-  ( "(" L=dl() ")"   { return new DefaultLiteral(isPos,L); }
+  ( "(" L=dl() ")"   { return new DefaultLiteral(isPos,(Literal)L.getLiteral()); }
   | ( op1 = l()      { rel = new DefaultLiteral(isPos,(Literal)op1); }
     | op1 = value()  { rel = null; }
     | k = <VAR>      { op1 = new VarTerm(k.image); 
@@ -273,7 +275,7 @@ ArrayList bd() : { BodyLiteral F;
                    ArrayList BD = new ArrayList(); 
                    List BD2;}
 {
-  F=f()          { if (! F.equalsAsLiteral(D.LTrue)) {
+  F=f()          { if (! F.equalsAsLiteral(Literal.LTrue)) {
                       BD.add(F); 
                    } 
                  }
@@ -284,13 +286,13 @@ ArrayList bd() : { BodyLiteral F;
 
 
 BodyLiteral f() : { Literal A; Token k;
-                    byte formType = D.HAction;
+                    byte formType = BodyLiteral.HAction;
                   }
 {
-  [ ( "!"  { formType = D.HAchieve; }
-    | "?"  { formType = D.HTest; }
-    | "+"  { formType = D.HAddBel; }
-    | "-"  { formType = D.HDelBel; }
+  [ ( "!"  { formType = BodyLiteral.HAchieve; }
+    | "?"  { formType = BodyLiteral.HTest; }
+    | "+"  { formType = BodyLiteral.HAddBel; }
+    | "-"  { formType = BodyLiteral.HDelBel; }
     )
   ]
   ( A=l()       { return new BodyLiteral(formType,A); }
@@ -351,7 +353,6 @@ Term t() : { Token K; Term u; }
   | K=<NUMBER>   { return new Term(K.image); }
   | K=<STRING>   { return new StringTerm(K.image.replaceAll("\"", "\\\"")); } 
   // alredy in at | K=<ATOM>     { return new Pred(K.image); }
-  // in literal | K=<TK_TRUE>  { return D.LTrue; } 
   | K=<TK_FALSE> { return new Term(K.image); } 
   )
 }

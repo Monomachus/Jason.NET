@@ -78,51 +78,51 @@ public class Circumstance implements Serializable {
     }
 
     public void addAchvGoal(Literal l, Intention i) {
-        E.add(new Event(new Trigger(D.TEAdd,D.TEAchvG,l), i));
+        E.add(new Event(new Trigger(Trigger.TEAdd,Trigger.TEAchvG,l), i));
     }
     //public void addAchvGoal(String sl, Intention i) {
     //    addAchvGoal(Literal.parseLiteral(sl), i);
     //}
     public void addTestGoal(Literal l, Intention i) {
-        E.add(new Event(new Trigger(D.TEAdd,D.TETestG,l), i));
+        E.add(new Event(new Trigger(Trigger.TEAdd,Trigger.TETestG,l), i));
     }
     //public void addTestGoal(String sl, Intention i) {
     //    addTestGoal(Literal.parseLiteral(sl), i);
     //}
 
     public void addGoal(byte g, Literal l, Intention i) throws JasonException {
-        if (g==D.TEAchvG)
+        if (g==Trigger.TEAchvG)
             addAchvGoal(l, i);
-        else if (g==D.TETestG)
+        else if (g==Trigger.TETestG)
             addTestGoal(l, i);
         else
             throw new JasonException("Unknown type of goal.");
     }
 
     public void delAchvGoal(Literal l, Intention i) {
-        E.add(new Event(new Trigger(D.TEDel,D.TEAchvG,l), i));
+        E.add(new Event(new Trigger(Trigger.TEDel,Trigger.TEAchvG,l), i));
     }
     public void delAchvGoal(String sl, Intention i) {
         delAchvGoal(Literal.parseLiteral(sl), i);
     }
     public void delTestGoal(Literal l, Intention i) {
-        E.add(new Event(new Trigger(D.TEDel,D.TETestG,l), i));
+        E.add(new Event(new Trigger(Trigger.TEDel,Trigger.TETestG,l), i));
     }
     public void delTestGoal(String sl, Intention i) {
         delTestGoal(Literal.parseLiteral(sl), i);
     }
 
     public void delGoal(byte g, Literal l, Intention i) throws JasonException {
-        if (g==D.TEAchvG)
+        if (g==Trigger.TEAchvG)
             delAchvGoal(l, i);
-        else if (g==D.TETestG)
+        else if (g==Trigger.TETestG)
             delTestGoal(l, i);
         else
             throw new JasonException("Unknown type of goal.");
     }
 
     public void addExternalEv(Trigger trig) {
-        E.add(new Event(trig, D.EmptyInt));
+        E.add(new Event(trig, Intention.EmptyInt));
     }
     public void addEvent(Event ev) {
         E.add(ev);

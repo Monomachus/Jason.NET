@@ -23,8 +23,6 @@
 package jason.asSyntax;
 
 
-import jason.D;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -36,6 +34,10 @@ import org.w3c.dom.Element;
 
 public class BeliefBase {
 
+	
+	public static final Term TPercept = Term.parse("source(percept)");
+	public static final Term TSelf = Term.parse("source(self)");
+	
 	/** 
 	 * belsMap is a table where the key is the bel.getFunctorArity and the
 	 * value is a list of literals with the same functorArity.
@@ -79,7 +81,7 @@ public class BeliefBase {
 	*/
 	
 	private void addPercept(Literal l) {
-		if (l.hasAnnot(D.TPercept)) {
+		if (l.hasAnnot(TPercept)) {
 			if (! percepts.contains(l)) {
 				percepts.add(l);
 			}

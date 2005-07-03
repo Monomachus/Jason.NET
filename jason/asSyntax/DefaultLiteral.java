@@ -23,13 +23,14 @@
 
 package jason.asSyntax;
 
-import jason.D;
 
 public class DefaultLiteral implements Cloneable {
 
-	// TODO: not extends Literal (because of the VarTerm), same solution than BodyLiteral
-	// JOMI: this is the one you wanted to do.
+	// TODO: use expressions grammar
 
+	public static final boolean   LDefPos    = true;
+    public static final boolean   LDefNeg    = false;
+	
 	Term literal;
 	boolean defType;
 
@@ -43,13 +44,17 @@ public class DefaultLiteral implements Cloneable {
     }
 
     public boolean isDefaultNegated() {
-        return defType==D.LDefNeg;
+        return defType==LDefNeg;
     }
 	
 	public Term getLiteral() {
 		return literal;
 	}
 
+	public void addTerm(Term t) {
+		literal.addTerm(t);
+	}
+	
     public boolean equals(Object o) {
         try {
             DefaultLiteral d = (DefaultLiteral) o;
@@ -69,7 +74,7 @@ public class DefaultLiteral implements Cloneable {
     }
     
     public String toString() {
-        if (defType==D.LDefPos)
+        if (defType == LDefPos)
             return super.toString();
         else
             return "not " + super.toString();

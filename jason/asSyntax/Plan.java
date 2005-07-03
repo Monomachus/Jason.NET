@@ -22,7 +22,6 @@
 
 package jason.asSyntax;
 
-import jason.D;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.parser.as2j;
 
@@ -37,6 +36,8 @@ import org.w3c.dom.Element;
 
 public class Plan implements Cloneable, Serializable {
 
+	public static final Term TAtomic = Term.parse("atomic");	
+	
 	Pred label = null;
 	protected Trigger tevent = null;
 	protected ArrayList context;
@@ -94,7 +95,7 @@ public class Plan implements Cloneable, Serializable {
 	public boolean isAtomic() {
 		if (isAtomic == null) {
 			if (label != null) {
-				isAtomic = new Boolean(label.hasAnnot(D.TAtomic));
+				isAtomic = new Boolean(label.hasAnnot(TAtomic));
 			} else {
 				isAtomic = new Boolean(false);
 			}

@@ -22,16 +22,22 @@
 
 package jason.asSyntax;
 
-import jason.D;
 import jason.asSyntax.parser.as2j;
 
 import java.io.StringReader;
 
 public class Trigger extends Literal implements Cloneable {
 
-	boolean trigType = D.TEAdd;
 
-	byte goal = D.TEBel;
+    public static final byte      TEBel      = 0;
+    public static final byte      TEAchvG    = 1;
+    public static final byte      TETestG    = 2;
+    public static final boolean   TEAdd      = false;
+    public static final boolean   TEDel      = true;
+	
+	boolean trigType = TEAdd;
+
+	byte goal = TEBel;
 
 	public Trigger(boolean t, byte g, Literal l) {
 		super(l);
@@ -64,11 +70,11 @@ public class Trigger extends Literal implements Cloneable {
 	}
 
 	public boolean isAchvGoal() {
-		return (goal == D.TEAchvG);
+		return (goal == TEAchvG);
 	}
 
 	public boolean isGoal() {
-		return (goal == D.TEAchvG || goal == D.TETestG);
+		return (goal == TEAchvG || goal == TETestG);
 	}
 
 	public byte getGoal() {
@@ -76,7 +82,7 @@ public class Trigger extends Literal implements Cloneable {
 	}
 
 	public boolean isAddition() {
-		return (trigType == D.TEAdd);
+		return (trigType == TEAdd);
 	}
 
 	public Object clone() {
@@ -86,13 +92,13 @@ public class Trigger extends Literal implements Cloneable {
 	/** return [+|-][!|?] super.getFucntorArity */
 	public String getFunctorArity() {
 		String s;
-		if (trigType == D.TEAdd)
+		if (trigType == TEAdd)
 			s = "+";
 		else
 			s = "-";
-		if (goal == D.TEAchvG)
+		if (goal == TEAchvG)
 			s += "!";
-		else if (goal == D.TETestG)
+		else if (goal == TETestG)
 			s += "?";
 		return s + super.getFunctorArity();
 	}
@@ -103,13 +109,13 @@ public class Trigger extends Literal implements Cloneable {
 
 	public String toString() {
 		String s;
-		if (trigType == D.TEAdd)
+		if (trigType == TEAdd)
 			s = "+";
 		else
 			s = "-";
-		if (goal == D.TEAchvG)
+		if (goal == TEAchvG)
 			s += "!";
-		else if (goal == D.TETestG)
+		else if (goal == TETestG)
 			s += "?";
 		s += super.toString();
 		return s;

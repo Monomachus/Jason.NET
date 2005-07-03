@@ -60,10 +60,9 @@ public class Term implements Cloneable, Comparable, Serializable {
 		}
 	}
 
-	// use Object as parameter to simply the Unifier.apply
-	public void set(Object o) {
+	/** copy all attributes of <i>t</i> */
+	public void set(Term t) {
 		try {
-			Term t = (Term)o;
 			setFunctor(t.funcSymb);
 			terms = t.getHardCopyOfTerms();
 		} catch (Exception e) {

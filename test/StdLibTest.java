@@ -1,9 +1,10 @@
 package test;
 
-import jason.D;
 import jason.asSemantics.Agent;
+import jason.asSemantics.Intention;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
+import jason.asSyntax.BeliefBase;
 import jason.asSyntax.ListTerm;
 import jason.asSyntax.Literal;
 import jason.asSyntax.Pred;
@@ -56,16 +57,16 @@ public class StdLibTest extends TestCase {
 	
 	public void testFindAll() {
 		Agent ag = new Agent();
-		ag.addBel(Literal.parseLiteral("a(10)"), D.TPercept, null, D.EmptyInt);
-		ag.addBel(Literal.parseLiteral("a(20)"), D.TPercept, null, D.EmptyInt);
-		ag.addBel(Literal.parseLiteral("a(30)"), D.TPercept, null, D.EmptyInt);
+		ag.addBel(Literal.parseLiteral("a(10)"), BeliefBase.TPercept, null, Intention.EmptyInt);
+		ag.addBel(Literal.parseLiteral("a(20)"), BeliefBase.TPercept, null, Intention.EmptyInt);
+		ag.addBel(Literal.parseLiteral("a(30)"), BeliefBase.TPercept, null, Intention.EmptyInt);
 
 		TransitionSystem ts = new TransitionSystem(ag, null, null, null);
 
 		Unifier u = new Unifier();
 		VarTerm X = new VarTerm("X");
 		Literal c = Literal.parseLiteral("a(X)");
-		c.addAnnot(D.TPercept);
+		c.addAnnot(BeliefBase.TPercept);
 		VarTerm L = new VarTerm("L");
 		//System.out.println(ag.getPS().getAllRelevant(Trigger.parseTrigger(ste.getFunctor())));
 		try {

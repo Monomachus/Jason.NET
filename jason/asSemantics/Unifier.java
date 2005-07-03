@@ -220,7 +220,7 @@ public class Unifier implements Cloneable {
     }
     
     public boolean unifies(DefaultLiteral d1, DefaultLiteral d2) {
-        return d1.isDefaultNegated()==d2.isDefaultNegated() && unifies((Literal)d1,(Literal)d2);
+        return d1.isDefaultNegated()==d2.isDefaultNegated() && unifies((Literal)d1.getLiteral(),(Literal)d2.getLiteral());
     }
     
     public boolean unifies(Trigger te1, Trigger te2) {

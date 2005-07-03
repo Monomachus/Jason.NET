@@ -23,7 +23,6 @@
 package jason.asSemantics;
 
 import jIDE.JasonID;
-import jason.D;
 import jason.JasonException;
 import jason.Settings;
 import jason.architecture.AgentArchitecture;
@@ -208,7 +207,7 @@ public class Agent {
             	}
             }
             if (!wasPercepted) {
-                if (delBel(l,D.TPercept,fTS.getC())) {
+                if (delBel(l,BeliefBase.TPercept,fTS.getC())) {
                 	i--;
                 }
             }
@@ -220,7 +219,7 @@ public class Agent {
         while (i.hasNext()) {
 			Literal l = (Literal)i.next();
 			try {
-				addBel( l, D.TPercept, fTS.getC(), D.EmptyInt);
+				addBel( l, BeliefBase.TPercept, fTS.getC(), Intention.EmptyInt);
 			} catch (Exception e) {
 				System.err.println("Error adding percetion "+l+"\n");
 				e.printStackTrace();
@@ -275,7 +274,8 @@ public class Agent {
 	}
 	*/
 
-	/** the Literal will be cloned before added in the BB */
+	/** Adds a new Literal <i>l</i> in BB with "source(<i>source</i>)" annotation.
+	 *  <i>l</i> will be cloned before being added in the BB */
 	public boolean addBel(Literal l, Term source, Circumstance c, Intention focus) {
 		if (source != null && !source.isGround()) {
 			System.err.println("Error: Annotations must be ground!\n Cannot use "+source+" as annotation.");
@@ -286,7 +286,7 @@ public class Agent {
 			}
 			if (fBS.add(l)) {
 				//System.out.println("*** adding "+l);
-				updateEvents(new Event(new Trigger(D.TEAdd, D.TEBel, l), focus), c);
+				updateEvents(new Event(new Trigger(Trigger.TEAdd, Trigger.TEBel, l), focus), c);
 				return true;
 			}
 			return false;
@@ -300,7 +300,7 @@ public class Agent {
 	}
 
 	public boolean delBel(Literal l, Term source, Circumstance c) {
-		return delBel(l, source, c, D.EmptyInt);
+		return delBel(l, source, c, Intention.EmptyInt);
 	}
 
 	public boolean delBel(Literal l, Term source, Circumstance c, Intention focus) {
@@ -314,7 +314,7 @@ public class Agent {
 			//System.out.println("removing "+l);
 			if (fBS.remove(l)) {
 				//System.out.println("removed "+l);
-				updateEvents(new Event(new Trigger(D.TEDel, D.TEBel, l), focus), c);
+				updateEvents(new Event(new Trigger(Trigger.TEDel, Trigger.TEBel, l), focus), c);
 				return true;
 			}
 		}

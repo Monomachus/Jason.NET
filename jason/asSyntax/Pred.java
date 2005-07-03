@@ -32,6 +32,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+/** 
+ * A Pred is a Term with annotations, eg a(1)[an1,an2].
+ */
 public class Pred extends Term implements Cloneable, Comparable, Serializable {
 
 	private ArrayList annots;
@@ -51,13 +54,6 @@ public class Pred extends Term implements Cloneable, Comparable, Serializable {
 		set(p);
 	}
 
-	/* no necessary, the above constructor subsumes this
-	public Pred(Literal l) {
-		super(l);
-		copyAnnot((Pred) l);
-	}
-	*/
-
 	public static Pred parsePred(String sPred) {
 		as2j parser = new as2j(new StringReader(sPred));
 		try {
@@ -70,15 +66,10 @@ public class Pred extends Term implements Cloneable, Comparable, Serializable {
 	}
 
 
-	public void set(Object o) {
-		super.set(o);
-		try {
-			Pred p = (Pred)o;
-			copyAnnot(p);
-		} catch (Exception e) {
-			// no problem, o is not a pred, may be it is a term and the
-			// super.set handle it
-		}
+	/** copy all attributes of Pred <i>p</i> */
+	public void set(Pred p) {
+		super.set((Term)p);
+		copyAnnot(p);
 	}
 
 	
@@ -220,7 +211,7 @@ public class Pred extends Term implements Cloneable, Comparable, Serializable {
 			} else {
 				// TODO: why del? (jomi has removed it since it causes concurrent problems): 
 				// JOMI: o addBel vai precisar so da lista de anotacoes
-				// que foram anotadas pra gerer soment os eventos relativos
+				// que foram anotadas pra gerar soment os eventos relativos
 				// aaquelas anotacoes. Eu acho que vai dar pau este teu comentario,
 				// so que nao temos teste pra estas coisas ainda -- ou temos teste
 				// e eu que nao entendo mais como funciona isto! :)))
