@@ -1,5 +1,7 @@
 package jason.asSyntax;
 
+import java.util.List;
+
 
 /**
  * Represents a variable Term: like X (starts with upper case). 
@@ -81,17 +83,6 @@ public class VarTerm extends Term {
 	 * @return
 	 */
 	public Term getValue() {
-		/*
-		try {
-			// if value is a var, return its value
-			return ((VarTerm)value).getValue();
-		} catch (StackOverflowError e) {
-			System.err.println("Stack overflow in VarTerm.getValue!\n\t"+this);
-			return null;
-		} catch (Exception e) {}
-	
-		return value;
-		*/
 		return getLastVarChain().value;
 	}
 
@@ -127,14 +118,101 @@ public class VarTerm extends Term {
 		return false;
 	}
 	
+	
+	// ----------
+	// Term methods overridden
+	// 
+	// in case this VarTerm has a value, use value's methods
+	// ----------
+	
+	public String getFunctor() {
+		if (value == null) {
+			return super.getFunctor();
+		} else {
+			return getValue().getFunctor();
+		}
+	}
+
+
+	public Term getTerm(int i) {
+		if (value == null) {
+			return null;
+		} else {
+			return getValue().getTerm(i);
+		}
+	}
+
+	public void addTerm(Term t) {
+		if (value != null) {
+			getValue().addTerm(t);
+		}
+	}
+
+	public int getTermsSize() {
+		if (value == null) {
+			return 0;
+		} else {
+			return getValue().getTermsSize();
+		}
+	}
+
+	public List getTerms() {
+		if (value == null) {
+			return null;
+		} else {
+			return getValue().getTerms();
+		}
+	}
+	
+	
+	/*
+	 * TODO the below is not ok, see the following code where
+	 * x is a VarTerm with a List value!
+	 *  
+	 * if (x.isList()) {
+	 *    ListTerm lt = (ListTerm)x;
+	 *    
+	 * To solve it, we must use ListTerm, StringTerm, ... interfaces
+	 *    
+	public boolean isList() {
+		if (value == null) {
+			return false;
+		} else {
+			return getValue().isList();
+		}
+	}
+	
+	public boolean isString() {
+		if (value == null) {
+			return false;
+		} else {
+			return getValue().isString();
+		}
+	}
+	public boolean isInternalAction() {
+		if (value == null) {
+			return false;
+		} else {
+			return getValue().isInternalAction();
+		}
+	}
+	*/
+	
+	public boolean hasVar(Term t) {
+		if (value == null) {
+			return super.hasVar(t);
+		} else {
+			return getValue().hasVar(t);
+		}
+	}
+	
 	public String toString() {
-		Term vl = getValue();
-		if (vl == null) {
+		if (value == null) {
 			// no value, the var name must be equal
 			return funcSymb;
 		} else {
 			// campare the values
-			return vl.toString();
+			return getValue().toString();
 		}
 	}
 }

@@ -5,7 +5,6 @@
   import java.io.*;
   import jason.asSyntax.*;
   import jason.asSemantics.Agent;
-  import jason.D;
 
   public class as2j implements as2jConstants {
 
@@ -212,7 +211,7 @@
   final public ArrayList ct() throws ParseException {
                     DefaultLiteral P; ArrayList C = new ArrayList(); List CT;
     P = dl();
-                  if (!P.equals(Literal.LTrue)) {
+                  if (!P.getLiteral().equals(Literal.LTrue)) {
                     C.add(P);
                   }
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -394,7 +393,7 @@
                    ArrayList BD = new ArrayList();
                    List BD2;
     F = f();
-                   if (! F.equalsAsLiteral(Literal.LTrue)) {
+                   if (! F.getLiteral().equals(Literal.LTrue)) {
                       BD.add(F);
                    }
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {

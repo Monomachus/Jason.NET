@@ -62,10 +62,6 @@ public class BodyLiteral implements Cloneable {
     	}
     }
 
-    public boolean equalsAsLiteral(Object o) {
-    	return literal.equals(o);
-    }
-    
     
     public boolean isAsk() {
     	if (! literal.getFunctorArity().equals(".send/4")) {

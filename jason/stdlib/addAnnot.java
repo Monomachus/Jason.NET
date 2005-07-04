@@ -38,24 +38,19 @@ public class addAnnot implements InternalAction {
 	/**
 	 * Example: .addAnnot(a,source(jomi),B)
 	 *          B will be a[source(jomi)]
-	 * 
+	 * or       .addAnnot([a1,a2], source(jomi), B)
+	 *          B will be [a1[source(jomi)], a2[source(jomi)]]
+	 *          
 	 * args[0] is the literal to be annotted
 	 * args[1] is the annotation itself
 	 * args[2] is the result -- does't have to be a var!
 	 */
-
-	// TODO Jomi: implementei considerando se for lista tambem
-	// Da uma olhada se ta OK e se sim pode apagar este todo
-	
-	private Unifier unif;
 	
 	public boolean execute(TransitionSystem ts, Unifier un, Term[] args)
 			throws Exception {
 		try {
-			unif = un;
-			Term l = (Term)args[0].clone();
-			addAnnotToList(l,args[1]);
-			return un.unifies(l,args[2]);
+			Term result = addAnnotToList(un, (Term)args[0].clone(), args[1]);
+			return un.unifies(result,args[2]);
 		} catch (ArrayIndexOutOfBoundsException e) {
 			throw new JasonException("The internal action 'addAnnot' requires three arguments.");
 		} //finally {
@@ -63,27 +58,33 @@ public class addAnnot implements InternalAction {
 		//}
 	}
 
-	public void addAnnotToList(Term l, Term annot) {
+	public Term addAnnotToList(Unifier unif, Term l, Term annot) {
 		if (l.isVar()) {
 			unif.apply(l);
 		}
 		if (l.isList()) {
+			ListTerm result = new ListTerm();
 			ListTerm lt = (ListTerm)l;
-			Iterator i = lt.iterator();
+			Iterator i = lt.termsIterator();
 			while (i.hasNext()) {
-				addAnnotToList(((ListTerm) i.next()).getTerm(),annot);
+				Term t = addAnnotToList( unif, (Term)i.next(), annot);
+				if (t != null) {
+					result.add(t);
+				}
 			}
+			return result;
 		} else {
 			try {
 				// if it can be parsed as a literal, OK to add annot
-				Literal tmp = Literal.parseLiteral(l.toString());
-				tmp = (Literal)l;
-				tmp.addAnnot((Term) annot.clone());
+				Literal result = Literal.parseLiteral(l.toString());
+				result.addAnnot( (Term)annot.clone());
+				return result;
 			} catch (Exception e) {
 				// no problem, the content is not a pred (is a number,
 				// string, ....) received in a message, for instance
 			}
 		}
+		return null;
 	}
 
 	

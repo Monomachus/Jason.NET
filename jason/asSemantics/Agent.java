@@ -332,7 +332,7 @@ public class Agent {
 	public void addPlan(StringTerm stPlan, Term tSource) {
 		String sPlan = stPlan.getString();
 		try {
-			// remove \" -> "
+			// remove quotes \" -> "
 			StringBuffer sTemp = new StringBuffer();
 			for (int c=0; c <sPlan.length(); c++) {
 				if (sPlan.charAt(c) != '\\') {
@@ -357,31 +357,6 @@ public class Agent {
 			
 			//System.out.println("**** adding plan "+p+" from "+sSource);		
 
-			/*
-			Iterator l = p.getLabel().getAnnots().iterator();
-			Term t = null;
-			Term as = null;
-			while (l.hasNext()) {
-				t = (Term) l.next();
-				if (t.getFunctor().equals("sources")) {
-					as = (Term) t.getTerms().remove(0);
-					break;
-				}
-			}
-			if (as != null) {
-				ParseList pl = new ParseList(as);
-				List ls = pl.getAsList();
-				if (!ls.contains(tSource)) {
-					ls.add(tSource);
-					pl.set(ls);
-				}
-				t.getTerms().add(0, pl.getList());
-			} else {
-				Term n = new Term("sources");
-				n.addTerm(new ParseList("[" + tSource + "]").getList());
-				p.getLabel().addAnnot(n);
-			}
-			*/
 		} catch (Exception e) {
 			System.err.println("Error adding plan "+sPlan);
 			e.printStackTrace();
@@ -398,36 +373,13 @@ public class Agent {
 		if (i >= 0) {
 			p = (Plan)fPS.get(i);
 			boolean hasSource = p.getLabel().delSource(source);
-			
+
 			// if no source anymore, remove the plan
 			if (hasSource && ! p.getLabel().hasSource()) {
 				fPS.remove(i);
 			}
-			/*
-			Iterator l = p.getLabel().getAnnots().iterator();
-			Term tPlanSources = null;
-			Term sourcesList = null;
-			while (l.hasNext()) {
-				tPlanSources = (Term) l.next();
-				if (tPlanSources.getFunctor().equals("sources")) {
-					sourcesList = (Term) tPlanSources.getTerms().remove(0);
-					break;
-				}
-			}
-			if (sourcesList != null) {
-				ParseList pl = new ParseList(sourcesList);
-				List ls = pl.getAsList();
-				if (ls.contains(tSource)) {
-					ls.remove(tSource);
-					if (!ls.isEmpty()) {
-						pl.set(ls);
-						tPlanSources.getTerms().add(0, pl.getList());
-					} else {
-						ps.remove(i);
-					}
-				}
-			}
-			*/
+		} else {
+			System.err.println("The plan "+p+" was not found for deletion!");
 		}
 	}
 

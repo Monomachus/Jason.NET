@@ -134,7 +134,7 @@ public class Plan implements Cloneable, Serializable {
 			p.context = new ArrayList(context.size());
 			Iterator i = context.iterator();
 			while (i.hasNext()) {
-				Literal l = (Literal) i.next();
+				DefaultLiteral l = (DefaultLiteral) i.next();
 				p.context.add(l.clone());
 			}
 		}

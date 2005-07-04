@@ -23,7 +23,7 @@ public class StringTerm extends Term {
 		super.setFunctor(fs);
 	}
 
-	public String  getString() {
+	public String getString() {
 		return funcSymb;
 	}
 	

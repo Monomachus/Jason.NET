@@ -49,8 +49,7 @@ public class getRelevantPlans implements InternalAction {
 			StringTerm sTe = (StringTerm) args[0];
 			Trigger te = Trigger.parseTrigger(sTe.getFunctor());
 			if (te == null) {
-				throw new JasonException(
-						"The fist argument is not a TE (getRelevantPlans internal action)");
+				throw new JasonException("The first argument is not a TE (getRelevantPlans internal action)");
 			}
 			ListTerm lt = new ListTerm();
 			Iterator i = ts.relevantPlans(te).iterator();
@@ -61,8 +60,7 @@ public class getRelevantPlans implements InternalAction {
 				if (np.getLabel() != null) {
 					np.getLabel().delSources();
 				}
-				StringTerm stplan = new StringTerm(np.toASString()
-						.replaceAll("\\\"", "\\\\\""));
+				StringTerm stplan = new StringTerm(np.toASString().replaceAll("\\\"", "\\\\\""));
 				lt.add(stplan);
 			}
 
@@ -77,11 +75,9 @@ public class getRelevantPlans implements InternalAction {
 			return un.unifies(lt, listVar);
 			// System.out.println("*** un = "+un);
 		} catch (ArrayIndexOutOfBoundsException e) {
-			throw new JasonException(
-					"The internal action 'getRelevantPlans' has not received two arguments (TE and a VAR)");
+			throw new JasonException("The internal action 'getRelevantPlans' has not received two arguments (TE and a VAR)");
 		} catch (Exception e) {
-			throw new JasonException(
-					"Error in internal action 'getRelevantPlans': " + e);
+			throw new JasonException("Error in internal action 'getRelevantPlans': " + e);
 		}
 	}
 

@@ -3,11 +3,15 @@ package test;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.BeliefBase;
 import jason.asSyntax.DefaultLiteral;
+import jason.asSyntax.ListTerm;
 import jason.asSyntax.Literal;
 import jason.asSyntax.Pred;
 import jason.asSyntax.Term;
 import jason.asSyntax.Trigger;
 import jason.asSyntax.VarTerm;
+
+import java.util.Iterator;
+
 import junit.framework.TestCase;
 
 /** JUnit test case for syntax package */
@@ -296,6 +300,18 @@ public class TermTest extends TestCase {
 		
 		// test x1 -> x2 -> x3 -> x1!
 		assertFalse(x3.setValue(x1));
+		
+		VarTerm v1 = new VarTerm("L");
+		ListTerm lt = ListTerm.parseList("[a,B,a(B)]");
+		Unifier u = new Unifier();
+		u.unifies(new VarTerm("B"), new Term("oi"));
+		u.unifies(v1, lt);
+		u.apply(v1);
+		lt = (ListTerm)v1.getValue();
+		Iterator i = lt.termsIterator();
+		i.next();i.next();
+		Term third = (Term)i.next();
+		assertTrue(third.equals(Term.parse("a(oi)")));
 		
 	}
 }

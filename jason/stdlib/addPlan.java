@@ -45,10 +45,9 @@ public class addPlan implements InternalAction {
 			Term source = args[1];
         	if (plans.isList()) { // if arg[0] is a list
 				ListTerm lt = (ListTerm)plans;
-        		Iterator i = lt.iterator();
+        		Iterator i = lt.termsIterator();
         		while (i.hasNext()) {
-					lt = (ListTerm)i.next();
-					ts.getAg().addPlan( (StringTerm)lt.getTerm(), source);
+					ts.getAg().addPlan( (StringTerm)i.next(), source);
         		}
         	} else { // args[0] is a plan
         		ts.getAg().addPlan((StringTerm)plans, source);

@@ -33,7 +33,6 @@ PARSER_BEGIN(as2j)
   import java.io.*;
   import jason.asSyntax.*;
   import jason.asSemantics.Agent;
-  import jason.D;
 
   public class as2j {
 
@@ -196,7 +195,7 @@ Literal l() : { Pred F; Token k; boolean type = Literal.LPos; }
 
 ArrayList ct() :  { DefaultLiteral P; ArrayList C = new ArrayList(); List CT;}
 {
-     P = dl()   { if (!P.equals(Literal.LTrue)) {
+     P = dl()   { if (!P.getLiteral().equals(Literal.LTrue)) {
                     C.add(P); 
                   }
                 }
@@ -275,7 +274,7 @@ ArrayList bd() : { BodyLiteral F;
                    ArrayList BD = new ArrayList(); 
                    List BD2;}
 {
-  F=f()          { if (! F.equalsAsLiteral(Literal.LTrue)) {
+  F=f()          { if (! F.getLiteral().equals(Literal.LTrue)) {
                       BD.add(F); 
                    } 
                  }

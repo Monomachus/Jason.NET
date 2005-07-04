@@ -35,7 +35,6 @@ public class StdLibTest extends TestCase {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		//System.out.println("X="+X);
 		//System.out.println("u="+u);
 		assertEquals(msg.toString(), "ok(10)");
 		assertTrue( ((Pred)u.get("X")).hasAnnot(annot) );
@@ -102,7 +101,8 @@ public class StdLibTest extends TestCase {
 		//System.out.println("plans="+plans);
 
 		assertEquals(plans.size(), 2);
-		
+
+		assertEquals(ag.getPS().getPlans().size(), 3);
 		// remove plan t1 from PS
 		try {
 			new removePlan().execute(ts, new Unifier(), new Term[] { pt1, new Term("nosource") });
@@ -116,14 +116,14 @@ public class StdLibTest extends TestCase {
 		
 		// add plans returned from getRelevantPlans
 		// using IA addPlan
-		Iterator i = plans.iterator();
-		while (i.hasNext()) {
-			ListTerm lt = (ListTerm)i.next();
-			try {
-				new addPlan().execute(ts, new Unifier(), new Term[] { (StringTerm)lt.getTerm(), new Term("fromGR") });
-			} catch (Exception e) {
-				e.printStackTrace();
+		Iterator i = plans.termsIterator();
+		try {
+			while (i.hasNext()) {
+				StringTerm t = (StringTerm)i.next();
+				new addPlan().execute(ts, new Unifier(), new Term[] { t, new Term("fromGR") });
 			}
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 
 		

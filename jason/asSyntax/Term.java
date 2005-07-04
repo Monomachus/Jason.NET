@@ -33,7 +33,7 @@ import java.util.List;
 public class Term implements Cloneable, Comparable, Serializable {
 
 	protected String funcSymb = null;
-	protected List terms;
+	protected List   terms;
 
 	public Term() {
 	}
@@ -80,19 +80,15 @@ public class Term implements Cloneable, Comparable, Serializable {
 		return funcSymb;
 	}
 
-	public boolean hasFunctor(String fs) {
-		return funcSymb.equals(fs);
-	}
-
 	protected String functorArityBak = null; // to not compute it all the time (is is called many many times)
 	
 	/** return <functor symbol> "/" <arity> */
 	public String getFunctorArity() {
 		if (functorArityBak == null) {
 			if (terms == null) {
-				functorArityBak = funcSymb + "/0";
+				functorArityBak = getFunctor() + "/0";
 			} else {
-				functorArityBak = funcSymb + "/" + terms.size();
+				functorArityBak = getFunctor() + "/" + getTermsSize();
 			}
 		}
 		return functorArityBak;
@@ -131,14 +127,12 @@ public class Term implements Cloneable, Comparable, Serializable {
 	
 	public Term[] getTermsArray() {
 		Term ts[] = null;
-		if (terms == null) {
+		if (getTermsSize() == 0) {
 			ts = new Term[0];
 		} else {
-			ts = new Term[terms.size()];
-			int i = 0;
-			Iterator j = terms.iterator();
-			while (j.hasNext()) {
-				ts[i++] = (Term)j.next();
+			ts = new Term[getTermsSize()];
+			for (int i=0; i<getTermsSize(); i++) { // use "for" instead of iterator for ListTerm compatibility
+				ts[i] = getTerm(i);
 			}
 		}
 		return ts;
@@ -163,13 +157,6 @@ public class Term implements Cloneable, Comparable, Serializable {
 	}
 
 	public boolean isGround() {
-		if (funcSymb == null) // empty predicate
-			return true;
-		//if (isVar()) // variable
-		//	return false;
-		if (terms == null) // atom
-			return true;
-		
 		for (int i=0; i<getTermsSize(); i++) {
 			if (!getTerm(i).isGround()) {
 				return false;

@@ -215,6 +215,8 @@ public class Pred extends Term implements Cloneable, Comparable, Serializable {
 				// aaquelas anotacoes. Eu acho que vai dar pau este teu comentario,
 				// so que nao temos teste pra estas coisas ainda -- ou temos teste
 				// e eu que nao entendo mais como funciona isto! :)))
+				// RAFA: o literal do evento gerado não vai ter as annotações não adicionadas, é isso?
+				// Se for, qual o problema de deixas as anotações que já existiam?
 				// Remove what is not new from l 
 				//p.delAnnot(t);
 				//i--;

@@ -35,6 +35,7 @@ public final class BDIlogic {
 	// JOMI: o TS ja e' enorme e eu preferia deixar estes metodos separados
 	// porque sao todos relacionados com as definicoes de BDI para AgentSpeak
 	// Faz muita diferenca de eficiencia tirar eles daqui?
+	// RAFA: fica aqui! Qdo vc ler, tira o TODO
 	
     public static final boolean Bel(TransitionSystem ts, Literal l) {
         return ts.ag.believes(l,null)!=null;

@@ -45,7 +45,7 @@ public class removePlan implements InternalAction {
         try {
         	if (args[0].isList()) { // if arg[0] is a list
         		ListTerm lt = (ListTerm)args[0];
-        		Iterator i = lt.iterator();
+        		Iterator i = lt.termsIterator();
         		while (i.hasNext()) {
             		ts.getAg().removePlan( (StringTerm)i.next(), args[1]);
         		}

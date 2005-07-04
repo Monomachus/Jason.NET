@@ -101,6 +101,18 @@ public class ListTerm extends Term {
 		return null;
 	}
 	
+	/** return the this ListTerm elements (0=Term, 1=ListTerm) */
+	public List getTerms() {
+		List l = new ArrayList(2);
+		if (term != null) {
+			l.add(term);
+		}
+		if (next != null) {
+			l.add(next);
+		}
+		return l;
+	}
+	
 	public void addTerm(Term t) {
 		System.err.println("Do not use addTerm in lists!");
 	}
@@ -125,6 +137,17 @@ public class ListTerm extends Term {
 		return isEmpty() || isTail();
 	}
 
+	public boolean isGround() {
+		Iterator i = termsIterator();
+		while (i.hasNext()) {
+			Term t = (Term)i.next();
+			if (!t.isGround()) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
 	public void setTail(Term t) {
 		isTail = true;
 		next = t;
@@ -184,7 +207,8 @@ public class ListTerm extends Term {
 	}
 
 	
-	public Iterator iterator() {
+	/** returns an iterator where each element is a ListTerm */
+	public Iterator listTermIterator() {
 		final ListTerm lt = this;
 		return new Iterator() {
 			ListTerm current = lt;
@@ -200,6 +224,23 @@ public class ListTerm extends Term {
 			}
 		};
 	}
+
+	/** returns an iterator where each element is a Term of this list */
+	public Iterator termsIterator() {
+		final Iterator i = this.listTermIterator();
+		return new Iterator() {
+			public boolean hasNext() {
+				return i.hasNext();
+			}
+			public Object next() {
+				ListTerm lt = (ListTerm)i.next();
+				return lt.getTerm();
+			}
+			public void remove() {	
+			}
+		};
+	}
+	
 	
 	/** 
 	 * Returns this ListTerm as a Java List. 
@@ -207,10 +248,9 @@ public class ListTerm extends Term {
 	 */
     public List getAsList() {
         List l = new ArrayList();
-		Iterator i = iterator();
+		Iterator i = termsIterator();
 		while (i.hasNext()) {
-			ListTerm lt = (ListTerm)i.next();
-			l.add( lt.getTerm() );
+			l.add( i.next() );
 		}
 		return l;
     }
@@ -218,7 +258,7 @@ public class ListTerm extends Term {
 	
 	public String toString() {
 		StringBuffer s = new StringBuffer("[");
-		Iterator i = iterator();
+		Iterator i = listTermIterator();
 		while (i.hasNext()) {
 			ListTerm lt = (ListTerm)i.next();
 			s.append( lt.getTerm() );

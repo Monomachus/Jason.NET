@@ -58,7 +58,7 @@ public class DefaultLiteral implements Cloneable {
     public boolean equals(Object o) {
         try {
             DefaultLiteral d = (DefaultLiteral) o;
-            return (defType==d.defType && super.equals(d));
+            return (defType==d.defType && literal.equals(d.literal));
         }
         catch (Exception e) {
             return super.equals(o);
@@ -72,12 +72,12 @@ public class DefaultLiteral implements Cloneable {
 			return new DefaultLiteral(defType, (Literal)literal);
 		}
     }
-    
+	    
     public String toString() {
         if (defType == LDefPos)
-            return super.toString();
+            return literal.toString();
         else
-            return "not " + super.toString();
+            return "not " + literal.toString();
     }
 
 }

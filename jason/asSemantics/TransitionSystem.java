@@ -326,12 +326,13 @@ public class TransitionSystem {
 		// a search linear in the size of the set of intentions
 		// at every resoning cycle, right? can't we use a flag
 		// just to remember that there is an atomic to search for?
-
-		// JOMI isn't it better if selectAtomicIntention() is defined
-		// in this class and not in the circumstance?
 		
+		// RAFA: see the new imple of selectAtomicIntention below. Does
+		// it do what you want? 
+		// If so, remove this TODO.
+
 		// Rule for Atomic Intentions
-		confP.C.SI = conf.C.selectAtomicIntention();
+		confP.C.SI = selectAtomicIntention();
 		if (confP.C.SI != null) {
 			confP.step = SExecInt;
 			return;
@@ -347,6 +348,21 @@ public class TransitionSystem {
 		confP.step = SStartRC;
 	}
 
+	public Intention selectAtomicIntention() {
+		if (conf.C.SI != null && conf.C.SI.isAtomic()) {
+			return conf.C.SI;
+		}
+		Iterator i = conf.C.getIntentions().iterator();
+		while (i.hasNext()) {
+			Intention inte = (Intention)i.next();
+			if (inte.isAtomic()) {
+				i.remove();
+				return inte;
+			}
+		}
+		return null;
+	}
+	
 
 	static Class classParameters[] = { jason.asSemantics.TransitionSystem.class, jason.asSemantics.Unifier.class, (new String[3]).getClass() };
 	private Map agInternalAction = new HashMap(); // this agent internal actions (key->IA'name, value->InternalAction object)
@@ -468,10 +484,6 @@ public class TransitionSystem {
 					if (setts.sameFocus())
 						conf.ag.addBel(l, BeliefBase.TSelf, conf.C, conf.C.SI);
 					else {
-						// TODO: Must COPY the whole intention, for the newFocus!!!!
-						// JOMI: acho que esta msg e' velha e nem faz sentido.
-						// Nao vejo porque copiar a intention se e' NewFocus
-						// Se concordas que isto nao deve ser feito, remove este todo.
 						conf.ag.addBel(l, BeliefBase.TSelf, conf.C, Intention.EmptyInt);
 						updateIntention();
 					}

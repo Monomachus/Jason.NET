@@ -24,7 +24,6 @@
 package jason.asSemantics;
 
 
-import jason.D;
 import jason.JasonException;
 import jason.asSyntax.Literal;
 import jason.asSyntax.Trigger;
@@ -158,18 +157,6 @@ public class Circumstance implements Serializable {
 	}
 	public Event getSelectedEvent() {
 		return SE;
-	}
-	
-	public Intention selectAtomicIntention() {
-		Iterator i = getIntentions().iterator();
-		while (i.hasNext()) {
-			Intention inte = (Intention)i.next();
-			if (inte.isAtomic()) {
-				i.remove();
-				return inte;
-			}
-		}
-		return null;
 	}
 	
 	public Intention getSelectedIntention() {
