@@ -11,6 +11,8 @@ import java.util.List;
  */
 public class VarTerm extends Term {
 	
+	// TODO: do not use super.functor to store the var name
+	
 	private Term value = null;
 	
 	public VarTerm() {
@@ -27,7 +29,7 @@ public class VarTerm extends Term {
 	public Object clone() {
 		// do not call constructor with term parameter!
 		VarTerm t = new VarTerm();
-		t.funcSymb = funcSymb;
+		t.setFunctor(getFunctor());
 		if (value != null) {
 			t.value = (Term)value.clone();
 		}
@@ -48,7 +50,7 @@ public class VarTerm extends Term {
 			VarTerm vlvl = (VarTerm)((VarTerm)vl).value; // not getValue! (use the "real" value)
 			while (vlvl != null) {
 				if (vlvl == this) {
-					System.err.println("Error: trying to make a loop in VarTerm values of "+this.funcSymb);
+					System.err.println("Error: trying to make a loop in VarTerm values of "+this.getFunctor());
 					return false;
 				}
 				vlvl = (VarTerm)vlvl.value;
@@ -104,7 +106,7 @@ public class VarTerm extends Term {
 
 					// no value, the var names must be equal
 					//System.out.println("will return "+funcSymb.equals(tAsTerm.funcSymb));
-					return funcSymb.equals(tAsTerm.funcSymb);
+					return getFunctor().equals(tAsTerm.getFunctor());
 				} catch (Exception e) {
 					return false;
 				}
@@ -209,7 +211,7 @@ public class VarTerm extends Term {
 	public String toString() {
 		if (value == null) {
 			// no value, the var name must be equal
-			return funcSymb;
+			return getFunctor();
 		} else {
 			// campare the values
 			return getValue().toString();

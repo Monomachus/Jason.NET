@@ -6,29 +6,43 @@ import java.io.StringReader;
 
 public class StringTerm extends Term {
 
+	// TODO: do not use functor to represent the string
+	//private String fValue;
+	
 	public StringTerm() {
 		super();
 	}
+	
 	public StringTerm(String fs) {
-		setFunctor(fs);
-	}
-	public StringTerm(StringTerm t) {
-		setFunctor(t.getFunctor());
+		setString(fs);
 	}
 	
+	public StringTerm(StringTerm t) {
+		setString(t.getString());
+	}
+
+	/*
 	public void setFunctor(String fs) {
 		if (fs.startsWith("\"")) {
 			fs = fs.substring(1,fs.length()-1);
 		}
 		super.setFunctor(fs);
 	}
+	*/
 
+	public void setString(String s) {
+		if (s.startsWith("\"")) {
+			s = s.substring(1,s.length()-1);
+		}
+		setFunctor(s);
+	}
+	
 	public String getString() {
-		return funcSymb;
+		return getFunctor();
 	}
 	
 	public Object clone() {
-		return new StringTerm(funcSymb);
+		return new StringTerm(getString());
 	}
 	
 	
@@ -48,10 +62,10 @@ public class StringTerm extends Term {
 	}
 	
 	public int length() {
-		return funcSymb.length();
+		return getString().length();
 	}
 	
 	public String toString() {
-		return "\""+funcSymb+"\"";
+		return "\""+getString()+"\"";
 	}
 }

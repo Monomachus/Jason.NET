@@ -30,10 +30,13 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+/**
+ * Represents a Term (a predicate parameter), e.g.: val(10,x(3)).
+ */
 public class Term implements Cloneable, Comparable, Serializable {
 
-	protected String funcSymb = null;
-	protected List   terms;
+	private String functor = null;
+	private List   terms;
 
 	public Term() {
 	}
@@ -63,8 +66,8 @@ public class Term implements Cloneable, Comparable, Serializable {
 	/** copy all attributes of <i>t</i> */
 	public void set(Term t) {
 		try {
-			setFunctor(t.funcSymb);
-			terms = t.getHardCopyOfTerms();
+			setFunctor(t.functor);
+			terms = t.getDeepCopyOfTerms();
 		} catch (Exception e) {
 			System.err.println("Error setting value for term ");
 			e.printStackTrace();
@@ -72,17 +75,17 @@ public class Term implements Cloneable, Comparable, Serializable {
 	}
 
 	public void setFunctor(String fs) {
-		funcSymb = fs;
+		functor = fs;
 		functorArityBak = null;
 	}
 
 	public String getFunctor() {
-		return funcSymb;
+		return functor;
 	}
 
 	protected String functorArityBak = null; // to not compute it all the time (is is called many many times)
 	
-	/** return <functor symbol> "/" <arity> */
+	/** returns <functor symbol> "/" <arity> */
 	public String getFunctorArity() {
 		if (functorArityBak == null) {
 			if (terms == null) {
@@ -190,10 +193,10 @@ public class Term implements Cloneable, Comparable, Serializable {
 		try {
 			Term tAsTerm = (Term)t;
 			//System.out.println(this.funcSymb+" equals2 "+tAsTerm.funcSymb);
-			if (funcSymb == null && tAsTerm.funcSymb != null) {
+			if (functor == null && tAsTerm.functor != null) {
 				return false;
 			}
-			if (funcSymb != null && !funcSymb.equals(tAsTerm.funcSymb))
+			if (functor != null && !functor.equals(tAsTerm.functor))
 				return false;
 			if (terms == null && tAsTerm.terms == null)
 				return true;
@@ -215,11 +218,11 @@ public class Term implements Cloneable, Comparable, Serializable {
 
 	public int compareTo(Object t) {
 		int c;
-		if (((Term) t).funcSymb == null)
+		if (((Term) t).functor == null)
 			return 1;
-		if (funcSymb == null)
+		if (functor == null)
 			return -1;
-		c = funcSymb.compareTo(((Term) t).funcSymb);
+		c = functor.compareTo(((Term) t).functor);
 		if (c != 0)
 			return c;
 		if (terms == null && ((Term) t).terms == null)
@@ -242,12 +245,12 @@ public class Term implements Cloneable, Comparable, Serializable {
 		return 0;
 	}
 
-	/** make a hard copy of the terms */
+	/** make a deep copy of the terms */
 	public Object clone() {
 		return new Term(this);
 	}
 
-	protected List getHardCopyOfTerms() {
+	protected List getDeepCopyOfTerms() {
 		if (terms == null) {
 			return null;
 		}
@@ -262,8 +265,8 @@ public class Term implements Cloneable, Comparable, Serializable {
 	
 	public String toString() {
 		StringBuffer s = new StringBuffer();
-		if (funcSymb != null) {
-			s.append(funcSymb);
+		if (functor != null) {
+			s.append(functor);
 		}
 		if (terms != null) {
 			s.append("(");

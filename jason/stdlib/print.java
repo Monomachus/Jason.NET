@@ -26,6 +26,7 @@ import jason.JasonException;
 import jason.asSemantics.InternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
+import jason.asSyntax.StringTerm;
 import jason.asSyntax.Term;
 
 public class print implements InternalAction {
@@ -39,7 +40,8 @@ public class print implements InternalAction {
 		System.out.print("Agent " + ts.getAgArch().getName() + " is saying: ");
 		for (int i = 0; i < args.length; i++) {
 			if (args[i].isString()) {
-				System.out.print(args[i]);
+				StringTerm st = (StringTerm)args[i];
+				System.out.print(st.getString());
 			} else {
 				Term t = (Term)args[i].clone();
 				un.apply(t);
