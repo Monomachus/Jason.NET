@@ -37,6 +37,10 @@ import java.util.List;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -51,13 +55,34 @@ public class RunCentralisedMAS {
     CentralisedExecutionControl control = null;
     List ags = new ArrayList();
 
-	
+    static Logger logger = Logger.getLogger(RunCentralisedMAS.class);
+    static String logPropFile = "log4j-Centralised.properties";
+    
+    
     public static void main(String[] args) {
-        if (args.length != 1) {
+        if (args.length < 1) {
             System.err.println("You must inform only the MAS XML script.");
             System.exit(1);
         }
+        String jasonHome = "../../jason/bin";
+        
+        if (args.length > 1) {
+        	jasonHome = args[1];
+        }
 
+        // see for a local log4j configuration
+        if (new File(logPropFile).exists()) {
+        	PropertyConfigurator.configure(logPropFile);
+        // try jason bin log4j configuration
+        } else if (new File(jasonHome+"/bin/"+logPropFile).exists()) {
+        	System.out.println("proprieties from "+jasonHome);
+        	PropertyConfigurator.configure(jasonHome+"/bin/"+logPropFile);
+        } else {
+        	System.out.println("No log4j.properties file, using default!");
+        	BasicConfigurator.configure();
+        	Logger.getRootLogger().setLevel(Level.INFO);
+        }
+        
         Document docDOM = parse(args[0]);
         if (docDOM != null) {
 			RunCentralisedMAS r = new RunCentralisedMAS();
@@ -81,8 +106,7 @@ public class RunCentralisedMAS {
             DocumentBuilder builder = factory.newDocumentBuilder();
             return builder.parse( new File( file ) );
         } catch (Exception e) {
-            System.err.println("Error parsing the script file");
-            e.printStackTrace();
+            logger.error("Error parsing the script file",e);
             return null;
         }
     }
@@ -97,10 +121,10 @@ public class RunCentralisedMAS {
             String agName = sAg.getAttribute("name");
             try {
                 if (agName.equals("environment")) {
-                    System.out.println("Creating environment "+sAg.getAttribute("class"));
+                    logger.info("Creating environment "+sAg.getAttribute("class"));
                     env = new CentralisedEnvironment(sAg.getAttribute("class"));
                 } else if (agName.equals("controller")) {
-                	System.out.println("Creating controller "+sAg.getAttribute("class"));
+                	logger.info("Creating controller "+sAg.getAttribute("class"));
                 	control = new CentralisedExecutionControl(env, sAg.getAttribute("class"));
                 } else {
                     // it is an agent
@@ -115,19 +139,18 @@ public class RunCentralisedMAS {
                         if (qty > 1) {
                             numberedAg += (cAg+1);
                         }
-                        System.out.println("Creating agent "+numberedAg+" ("+(cAg+1)+"/"+qty+") from "+className);
+                        logger.info("Creating agent "+numberedAg+" ("+(cAg+1)+"/"+qty+") from "+className);
                         CentralisedAgArch agArch = (CentralisedAgArch)Class.forName(className).newInstance();
+                        agArch.setAgName(numberedAg);
                         agArch.initAg(agArgs);
                         agArch.setEnv(env);
-                        agArch.setName(numberedAg);
                         env.addAgent(agArch);
                         ags.add(agArch);
                     }
                 }
                 
             } catch (Exception e) {
-                System.err.println("Error creating agent "+agName);
-                e.printStackTrace();
+            	logger.error("Error creating agent "+agName,e);
                 System.exit(0);
             }
         } // for

@@ -31,28 +31,27 @@ import jason.asSyntax.Term;
 
 public class print implements InternalAction {
 
-	public boolean execute(TransitionSystem ts, Unifier un, Term[] args)
-			throws Exception {
+	public boolean execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
 		if (args.length == 0) {
 			throw new JasonException(".print without parameters!");
 		}
 
-		System.out.print("Agent " + ts.getAgArch().getName() + " is saying: ");
+		StringBuffer sout = new StringBuffer("saying: ");
 		for (int i = 0; i < args.length; i++) {
 			if (args[i].isString()) {
 				StringTerm st = (StringTerm)args[i];
-				System.out.print(st.getString());
+				sout.append(st.getString());
 			} else {
 				Term t = (Term)args[i].clone();
 				un.apply(t);
 				if (! t.isVar()) {
-					System.out.print(t);
+					sout.append(t);
 				} else {
-					System.out.print(t+"<no-value>");
+					sout.append(t+"<no-value>");
 				}
 			}
 		}
-		System.out.println();
+		ts.getLogger().info(sout);
 
 		return true;
 	}

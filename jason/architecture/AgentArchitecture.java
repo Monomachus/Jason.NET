@@ -44,7 +44,7 @@ public interface AgentArchitecture {
     public void checkMail();
     public void act();
 
-    public String getName();
+    public String getAgName();
     public void   sendMsg(Message m) throws Exception;
     public void   broadcast(Message m) throws Exception;
     

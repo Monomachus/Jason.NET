@@ -35,6 +35,8 @@ import jason.environment.CentralisedEnvironment;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 /**
  * Centralised architecture for a Mulit-Agent Society of AgentSpeak Agents.
  * 
@@ -48,9 +50,14 @@ public class CentralisedAgArch extends Thread implements AgentArchitecture {
 
 	protected TransitionSystem fTS = null;
 
+	private String agName = "";
     private boolean running = true;
 	
+	private Logger logger;
+    
     public void initAg(String[] args) throws JasonException {
+    	logger = Logger.getLogger(CentralisedAgArch.class.getName()+"."+getAgName());
+    	System.out.println("Logger is "+CentralisedAgArch.class.getName()+"."+getAgName());
         // set the agent
         try {
             String className = null;
@@ -67,6 +74,14 @@ public class CentralisedAgArch extends Thread implements AgentArchitecture {
         }
     }
     
+    public void setAgName(String name) {
+    	super.setName(name);
+    	agName = name;
+    }
+    
+    public String getAgName() {
+    	return agName;
+    }
     
     public void setTS(TransitionSystem ts) {
         this.fTS = ts;
@@ -111,9 +126,7 @@ public class CentralisedAgArch extends Thread implements AgentArchitecture {
     // Default perception assumes Complete and Accurate sensing.
     public List perceive() {
     	List percepts = fEnv.getUserEnvironment().getPercepts(getName());
-        if (fTS.getSettings().verbose()>=5) {
-            System.out.println("Agent "+getName() + " received percepts: "+percepts);
-        }
+    	logger.debug("percepts: "+percepts);
         return percepts;
     }
     
@@ -157,9 +170,7 @@ public class CentralisedAgArch extends Thread implements AgentArchitecture {
                 Message im = (Message)i.next();
                 fTS.getC().getMB().add(im);
                 i.remove();
-                if (fTS.getSettings().verbose()>=1) {
-                    System.out.println("Agent "+getName()+" received message: " + im);
-                }
+                logger.info("received message: " + im);
             }
         }
     }
@@ -172,9 +183,8 @@ public class CentralisedAgArch extends Thread implements AgentArchitecture {
             return;
         }
         Term acTerm = acExec.getActionTerm();
-        if (fTS.getSettings().verbose()>=1) {
-            System.out.println("Agent "+getName()+" is doing: "+acTerm);
-        }
+        logger.info("doing: "+acTerm);
+
         if (fEnv.getUserEnvironment().executeAction(getName(), acTerm)) {
             acExec.setResult(true);
         } else {

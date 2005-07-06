@@ -36,6 +36,7 @@ import java.util.List;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 
+import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 
 import saci.Config;
@@ -57,10 +58,12 @@ public class SaciAgArch extends saci.Agent implements AgentArchitecture {
 
 	private TransitionSystem fTS = null;
 
+	private Logger logger;
     
     // this is used by SACI to initialize the agent
     public void initAg(String[] args) throws JasonException {
-        
+    	logger = Logger.getLogger(SaciAgArch.class.getName()+"."+getAgName());
+    	
         // set the agent class
         try {
             // create the jasonId console
@@ -121,10 +124,8 @@ public class SaciAgArch extends saci.Agent implements AgentArchitecture {
                             r.putWithoutSerialization("content", agStateDoc);
 
                             mboxPercept.sendMsg(r);
-                            //System.out.println("sending "+r.get("content").getClass().getName());
                         } catch (Exception e) {
-                        	System.err.println("Error sending message "+r);
-                        	e.printStackTrace();
+                        	logger.error("Error sending message "+r,e);
                         }
                         return true; // no other message handler gives this message
                     }
@@ -140,9 +141,12 @@ public class SaciAgArch extends saci.Agent implements AgentArchitecture {
 
             
         } catch (Exception e) {
-            System.err.println("Error entering the environment's society.");
-            e.printStackTrace();
+        	logger.error("Error entering the environment's society.",e);
         }
+    }
+    
+    public String getAgName() {
+    	return super.getName();
     }
     
     public void stopAg() {
@@ -154,9 +158,7 @@ public class SaciAgArch extends saci.Agent implements AgentArchitecture {
         while (running) {
             fTS.reasoningCycle();
         }
-        if (fTS.getSettings().verbose()>=1) {
-            System.out.println("Agent "+fTS.getAgArch().getName()+" finished running.\n");
-        }
+        logger.debug("finished running.\n");
     }
     
     // Default functions for the overall agent architecture (based on SACI)
@@ -180,39 +182,19 @@ public class SaciAgArch extends saci.Agent implements AgentArchitecture {
         try {
             m = mboxPercept.ask(askMsg);
         } catch (Exception e) {
-            System.err.println("Error receiving perceptions.");
-            e.printStackTrace();
+        	logger.error("Error receiving perceptions.",e);
         }
         if (m != null) {
 			String content = (String) m.get("content");
 			if (content != null) {
 				percepts = ListTerm.parseList(content).getAsList();
-				if (fTS.getSettings().verbose()>=5) {
-					System.out.println("Agent " + mboxPercept.getName() + " received percepts: "+percepts);
-				}
+				logger.info("received percepts: "+percepts);
 			} else {
 				percepts = null; // used to indicate that are nothing new in the environment, no BRF needed
 			}
         }
         
-		/*
-        askMsg = new saci.Message("(ask-all :receiver environment :ontology AS-Perception :content getNegativePercepts)");
-        
-        // asks current environment state (negative percepts)
-        m = null;
-        try {
-            m = mboxPercept.ask(askMsg);
-        } catch (Exception e) {
-            System.err.println("Error receiving perceptions.");
-            e.printStackTrace();
-        }
-        if (m != null) {
-            negPercepts = new ParseList((String) m.get("content")).getAsList();
-            if (fTS.getSettings().verbose()>=5)
-                System.out.println("Agent " + mboxPercept.getName() + " received negative percepts: "+negPercepts);
-        }
-        */
-		
+	
         // check if there are feedbacks on requested action executions
         try {
             do {
@@ -234,7 +216,7 @@ public class SaciAgArch extends saci.Agent implements AgentArchitecture {
                                     fTS.getC().getFeedbackActions().add(a);
                                 }
                                 else {
-                                    System.err.println("*** Warning: received feedback for an Action that is not pending.");
+                                	logger.warn("*** Warning: received feedback for an Action that is not pending.");
                                 }
                             }
                             else {
@@ -245,8 +227,7 @@ public class SaciAgArch extends saci.Agent implements AgentArchitecture {
                 }
             } while (m != null);
         } catch (Exception e) {
-            System.err.println("Error receiving message.");
-            e.printStackTrace();
+        	logger.error("Error receiving message.",e);
         }
 		return percepts;
     }
@@ -256,7 +237,6 @@ public class SaciAgArch extends saci.Agent implements AgentArchitecture {
     public void sendMsg(jason.asSemantics.Message m) throws Exception {
     	// suspend intention if it is an ask
     	if (m.isAsk()) {
-    		//System.out.println("adding PA "+m.getMsgId()+":"+fTS.getC().getSelectedIntention());
             fTS.getC().getPendingActions().put(m.getMsgId(), fTS.getC().getSelectedIntention());    		
     	}
         saci.Message msaci = new saci.Message("("+m.getIlForce()+")");
@@ -282,7 +262,7 @@ public class SaciAgArch extends saci.Agent implements AgentArchitecture {
             return;
         }
         if (getMBox() == null) {
-            System.err.println("*** Warning! Agent "+fTS.getAgArch().getName()+" has no mail box.");
+            logger.warn("I have no mail box!");
             return;
         }
         
@@ -291,8 +271,7 @@ public class SaciAgArch extends saci.Agent implements AgentArchitecture {
             try {
                 m  = getMBox().receive();
             } catch (Exception e) {
-                System.err.println("Error receiving message.");
-                e.printStackTrace();
+            	logger.error("Error receiving message.",e);
             }
             if (m != null) {
                 String ilForce   = (String)m.get("performative");
@@ -310,10 +289,9 @@ public class SaciAgArch extends saci.Agent implements AgentArchitecture {
                         	im.setInReplyTo(irt);
                         }
                         fTS.getC().getMB().add(im);
-                        if (fTS.getSettings().verbose()>=1)
-                            System.out.println("Agent " + fTS.getAgArch().getName() + " received message: " + im);
+                        logger.info("received message: " + im);
                     } else {
-                        System.err.println("*** Warning! Message received cannot be handled:"+m);
+                        logger.warn("Warning! Message received cannot be handled:"+m);
                     }
                 }
             }
@@ -339,8 +317,7 @@ public class SaciAgArch extends saci.Agent implements AgentArchitecture {
             
             fTS.getC().getPendingActions().put(rw, fTS.getC().getAction());
         } catch (Exception e) {
-            System.err.println("Error sending action "+ fTS.getC().getAction());
-            e.printStackTrace();
+        	logger.error("Error sending action "+ fTS.getC().getAction(),e);
         }
     }
 

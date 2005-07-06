@@ -232,6 +232,7 @@ public class mas2j implements mas2jConstants {
                "."+File.pathSeparator+
                indelim+getJasonClasspath()+indelim+File.pathSeparator+
                indelim+saciHome+File.separator+"bin"+File.separator+"saci.jar"+indelim+File.pathSeparator+
+               indelim+jasonHome+File.separator+"lib"+File.separator+"log4j.jar"+indelim+File.pathSeparator+
                indelim+dDir+indelim+File.pathSeparator+
                clPath+
                outdelim;
@@ -259,7 +260,7 @@ public class mas2j implements mas2jConstants {
                 if (architecture.equals("Saci")) {
                     out.println("java -classpath "+classPath+" "+saci.tools.runApplicationScript.class.getName()+" \""+soc+".xml\"");
                 } else if (architecture.equals("Centralised")) {
-                    out.println("java -classpath "+classPath+" "+jIDE.RunCentralisedMAS.class.getName()+" \""+soc+".xml\"");
+                    out.println("java -classpath "+classPath+" "+jIDE.RunCentralisedMAS.class.getName()+" \""+soc+".xml\" \""+jasonHome+"\"");
                 }
                 out.close();
 
@@ -294,7 +295,7 @@ public class mas2j implements mas2jConstants {
                 if (architecture.equals("Saci")) {
                     out.println("java -classpath "+classPath+" "+saci.tools.runApplicationScript.class.getName()+" \""+soc+".xml\"");
                 } else if (architecture.equals("Centralised")) {
-                    out.println("java -classpath "+classPath+" "+jIDE.RunCentralisedMAS.class.getName()+" \""+soc+".xml\"");
+                    out.println("java -classpath "+classPath+" "+jIDE.RunCentralisedMAS.class.getName()+" \""+soc+".xml\" \""+jasonHome+"\"");
                 }
                 out.close();
 

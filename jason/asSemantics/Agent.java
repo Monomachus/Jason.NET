@@ -47,6 +47,7 @@ import java.util.List;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -54,16 +55,19 @@ import org.w3c.dom.Element;
 /**
  * Agent class has the belief base and plan library of an AgentSpeak agent.
  * It also implements the default selection functions of the AgentSpeak semantics.
- * 
  */
 public class Agent {
 
+	
 	// Members
 	protected BeliefBase fBS = new BeliefBase();
 	protected PlanLibrary fPS = new PlanLibrary();
 
 	protected TransitionSystem fTS = null;
 
+	private Logger logger;
+	
+	
 	/**
 	 * args[0] is the user Agent class (ignored here)
 	 * args[1] is the AgentSpeak source file
@@ -71,6 +75,7 @@ public class Agent {
     public TransitionSystem initAg(String[] args, AgentArchitecture arch) throws JasonException {
         // set the agent
         try {
+        	logger = Logger.getLogger(Agent.class.getName()+"."+arch.getAgName());
             String asSource = null;
             if (args.length < 2) { // error
                 throw new JasonException("The AS source file was not informed for the Agent creation!");
@@ -99,25 +104,26 @@ public class Agent {
 	public boolean parseAS(URL asURL) {
 		try {
 			parseAS(asURL.openStream());
+			logger.debug("as2j: AgentSpeak program '"+asURL+"' parsed successfully!");
 			return true;
-			//System.out.println("as2j: AgentSpeak program '"+asURL+"' parsed successfully!");
 		} catch (IOException e) {
-			System.err.println("as2j: the AS source file was not found\n" + e);
+			logger.error("as2j: the AS source file was not found",e);
 		} catch (ParseException e) {
-			System.err.println("as2j: error parsing \"" + asURL + "\"\n" + e);
+			logger.error("as2j: error parsing \"" + asURL + "\"",e);
 		}
 		return false;
 	}
+
 	/** add beliefs and plan form a file */
 	public boolean parseAS(String asFileName) {
 		try {
 			parseAS(new FileInputStream(asFileName));
+			logger.debug("as2j: AgentSpeak program '"+asFileName+"' parsed successfully!");
 			return true;
-			//System.out.println("as2j: AgentSpeak program '"+asFileName+"' parsed successfully!");
 		} catch (FileNotFoundException e) {
-			System.err.println("as2j: the AS source file was not found\n" + e);
+			logger.error("as2j: the AS source file was not found", e);
 		} catch (ParseException e) {
-			System.err.println("as2j: error parsing \"" + asFileName + "\"\n" + e);
+			logger.error("as2j: error parsing \"" + asFileName + "\"", e);
 		}
 		return false;
 	}
@@ -221,8 +227,7 @@ public class Agent {
 			try {
 				addBel( l, BeliefBase.TPercept, fTS.getC(), Intention.EmptyInt);
 			} catch (Exception e) {
-				System.err.println("Error adding percetion "+l+"\n");
-				e.printStackTrace();
+				logger.error("Error adding percetion "+l,e);
 			}
         }
     }
@@ -278,14 +283,13 @@ public class Agent {
 	 *  <i>l</i> will be cloned before being added in the BB */
 	public boolean addBel(Literal l, Term source, Circumstance c, Intention focus) {
 		if (source != null && !source.isGround()) {
-			System.err.println("Error: Annotations must be ground!\n Cannot use "+source+" as annotation.");
+			logger.error("Error: Annotations must be ground!\n Cannot use "+source+" as annotation.");
 		} else {
 			l = (Literal)l.clone();
 			if (source != null) {
 				l.addAnnot(source);
 			}
 			if (fBS.add(l)) {
-				//System.out.println("*** adding "+l);
 				updateEvents(new Event(new Trigger(Trigger.TEAdd, Trigger.TEBel, l), focus), c);
 				return true;
 			}
@@ -305,7 +309,7 @@ public class Agent {
 
 	public boolean delBel(Literal l, Term source, Circumstance c, Intention focus) {
 		if(source != null && !source.isGround()) {
-			System.err.println("Error: Annotations must be ground!\n Cannot use "+source+" as annotation.");
+			logger.error("Error: Annotations must be ground!\n Cannot use "+source+" as annotation.");
 		} else {
 			if (source != null) {
 				//l.clearAnnot();
@@ -358,8 +362,7 @@ public class Agent {
 			//System.out.println("**** adding plan "+p+" from "+sSource);		
 
 		} catch (Exception e) {
-			System.err.println("Error adding plan "+sPlan);
-			e.printStackTrace();
+			logger.error("Error adding plan "+sPlan,e);
 		}
 	}
 
@@ -379,7 +382,7 @@ public class Agent {
 				fPS.remove(i);
 			}
 		} else {
-			System.err.println("The plan "+p+" was not found for deletion!");
+			logger.error("The plan "+p+" was not found for deletion!");
 		}
 	}
 
@@ -392,8 +395,7 @@ public class Agent {
 			try {
 				builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 			} catch (Exception e) {
-				System.err.println("Error creating XML builder\n");
-				e.printStackTrace();
+				logger.error("Error creating XML builder\n");
 				return null;
 			}
 		}
@@ -408,7 +410,7 @@ public class Agent {
 	/** get the agent "mind" as XML */
 	public Element getAsDOM(Document document) {
 		Element ag = (Element) document.createElement("agent");
-		ag.setAttribute("name", fTS.getAgArch().getName());
+		ag.setAttribute("name", fTS.getAgArch().getAgName());
 		ag.appendChild(fBS.getAsDOM(document));
 		//ag.appendChild(ps.getAsDOM(document));
 		return ag;

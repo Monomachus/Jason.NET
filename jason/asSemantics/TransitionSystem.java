@@ -44,8 +44,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-public class TransitionSystem {
+import org.apache.log4j.Logger;
 
+public class TransitionSystem {
 
     static final byte      SStartRC   = 0;
     static final byte      SProcMsg   = 0;
@@ -60,12 +61,13 @@ public class TransitionSystem {
     static final byte      SClrInt    = 9;
 
     static final String[]  SRuleNames = { "ProcMsg", "SelEv", "RelPl",
-                                                 "ApplPl", "SelAppl", "AddIM",
-                                                 "ProcAct", "SelInt", "ExecInt",
-                                                 "ClrInt" };
+                                          "ApplPl", "SelAppl", "AddIM",
+                                          "ProcAct", "SelInt", "ExecInt",
+                                          "ClrInt" };
 
 	
 	
+	private Logger logger = null;	
 	
 	Agent ag = null;
 
@@ -75,7 +77,7 @@ public class TransitionSystem {
 
 	AgentArchitecture agArch = null;
 
-	byte step = SStartRC; // First step of the SOS
+	private byte step = SStartRC; // First step of the SOS
 
 	// both configuration and configuration' point to this
 	// object, this is just to make it look more like the SOS
@@ -93,6 +95,7 @@ public class TransitionSystem {
 
 		// we need to initialise this "aliases"
 		conf = confP = this;
+		logger = Logger.getLogger(TransitionSystem.class.getName()+"."+agArch.getAgName());
 	}
 
 	/********************************************************************* */
@@ -175,7 +178,6 @@ public class TransitionSystem {
 				received.addTerm(new Term(m.getMsgId()));
 				
 				Event evt = new Event(new Trigger(Trigger.TEAdd, Trigger.TEBel, received), focus);
-				//System.out.println("event = "+evt);
 				conf.ag.updateEvents(evt, conf.C);
 			}
 			
@@ -236,7 +238,6 @@ public class TransitionSystem {
 	private void applyRelPl() throws JasonException {
 		// get all relevant plans for the selected event
 		confP.C.RP = relevantPlans(conf.C.SE.trigger);
-		//System.out.println("\tRP for "+conf.C.SE.trigger+" are "+confP.C.RP);
 		
 		// Rule Rel1
 		if (!confP.C.RP.isEmpty() || setts.retrieve()) { // retrieve is mainly for Coo-AgentSpeak
@@ -246,7 +247,7 @@ public class TransitionSystem {
 		else {
 			if (conf.C.SE.trigger.isGoal()) {
 				generateGoalDeletionFromEvent();
-				System.err.println("*** Warning! Found an internal event for which there is no relevant plan:\n"+ conf.C.SE);
+				logger.warn("Found an internal event for which there is no relevant plan:\n"+ conf.C.SE);
 			}
 			// e.g. goal addition as internal event, just go ahead
 			else if (conf.C.SE.isInternal()) {
@@ -264,7 +265,6 @@ public class TransitionSystem {
 	private void applyApplPl() throws JasonException {
 		confP.C.AP = applicablePlans(new ArrayList(confP.C.RP));
 
-		//System.out.println("\tRP="+confP.C.RP+"\n\tAP="+confP.C.AP);
 		// Rule Appl1
 		if (!confP.C.AP.isEmpty() || setts.retrieve()) { // retrieve is mainly fo Coo-AgentSpeak
 			confP.step = SSelAppl;
@@ -280,7 +280,7 @@ public class TransitionSystem {
 		if (confP.C.SO != null) {
 			confP.step = SAddIM;
 		} else {
-			System.err.println("*** Warning! selectOption returned null.");
+			logger.warn("selectOption returned null.");
 			generateGoalDeletionFromEvent(); // can't carry on, no applicable plan.
 			confP.step = SProcAct;
 		}
@@ -466,7 +466,7 @@ public class TransitionSystem {
 					im.unif = ubel;
 					updateIntention();
 				} else {
-					System.err.println("*** Warning! Test Goal '"+h+"' failed as simple query. Generating internal event for it...");
+					logger.warn("Test Goal '"+h+"' failed as simple query. Generating internal event for it...");
 					u.apply(l);
 					conf.C.addTestGoal(l, conf.C.SI);
 				}
@@ -480,7 +480,6 @@ public class TransitionSystem {
 				//    X = ~p(a); +p(X)
 				l = Literal.parseLiteral(l.toString());
 				if (l != null) {
-					//System.out.println("*** adding "+l);			
 					if (setts.sameFocus())
 						conf.ag.addBel(l, BeliefBase.TSelf, conf.C, conf.C.SI);
 					else {
@@ -493,10 +492,8 @@ public class TransitionSystem {
 			// Rule DelBel
 			case BodyLiteral.HDelBel:
 				ubel = conf.ag.believes((Literal)l, u);
-				//System.out.println("****00-"+ubel);
 				if (ubel != null) {
 					ubel.apply(l);
-					//System.out.println("****11-"+l);
 					if (setts.sameFocus())
 						conf.ag.delBel(l, BeliefBase.TSelf, conf.C, conf.C.SI);
 					else {
@@ -546,7 +543,6 @@ public class TransitionSystem {
 			Plan pl = (Plan) candidateRPs.get(i);
 			Unifier relUn = pl.relevant(te);
 			if (relUn != null) {
-				//System.out.println("Add="+te+"|"+pl+"|"+relUn);
 				rp.add(new Option(pl, relUn));
 			}
 		}
@@ -670,8 +666,9 @@ public class TransitionSystem {
 			Trigger tr = (Trigger) tevent.clone();
 			im.unif.apply((Pred) tr);
 			confP.C.addExternalEv(tr);
-		} else
-			System.err.println("*** "+conf.agArch.getName()+" - Warning! Could not finish intention: " + conf.C.SI);
+		} else {
+			logger.warn("Could not finish intention: " + conf.C.SI);
+		}
 	}
 
 	// similar to the one above, but for an Event rather than intention
@@ -681,14 +678,14 @@ public class TransitionSystem {
 			confP.C.delGoal(ev.getTrigger().getGoal(), (Literal) ev.trigger, ev.intention);
 		}
 		if (ev.isInternal()) {
-			System.err.println("*** "+conf.agArch.getName()+" -- warning! Could not finish intention: " + ev.intention);
+			logger.warn("warning! Could not finish intention: " + ev.intention);
 		}
 		// if "discard" is set, we are deleting the whole intention!
 		// it is simply not going back to I nor anywhere else!
 		else if (setts.requeue()) {
 			confP.C.addEvent(ev);
 		} else
-			System.err.println("*** Warning! Discarding external event : " + ev);
+			logger.warn("discarding external event : " + ev);
 	}
 
 	/** ********************************************************************* */
@@ -721,7 +718,6 @@ public class TransitionSystem {
 	/** waits for a signal to continue the execution (used in synchronized execution mode) */
 	private void waitSyncSignal() {
 		try {
-			//System.out.println("*** "+agArch.getName()+" waiting sync");
 			synchronized(syncMonitor) {
 				inWaitSyncMonitor = true;
 				syncMonitor.wait();
@@ -735,7 +731,6 @@ public class TransitionSystem {
 	/** inform this agent that it can continue, if it is in sync mode and wainting a signal */
 	public void receiveSyncSignal() {
 		try {
-			//System.out.println("*** "+agArch.getName()+"receivied go");
 			synchronized(syncMonitor) {
 				while (!inWaitSyncMonitor) {
 					syncMonitor.wait(50); // waits the agent to enter in waitSyncSignal
@@ -777,51 +772,43 @@ public class TransitionSystem {
 			
 			C.reset();
 			
-			if (setts.verbose() >= 5)
-				System.out.println(agArch.getName() + " perceiving...");
+			logger.debug("perceiving...");
 			List percept = agArch.perceive();
 
-			if (setts.verbose() >= 5)
-				System.out.println(agArch.getName() + " checking mail...");
+			logger.debug("checking mail...");
 			agArch.checkMail();
 
-			if (setts.verbose() >= 5)
-				System.out.println(agArch.getName() + " doing belief revision...");
+			logger.debug("doing belief revision...");
 			ag.brf(percept);
 
 			if (setts.verbose() == 2) {
-				System.out.println(agArch.getName() + " Beliefs:    " + ag.fBS);
-				System.out.println(agArch.getName() + " Intentions: " + C.I);
+				logger.debug("Beliefs:    " + ag.fBS);
+				logger.debug("Intentions: " + C.I);
 			} else if (setts.verbose() >= 3) {
-				System.out.println(agArch.getName() + " Beliefs:      " + ag.fBS);
-				System.out.println(agArch.getName() + " Plans:        " + ag.fPS);
-				System.out.println(agArch.getName() + " Desires:      " + C.E);
-				System.out.println(agArch.getName() + " Intentions:   " + C.I);
+				logger.debug("Beliefs:      " + ag.fBS);
+				logger.debug("Plans:        " + ag.fPS);
+				logger.debug("Desires:      " + C.E);
+				logger.debug("Intentions:   " + C.I);
 			}
 
 			do {
 				if (setts.verbose() >= 6)
-					System.out.println(agArch.getName() + " Circumstance: " + C);
+					logger.debug("Circumstance: " + C);
 				if (setts.verbose() >= 4)
-					System.out.println(agArch.getName() + " Step:         " + SRuleNames[conf.step]);
+					logger.debug("Step:         " + SRuleNames[conf.step]);
 
 				applySemanticRule();
 			} while (step != SStartRC); // finished a reasoning cycle
 
-			if (setts.verbose() >= 5)
-				System.out.println(agArch.getName() + " acting");
-			
+			logger.debug("acting");
 			agArch.act();
-
-			if (setts.verbose() >= 2)
-				System.out.println();
 
 			if (setts.isSync()) {
 				agArch.informCycleFinished();
 			}
 			
 		} catch (Exception e) {
-			System.err.println("*** ERROR detected at transition system: ");
+			logger.error("*** ERROR detected at transition system: ");
 			e.printStackTrace();
 		}
 	}
@@ -846,5 +833,9 @@ public class TransitionSystem {
 
 	public AgentArchitecture getAgArch() {
 		return agArch;
+	}
+	
+	public Logger getLogger() {
+		return logger;
 	}
 }

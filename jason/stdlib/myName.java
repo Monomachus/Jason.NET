@@ -30,27 +30,21 @@ import jason.asSyntax.Term;
 
 public class myName implements InternalAction {
 
-	public boolean execute(TransitionSystem ts, Unifier un, Term[] args)
-			throws Exception {
+	public boolean execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
 		
 		Term name = null;
 		try {
 			name = args[0];
 			if (name == null) {
-				throw new JasonException(
-						"The parameter Name of internal action 'myName' is not a term!");
+				throw new JasonException("The parameter Name of internal action 'myName' is not a term!");
 			}
 			if (!name.isVar()) {
-				throw new JasonException(
-						"The parameter Name of internal action 'myName' is not a variable!");
+				throw new JasonException("The parameter Name of internal action 'myName' is not a variable!");
 			}
 
 		} catch (ArrayIndexOutOfBoundsException e) {
-			throw new JasonException(
-					"The internal action 'myName' has not received one argument");
+			throw new JasonException("The internal action 'myName' has not received one argument");
 		}
-		un.unifies(name, new Term(ts.getAgArch().getName()));
-		return true;
+		return un.unifies(name, new Term(ts.getAgArch().getAgName()));
 	}
-
 }
