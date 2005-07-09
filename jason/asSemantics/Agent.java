@@ -75,31 +75,40 @@ public class Agent {
     public TransitionSystem initAg(String[] args, AgentArchitecture arch) throws JasonException {
         // set the agent
         try {
-        	logger = Logger.getLogger(Agent.class.getName()+"."+arch.getAgName());
-            String asSource = null;
-            if (args.length < 2) { // error
-                throw new JasonException("The AS source file was not informed for the Agent creation!");
-            } else {
-                asSource = args[1].trim();
-            }
-            parseAS(asSource);
-            // kqml Plans at the end of the ag PS
-			parseAS(JasonID.class.getResource("/asl/kqmlPlans.asl"));            
-            Circumstance C = new Circumstance();
-            Settings setts = new Settings();
-            if (args.length > 2) {
-                if (args[2].equals("options")) {
-                    setts.setOptions("["+args[3]+"]");
-                    logger.setLevel(setts.log4JLevel());
-                }
-            }
-            setTS(new TransitionSystem(this,C,setts,arch));
-            return fTS;
-        } catch (Exception e) {
-            throw new JasonException("Error initializing creating the agent class! - "+e);
-        }
+			setLogger(arch);
+			String asSource = null;
+			if (args.length < 2) { // error
+				throw new JasonException(
+						"The AS source file was not informed for the Agent creation!");
+			} else {
+				asSource = args[1].trim();
+			}
+			parseAS(asSource);
+			// kqml Plans at the end of the ag PS
+			parseAS(JasonID.class.getResource("/asl/kqmlPlans.asl"));
+			Circumstance C = new Circumstance();
+			Settings setts = new Settings();
+			if (args.length > 2) {
+				if (args[2].equals("options")) {
+					setts.setOptions("[" + args[3] + "]");
+					logger.setLevel(setts.log4JLevel());
+				}
+			}
+			setTS(new TransitionSystem(this, C, setts, arch));
+			return fTS;
+		} catch (Exception e) {
+			throw new JasonException(
+					"Error initializing creating the agent class! - " + e);
+		}
     }
-	
+
+	public void setLogger(AgentArchitecture arch) {
+		if (arch != null) {
+			logger = Logger.getLogger(Agent.class.getName()+"."+arch.getAgName());
+		} else {
+			logger = Logger.getLogger(Agent.class.getName());			
+		}
+	}
 
 	/** add beliefs and plan form a URL */
 	public boolean parseAS(URL asURL) {

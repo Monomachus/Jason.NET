@@ -93,9 +93,21 @@ public class TransitionSystem {
 
 		// we need to initialise this "aliases"
 		conf = confP = this;
-		logger = Logger.getLogger(TransitionSystem.class.getName()+"."+agArch.getAgName());
-		logger.setLevel(setts.log4JLevel());
+
+		setLogger(agArch);
+		if (setts != null) {
+			logger.setLevel(setts.log4JLevel());
+		}
 	}
+	
+	public void setLogger(AgentArchitecture arch) {
+		if (arch != null) {
+			logger = Logger.getLogger(TransitionSystem.class.getName()+"."+arch.getAgName());
+		} else {
+			logger = Logger.getLogger(TransitionSystem.class.getName());			
+		}
+	}
+
 
 	/********************************************************************* */
 	/* SEMANTIC RULES */
