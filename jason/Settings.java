@@ -28,6 +28,8 @@ import jIDE.parser.mas2j;
 import java.io.StringReader;
 import java.util.Map;
 
+import org.apache.log4j.Level;
+
 public class Settings {
 	
     public static final byte      ODiscard        = 1;
@@ -141,7 +143,16 @@ public class Settings {
     }
     
     public int verbose() {
-        return(verbose);
+        return verbose;
+    }
+    
+    public Level log4JLevel() {
+    	 switch(verbose) {
+    	 case 0 : return Level.WARN;
+    	 case 1 : return Level.INFO;
+    	 case 2 : return Level.DEBUG;
+    	 }
+    	 return Level.INFO;
     }
     
     /** returns true if the execution is synchronized */

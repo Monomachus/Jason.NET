@@ -38,24 +38,19 @@ import javax.swing.JOptionPane;
 import saci.launcher.Launcher;
 import saci.launcher.LauncherD;
 
+// TODO: create sub-classes for each architecture, use algorithm pattern 
+
 /** runs an MAS */
 class RunMAS extends AbstractAction {
 
 	JasonID jasonID;
 
 	MASRunner masRunner;
-
 	String javaHomeJavac;
-
 	String javaHomeJava;
-
 	Process saciProcess;
-
 	BufferedReader saciIn;
-
 	BufferedReader saciErr;
-
-	MASConsole masConsole;
 
 	RunMAS(JasonID jID) {
 		super("Run MAS...", new ImageIcon(JasonID.class.getResource("/images/execute.gif")));
@@ -83,26 +78,18 @@ class RunMAS extends AbstractAction {
 					CompileThread compT = new CompileThread(jasonID.fMAS2jThread.fParserMAS2J.getAllUserJavaFiles());
 					compT.start();
 
-					if (jasonID.fMAS2jThread.fParserMAS2J.getArchitecture().equals(
-							"Centralised")) {
-						masRunner = new MASRunner(jIDE.RunCentralisedMAS.class
-								.getName(), compT, null, false);
-						masRunner.start();
-					} else if (jasonID.fMAS2jThread.fParserMAS2J.getArchitecture()
-							.equals("Saci")) {
-						// test saci
-						//boolean okSaci = false;
+					if (jasonID.fMAS2jThread.fParserMAS2J.getArchitecture().equals("Centralised")) {
+						masRunner = new MASRunnerCentralised(compT);
+					} else if (jasonID.fMAS2jThread.fParserMAS2J.getArchitecture().equals("Saci")) {
 						StartSaci saciThread = null;
 						Launcher l = getLauncher();
 						if (l == null) {
 							saciThread = new StartSaci();
 							saciThread.start();
 						}
-						masRunner = new MASRunner(
-								"saci.tools.runApplicationScript", compT,
-								saciThread, true);
-						masRunner.start();
+						masRunner = new MASRunnerSaci(compT, saciThread);
 					}
+					masRunner.start();
 				}
 			}
 		} catch (Exception ex) {
@@ -111,11 +98,6 @@ class RunMAS extends AbstractAction {
 	}
 
 	void stopMAS() {
-		if (masConsole != null) {
-			masConsole.close();
-		}
-		masConsole = null;
-
 		if (masRunner != null) {
 			masRunner.stopRunner();
 		}
@@ -173,9 +155,11 @@ class RunMAS extends AbstractAction {
 				saciIn = new BufferedReader(new InputStreamReader(saciProcess.getInputStream()));
 				saciErr = new BufferedReader(new InputStreamReader(saciProcess.getErrorStream()));
 				System.out.println("running saci with " + command);
+				/*
 				if (System.getProperty("os.name").indexOf("indows") > 0) {
 					System.out.println("The agents output will be sent to the saci console.");
 				}
+				*/
 				int tryCont = 0;
 				while (tryCont < 30) {
 					tryCont++;
@@ -231,9 +215,7 @@ class RunMAS extends AbstractAction {
 
 	class CompileThread extends Thread {
 		private boolean ok = true;
-
 		private boolean finished = false;
-
 		private Set files;
 
 		CompileThread(Set files) {
@@ -257,23 +239,8 @@ class RunMAS extends AbstractAction {
 
 		public void run() {
 			try {
-				/*
-				String sourceFiles = " ";
-				Set directories = new HashSet();
-				Iterator ifiles = files.iterator();
-				while (ifiles.hasNext()) {
-					String file = (String) ifiles.next();
-					directories.add(new File(file+".java").getParent());
-					sourceFiles += file + ".java ";
-				}
-				*/
 				if (needsComp()) {
 					String command = getAsScriptCommand("compile-" + jasonID.fMAS2jThread.fParserMAS2J.getSocName());
-						/*
-						String command = javaHomeJavac + " -classpath "
-								+ jasonID.fMAS2jThread.fParserMAS2J.getFullClassPath()
-								+ sourceFiles;
-								*/
 					System.out.println("Compiling user class with " + command);
 					Process p = Runtime.getRuntime().exec(command, null, new File(jasonID.projectDirectory));
 					p.waitFor();
@@ -316,32 +283,25 @@ class RunMAS extends AbstractAction {
 	}
 
 	class MASRunner extends Thread {
-		String runnerClass;
-
-		boolean stop = false;
-
-		boolean isSaci = false;
-
+		//String runnerClass;
 		CompileThread compT;
-
-		StartSaci saciT;
-
+		
 		Process masProcess = null;
+		OutputStreamWriter processOut;
 
-		MASRunner(String r, CompileThread t, StartSaci st, boolean isSaci) {
+		MASRunner(CompileThread t) {
 			super("MASRunner");
-			runnerClass = r;
 			compT = t;
-			saciT = st;
-			this.isSaci = isSaci;
 		}
 
 		void stopRunner() {
-			stop = true;
-
 			if (masProcess != null) {
 				masProcess.destroy();
 			}
+			jasonID.runMASButton.setEnabled(true);
+			jasonID.debugMASButton.setEnabled(true);
+			jasonID.stopMASButton.setEnabled(false);
+			
 		}
 
 		public void run() {
@@ -351,57 +311,29 @@ class RunMAS extends AbstractAction {
 						return;
 					}
 				}
-				if (saciT != null) {
-					if (!saciT.waitSaciOk()) {
-						return;
-					}
-				}
-				jasonID.stopMASButton.setEnabled(true);
-
-				if (!isSaci) {
-					masConsole = MASConsole.get(jasonID.getFileName(), RunMAS.this);
-				} else if (masConsole != null) {
-					masConsole.close();
-					masConsole = null;
-
-				}
-
-				// "clean" saci stream
-				/*
-				 * if (saciIn != null) { while (saciIn.ready()) {
-				 * saciIn.readLine(); } } if (saciErr != null) { while
-				 * (saciErr.ready()) { saciErr.readLine(); } }
-				 */
-
-				/*
-				if (jasonID.fMAS2jThread.fParserMAS2J.getFullClassPath().indexOf(" ")>0) {
-						masConsole.append("JasonIDE must be installed in path without white space to be able to run a projet.");
-						masConsole.append("You can run your project through the script created in your project's directory.");
-						//return;
-				}
-				*/
-
-				/*
-				String command = javaHomeJava 
-					    + " -classpath " + jasonID.fMAS2jThread.fParserMAS2J.getFullClassPath() + " "
-						+ runnerClass + " \"" 
-						+ jasonID.fMAS2jThread.fParserMAS2J.getOutputFile() + "\""; 
-				*/
-				
 				String command = getAsScriptCommand(jasonID.fMAS2jThread.fParserMAS2J.getSocName());
 				System.out.println("Executing MAS with " + command);
 				masProcess = Runtime.getRuntime().exec(command, null,
 						new File(jasonID.projectDirectory));
-				BufferedReader in = new BufferedReader(new InputStreamReader(
-						masProcess.getInputStream()));
-				OutputStreamWriter out = new OutputStreamWriter(masProcess.getOutputStream());
-				BufferedReader err = new BufferedReader(new InputStreamReader(
-						masProcess.getErrorStream()));
-				stop = false;
+
+				//BufferedReader in = new BufferedReader(new InputStreamReader(
+				//		masProcess.getInputStream()));
+				
+				processOut = new OutputStreamWriter(masProcess.getOutputStream());
+
+				jasonID.stopMASButton.setEnabled(true);
+				
+				//BufferedReader err = new BufferedReader(new InputStreamReader(
+				//		masProcess.getErrorStream()));
+				
+				//stop = false;
+				
+				/*
 				if (masConsole != null) {
 					masConsole.append("MAS execution\n");
 					masConsole.append("--------------------------------------\n");
 				}
+				
 				sleep(500);
 				while (!stop) {// || saciProcess!=null) {
 					while (!stop && in.ready()) {
@@ -414,52 +346,73 @@ class RunMAS extends AbstractAction {
 							masConsole.append(err.readLine() + "\n");
 						}
 					}
-					/*
-					 * if (saciIn != null) { while (saciIn.ready()) { if
-					 * (masConsole != null) {
-					 * masConsole.append(saciIn.readLine()+"\n"); } } } if
-					 * (saciErr != null) { while (saciErr.ready()) { if
-					 * (masConsole != null) {
-					 * masConsole.append(saciErr.readLine()+"\n"); } } }
-					 */
-
-					/*
-					 * try { int exit = masProcess.exitValue(); // if the above
-					 * command does not cause an exception, the process is
-					 * finished stop = true; } catch
-					 * (IllegalThreadStateException e) { }
-					 */
 					sleep(250); // to not consume cpu
 				}
 
 				if (masConsole != null) {
 					masConsole.append("\n------\n");
 				}
-
-				// kill the agents
-				if (isSaci) {
-					Launcher l = getLauncher();
-					if (l != null) {
-						l.killFacilitatorAgs(jasonID.getFileName());
-						l.killFacilitator(jasonID.getFileName());
-						l.killFacilitatorAgs(jasonID.getFileName() + "-env");
-						l.killFacilitator(jasonID.getFileName() + "-env");
-					}
-				} else {
-					out.write("quit\n");
-				}
+				*/
 			} catch (Exception e) {
 				System.err.println("Execution error: " + e);
 				e.printStackTrace();
-			} finally {
-				jasonID.runMASButton.setEnabled(true);
-				jasonID.debugMASButton.setEnabled(true);
-				jasonID.stopMASButton.setEnabled(false);
 			}
 		}
 	}
 	
+	class MASRunnerCentralised extends MASRunner {
 
+		MASRunnerCentralised(CompileThread t) {
+			super(t);
+		}
+
+		void stopRunner() {
+			try {
+				processOut.write("quit\n");
+			} catch (Exception e) {
+				System.err.println("Execution error: " + e);
+				e.printStackTrace();
+			}
+
+			super.stopRunner();
+		}
+	}
+
+	class MASRunnerSaci extends MASRunner {
+		StartSaci saciT;
+		
+		MASRunnerSaci(CompileThread t, StartSaci st) {
+			super(t);
+			saciT = st;
+		}
+
+		void stopRunner() {
+			try {
+				Launcher l = getLauncher();
+				if (l != null) {
+					l.killFacilitatorAgs(jasonID.getFileName());
+					l.killFacilitator(jasonID.getFileName());
+					l.killFacilitatorAgs(jasonID.getFileName() + "-env");
+					l.killFacilitator(jasonID.getFileName() + "-env");
+				}
+			} catch (Exception e) {
+				System.err.println("Execution error: " + e);
+				e.printStackTrace();
+			}
+			super.stopRunner();
+		}
+
+		public void run() {
+			if (saciT != null) {
+				if (!saciT.waitSaciOk()) {
+					return;
+				}
+			}
+			super.run();
+		}
+	}
+
+	
 	String getAsScriptCommand(String scriptName) {
 		return getAsScriptCommand(scriptName, false); 
 	}

@@ -25,8 +25,6 @@ package jason.asSemantics;
 import jason.JasonException;
 import jason.Settings;
 import jason.architecture.AgentArchitecture;
-import jason.architecture.CentralisedAgArch;
-import jason.architecture.SaciAgArch;
 import jason.asSyntax.BeliefBase;
 import jason.asSyntax.BodyLiteral;
 import jason.asSyntax.DefaultLiteral;
@@ -96,6 +94,7 @@ public class TransitionSystem {
 		// we need to initialise this "aliases"
 		conf = confP = this;
 		logger = Logger.getLogger(TransitionSystem.class.getName()+"."+agArch.getAgName());
+		logger.setLevel(setts.log4JLevel());
 	}
 
 	/********************************************************************* */
@@ -734,16 +733,9 @@ public class TransitionSystem {
 			synchronized(syncMonitor) {
 				while (!inWaitSyncMonitor) {
 					syncMonitor.wait(50); // waits the agent to enter in waitSyncSignal
-					try {
-						if ( ! ((CentralisedAgArch)agArch).isRunning() ) {
-							break;
-						}
-					} catch (Exception e) {}
-					try {
-						if ( ! ((SaciAgArch)agArch).isRunning() ) {
-							break;
-						}
-					} catch (Exception e) {}
+					if ( !agArch.isRunning() ) {
+						break;
+					}
 				}
 				
 				syncMonitor.notifyAll();
@@ -781,22 +773,25 @@ public class TransitionSystem {
 			logger.debug("doing belief revision...");
 			ag.brf(percept);
 
-			if (setts.verbose() == 2) {
+			/* use mind inspector to get these infs
+			if (logger.isDebugEnabled()) {
 				logger.debug("Beliefs:    " + ag.fBS);
 				logger.debug("Intentions: " + C.I);
-			} else if (setts.verbose() >= 3) {
 				logger.debug("Beliefs:      " + ag.fBS);
 				logger.debug("Plans:        " + ag.fPS);
 				logger.debug("Desires:      " + C.E);
 				logger.debug("Intentions:   " + C.I);
 			}
+			*/
 
 			do {
-				if (setts.verbose() >= 6)
+				/* use mind inspector to get these infs
+				if (logger.isDebugEnabled()) {
 					logger.debug("Circumstance: " + C);
-				if (setts.verbose() >= 4)
 					logger.debug("Step:         " + SRuleNames[conf.step]);
-
+				}
+				*/
+				
 				applySemanticRule();
 			} while (step != SStartRC); // finished a reasoning cycle
 

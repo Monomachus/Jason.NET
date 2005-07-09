@@ -57,7 +57,6 @@ public class CentralisedAgArch extends Thread implements AgentArchitecture {
     
     public void initAg(String[] args) throws JasonException {
     	logger = Logger.getLogger(CentralisedAgArch.class.getName()+"."+getAgName());
-    	System.out.println("Logger is "+CentralisedAgArch.class.getName()+"."+getAgName());
         // set the agent
         try {
             String className = null;
@@ -69,6 +68,7 @@ public class CentralisedAgArch extends Thread implements AgentArchitecture {
             }
             Agent ag = (Agent)Class.forName(className).newInstance();
             fTS = ag.initAg(args, this);
+    		logger.setLevel(fTS.getSettings().log4JLevel());
         } catch (Exception e) {
             throw new JasonException("as2j: error creating the agent class! - "+e);
         }
@@ -126,7 +126,9 @@ public class CentralisedAgArch extends Thread implements AgentArchitecture {
     // Default perception assumes Complete and Accurate sensing.
     public List perceive() {
     	List percepts = fEnv.getUserEnvironment().getPercepts(getName());
-    	logger.debug("percepts: "+percepts);
+    	if (logger.isDebugEnabled()) { // to salve CPU time building the string
+    		logger.debug("percepts: "+percepts);
+    	}
         return percepts;
     }
     

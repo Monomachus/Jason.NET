@@ -24,6 +24,7 @@
 package jason.architecture;
 
 
+import jIDE.RunCentralisedMAS;
 import jason.JasonException;
 import jason.asSemantics.ActionExec;
 import jason.asSemantics.Agent;
@@ -37,6 +38,7 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 
 import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 import org.w3c.dom.Document;
 
 import saci.Config;
@@ -62,15 +64,17 @@ public class SaciAgArch extends saci.Agent implements AgentArchitecture {
     
     // this is used by SACI to initialize the agent
     public void initAg(String[] args) throws JasonException {
-    	logger = Logger.getLogger(SaciAgArch.class.getName()+"."+getAgName());
+
+    	// create the jasonId console
+    	jIDE.MASConsoleGUI.get("MAS Console - "+getSociety(), null).setAsDefaultOut();
     	
+    	// create a logger
+    	logger = Logger.getLogger(SaciAgArch.class.getName()+"."+getAgName());
+    	// TODO: some alternative for the user to change the log file
+    	PropertyConfigurator.configure(SaciAgArch.class.getResource("/"+RunCentralisedMAS.logPropFile));
+    
         // set the agent class
         try {
-            // create the jasonId console
-            if (! jIDE.MASConsole.hasConsole()) {
-                jIDE.MASConsole.get("Saci - "+getSociety(), null).setAsDefaultOut();
-            }
-
             String className = null;
             if (args.length < 1) { // error
             	running = false;
@@ -80,6 +84,7 @@ public class SaciAgArch extends saci.Agent implements AgentArchitecture {
             }
             Agent ag = (Agent)Class.forName(className).newInstance();
             fTS = ag.initAg(args, this);
+    		logger.setLevel(fTS.getSettings().log4JLevel());
         } catch (Exception e) {
             throw new JasonException("as2j: error creating the agent class! - "+e.getMessage());
         }
@@ -188,7 +193,9 @@ public class SaciAgArch extends saci.Agent implements AgentArchitecture {
 			String content = (String) m.get("content");
 			if (content != null) {
 				percepts = ListTerm.parseList(content).getAsList();
-				logger.info("received percepts: "+percepts);
+				if (logger.isDebugEnabled()) {
+					logger.debug("received percepts: "+percepts);
+				}
 			} else {
 				percepts = null; // used to indicate that are nothing new in the environment, no BRF needed
 			}
@@ -307,9 +314,12 @@ public class SaciAgArch extends saci.Agent implements AgentArchitecture {
         if (fTS.getC().getAction() == null)
             return;
         try {
+        	Term acTerm = fTS.getC().getAction().getActionTerm();
+        	logger.info("doing: "+acTerm);
+
             String rw = mboxPercept.getRW();
             saci.Message m = new saci.Message("(ask :receiver environment :ontology AS-Action :content execute)");
-            m.put("action", fTS.getC().getAction().getActionTerm().toString());
+            m.put("action", acTerm.toString());
             m.put("reply-with", rw);
             m.put("verbose", new Integer(fTS.getSettings().verbose()).toString());
             

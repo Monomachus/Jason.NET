@@ -34,6 +34,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
 /**
  * This class implements the centralised version of the environment and
  * the agents mailbox.
@@ -47,6 +49,8 @@ public class CentralisedEnvironment implements EnvironmentInterface {
     
 	private Environment fUserEnv;
     
+    static Logger logger = Logger.getLogger(CentralisedEnvironment.class);
+	
     public CentralisedEnvironment(String userEnvClassName) throws JasonException {
         mboxes      = Collections.synchronizedMap(new HashMap());
         agents      = Collections.synchronizedMap(new HashMap());
@@ -56,8 +60,7 @@ public class CentralisedEnvironment implements EnvironmentInterface {
 			fUserEnv.setJasonEnvironment(this);
 			fUserEnv.init();
         } catch (Exception e) {
-            System.err.println("Error "+e);
-            e.printStackTrace();
+            logger.error("Error in Centralised MAS environment creation",e);
             throw new JasonException("The user environment class instantiation '"+userEnvClassName+"' has failed!"+e.getMessage());
         }
     }
@@ -125,7 +128,7 @@ public class CentralisedEnvironment implements EnvironmentInterface {
                 if (agArch != null) {
                     agArch.getTS().newMessageHasArrived();
                 } else {
-                    System.err.println("Error sending notify events to agent "+agName+", it does not exist!");
+                    logger.error("Error sending notify events to agent "+agName+", it does not exist!");
                 }
             }
         }
@@ -134,7 +137,7 @@ public class CentralisedEnvironment implements EnvironmentInterface {
     
     public void addAgent(CentralisedAgArch agent) {
         if (mboxes.get(agent.getName()) != null) {
-        	System.err.println("Warning: add an agent that already exists: "+ agent.getName());
+        	logger.warn("Warning: add an agent that already exists: "+ agent.getName());
         }
         mboxes.put(agent.getName(), new LinkedList());
         agents.put(agent.getName(), agent);

@@ -48,6 +48,8 @@ public interface AgentArchitecture {
     public void   sendMsg(Message m) throws Exception;
     public void   broadcast(Message m) throws Exception;
     
+    public boolean isRunning();
+    
     // methods for execution control
 
 	/** inform the (centralised/saci) controller that this agent's cycle was finished (used in sync mode) */ 

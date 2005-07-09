@@ -37,13 +37,22 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
 /** runs a MAS */
-public class MASConsole extends JFrame {
+public class MASConsoleGUI extends JFrame  {
     
-    private static MASConsole masConsole = null;
+    private static MASConsoleGUI masConsole = null;
     
-    public static MASConsole get(String title, RunMAS runMAS) {
+    /** for sigleton pattern */
+    public static MASConsoleGUI get(String title, RunMAS runMAS) {
         if (masConsole == null) {
-            masConsole = new MASConsole(title, runMAS);
+            masConsole = new MASConsoleGUI(title, runMAS);
+        }
+        return masConsole;
+    }
+
+    /** for sigleton pattern */
+    public static MASConsoleGUI get() {
+        if (masConsole == null) {
+            masConsole = new MASConsoleGUI("MAS Console", null);
         }
         return masConsole;
     }
@@ -56,9 +65,9 @@ public class MASConsole extends JFrame {
     PrintStream originalOut = null;
     PrintStream originalErr = null;
     
-    private MASConsole(String title, final RunMAS runMAS) {
-        super(title);
-        addWindowListener(new WindowAdapter() {
+    private MASConsoleGUI(String title, final RunMAS runMAS) {
+    	super(title);
+    	addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
                 if (runMAS != null) {
                     runMAS.stopMAS();
@@ -88,19 +97,22 @@ public class MASConsole extends JFrame {
         setVisible(true);
     }
     
-    public void append(String s) {
-        output.append(s);
+  
+	public void append(String s) {
+		output.append(s);
     }
     
     public void close() {
-        setVisible(false);
+    	if (masConsole == null) return;
+    	
+        masConsole.setVisible(false);
+        if (masConsole.originalOut != null) {
+            System.setOut(masConsole.originalOut);
+        }
+        if (masConsole.originalErr != null) {
+            System.setOut(masConsole.originalErr);
+        }
         masConsole = null;
-        if (originalOut != null) {
-            System.setOut(originalOut);
-        }
-        if (originalErr != null) {
-            System.setOut(originalErr);
-        }
     }
     
     public void setAsDefaultOut() {

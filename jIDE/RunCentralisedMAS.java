@@ -37,8 +37,6 @@ import java.util.List;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.w3c.dom.Document;
@@ -56,32 +54,25 @@ public class RunCentralisedMAS {
     List ags = new ArrayList();
 
     static Logger logger = Logger.getLogger(RunCentralisedMAS.class);
-    static String logPropFile = "log4j-Centralised.properties";
+    public final static String logPropFile = "log4j.configuration";
     
+    //static MASConsoleGUI console;
     
     public static void main(String[] args) {
         if (args.length < 1) {
             System.err.println("You must inform only the MAS XML script.");
             System.exit(1);
         }
-        String jasonHome = "../../jason/bin";
-        
-        if (args.length > 1) {
-        	jasonHome = args[1];
-        }
 
         // see for a local log4j configuration
         if (new File(logPropFile).exists()) {
         	PropertyConfigurator.configure(logPropFile);
-        // try jason bin log4j configuration
-        } else if (new File(jasonHome+"/bin/"+logPropFile).exists()) {
-        	System.out.println("proprieties from "+jasonHome);
-        	PropertyConfigurator.configure(jasonHome+"/bin/"+logPropFile);
         } else {
-        	System.out.println("No log4j.properties file, using default!");
-        	BasicConfigurator.configure();
-        	Logger.getRootLogger().setLevel(Level.INFO);
+        	PropertyConfigurator.configure(RunCentralisedMAS.class.getResource("/"+logPropFile));
+        	//Logger.getRootLogger().addAppender(new ConsoleAppender(new PatternLayout("[%c{1}] %m%n")));
+        	//Logger.getRootLogger().setLevel(Level.INFO);
         }
+        
         
         Document docDOM = parse(args[0]);
         if (docDOM != null) {
@@ -202,6 +193,10 @@ public class RunCentralisedMAS {
 			}
 			if (env != null) {
 				env.stop();
+			}
+		
+			if (MASConsoleGUI.hasConsole()) {
+				MASConsoleGUI.get().close();
 			}
 			
 		} catch (Exception e) {

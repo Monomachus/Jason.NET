@@ -1,0 +1,40 @@
+# Set root logger level to INFO and its only appender to Console1.
+
+log4j.rootLogger=INFO, MASConsole 
+#log4j.rootLogger=DEBUG, File1
+#log4j.rootLogger=DEBUG, Chainsaw
+
+# PatternLayout codes:
+# %c - category
+# %C - class
+# %d - time/date
+# %L - line number
+# %m - message
+# %p - priority
+# %r - time elapsed
+# %t - thread
+
+# ------ MASConsole --------
+log4j.appender.MASConsole=jIDE.MASConsoleAppender
+log4j.appender.MASConsole.layout=org.apache.log4j.PatternLayout
+log4j.appender.MASConsole.layout.ConversionPattern=[%c{1}] %m%n
+
+# ------ Console1 --------
+# Console1 is set to be a ConsoleAppender.
+log4j.appender.Console1=org.apache.log4j.ConsoleAppender
+log4j.appender.Console1.layout=org.apache.log4j.PatternLayout
+#Console1.layout.ConversionPattern=%-4r %-5p [%t] %c %x - %m%n
+log4j.appender.Console1.layout.ConversionPattern=[%c{1}] %m%n
+#Console1.layout.ConversionPattern=[%t] %-5p %x - %m%n
+
+# ------ File1 --------
+log4j.appender.File1=org.apache.log4j.FileAppender
+log4j.appender.File1.file=mas-log.xml
+log4j.appender.File1.layout=org.apache.log4j.xml.XMLLayout
+log4j.appender.File1.append=false
+
+# ------ Chainsaw --------
+log4j.appender.Chainsaw=org.apache.log4j.net.SocketAppender
+log4j.appender.Chainsaw.remoteHost=localhost
+log4j.appender.Chainsaw.port=4445
+log4j.appender.Chainsaw.locationInfo=true
