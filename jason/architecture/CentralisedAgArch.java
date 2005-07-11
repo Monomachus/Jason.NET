@@ -70,6 +70,7 @@ public class CentralisedAgArch extends Thread implements AgentArchitecture {
             fTS = ag.initAg(args, this);
     		logger.setLevel(fTS.getSettings().log4JLevel());
         } catch (Exception e) {
+        	logger.error("as2j: error creating the agent class! - ",e);
             throw new JasonException("as2j: error creating the agent class! - "+e);
         }
     }

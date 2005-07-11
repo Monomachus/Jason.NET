@@ -38,33 +38,33 @@ import javax.swing.JOptionPane;
 import saci.launcher.Launcher;
 import saci.launcher.LauncherD;
 
-// TODO: create sub-classes for each architecture, use algorithm pattern 
-
 /** runs an MAS */
 class RunMAS extends AbstractAction {
 
 	JasonID jasonID;
 
 	MASRunner masRunner;
-	String javaHomeJavac;
-	String javaHomeJava;
 	Process saciProcess;
-	BufferedReader saciIn;
-	BufferedReader saciErr;
 
 	RunMAS(JasonID jID) {
 		super("Run MAS...", new ImageIcon(JasonID.class.getResource("/images/execute.gif")));
 		jasonID = jID;
-		javaHomeJavac = JasonID.javaHome + File.separator + "bin"
-				+ File.separator + "javac";
-		javaHomeJava = JasonID.javaHome + File.separator + "bin"
-				+ File.separator + "java";
 	}
 
 	public void actionPerformed(ActionEvent e) {
 		try {
 			jasonID.output.setText("");
 			jasonID.saveAllAct.actionPerformed(null);
+			
+			String jasonHome = jasonID.getConf().getProperty("jasonHome");
+			if (!jasonID.checkJasonPath(jasonHome)) {
+				System.err.println("The Jason home directory ("+jasonHome+") was not correctly set, the MAS may not run. Go to menu Edit->Preferences and set it.");
+			}
+			String javaHome = jasonID.getConf().getProperty("javaHome");
+			if (!jasonID.checkJavaPath(javaHome)) {
+				System.err.println("The Java home directory ("+javaHome+") was not correctly set, the MAS may not run. Go to menu Edit->Preferences and set it.");
+			}
+			
 			
 			boolean ok = jasonID.fMAS2jThread.foregroundCompile();
 			if (ok) {
@@ -81,13 +81,19 @@ class RunMAS extends AbstractAction {
 					if (jasonID.fMAS2jThread.fParserMAS2J.getArchitecture().equals("Centralised")) {
 						masRunner = new MASRunnerCentralised(compT);
 					} else if (jasonID.fMAS2jThread.fParserMAS2J.getArchitecture().equals("Saci")) {
-						StartSaci saciThread = null;
-						Launcher l = getLauncher();
-						if (l == null) {
-							saciThread = new StartSaci();
-							saciThread.start();
+						String saciHome = jasonID.getConf().getProperty("saciHome");
+						if (jasonID.checkSaciPath(saciHome)) {
+							StartSaci saciThread = null;
+							Launcher l = getLauncher();
+							if (l == null) {
+								saciThread = new StartSaci();
+								saciThread.start();
+							}
+							masRunner = new MASRunnerSaci(compT, saciThread);
+						} else {
+							System.err.println("Error: Saci home directory "+saciHome+" was not correctly set. Go to menu Edit->Preferences and set it.");
+							return;
 						}
-						masRunner = new MASRunnerSaci(compT, saciThread);
 					}
 					masRunner.start();
 				}
@@ -138,6 +144,9 @@ class RunMAS extends AbstractAction {
 
 	class StartSaci extends Thread {
 
+		//BufferedReader saciIn;
+		//BufferedReader saciErr;
+
 		boolean saciOk = false;
 
 		StartSaci() {
@@ -152,14 +161,10 @@ class RunMAS extends AbstractAction {
 				saciProcess = Runtime.getRuntime().exec(command, null,
 						//new File(JasonID.saciHome + File.separator + "bin"));
 						new File(jasonID.projectDirectory));
-				saciIn = new BufferedReader(new InputStreamReader(saciProcess.getInputStream()));
-				saciErr = new BufferedReader(new InputStreamReader(saciProcess.getErrorStream()));
+				//saciIn = new BufferedReader(new InputStreamReader(saciProcess.getInputStream()));
+				//saciErr = new BufferedReader(new InputStreamReader(saciProcess.getErrorStream()));
 				System.out.println("running saci with " + command);
-				/*
-				if (System.getProperty("os.name").indexOf("indows") > 0) {
-					System.out.println("The agents output will be sent to the saci console.");
-				}
-				*/
+
 				int tryCont = 0;
 				while (tryCont < 30) {
 					tryCont++;
@@ -171,12 +176,6 @@ class RunMAS extends AbstractAction {
 						break;
 					}
 				}
-				/*
-				 * while (saciProcess != null) { sleep(250); // to do not
-				 * consume cpu while (saciIn.ready()) {
-				 * System.out.println(saciIn.readLine()); } while
-				 * (saciErr.ready()) { System.out.println(saciErr.readLine()); } }
-				 */
 			} catch (Exception ex) {
 				System.err.println("error running SACI:" + ex);
 			} finally {

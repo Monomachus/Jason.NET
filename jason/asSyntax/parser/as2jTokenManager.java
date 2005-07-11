@@ -3,7 +3,7 @@ package jason.asSyntax.parser;
 import java.util.*;
 import java.io.*;
 import jason.asSyntax.*;
-import jason.asSemantics.Agent;
+import jason.asSemantics.*;
 
 public class as2jTokenManager implements as2jConstants
 {

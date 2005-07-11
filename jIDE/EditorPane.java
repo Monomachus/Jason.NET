@@ -59,15 +59,11 @@ class EditorPane extends JPanel {
 	UndoManager undo;
 	JScrollPane editorScroller;
 	boolean modified = false;
-
 	boolean needsParsing = false;
 
 	private String fileName = "";
-
 	String extension = "asl";
-
 	JasonID mainID = null;
-
 	int tabIndex;
 
 	EditorPane() {
@@ -210,17 +206,16 @@ class EditorPane extends JPanel {
 		});
 	}
 
-	String getDefaultText() {
-		String s = fileName;
-		if (s.length() == 0) {
-			s = "<replace with project name>";
+	String getDefaultText(String projectName) {
+		if (projectName.length() == 0) {
+			projectName = "<replace with project name>";
 		}
 		return "MAS "
-				+ s
+				+ projectName
 				+ " {\n"
 				+ "\tarchitecture: Centralised\n\n"
-				+ "\tenvironment: <replace with the environment class name>\n\n"
-				+ "\tagents:\n" + "\t\t<add agent name where>\n\n" + "}";
+				+ "\t//environment: <replace with the environment class name>\n\n"
+				+ "\tagents:\n \t\tag1;\n" + "\t\t//<add moreagent name here>\n\n" + "}";
 	}
 
 	class NumberedViewFactory implements ViewFactory {

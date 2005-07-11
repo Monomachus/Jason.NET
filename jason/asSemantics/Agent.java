@@ -83,9 +83,6 @@ public class Agent {
 			} else {
 				asSource = args[1].trim();
 			}
-			parseAS(asSource);
-			// kqml Plans at the end of the ag PS
-			parseAS(JasonID.class.getResource("/asl/kqmlPlans.asl"));
 			Circumstance C = new Circumstance();
 			Settings setts = new Settings();
 			if (args.length > 2) {
@@ -95,10 +92,15 @@ public class Agent {
 				}
 			}
 			setTS(new TransitionSystem(this, C, setts, arch));
+
+			parseAS(asSource);
+			// kqml Plans at the end of the ag PS
+			parseAS(JasonID.class.getResource("/asl/kqmlPlans.asl"));
+			
 			return fTS;
 		} catch (Exception e) {
-			throw new JasonException(
-					"Error initializing creating the agent class! - " + e);
+			logger.error("Error initializing creating the agent class!",e);
+			throw new JasonException("Error initializing creating the agent class! - " + e);
 		}
     }
 
@@ -180,9 +182,16 @@ public class Agent {
 	}
 
 	/** Agent's Source Beliefs Initialisation (called by the parser) */
-	public void addBS(BeliefBase bb) {
-		fBS.addAll(bb);
+	/*
+	public void importBS(BeliefBase bb) {
+		Iterator i = bb.allIterator();
+		while (i.hasNext()) {
+			Literal l = (Literal)i.next();
+			addBel(l, BeliefBase.TSelf, fTS.C, Intention.EmptyInt);
+		}
+		//fBS.addAll(bb);
 	}
+	*/
 
 	/** Agent's Source Plans Initialisation (called by the parser) */
 	public void addPS(PlanLibrary pp) {
@@ -192,6 +201,9 @@ public class Agent {
 	/** TS Initialisation (called by the AgArch) */
 	public void setTS(TransitionSystem ts) {
 		this.fTS = ts;
+	}
+	public TransitionSystem getTS() {
+		return fTS;
 	}
 
 	// Accessing the agent's belief base and plans
@@ -300,6 +312,7 @@ public class Agent {
 				l.addAnnot(source);
 			}
 			if (fBS.add(l)) {
+				logger.debug("Added belief "+l);
 				updateEvents(new Event(new Trigger(Trigger.TEAdd, Trigger.TEBel, l), focus), c);
 				return true;
 			}
@@ -337,8 +350,10 @@ public class Agent {
 
 	// only add External Event if it is relevant in respect to the PlanLibrary
 	public void updateEvents(Event e, Circumstance c) {
-		if (e.isInternal() || fPS.isRelevant(e.trigger))
+		if (e.isInternal() || fPS.isRelevant(e.trigger)) {
 			c.E.add(e);
+			logger.debug("Added event "+e);
+		}
 	}
 
 	// TODO IMPORTANT: this is not making sure the label of the new plan is unique!!!

@@ -4,7 +4,7 @@
   import java.util.*;
   import java.io.*;
   import jason.asSyntax.*;
-  import jason.asSemantics.Agent;
+  import jason.asSemantics.*;
 
   public class as2j implements as2jConstants {
 
@@ -12,39 +12,6 @@
     private File source = null;
 
     private PrintStream out = System.out;
-
-    // Run the parser
-    public static void main ( String args[] ) {
-      as2j parser;
-
-      if(args.length==1) {
-        String name = args[0];
-                try {
-                  parser = new as2j(new java.io.FileInputStream(name+".asl"));
-                  parser.setName(name);
-                }
-                catch(java.io.FileNotFoundException e){
-                  System.err.println("as2j: file \"" + name + ".asl\" not found.");
-                  return ;
-        }
-        System.out.println("as2j: Creating Jason agent for \"" + name + ".asl\" ..." );
-                try {
-           parser.bs(); // just to let the user know in advance there is ...
-           parser.ps(); // ... any syntax error. Can't use ag() as there isn't an agent to create.
-                }
-        catch (Exception e) {
-          System.err.println("as2j: parsing error in file \"" + name + ".asl\"\n" + e );
-          System.err.println("as2j: generating java files anyway.");
-        }
-      }
-      else {
-                System.err.println("as2j: usage must be:");
-                System.err.println("      java as2j <AgentName>");
-                System.err.println("         Input from <AgentName>.asl");
-                System.err.println("         Output to file Agent_<AgentName>.java");
-        return ;
-      }
-    }
 
     /* Auxiliary Functions */
 
@@ -58,15 +25,25 @@
 
 /* AgentSpeak Grammar */
   final public void ag(Agent a) throws ParseException {
-                     BeliefBase bb; PlanLibrary pp;
-    bb = bs();
-              a.addBS(bb);
-    pp = ps();
-              a.addPS(pp);
+                     List bbl = new LinkedList(); PlanLibrary pp;
+    bs(bbl);
+    //{ a.importBS(bb); } 
+      pp = ps();
+                 if (a != null) {
+                    a.addPS(pp);
+
+                    // add beliefs (after the plan are loaded, so the events are relevant
+                    Iterator i = bbl.iterator();
+                    while (i.hasNext()) {
+                       Literal l = (Literal)i.next();
+                       a.addBel(l, BeliefBase.TSelf, a.getTS().getC(), Intention.EmptyInt);
+                    }
+                 }
   }
 
-  final public BeliefBase bs() throws ParseException {
-                    BeliefBase bb = new BeliefBase(); Literal F;
+  final public void bs(List bbl) throws ParseException {
+                      //BeliefBase bb = new BeliefBase(); 
+                              Literal F;
     label_1:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -83,13 +60,12 @@
       jj_consume_token(21);
                      if(!F.isGround()) {
                                          {if (true) throw new ParseException("Error: Initial belief must be ground!\n       Cannot use "+F+" as initial belief.");}
-                  }
-    // NB: initial beliefs are as percepts (not internal) by default!!!
-    F.addAnnot(BeliefBase.TSelf);
-    bb.add(F);
+                     }
+                     // NB: initial beliefs are as percepts (not internal) by default!!!
+                     //F.addAnnot(BeliefBase.TSelf);
+                     //bb.add(F); 
+                     bbl.add(F);
     }
-    {if (true) return bb;}
-    throw new Error("Missing return statement in function");
   }
 
   final public PlanLibrary ps() throws ParseException {

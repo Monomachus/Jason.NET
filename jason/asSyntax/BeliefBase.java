@@ -130,6 +130,7 @@ public class BeliefBase {
 		}
 	}
 	
+	/*
 	public void addAll(BeliefBase bb) {
 		Iterator i = bb.belsMap.values().iterator();
 		while (i.hasNext()) {
@@ -140,6 +141,22 @@ public class BeliefBase {
 			}
 		}
 	}
+	*/
+
+	/** returns a iterator for all Beliefs. */
+	/*
+	public Iterator allIterator() {
+		List all = new ArrayList();
+		Iterator i = belsMap.values().iterator();
+		while (i.hasNext()) {
+			Iterator j = ((List)i.next()).iterator();
+			while (j.hasNext()) {
+				all.add(j.next());
+			}
+		}
+		return all.iterator();
+	}
+	*/
 
 	/*
 	public boolean removeOld(Literal l) {

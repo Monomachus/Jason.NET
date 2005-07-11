@@ -51,7 +51,7 @@ import java.util.Set;
  * <img src="../../../uml/jason.environment.gif" />
  *  
  */
-public abstract class Environment { 
+public class Environment { 
 
 	private List percepts = Collections.synchronizedList(new ArrayList());
 	private Map  agPercepts = Collections.synchronizedMap(new HashMap());

@@ -79,8 +79,9 @@ public class ASParserThread extends Thread {
             Document doc  = editorPanel.editor.getDocument();
             String text = doc.getText(0, doc.getLength());
             parser.ReInit(new StringReader(text));
-            parser.bs();
-            parser.ps();
+            //parser.bs();
+            //parser.ps();
+            parser.ag(null);
             
             if (foregroundCompilation) {
                 System.out.println(" parsed successfully!");

@@ -41,14 +41,12 @@ public class MAS2JParserThread extends Thread {
     boolean fForegroundCompilation = false;
     boolean fCompilationDone = true;
     
-    MAS2JParserThread(EditorPane editor, JasonID jasonID, String asHome, String saciHome) {
+    MAS2JParserThread(EditorPane editor, JasonID jasonID) {
     	super("MAS2JParser");
         fParserMAS2J = new mas2j(new StringReader(""));
         fParserMAS2J.setNoOut(true);
         this.fEditorPanel = editor;
         this.fJasonID = jasonID;
-        fParserMAS2J.setJasonHome(asHome);
-        fParserMAS2J.setSaciHome(saciHome);
     }
     
     void parse() {
@@ -62,6 +60,9 @@ public class MAS2JParserThread extends Thread {
             String text = doc.getText(0, doc.getLength());
             fParserMAS2J.ReInit(new StringReader(text));
             fParserMAS2J.setDestDir( fEditorPanel.mainID.projectDirectory );
+            fParserMAS2J.setJasonHome(fJasonID.getConf().getProperty("jasonHome"));
+            fParserMAS2J.setSaciHome(fJasonID.getConf().getProperty("saciHome"));
+            fParserMAS2J.setJavaHome(fJasonID.getConf().getProperty("javaHome"));
             fParserMAS2J.mas();
             fParserMAS2J.close();
             fOk = true;
