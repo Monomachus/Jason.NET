@@ -14,9 +14,11 @@ public class mas2j implements mas2jConstants {
     boolean debug = false;
 
     String architecture = "Centralised";
-    String destDir = "."+File.separator;
-    String saciHome = "../lib/saci"+File.separator;
-    String jasonHome = "../"+File.separator;
+    String destDir  = "."+File.separator;
+    String saciJar  = "saci.jar";
+    String saciHome = File.separator;
+    String jasonJar = "jason.jar";
+    String log4jJar = "log4j.jar";
     String javaHome = File.separator;
 
     String controlPart = null; // this string has the ag control creation (to be added at the end of the script)
@@ -36,8 +38,9 @@ public class mas2j implements mas2jConstants {
         System.err.println("mas2j: reading from file " + name + " ..." );
                 try {
                   parser = new mas2j(new java.io.FileInputStream(name));
-          parser.setJasonHome(args[1]);
-          parser.setSaciHome(args[2]);
+          parser.setJasonJar(args[1]+"/bin/jason.jar");
+          parser.setLog4jJar(args[1]+"/lib/log4j.jar");
+          parser.setSaciJar(args[2]+"/bin/saci.jar");
                 } catch(java.io.FileNotFoundException e){
                   System.err.println("mas2j: file \"" + name + "\" not found.");
                   return;
@@ -45,7 +48,7 @@ public class mas2j implements mas2jConstants {
       } else {
                 System.out.println("mas2j: usage must be:");
                 System.out.println("      java mas2j <MASConfFile> <JasonHome> <SACIHome>");
-                System.out.println("         Output to file <MASName>.xml");
+                System.out.println("Output to file <MASName>.xml");
         return;
       }
 
@@ -108,22 +111,34 @@ public class mas2j implements mas2jConstants {
                 out.close();
     }
 
+        /*
     public void setSaciHome(String s) {
-        if (s != null) {
-                saciHome = new File(s).getAbsolutePath();
-                if (! saciHome.endsWith(File.separator)) {
-                        saciHome += File.separator;
-                }
-            }
+    	if (s != null) {
+	        saciHome = new File(s).getAbsolutePath();
+    		if (! saciHome.endsWith(File.separator)) {
+    			saciHome += File.separator;
+    		}
+	    }
     }
 
     public void setJasonHome(String s) {
-        if (s != null) {
-                jasonHome = new File(s).getAbsolutePath();
-                if (! jasonHome.endsWith(File.separator)) {
-                        jasonHome += File.separator;
-                }
-            }
+    	if (s != null) {
+	        jasonHome = new File(s).getAbsolutePath();
+    		if (! jasonHome.endsWith(File.separator)) {
+    			jasonHome += File.separator;
+    		}
+	    }
+    }
+    */
+    public void setJasonJar(String s) {
+        jasonJar = s;
+    }
+    public void setLog4jJar(String s) {
+        log4jJar = s;
+    }
+    public void setSaciJar(String s) {
+        saciJar = s;
+        saciHome = new File(saciJar).getParent().toString();
     }
 
     public void setJavaHome(String s) {
@@ -204,8 +219,8 @@ public class mas2j implements mas2jConstants {
         if (System.getProperty("os.name").indexOf("indows") > 0) {
             extraSlash = "/";
         }
-        out.println("<!DOCTYPE saci SYSTEM \"file:"+extraSlash+saciHome+"bin"+File.separator+"applications.dtd\">");
-            out.println("<?xml-stylesheet href=\"file:"+extraSlash+saciHome+"bin"+File.separator+"applications.xsl\" type=\"text/xsl\" ?>");
+        out.println("<!DOCTYPE saci SYSTEM \"file:"+extraSlash+saciHome+File.separator+"applications.dtd\">");
+            out.println("<?xml-stylesheet href=\"file:"+extraSlash+saciHome+File.separator+"applications.xsl\" type=\"text/xsl\" ?>");
         out.println("<saci>");
                 out.println("<application id=\""+ soc +"\">");
 
@@ -230,13 +245,16 @@ public class mas2j implements mas2jConstants {
     }
 
 
+        /*
     public String getJasonClasspath() {
-        return jasonHome+"bin"+File.separator+"jason.jar";
+        //return jasonHome+"bin"+File.separator+"jason.jar"; 
+        return jasonJar;
     }
 
     public String getJasonClasspathURL() {
-        return "file:"+jasonHome+"bin/jason.jar";
+        return "file:"+jasonHome+"bin/jason.jar"; 
     }
+    */
 
     public String getFullClassPath() {
         String clPath = "\"$CLASSPATH\"";
@@ -254,9 +272,9 @@ public class mas2j implements mas2jConstants {
                 }
         return outdelim+
                "."+File.pathSeparator+
-               indelim+getJasonClasspath()+indelim+File.pathSeparator+
-               indelim+saciHome+"bin"+File.separator+"saci.jar"+indelim+File.pathSeparator+
-               indelim+jasonHome+"lib"+File.separator+"log4j.jar"+indelim+File.pathSeparator+
+               indelim+jasonJar+indelim+File.pathSeparator+
+               indelim+saciJar+indelim+File.pathSeparator+
+               indelim+log4jJar+indelim+File.pathSeparator+
                indelim+dDir+indelim+File.pathSeparator+
                clPath+
                outdelim;
@@ -308,7 +326,7 @@ public class mas2j implements mas2jConstants {
                     out.println("@echo off");
                     out.println("rem this file was generated by mas2j parser\n");
                     out.println("set CLASSPATH="+classPath);
-                    out.println("cd \""+saciHome+"bin\"");
+                    out.println("cd \""+saciHome+"\"");
                     out.println("saci &");
                     out.close();
                 }
@@ -335,6 +353,8 @@ public class mas2j implements mas2jConstants {
                         out.println("export PATH="+javaHome+"bin:$PATH\n");
                 }
                 if (dirsToCompile.length() > 0) {
+                         out.println("# compile files "+getAllUserJavaFiles());
+                         out.println("# on "+getAllUserJavaDirectories());
                         out.println("javac -classpath "+classPath+" "+dirsToCompile+"\n");
                     }
                 out.println("chmod u+x *.sh");
@@ -351,7 +371,7 @@ public class mas2j implements mas2jConstants {
                     //out.println("APPDIR=`pwd`");
                     //out.println("export CLASSPATH=$APPDIR:$CURDIR:"+classPath);
                     out.println("export CLASSPATH="+classPath);
-                    out.println("cd \""+saciHome+"bin\"");
+                    out.println("cd \""+saciHome+"\"");
                     out.println("./saci &");
                     out.close();
                 }
@@ -632,7 +652,7 @@ public class mas2j implements mas2jConstants {
   }
 
   final public void environment() throws ParseException {
-                              String host = null;
+                              String host = null; envClass = null;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case ENV:
       jj_consume_token(ENV);

@@ -56,12 +56,12 @@ class RunMAS extends AbstractAction {
 			jasonID.output.setText("");
 			jasonID.saveAllAct.actionPerformed(null);
 			
-			String jasonHome = jasonID.getConf().getProperty("jasonHome");
-			if (!jasonID.checkJasonPath(jasonHome)) {
-				System.err.println("The Jason home directory ("+jasonHome+") was not correctly set, the MAS may not run. Go to menu Edit->Preferences and set it.");
+			String jasonJar = jasonID.getConf().getProperty("jasonJar");
+			if (!JasonID.checkJar(jasonJar)) {
+				System.err.println("The jason.jar file ("+jasonJar+") was not correctly set, the MAS may not run. Go to menu Edit->Preferences and set it.");
 			}
 			String javaHome = jasonID.getConf().getProperty("javaHome");
-			if (!jasonID.checkJavaPath(javaHome)) {
+			if (!JasonID.checkJavaPath(javaHome)) {
 				System.err.println("The Java home directory ("+javaHome+") was not correctly set, the MAS may not run. Go to menu Edit->Preferences and set it.");
 			}
 			
@@ -81,8 +81,8 @@ class RunMAS extends AbstractAction {
 					if (jasonID.fMAS2jThread.fParserMAS2J.getArchitecture().equals("Centralised")) {
 						masRunner = new MASRunnerCentralised(compT);
 					} else if (jasonID.fMAS2jThread.fParserMAS2J.getArchitecture().equals("Saci")) {
-						String saciHome = jasonID.getConf().getProperty("saciHome");
-						if (jasonID.checkSaciPath(saciHome)) {
+						String saciJar = jasonID.getConf().getProperty("saciJar");
+						if (JasonID.checkJar(saciJar)) {
 							StartSaci saciThread = null;
 							Launcher l = getLauncher();
 							if (l == null) {
@@ -91,7 +91,7 @@ class RunMAS extends AbstractAction {
 							}
 							masRunner = new MASRunnerSaci(compT, saciThread);
 						} else {
-							System.err.println("Error: Saci home directory "+saciHome+" was not correctly set. Go to menu Edit->Preferences and set it.");
+							System.err.println("Error: saci.jar file ("+saciJar+") was not correctly set. Go to menu Edit->Preferences and set it.");
 							return;
 						}
 					}

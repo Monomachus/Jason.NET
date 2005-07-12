@@ -42,6 +42,7 @@ import java.io.PrintStream;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Properties;
+import java.util.StringTokenizer;
 import java.util.prefs.Preferences;
 
 import javax.swing.AbstractAction;
@@ -103,9 +104,6 @@ public class JasonID extends EditorPane {
     AbstractAction exitAppAct;
     
     public static void main(String[] args) {
-        String saciHome = null;
-        String jasonHome = null;
-        String javaHome = null;
         String currJasonVersion;
         String initProject = null;
 
@@ -125,74 +123,40 @@ public class JasonID extends EditorPane {
         		if (!userProperties.getProperty("version").equals(currJasonVersion)) { 
         			// new version, set all values to default
         			userProperties.remove("javaHome");
-        			userProperties.remove("saciHome");
-        			userProperties.remove("jasonHome");
+        			userProperties.remove("saciJar");
+        			userProperties.remove("jasonJar");
+        			userProperties.remove("log4jJar");
         		}
         	} 
-        	/*
-        	if (! confOk) {
-        		// try to get the values from args parameters
-
-        		//javaHome = null;
-                //saciHome = null;
-                
-                if (args.length >= 3) {
-                    saciHome = new File(args[1]).getAbsolutePath();
-                    javaHome = new File(args[2]).getAbsolutePath();
-                    
-                    if (checkSaciPath(saciHome)) {
-                    	userProperties.put("saciHome", saciHome);
-                    }
-                    if (checkJavaPath(javaHome)) {
-                    	userProperties.put("javaHome", javaHome);
-                    }
-                }
-                */
-                /*
-                boolean changed = false;
-                String temp = checkSaci(saciHome);
-                if (temp != null) {
-                    if (!temp.equals(saciHome)) {
-                        changed = true;
-                        saciHome = temp;
-                    }
-                }
-                temp = checkJavaHome(javaHome);
-                if (temp != null) {
-                    if (!temp.equals(javaHome)) {
-                        changed = true;
-                        javaHome = temp;
-                    }
-                }
-                if (changed) {
-                    storeEnv(saciHome, javaHome);
-                    if (System.getProperty("os.name").indexOf("indows") > 0) {
-                    		JOptionPane.showMessageDialog(null,"You need to start Jason again since the configuration was changed.");
-                    }
-                    System.exit(1);
-                }
-                */
-        	//}
 
             // try some default values for properties
-            if (userProperties.get("jasonHome") == null) {
-            	jasonHome = new File("..").getAbsolutePath();
-            	if (checkJasonPath(jasonHome)) {
-            		userProperties.put("jasonHome", jasonHome);
+            if (userProperties.get("jasonJar") == null || !checkJar(userProperties.getProperty("jasonJar"))) {
+            	String jasonJar = getPathFromClassPath("jason.jar");//new File("..").getAbsolutePath();
+            	if (checkJar(jasonJar)) {
+            		userProperties.put("jasonJar", jasonJar);
             	} else {
-            		userProperties.put("jasonHome", File.separator+"Jason");            		
+            		userProperties.put("jasonJar", File.separator);            		
             	}
             }
-            if (userProperties.get("saciHome") == null) {
-            	saciHome = new File("../lib/saci").getAbsolutePath();
-            	if (checkSaciPath(saciHome)) {
-            		userProperties.put("saciHome", saciHome);
+            if (userProperties.get("saciJar") == null  || !checkJar(userProperties.getProperty("saciJar"))) {
+            	String saciJar = getPathFromClassPath("saci.jar");//new File("../lib/saci").getAbsolutePath();
+            	if (checkJar(saciJar)) {
+            		userProperties.put("saciJar", saciJar);
             	} else {
-            		userProperties.put("saciHome", File.separator+"Saci");            		
+            		userProperties.put("saciJar", File.separator);            		
             	}
             }
+            if (userProperties.get("log4jJar") == null  || !checkJar(userProperties.getProperty("log4jJar"))) {
+            	String log4jJar = getPathFromClassPath("log4j.jar");
+            	if (checkJar(log4jJar)) {
+            		userProperties.put("log4jJar", log4jJar);
+            	} else {
+            		userProperties.put("log4jJar", File.separator);            		
+            	}
+            }
+			
             if (userProperties.get("javaHome") == null) {
-            	javaHome = "/usr";
+            	String javaHome = System.getProperty("java.home");
             	if (checkJavaPath(javaHome)) {
             		userProperties.put("javaHome", javaHome);
             	} else {
@@ -234,13 +198,22 @@ public class JasonID extends EditorPane {
     	return userProperties;
     }
     
-    static boolean checkJasonPath(String jasonHome) {
+	static boolean checkJar(String jar) {
         try {
-        	if (!jasonHome.endsWith(File.separator)) {
-        		jasonHome += File.separator;
-        	}
-        	File f = new File(jasonHome + "bin" + File.separatorChar + "jason.jar");
-        	if (f.exists()) {
+        	if (jar != null && new File(jar).exists()) {
+        		return true;
+            }
+        } catch (Exception e) {}
+        return false;
+    }
+	/*
+	static boolean checkJasonJar(String jasonJar) {
+        try {
+        	//if (!jasonHome.endsWith(File.separator)) {
+        	//	jasonHome += File.separator;
+        	//}
+        	//File f = jasonHome + "bin" + File.separatorChar + "jason.jar");
+        	if (new File(jasonJar).exists()) {
         		return true;
             }
         } catch (Exception e) {}
@@ -248,7 +221,7 @@ public class JasonID extends EditorPane {
     }
     static boolean checkSaciPath(String saciHome) {
         try {
-        	if (!saciHome.endsWith(File.separator)) {
+			if (!saciHome.endsWith(File.separator)) {
         		saciHome += File.separator;
         	}
         	File f = new File(saciHome + "bin" + File.separatorChar + "applications.dtd");
@@ -258,6 +231,8 @@ public class JasonID extends EditorPane {
         } catch (Exception e) {}
         return false;
     }
+    */
+    
     static boolean checkJavaPath(String javaHome) {
         try {
         	if (!javaHome.endsWith(File.separator)) {
@@ -271,6 +246,16 @@ public class JasonID extends EditorPane {
         } catch (Exception e) {}
         return false;
     }
+	static String getPathFromClassPath(String file) {
+		StringTokenizer st = new StringTokenizer(System.getProperty("java.class.path"), File.pathSeparator);
+		while (st.hasMoreTokens()) {
+			String token = st.nextToken();
+			if (token.endsWith(file)) {
+				return new File(token).getAbsolutePath();
+			}
+		}
+		return null;
+ 	}
 
     /*
     static String checkSaci(String saciHome) {
@@ -652,7 +637,7 @@ public class JasonID extends EditorPane {
 
     	NewProject() {
             super("New project", new ImageIcon( JasonID.class.getResource("/images/new.gif")));
-            chooser = new JFileChooser(".");
+            chooser = new JFileChooser(System.getProperty("user.dir"));
             //chooser.setFileFilter(new DirectoryFileFilter());
             chooser.setDialogTitle("Select the project directory");
             chooser.setAcceptAllFileFilterUsed(false);
@@ -702,7 +687,7 @@ public class JasonID extends EditorPane {
         JFileChooser chooser;
         OpenProject() {
             super("Open project", new ImageIcon(JasonID.class.getResource("/images/openProject.gif")));
-            chooser = new JFileChooser(".");
+            chooser = new JFileChooser(System.getProperty("user.dir"));
             chooser.setFileFilter(new JasonFileFilter());
         }
         
@@ -841,7 +826,7 @@ public class JasonID extends EditorPane {
         JFileChooser chooser;
         SaveAs() {
             super("Save as ...", new ImageIcon(JasonID.class.getResource("/images/save.gif")));
-            chooser = new JFileChooser(".");
+            chooser = new JFileChooser(System.getProperty("user.dir"));
             chooser.setFileFilter(new JasonFileFilter());
         }
         
@@ -906,19 +891,21 @@ public class JasonID extends EditorPane {
         	// jason home
         	JPanel jasonHomePanel = new JPanel();
         	jasonHomePanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-        	jasonHomePanel.add(new JLabel("Jason home:"));
+        	jasonHomePanel.add(new JLabel("Jason jar"));
         	jasonTF = new JTextField(30);
         	jasonHomePanel.add(jasonTF);
         	JButton setJason = new JButton("Set");
         	setJason.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent arg0) {
 		            try {
-		                JFileChooser chooser = new JFileChooser(".");
-		                chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-		                if (chooser.showDialog(null, "Select the Jason directory") == JFileChooser.APPROVE_OPTION) {
-		                	String jasonHome = (new File(chooser.getSelectedFile().getPath())).getCanonicalPath();
-		                	if (checkJasonPath(jasonHome)) {
-		                		saciTF.setText(jasonHome);
+						JFileChooser chooser = new JFileChooser(System.getProperty("user.dir"));
+						chooser.setDialogTitle("Select the jason.jar file");
+						chooser.setFileFilter(new JarFileFilter("jason.jar", "The Jason.jar file"));
+		                //chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+		                if (chooser.showOpenDialog(JasonID.this) == JFileChooser.APPROVE_OPTION) {
+		                	String jasonJar = (new File(chooser.getSelectedFile().getPath())).getCanonicalPath();
+		                	if (checkJar(jasonJar)) {
+								jasonTF.setText(jasonJar);
 		                	}
 		                }
 		            } catch (Exception e) {}
@@ -931,19 +918,21 @@ public class JasonID extends EditorPane {
         	// saci home
         	JPanel saciHomePanel = new JPanel();
         	saciHomePanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-        	saciHomePanel.add(new JLabel("Saci home:"));
+        	saciHomePanel.add(new JLabel("Saci jar"));
         	saciTF = new JTextField(30);
         	saciHomePanel.add(saciTF);
         	JButton setSaci = new JButton("Set");
         	setSaci.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent arg0) {
 		            try {
-		                JFileChooser chooser = new JFileChooser(".");
-		                chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-		                if (chooser.showDialog(null, "Select the Saci directory") == JFileChooser.APPROVE_OPTION) {
-		                	String saciHome = (new File(chooser.getSelectedFile().getPath())).getCanonicalPath();
-		                	if (checkSaciPath(saciHome)) {
-		                		saciTF.setText(saciHome);
+		                JFileChooser chooser = new JFileChooser(System.getProperty("user.dir"));
+						chooser.setDialogTitle("Select the Saci.jar file");
+						chooser.setFileFilter(new JarFileFilter("saci.jar", "The Saci.jar file"));
+						//chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+		                if (chooser.showOpenDialog(JasonID.this) == JFileChooser.APPROVE_OPTION) {
+		                	String saciJar = (new File(chooser.getSelectedFile().getPath())).getCanonicalPath();
+		                	if (checkJar(saciJar)) {
+		                		saciTF.setText(saciJar);
 		                	}
 		                }
 		            } catch (Exception e) {}
@@ -955,19 +944,20 @@ public class JasonID extends EditorPane {
         	// java home
         	JPanel javaHomePanel = new JPanel();
         	javaHomePanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-        	javaHomePanel.add(new JLabel("Java home:"));
+        	javaHomePanel.add(new JLabel("Java home"));
         	javaTF = new JTextField(30);
         	javaHomePanel.add(javaTF);
         	JButton setJava = new JButton("Set");
         	setJava.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent arg0) {
 		            try {
-		                JFileChooser chooser = new JFileChooser(".");
+		                JFileChooser chooser = new JFileChooser(System.getProperty("user.dir"));
+						 chooser.setDialogTitle("Select the Java Home directory");
 		                chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-		                if (chooser.showDialog(null, "Select the Jason directory") == JFileChooser.APPROVE_OPTION) {
-		                	String jasonHome = (new File(chooser.getSelectedFile().getPath())).getCanonicalPath();
-		                	if (checkJasonPath(jasonHome)) {
-		                		saciTF.setText(jasonHome);
+		                if (chooser.showOpenDialog(JasonID.this) == JFileChooser.APPROVE_OPTION) {
+		                	String javaHome = (new File(chooser.getSelectedFile().getPath())).getCanonicalPath();
+		                	if (checkJavaPath(javaHome)) {
+		                		javaTF.setText(javaHome);
 		                	}
 		                }
 		            } catch (Exception e) {}
@@ -983,11 +973,11 @@ public class JasonID extends EditorPane {
         	btPanel.add(okBt);
         	okBt.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent arg0) {
-					if (checkSaciPath(saciTF.getText())) {
-						userProperties.put("saciHome", saciTF.getText());
+					if (checkJar(saciTF.getText())) {
+						userProperties.put("saciJar", saciTF.getText());
 					}
-					if (checkJasonPath(jasonTF.getText())) {
-						userProperties.put("jasonHome", jasonTF.getText());
+					if (checkJar(jasonTF.getText())) {
+						userProperties.put("jasonJar", jasonTF.getText());
 					}
 					if (checkJavaPath(javaTF.getText())) {
 						userProperties.put("javaHome", javaTF.getText());
@@ -1010,8 +1000,8 @@ public class JasonID extends EditorPane {
         }
         
         public void actionPerformed(ActionEvent e) {
-        	saciTF.setText(userProperties.getProperty("saciHome"));
-        	jasonTF.setText(userProperties.getProperty("jasonHome"));
+        	saciTF.setText(userProperties.getProperty("saciJar"));
+        	jasonTF.setText(userProperties.getProperty("jasonJar"));
         	javaTF.setText(userProperties.getProperty("javaHome"));
         	d.setVisible(true);
         }
@@ -1088,18 +1078,23 @@ public class JasonID extends EditorPane {
             return "Jason project files";
         }
     }
-    /*
-    class DirectoryFileFilter extends FileFilter {
+
+    class JarFileFilter extends FileFilter {
+		String jar,ds;
+		public JarFileFilter(String jar, String ds) {
+			this.jar = jar;
+			this.ds  = ds;
+		}
         public boolean accept(File f) {
-            if (f.isDirectory()) {
-                return true;
+            if (f.getName().endsWith(jar)) {
+				return true;
             } else {
-            	return false;
+				return false;
             }
         }
+        
         public String getDescription() {
-            return "Directory";
+            return ds;
         }
-    }*/
-    
+    }
 }

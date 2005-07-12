@@ -60,8 +60,9 @@ public class MAS2JParserThread extends Thread {
             String text = doc.getText(0, doc.getLength());
             fParserMAS2J.ReInit(new StringReader(text));
             fParserMAS2J.setDestDir( fEditorPanel.mainID.projectDirectory );
-            fParserMAS2J.setJasonHome(fJasonID.getConf().getProperty("jasonHome"));
-            fParserMAS2J.setSaciHome(fJasonID.getConf().getProperty("saciHome"));
+            fParserMAS2J.setJasonJar(fJasonID.getConf().getProperty("jasonJar"));
+            fParserMAS2J.setSaciJar(fJasonID.getConf().getProperty("saciJar"));
+            fParserMAS2J.setLog4jJar(fJasonID.getConf().getProperty("log4jJar"));
             fParserMAS2J.setJavaHome(fJasonID.getConf().getProperty("javaHome"));
             fParserMAS2J.mas();
             fParserMAS2J.close();
