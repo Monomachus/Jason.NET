@@ -56,6 +56,7 @@ public class StdLibTest extends TestCase {
 	
 	public void testFindAll() {
 		Agent ag = new Agent();
+		ag.setLogger(null);
 		ag.addBel(Literal.parseLiteral("a(10)"), BeliefBase.TPercept, null, Intention.EmptyInt);
 		ag.addBel(Literal.parseLiteral("a(20)"), BeliefBase.TPercept, null, Intention.EmptyInt);
 		ag.addBel(Literal.parseLiteral("a(30)"), BeliefBase.TPercept, null, Intention.EmptyInt);
@@ -80,6 +81,7 @@ public class StdLibTest extends TestCase {
 	
 	public void testGetRelevantPlansAndAddPlan() {
 		Agent ag = new Agent();
+		ag.setLogger(null);
 		StringTerm pt1 = new StringTerm("@t1 +a : g(10) <- .print(\"ok 10\").");
 		ag.addPlan(pt1, new Term("nosource"));
 		ag.addPlan(new StringTerm("@t2 +a : g(20) <- .print(\"ok 20\")."), new Term("nosource"));

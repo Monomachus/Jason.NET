@@ -166,7 +166,11 @@ public class mas2j {
     }
     public void setSaciJar(String s) {
     	saciJar = s;
-    	saciHome = new File(saciJar).getParent().toString();
+    	try {
+    		saciHome = new File(saciJar).getParent().toString();
+    	} catch (Exception e) {
+    		saciHome = File.separator;
+    	}
     }
 
     public void setJavaHome(String s) {
@@ -247,7 +251,7 @@ public class mas2j {
         if (System.getProperty("os.name").indexOf("indows") > 0) {
             extraSlash = "/";
         }
-    	out.println("<!DOCTYPE saci SYSTEM \"file:"+extraSlash+saciHome+File.separator+"applications.dtd\">");
+    	//out.println("<!DOCTYPE saci SYSTEM \"file:"+extraSlash+saciHome+File.separator+"applications.dtd\">");
 	    out.println("<?xml-stylesheet href=\"file:"+extraSlash+saciHome+File.separator+"applications.xsl\" type=\"text/xsl\" ?>");
     	out.println("<saci>");
 		out.println("<application id=\""+ soc +"\">");
@@ -540,10 +544,10 @@ void agent() :              { Token agName;
 
 
                             { String agClass = jason.asSemantics.Agent.class.getName();
-                              String agArchClass = jason.architecture.SaciAgArch.class.getName();
+                              String agArchClass = jason.architecture.CentralisedAgArch.class.getName();
 
-                              if (architecture.equals("Centralised")) {
-                                  agArchClass = jason.architecture.CentralisedAgArch.class.getName();
+                              if (architecture.equals("Saci")) {
+                                  agArchClass = jason.architecture.SaciAgArch.class.getName();
                               }
                             }
 

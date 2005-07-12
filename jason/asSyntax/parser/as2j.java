@@ -36,7 +36,11 @@
                     Iterator i = bbl.iterator();
                     while (i.hasNext()) {
                        Literal l = (Literal)i.next();
-                       a.addBel(l, BeliefBase.TSelf, a.getTS().getC(), Intention.EmptyInt);
+                       Circumstance c = null;
+                       try {
+                          c = a.getTS().getC();
+                       } catch (Exception e) {}
+                       a.addBel(l, BeliefBase.TSelf, c, Intention.EmptyInt);
                     }
                  }
   }

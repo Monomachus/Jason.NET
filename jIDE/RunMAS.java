@@ -44,7 +44,6 @@ class RunMAS extends AbstractAction {
 	JasonID jasonID;
 
 	MASRunner masRunner;
-	Process saciProcess;
 
 	RunMAS(JasonID jID) {
 		super("Run MAS...", new ImageIcon(JasonID.class.getResource("/images/execute.gif")));
@@ -83,13 +82,7 @@ class RunMAS extends AbstractAction {
 					} else if (jasonID.fMAS2jThread.fParserMAS2J.getArchitecture().equals("Saci")) {
 						String saciJar = jasonID.getConf().getProperty("saciJar");
 						if (JasonID.checkJar(saciJar)) {
-							StartSaci saciThread = null;
-							Launcher l = getLauncher();
-							if (l == null) {
-								saciThread = new StartSaci();
-								saciThread.start();
-							}
-							masRunner = new MASRunnerSaci(compT, saciThread);
+							masRunner = new MASRunnerSaci(compT);
 						} else {
 							System.err.println("Error: saci.jar file ("+saciJar+") was not correctly set. Go to menu Edit->Preferences and set it.");
 							return;
@@ -107,40 +100,16 @@ class RunMAS extends AbstractAction {
 		if (masRunner != null) {
 			masRunner.stopRunner();
 		}
+		masRunner = null;
 	}
 
 	void exitJason() {
-		if (saciProcess != null) { // i've created saci
-			stopSaci();
-		}
+		stopMAS();
+		//if (saciProcess != null) { // i've created saci
+		//	stopSaci();
+		//}
 	}
 
-	void stopSaci() {
-		try {
-			Launcher l = getLauncher();
-			l.stop();
-		} catch (Exception e) {
-			try {
-				saciProcess.destroy();
-			} catch (Exception e2) {
-			}
-		}
-		saciProcess = null;
-	}
-
-	Launcher getLauncher() {
-		PrintStream err = System.err;
-		Launcher l = null;
-		try {
-			System.setErr(jasonID.originalErr);
-			l = LauncherD.getLauncher();
-			return l;
-		} catch (Exception e) {
-			return null;
-		} finally {
-			System.setErr(err);
-		}
-	}
 
 	class StartSaci extends Thread {
 
@@ -148,11 +117,38 @@ class RunMAS extends AbstractAction {
 		//BufferedReader saciErr;
 
 		boolean saciOk = false;
+		Process saciProcess;
 
 		StartSaci() {
 			super("StartSaci");
 		}
+
+		Launcher getLauncher() {
+			PrintStream err = System.err;
+			Launcher l = null;
+			try {
+				System.setErr(jasonID.originalErr);
+				l = LauncherD.getLauncher();
+				return l;
+			} catch (Exception e) {
+				return null;
+			} finally {
+				System.setErr(err);
+			}
+		}
 		
+		void stopSaci() {
+			try {
+				getLauncher().stop();
+			} catch (Exception e) {
+				try {
+					saciProcess.destroy();
+				} catch (Exception e2) {
+				}
+			}
+			saciProcess = null;
+		}
+
 		public void run() {
 			//stopSaci();
 			try {
@@ -300,7 +296,6 @@ class RunMAS extends AbstractAction {
 			jasonID.runMASButton.setEnabled(true);
 			jasonID.debugMASButton.setEnabled(true);
 			jasonID.stopMASButton.setEnabled(false);
-			
 		}
 
 		public void run() {
@@ -378,16 +373,17 @@ class RunMAS extends AbstractAction {
 	}
 
 	class MASRunnerSaci extends MASRunner {
-		StartSaci saciT;
+		StartSaci saciThread;
+		Launcher l;
+
+		boolean iHaveStartedSaci = false;
 		
-		MASRunnerSaci(CompileThread t, StartSaci st) {
+		MASRunnerSaci(CompileThread t) {
 			super(t);
-			saciT = st;
 		}
 
 		void stopRunner() {
 			try {
-				Launcher l = getLauncher();
 				if (l != null) {
 					l.killFacilitatorAgs(jasonID.getFileName());
 					l.killFacilitator(jasonID.getFileName());
@@ -398,15 +394,24 @@ class RunMAS extends AbstractAction {
 				System.err.println("Execution error: " + e);
 				e.printStackTrace();
 			}
+			if (iHaveStartedSaci) {
+				saciThread.stopSaci();
+			}
 			super.stopRunner();
 		}
 
 		public void run() {
-			if (saciT != null) {
-				if (!saciT.waitSaciOk()) {
+			saciThread = new StartSaci();
+			l = saciThread.getLauncher();
+			if (l == null) { // no saci running, start one
+				saciThread.start();
+				if (!saciThread.waitSaciOk()) {
 					return;
 				}
+				iHaveStartedSaci = true;
 			}
+			l = saciThread.getLauncher();
+
 			super.run();
 		}
 	}

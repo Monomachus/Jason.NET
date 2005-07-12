@@ -77,10 +77,14 @@ public class RunCentralisedMAS {
         Document docDOM = parse(args[0]);
         if (docDOM != null) {
 			RunCentralisedMAS r = new RunCentralisedMAS();
-			r.createAg(docDOM);
-			r.startAgs();
+			try {
+				r.createAg(docDOM);
+				r.startAgs();
 			
-			r.startSyncMode();   
+				r.startSyncMode();
+			} catch (Exception e) {
+				logger.error("Error!?:",e);
+			}
 			r.waitEnd();
         }
     }
@@ -93,7 +97,7 @@ public class RunCentralisedMAS {
         	
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             factory.setNamespaceAware(true); // se o parser considera o name space
-            
+			
             DocumentBuilder builder = factory.newDocumentBuilder();
             return builder.parse( new File( file ) );
         } catch (Exception e) {
@@ -124,7 +128,7 @@ public class RunCentralisedMAS {
                         qty = Integer.parseInt(sAg.getAttribute("qty"));
                     } catch (Exception e) {}
                     String className = sAg.getAttribute("class");
-                    String[] agArgs = saci.launcher.AgentType.getArrayFromString(sAg.getAttribute("args"));
+                    String[] agArgs = getArrayFromString(sAg.getAttribute("args"));
                     for (int cAg=0; cAg<qty; cAg++) {
                         String numberedAg = agName;
                         if (qty > 1) {
@@ -142,7 +146,7 @@ public class RunCentralisedMAS {
                 
             } catch (Exception e) {
             	logger.error("Error creating agent "+agName,e);
-                System.exit(0);
+				System.exit(0);
             }
         } // for
 	}
@@ -204,4 +208,43 @@ public class RunCentralisedMAS {
 		}
 		System.exit(0);
 	}
+
+    public static String[] getArrayFromString(String s) {
+        if (s == null) {
+            return new String[0];
+        }
+
+        List v = new ArrayList();
+        
+        s = s.trim();
+        String token = "";
+        char lookingFor = ' ';
+        for (int i = 0; i < s.length(); i++) {
+        		if (s.charAt(i) == lookingFor) {
+        			if (token.length() > 0) {
+        				v.add(token);
+        			}
+        			token = "";
+        			if (lookingFor == '\'') {
+        				lookingFor = ' ';
+        			}
+        		} else if (s.charAt(i) == '\'') {
+        			lookingFor = '\'';
+        		} else {
+        			token += s.charAt(i);
+        		}
+        }
+        if (token.length() > 0) {
+        		v.add(token);
+        }
+        
+        String[] a = new String[v.size()];
+
+        for (int i = 0; i < v.size(); i++) {
+            a[i] = (String) v.get(i);
+        }
+
+        return a;
+    }
+
 }

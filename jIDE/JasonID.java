@@ -352,7 +352,6 @@ public class JasonID extends EditorPane {
     
     public JasonID() {
         super();
-        Preferences prefs = Preferences.userNodeForPackage(JasonID.class);
         mainID = this;
         extension   = "mas2j";
 
@@ -870,7 +869,6 @@ public class JasonID extends EditorPane {
         
         public void actionPerformed(ActionEvent e) {
             if (checkNeedsSave()) {
-                runMASAct.stopMAS();
                 runMASAct.exitJason();
                 System.exit(0);
             }
