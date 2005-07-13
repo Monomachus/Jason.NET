@@ -146,7 +146,6 @@ public class RunCentralisedMAS {
                 
             } catch (Exception e) {
             	logger.error("Error creating agent "+agName,e);
-				System.exit(0);
             }
         } // for
 	}

@@ -40,7 +40,11 @@ public class SaciExecutionControl extends saci.Agent implements ExecutionControl
             mbox.addMessageHandler("cycleFinished", "tell", null, "AS-ExecControl", new MessageHandler() {
                 public boolean processMessage(saci.Message m) {
                 	String sender = (String)m.get("sender");
-            		fUserControl.receiveFinishedCycle(sender);
+                	boolean breakpoint = false;
+                	if (m.get("breakpoint") != null) {
+                		breakpoint = m.get("breakpoint").equals("true");
+                	}
+            		fUserControl.receiveFinishedCycle(sender, breakpoint);
                     return true; // no other message handler gives this message
                 }
             });

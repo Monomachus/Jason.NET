@@ -199,7 +199,7 @@ public class CentralisedAgArch extends Thread implements AgentArchitecture {
     // methods for execution control
 
 	/** inform the controller that this agent's cycle was finished (used in sync mode) */ 
-	public void informCycleFinished() {
-		fControl.receiveFinishedCycle(getName());
+	public void informCycleFinished(boolean breakpoint) {
+		fControl.receiveFinishedCycle(getName(), breakpoint);
 	}
 }

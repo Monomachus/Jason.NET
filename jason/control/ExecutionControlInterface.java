@@ -28,7 +28,8 @@ import java.util.Collection;
 import org.w3c.dom.Document;
 
 
-/** The execution control defines how the agents will run: asynchronous or synchronous.
+/** 
+ *  The execution control defines how the agents will run: asynchronous or synchronous.
  *  
  *  <p>This interface is implemented by Jason Execution Control to ecapsulate 
  *  the MAS architecture (distributed/centralised),

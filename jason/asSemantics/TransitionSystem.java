@@ -807,16 +807,25 @@ public class TransitionSystem {
 				applySemanticRule();
 			} while (step != SStartRC); // finished a reasoning cycle
 
-			logger.debug("acting");
+			logger.debug("acting... ");
 			agArch.act();
 
 			if (setts.isSync()) {
-				agArch.informCycleFinished();
+				boolean isBreakPoint = false;
+				try {
+					isBreakPoint = getC().getSelectedOption().getPlan().getLabel().hasAnnot(Plan.TBreakPoint);
+				} catch (Exception e) {
+					// no problem, the plan has no label
+					//logger.error("E!",e);
+				}
+				if (logger.isDebugEnabled()) {
+					logger.debug("Informing controller that I finished a reasoning cycle. Breakpoint is "+isBreakPoint);
+				}
+				agArch.informCycleFinished(isBreakPoint);
 			}
 			
 		} catch (Exception e) {
-			logger.error("*** ERROR detected at transition system: ");
-			e.printStackTrace();
+			logger.error("*** ERROR detected at transition system: ",e);
 		}
 	}
 

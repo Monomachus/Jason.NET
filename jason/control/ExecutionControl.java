@@ -1,5 +1,7 @@
 package jason.control;
 
+import org.apache.log4j.Logger;
+
 
 
 
@@ -25,6 +27,8 @@ public class ExecutionControl {
 
 	//private String jasonDir = "..";
 
+	static Logger logger = Logger.getLogger(ExecutionControl.class);
+
 
 	public ExecutionControl() {
 
@@ -37,9 +41,9 @@ public class ExecutionControl {
 							syncAgFinished.wait(); // waits notify
 							if (fJasonControl != null) { 
 								if (nbFinished == fJasonControl.getAgentsQty()) {
+									nbFinished = 0;
 									allAgsFinished();
 									//setAllAgFinished();
-									nbFinished = 0;
 									cycleNumber++;
 								}
 							}
@@ -75,10 +79,17 @@ public class ExecutionControl {
 	
 	
 	/** 
-	 * Called by the agent when it finishes its reasoning cycle
-	 */
-	public void receiveFinishedCycle(String agName) {
-		//System.out.println("agent "+agName+" has finished a cycle, total nb of ags is "+fJasonControl.getAgentsQty());
+	 * Called when the agent <i>agName</i> has finished its reasoning cycle.
+	 * <i>breakpoint</i> is true in case the agent selected one plan with "breakpoint" 
+	 * annotation. 
+	  */
+	public void receiveFinishedCycle(String agName, boolean breakpoint) {
+		if (logger.isDebugEnabled()) {
+			logger.debug("agent "+agName+" has finished a cycle, nb of finished ags is "+(nbFinished+1)+"/"+fJasonControl.getAgentsQty());
+			if (breakpoint) {
+				logger.debug("agent "+agName+" has achieved a breakpoint");				
+			}
+		}
 		synchronized(syncAgFinished) {
 			nbFinished++;
 			syncAgFinished.notifyAll();
@@ -93,19 +104,6 @@ public class ExecutionControl {
 		return fJasonControl;
 	}
 
-	/*
-	public void setJasonDir(String dir) {
-		if (dir.startsWith("'")) {
-			dir = dir.substring(1, dir.length()-1);
-		}
-		jasonDir = dir;
-	}
-	public String getJasonDir() {
-		return jasonDir;
-	}
-	*/
-
-	
 	/**
 	 * This method is called when setJasonExecutionControl and setJasonDir was already called
 	 */
@@ -165,7 +163,7 @@ public class ExecutionControl {
 	/** called when all agents have finished the current cycle */
 	protected void allAgsFinished() {
 		fJasonControl.informAllAgToPerformCycle();
-		System.out.println("starting cycle "+cycleNumber);
+		logger.info("starting cycle "+cycleNumber);
 	}
 
 	public int getCycleNumber() {

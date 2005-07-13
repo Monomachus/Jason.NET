@@ -43,10 +43,10 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Properties;
 import java.util.StringTokenizer;
-import java.util.prefs.Preferences;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -65,6 +65,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JToolBar;
+import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
@@ -104,8 +105,10 @@ public class JasonID extends EditorPane {
     AbstractAction exitAppAct;
     
     public static void main(String[] args) {
+        JasonID jasonID = new JasonID();
+        jasonID.createMainFrame();
+
         String currJasonVersion;
-        String initProject = null;
 
         try {
             Properties p = new Properties();
@@ -120,6 +123,8 @@ public class JasonID extends EditorPane {
         	File jasonConfFile = getUserConfFile();
         	if (jasonConfFile.exists()) {
         		userProperties.load(new FileInputStream(jasonConfFile));
+        		/*
+        		 * do not remove. If it is ok, let it!
         		if (!userProperties.getProperty("version").equals(currJasonVersion)) { 
         			// new version, set all values to default
         			userProperties.remove("javaHome");
@@ -127,33 +132,12 @@ public class JasonID extends EditorPane {
         			userProperties.remove("jasonJar");
         			userProperties.remove("log4jJar");
         		}
+        		*/
         	} 
 
-            // try some default values for properties
-            if (userProperties.get("jasonJar") == null || !checkJar(userProperties.getProperty("jasonJar"))) {
-            	String jasonJar = getPathFromClassPath("jason.jar");//new File("..").getAbsolutePath();
-            	if (checkJar(jasonJar)) {
-            		userProperties.put("jasonJar", jasonJar);
-            	} else {
-            		userProperties.put("jasonJar", File.separator);            		
-            	}
-            }
-            if (userProperties.get("saciJar") == null  || !checkJar(userProperties.getProperty("saciJar"))) {
-            	String saciJar = getPathFromClassPath("saci.jar");//new File("../lib/saci").getAbsolutePath();
-            	if (checkJar(saciJar)) {
-            		userProperties.put("saciJar", saciJar);
-            	} else {
-            		userProperties.put("saciJar", File.separator);            		
-            	}
-            }
-            if (userProperties.get("log4jJar") == null  || !checkJar(userProperties.getProperty("log4jJar"))) {
-            	String log4jJar = getPathFromClassPath("log4j.jar");
-            	if (checkJar(log4jJar)) {
-            		userProperties.put("log4jJar", log4jJar);
-            	} else {
-            		userProperties.put("log4jJar", File.separator);            		
-            	}
-            }
+        	tryToFixJarFileConf("jasonJar", "jason.jar", 300000);
+        	tryToFixJarFileConf("saciJar",  "saci.jar",  300000);
+        	tryToFixJarFileConf("log4jJar", "log4j.jar", 350000);
 			
             if (userProperties.get("javaHome") == null) {
             	String javaHome = System.getProperty("java.home");
@@ -168,13 +152,11 @@ public class JasonID extends EditorPane {
             jasonConfFile.getParentFile().mkdirs();
             storePrefs();
 
-            JasonID jasonID = new JasonID();
-
             if (args.length > 0) {
-                initProject = args[0];
+                jasonID.openAct.loadProject(new File(args[0]));
             }
-            
-            jasonID.createMainFrame(initProject);
+            jasonID.startThreads();
+
         } catch (Throwable t) {
             System.out.println("uncaught exception: " + t);
             t.printStackTrace();
@@ -197,41 +179,68 @@ public class JasonID extends EditorPane {
     public Properties getConf() {
     	return userProperties;
     }
+
+    static void tryToFixJarFileConf(String jarEntry, String jarName, int minSize) {
+    	String jarFile = userProperties.getProperty(jarEntry);
+        if (jarFile == null || !checkJar(jarFile)) {
+        	System.out.println("Wrong conf for "+jarName+", current is "+jarFile);
+        	// try to get from classpath
+        	jarFile = getPathFromClassPath(jarName);
+        	if (checkJar(jarFile)) {
+        		userProperties.put(jarEntry, jarFile);
+    			System.out.println("found at "+jarFile);
+        	} else {
+        		// try from java web start
+        		String jwsDir = System.getProperty("jnlpx.deployment.user.home");
+        		if (jwsDir == null) {
+        			// try another property (windows)
+        			try {
+        				jwsDir = System.getProperty("deployment.user.security.trusted.certs");
+        				jwsDir = new File(jwsDir).getParentFile().getParent();
+        			} catch (Exception e) {}
+        		}
+        		if (jwsDir != null) {
+            		jarFile = findFile(new File(jwsDir), jarName, minSize);
+            		System.out.print("Searching "+jarName+" in "+jwsDir+" ... ");
+            		if (jarFile != null && checkJar(jarFile)) {
+            			System.out.println("found at "+jarFile);
+            			userProperties.put(jarEntry, jarFile);            			
+            		} else {
+            			userProperties.put(jarEntry, File.separator);
+            		}
+        		}
+        	}
+        }
+    	
+    }
+    
+    static String findFile(File p, String file, int minSize) {
+    	if (p.isDirectory()) {
+    		File[] files = p.listFiles();
+    		for (int i=0; i<files.length; i++) {
+    			if (files[i].isDirectory()) {
+    				String r = findFile(files[i], file, minSize);
+    				if (r != null) {
+    					return r;
+    				}
+    			} else {
+    				if (files[i].getName().endsWith(file) && files[i].length() > minSize) {
+    					return files[i].getAbsolutePath();
+    				}
+    			}
+    		}
+    	}
+    	return null;
+    }
     
 	static boolean checkJar(String jar) {
         try {
-        	if (jar != null && new File(jar).exists()) {
+        	if (jar != null && new File(jar).exists() && jar.endsWith(".jar")) {
         		return true;
             }
         } catch (Exception e) {}
         return false;
     }
-	/*
-	static boolean checkJasonJar(String jasonJar) {
-        try {
-        	//if (!jasonHome.endsWith(File.separator)) {
-        	//	jasonHome += File.separator;
-        	//}
-        	//File f = jasonHome + "bin" + File.separatorChar + "jason.jar");
-        	if (new File(jasonJar).exists()) {
-        		return true;
-            }
-        } catch (Exception e) {}
-        return false;
-    }
-    static boolean checkSaciPath(String saciHome) {
-        try {
-			if (!saciHome.endsWith(File.separator)) {
-        		saciHome += File.separator;
-        	}
-        	File f = new File(saciHome + "bin" + File.separatorChar + "applications.dtd");
-        	if (f.exists()) {
-        		return true;
-            }
-        } catch (Exception e) {}
-        return false;
-    }
-    */
     
     static boolean checkJavaPath(String javaHome) {
         try {
@@ -257,98 +266,6 @@ public class JasonID extends EditorPane {
 		return null;
  	}
 
-    /*
-    static String checkSaci(String saciHome) {
-        boolean saciHomeOk = false;
-        while (!saciHomeOk) {
-            try {
-                if (checkSaciPath(saciHome)) {
-                    saciHomeOk = true;
-                    break;
-                } else {
-                    Object[] options = {"Ok, let me select saci installation directory", "Cancel, try to continue without saci"};
-                    int n = JOptionPane.showOptionDialog(null,
-                    "Jason needs Saci for some features!\n"+
-                    "(see jason manual for more information)\n\n"+
-                    "The current saci directory (\""+saciHome+"\") is not a saci directory.",
-                    "Saci home directory misconfigured",
-                    JOptionPane.OK_CANCEL_OPTION,
-                    JOptionPane.QUESTION_MESSAGE,
-                    null, options, options[0]);
-                    if (n == 1) {
-                        break;
-                    }
-                }
-                JFileChooser chooser = new JFileChooser(".");
-                chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-                if (chooser.showDialog(null, "Select the SACI/bin directory") == JFileChooser.APPROVE_OPTION) {
-                    saciHome = (new File(chooser.getSelectedFile().getPath())).getParentFile().getCanonicalPath();
-                }
-            } catch (Exception e) {}
-        }
-        return saciHome;
-    }
-    */
-
-    /*
-    static String checkJavaHome(String javaHome) {
-        boolean javaHomeOk = false;
-        while (!javaHomeOk) {
-            try {
-                File javac1 = new File(javaHome + File.separatorChar + "bin" + File.separatorChar + "javac");
-                File javac2 = new File(javaHome + File.separatorChar + "bin" + File.separatorChar + "javac.exe");
-                if (javac1.exists() || javac2.exists()) {
-                    javaHomeOk = true;
-                    break;
-                } else {
-                    Object[] options = {"Ok, let me select java home directory", "Cancel, try to continue without javac"};
-                    int n = JOptionPane.showOptionDialog(null,
-                    "Jason needs javac for some features!\n\n"+
-                    "The current java directory (\""+javaHome+"\") is not a java directory.",
-                    "Java home directory misconfigured",
-                    JOptionPane.OK_CANCEL_OPTION,
-                    JOptionPane.QUESTION_MESSAGE,
-                    null, options, options[0]);
-                    if (n == 1) {
-                        break;
-                    }
-                }
-                JFileChooser chooser = new JFileChooser(".");
-                chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-                if (chooser.showDialog(null, "Select the Java Home/bin directory") == JFileChooser.APPROVE_OPTION) {
-                    javaHome = (new File(chooser.getSelectedFile().getPath())).getParentFile().getCanonicalPath();
-                }
-            } catch (Exception e) {}
-        }
-        return javaHome;
-    }
-    */
-    /*
-    static void storeEnv(String saciHome, String javaHome) {
-        try {
-            if (System.getProperty("os.name").indexOf("indows") > 0) {
-                BufferedWriter out = new BufferedWriter(new FileWriter("jason.bat"));
-                out.write("@echo off\n");
-                //out.write("rem generated by jason, do not edit\n");
-                out.write("SET SACI_HOME="+saciHome+"\n");
-                out.write("SET JAVA_HOME="+javaHome+"\n");
-                out.write("SET PATH=\"%JAVA_HOME%\\bin\";%PATH%\n");
-                out.write("java -classpath classes;\"%SACI_HOME%\\bin\\saci.jar\" jIDE.JasonID \"%SACI_HOME%\" \"%JAVA_HOME%\"\n");
-                out.close();
-            } else {
-                BufferedWriter out = new BufferedWriter(new FileWriter("setenv.sh"));
-                out.write("#!/bin/sh\n");
-                out.write("export SACI_HOME="+saciHome+"\n");
-                out.write("export JAVA_HOME="+javaHome+"\n");
-                out.write("java -classpath classes:\"$SACI_HOME/bin/saci.jar\" jIDE.JasonID \"$SACI_HOME\" \"$JAVA_HOME\" $1\n");
-                out.close();
-            }
-        } catch (Exception e) {
-            System.err.println("Error writing setenv file."+e);
-        }
-    }
-    */
-    
     
     public JasonID() {
         super();
@@ -367,7 +284,7 @@ public class JasonID extends EditorPane {
     }
     
     
-    JFrame createMainFrame(String initProject) {
+    JFrame createMainFrame() {
         frame = new JFrame();
         frame.setTitle("Jason");
         //frame.setBackground(Color.lightGray);
@@ -404,16 +321,15 @@ public class JasonID extends EditorPane {
         frame.setVisible(true);
         
         
-        if (initProject != null) {
-            openAct.loadProject(new File(initProject));
-        }
+        return frame;
+    }
+
+    void startThreads() {
         fMAS2jThread = new MAS2JParserThread( this, this);
         fMAS2jThread.start();
         fASParser = new ASParserThread( this );
         fASParser.start();
-        return frame;
     }
-    
     
     protected boolean checkNeedsSave() {
         for (int i = 0; i<tab.getComponentCount(); i++) {
@@ -888,8 +804,10 @@ public class JasonID extends EditorPane {
 
         	// jason home
         	JPanel jasonHomePanel = new JPanel();
+        	jasonHomePanel.setBorder(BorderFactory.createTitledBorder(BorderFactory
+    				.createEtchedBorder(), "jason.jar file", TitledBorder.LEFT, TitledBorder.TOP));
         	jasonHomePanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-        	jasonHomePanel.add(new JLabel("Jason jar"));
+        	jasonHomePanel.add(new JLabel("Location"));
         	jasonTF = new JTextField(30);
         	jasonHomePanel.add(jasonTF);
         	JButton setJason = new JButton("Set");
@@ -915,8 +833,10 @@ public class JasonID extends EditorPane {
         	
         	// saci home
         	JPanel saciHomePanel = new JPanel();
+        	saciHomePanel.setBorder(BorderFactory.createTitledBorder(BorderFactory
+    				.createEtchedBorder(), "saci.jar file", TitledBorder.LEFT, TitledBorder.TOP));
         	saciHomePanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-        	saciHomePanel.add(new JLabel("Saci jar"));
+        	saciHomePanel.add(new JLabel("Location"));
         	saciTF = new JTextField(30);
         	saciHomePanel.add(saciTF);
         	JButton setSaci = new JButton("Set");
@@ -941,8 +861,10 @@ public class JasonID extends EditorPane {
 
         	// java home
         	JPanel javaHomePanel = new JPanel();
+        	javaHomePanel.setBorder(BorderFactory.createTitledBorder(BorderFactory
+    				.createEtchedBorder(), "Java Home", TitledBorder.LEFT, TitledBorder.TOP));
         	javaHomePanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-        	javaHomePanel.add(new JLabel("Java home"));
+        	javaHomePanel.add(new JLabel("Directory"));
         	javaTF = new JTextField(30);
         	javaHomePanel.add(javaTF);
         	JButton setJava = new JButton("Set");

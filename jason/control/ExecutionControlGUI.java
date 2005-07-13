@@ -10,6 +10,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.swing.AbstractListModel;
@@ -35,7 +36,8 @@ import org.w3c.dom.Document;
 public class ExecutionControlGUI extends ExecutionControl {
 
 	String currentAg = "";
-
+	boolean inRunMode = false;
+	
 	// xml components
 	Transformer agTransformer = null;
 
@@ -45,6 +47,7 @@ public class ExecutionControlGUI extends ExecutionControl {
 
 	// Inteface components
 	JButton jBtStep = null;
+	JButton jBtRun = null;
 
 	JTextPane jTA = null;
 
@@ -55,7 +58,8 @@ public class ExecutionControlGUI extends ExecutionControl {
 	void initComponents() {
 		JFrame frame = new JFrame("MAS Execution Control");
 
-		jBtStep = new JButton("Step all agents");
+		jBtStep = new JButton("Step");
+		jBtStep.setToolTipText("ask all agents to perform one reasoning cycle");
 		jBtStep.setEnabled(false);
 		jBtStep.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -64,7 +68,18 @@ public class ExecutionControlGUI extends ExecutionControl {
 			}
 		});
 
+		jBtRun = new JButton("Run");
+		jBtRun.setToolTipText("Run the MAS until some agent achieve a breakpoint. Breakpoints are annotations in plans' label");
+		jBtRun.setEnabled(false);
+		jBtRun.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				jBtRun.setEnabled(false);
+				inRunMode = true;
+				fJasonControl.informAllAgToPerformCycle();
+			}
+		});
 
+		
 		jTA = new JTextPane();
 		jTA.setEditable(false);
 		jTA.setContentType("text/html");
@@ -103,7 +118,7 @@ public class ExecutionControlGUI extends ExecutionControl {
 
 		JPanel pButtons = new JPanel(new FlowLayout(FlowLayout.CENTER));
 		pButtons.add(jBtStep);
-		//pButtons.add(jBtClean);
+		pButtons.add(jBtRun);
 
 		JSplitPane splitPaneHor = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 		splitPaneHor.setTopComponent(spList);
@@ -168,16 +183,29 @@ public class ExecutionControlGUI extends ExecutionControl {
 		
 	}
 
-	public void receiveFinishedCycle(String agName) {
-		super.receiveFinishedCycle(agName);
+	/** 
+	 * Called when the agent <i>agName</i> has finished its reasoning cycle.
+	 * <i>breakpoint</i> is true in case the agent selected one plan with "breakpoint" 
+	 * annotation. 
+	  */
+	public void receiveFinishedCycle(String agName, boolean breakpoint) {
+		if (breakpoint) {
+			inRunMode = false;
+		}
 		listModel.addAgent(agName);
+		super.receiveFinishedCycle(agName, breakpoint);
 	}
 
 
 	/** called when all agents have finished the current cycle */
 	protected void allAgsFinished() {
-		inspectAgent(currentAg);
-		jBtStep.setEnabled(true);
+		if (inRunMode) {
+			fJasonControl.informAllAgToPerformCycle();
+		} else {
+			inspectAgent(currentAg);
+			jBtStep.setEnabled(true);
+			jBtRun.setEnabled(true);
+		}
 	}
 
 	class MyListModel extends AbstractListModel {
@@ -186,7 +214,7 @@ public class ExecutionControlGUI extends ExecutionControl {
 		public void addAgent(String agName) {
 			if (!agents.contains(agName)) {
 				agents.add(agName);
-				//Collections.sort(agents);
+				Collections.sort(agents);
 				fireContentsChanged(this, 0, agents.size()-1);
 				//fireIntervalAdded(this, agents.size() - 1, agents.size());
 			}

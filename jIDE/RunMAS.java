@@ -278,8 +278,8 @@ class RunMAS extends AbstractAction {
 	}
 
 	class MASRunner extends Thread {
-		//String runnerClass;
 		CompileThread compT;
+		private boolean stop = false;
 		
 		Process masProcess = null;
 		OutputStreamWriter processOut;
@@ -296,6 +296,7 @@ class RunMAS extends AbstractAction {
 			jasonID.runMASButton.setEnabled(true);
 			jasonID.debugMASButton.setEnabled(true);
 			jasonID.stopMASButton.setEnabled(false);
+			stop = true;
 		}
 
 		public void run() {
@@ -310,39 +311,33 @@ class RunMAS extends AbstractAction {
 				masProcess = Runtime.getRuntime().exec(command, null,
 						new File(jasonID.projectDirectory));
 
-				//BufferedReader in = new BufferedReader(new InputStreamReader(
-				//		masProcess.getInputStream()));
-				
+				BufferedReader in = new BufferedReader(new InputStreamReader(masProcess.getInputStream()));
+				BufferedReader err = new BufferedReader(new InputStreamReader(	masProcess.getErrorStream()));
 				processOut = new OutputStreamWriter(masProcess.getOutputStream());
 
 				jasonID.stopMASButton.setEnabled(true);
 				
-				//BufferedReader err = new BufferedReader(new InputStreamReader(
-				//		masProcess.getErrorStream()));
-				
-				//stop = false;
 				
 				/*
 				if (masConsole != null) {
 					masConsole.append("MAS execution\n");
 					masConsole.append("--------------------------------------\n");
 				}
+				*/
 				
 				sleep(500);
+				stop = false;
 				while (!stop) {// || saciProcess!=null) {
 					while (!stop && in.ready()) {
-						if (masConsole != null) {
-							masConsole.append(in.readLine() + "\n");
-						}
+						System.out.println(in.readLine());
 					}
 					while (!stop && err.ready()) {
-						if (masConsole != null) {
-							masConsole.append(err.readLine() + "\n");
-						}
+						System.out.println(err.readLine());
 					}
 					sleep(250); // to not consume cpu
 				}
-
+				
+				/*
 				if (masConsole != null) {
 					masConsole.append("\n------\n");
 				}

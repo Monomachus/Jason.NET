@@ -334,9 +334,14 @@ public class SaciAgArch extends saci.Agent implements AgentArchitecture {
     private static Message cycleFinished = new Message("(tell :receiver controller :ontology AS-ExecControl :content cycleFinished)");
     
 	/** inform the remote controller that this agent's cycle was finished (used in sync mode) */ 
-	public void informCycleFinished() {
+	public void informCycleFinished(boolean breakpoint) {
 		// send a message to the executionControl agent
-		mboxPercept.sendMsg(cycleFinished);
+		// TODO: add breakpoint
+	    Message m = (Message)cycleFinished.clone();
+	    if (breakpoint) {
+	    	m.put("breakpoint","true");
+	    }
+		mboxPercept.sendMsg(m);
 	}
 
 }

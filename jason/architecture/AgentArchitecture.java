@@ -52,7 +52,12 @@ public interface AgentArchitecture {
     
     // methods for execution control
 
-	/** inform the (centralised/saci) controller that this agent's cycle was finished (used in sync mode) */ 
-	public void informCycleFinished();
-    
+	/** 
+	 *  Inform the (centralised/saci) controller that this agent's cycle 
+	 *  has finished its reasoning cycle (used in sync mode).
+	 *  
+	 *  <i>breakpoint</i> is true in case the agent selected one plan 
+	 *  with the "breakpoint"  annotation.  
+	 */ 
+	public void informCycleFinished(boolean breakpoint);
 }

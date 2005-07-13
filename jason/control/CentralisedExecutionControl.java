@@ -7,6 +7,7 @@ import jason.environment.CentralisedEnvironment;
 import java.util.Collection;
 import java.util.Iterator;
 
+import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 
 /**
@@ -17,6 +18,8 @@ public class CentralisedExecutionControl implements ExecutionControlInterface {
 	private CentralisedEnvironment    fEnv;
 	private ExecutionControl          fUserControl;
 	
+	static Logger logger = Logger.getLogger(CentralisedExecutionControl.class);
+	
 	public CentralisedExecutionControl(CentralisedEnvironment env, String userControlClass) throws JasonException {
 		fEnv = env;
         try {
@@ -25,8 +28,7 @@ public class CentralisedExecutionControl implements ExecutionControlInterface {
         	//fUserControl.setJasonDir(jasonDir);
         	fUserControl.init();
         } catch (Exception e) {
-            System.err.println("Error "+e);
-            e.printStackTrace();
+            logger.error("Error ",e);
             throw new JasonException("The user execution control class instantiation '"+userControlClass+"' has failed!"+e.getMessage());
         }
 	}
@@ -49,11 +51,13 @@ public class CentralisedExecutionControl implements ExecutionControlInterface {
 	}
 	
 	/** 
-	 * @see jason.control.ExecutionControlInterface#receiveFinishedCycle(java.lang.String)
-	 */
-	public void receiveFinishedCycle(String agName) {
+	 * Called (by the ag arch) when the agent <i>agName</i> has finished its reasoning cycle.
+	 * <i>breakpoint</i> is true in case the agent selected one plan with "breakpoint" 
+	 * annotation.
+     */
+	public void receiveFinishedCycle(String agName, boolean breakpoint) {
 		// pass to user controller
-		fUserControl.receiveFinishedCycle(agName);
+		fUserControl.receiveFinishedCycle(agName, breakpoint);
 	}
 
 	/**

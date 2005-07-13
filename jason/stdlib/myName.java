@@ -38,9 +38,10 @@ public class myName implements InternalAction {
 			if (name == null) {
 				throw new JasonException("The parameter Name of internal action 'myName' is not a term!");
 			}
-			if (!name.isVar()) {
-				throw new JasonException("The parameter Name of internal action 'myName' is not a variable!");
-			}
+			// do not need to be VAR
+			//if (!name.isVar()) {
+			//	throw new JasonException("The parameter Name of internal action 'myName' is not a variable!");
+			//}
 
 		} catch (ArrayIndexOutOfBoundsException e) {
 			throw new JasonException("The internal action 'myName' has not received one argument");

@@ -37,11 +37,13 @@ import org.w3c.dom.Element;
 public class Plan implements Cloneable, Serializable {
 
 	public static final Term TAtomic = Term.parse("atomic");	
+	public static final Term TBreakPoint = Term.parse("breakpoint");	
 	
 	Pred label = null;
 	protected Trigger tevent = null;
 	protected ArrayList context;
 	protected ArrayList body;
+
 	Boolean isAtomic = null; // if the label has atomic annotation, used to cache the value, so we do not need to seach all label annotations each isAtomic()
 	
 	
@@ -102,7 +104,7 @@ public class Plan implements Cloneable, Serializable {
 		}
 		return isAtomic.booleanValue();
 	}
-	
+
 	public Unifier relevant(Trigger te) {
 		// annots in plan's TE must be a subset of the ones in the event!
 		// (see definition of Unifier.unifies for 2 Preds)
