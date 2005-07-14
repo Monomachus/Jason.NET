@@ -22,14 +22,18 @@
 
 package jIDE;
 
+
+
 import java.awt.BorderLayout;
-import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.EOFException;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 
 import javax.swing.JEditorPane;
 import javax.swing.JPanel;
@@ -39,6 +43,8 @@ import javax.swing.event.UndoableEditListener;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.BoxView;
 import javax.swing.text.ComponentView;
+import javax.swing.text.DefaultEditorKit;
+import javax.swing.text.Document;
 import javax.swing.text.Element;
 import javax.swing.text.IconView;
 import javax.swing.text.JTextComponent;
@@ -46,7 +52,6 @@ import javax.swing.text.LabelView;
 import javax.swing.text.ParagraphView;
 import javax.swing.text.PlainDocument;
 import javax.swing.text.StyleConstants;
-import javax.swing.text.StyledEditorKit;
 import javax.swing.text.View;
 import javax.swing.text.ViewFactory;
 import javax.swing.undo.CannotRedoException;
@@ -66,6 +71,8 @@ class EditorPane extends JPanel {
 	JasonID mainID = null;
 	int tabIndex;
 
+	EditorKit editorKit = new EditorKit(new ASContext(), "text/asl");
+	
 	EditorPane() {
 		this(null, 0);
 	}
@@ -74,7 +81,7 @@ class EditorPane extends JPanel {
 		super(true);
 		this.mainID = mainID;
 		this.tabIndex = tabIndex;
-		editor = createEditor();
+		createEditor();
 		createUndoManager(editor);
 		editorScroller = new JScrollPane();
 		editorScroller.getViewport().add(editor);
@@ -99,7 +106,7 @@ class EditorPane extends JPanel {
 	}
 	
     protected String removeExtension(String s) {
-        if (mainID != null) {
+       	if (mainID != null) {
         	if (s.startsWith(mainID.projectDirectory)) {
         		s = s.substring(mainID.projectDirectory.length()+1);
         	}
@@ -116,14 +123,6 @@ class EditorPane extends JPanel {
     }
 	
 	void createNewPlainText(String text) {
-		editor.setDocument(new PlainDocument());
-
-		editor.setEditorKit(new StyledEditorKit() {
-			public ViewFactory getViewFactory() {
-				return new NumberedViewFactory();
-			}
-		});
-		
 		try {
 			editor.getDocument().insertString(0, text, null);
 		} catch (Exception ex) {
@@ -132,13 +131,29 @@ class EditorPane extends JPanel {
 		createUndoManager(editor);
 	}
 
+	void createNewPlainText(InputStream in) {
+		StringBuffer s = new StringBuffer();
+		try {
+			int c = in.read();
+			while (c != -1) {
+				s.append((char)c);
+				c = in.read();
+			}
+		} catch (EOFException e) {
+		} catch (IOException e) {
+			System.err.println("Error reading text!");
+			e.printStackTrace();
+		}
+		createNewPlainText(s.toString());
+	}
+
 	/**
 	 * Create an editor to represent the given document.
 	 */
-	protected JEditorPane createEditor() {
-		JEditorPane c = new JEditorPane(); //new JTextArea();
+	protected void createEditor() {
+		editor = new JEditorPane(); //new JTextArea();
 		
-		c.addKeyListener(new KeyListener() {
+		editor.addKeyListener(new KeyListener() {
 			boolean lastKeyWasSave = false;
 
 			public void keyTyped(KeyEvent evt) {
@@ -185,11 +200,48 @@ class EditorPane extends JPanel {
 			public void keyReleased(KeyEvent evt) {
 			}
 		});
-		c.setDragEnabled(true);
-		c.setFont(new Font("monospaced", Font.PLAIN, 12));
-
-		return c;
+		editor.setDragEnabled(true);
+		editor.setEditorKitForContentType(editorKit.getContentType(), editorKit);
+		editor.setContentType("text/asl");
+		updateFont();
 	}
+
+	public void updateFont() {
+		if (mainID != null) {
+			String font = mainID.userProperties.getProperty("font");
+			int size = 12;
+			try {
+				size = Integer.parseInt(mainID.userProperties.getProperty("fontSize"));
+			} catch (Exception e) {}
+			editorKit.getStylePreferences().setFont(font, size);
+			editor.setFont(editorKit.getStylePreferences().getFont(0));
+		}
+	}
+	
+	class EditorKit extends DefaultEditorKit {
+		ASContext context;
+		String mime;
+		EditorKit(ASContext style, String mime) {
+			context = style;
+			this.mime = mime;
+		}
+		public ASContext getStylePreferences() {
+			return context;
+		}
+		public String getContentType() {
+			return mime;
+		}
+		public Document createDefaultDocument() {
+			return new PlainDocument();
+		}
+		public final ViewFactory getViewFactory() {
+			return getStylePreferences();
+		}
+		//public ViewFactory getViewFactory() {
+		//	return new NumberedViewFactory();
+		//}
+	}
+	
 
 	private void createUndoManager(JTextComponent ed) {
 		// undo support
@@ -206,16 +258,8 @@ class EditorPane extends JPanel {
 		});
 	}
 
-	String getDefaultText(String projectName) {
-		if (projectName.length() == 0) {
-			projectName = "<replace with project name>";
-		}
-		return "MAS "
-				+ projectName
-				+ " {\n"
-				+ "\tarchitecture: Centralised\n\n"
-				+ "\t//environment: <replace with the environment class name>\n\n"
-				+ "\tagents:\n \t\tag1;\n" + "\t\t//<add moreagent name here>\n\n" + "}";
+	String getDefaultText(String s) {
+		return "// "+s+"\ndemo.\n+demo : true <- .print(\"hello world.\").";
 	}
 
 	class NumberedViewFactory implements ViewFactory {

@@ -32,6 +32,7 @@ import jason.asSemantics.TransitionSystem;
 import jason.asSyntax.ListTerm;
 import jason.asSyntax.Term;
 
+import java.io.File;
 import java.util.List;
 
 import javax.xml.transform.Transformer;
@@ -70,8 +71,11 @@ public class SaciAgArch extends saci.Agent implements AgentArchitecture {
     	
     	// create a logger
     	logger = Logger.getLogger(SaciAgArch.class.getName()+"."+getAgName());
-    	// TODO: some alternative for the user to change the log file
-    	PropertyConfigurator.configure(SaciAgArch.class.getResource("/"+RunCentralisedMAS.logPropFile));
+        if (new File(RunCentralisedMAS.logPropFile).exists()) {
+        	PropertyConfigurator.configure(RunCentralisedMAS.logPropFile);
+        } else {
+        	PropertyConfigurator.configure(SaciAgArch.class.getResource("/"+RunCentralisedMAS.logPropFile));
+        }
     
         // set the agent class
         try {

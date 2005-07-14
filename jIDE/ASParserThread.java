@@ -70,6 +70,9 @@ public class ASParserThread extends Thread {
         // compile
         try {
             editorPanel = (EditorPane)jasonID.tab.getComponentAt(tabIndex);
+            if (RunCentralisedMAS.logPropFile.startsWith(editorPanel.getFileName())) {
+            	return true;
+            }
             if (!editorPanel.needsParsing && !foregroundCompilation) {
                 return true;
             }
@@ -79,8 +82,6 @@ public class ASParserThread extends Thread {
             Document doc  = editorPanel.editor.getDocument();
             String text = doc.getText(0, doc.getLength());
             parser.ReInit(new StringReader(text));
-            //parser.bs();
-            //parser.ps();
             parser.ag(null);
             
             if (foregroundCompilation) {

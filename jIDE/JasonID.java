@@ -22,12 +22,14 @@
 
 package jIDE;
 
+
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Frame;
+import java.awt.GraphicsEnvironment;
 import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.Toolkit;
@@ -50,6 +52,7 @@ import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -102,6 +105,7 @@ public class JasonID extends EditorPane {
     RunMAS         runMASAct;
     DebugMAS       debugMASAct;
     AbstractAction stopMASAct;
+    AbstractAction editLogAct;
     AbstractAction exitAppAct;
     
     public static void main(String[] args) {
@@ -147,7 +151,15 @@ public class JasonID extends EditorPane {
             		userProperties.put("javaHome", File.separator);            		
             	}
             }
-            
+
+            if (userProperties.get("font") == null) {
+            	userProperties.put("font", "Monospaced");
+            }
+            if (userProperties.get("fontSize") == null) {
+            	userProperties.put("fontSize", "12");
+            }
+            jasonID.updateFont();
+        
             userProperties.put("version", currJasonVersion);
             jasonConfFile.getParentFile().mkdirs();
             storePrefs();
@@ -280,10 +292,30 @@ public class JasonID extends EditorPane {
 		runMASAct   = new RunMAS(this);
         debugMASAct = new DebugMAS(this);
 	    stopMASAct  = new StopMAS();
+	    editLogAct  = new EditLog();
 	    exitAppAct  = new ExitApp();
     }
     
-    
+	String getDefaultText(String s) {
+		if (s.length() == 0) {
+			s = "<replace with project name>";
+		}
+		return "MAS "
+				+ s
+				+ " {\n"
+				+ "\tarchitecture: Centralised\n\n"
+				+ "\t//environment: <replace with the environment class name>\n\n"
+				+ "\tagents:\n \t\tag1;\n" + "\t\t//<add moreagent name here>\n\n" + "}";
+	}
+
+	protected void createEditor() {
+		super.createEditor();
+		editorKit = new EditorKit(new MAS2JContext(), "text/mas2j");
+		editor.setEditorKitForContentType(editorKit.getContentType(), editorKit);
+		editor.setContentType(editorKit.getContentType());		
+	}
+
+	
     JFrame createMainFrame() {
         frame = new JFrame();
         frame.setTitle("Jason");
@@ -319,7 +351,6 @@ public class JasonID extends EditorPane {
         frame.setSize((int)(height * 1.618), height);
         split.setDividerLocation(height-200);
         frame.setVisible(true);
-        
         
         return frame;
     }
@@ -366,8 +397,9 @@ public class JasonID extends EditorPane {
                     break;
                 }
             }
-            if (!alreadyHas) {
+            if (!alreadyHas && !tab.getTitleAt(i).startsWith(RunCentralisedMAS.logPropFile)) {
                 if (checkNeedsSave(i)) {
+                	System.out.println("removing "+tab.getTitleAt(i));
                     tab.remove(i);
                     i--;
                 }
@@ -463,6 +495,7 @@ public class JasonID extends EditorPane {
         jMenuProject.add(exitAppAct);
 
         JMenu jMenuEdit = new JMenu("Edit");
+        jMenuEdit.add(editLogAct);
         jMenuEdit.add(new EditPreferences());
         
         
@@ -561,6 +594,7 @@ public class JasonID extends EditorPane {
         
         public void actionPerformed(ActionEvent e) {
             if (checkNeedsSave()) {
+            	editLogAct.setEnabled(true);
                 String tmpFileName = JOptionPane.showInputDialog("What is the new project name?");
 
                 if (tmpFileName == null) {
@@ -590,7 +624,7 @@ public class JasonID extends EditorPane {
                 newPane.modified = true;
                 newPane.needsParsing = true;
                 tab.add("new", newPane);
-                newPane.createNewPlainText("demo.\n+demo : true <- .print(\"hello world.\").");
+                newPane.createNewPlainText(newPane.getDefaultText("auto code"));
                 updateTabTitle(1, newPane, null);
                 
             }
@@ -611,6 +645,7 @@ public class JasonID extends EditorPane {
                 if (chooser.showOpenDialog(getFrame()) == JFileChooser.APPROVE_OPTION) {
                     File f = chooser.getSelectedFile();
                     if (f.isFile()) {
+                    	editLogAct.setEnabled(true);
                     	runMASButton.setEnabled(false);
                     	debugMASButton.setEnabled(false);
                         tab.removeAll();
@@ -791,11 +826,39 @@ public class JasonID extends EditorPane {
         }
     }
 
+    class EditLog extends AbstractAction {
+        EditLog() {
+            super("Edit log configuration");
+        }
+        
+        public void actionPerformed(ActionEvent e) {
+        	this.setEnabled(false);
+            EditorPane newPane = new EditorPane(JasonID.this, tab.getComponentCount());
+            newPane.setFileName(RunCentralisedMAS.logPropFile);
+            tab.add("log4j", newPane);
+            try {
+            	newPane.createNewPlainText(JasonID.class.getResource("/"+RunCentralisedMAS.logPropFile).openStream() );
+            } catch (Exception ex) {
+            	ex.printStackTrace();
+            }
+            newPane.modified = true;
+            newPane.needsParsing = false;
+            newPane.extension = "configuration";
+            updateTabTitle(tab.getComponentCount(), newPane, null);
+            tab.setSelectedIndex(tab.getComponentCount()-1);
+        }
+    }
+
+    
     class EditPreferences extends AbstractAction {
     	JDialog d = null;
     	JTextField saciTF;
     	JTextField jasonTF;
     	JTextField javaTF;
+    	JComboBox jBCFont;
+    	JComboBox jBCSize;
+    	String fonts[] = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
+    	String fontSizes[] = {"8","10","11","12","14","16","18","20","24","30","36","40"};
     	
         EditPreferences() {
             super("Preferences...");
@@ -810,7 +873,7 @@ public class JasonID extends EditorPane {
         	jasonHomePanel.add(new JLabel("Location"));
         	jasonTF = new JTextField(30);
         	jasonHomePanel.add(jasonTF);
-        	JButton setJason = new JButton("Set");
+        	JButton setJason = new JButton("Browse");
         	setJason.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent arg0) {
 		            try {
@@ -839,7 +902,7 @@ public class JasonID extends EditorPane {
         	saciHomePanel.add(new JLabel("Location"));
         	saciTF = new JTextField(30);
         	saciHomePanel.add(saciTF);
-        	JButton setSaci = new JButton("Set");
+        	JButton setSaci = new JButton("Browse");
         	setSaci.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent arg0) {
 		            try {
@@ -867,7 +930,7 @@ public class JasonID extends EditorPane {
         	javaHomePanel.add(new JLabel("Directory"));
         	javaTF = new JTextField(30);
         	javaHomePanel.add(javaTF);
-        	JButton setJava = new JButton("Set");
+        	JButton setJava = new JButton("Browse");
         	setJava.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent arg0) {
 		            try {
@@ -887,6 +950,16 @@ public class JasonID extends EditorPane {
         	d.getContentPane().add(javaHomePanel);
 
         	
+        	// font
+        	JPanel fontPanel = new JPanel();
+        	fontPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory	.createEtchedBorder(), "Font", TitledBorder.LEFT, TitledBorder.TOP));
+        	fontPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+        	jBCFont = new JComboBox(fonts);
+        	fontPanel.add(jBCFont);
+        	jBCSize = new JComboBox(fontSizes);
+        	fontPanel.add(jBCSize);
+        	d.getContentPane().add(fontPanel);
+        	
         	JPanel btPanel = new JPanel();
         	btPanel.setLayout(new FlowLayout());
         	JButton okBt = new JButton("Ok");
@@ -901,6 +974,12 @@ public class JasonID extends EditorPane {
 					}
 					if (checkJavaPath(javaTF.getText())) {
 						userProperties.put("javaHome", javaTF.getText());
+					}
+					userProperties.put("font", jBCFont.getSelectedItem());
+					userProperties.put("fontSize", jBCSize.getSelectedItem());
+					// update all tabs fonts
+					for (int i=0; i<tab.getComponentCount(); i++) {
+				        ((EditorPane)tab.getComponentAt(i)).updateFont();
 					}
 					storePrefs();
 					d.setVisible(false);
@@ -923,6 +1002,23 @@ public class JasonID extends EditorPane {
         	saciTF.setText(userProperties.getProperty("saciJar"));
         	jasonTF.setText(userProperties.getProperty("jasonJar"));
         	javaTF.setText(userProperties.getProperty("javaHome"));
+
+        	// search the current font
+        	String curFont = userProperties.getProperty("font");
+        	for (int i=0;i<fonts.length; i++) {
+        		if (fonts[i].equals(curFont)) {
+        			jBCFont.setSelectedIndex(i);
+        			break;
+        		}
+        	}
+        	// search the current font
+        	String curSize = userProperties.getProperty("fontSize");
+        	for (int i=0;i<fontSizes.length; i++) {
+        		if (fontSizes[i].equals(curSize)) {
+        			jBCSize.setSelectedIndex(i);
+        			break;
+        		}
+        	}
         	d.setVisible(true);
         }
     }

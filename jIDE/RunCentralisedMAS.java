@@ -108,6 +108,14 @@ public class RunCentralisedMAS {
 
 	void createAg(Document docDOM) {
         
+		// get soc nome
+		try {
+			Element app = (Element)docDOM.getElementsByTagName("application").item(0);
+			MASConsoleGUI.get().setTitle("MAS Console - " + app.getAttribute("id"));
+		} catch (Exception e) {
+			logger.error("can't get soc nome",e);
+		}
+		
         // create the agentes
         NodeList listAg = docDOM.getElementsByTagName("startAgent");
         for (int i=0; i<listAg.getLength(); i++) {
