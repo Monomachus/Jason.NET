@@ -66,11 +66,11 @@ public class Environment {
 	private Set uptodateAgs = Collections.synchronizedSet(new HashSet());
 	
 	
-	/** called before the start of MAS execution, the user environment could overridden it */
+	/** called before the start of MAS execution, the user environment could override it */
 	public void init() {
 	}
 	
-	/** called before the end of MAS execution, the user environment could overridden it */
+	/** called before the end of MAS execution, the user environment could override it */
 	public void stop() {
 	}
 	
@@ -191,6 +191,9 @@ public class Environment {
 		} 
 		return false;
 	}
+	
+	
+	/** clear list of global percepts */
 	public void clearPercepts() {
 		uptodateAgs.clear();
 		percepts.clear();
@@ -244,6 +247,20 @@ public class Environment {
 		}
 		return false;
 	}
+
+	/** clear list of percepts of a specific agent */
+	public void clearPercepts(String agName) {
+		if (agName != null) {
+			List agl = (List)agPercepts.get(agName);
+			if (agl != null) {
+				uptodateAgs.remove(agName);
+				agl.clear();
+				//agPercepts.put( agName, agl);
+			}
+		}
+	}
+	
+	
 	
     /**
      * called by the agent architecture to execute an action on the environment.
