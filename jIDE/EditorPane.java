@@ -50,6 +50,7 @@ import javax.swing.text.JTextComponent;
 import javax.swing.text.LabelView;
 import javax.swing.text.ParagraphView;
 import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledEditorKit;
 import javax.swing.text.View;
 import javax.swing.text.ViewFactory;
 import javax.swing.undo.CannotRedoException;
@@ -180,23 +181,20 @@ class EditorPane extends JPanel {
 
 			public void keyPressed(KeyEvent evt) {
 				lastKeyWasSave = false;
-				if ((evt.getKeyCode() == KeyEvent.VK_Z)
-						&& (evt.isControlDown())) {
+				if ((evt.getKeyCode() == KeyEvent.VK_Z) && (evt.isControlDown())) {
 					try {
 						undo.undo();
 					} catch (CannotUndoException cue) {
 						Toolkit.getDefaultToolkit().beep();
 					}
-				} else if ((evt.getKeyCode() == KeyEvent.VK_Y)
-						&& (evt.isControlDown())) {
+				} else if ((evt.getKeyCode() == KeyEvent.VK_Y) && (evt.isControlDown())) {
 					try {
 						//Redo changes
 						undo.redo();
 					} catch (CannotRedoException cue) {
 						Toolkit.getDefaultToolkit().beep();
 					}
-				} else if ((evt.getKeyCode() == KeyEvent.VK_S)
-						&& (evt.isControlDown())) {
+				} else if ((evt.getKeyCode() == KeyEvent.VK_S) && (evt.isControlDown())) {
 					try {
 						mainID.saveAct.actionPerformed(null);
 					} catch (CannotRedoException cue) {
@@ -210,6 +208,14 @@ class EditorPane extends JPanel {
 			}
 		});
 		editor.setDragEnabled(true);
+		/*
+		editor.setEditorKit(new StyledEditorKit() {
+			public ViewFactory getViewFactory() {
+				return new NumberedViewFactory();
+			}
+		});
+		*/
+		
 		//editor.setEditorKitForContentType(editorKit.getContentType(), editorKit);
 		//editor.setContentType("text/asl");
 	}
@@ -303,8 +309,7 @@ class EditorPane extends JPanel {
 			this.setInsets(top, left, bottom, right);
 		}
 
-		protected void setInsets(short top, short left, short bottom,
-				short right) {
+		protected void setInsets(short top, short left, short bottom, short right) {
 			super.setInsets(top, (short) (left + NUMBERS_WIDTH), bottom, right);
 		}
 
@@ -313,8 +318,7 @@ class EditorPane extends JPanel {
 			int previousLineCount = getPreviousLineCount();
 			int numberX = r.x - getLeftInset();
 			int numberY = r.y + r.height - 5;
-			g.drawString(Integer.toString(previousLineCount + n + 1), numberX,
-					numberY);
+			g.drawString(Integer.toString(previousLineCount + n + 1), numberX, numberY);
 		}
 
 		public int getPreviousLineCount() {

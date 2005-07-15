@@ -283,7 +283,8 @@ public class JasonID extends EditorPane {
         super();
         mainID = this;
         extension   = "mas2j";
-
+		
+		syntaxThread.stopRun();
 		syntaxThread = new MAS2JSyntaxHighLight(editor);
 		syntaxThread.start();
 
@@ -450,10 +451,12 @@ public class JasonID extends EditorPane {
             super(System.out);
         }
         public void print(String s) {
-            output.append(s);
+			output.append(s);
+			output.setCaretPosition(output.getDocument().getLength());
         }
         public void println(String s) {
-            output.append(s+"\n");
+			output.append(s+"\n");
+			output.setCaretPosition(output.getDocument().getLength());
         }
     }
     
@@ -669,7 +672,7 @@ public class JasonID extends EditorPane {
             Thread loader = new FileLoader(f, pane);
             loader.start();
             updateTabTitle(tabIndex, pane, null);
-			return loader;
+			 return loader;
         }
         
         class FileLoader extends Thread {

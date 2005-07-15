@@ -21,14 +21,17 @@ import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
 import javax.swing.text.StyledDocument;
 
-public class ASSyntaxHighLight extends Thread {
+public class ASSyntaxHighLight extends Thread { //implements CaretListener {
 	int offset = 0;
 	as2jTokenManager tm = new as2jTokenManager(new SimpleCharStream(new StringReader("")));
 	Object refreshMonitor = new Object();
 	Style commentStyle, planLabelStyle, currentVarStyle, internalActionStyle, specialAnnot;
-	Token varToken;
 	JTextPane editor;
 	ASStyles context;
+	boolean running = true;
+	
+	//Token varToken;
+	//boolean paintOnlyCurVar = false;
 	
 	public ASSyntaxHighLight(JTextPane p) {
 		super("SyntaxColoring");
@@ -55,6 +58,7 @@ public class ASSyntaxHighLight extends Thread {
 		StyleConstants.setForeground(specialAnnot, Color.red);
 				
 		addDocListener();
+		//editor.addCaretListener(this);
 	}
 	
 	public void addDocListener() {
@@ -71,7 +75,7 @@ public class ASSyntaxHighLight extends Thread {
 	public void repainAll() {
 		offset = 0;
 		while (offset < editor.getDocument().getLength()) {
-			paintLine();
+			refresh(offset);
 		}
 	}
 	
@@ -82,8 +86,13 @@ public class ASSyntaxHighLight extends Thread {
 		}
 	}
 	
+	public void stopRun() {
+		running = false;
+		refresh(0); // to wakeup the thread
+	}
+	
 	public void run() {
-		while (true) {
+		while (running) {
 			try {
 				synchronized (refreshMonitor) {
 					refreshMonitor.wait();
@@ -122,26 +131,33 @@ public class ASSyntaxHighLight extends Thread {
 						// special annots
 						} else if (t.kind == as2j.ATOM && (t.image.equals(Plan.TBreakPoint.getFunctor()) || t.image.equals(Plan.TAtomic.getFunctor()))) {
 							s = specialAnnot;
-						// set current cursor var
-						//} else if (varToken != null && t.image.equals(varToken.image)) {
-						//	s = currentVarStyle;
 						}
 						sd.setCharacterAttributes(eIni+t.beginColumn-1, t.endColumn-t.beginColumn+1,	 s, true);
-						
+
+						// set currenttoken
+						// TODO: show all var ocoorences
+						/*
+						if (t.kind == as2j.VAR && editor.getCaretPosition() >= t.beginColumn+eIni && editor.getCaretPosition() <= t.endColumn+eIni) {
+							varToken = t;
+							System.out.println("Var="+varToken);
+							paintOnlyCurVar = true;
+							repainAll();
+							paintOnlyCurVar = false;
+							//return;
+						}
+						*/
+
 						lastToken = t;
 						t = tm.getNextToken();
 					}
 					
-					// set currenttoken
-					/* TODO: with caret listener
-					if (t.kind == as2j.VAR && varToken == null && editor.getCaretPosition() >= t.beginColumn+eIni && editor.getCaretPosition() <= t.endColumn+eIni) {
-						varToken = t;
-						// paint all!
-						repainAll();
-						varToken = null;
-						return;
+					// verify the end of line comments
+					if (lastToken != null && lastToken.endColumn+eIni+1 < eEnd) {
+						sPar = sd.getText(lastToken.endColumn+eIni, eEnd-(lastToken.endColumn+eIni));
+						if (sPar.trim().startsWith("//")) {
+							sd.setCharacterAttributes(lastToken.endColumn+eIni, eEnd-(lastToken.endColumn+eIni), commentStyle, true);					
+						}
 					}
-					*/
 
 				} catch (TokenMgrError e) {}
 			}
@@ -151,6 +167,15 @@ public class ASSyntaxHighLight extends Thread {
 			ex.printStackTrace();
 		}
 	}
+
+	/*
+	public void caretUpdate(CaretEvent e) {
+        //Get the location in the text
+        refresh(e.getDot());
+		//paintLine();
+        //int mark = e.getMark();
+    }
+    */
 	
 	class DocLis implements DocumentListener {
 		public void changedUpdate(DocumentEvent arg0) {

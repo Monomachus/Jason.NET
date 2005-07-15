@@ -77,6 +77,7 @@ public class MASConsoleGUI extends JFrame  {
         });
         
         output = new JTextArea();
+        output.setEditable(false);
         JButton btClean = new JButton("Clean");
         btClean.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
@@ -99,7 +100,13 @@ public class MASConsoleGUI extends JFrame  {
     
   
 	public void append(String s) {
+		int l = output.getDocument().getLength();
+		if (l > 10000) {
+			output.setText("");
+			l = output.getDocument().getLength();
+		}
 		output.append(s);
+		output.setCaretPosition(l);
     }
     
     public void close() {
@@ -128,13 +135,13 @@ public class MASConsoleGUI extends JFrame  {
             super(System.out);
         }
         public void print(String s) {
-            output.append(s);
+			append(s);
         }
         public void println(String s) {
-            output.append(s+"\n");
+            append(s+"\n");
         }
         public void println() {
-            output.append("\n");
+            append("\n");
         }
     }
     

@@ -36,10 +36,19 @@ public class MAS2JSyntaxHighLight extends ASSyntaxHighLight {
 			} else {
 				tm.ReInit(new SimpleCharStream(new StringReader(sPar)));
 				try {
+					Token lastToken = null;
 					Token t = tm.getNextToken();
 					while (t.kind != mas2jConstants.EOF) {
 						sd.setCharacterAttributes(eIni+t.beginColumn-1, t.endColumn-t.beginColumn+1,	 context.tokenStyles[t.kind], true);
+						lastToken = t;
 						t = tm.getNextToken();
+					}
+					// verify the end of line comments
+					if (lastToken != null && lastToken.endColumn+eIni+1 < eEnd) {
+						sPar = sd.getText(lastToken.endColumn+eIni, eEnd-(lastToken.endColumn+eIni));
+						if (sPar.trim().startsWith("//")) {
+							sd.setCharacterAttributes(lastToken.endColumn+eIni, eEnd-(lastToken.endColumn+eIni), commentStyle, true);					
+						}
 					}
 				} catch (TokenMgrError e) {
 			}
