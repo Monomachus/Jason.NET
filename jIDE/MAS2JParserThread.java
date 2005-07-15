@@ -93,6 +93,7 @@ public class MAS2JParserThread extends Thread {
                 }
             }
         } catch (Exception ex) {
+			System.err.println("Error:"+ex);
             ex.printStackTrace();
         } finally {
             fCompilationDone = true;

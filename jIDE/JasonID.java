@@ -39,6 +39,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.util.Collection;
@@ -704,6 +705,8 @@ public class JasonID extends EditorPane {
                     	fMAS2jThread.stopWaiting();
                     }
 				  	 pane.syntaxThread.repainAll();
+                } catch (FileNotFoundException ex) {
+					System.err.println("File does not exists, it will be created!");
 				 } catch (java.io.IOException e) {
                 	System.err.println("I/O error for "+f+" -- "+e.getMessage());
                     e.printStackTrace();
