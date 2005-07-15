@@ -34,14 +34,14 @@ import javax.swing.text.Document;
 public class MAS2JParserThread extends Thread {
     
     mas2j fParserMAS2J;
-    EditorPane fEditorPanel;
+    MAS2JEditorPane fEditorPanel;
     JasonID fJasonID;
     boolean fStop = false;
     boolean fOk = false;
     boolean fForegroundCompilation = false;
     boolean fCompilationDone = true;
     
-    MAS2JParserThread(EditorPane editor, JasonID jasonID) {
+    MAS2JParserThread(MAS2JEditorPane editor, JasonID jasonID) {
     	super("MAS2JParser");
         fParserMAS2J = new mas2j(new StringReader(""));
         fParserMAS2J.setNoOut(true);
@@ -59,7 +59,7 @@ public class MAS2JParserThread extends Thread {
             Document doc  = fEditorPanel.editor.getDocument();
             String text = doc.getText(0, doc.getLength());
             fParserMAS2J.ReInit(new StringReader(text));
-            fParserMAS2J.setDestDir( fEditorPanel.mainID.projectDirectory );
+            fParserMAS2J.setDestDir( fJasonID.projectDirectory );
             fParserMAS2J.setJasonJar(fJasonID.getConf().getProperty("jasonJar"));
             fParserMAS2J.setSaciJar(fJasonID.getConf().getProperty("saciJar"));
             fParserMAS2J.setLog4jJar(fJasonID.getConf().getProperty("log4jJar"));
@@ -139,6 +139,7 @@ public class MAS2JParserThread extends Thread {
     
     public void stopParser() {
         fStop = true;
+        stopWaiting();
     }
     
     public void run() {

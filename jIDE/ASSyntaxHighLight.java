@@ -25,17 +25,21 @@ public class ASSyntaxHighLight extends Thread { //implements CaretListener {
 	int offset = 0;
 	as2jTokenManager tm = new as2jTokenManager(new SimpleCharStream(new StringReader("")));
 	Object refreshMonitor = new Object();
-	Style commentStyle, planLabelStyle, currentVarStyle, internalActionStyle, specialAnnot;
+	Style commentStyle, planLabelStyle, currentVarStyle, internalActionStyle, specialAnnot, errorStyle, noErrorStyle;
 	JTextPane editor;
 	ASStyles context;
 	boolean running = true;
 	
+	JasonID jasonID;
+
 	//Token varToken;
 	//boolean paintOnlyCurVar = false;
 	
-	public ASSyntaxHighLight(JTextPane p) {
+	public ASSyntaxHighLight(JTextPane p, JasonID jasonID) {
 		super("SyntaxColoring");
 		editor = p;
+		this.jasonID = jasonID;
+		
 		context = new ASStyles();
 		setPriority(Thread.MIN_PRIORITY);
 		
@@ -56,6 +60,12 @@ public class ASSyntaxHighLight extends Thread { //implements CaretListener {
 		
 		specialAnnot = context.addStyle(null, context.tokenStyles[as2j.ATOM]);
 		StyleConstants.setForeground(specialAnnot, Color.red);
+
+		errorStyle = context.addStyle(null, context.getStyle(ASStyles.DEFAULT_STYLE));
+		StyleConstants.setUnderline(errorStyle, true);
+
+		noErrorStyle = context.addStyle(null, context.getStyle(ASStyles.DEFAULT_STYLE));
+		StyleConstants.setUnderline(noErrorStyle, false);
 				
 		addDocListener();
 		//editor.addCaretListener(this);
@@ -97,7 +107,9 @@ public class ASSyntaxHighLight extends Thread { //implements CaretListener {
 				synchronized (refreshMonitor) {
 					refreshMonitor.wait();
 				}
-				paintLine();
+				if (running) {
+					paintLine();
+				}
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			}
@@ -132,7 +144,7 @@ public class ASSyntaxHighLight extends Thread { //implements CaretListener {
 						} else if (t.kind == as2j.ATOM && (t.image.equals(Plan.TBreakPoint.getFunctor()) || t.image.equals(Plan.TAtomic.getFunctor()))) {
 							s = specialAnnot;
 						}
-						sd.setCharacterAttributes(eIni+t.beginColumn-1, t.endColumn-t.beginColumn+1,	 s, true);
+						sd.setCharacterAttributes(eIni+t.beginColumn-1, t.endColumn-t.beginColumn+1, s, true);
 
 						// set currenttoken
 						// TODO: show all var ocoorences
@@ -158,6 +170,18 @@ public class ASSyntaxHighLight extends Thread { //implements CaretListener {
 							sd.setCharacterAttributes(lastToken.endColumn+eIni, eEnd-(lastToken.endColumn+eIni), commentStyle, true);					
 						}
 					}
+					
+					// cursor line (check for error in this line)
+					if (jasonID != null && jasonID.fASParser != null) {
+						if (editor.getCaretPosition() >= eIni && editor.getCaretPosition() <= eEnd) {
+							if (jasonID.fASParser.getErrorLine() != -1) {
+								sd.setCharacterAttributes(eIni, eEnd-eIni, errorStyle, false);
+							} else {
+								sd.setCharacterAttributes(eIni, eEnd-eIni, noErrorStyle, false);								
+							}
+						}
+					}
+					
 
 				} catch (TokenMgrError e) {}
 			}

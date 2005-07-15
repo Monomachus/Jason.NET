@@ -19,7 +19,7 @@ import javax.swing.text.StyledDocument;
 public class MAS2JSyntaxHighLight extends ASSyntaxHighLight {
 	mas2jTokenManager tm = new mas2jTokenManager(new SimpleCharStream(new StringReader("")));
 	public MAS2JSyntaxHighLight(JTextPane p) {
-		super(p);
+		super(p, null);
 		context = new MAS2JStyles();
 	}
 	void paintLine() {
@@ -29,7 +29,7 @@ public class MAS2JSyntaxHighLight extends ASSyntaxHighLight {
 			int eIni = ePar.getStartOffset();
 			int eEnd = ePar.getEndOffset();
 			String sPar = sd.getText(eIni, eEnd- eIni);
-			//System.out.println("$"+sPar);
+			//System.out.println("$"+sPar+"$");
 			
 			if (sPar.trim().startsWith("//")) {
 				sd.setCharacterAttributes(eIni, eEnd-eIni-1, commentStyle, true);					

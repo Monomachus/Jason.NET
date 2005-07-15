@@ -42,11 +42,18 @@ public class ASParserThread extends Thread {
     boolean foregroundCompilation = false;
     boolean forDone = true;
     boolean compilationDone = false;
+
+    int errorLine = -1;
     
     ASParserThread(JasonID jasonID) {
     	super("ASParserThread");
         this.jasonID = jasonID;
         createParser();
+    }
+    
+    /** returns the line that contains error, -1 in case of no errors. Only for current tab */
+    public int getErrorLine() {
+    	return errorLine;
     }
     
     private void createParser() {
@@ -66,10 +73,12 @@ public class ASParserThread extends Thread {
     			return false;
     		}
     	}
-        EditorPane editorPanel = null;
+        ASEditorPane editorPanel = null;
+        Document doc;
+
         // compile
         try {
-            editorPanel = (EditorPane)jasonID.tab.getComponentAt(tabIndex);
+            editorPanel = (ASEditorPane)jasonID.tab.getComponentAt(tabIndex);
             if (RunCentralisedMAS.logPropFile.startsWith(editorPanel.getFileName())) {
             	return true;
             }
@@ -79,7 +88,7 @@ public class ASParserThread extends Thread {
             if (foregroundCompilation) {
                 System.out.print("Parsing "+editorPanel.getFileName()+"...");
             }
-            Document doc  = editorPanel.editor.getDocument();
+            doc  = editorPanel.editor.getDocument();
             String text = doc.getText(0, doc.getLength());
             parser.ReInit(new StringReader(text));
             parser.ag(null);
@@ -87,12 +96,24 @@ public class ASParserThread extends Thread {
             if (foregroundCompilation) {
                 System.out.println(" parsed successfully!");
             }
+
+            if (errorLine != -1) {
+            	// update the last error line
+        		editorPanel.syntaxThread.refresh(editorPanel.editor.getCaretPosition());
+            }
+            errorLine = -1;
+            
             return true;
         } catch (ParseException ex) {
             if (foregroundCompilation) {
                 System.out.println("\nas2j: parsing errors found... \n" + ex);
             } else {
-                jasonID.updateTabTitle(tabIndex, editorPanel, "!line "+ex.currentToken.beginLine);
+            	if (jasonID.tab.getSelectedIndex() == tabIndex && ex.currentToken != null) {
+                	//jasonID.updateTabTitle(tabIndex, editorPanel, "!line "+ex.currentToken.beginLine);
+            		errorLine = ex.currentToken.beginLine;
+            		//System.out.println("error line is "+errorLine);
+            		editorPanel.syntaxThread.refresh(editorPanel.editor.getCaretPosition());
+            	}
             }
         } catch (TokenMgrError ex) {
             if (foregroundCompilation) {
@@ -159,8 +180,8 @@ public class ASParserThread extends Thread {
         compilationDone = false;
         // TODO: the following two lines (and the run method) was commented
         // since the AS online parsing does not work properly
-        //stopWaiting(); // wakeup this thread
-        //waitCompilation(); // waits the end of compilation
+        stopWaiting(); // wakeup this thread
+        waitCompilation(); // waits the end of compilation
         parseAllTabs();
         foregroundCompilation = false;
         return ok;
@@ -168,9 +189,9 @@ public class ASParserThread extends Thread {
     
     public void stopParser() {
         stop = true;
+        stopWaiting();
     }
 
-    /*
     public void run() {
         while (!stop) {
             waitSomeTime();
@@ -179,5 +200,4 @@ public class ASParserThread extends Thread {
             }
         }
     }
-    */
 }

@@ -25,10 +25,8 @@ package jIDE;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Frame;
 import java.awt.GraphicsEnvironment;
 import java.awt.GridLayout;
 import java.awt.Insets;
@@ -41,6 +39,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.Collection;
 import java.util.Iterator;
@@ -74,7 +73,7 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 
-public class JasonID extends EditorPane {
+public class JasonID {
     
     JFrame frame = null;
 	JMenuBar  menuBar;
@@ -88,6 +87,8 @@ public class JasonID extends EditorPane {
     
     MAS2JParserThread fMAS2jThread;
     ASParserThread    fASParser;
+
+    MAS2JEditorPane mas2jPane;
     
     String projectDirectory = "";
 
@@ -95,8 +96,6 @@ public class JasonID extends EditorPane {
     
     PrintStream originalOut;
     PrintStream originalErr;
-    
-    //HashMap editorFiles = new HashMap();
     
     AbstractAction newAct;
     OpenProject    openAct;
@@ -108,6 +107,12 @@ public class JasonID extends EditorPane {
     AbstractAction stopMASAct;
     AbstractAction editLogAct;
     AbstractAction exitAppAct;
+
+    
+    // --------------------------------
+    // static start up methods
+    // --------------------------------
+    
     
     public static void main(String[] args) {
         JasonID jasonID = new JasonID();
@@ -159,14 +164,17 @@ public class JasonID extends EditorPane {
             if (userProperties.get("fontSize") == null) {
             	userProperties.put("fontSize", "12");
             }
-            jasonID.updateFont();
         
             userProperties.put("version", currJasonVersion);
             jasonConfFile.getParentFile().mkdirs();
             storePrefs();
 
+            jasonID.mas2jPane.updateFont();
+
             if (args.length > 0) {
                 jasonID.openAct.loadProject(new File(args[0]));
+            } else {
+            	jasonID.mas2jPane.createNewPlainText(jasonID.mas2jPane.getDefaultText("anMAS", ""));
             }
             jasonID.startThreads();
 
@@ -279,16 +287,13 @@ public class JasonID extends EditorPane {
 		return null;
  	}
 
+    // --------------------------------
+    // non-static methods
+    // --------------------------------
     
     public JasonID() {
-        super();
-        mainID = this;
-        extension   = "mas2j";
-		
-		syntaxThread.stopRun();
-		syntaxThread = new MAS2JSyntaxHighLight(editor);
-		syntaxThread.start();
-
+    	mas2jPane = new MAS2JEditorPane(this);
+    	
 		newAct      = new NewProject();
 	    openAct     = new OpenProject();
 	    saveAct     = new Save();
@@ -301,19 +306,6 @@ public class JasonID extends EditorPane {
 	    exitAppAct  = new ExitApp();
     }
     
-	String getDefaultText(String s) {
-		if (s.length() == 0) {
-			s = "<replace with project name>";
-		}
-		return "MAS "
-				+ s
-				+ " {\n"
-				+ "\tarchitecture: Centralised\n\n"
-				+ "\t//environment: <replace with the environment class name>\n\n"
-				+ "\tagents:\n \t\tag1;\n" + "\t\t//<add moreagent name here>\n\n" + "}";
-	}
-
-	
     JFrame createMainFrame() {
         frame = new JFrame();
         frame.setTitle("Jason");
@@ -329,7 +321,7 @@ public class JasonID extends EditorPane {
         frame.getContentPane().add(BorderLayout.NORTH, createMenuBar());
         
         tab = new JTabbedPane();
-        tab.add("project", this);
+        tab.add("project", mas2jPane);
         
         int height = 440;
         
@@ -354,7 +346,15 @@ public class JasonID extends EditorPane {
     }
 
     void startThreads() {
-        fMAS2jThread = new MAS2JParserThread( this, this);
+    	if (fMAS2jThread != null) {
+    		fMAS2jThread.stopParser();
+        	while (fMAS2jThread.isAlive()); // wait it ends
+    	}
+    	if (fASParser != null) {
+    		fASParser.stopParser();
+        	while (fASParser.isAlive()); // wait it ends
+    	}
+        fMAS2jThread = new MAS2JParserThread( mas2jPane, this);
         fMAS2jThread.start();
         fASParser = new ASParserThread( this );
         fASParser.start();
@@ -370,10 +370,10 @@ public class JasonID extends EditorPane {
     }
     
     protected boolean checkNeedsSave(int indexTab) {
-        EditorPane pane = (EditorPane)tab.getComponentAt(indexTab);
+        ASEditorPane pane = (ASEditorPane)tab.getComponentAt(indexTab);
         if (pane.modified) {
             tab.setSelectedIndex(indexTab);
-            int op = JOptionPane.showConfirmDialog(mainID.getFrame(), "Do you want to save "+pane.getFileName()+"?", "Save", JOptionPane.YES_NO_CANCEL_OPTION);
+            int op = JOptionPane.showConfirmDialog(this.frame, "Do you want to save "+pane.getFileName()+"?", "Save", JOptionPane.YES_NO_CANCEL_OPTION);
             if (op == JOptionPane.YES_OPTION) {
                 saveAct.actionPerformed(null);
             } else if (op == JOptionPane.CANCEL_OPTION) {
@@ -386,40 +386,44 @@ public class JasonID extends EditorPane {
     void openAllASFiles(Collection files) {
         // remove files not used anymore
         for (int i = 1; i<tab.getComponentCount(); i++) {
-            boolean alreadyHas = false;
+        	ASEditorPane pane = (ASEditorPane) tab.getComponent(i);
+            boolean isInFiles = false;
             Iterator iFiles = files.iterator();
             while (iFiles.hasNext()) {
-                String sFile = removeExtension(iFiles.next().toString());
+                String sFile = pane.removeExtension(iFiles.next().toString());
                 if (tab.getTitleAt(i).startsWith(sFile)) {
-                    alreadyHas = true;
+                    isInFiles = true;
                     break;
                 }
             }
-            if (!alreadyHas && !tab.getTitleAt(i).startsWith(RunCentralisedMAS.logPropFile)) {
+            if (!isInFiles && !tab.getTitleAt(i).startsWith(RunCentralisedMAS.logPropFile)) {
                 if (checkNeedsSave(i)) {
-                	System.out.println("removing "+tab.getTitleAt(i));
+                	//System.out.println("removing "+tab.getTitleAt(i));
                     tab.remove(i);
                     i--;
                 }
             }
         }
+        
         Iterator iFiles = files.iterator();
         while (iFiles.hasNext()) {
             File file = new File(iFiles.next().toString());
-            String sFile = removeExtension(file.toString());
-            boolean alreadyHas = false;
+            boolean isInTab = false;
             for (int i = 1; i<tab.getComponentCount(); i++) {
-                if (tab.getTitleAt(i).startsWith(sFile)) {
-                    alreadyHas = true;
+            	ASEditorPane pane = (ASEditorPane) tab.getComponent(i);
+            	String sFile = pane.removeExtension(file.toString());
+            	if (tab.getTitleAt(i).startsWith(sFile)) {
+                    isInTab = true;
                     break;
                 }
             }
-            if (!alreadyHas) {
+            if (!isInTab) {
+            	//System.out.println(" not in tab "+file);
                 int tabIndex = tab.getComponentCount();
-                EditorPane newPane = new EditorPane(this, tabIndex);
+                ASEditorPane newPane = new ASEditorPane(this, tabIndex);
                 newPane.setFileName(file);
-                tab.add("new", newPane);
-				 openAct.load(tabIndex, file, newPane);
+                tab.add(newPane.getFileName(), newPane);
+                openAct.load(tabIndex, file, newPane);
             }
         }
     }
@@ -519,19 +523,7 @@ public class JasonID extends EditorPane {
     }
     
     
-    /**
-     * Find the hosting frame, for the file-chooser dialog.
-     */
-    Frame getFrame() {
-        for (Container p = getParent(); p != null; p = p.getParent()) {
-            if (p instanceof Frame) {
-                return (Frame) p;
-            }
-        }
-        return null;
-    }
-    
-    protected void updateTabTitle(int index, EditorPane pane, String error) {
+    protected void updateTabTitle(int index, ASEditorPane pane, String error) {
         String title = "";
         if (pane.getFileName().length() > 0) {
             title = pane.getFileName() + "." + pane.extension;
@@ -601,7 +593,7 @@ public class JasonID extends EditorPane {
                 	return;
                 }
 
-                if (chooser.showOpenDialog(getFrame()) == JFileChooser.APPROVE_OPTION) {
+                if (chooser.showOpenDialog(frame) == JFileChooser.APPROVE_OPTION) {
 					File f = chooser.getSelectedFile();
 					if (f.isDirectory()) {
 						projectDirectory = f.getAbsolutePath();
@@ -610,23 +602,25 @@ public class JasonID extends EditorPane {
 					return;
 				}
                 
+	            mas2jPane = new MAS2JEditorPane(JasonID.this);
+                mas2jPane.setFileName(tmpFileName);
+                mas2jPane.createNewPlainText(mas2jPane.getDefaultText(tmpFileName));
+                mas2jPane.modified = true;
+                mas2jPane.needsParsing = true;
+
 	            tab.removeAll();
-                tab.add("Project",  JasonID.this);
-                setFileName(tmpFileName);
-                createNewPlainText(getDefaultText(tmpFileName));
-                revalidate();
-                modified = true;
-                needsParsing = true;
-                updateTabTitle(0, (EditorPane)tab.getComponentAt(0), null);
+                tab.add("Project",  mas2jPane);
+                updateTabTitle(0, mas2jPane, null);
                     
-                EditorPane newPane = new EditorPane(JasonID.this, 1);
+                ASEditorPane newPane = new ASEditorPane(JasonID.this, 1);
                 newPane.setFileName("ag1.asl");
                 newPane.modified = true;
                 newPane.needsParsing = true;
                 tab.add("new", newPane);
                 newPane.createNewPlainText(newPane.getDefaultText("auto code"));
                 updateTabTitle(1, newPane, null);
-                
+
+                startThreads(); // to read from the new mas2j                
             }
         }
     }
@@ -642,15 +636,13 @@ public class JasonID extends EditorPane {
         
         public void actionPerformed(ActionEvent e) {
             if (checkNeedsSave()) {
-                if (chooser.showOpenDialog(getFrame()) == JFileChooser.APPROVE_OPTION) {
+                if (chooser.showOpenDialog(frame) == JFileChooser.APPROVE_OPTION) {
                     File f = chooser.getSelectedFile();
                     if (f.isFile()) {
                     	editLogAct.setEnabled(true);
                     	runMASButton.setEnabled(false);
                     	debugMASButton.setEnabled(false);
-                        tab.removeAll();
-                        tab.add(f.getName(),  JasonID.this);
-                        loadProject(f);
+                       loadProject(f);
                     }
                 }
             }
@@ -663,23 +655,27 @@ public class JasonID extends EditorPane {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            setFileName(f);
-            load(0, f, JasonID.this);
+            mas2jPane = new MAS2JEditorPane(JasonID.this);
+            mas2jPane.setFileName(f);
+            tab.removeAll();
+            tab.add(f.getName(), mas2jPane);
+            load(0, f, mas2jPane);
+            startThreads();
         }
         
-        Thread load(int tabIndex, File f, EditorPane pane) {
+        Thread load(int tabIndex, File f, ASEditorPane pane) {
             pane.createNewPlainText("");
             pane.modified = false;
             Thread loader = new FileLoader(f, pane);
             loader.start();
             updateTabTitle(tabIndex, pane, null);
-			 return loader;
+            return loader;
         }
         
         class FileLoader extends Thread {
-            EditorPane pane;
+            ASEditorPane pane;
             File f;
-            FileLoader(File f, EditorPane pane) {
+            FileLoader(File f, ASEditorPane pane) {
                 this.f = f;
                 this.pane = pane;
             }
@@ -692,7 +688,7 @@ public class JasonID extends EditorPane {
                     status.progress.setMaximum((int) f.length());
                     // try to start reading
                     java.io.Reader in = new java.io.FileReader(f);
-                    char[] buff = new char[4096];
+                    char[] buff = new char[1024];
                     int nch;
                     while ((nch = in.read(buff, 0, buff.length)) != -1) {
                         doc.insertString(doc.getLength(), new String(buff, 0, nch), null);
@@ -728,10 +724,10 @@ public class JasonID extends EditorPane {
         }
         
         public void actionPerformed(ActionEvent e) {
-            savePane(tab.getSelectedIndex(), (EditorPane)tab.getSelectedComponent());
+            savePane(tab.getSelectedIndex(), (ASEditorPane)tab.getSelectedComponent());
         }
 		
-		public void savePane(int index, EditorPane pane) {
+		public void savePane(int index, ASEditorPane pane) {
             if (pane.getFileName().length() == 0) {
                 saveAsAct.actionPerformed(null);
             } else {
@@ -767,7 +763,7 @@ public class JasonID extends EditorPane {
         
         public void actionPerformed(ActionEvent e) {
 	        for (int i = 0; i<tab.getComponentCount(); i++) {
-				EditorPane pane = (EditorPane)tab.getComponentAt(i);
+				ASEditorPane pane = (ASEditorPane)tab.getComponentAt(i);
 		        if (pane.modified) {
 					saveAct.savePane(i,pane);
 		        }
@@ -785,15 +781,15 @@ public class JasonID extends EditorPane {
         }
         
         public void actionPerformed(ActionEvent e) {
-            if (chooser.showSaveDialog(getFrame()) == JFileChooser.APPROVE_OPTION) {
+            if (chooser.showSaveDialog(frame) == JFileChooser.APPROVE_OPTION) {
+                ASEditorPane pane = (ASEditorPane)tab.getSelectedComponent();
                 File f = chooser.getSelectedFile();
-                if (! f.getName().toLowerCase().endsWith(extension)) {
-                    f = new File(f.getPath()+"."+extension);
+                if (! f.getName().toLowerCase().endsWith(pane.extension)) {
+                    f = new File(f.getPath()+"."+pane.extension);
                 }
-                if (f.getName().toLowerCase().endsWith(extension)) {
+                if (f.getName().toLowerCase().endsWith(pane.extension)) {
                     projectDirectory = f.getParentFile().getPath();
                 }
-                EditorPane pane = (EditorPane)tab.getSelectedComponent();
                 
                 pane.setFileName(f);
                 saveAct.actionPerformed(e);
@@ -837,11 +833,16 @@ public class JasonID extends EditorPane {
         
         public void actionPerformed(ActionEvent e) {
         	this.setEnabled(false);
-            EditorPane newPane = new EditorPane(JasonID.this, tab.getComponentCount());
+            ASEditorPane newPane = new ASEditorPane(JasonID.this, tab.getComponentCount());
             newPane.setFileName(RunCentralisedMAS.logPropFile);
             tab.add("log4j", newPane);
             try {
-            	newPane.createNewPlainText(JasonID.class.getResource("/"+RunCentralisedMAS.logPropFile).openStream() );
+            	InputStream in = JasonID.class.getResource("/"+RunCentralisedMAS.logPropFile).openStream();
+            	File f = new File(projectDirectory + File.separator + RunCentralisedMAS.logPropFile);
+            	if (f.exists()) {
+            		in = new FileInputStream(f);
+            	}
+            	newPane.createNewPlainText(in);
             } catch (Exception ex) {
             	ex.printStackTrace();
             }
@@ -885,7 +886,7 @@ public class JasonID extends EditorPane {
 						chooser.setDialogTitle("Select the jason.jar file");
 						chooser.setFileFilter(new JarFileFilter("jason.jar", "The Jason.jar file"));
 		                //chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-		                if (chooser.showOpenDialog(JasonID.this) == JFileChooser.APPROVE_OPTION) {
+		                if (chooser.showOpenDialog(frame) == JFileChooser.APPROVE_OPTION) {
 		                	String jasonJar = (new File(chooser.getSelectedFile().getPath())).getCanonicalPath();
 		                	if (checkJar(jasonJar)) {
 								jasonTF.setText(jasonJar);
@@ -914,7 +915,7 @@ public class JasonID extends EditorPane {
 						chooser.setDialogTitle("Select the Saci.jar file");
 						chooser.setFileFilter(new JarFileFilter("saci.jar", "The Saci.jar file"));
 						//chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-		                if (chooser.showOpenDialog(JasonID.this) == JFileChooser.APPROVE_OPTION) {
+		                if (chooser.showOpenDialog(frame) == JFileChooser.APPROVE_OPTION) {
 		                	String saciJar = (new File(chooser.getSelectedFile().getPath())).getCanonicalPath();
 		                	if (checkJar(saciJar)) {
 		                		saciTF.setText(saciJar);
@@ -941,7 +942,7 @@ public class JasonID extends EditorPane {
 		                JFileChooser chooser = new JFileChooser(System.getProperty("user.dir"));
 						 chooser.setDialogTitle("Select the Java Home directory");
 		                chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-		                if (chooser.showOpenDialog(JasonID.this) == JFileChooser.APPROVE_OPTION) {
+		                if (chooser.showOpenDialog(frame) == JFileChooser.APPROVE_OPTION) {
 		                	String javaHome = (new File(chooser.getSelectedFile().getPath())).getCanonicalPath();
 		                	if (checkJavaPath(javaHome)) {
 		                		javaTF.setText(javaHome);
@@ -983,7 +984,7 @@ public class JasonID extends EditorPane {
 					userProperties.put("fontSize", jBCSize.getSelectedItem());
 					// update all tabs fonts
 					for (int i=0; i<tab.getComponentCount(); i++) {
-				        ((EditorPane)tab.getComponentAt(i)).updateFont();
+				        ((ASEditorPane)tab.getComponentAt(i)).updateFont();
 					}
 					storePrefs();
 					d.setVisible(false);
@@ -1046,7 +1047,7 @@ public class JasonID extends EditorPane {
                 build = " build " + p.get("build") + " on " + p.get("build.date") + "\n\n";
             } catch (Exception ex) { }
 
-            JOptionPane.showMessageDialog( getFrame(),
+            JOptionPane.showMessageDialog( frame,
             version +  build+
             "Copyright (C) 2003-2005  Rafael H. Bordini, Jomi F. Hubner, et al.\n\n"+
             "This library is free software; you can redistribute it and/or\n"+
@@ -1085,7 +1086,7 @@ public class JasonID extends EditorPane {
                 ext = s.substring(i+1).toLowerCase();
             }
             if (ext != null) {
-                if (ext.equals(extension)) {
+                if (ext.equals(mas2jPane.extension)) {
                     return true;
                 } else {
                     return false;

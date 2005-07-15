@@ -189,16 +189,16 @@ class RunMAS extends AbstractAction {
 				if (!saciOk) {
 					JOptionPane
 							.showMessageDialog(
-									jasonID.getFrame(),
+									jasonID.frame,
 									"Fail to automatically start saci! \nGo to \""
 											+ jasonID.projectDirectory
 											+ "\" directory and run the saci-"
-											+ jasonID.getFileName()
+											+ jasonID.fMAS2jThread.fParserMAS2J.getSocName()
 											+ " script.\n\nClick 'ok' when the saci is running.");
 					wait(1000);
 					if (!saciOk) {
 						JOptionPane
-								.showMessageDialog(jasonID.getFrame(),
+								.showMessageDialog(jasonID.frame,
 										"Saci is not running. Use centralised architecture to run the MAS");
 					}
 				}
@@ -380,11 +380,12 @@ class RunMAS extends AbstractAction {
 
 		void stopRunner() {
 			try {
+				String socName = jasonID.fMAS2jThread.fParserMAS2J.getSocName();
 				if (l != null) {
-					l.killFacilitatorAgs(jasonID.getFileName());
-					l.killFacilitator(jasonID.getFileName());
-					l.killFacilitatorAgs(jasonID.getFileName() + "-env");
-					l.killFacilitator(jasonID.getFileName() + "-env");
+					l.killFacilitatorAgs(socName);
+					l.killFacilitator(socName);
+					l.killFacilitatorAgs(socName + "-env");
+					l.killFacilitator(socName + "-env");
 				}
 			} catch (Exception e) {
 				System.err.println("Execution error: " + e);
