@@ -23,12 +23,6 @@
 package jIDE;
 
 
-import jIDE.parser.SimpleCharStream;
-import jIDE.parser.Token;
-import jIDE.parser.TokenMgrError;
-import jIDE.parser.mas2jConstants;
-import jIDE.parser.mas2jTokenManager;
-
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
@@ -47,7 +41,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
-import java.io.StringReader;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Properties;
@@ -79,8 +72,6 @@ import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
-import javax.swing.text.Element;
-import javax.swing.text.StyledDocument;
 
 public class JasonID extends EditorPane {
     
@@ -293,8 +284,7 @@ public class JasonID extends EditorPane {
         mainID = this;
         extension   = "mas2j";
 
-		context      = new MAS2JContext();
-		syntaxThread = new MAS2JSyntaxHighLight();
+		syntaxThread = new MAS2JSyntaxHighLight(editor);
 		syntaxThread.start();
 
 		newAct      = new NewProject();
@@ -320,39 +310,6 @@ public class JasonID extends EditorPane {
 				+ "\t//environment: <replace with the environment class name>\n\n"
 				+ "\tagents:\n \t\tag1;\n" + "\t\t//<add moreagent name here>\n\n" + "}";
 	}
-
-	
-	class MAS2JSyntaxHighLight extends ASSyntaxHighLight {
-		mas2jTokenManager tm = new mas2jTokenManager(new SimpleCharStream(new StringReader("")));
-		void paintLine() {
-			try {
-				StyledDocument sd = (StyledDocument) editor.getDocument();
-				Element ePar = sd.getParagraphElement(offset);
-				int eIni = ePar.getStartOffset();
-				int eEnd = ePar.getEndOffset();
-				String sPar = sd.getText(eIni, eEnd- eIni);
-				//System.out.println("$"+sPar);
-				
-				if (sPar.trim().startsWith("//")) {
-					sd.setCharacterAttributes(eIni, eEnd-eIni-1, commentStyle, true);					
-				} else {
-					tm.ReInit(new SimpleCharStream(new StringReader(sPar)));
-					try {
-						Token t = tm.getNextToken();
-						while (t.kind != mas2jConstants.EOF) {
-							sd.setCharacterAttributes(eIni+t.beginColumn-1, t.endColumn-t.beginColumn+1,	 context.tokenStyles[t.kind], true);
-							t = tm.getNextToken();
-						}
-					} catch (TokenMgrError e) {
-				}
-				}
-				offset = eEnd;
-			} catch (Exception ex) {
-				ex.printStackTrace();
-			}
-		}
-	}	
-	
 
 	
     JFrame createMainFrame() {

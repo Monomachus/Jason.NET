@@ -61,7 +61,7 @@
         break label_1;
       }
       F = l();
-      jj_consume_token(21);
+      jj_consume_token(22);
                      if(!F.isGround()) {
                                          {if (true) throw new ParseException("Error: Initial belief must be ground!\n       Cannot use "+F+" as initial belief.");}
                      }
@@ -79,7 +79,7 @@
       pl = p();
                pp.add(pl);
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case 22:
+      case TK_LABEL_AT:
       case 25:
       case 26:
         ;
@@ -96,8 +96,8 @@
   final public Plan p() throws ParseException {
              Trigger T; ArrayList C; ArrayList H; Pred L = null;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case 22:
-      jj_consume_token(22);
+    case TK_LABEL_AT:
+      jj_consume_token(TK_LABEL_AT);
       L = at();
       break;
     default:
@@ -109,7 +109,7 @@
     C = ct();
     jj_consume_token(24);
     H = bd();
-    jj_consume_token(21);
+    jj_consume_token(22);
                                    {if (true) return new Plan(L,T,C,H);}
     throw new Error("Missing return statement in function");
   }
@@ -624,7 +624,7 @@
       jj_la1_1();
    }
    private static void jj_la1_0() {
-      jj_la1_0 = new int[] {0x4480,0x6400000,0x400000,0x6000000,0x18000000,0x18000000,0x400,0x4480,0x20000000,0x200,0xec80,0x0,0xec80,0x0,0x4000ec80,0x2800,0x0,0x1e000000,0x1e000000,0xc480,0x40000000,0x0,0x0,0x0,0xed80,0x0,0x8000,0x0,};
+      jj_la1_0 = new int[] {0x8480,0x6000800,0x800,0x6000000,0x18000000,0x18000000,0x400,0x8480,0x20000000,0x200,0x1d480,0x0,0x1d480,0x0,0x4001d480,0x5000,0x0,0x1e000000,0x1e000000,0x18480,0x40000000,0x0,0x0,0x0,0x1d580,0x0,0x10000,0x0,};
    }
    private static void jj_la1_1() {
       jj_la1_1 = new int[] {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x7f,0x0,0x7f,0x0,0x0,0x80,0x0,0x0,0x0,0x0,0x100,0x400,0x400,0x100,0x400,0x100,0x800,};

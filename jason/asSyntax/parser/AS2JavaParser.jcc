@@ -70,6 +70,9 @@ TOKEN : {
 | <TK_NOT:  "not">
 | <TK_NEG:  "~">
 
+// special chars
+| <TK_LABEL_AT: "@">
+
 // Numbers
 |   <NUMBER: ("-")? ["0"-"9"] (["0"-"9"])*
           | (("-")? ["0"-"9"])* "." (["0"-"9"])+ (<EXPONENT>)?
@@ -138,7 +141,7 @@ PlanLibrary ps() : { PlanLibrary pp = new PlanLibrary(); Plan pl;  }
 
 Plan p() : { Trigger T; ArrayList C; ArrayList H; Pred L = null; }
 {
-  [ "@" L=at() ] 
+  [ <TK_LABEL_AT> L=at() ] 
     T=te() 
     ":" C=ct() 
     "<-" H=bd() "." 

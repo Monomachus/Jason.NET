@@ -24,14 +24,7 @@ package jIDE;
 
 
 
-import jason.asSyntax.parser.SimpleCharStream;
-import jason.asSyntax.parser.Token;
-import jason.asSyntax.parser.TokenMgrError;
-import jason.asSyntax.parser.as2j;
-import jason.asSyntax.parser.as2jTokenManager;
-
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
@@ -41,26 +34,22 @@ import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringReader;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import javax.swing.event.UndoableEditEvent;
 import javax.swing.event.UndoableEditListener;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.BoxView;
 import javax.swing.text.ComponentView;
+import javax.swing.text.DefaultStyledDocument;
 import javax.swing.text.Element;
 import javax.swing.text.IconView;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.LabelView;
 import javax.swing.text.ParagraphView;
-import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
-import javax.swing.text.StyledDocument;
 import javax.swing.text.View;
 import javax.swing.text.ViewFactory;
 import javax.swing.undo.CannotRedoException;
@@ -81,7 +70,7 @@ class EditorPane extends JPanel {
 	int tabIndex;
 
 	//EditorKit editorKit = new EditorKit(new ASContext(), "text/asl");
-	ASContext context = new ASContext();
+	//ASContext context = new ASContext();
 	ASSyntaxHighLight syntaxThread;
 	
 	
@@ -100,9 +89,8 @@ class EditorPane extends JPanel {
 		setLayout(new BorderLayout());
 		add(BorderLayout.CENTER, editorScroller);
 
-		syntaxThread = new ASSyntaxHighLight();
+		syntaxThread = new ASSyntaxHighLight(editor);
 		syntaxThread.start();
-		editor.getDocument().addDocumentListener(new ASDocLis());
 		
 		updateFont();
 	}
@@ -141,12 +129,14 @@ class EditorPane extends JPanel {
     }
 	
 	void createNewPlainText(String text) {
+		editor.setDocument(new DefaultStyledDocument());
 		try {
 			editor.getDocument().insertString(0, text, null);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
 		createUndoManager(editor);
+		syntaxThread.addDocListener();
 		syntaxThread.repainAll();
 	}
 
@@ -231,100 +221,10 @@ class EditorPane extends JPanel {
 			try {
 				size = Integer.parseInt(JasonID.userProperties.getProperty("fontSize"));
 			} catch (Exception e) {}
-			context.setFont(font, size);
-			editor.setFont(context.getFont(context.tokenStyles[0]));
-			syntaxThread.repainAll();
+			syntaxThread.setFont(font, size);
 		}
 	}
 
-	class ASDocLis implements DocumentListener {
-		public void changedUpdate(DocumentEvent arg0) {
-			updateSyntax(arg0);
-		}
-		public void insertUpdate(DocumentEvent arg0) {
-			updateSyntax(arg0);
-		}
-		public void removeUpdate(DocumentEvent arg0) {
-			updateSyntax(arg0);
-		}
-		void updateSyntax(DocumentEvent e) {
-			if (syntaxThread != null) {
-				syntaxThread.refresh(e.getOffset());
-			}
-		}
-	}
-	
-	class ASSyntaxHighLight extends Thread {
-		int offset = 0;
-		as2jTokenManager tm = new as2jTokenManager(new SimpleCharStream(new StringReader("")));
-		Object refreshMonitor = new Object();
-		Style commentStyle;
-		
-		public ASSyntaxHighLight() {//JTextPane p) {
-			super("SyntaxColoring");
-			//editor = p;
-			setPriority(Thread.MIN_PRIORITY);
-			commentStyle = context.addStyle(null, context.getStyle(context.DEFAULT_STYLE));
-			StyleConstants.setForeground(commentStyle, new Color(102, 153, 153));
-			StyleConstants.setItalic(commentStyle, true);
-		}
-		
-		public void repainAll() {
-			offset = 0;
-			while (offset < editor.getDocument().getLength()) {
-				paintLine();
-			}
-		}
-		
-		public void refresh(int offset) {
-			this.offset = offset;
-			synchronized (refreshMonitor) {
-				refreshMonitor.notifyAll();
-			}
-		}
-		
-		public void run() {
-			while (true) {
-				try {
-					synchronized (refreshMonitor) {
-						refreshMonitor.wait();
-					}
-					paintLine();
-				} catch (Exception ex) {
-					ex.printStackTrace();
-				}
-			}
-		}
-		
-		void paintLine() {
-			try {
-				StyledDocument sd = (StyledDocument) editor.getDocument();
-				Element ePar = sd.getParagraphElement(offset);
-				int eIni = ePar.getStartOffset();
-				int eEnd = ePar.getEndOffset();
-				String sPar = sd.getText(eIni, eEnd- eIni);
-				//System.out.println("$"+sPar);
-				
-				if (sPar.trim().startsWith("//")) {
-					sd.setCharacterAttributes(eIni, eEnd-eIni-1, commentStyle, true);					
-				} else {
-					tm.ReInit(new SimpleCharStream(new StringReader(sPar)));
-					try {
-						Token t = tm.getNextToken();
-						while (t.kind != as2j.EOF) {
-							sd.setCharacterAttributes(eIni+t.beginColumn-1, t.endColumn-t.beginColumn+1,	 context.tokenStyles[t.kind], true);
-							t = tm.getNextToken();
-						}
-					} catch (TokenMgrError e) {
-				}
-				}
-				offset = eEnd;
-			} catch (Exception ex) {
-				ex.printStackTrace();
-			}
-		}
-	}	
-	
 	
 /*	
 	class EditorKit extends DefaultEditorKit {

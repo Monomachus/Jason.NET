@@ -293,9 +293,6 @@ class RunMAS extends AbstractAction {
 			if (masProcess != null) {
 				masProcess.destroy();
 			}
-			jasonID.runMASButton.setEnabled(true);
-			jasonID.debugMASButton.setEnabled(true);
-			jasonID.stopMASButton.setEnabled(false);
 			stop = true;
 		}
 
@@ -345,6 +342,10 @@ class RunMAS extends AbstractAction {
 			} catch (Exception e) {
 				System.err.println("Execution error: " + e);
 				e.printStackTrace();
+			} finally {
+				jasonID.runMASButton.setEnabled(true);
+				jasonID.debugMASButton.setEnabled(true);
+				jasonID.stopMASButton.setEnabled(false);				
 			}
 		}
 	}
