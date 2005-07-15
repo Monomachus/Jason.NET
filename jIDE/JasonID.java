@@ -23,6 +23,12 @@
 package jIDE;
 
 
+import jIDE.parser.SimpleCharStream;
+import jIDE.parser.Token;
+import jIDE.parser.TokenMgrError;
+import jIDE.parser.mas2jConstants;
+import jIDE.parser.mas2jTokenManager;
+
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
@@ -41,6 +47,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
+import java.io.StringReader;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Properties;
@@ -72,6 +79,8 @@ import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
+import javax.swing.text.Element;
+import javax.swing.text.StyledDocument;
 
 public class JasonID extends EditorPane {
     
@@ -284,6 +293,10 @@ public class JasonID extends EditorPane {
         mainID = this;
         extension   = "mas2j";
 
+		context      = new MAS2JContext();
+		syntaxThread = new MAS2JSyntaxHighLight();
+		syntaxThread.start();
+
 		newAct      = new NewProject();
 	    openAct     = new OpenProject();
 	    saveAct     = new Save();
@@ -308,12 +321,38 @@ public class JasonID extends EditorPane {
 				+ "\tagents:\n \t\tag1;\n" + "\t\t//<add moreagent name here>\n\n" + "}";
 	}
 
-	protected void createEditor() {
-		super.createEditor();
-		editorKit = new EditorKit(new MAS2JContext(), "text/mas2j");
-		editor.setEditorKitForContentType(editorKit.getContentType(), editorKit);
-		editor.setContentType(editorKit.getContentType());		
-	}
+	
+	class MAS2JSyntaxHighLight extends ASSyntaxHighLight {
+		mas2jTokenManager tm = new mas2jTokenManager(new SimpleCharStream(new StringReader("")));
+		void paintLine() {
+			try {
+				StyledDocument sd = (StyledDocument) editor.getDocument();
+				Element ePar = sd.getParagraphElement(offset);
+				int eIni = ePar.getStartOffset();
+				int eEnd = ePar.getEndOffset();
+				String sPar = sd.getText(eIni, eEnd- eIni);
+				//System.out.println("$"+sPar);
+				
+				if (sPar.trim().startsWith("//")) {
+					sd.setCharacterAttributes(eIni, eEnd-eIni-1, commentStyle, true);					
+				} else {
+					tm.ReInit(new SimpleCharStream(new StringReader(sPar)));
+					try {
+						Token t = tm.getNextToken();
+						while (t.kind != mas2jConstants.EOF) {
+							sd.setCharacterAttributes(eIni+t.beginColumn-1, t.endColumn-t.beginColumn+1,	 context.tokenStyles[t.kind], true);
+							t = tm.getNextToken();
+						}
+					} catch (TokenMgrError e) {
+				}
+				}
+				offset = eEnd;
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+		}
+	}	
+	
 
 	
     JFrame createMainFrame() {
@@ -421,7 +460,7 @@ public class JasonID extends EditorPane {
                 EditorPane newPane = new EditorPane(this, tabIndex);
                 newPane.setFileName(file);
                 tab.add("new", newPane);
-                openAct.load(tabIndex, file, newPane);
+				 openAct.load(tabIndex, file, newPane);
             }
         }
     }
@@ -667,12 +706,13 @@ public class JasonID extends EditorPane {
             load(0, f, JasonID.this);
         }
         
-        void load(int tabIndex, File f, EditorPane pane) {
+        Thread load(int tabIndex, File f, EditorPane pane) {
             pane.createNewPlainText("");
             pane.modified = false;
             Thread loader = new FileLoader(f, pane);
             loader.start();
             updateTabTitle(tabIndex, pane, null);
+			return loader;
         }
         
         class FileLoader extends Thread {
@@ -703,7 +743,8 @@ public class JasonID extends EditorPane {
                     if (fMAS2jThread != null) {
                     	fMAS2jThread.stopWaiting();
                     }
-                } catch (java.io.IOException e) {
+				  	 pane.syntaxThread.repainAll();
+				 } catch (java.io.IOException e) {
                 	System.err.println("I/O error for "+f+" -- "+e.getMessage());
                     e.printStackTrace();
                 } catch (BadLocationException e) {

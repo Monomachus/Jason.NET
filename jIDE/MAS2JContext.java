@@ -1,27 +1,14 @@
 package jIDE;
 
-import jIDE.parser.SimpleCharStream;
-import jIDE.parser.Token;
-import jIDE.parser.TokenMgrError;
 import jIDE.parser.mas2jConstants;
-import jIDE.parser.mas2jTokenManager;
 
 import java.awt.Color;
-import java.awt.Graphics;
-import java.io.StringReader;
 
-import javax.swing.text.BadLocationException;
-import javax.swing.text.Document;
-import javax.swing.text.Element;
-import javax.swing.text.Segment;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
-import javax.swing.text.Utilities;
-import javax.swing.text.View;
-import javax.swing.text.ViewFactory;
 
-public class MAS2JContext extends ASContext implements ViewFactory {
+public class MAS2JContext extends ASContext { //implements ViewFactory {
 
 	/**
 	 * Constructs a set of styles to represent java lexical tokens. By default
@@ -81,7 +68,7 @@ public class MAS2JContext extends ASContext implements ViewFactory {
 	}
 
 	// --- ViewFactory methods -------------------------------------
-
+	/*
 	public View create(Element elem) {
 		return new MAS2JView(elem);
 	}
@@ -90,27 +77,6 @@ public class MAS2JContext extends ASContext implements ViewFactory {
 		MAS2JView(Element elem) {
 			super(elem);
 		}
-		/**
-		 * Renders the given range in the model as normal unselected text. This
-		 * is implemented to paint colors based upon the token-to-color
-		 * translations. To reduce the number of calls to the Graphics object,
-		 * text is batched up until a color change is detected or the entire
-		 * requested range has been reached.
-		 * 
-		 * @param g
-		 *            the graphics context
-		 * @param x
-		 *            the starting X coordinate
-		 * @param y
-		 *            the starting Y coordinate
-		 * @param p0
-		 *            the beginning position in the model
-		 * @param p1
-		 *            the ending position in the model
-		 * @returns the location of the end of the range
-		 * @exception BadLocationException
-		 *                if the range is invalid
-		 */
 		protected int drawUnselectedText(Graphics g, int x, int y, int p0, int p1) throws BadLocationException {
 			Document doc = getDocument();
 			String text = doc.getText(p0, p1-p0);
@@ -155,4 +121,5 @@ public class MAS2JContext extends ASContext implements ViewFactory {
 			return x;
 		}
 	}
+*/
 }

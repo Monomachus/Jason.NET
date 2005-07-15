@@ -1,30 +1,15 @@
 package jIDE;
 
-import jason.asSyntax.parser.SimpleCharStream;
-import jason.asSyntax.parser.Token;
-import jason.asSyntax.parser.TokenMgrError;
 import jason.asSyntax.parser.as2j;
-import jason.asSyntax.parser.as2jTokenManager;
 
 import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.io.StringReader;
 
-import javax.swing.text.BadLocationException;
-import javax.swing.text.Document;
-import javax.swing.text.Element;
-import javax.swing.text.Segment;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
-import javax.swing.text.Utilities;
-import javax.swing.text.View;
-import javax.swing.text.ViewFactory;
-import javax.swing.text.WrappedPlainView;
 
-public class ASContext extends StyleContext implements ViewFactory {
+public class ASContext extends StyleContext { //implements ViewFactory {
 
 	/**
 	 * The styles representing the actual token types.
@@ -34,12 +19,12 @@ public class ASContext extends StyleContext implements ViewFactory {
 	/**
 	 * Cache of foreground colors to represent the various tokens.
 	 */
-	transient Color[] tokenColors;
+	//transient Color[] tokenColors;
 
 	/**
 	 * Cache of fonts to represent the various tokens.
 	 */
-	transient Font[] tokenFonts;
+	//transient Font[] tokenFonts;
 
 	
 	/**
@@ -131,10 +116,11 @@ public class ASContext extends StyleContext implements ViewFactory {
 		Style root = getStyle(DEFAULT_STYLE);
 		StyleConstants.setFontFamily(root, font);
 		StyleConstants.setFontSize(root, size);
-		tokenColors = null;
-		tokenFonts = null;
+		//tokenColors = null;
+		//tokenFonts = null;
 	}
 
+	/*
 	public Color getForeground(int code) {
 		if (tokenColors == null) {
 			tokenColors = new Color[as2j.tokenImage.length];
@@ -171,17 +157,19 @@ public class ASContext extends StyleContext implements ViewFactory {
 	public View create(Element elem) {
 		return new ASView(elem);
 	}
+	*/
 
 	/**
 	 * View that uses the lexical information to determine the style
 	 * characteristics of the text that it renders. This simply colorizes the
 	 * various tokens and assumes a constant font family and size.
 	 */
+	/*
 	class ASView extends WrappedPlainView {
 		ASView(Element elem) {
 			super(elem);
 		}
-
+*/
 		/**
 		 * Renders using the given rendering surface and area on that surface.
 		 * This is implemented to invalidate the lexical scanner after rendering
@@ -222,7 +210,7 @@ public class ASContext extends StyleContext implements ViewFactory {
 		 * @exception BadLocationException
 		 *                if the range is invalid
 		 */
-		protected int drawUnselectedText(Graphics g, int x, int y, int p0, int p1) throws BadLocationException {
+	/*	protected int drawUnselectedText(Graphics g, int x, int y, int p0, int p1) throws BadLocationException {
 			Document doc = getDocument();
 			String text = doc.getText(p0, p1-p0);
 			//System.out.println(p0 +"-"+p1+"="+text);
@@ -265,5 +253,5 @@ public class ASContext extends StyleContext implements ViewFactory {
 			}
 			return x;
 		}
-	}
+	} */
 }
