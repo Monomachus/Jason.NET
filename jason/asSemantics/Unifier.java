@@ -29,6 +29,7 @@ import jason.asSyntax.Pred;
 import jason.asSyntax.Term;
 import jason.asSyntax.Trigger;
 import jason.asSyntax.VarTerm;
+import jason.asSyntax.ExprTerm;
 
 import java.util.HashMap;
 import java.util.List;
@@ -141,6 +142,40 @@ public class Unifier implements Cloneable {
         
 		List t1gl = t1g.getTerms();
 		List t2gl = t2g.getTerms();
+
+		// check if an expression needs solving, before anything else
+		try {
+			ExprTerm t1ge = (ExprTerm)t1g;
+			try {
+				ExprTerm t2ge = (ExprTerm)t2g;
+			} catch (ClassCastException e) {
+				// t1 is expr but t2 is not
+				// TODO Jomi: ve se tem jeito mais facil de ver se e' inteiro
+				double t1gd = t1ge.solve();
+				String t1gs = Double.toString(t1gd);
+				if (t1gs.endsWith(".0")) {
+					t1g = new Term(Long.toString(Math.round(t1gd)));
+				}
+				else {
+					t1g = new Term(t1gs);
+				}
+			}
+		} catch (ClassCastException e) {
+			try {
+				ExprTerm t2ge = (ExprTerm)t2g;
+				// t1 is not expr but t2 is
+				// TODO Jomi: ve se tem jeito mais facil de ver se e' inteiro
+				double t2gd = t2ge.solve();
+				String t2gs = Double.toString(t2gd);
+				if (t2gs.endsWith(".0")) {
+					t2g = new Term(Long.toString(Math.round(t2gd)));
+				}
+				else {
+					t2g = new Term(t2gs);
+				}
+			} catch (ClassCastException e2) {
+			}
+		}
 		
         // identical variables or constants
 		if (t1g.equals(t2g)) {

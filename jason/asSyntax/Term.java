@@ -158,6 +158,9 @@ public class Term implements Cloneable, Comparable, Serializable {
 	public boolean isInternalAction() {
 		return false;
 	}
+	public boolean isExpr() {
+		return false;
+	}
 
 	public boolean isGround() {
 		for (int i=0; i<getTermsSize(); i++) {
@@ -261,6 +264,16 @@ public class Term implements Cloneable, Comparable, Serializable {
 			l.add(ti.clone());
 		}
 		return l;
+	}
+
+	public double toDouble() {
+		try {
+			return Double.parseDouble(functor);
+		} catch (Exception e) {
+			System.err.println("Error converting to double " + functor);
+			e.printStackTrace();
+			return 0;
+		}
 	}
 	
 	public String toString() {

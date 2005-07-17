@@ -21,7 +21,8 @@
 
 
 options {
-  //LOOKAHEAD=5;
+//  LOOKAHEAD=2;
+//  FORCE_LA_CHECK=true;
   STATIC=false;
 }
 
@@ -273,17 +274,65 @@ ArrayList bd() : { BodyLiteral F;
 
 BodyLiteral f() : { Literal A; Token k;
                     byte formType = BodyLiteral.HAction;
+                        Term op1 = null;
+                        Term op2 = null; 
+                        String operator = "";
+                        boolean change = false;
+                        BodyLiteral rel;
+
                   }
 {
-  [ ( "!"  { formType = BodyLiteral.HAchieve; }
+// goals and belief updates
+ (
+   (  "!"  { formType = BodyLiteral.HAchieve; }
     | "?"  { formType = BodyLiteral.HTest; }
     | "+"  { formType = BodyLiteral.HAddBel; }
     | "-"  { formType = BodyLiteral.HDelBel; }
-    )
-  ]
-  ( A=l()       { return new BodyLiteral(formType,A); }
-  | k = <VAR>   { return new BodyLiteral(formType,new VarTerm(k.image)); } // used in communication "+C"
-  )
+   )
+   ( A=l()       { return new BodyLiteral(formType,A); }
+   | k = <VAR>   { return new BodyLiteral(formType,new VarTerm(k.image)); } // used in communication "+C"
+   )
+ |
+// acoes
+   A=l()       { return new BodyLiteral(formType,A); }
+// arithmetic expresions
+ | (  op1 = expression()      { rel = null; }
+//    | op1 = value()  { rel = null; }
+//    | k = <VAR>      { op1 = new VarTerm(k.image); 
+//                       rel = new BodyLiteral(formType,new Literal(op1)); }
+   )
+                     
+    [
+       ( "<"         { operator = ".gt"; change = true; } 
+       | "<="        { operator = ".gte"; change = true; } 
+       | ">"         { operator = ".gt"; } 
+       | ">="        { operator = ".gte"; } 
+       | "=="        { operator = ".equals"; } 
+       | "\\=="      { operator = ".notequals"; } 
+       | "="         { operator = ".unifies"; } 
+       )
+
+       ( op2 = expression()
+//       | op2 = value()
+//       | k = <VAR>   { op2 = new VarTerm(k.image); }
+       )
+                     { rel = new BodyLiteral(formType, new Literal(true, new Pred(operator)));
+                       if (!change) {
+   					      rel.addTerm(op1); 
+   					      rel.addTerm(op2); 
+   					   } else {
+   					      rel.addTerm(op2); 
+   					      rel.addTerm(op1); 
+   					   }
+   					 }
+    ]
+    { if (rel == null) {
+        throw new ParseException("Body literal: problem with expression");
+      } else {
+        return rel; 
+      }
+    }
+ )
 }
 
 
@@ -301,7 +350,48 @@ Pred at() : { Token K; Pred p = new Pred(); Term t; }
   { return p; }
 }
 
+Term expression() : { Term t1, op, t2; }
+{
+   t1 = trm() { op=null; t2=null; }
+[   ("+"{op = ExprTerm.EOplus;} | "-" {op = ExprTerm.EOminus;})
+   t2 = expression() { return new ExprTerm(t1,op,t2); }
+]  { if (op==null) return t1;
+     else return new ExprTerm(t1,op,t2); }
+// TODO fix conflict with unary - followed by VAR as BelDel/arithm!!!
+// | "-" t1 = trm() { return new ExprTerm(EOminus,t1); }
+}
 
+Term trm() : {Term t1, op, t2;}
+{
+   t1 = factor() { op=null; t2=null; }
+[   ("*"{op = ExprTerm.EOtimes;} | "/" {op = ExprTerm.EOdiv;})
+   t2 = trm() { return new ExprTerm(t1,op,t2); }
+]  { if (op==null) return t1;
+     else return new ExprTerm(t1,op,t2); }
+}
+
+Term factor() : { Term t1, op, t2; }
+{
+   t1 = other() { op=null; t2=null; }
+[   ("%"{op = ExprTerm.EOmod;} | "**" {op = ExprTerm.EOpow;})
+   t2 = factor() { return new ExprTerm(t1,op,t2); }
+]  { if (op==null) return t1;
+     else return new ExprTerm(t1,op,t2); }
+}
+
+Term other() : { Term t; }
+{
+ ( t = simple()
+ | "(" t = expression() ")"
+ ) {return t; }
+}
+
+Term simple() : { Token K; Term t; }
+{
+ ( K = <NUMBER> { t = new Term(K.image); }
+ | K = <VAR> { t = (Term) new VarTerm(K.image); }
+ ) {return t; }
+}
 
 /* List of terms as parameters */
 Term lt(Term u) : { Term v; }

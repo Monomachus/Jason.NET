@@ -393,6 +393,11 @@
   final public BodyLiteral f() throws ParseException {
                     Literal A; Token k;
                     byte formType = BodyLiteral.HAction;
+                        Term op1 = null;
+                        Term op2 = null;
+                        String operator = "";
+                        boolean change = false;
+                        BodyLiteral rel;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case 25:
     case 26:
@@ -420,24 +425,99 @@
         jj_consume_token(-1);
         throw new ParseException();
       }
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case TK_TRUE:
+      case TK_NEG:
+      case ATOM:
+        A = l();
+                   {if (true) return new BodyLiteral(formType,A);}
+        break;
+      case VAR:
+        k = jj_consume_token(VAR);
+                   {if (true) return new BodyLiteral(formType,new VarTerm(k.image));}
+        break;
+      default:
+        jj_la1[18] = jj_gen;
+        jj_consume_token(-1);
+        throw new ParseException();
+      }
       break;
-    default:
-      jj_la1[18] = jj_gen;
-      ;
-    }
-    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case TK_TRUE:
     case TK_NEG:
     case ATOM:
-      A = l();
-                  {if (true) return new BodyLiteral(formType,A);}
+      // acoes
+         A = l();
+                 {if (true) return new BodyLiteral(formType,A);}
       break;
+    case NUMBER:
     case VAR:
-      k = jj_consume_token(VAR);
-                  {if (true) return new BodyLiteral(formType,new VarTerm(k.image));}
+    case 30:
+      op1 = expression();
+                                rel = null;
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case 32:
+      case 33:
+      case 34:
+      case 35:
+      case 36:
+      case 37:
+      case 38:
+        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        case 32:
+          jj_consume_token(32);
+                       operator = ".gt"; change = true;
+          break;
+        case 33:
+          jj_consume_token(33);
+                       operator = ".gte"; change = true;
+          break;
+        case 34:
+          jj_consume_token(34);
+                       operator = ".gt";
+          break;
+        case 35:
+          jj_consume_token(35);
+                       operator = ".gte";
+          break;
+        case 36:
+          jj_consume_token(36);
+                       operator = ".equals";
+          break;
+        case 37:
+          jj_consume_token(37);
+                       operator = ".notequals";
+          break;
+        case 38:
+          jj_consume_token(38);
+                       operator = ".unifies";
+          break;
+        default:
+          jj_la1[19] = jj_gen;
+          jj_consume_token(-1);
+          throw new ParseException();
+        }
+        op2 = expression();
+                       rel = new BodyLiteral(formType, new Literal(true, new Pred(operator)));
+                       if (!change) {
+                                              rel.addTerm(op1);
+                                              rel.addTerm(op2);
+                                           } else {
+                                              rel.addTerm(op2);
+                                              rel.addTerm(op1);
+                                           }
+        break;
+      default:
+        jj_la1[20] = jj_gen;
+        ;
+      }
+      if (rel == null) {
+        {if (true) throw new ParseException("Body literal: problem with expression");}
+      } else {
+        {if (true) return rel;}
+      }
       break;
     default:
-      jj_la1[19] = jj_gen;
+      jj_la1[21] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -456,7 +536,7 @@
       jj_consume_token(31);
       break;
     default:
-      jj_la1[20] = jj_gen;
+      jj_la1[22] = jj_gen;
       ;
     }
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -466,10 +546,150 @@
       jj_consume_token(41);
       break;
     default:
-      jj_la1[21] = jj_gen;
+      jj_la1[23] = jj_gen;
       ;
     }
     {if (true) return p;}
+    throw new Error("Missing return statement in function");
+  }
+
+  final public Term expression() throws ParseException {
+                      Term t1, op, t2;
+    t1 = trm();
+                op=null; t2=null;
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case 25:
+    case 26:
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case 25:
+        jj_consume_token(25);
+         op = ExprTerm.EOplus;
+        break;
+      case 26:
+        jj_consume_token(26);
+                                       op = ExprTerm.EOminus;
+        break;
+      default:
+        jj_la1[24] = jj_gen;
+        jj_consume_token(-1);
+        throw new ParseException();
+      }
+      t2 = expression();
+                       {if (true) return new ExprTerm(t1,op,t2);}
+      break;
+    default:
+      jj_la1[25] = jj_gen;
+      ;
+    }
+     if (op==null) {if (true) return t1;}
+     else {if (true) return new ExprTerm(t1,op,t2);}
+    throw new Error("Missing return statement in function");
+  }
+
+  final public Term trm() throws ParseException {
+              Term t1, op, t2;
+    t1 = factor();
+                   op=null; t2=null;
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case 42:
+    case 43:
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case 42:
+        jj_consume_token(42);
+         op = ExprTerm.EOtimes;
+        break;
+      case 43:
+        jj_consume_token(43);
+                                        op = ExprTerm.EOdiv;
+        break;
+      default:
+        jj_la1[26] = jj_gen;
+        jj_consume_token(-1);
+        throw new ParseException();
+      }
+      t2 = trm();
+                {if (true) return new ExprTerm(t1,op,t2);}
+      break;
+    default:
+      jj_la1[27] = jj_gen;
+      ;
+    }
+     if (op==null) {if (true) return t1;}
+     else {if (true) return new ExprTerm(t1,op,t2);}
+    throw new Error("Missing return statement in function");
+  }
+
+  final public Term factor() throws ParseException {
+                  Term t1, op, t2;
+    t1 = other();
+                  op=null; t2=null;
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case 44:
+    case 45:
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case 44:
+        jj_consume_token(44);
+         op = ExprTerm.EOmod;
+        break;
+      case 45:
+        jj_consume_token(45);
+                                       op = ExprTerm.EOpow;
+        break;
+      default:
+        jj_la1[28] = jj_gen;
+        jj_consume_token(-1);
+        throw new ParseException();
+      }
+      t2 = factor();
+                   {if (true) return new ExprTerm(t1,op,t2);}
+      break;
+    default:
+      jj_la1[29] = jj_gen;
+      ;
+    }
+     if (op==null) {if (true) return t1;}
+     else {if (true) return new ExprTerm(t1,op,t2);}
+    throw new Error("Missing return statement in function");
+  }
+
+  final public Term other() throws ParseException {
+                 Term t;
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case NUMBER:
+    case VAR:
+      t = simple();
+      break;
+    case 30:
+      jj_consume_token(30);
+      t = expression();
+      jj_consume_token(31);
+      break;
+    default:
+      jj_la1[30] = jj_gen;
+      jj_consume_token(-1);
+      throw new ParseException();
+    }
+    {if (true) return t;}
+    throw new Error("Missing return statement in function");
+  }
+
+  final public Term simple() throws ParseException {
+                  Token K; Term t;
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case NUMBER:
+      K = jj_consume_token(NUMBER);
+                  t = new Term(K.image);
+      break;
+    case VAR:
+      K = jj_consume_token(VAR);
+               t = (Term) new VarTerm(K.image);
+      break;
+    default:
+      jj_la1[31] = jj_gen;
+      jj_consume_token(-1);
+      throw new ParseException();
+    }
+    {if (true) return t;}
     throw new Error("Missing return statement in function");
   }
 
@@ -481,14 +701,14 @@
     label_3:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case 42:
+      case 46:
         ;
         break;
       default:
-        jj_la1[22] = jj_gen;
+        jj_la1[32] = jj_gen;
         break label_3;
       }
-      jj_consume_token(42);
+      jj_consume_token(46);
       v = t();
                 u.addTerm(v);
     }
@@ -508,14 +728,14 @@
     label_4:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case 42:
+      case 46:
         ;
         break;
       default:
-        jj_la1[23] = jj_gen;
+        jj_la1[33] = jj_gen;
         break label_4;
       }
-      jj_consume_token(42);
+      jj_consume_token(46);
       v = t();
                 //if(!v.isGround()) {
                 //  throw new ParseException("Error: Annotations must be ground!\n       Cannot use "+v+" as annotation.");
@@ -558,7 +778,7 @@
                    {if (true) return new Term(K.image);}
       break;
     default:
-      jj_la1[24] = jj_gen;
+      jj_la1[34] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -573,20 +793,20 @@
     label_5:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case 42:
+      case 46:
         ;
         break;
       default:
-        jj_la1[25] = jj_gen;
+        jj_la1[35] = jj_gen;
         break label_5;
       }
-      jj_consume_token(42);
+      jj_consume_token(46);
       f = t();
                         last = last.add(f);
     }
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case 43:
-      jj_consume_token(43);
+    case 47:
+      jj_consume_token(47);
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case VAR:
         K = jj_consume_token(VAR);
@@ -597,13 +817,13 @@
                         last = last.concat((ListTerm)f);
         break;
       default:
-        jj_la1[26] = jj_gen;
+        jj_la1[36] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
       break;
     default:
-      jj_la1[27] = jj_gen;
+      jj_la1[37] = jj_gen;
       ;
     }
     jj_consume_token(41);
@@ -616,7 +836,7 @@
   public Token token, jj_nt;
   private int jj_ntk;
   private int jj_gen;
-  final private int[] jj_la1 = new int[28];
+  final private int[] jj_la1 = new int[38];
   static private int[] jj_la1_0;
   static private int[] jj_la1_1;
   static {
@@ -624,10 +844,10 @@
       jj_la1_1();
    }
    private static void jj_la1_0() {
-      jj_la1_0 = new int[] {0x8480,0x6000800,0x800,0x6000000,0x18000000,0x18000000,0x400,0x8480,0x20000000,0x200,0x1d480,0x0,0x1d480,0x0,0x4001d480,0x5000,0x0,0x1e000000,0x1e000000,0x18480,0x40000000,0x0,0x0,0x0,0x1d580,0x0,0x10000,0x0,};
+      jj_la1_0 = new int[] {0x8480,0x6000800,0x800,0x6000000,0x18000000,0x18000000,0x400,0x8480,0x20000000,0x200,0x1d480,0x0,0x1d480,0x0,0x4001d480,0x5000,0x0,0x1e000000,0x18480,0x0,0x0,0x5e019480,0x40000000,0x0,0x6000000,0x6000000,0x0,0x0,0x0,0x0,0x40011000,0x11000,0x0,0x0,0x1d580,0x0,0x10000,0x0,};
    }
    private static void jj_la1_1() {
-      jj_la1_1 = new int[] {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x7f,0x0,0x7f,0x0,0x0,0x80,0x0,0x0,0x0,0x0,0x100,0x400,0x400,0x100,0x400,0x100,0x800,};
+      jj_la1_1 = new int[] {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x7f,0x0,0x7f,0x0,0x0,0x80,0x0,0x0,0x7f,0x7f,0x0,0x0,0x100,0x0,0x0,0xc00,0xc00,0x3000,0x3000,0x0,0x0,0x4000,0x4000,0x100,0x4000,0x100,0x8000,};
    }
 
   public as2j(java.io.InputStream stream) {
@@ -636,7 +856,7 @@
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 28; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 38; i++) jj_la1[i] = -1;
   }
 
   public void ReInit(java.io.InputStream stream) {
@@ -645,7 +865,7 @@
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 28; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 38; i++) jj_la1[i] = -1;
   }
 
   public as2j(java.io.Reader stream) {
@@ -654,7 +874,7 @@
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 28; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 38; i++) jj_la1[i] = -1;
   }
 
   public void ReInit(java.io.Reader stream) {
@@ -663,7 +883,7 @@
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 28; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 38; i++) jj_la1[i] = -1;
   }
 
   public as2j(as2jTokenManager tm) {
@@ -671,7 +891,7 @@
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 28; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 38; i++) jj_la1[i] = -1;
   }
 
   public void ReInit(as2jTokenManager tm) {
@@ -679,7 +899,7 @@
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 28; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 38; i++) jj_la1[i] = -1;
   }
 
   final private Token jj_consume_token(int kind) throws ParseException {
@@ -726,15 +946,15 @@
 
   public ParseException generateParseException() {
     jj_expentries.removeAllElements();
-    boolean[] la1tokens = new boolean[44];
-    for (int i = 0; i < 44; i++) {
+    boolean[] la1tokens = new boolean[48];
+    for (int i = 0; i < 48; i++) {
       la1tokens[i] = false;
     }
     if (jj_kind >= 0) {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
     }
-    for (int i = 0; i < 28; i++) {
+    for (int i = 0; i < 38; i++) {
       if (jj_la1[i] == jj_gen) {
         for (int j = 0; j < 32; j++) {
           if ((jj_la1_0[i] & (1<<j)) != 0) {
@@ -746,7 +966,7 @@
         }
       }
     }
-    for (int i = 0; i < 44; i++) {
+    for (int i = 0; i < 48; i++) {
       if (la1tokens[i]) {
         jj_expentry = new int[1];
         jj_expentry[0] = i;

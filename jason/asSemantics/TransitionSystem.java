@@ -76,6 +76,7 @@ public class TransitionSystem {
 	AgentArchitecture agArch = null;
 
 	private byte step = SStartRC; // First step of the SOS
+	private int nrcslbr; // number of reasoning cycles since last belief revision
 
 	// both configuration and configuration' point to this
 	// object, this is just to make it look more like the SOS
@@ -94,6 +95,8 @@ public class TransitionSystem {
 		// we need to initialise this "aliases"
 		conf = confP = this;
 
+		nrcslbr = setts.nrcbp(); // to do BR to start with
+		
 		setLogger(agArch);
 		if (setts != null) {
 			logger.setLevel(setts.log4JLevel());
@@ -258,9 +261,9 @@ public class TransitionSystem {
 		else {
 			if (conf.C.SE.trigger.isGoal()) {
 				generateGoalDeletionFromEvent();
-				logger.warn("Found an internal event for which there is no relevant plan:\n"+ conf.C.SE);
+				logger.warn("Found a goal for which there is no relevant plan:\n"+ conf.C.SE);
 			}
-			// e.g. goal addition as internal event, just go ahead
+			// e.g. belief addition as internal event, just go ahead
 			else if (conf.C.SE.isInternal()) {
 				confP.C.SI = conf.C.SE.intention;
 				updateIntention();
@@ -280,7 +283,23 @@ public class TransitionSystem {
 		if (!confP.C.AP.isEmpty() || setts.retrieve()) { // retrieve is mainly fo Coo-AgentSpeak
 			confP.step = SSelAppl;
 		} else { // Rule Appl2
-			generateGoalDeletionFromEvent(); // can't carry on, no applicable plan.
+			if (conf.C.SE.trigger.isGoal()) {
+				generateGoalDeletionFromEvent(); // can't carry on, no applicable plan.
+				logger.warn("Found a goal for which there is no applicable plan:\n"+ conf.C.SE);
+			}
+			// e.g. belief addition as internal event, just go ahead
+			// but note that the event was relevant, yet it is possible
+			// the programmer just wanted to add the belief and it was
+			// relevant by chance, so just carry on instead of dropping the intention
+			// TODO RECONSIDER THIS PROBLEM IN THE SEMANTICS!
+			else if (conf.C.SE.isInternal()) {
+				confP.C.SI = conf.C.SE.intention;
+				updateIntention();
+			}
+			// if external, then needs to check settings
+			else if (setts.requeue()) {
+				confP.C.addEvent(conf.C.SE);
+			}
 			confP.step = SProcAct;
 		}
 	}
@@ -685,18 +704,21 @@ public class TransitionSystem {
 	// similar to the one above, but for an Event rather than intention
 	private void generateGoalDeletionFromEvent() throws JasonException {
 		Event ev = conf.C.SE;
+		// TODO: double check all cases here
 		if (ev.trigger.isAddition() && ev.trigger.isGoal() && ev.isInternal()) {
 			confP.C.delGoal(ev.getTrigger().getGoal(), (Literal) ev.trigger, ev.intention);
+			logger.warn("Generating goal deletion from event: " + ev);
 		}
-		if (ev.isInternal()) {
-			logger.warn("warning! Could not finish intention: " + ev.intention);
+		else if (ev.isInternal()) {
+			logger.warn("Could not finish intention: " + ev.intention);
 		}
 		// if "discard" is set, we are deleting the whole intention!
 		// it is simply not going back to I nor anywhere else!
 		else if (setts.requeue()) {
 			confP.C.addEvent(ev);
+			logger.warn("Requeing external event: " + ev);
 		} else
-			logger.warn("discarding external event : " + ev);
+			logger.warn("Discarding external event: " + ev);
 	}
 
 	/** ********************************************************************* */
@@ -771,19 +793,25 @@ public class TransitionSystem {
 			if (setts.isSync()) {
 				waitSyncSignal();
 			} else if (canSleep()) {
-				waitMessage();
+				// changed here: now conditinal on NRCSLBR
+				if(nrcslbr <= 1)
+					waitMessage();
 			}
 			
 			C.reset();
-			
-			logger.debug("perceiving...");
-			List percept = agArch.perceive();
 
-			logger.debug("checking mail...");
-			agArch.checkMail();
+			if (nrcslbr >= setts.nrcbp() || canSleep()) {
+				nrcslbr = 0;
+				
+				logger.debug("perceiving...");
+				List percept = agArch.perceive();
 
-			logger.debug("doing belief revision...");
-			ag.brf(percept);
+				logger.debug("checking mail...");
+				agArch.checkMail();
+
+				logger.debug("doing belief revision...");
+				ag.brf(percept);
+			}
 
 			/* use mind inspector to get these infs
 			if (logger.isDebugEnabled()) {
@@ -810,6 +838,9 @@ public class TransitionSystem {
 			logger.debug("acting... ");
 			agArch.act();
 
+			// counting number of cycles since last belief revision
+			nrcslbr++;
+			
 			if (setts.isSync()) {
 				boolean isBreakPoint = false;
 				try {

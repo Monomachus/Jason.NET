@@ -53,6 +53,11 @@ public class BodyLiteral implements Cloneable {
 		return literal;
 	}
     
+	// used with arithmetic expressions
+	public void addTerm(Term t) {
+		literal.addTerm(t);
+	}
+	
     public boolean equals(Object o) {
     	try {
     		BodyLiteral b = (BodyLiteral) o;

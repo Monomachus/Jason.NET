@@ -391,12 +391,12 @@ public class mas2j implements mas2jConstants {
     soc = sId();
                                  setOut(soc);
                                  writeInit();
-    jj_consume_token(32);
+    jj_consume_token(33);
     arch();
     environment();
     control();
     agents();
-    jj_consume_token(33);
+    jj_consume_token(34);
                                  writeEnd();
                                  close();
   }
@@ -407,7 +407,7 @@ public class mas2j implements mas2jConstants {
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case ARCH:
       jj_consume_token(ARCH);
-      jj_consume_token(34);
+      jj_consume_token(35);
       t = jj_consume_token(ARCHV);
                               architecture = t.image;
       break;
@@ -422,7 +422,7 @@ public class mas2j implements mas2jConstants {
                               agClassFiles = new HashMap();
                               agASFiles = new HashMap();
     jj_consume_token(AGS);
-    jj_consume_token(34);
+    jj_consume_token(35);
     label_1:
     while (true) {
       agent();
@@ -486,8 +486,8 @@ public class mas2j implements mas2jConstants {
                               out.print("\n\t\tclass=\""+agArchClass+"\"");
                               out.print("\n\t\targs=\""+agClass+" '"+source.getAbsolutePath()+"' "+getOptsStr(opts)+"\"");
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case 35:
-      jj_consume_token(35);
+    case 36:
+      jj_consume_token(36);
       qty = jj_consume_token(NUMBER);
                               out.print("\n\t\tqty=\""+qty.image+"\" ");
       break;
@@ -505,7 +505,7 @@ public class mas2j implements mas2jConstants {
       jj_la1[6] = jj_gen;
       ;
     }
-    jj_consume_token(36);
+    jj_consume_token(37);
                               out.println("/>");
   }
 
@@ -525,8 +525,8 @@ public class mas2j implements mas2jConstants {
     }
     i = sId();
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case 37:
-      jj_consume_token(37);
+    case 38:
+      jj_consume_token(38);
       ext = sId();
                               ext = "." + ext;
       break;
@@ -556,8 +556,8 @@ public class mas2j implements mas2jConstants {
       throw new ParseException();
     }
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case 37:
-      jj_consume_token(37);
+    case 38:
+      jj_consume_token(38);
       p = className();
                              {if (true) return c.image + "." + p;}
       break;
@@ -572,23 +572,23 @@ public class mas2j implements mas2jConstants {
   final public Map ASoptions() throws ParseException {
                              Map opts = new HashMap();
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case 38:
-      jj_consume_token(38);
+    case 39:
+      jj_consume_token(39);
       opts = procOption(opts);
       label_2:
       while (true) {
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-        case 39:
+        case 40:
           ;
           break;
         default:
           jj_la1[11] = jj_gen;
           break label_2;
         }
-        jj_consume_token(39);
+        jj_consume_token(40);
         opts = procOption(opts);
       }
-      jj_consume_token(40);
+      jj_consume_token(41);
       break;
     default:
       jj_la1[12] = jj_gen;
@@ -610,25 +610,31 @@ public class mas2j implements mas2jConstants {
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case ASOEE:
       opt = jj_consume_token(ASOEE);
-      jj_consume_token(41);
+      jj_consume_token(42);
       oval = jj_consume_token(ASOEEV);
                                       opts.put(opt.image,oval.image);
       break;
     case ASOIB:
       opt = jj_consume_token(ASOIB);
-      jj_consume_token(41);
+      jj_consume_token(42);
       oval = jj_consume_token(ASOIBV);
                                       opts.put(opt.image,oval.image);
       break;
     case ASOSYNC:
       opt = jj_consume_token(ASOSYNC);
-      jj_consume_token(41);
+      jj_consume_token(42);
       oval = jj_consume_token(ASOBOOL);
+                                      opts.put(opt.image,oval.image);
+      break;
+    case ASONRC:
+      opt = jj_consume_token(ASONRC);
+      jj_consume_token(42);
+      oval = jj_consume_token(NUMBER);
                                       opts.put(opt.image,oval.image);
       break;
     case ASOV:
       opt = jj_consume_token(ASOV);
-      jj_consume_token(41);
+      jj_consume_token(42);
       oval = jj_consume_token(NUMBER);
                                       opts.put(opt.image,oval.image);
       break;
@@ -646,7 +652,7 @@ public class mas2j implements mas2jConstants {
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case ENV:
       jj_consume_token(ENV);
-      jj_consume_token(34);
+      jj_consume_token(35);
       envClass = className();
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case AT:
@@ -692,7 +698,7 @@ public class mas2j implements mas2jConstants {
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case CONTROL:
       jj_consume_token(CONTROL);
-      jj_consume_token(34);
+      jj_consume_token(35);
       controlClass = className();
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case AT:
@@ -754,10 +760,10 @@ public class mas2j implements mas2jConstants {
       jj_la1_1();
    }
    private static void jj_la1_0() {
-      jj_la1_0 = new int[] {0x1000,0x1000000,0x5000000,0x400000,0x200000,0x0,0x800,0x4000000,0x0,0x3000000,0x0,0x0,0x0,0xd4000,0x800,0x200,0x800,0x400,};
+      jj_la1_0 = new int[] {0x1000,0x2000000,0xa000000,0x800000,0x400000,0x0,0x800,0x8000000,0x0,0x6000000,0x0,0x0,0x0,0x1d4000,0x800,0x200,0x800,0x400,};
    }
    private static void jj_la1_1() {
-      jj_la1_1 = new int[] {0x0,0x0,0x0,0x0,0x0,0x8,0x0,0x0,0x20,0x0,0x20,0x80,0x40,0x0,0x0,0x0,0x0,0x0,};
+      jj_la1_1 = new int[] {0x0,0x0,0x0,0x0,0x0,0x10,0x0,0x0,0x40,0x0,0x40,0x100,0x80,0x0,0x0,0x0,0x0,0x0,};
    }
 
   public mas2j(java.io.InputStream stream) {
@@ -856,8 +862,8 @@ public class mas2j implements mas2jConstants {
 
   public ParseException generateParseException() {
     jj_expentries.removeAllElements();
-    boolean[] la1tokens = new boolean[42];
-    for (int i = 0; i < 42; i++) {
+    boolean[] la1tokens = new boolean[43];
+    for (int i = 0; i < 43; i++) {
       la1tokens[i] = false;
     }
     if (jj_kind >= 0) {
@@ -876,7 +882,7 @@ public class mas2j implements mas2jConstants {
         }
       }
     }
-    for (int i = 0; i < 42; i++) {
+    for (int i = 0; i < 43; i++) {
       if (la1tokens[i]) {
         jj_expentry = new int[1];
         jj_expentry[0] = i;

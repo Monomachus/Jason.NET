@@ -442,6 +442,8 @@ TOKEN : {
 |  <ASOIB:       "intBels">
 |  <ASOIBV:      ("sameFocus"|"newFocus") >
 
+|  <ASONRC:      "nrcbp" >
+
 |  <ASOV:        "verbose" >
 
 |  <ASOSYNC:     "synchronized" >
@@ -597,6 +599,7 @@ Map procOption(Map opts): { Token opt; Token oval; }
   ( opt=<ASOEE>   "=" oval=<ASOEEV>  {opts.put(opt.image,oval.image);}
   | opt=<ASOIB>   "=" oval=<ASOIBV>  {opts.put(opt.image,oval.image);}
   | opt=<ASOSYNC> "=" oval=<ASOBOOL> {opts.put(opt.image,oval.image);}
+  | opt=<ASONRC>  "=" oval=<NUMBER>  {opts.put(opt.image,oval.image);} 
   | opt=<ASOV>    "=" oval=<NUMBER>  {opts.put(opt.image,oval.image);} 
   )
                                      { 

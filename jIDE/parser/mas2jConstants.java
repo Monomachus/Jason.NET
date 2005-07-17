@@ -15,20 +15,21 @@ public interface mas2jConstants {
   int ASOEEV = 15;
   int ASOIB = 16;
   int ASOIBV = 17;
-  int ASOV = 18;
-  int ASOSYNC = 19;
-  int ASOBOOL = 20;
-  int ASAGCLASS = 21;
-  int ASAGARCHCLASS = 22;
-  int NUMBER = 23;
-  int ASID = 24;
-  int CLASSID = 25;
-  int PATH = 26;
-  int DRIVER = 27;
-  int LETTER = 28;
-  int LC_LETTER = 29;
-  int UP_LETTER = 30;
-  int DIGIT = 31;
+  int ASONRC = 18;
+  int ASOV = 19;
+  int ASOSYNC = 20;
+  int ASOBOOL = 21;
+  int ASAGCLASS = 22;
+  int ASAGARCHCLASS = 23;
+  int NUMBER = 24;
+  int ASID = 25;
+  int CLASSID = 26;
+  int PATH = 27;
+  int DRIVER = 28;
+  int LETTER = 29;
+  int LC_LETTER = 30;
+  int UP_LETTER = 31;
+  int DIGIT = 32;
 
   int DEFAULT = 0;
 
@@ -51,6 +52,7 @@ public interface mas2jConstants {
     "<ASOEEV>",
     "\"intBels\"",
     "<ASOIBV>",
+    "\"nrcbp\"",
     "\"verbose\"",
     "\"synchronized\"",
     "<ASOBOOL>",

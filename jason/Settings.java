@@ -37,11 +37,13 @@ public class Settings {
     public static final byte      ORetrieve       = 3;
     public static final boolean   OSameFocus      = true;
     public static final boolean   ONewFocus       = false;
+    public static final int       ODefaultNRC     = 1;
     public static final int       ODefaultVerbose = 1;
 	
 	
     byte    events    = ODiscard;
     boolean intBels   = OSameFocus;
+    int     nrcbp     = ODefaultNRC;
     int     verbose   = ODefaultVerbose;
     boolean sync      = false; 
     
@@ -86,7 +88,12 @@ public class Settings {
             	setIntBels(ONewFocus);
             }
         }
-        
+
+        String nrc = (String)options.get("nrcbp");
+        if (nrc != null) {
+            setNRCBP(nrc);
+        }
+
         String verbose = (String)options.get("verbose");
         if (verbose != null) {
             setVerbose(verbose);
@@ -110,7 +117,18 @@ public class Settings {
 		intBels = opt;
 	}
 
-    
+    public void setNRCBP(String opt) {
+        try {
+            setNRCBP( Integer.parseInt(opt));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+	public void setNRCBP(int opt) {
+		nrcbp = opt;
+	}
+
     public void setVerbose(String opt) {
         try {
             setVerbose( Integer.parseInt(opt));
@@ -140,6 +158,10 @@ public class Settings {
     }
     public boolean newFocus() {
         return(!intBels);
+    }
+
+    public int nrcbp() {
+    	return nrcbp;
     }
     
     public int verbose() {
