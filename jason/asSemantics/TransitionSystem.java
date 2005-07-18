@@ -89,8 +89,13 @@ public class TransitionSystem {
 	public TransitionSystem(Agent a, Circumstance c, Settings s, AgentArchitecture ar) {
 		ag = a;
 		C = c;
-		setts = s;
 		agArch = ar;
+
+		if (s == null) {
+			setts = new Settings();
+		} else {
+			setts = s;
+		}
 
 		// we need to initialise this "aliases"
 		conf = confP = this;
