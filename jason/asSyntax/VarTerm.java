@@ -29,7 +29,7 @@ public class VarTerm extends Term {
 	public Object clone() {
 		// do not call constructor with term parameter!
 		VarTerm t = new VarTerm();
-		t.setFunctor(getFunctor());
+		t.setFunctor(super.getFunctor());
 		if (value != null) {
 			t.value = (Term)value.clone();
 		}
