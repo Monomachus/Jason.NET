@@ -268,7 +268,7 @@ public class Term implements Cloneable, Comparable, Serializable {
 
 	public double toDouble() {
 		try {
-			return Double.parseDouble(functor);
+			return Double.parseDouble(getFunctor());
 		} catch (Exception e) {
 			System.err.println("Error converting to double " + functor);
 			e.printStackTrace();
