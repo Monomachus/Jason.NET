@@ -29,6 +29,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -37,6 +38,10 @@ public class BeliefBase {
 	
 	public static final Term TPercept = Term.parse("source(percept)");
 	public static final Term TSelf = Term.parse("source(self)");
+
+	static private Logger logger = Logger.getLogger(BeliefBase.class.getName());
+	
+	
 	
 	/** 
 	 * belsMap is a table where the key is the bel.getFunctorArity and the
@@ -114,8 +119,7 @@ public class BeliefBase {
 				if (l.getAnnots() != null) 
 					((ArrayList)l.getAnnots()).trimToSize();
 			} catch (Exception e) {
-				System.err.println("error trim literal's terms/annots!");
-				e.printStackTrace();
+				logger.error("error trim literal's terms/annots!",e);
 			}
 
 			String key = l.getFunctorArity();

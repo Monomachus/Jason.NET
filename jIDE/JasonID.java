@@ -33,6 +33,7 @@ import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
@@ -59,6 +60,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
@@ -68,6 +70,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JToolBar;
+import javax.swing.KeyStroke;
 import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.text.BadLocationException;
@@ -162,7 +165,7 @@ public class JasonID {
             	userProperties.put("font", "Monospaced");
             }
             if (userProperties.get("fontSize") == null) {
-            	userProperties.put("fontSize", "12");
+            	userProperties.put("fontSize", "14");
             }
         
             userProperties.put("version", currJasonVersion);
@@ -174,7 +177,7 @@ public class JasonID {
             if (args.length > 0) {
                 jasonID.openAct.loadProject(new File(args[0]));
             } else {
-            	jasonID.mas2jPane.createNewPlainText(jasonID.mas2jPane.getDefaultText("anMAS", ""));
+            	jasonID.mas2jPane.createNewPlainText("// use the menu Project->New option to create a new project.");//jasonID.mas2jPane.getDefaultText("anMAS", ""));
             }
             jasonID.startThreads();
 
@@ -482,29 +485,66 @@ public class JasonID {
     protected JMenuBar createMenuBar() {
         
         JMenu jMenuProject = new JMenu("Project");
-        jMenuProject.add(newAct);
-        jMenuProject.add(openAct);
-        jMenuProject.add(saveAct);
-        jMenuProject.add(saveAsAct);
-        jMenuProject.add(saveAllAct);
+        jMenuProject.setMnemonic('P');
+        
+        JMenuItem item = jMenuProject.add(newAct);
+        item.setMnemonic('N');
+        item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, KeyEvent.CTRL_MASK));        
+        
+        item = jMenuProject.add(openAct);
+        item.setMnemonic('O');
+        item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, KeyEvent.CTRL_MASK));        
+        
+        item = jMenuProject.add(saveAct);
+        item.setMnemonic('S');
+        item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.CTRL_MASK));        
+        
+        jMenuProject.add(saveAsAct).setMnemonic('a');
+        jMenuProject.add(saveAllAct).setMnemonic('l');
         
         jMenuProject.addSeparator();
         
-        jMenuProject.add(runMASAct);
-        jMenuProject.add(debugMASAct);
-        jMenuProject.add(stopMASAct);
+        item = jMenuProject.add(runMASAct);
+        item.setMnemonic('R');
+        item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, KeyEvent.CTRL_MASK));        
+        
+        jMenuProject.add(debugMASAct).setMnemonic('D');
+        jMenuProject.add(stopMASAct).setMnemonic('t');
         
         jMenuProject.addSeparator();
         
-        jMenuProject.add(exitAppAct);
+        item = jMenuProject.add(exitAppAct);
+        item.setMnemonic('x');
+        item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, KeyEvent.CTRL_MASK));        
+        
 
         JMenu jMenuEdit = new JMenu("Edit");
-        jMenuEdit.add(editLogAct);
-        jMenuEdit.add(new EditPreferences());
+        jMenuEdit.setMnemonic('E');
+        
+        item = jMenuEdit.add(new AbstractAction("Find...") { 
+            public void actionPerformed(ActionEvent e) {
+                ((ASEditorPane)tab.getSelectedComponent()).askSearch();
+            }
+         });
+        item.setMnemonic('f');
+        item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, KeyEvent.CTRL_MASK));        
+        
+        item = jMenuEdit.add(new AbstractAction("Find next") { 
+            public void actionPerformed(ActionEvent e) {
+                ((ASEditorPane)tab.getSelectedComponent()).search();
+            }
+         });
+        item.setMnemonic('n');
+        item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_G, KeyEvent.CTRL_MASK));        
+        
+        jMenuEdit.addSeparator();
+        jMenuEdit.add(editLogAct).setMnemonic('l');
+        jMenuEdit.add(new EditPreferences()).setMnemonic('p');
         
         
         JMenu jMenuHelp = new JMenu("Help");
-        jMenuHelp.add(new HelpAbout());
+        jMenuHelp.setMnemonic('H');
+        jMenuHelp.add(new HelpAbout()).setMnemonic('A');
         
         menuBar = new JMenuBar();
         menuBar.add(jMenuProject);

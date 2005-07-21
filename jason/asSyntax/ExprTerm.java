@@ -4,41 +4,45 @@ import jason.asSyntax.parser.as2j;
 
 import java.io.StringReader;
 
-public class ExprTerm extends Term {
+import org.apache.log4j.Logger;
 
-	private Term lhs;
-	private Term op;
-	private Term rhs;
+public class ExprTerm extends VarTerm implements NumberTerm {
 
-	public static final Term EOplus  = new Term("+"); 
-	public static final Term EOminus = new Term("-"); 
-	public static final Term EOtimes = new Term("*"); 
-	public static final Term EOdiv   = new Term("/"); 
-	public static final Term EOmod   = new Term("%"); 
-	public static final Term EOpow   = new Term("**"); 
+	public static final int EOplus  = 1; 
+	public static final int EOminus = 2; 
+	public static final int EOtimes = 3; 
+	public static final int EOdiv   = 4; 
+	public static final int EOmod   = 5; 
+	public static final int EOpow   = 6; 
+
+	private NumberTerm lhs;
+	private int op = 0;
+	private NumberTerm rhs;
+
+	static private Logger logger = Logger.getLogger(ExprTerm.class.getName());
 	
 	public ExprTerm() {
 		super();
 	}
 	
-	public ExprTerm(Term t1, Term oper, Term t2) {
+	public ExprTerm(NumberTerm t1, int oper, NumberTerm t2) {
 		lhs = t1;
 		op = oper;
 		rhs = t2;
 	}
 
-	public ExprTerm(Term oper, Term t1) {
+	public ExprTerm(int oper, NumberTerm t1) {
 		op = oper;
 		lhs = t1;
 	}
 
-    public static ExprTerm parseExpr(String sExpr) {
+	/** will return some Term that can be evaluated as Number */
+    public static NumberTerm parseExpr(String sExpr) {
         as2j parser = new as2j(new StringReader(sExpr));
         try {
-            return (ExprTerm)parser.expression();
+            return (NumberTerm)parser.arithmeticExpression();
         } catch (Exception e) {
-            System.err.println("Error parsing expression "+sExpr);
-            e.printStackTrace();
+            logger.error("Error parsing expression "+sExpr,e);
 			return null;
         }
     }
@@ -48,13 +52,13 @@ public class ExprTerm extends Term {
 		// do not call constructor with term parameter!
 		ExprTerm t = new ExprTerm();
 		if (lhs != null) {
-			t.lhs = (Term)this.lhs.clone();
+			t.lhs = (NumberTerm) lhs.clone();
 		}
-		if (op != null) {
-			t.op = (Term)this.op.clone();
-		}
+
+		t.op = this.op;
+		
 		if (rhs != null) {
-			t.rhs = (Term)this.rhs.clone();
+			t.rhs = (NumberTerm) rhs.clone();
 		}
 		return t;
 	}
@@ -62,23 +66,22 @@ public class ExprTerm extends Term {
 
 	public boolean equals(Object t) {
 		try {
-			ExprTerm tAsTerm = (ExprTerm)t;
-			if (lhs == null && tAsTerm.lhs != null) {
+			ExprTerm eprt = (ExprTerm)t;
+			if (lhs == null && eprt.lhs != null) {
 				return false;
 			}
-			if (lhs != null && !lhs.equals(tAsTerm.lhs)) {
+			if (lhs != null && !lhs.equals(eprt.lhs)) {
 				return false;
 			}
-			if (op == null && tAsTerm.op != null) {
+			
+			if (op != eprt.op) {
 				return false;
 			}
-			if (op != null && !op.equals(tAsTerm.op)) {
+
+			if (rhs == null && eprt.rhs != null) {
 				return false;
 			}
-			if (rhs == null && tAsTerm.rhs != null) {
-				return false;
-			}
-			if (rhs != null && !rhs.equals(tAsTerm.rhs)) {
+			if (rhs != null && !rhs.equals(eprt.rhs)) {
 				return false;
 			}
 			return true;
@@ -88,19 +91,22 @@ public class ExprTerm extends Term {
 	}
 	
 	/** gets the Operation of this ExprTerm */
-	public Term getOp() {
+	public int getOp() {
 		return op;
 	}
+	
 	/** gets the LHS of this ExprTerm */
-	public Term getLHS() {
+	public NumberTerm getLHS() {
 		return lhs;
 	}
+	
 	/** gets the RHS of this ExprTerm */
-	public Term getRHS() {
+	public NumberTerm getRHS() {
 		return rhs;
 	}
 	
 	
+	/*
 	// for unifier compatibility
 	public int getTermsSize() {
 		if (rhs == null)
@@ -108,19 +114,21 @@ public class ExprTerm extends Term {
 		else
 			return 3; // lhs + op + rhs
 	}
+	
 	// for unifier compatibility
 	public Term getTerm(int i) {
 		if (i == 0) {
-			return op;
+			return new Term(getOpStr());
 		}
 		if (i == 1) {
-			return lhs;
+			return (Term)lhs;
 		}
 		if (i == 2) {
 			return rhs;
 		}
 		return null;
 	}
+	*/
 	
 	/** return the this ListTerm elements (0=Term, 1=ListTerm) */
 /*	public List getTerms() {
@@ -136,12 +144,16 @@ public class ExprTerm extends Term {
 */	
 
 	public void addTerm(Term t) {
-		System.err.println("Do not use addTerm in expressions!");
+		logger.warn("Do not use addTerm in expressions!");
 	}
 
 	public boolean isExpr() {
-		return true;
+		return !hasValue();
 	}
+	public boolean isVar() {
+		return false;
+	}
+	
 	public boolean isUnary() {
 		return rhs == null;
 	}
@@ -151,50 +163,57 @@ public class ExprTerm extends Term {
 	}
 	
 	public double solve() {
-		double l;
-		double r;
-		try {
-			ExprTerm et = (ExprTerm)lhs;
-			l = et.solve();
-		} catch (Exception e) {
-			l = lhs.toDouble();
-		}
-		if(rhs==null && op.equals(EOminus))
+		//try {
+			//ExprTerm et = (ExprTerm)lhs;
+			//l = et.solve();
+		//} catch (Exception e) {
+		double l = lhs.solve();
+		//}
+		if (rhs==null && op == EOminus) {
 			return -l;
-		else if (rhs != null) {
-			try {
-				ExprTerm et = (ExprTerm)rhs;
-				r = et.solve();
-			} catch (Exception e) {
-				r = rhs.toDouble();
-			}
-			if (op.equals(EOplus)){
-				return l + r;
-			}
-			else if (op.equals(EOminus)){
-				return l - r;
-			}
-			else if (op.equals(EOtimes)){
-				return l * r;
-			}
-			else if (op.equals(EOdiv)){
-				return l / r;
-			}
-			else if (op.equals(EOmod)){
-				return l % r;
-			}
-			else if (op.equals(EOpow)){
-				return Math.pow(l,r);
+		} else if (rhs != null) {
+
+			//try {
+			//	ExprTerm et = (ExprTerm)rhs;
+			//	r = et.solve();
+			//} catch (Exception e) {
+			double r = rhs.solve();
+			//}
+			switch (op) {
+			case EOplus:  return l + r;
+			case EOminus: return l - r;
+			case EOtimes: return l * r;
+			case EOdiv:   return l / r;
+			case EOmod:   return l % r;
+			case EOpow:   return Math.pow(l,r);
 			}
 		}
-		System.err.println("ERROR IN EXPRESION!");
+		logger.error("ERROR IN EXPRESION!");
 		return 0;
 	}
+
+	public String getOpStr() {
+		switch (op) {
+		case EOplus:  return "+";
+		case EOminus: return "-";
+		case EOtimes: return "*";
+		case EOdiv:   return "/";
+		case EOmod:   return "%";
+		case EOpow:   return "**";
+		}
+		return "?";
+	}
+	
 	
 	public String toString() {
-		if (rhs==null)
-			return op+" "+lhs;
-		return lhs+" "+op+" "+rhs;
+		if (hasValue()) {
+			return getValue().toString();
+		} else {
+			if (rhs==null) {
+				return "("+getOpStr()+lhs+")";
+			} else {
+				return "("+lhs+getOpStr()+rhs+")";
+			}
+		}
 	}
-		
 }

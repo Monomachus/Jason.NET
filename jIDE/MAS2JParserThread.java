@@ -40,13 +40,19 @@ public class MAS2JParserThread extends Thread {
     boolean fOk = false;
     boolean fForegroundCompilation = false;
     boolean fCompilationDone = true;
-    
+    int errorLine = -1;
+
     MAS2JParserThread(MAS2JEditorPane editor, JasonID jasonID) {
     	super("MAS2JParser");
         fParserMAS2J = new mas2j(new StringReader(""));
         fParserMAS2J.setNoOut(true);
         this.fEditorPanel = editor;
         this.fJasonID = jasonID;
+    }
+
+    /** returns the line number that contains error, -1 in case there is no errors. Only for current tab */
+    public int getErrorLine() {
+    	return errorLine;
     }
     
     void parse() {
@@ -76,11 +82,20 @@ public class MAS2JParserThread extends Thread {
             if (fOk) {
                 fJasonID.openAllASFiles(fParserMAS2J.getAgASFiles().values());
             }
+
+            errorLine = -1; // set no error!
+            fEditorPanel.syntaxThread.refresh(fEditorPanel.syntaxThread.docListener.lastChange); //errorOffSet); // 1 char was inserted
+            
         } catch (ParseException ex) {
             if (fForegroundCompilation) {
                 System.out.println("\nmas2j: parsing errors found... \n" + ex);
             } else {
-                fJasonID.updateTabTitle(0, fEditorPanel, "!line "+ex.currentToken.beginLine);
+            	if (fJasonID.tab.getSelectedIndex() == 0 && ex.currentToken != null) {
+            		//fJasonID.updateTabTitle(0, fEditorPanel, "!line "+ex.currentToken.beginLine);
+            		errorLine = ex.currentToken.beginLine;
+            		fEditorPanel.syntaxThread.refresh(fEditorPanel.syntaxThread.docListener.lastChange);
+            	}
+            	
             }
         } catch (TokenMgrError ex) {
             if (fForegroundCompilation) {
@@ -89,7 +104,10 @@ public class MAS2JParserThread extends Thread {
                 int p = ex.toString().indexOf("line");
                 int v = ex.toString().indexOf(", ", p);
                 if (p > 0 && v > p) {
-                    fJasonID.updateTabTitle(0, fEditorPanel, "!line "+ex.toString().substring(p+4,v).trim());
+            		errorLine = Integer.parseInt(ex.toString().substring(p+4,v).trim());
+            		//System.out.println("error line is "+ex.currentToken.beginLine+" buf bline="+inStream.getBeginLine()+" buf eline="+inStream.getEndLine()+" offset="+errorOffSet);
+            		fEditorPanel.syntaxThread.refresh(fEditorPanel.syntaxThread.docListener.lastChange);
+            		//fJasonID.updateTabTitle(0, fEditorPanel, "!line "+ex.toString().substring(p+4,v).trim());
                 }
             }
         } catch (Exception ex) {

@@ -23,8 +23,10 @@
 package jIDE;
 
 import jason.asSyntax.parser.ParseException;
+import jason.asSyntax.parser.SimpleCharStream;
 import jason.asSyntax.parser.TokenMgrError;
 import jason.asSyntax.parser.as2j;
+import jason.asSyntax.parser.as2jTokenManager;
 
 import java.io.StringReader;
 
@@ -48,10 +50,9 @@ public class ASParserThread extends Thread {
     ASParserThread(JasonID jasonID) {
     	super("ASParserThread");
         this.jasonID = jasonID;
-        createParser();
     }
     
-    /** returns the line that contains error, -1 in case of no errors. Only for current tab */
+    /** returns the line number that contains error, -1 in case there is no errors. Only for current tab */
     public int getErrorLine() {
     	return errorLine;
     }
@@ -75,7 +76,8 @@ public class ASParserThread extends Thread {
     	}
         ASEditorPane editorPanel = null;
         Document doc;
-
+        SimpleCharStream inStream = null;
+        
         // compile
         try {
             editorPanel = (ASEditorPane)jasonID.tab.getComponentAt(tabIndex);
@@ -90,18 +92,17 @@ public class ASParserThread extends Thread {
             }
             doc  = editorPanel.editor.getDocument();
             String text = doc.getText(0, doc.getLength());
-            parser.ReInit(new StringReader(text));
+            
+            inStream = new SimpleCharStream(new StringReader(text));
+            parser.ReInit(new as2jTokenManager(inStream));
             parser.ag(null);
             
             if (foregroundCompilation) {
                 System.out.println(" parsed successfully!");
             }
 
-            if (errorLine != -1) {
-            	// update the last error line
-        		editorPanel.syntaxThread.refresh(editorPanel.editor.getCaretPosition());
-            }
-            errorLine = -1;
+            errorLine = -1; // set no error!
+            editorPanel.syntaxThread.refresh(editorPanel.syntaxThread.docListener.lastChange); //errorOffSet); // 1 char was inserted
             
             return true;
         } catch (ParseException ex) {
@@ -109,10 +110,27 @@ public class ASParserThread extends Thread {
                 System.out.println("\nas2j: parsing errors found... \n" + ex);
             } else {
             	if (jasonID.tab.getSelectedIndex() == tabIndex && ex.currentToken != null) {
-                	//jasonID.updateTabTitle(tabIndex, editorPanel, "!line "+ex.currentToken.beginLine);
+            		//jasonID.updateTabTitle(tabIndex, editorPanel, "!line "+ex.currentToken.beginLine);
+            		//System.out.println("error line is "+ex.currentToken.beginLine+" buf bline="+inStream.getBeginLine()+" buf eline="+inStream.getEndLine());
+
+            		// error is defined by stream line
+            		int[][] expected = ex.expectedTokenSequences;
+            		for (int i=0; i<expected.length; i++) {
+            			for (int j=0; j<expected[i].length; j++) {
+            				if (expected[i][j] == as2j.EOF) {
+                        		errorLine = inStream.getBeginLine();
+                        		editorPanel.syntaxThread.refresh(editorPanel.syntaxThread.docListener.lastChange);
+                        		return false;
+            				}
+            			}
+            		}
+
+            		// error is defined by las token
             		errorLine = ex.currentToken.beginLine;
-            		//System.out.println("error line is "+errorLine);
-            		editorPanel.syntaxThread.refresh(editorPanel.editor.getCaretPosition());
+            		if (errorLine == 0) { // first token problem
+            			errorLine = 1;
+            		}
+            		editorPanel.syntaxThread.refresh(editorPanel.syntaxThread.docListener.lastChange);
             	}
             }
         } catch (TokenMgrError ex) {
@@ -122,7 +140,10 @@ public class ASParserThread extends Thread {
                 int p = ex.toString().indexOf("line");
                 int v = ex.toString().indexOf(", ", p);
                 if (p > 0 && v > p) {
-                    jasonID.updateTabTitle(tabIndex, editorPanel, "!line "+ex.toString().substring(p+4,v).trim());
+            		errorLine = Integer.parseInt(ex.toString().substring(p+4,v).trim());
+            		//System.out.println("error line is "+ex.currentToken.beginLine+" buf bline="+inStream.getBeginLine()+" buf eline="+inStream.getEndLine()+" offset="+errorOffSet);
+            		editorPanel.syntaxThread.refresh(editorPanel.syntaxThread.docListener.lastChange);
+                   //jasonID.updateTabTitle(tabIndex, editorPanel, "!line "+);
                 }
             }
         } catch (Exception ex) {
@@ -182,7 +203,7 @@ public class ASParserThread extends Thread {
         // since the AS online parsing does not work properly
         stopWaiting(); // wakeup this thread
         waitCompilation(); // waits the end of compilation
-        parseAllTabs();
+        //parseAllTabs();
         foregroundCompilation = false;
         return ok;
     }
@@ -193,6 +214,7 @@ public class ASParserThread extends Thread {
     }
 
     public void run() {
+        createParser();
         while (!stop) {
             waitSomeTime();
             if (!stop) {

@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -46,6 +47,8 @@ public class Plan implements Cloneable, Serializable {
 
 	Boolean isAtomic = null; // if the label has atomic annotation, used to cache the value, so we do not need to seach all label annotations each isAtomic()
 	
+	static private Logger logger = Logger.getLogger(Plan.class.getName());
+
 	
 	public Plan() {
 	}
@@ -68,8 +71,7 @@ public class Plan implements Cloneable, Serializable {
 		try {
 			return parser.p();
 		} catch (Exception e) {
-			System.err.println("Error parsing plan " + sPlan);
-			e.printStackTrace();
+			logger.error("Error parsing plan " + sPlan,e);
 			return null;
 		}
 	}

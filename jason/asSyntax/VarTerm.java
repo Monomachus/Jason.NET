@@ -2,6 +2,8 @@ package jason.asSyntax;
 
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 
 /**
  * Represents a variable Term: like X (starts with upper case). 
@@ -9,7 +11,10 @@ import java.util.List;
  * 
  * @author jomi
  */
-public class VarTerm extends Term {
+public class VarTerm extends Term implements NumberTerm {
+
+	static private Logger logger = Logger.getLogger(VarTerm.class.getName());
+	
 	
 	// TODO: do not use super.functor to store the var name
 	
@@ -21,7 +26,7 @@ public class VarTerm extends Term {
 
 	public VarTerm(String s) {
 		if (s != null && Character.isLowerCase(s.charAt(0))) {
-			System.err.println("Warning: are you sure to create a VarTerm that begins with lower case ("+s+")? Should it be a Term?");			
+			logger.warn("Are you sure to create a VarTerm that begins with lower case ("+s+")? Should it be a Term?");			
 		}
 		setFunctor(s);
 	}
@@ -50,7 +55,7 @@ public class VarTerm extends Term {
 			VarTerm vlvl = (VarTerm)((VarTerm)vl).value; // not getValue! (use the "real" value)
 			while (vlvl != null) {
 				if (vlvl == this) {
-					System.err.println("Error: trying to make a loop in VarTerm values of "+this.getFunctor());
+					logger.error("Trying to make a loop in VarTerm values of "+this.getFunctor());
 					return false;
 				}
 				vlvl = (VarTerm)vlvl.value;
@@ -217,4 +222,18 @@ public class VarTerm extends Term {
 			return getValue().toString();
 		}
 	}
+
+	// ----------
+	// ArithmeticExpression methods overridden
+	// ----------
+	public double solve() {
+		if (hasValue() && value.isNumber()) {
+			return ((NumberTermImpl)value).getValue();
+		} else {
+			logger.error("Error getting numeric value of VarTerm "+this);
+		}
+		return 0;
+	}
+
+
 }

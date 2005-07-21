@@ -26,6 +26,8 @@ import jason.asSyntax.parser.as2j;
 
 import java.io.StringReader;
 
+import org.apache.log4j.Logger;
+
 /**
  * A Literal is a Pred with strong negation (~).
  */
@@ -34,6 +36,9 @@ public class Literal extends Pred implements Cloneable {
 	public static final boolean   LPos       = true;
     public static final boolean   LNeg       = false;
     public static final Literal   LTrue      = new Literal(LPos, new Pred("true"));
+    public static final Literal   LFalse     = new Literal(LPos, new Pred("false"));
+
+    static private Logger logger = Logger.getLogger(Literal.class.getName());
 
 	boolean type = LPos;
 
@@ -58,8 +63,7 @@ public class Literal extends Pred implements Cloneable {
 		try {
 			return parser.l();
 		} catch (Exception e) {
-			System.err.println("Error parsing literal " + sLiteral);
-			e.printStackTrace();
+			logger.error("Error parsing literal " + sLiteral,e);
 			return null;
 		}
 	}
@@ -77,6 +81,9 @@ public class Literal extends Pred implements Cloneable {
 
 	public boolean negated() {
 		return (type == LNeg);
+	}
+	public boolean isLiteral() {
+		return true;
 	}
 
 	public boolean equals(Object o) {

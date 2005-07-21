@@ -194,6 +194,7 @@ public class RunCentralisedMAS {
 			BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 			String line = in.readLine();
 			while (! line.equals("quit")) {
+				logger.info("MAS have read "+line);
 				line = in.readLine();
 			}
 			

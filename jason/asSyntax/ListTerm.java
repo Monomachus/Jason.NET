@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 /**
  * Each nth-ListTerm has a term and the next ListTerm.
  * The last ListTem is a emptyListTerm (term==null).
@@ -20,6 +22,8 @@ public class ListTerm extends Term {
 	
 	private Term term;
 	private Term next;
+
+	static private Logger logger = Logger.getLogger(ListTerm.class.getName());
 	
 	public ListTerm() {
 		super();
@@ -30,8 +34,7 @@ public class ListTerm extends Term {
         try {
             return (ListTerm)parser.list();
         } catch (Exception e) {
-            System.err.println("Error parsing list "+sList);
-            e.printStackTrace();
+            logger.error("Error parsing list "+sList,e);
 			return null;
         }
     }
@@ -114,7 +117,7 @@ public class ListTerm extends Term {
 	}
 	
 	public void addTerm(Term t) {
-		System.err.println("Do not use addTerm in lists!");
+		logger.warn("Do not use addTerm in lists!");
 	}
 
 	public int size() {

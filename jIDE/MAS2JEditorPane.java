@@ -32,7 +32,7 @@ public class MAS2JEditorPane extends ASEditorPane {
     }
     
 	void createSyntaxHighlightThread() {
-		syntaxThread = new MAS2JSyntaxHighLight(editor);
+		syntaxThread = new MAS2JSyntaxHighLight(editor, this.mainID);
 		syntaxThread.start();
 	}
     

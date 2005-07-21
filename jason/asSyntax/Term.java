@@ -30,6 +30,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 /**
  * Represents a Term (a predicate parameter), e.g.: val(10,x(3)).
  */
@@ -38,12 +40,14 @@ public class Term implements Cloneable, Comparable, Serializable {
 	private String functor = null;
 	private List   terms;
 
+	static private Logger logger = Logger.getLogger(Term.class.getName());
+	
 	public Term() {
 	}
 
 	public Term(String fs) {
 		if (fs != null && Character.isUpperCase(fs.charAt(0))) {
-			System.err.println("Warning: are you sure to create a term that begins with upper case ("+fs+")? Should it be a VarTerm?");
+			logger.warn("Are you sure to create a term that begins with upper case ("+fs+")? Should it be a VarTerm?");
 		}
 		setFunctor(fs);
 	}
@@ -57,8 +61,7 @@ public class Term implements Cloneable, Comparable, Serializable {
 		try {
 			return parser.t(); // parse.t() may returns a Pred/List...
 		} catch (Exception e) {
-			System.err.println("Error parsing term " + sTerm);
-			e.printStackTrace();
+			logger.error("Error parsing term " + sTerm,e);
 			return null;
 		}
 	}
@@ -69,8 +72,7 @@ public class Term implements Cloneable, Comparable, Serializable {
 			setFunctor(t.functor);
 			terms = t.getDeepCopyOfTerms();
 		} catch (Exception e) {
-			System.err.println("Error setting value for term ");
-			e.printStackTrace();
+			logger.error("Error setting value for term ",e);
 		}
 	}
 
@@ -142,13 +144,11 @@ public class Term implements Cloneable, Comparable, Serializable {
 	}
 
 	public boolean isVar() {
-		//if (funcSymb == null) {
-			return false;
-		//} else {
-		//	return Character.isUpperCase(funcSymb.charAt(0));
-		//}
+		return false;
 	}
-
+	public boolean isLiteral() {
+		return false;
+	}
 	public boolean isList() {
 		return false;
 	}
@@ -161,6 +161,10 @@ public class Term implements Cloneable, Comparable, Serializable {
 	public boolean isExpr() {
 		return false;
 	}
+	public boolean isNumber() {
+		return false;
+	}
+	
 
 	public boolean isGround() {
 		for (int i=0; i<getTermsSize(); i++) {
@@ -266,15 +270,16 @@ public class Term implements Cloneable, Comparable, Serializable {
 		return l;
 	}
 
+	/*
 	public double toDouble() {
 		try {
 			return Double.parseDouble(getFunctor());
 		} catch (Exception e) {
-			System.err.println("Error converting to double " + functor);
-			e.printStackTrace();
+			logger.error("Error converting to double " + functor,e);
 			return 0;
 		}
 	}
+	*/
 	
 	public String toString() {
 		StringBuffer s = new StringBuffer();

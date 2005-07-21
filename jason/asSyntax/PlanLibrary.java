@@ -44,9 +44,6 @@ public class PlanLibrary {
 
 	/**
 	 * All plans as defined in the AS code
-	 *   
-	 * @uml.property name="plans"
-	 * @uml.associationEnd aggregation="aggregate" inverse="planLibrary:jason.asSyntax.Plan" multiplicity="(0 -1)" ordering="ordered"
 	 */
 	List plans = new ArrayList();
 

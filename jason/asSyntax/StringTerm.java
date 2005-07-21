@@ -4,7 +4,11 @@ import jason.asSyntax.parser.as2j;
 
 import java.io.StringReader;
 
+import org.apache.log4j.Logger;
+
 public class StringTerm extends Term {
+
+	static private Logger logger = Logger.getLogger(StringTerm.class.getName());
 
 	// TODO: do not use functor to represent the string
 	//private String fValue;
@@ -14,11 +18,11 @@ public class StringTerm extends Term {
 	}
 	
 	public StringTerm(String fs) {
-		setString(fs);
+		setValue(fs);
 	}
 	
 	public StringTerm(StringTerm t) {
-		setString(t.getString());
+		setValue(t.getValue());
 	}
 
 	/*
@@ -30,19 +34,19 @@ public class StringTerm extends Term {
 	}
 	*/
 
-	public void setString(String s) {
+	public void setValue(String s) {
 		if (s.startsWith("\"")) {
 			s = s.substring(1,s.length()-1);
 		}
 		setFunctor(s);
 	}
 	
-	public String getString() {
+	public String getValue() {
 		return getFunctor();
 	}
 	
 	public Object clone() {
-		return new StringTerm(getString());
+		return new StringTerm(getValue());
 	}
 	
 	
@@ -51,8 +55,7 @@ public class StringTerm extends Term {
 		try {
 			return (StringTerm)parser.t();
 		} catch (Exception e) {
-			System.err.println("Error parsing string term " + sTerm);
-			e.printStackTrace();
+			logger.error("Error parsing string term " + sTerm,e);
 			return null;
 		}
 	}
@@ -62,10 +65,19 @@ public class StringTerm extends Term {
 	}
 	
 	public int length() {
-		return getString().length();
+		return getValue().length();
+	}
+
+	public boolean equals(Object t) {
+		try {
+			StringTerm st = (StringTerm)t;
+			return this.getValue().equals(st.getValue());
+		} catch (Exception e) {}
+		return false;
 	}
 	
+	
 	public String toString() {
-		return "\""+getString()+"\"";
+		return "\""+getValue()+"\"";
 	}
 }

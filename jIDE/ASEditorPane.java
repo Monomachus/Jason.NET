@@ -25,6 +25,8 @@ package jIDE;
 
 
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
@@ -35,6 +37,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
@@ -43,13 +46,12 @@ import javax.swing.event.UndoableEditListener;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.BoxView;
 import javax.swing.text.ComponentView;
-import javax.swing.text.DefaultStyledDocument;
 import javax.swing.text.Element;
 import javax.swing.text.IconView;
-import javax.swing.text.JTextComponent;
 import javax.swing.text.LabelView;
 import javax.swing.text.ParagraphView;
 import javax.swing.text.StyleConstants;
+import javax.swing.text.StyleContext;
 import javax.swing.text.StyledEditorKit;
 import javax.swing.text.View;
 import javax.swing.text.ViewFactory;
@@ -84,7 +86,7 @@ class ASEditorPane extends JPanel {
 		this.mainID = mainID;
 		this.tabIndex = tabIndex;
 		createEditor();
-		createUndoManager(editor);
+		createUndoManager();
 		editorScroller = new JScrollPane();
 		editorScroller.getViewport().add(editor);
 		setLayout(new BorderLayout());
@@ -139,7 +141,7 @@ class ASEditorPane extends JPanel {
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
-		createUndoManager(editor);
+		createUndoManager();
 		syntaxThread.addDocListener();
 		syntaxThread.repainAll();
 	}
@@ -192,37 +194,70 @@ class ASEditorPane extends JPanel {
 					}
 				} else if ((evt.getKeyCode() == KeyEvent.VK_Y) && (evt.isControlDown())) {
 					try {
-						//Redo changes
 						undo.redo();
 					} catch (CannotRedoException cue) {
 						Toolkit.getDefaultToolkit().beep();
 					}
 				} else if ((evt.getKeyCode() == KeyEvent.VK_S) && (evt.isControlDown())) {
-					try {
-						mainID.saveAct.actionPerformed(null);
-					} catch (CannotRedoException cue) {
-						Toolkit.getDefaultToolkit().beep();
-					}
 					lastKeyWasSave = true;
 				}
 			}
-
+			
 			public void keyReleased(KeyEvent evt) {
 			}
 		});
 		editor.setDragEnabled(true);
-		/*
+
 		editor.setEditorKit(new StyledEditorKit() {
 			public ViewFactory getViewFactory() {
 				return new NumberedViewFactory();
 			}
 		});
-		*/
-		
+
 		//editor.setEditorKitForContentType(editorKit.getContentType(), editorKit);
 		//editor.setContentType("text/asl");
 	}
 
+	String strToFind = null;
+	public void askSearch() {
+		// search
+		strToFind = JOptionPane.showInputDialog(null, "What to search?", "Find", JOptionPane.QUESTION_MESSAGE);
+		search();
+	}
+	public void search() {
+		try {
+			int txtLength = editor.getDocument().getLength();
+			int pos = editor.getCaretPosition()+1;
+			if (pos+1 >= txtLength) {
+				pos = 0;
+			}
+			String text = editor.getDocument().getText(pos,txtLength-pos);
+			if (text != null) {
+				int loc = text.indexOf(strToFind);
+				if (loc >= 0) {
+					editor.grabFocus();
+					editor.setCaretPosition(pos+loc);
+				} else {
+					pos = 0;
+					text = editor.getDocument().getText(pos,txtLength-pos);
+					if (text != null) {
+						loc = text.indexOf(strToFind);
+						if (loc >= 0) {
+							editor.setCaretPosition(pos+loc);
+						} else {
+							Toolkit.getDefaultToolkit().beep();
+						}
+					}
+				}
+			}
+		} catch (Exception cue) {
+			System.err.println(cue);
+			cue.printStackTrace();
+		}
+	}
+
+	
+	
 	public void updateFont() {
 		if (mainID != null) {
 			String font = JasonID.userProperties.getProperty("font");
@@ -263,11 +298,11 @@ class ASEditorPane extends JPanel {
 	}
 	*/
 
-	private void createUndoManager(JTextComponent ed) {
+	private void createUndoManager() {
 		// undo support
 		undo = new UndoManager();
-		undo.setLimit(100);
-		ed.getDocument().addUndoableEditListener(new UndoableEditListener() {
+		undo.setLimit(1000);
+		editor.getDocument().addUndoableEditListener(new UndoableEditListener() {
 			/**
 			 * Messaged when the Document has created an edit, the edit is added
 			 * to <code>undo</code>, an instance of UndoManager.
@@ -303,8 +338,9 @@ class ASEditorPane extends JPanel {
 		}
 	}
 
+	public static int NUMBERS_WIDTH = 25;
+	
 	class NumberedParagraphView extends ParagraphView {
-		public short NUMBERS_WIDTH = 25;
 
 		public NumberedParagraphView(Element e) {
 			super(e);
@@ -321,10 +357,20 @@ class ASEditorPane extends JPanel {
 
 		public void paintChild(Graphics g, Rectangle r, int n) {
 			super.paintChild(g, r, n);
+			FontMetrics fm = g.getFontMetrics();
+
 			int previousLineCount = getPreviousLineCount();
+			String sNB = (getPreviousLineCount() + n + 1)+" ";
+			int width = fm.charsWidth( sNB.toCharArray(), 0, sNB.length());
+			if (width > NUMBERS_WIDTH) {
+				NUMBERS_WIDTH = width + 15;
+				setInsets((short)0, (short)0, (short)0, (short)0);
+			}
 			int numberX = r.x - getLeftInset();
 			int numberY = r.y + r.height - 5;
-			g.drawString(Integer.toString(previousLineCount + n + 1), numberX, numberY);
+			g.setColor(Color.BLACK);
+			g.setFont(syntaxThread.context.getFont(syntaxThread.context.getStyle(StyleContext.DEFAULT_STYLE)));
+			g.drawString(sNB, numberX, numberY);
 		}
 
 		public int getPreviousLineCount() {

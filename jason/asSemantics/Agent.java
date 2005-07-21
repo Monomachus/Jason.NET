@@ -359,7 +359,7 @@ public class Agent {
 	// TODO IMPORTANT: this is not making sure the label of the new plan is unique!!!
 	// TODO: use pl contains (to have only a MAP in plan library)
 	public void addPlan(StringTerm stPlan, Term tSource) {
-		String sPlan = stPlan.getString();
+		String sPlan = stPlan.getValue();
 		try {
 			// remove quotes \" -> "
 			StringBuffer sTemp = new StringBuffer();

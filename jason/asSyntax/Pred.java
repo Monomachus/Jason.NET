@@ -32,12 +32,16 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 /** 
  * A Pred is a Term with annotations, eg a(1)[an1,an2].
  */
 public class Pred extends Term implements Cloneable, Comparable, Serializable {
 
 	private ArrayList annots;
+
+	static private Logger logger = Logger.getLogger(Pred.class.getName());
 
 	public Pred() {
 	}
@@ -59,8 +63,7 @@ public class Pred extends Term implements Cloneable, Comparable, Serializable {
 		try {
 			return parser.at();
 		} catch (Exception e) {
-			System.err.println("Error parsing predicate " + sPred);
-			e.printStackTrace();
+			logger.error("Error parsing predicate " + sPred,e);
 			return null;
 		}
 	}

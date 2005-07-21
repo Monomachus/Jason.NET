@@ -26,8 +26,6 @@ package jason.asSyntax;
 
 public class DefaultLiteral implements Cloneable {
 
-	// TODO: use expressions grammar
-
 	public static final boolean   LDefPos    = true;
     public static final boolean   LDefNeg    = false;
 	

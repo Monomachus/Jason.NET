@@ -25,6 +25,7 @@ package jason.asSemantics;
 
 import jason.asSyntax.DefaultLiteral;
 import jason.asSyntax.Literal;
+import jason.asSyntax.NumberTermImpl;
 import jason.asSyntax.Pred;
 import jason.asSyntax.Term;
 import jason.asSyntax.Trigger;
@@ -51,7 +52,15 @@ public class Unifier implements Cloneable {
     // equality.
 
     public void apply(Term t) {
-        if (t.isVar()) {
+    	if (t.isExpr()) {
+    		ExprTerm et = (ExprTerm)t;
+    		// apply values to expression variables
+    		apply( (Term)et.getLHS()); // TODO: remove this cast when NumberTerm is sub-term interface
+    		if (!et.isUnary()) {
+    			apply( (Term)et.getRHS());// TODO: remove this cast when NumberTerm is sub-term interface
+    		}
+    		et.setValue(new NumberTermImpl(et.solve()));
+    	} else if (t.isVar()) {
 			VarTerm vt = (VarTerm) t;
 			if (! vt.hasValue()) { 
 				Term vl = get(vt.getFunctor());
@@ -77,6 +86,7 @@ public class Unifier implements Cloneable {
 		}
     }
 
+    
 	/**
 	 * gets the value for a Var, if it is unified with another var, gets this
 	 * other's value
@@ -143,7 +153,10 @@ public class Unifier implements Cloneable {
 		List t1gl = t1g.getTerms();
 		List t2gl = t2g.getTerms();
 
+		/*
 		// check if an expression needs solving, before anything else
+		RAFA: o apply troca uma expr por seu valor, e eh chamado um pouco acima
+		
 		try {
 			ExprTerm t1ge = (ExprTerm)t1g;
 			try {
@@ -151,6 +164,7 @@ public class Unifier implements Cloneable {
 			} catch (ClassCastException e) {
 				// t1 is expr but t2 is not
 				// TODO Jomi: ve se tem jeito mais facil de ver se e' inteiro
+				 RAFA: ver toString de NumberTermImpl
 				double t1gd = t1ge.solve();
 				String t1gs = Double.toString(t1gd);
 				if (t1gs.endsWith(".0")) {
@@ -176,6 +190,7 @@ public class Unifier implements Cloneable {
 			} catch (ClassCastException e2) {
 			}
 		}
+		*/
 		
         // identical variables or constants
 		if (t1g.equals(t2g)) {

@@ -40,7 +40,7 @@ public class print implements InternalAction {
 		for (int i = 0; i < args.length; i++) {
 			if (args[i].isString()) {
 				StringTerm st = (StringTerm)args[i];
-				sout.append(st.getString());
+				sout.append(st.getValue());
 			} else {
 				Term t = (Term)args[i].clone();
 				un.apply(t);

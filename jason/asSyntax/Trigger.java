@@ -26,6 +26,8 @@ import jason.asSyntax.parser.as2j;
 
 import java.io.StringReader;
 
+import org.apache.log4j.Logger;
+
 public class Trigger extends Literal implements Cloneable {
 
 
@@ -35,6 +37,9 @@ public class Trigger extends Literal implements Cloneable {
     public static final boolean   TEAdd      = false;
     public static final boolean   TEDel      = true;
 	
+	static private Logger logger = Logger.getLogger(Trigger.class.getName());
+    
+    
 	boolean trigType = TEAdd;
 
 	byte goal = TEBel;
@@ -50,8 +55,7 @@ public class Trigger extends Literal implements Cloneable {
 		try {
 			return parser.te(); 
 		} catch (Exception e) {
-			System.err.println("Error parsing trigger " + sTe);
-			e.printStackTrace();
+			logger.error("Error parsing trigger " + sTe,e);
 			return null;
 		}
 	}

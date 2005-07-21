@@ -28,6 +28,7 @@ public class ASSyntaxHighLight extends Thread { //implements CaretListener {
 	Style commentStyle, planLabelStyle, currentVarStyle, internalActionStyle, specialAnnot, errorStyle, noErrorStyle;
 	JTextPane editor;
 	ASStyles context;
+	ASDocListener docListener;
 	boolean running = true;
 	
 	JasonID jasonID;
@@ -72,7 +73,8 @@ public class ASSyntaxHighLight extends Thread { //implements CaretListener {
 	}
 	
 	public void addDocListener() {
-		editor.getDocument().addDocumentListener(new DocLis());		
+		docListener = new ASDocListener();
+		editor.getDocument().addDocumentListener(docListener);		
 	}
 
 	public Font setFont(String font, int size) {
@@ -85,15 +87,17 @@ public class ASSyntaxHighLight extends Thread { //implements CaretListener {
 	public void repainAll() {
 		offset = 0;
 		while (offset < editor.getDocument().getLength()) {
-			refresh(offset);
+			//refresh(offset);
+			paintLine();
 		}
 	}
 	
 	public void refresh(int offset) {
+		//synchronized (refreshMonitor) {
 		this.offset = offset;
-		synchronized (refreshMonitor) {
-			refreshMonitor.notifyAll();
-		}
+		//	refreshMonitor.notifyAll();
+		//}
+		paintLine();
 	}
 	
 	public void stopRun() {
@@ -102,18 +106,20 @@ public class ASSyntaxHighLight extends Thread { //implements CaretListener {
 	}
 	
 	public void run() {
-		while (running) {
-			try {
-				synchronized (refreshMonitor) {
+		/*
+		synchronized (refreshMonitor) {
+			while (running) {
+				try {
 					refreshMonitor.wait();
+					if (running) {
+						paintLine();
+					}
+				} catch (Exception ex) {
+					ex.printStackTrace();
 				}
-				if (running) {
-					paintLine();
-				}
-			} catch (Exception ex) {
-				ex.printStackTrace();
 			}
 		}
+		*/
 	}
 	
 	void paintLine() {
@@ -123,11 +129,29 @@ public class ASSyntaxHighLight extends Thread { //implements CaretListener {
 			int eIni = ePar.getStartOffset();
 			int eEnd = ePar.getEndOffset();
 			String sPar = sd.getText(eIni, eEnd- eIni);
-			//System.out.println("$"+sPar);
+			sd.setParagraphAttributes(eIni, eEnd-eIni+1, context.getStyle(StyleContext.DEFAULT_STYLE), false);
+			//System.out.println("$"+sPar+"$ line="+getParLineNumber(ePar)+" error line="+jasonID.fASParser.getErrorLine());
 			
 			if (sPar.trim().startsWith("//")) {
 				sd.setCharacterAttributes(eIni, eEnd-eIni-1, commentStyle, true);					
 			} else {
+				
+				// cursor line (check for error in this line)
+				if (jasonID != null && jasonID.fASParser != null) {
+					
+					// identify the current line of ePar
+					int curLine = getParLineNumber(ePar);
+
+					//if (editor.getCaretPosition() >= eIni && editor.getCaretPosition() <= eEnd) {
+					//if (docListener.lastChange >= eIni && docListener.lastChange <= eEnd) {
+						if (jasonID.fASParser.getErrorLine() == curLine) { // has an error?
+							sd.setCharacterAttributes(eIni, eEnd-eIni, errorStyle, true);
+						} else {
+							sd.setCharacterAttributes(eIni, eEnd-eIni, noErrorStyle, true);								
+						}
+					//}
+				}
+
 				tm.ReInit(new SimpleCharStream(new StringReader(sPar)));
 				try {
 					Token lastToken = null;
@@ -144,7 +168,7 @@ public class ASSyntaxHighLight extends Thread { //implements CaretListener {
 						} else if (t.kind == as2j.ATOM && (t.image.equals(Plan.TBreakPoint.getFunctor()) || t.image.equals(Plan.TAtomic.getFunctor()))) {
 							s = specialAnnot;
 						}
-						sd.setCharacterAttributes(eIni+t.beginColumn-1, t.endColumn-t.beginColumn+1, s, true);
+						sd.setCharacterAttributes(eIni+t.beginColumn-1, t.endColumn-t.beginColumn+1, s, false);
 
 						// set currenttoken
 						// TODO: show all var ocoorences
@@ -170,19 +194,6 @@ public class ASSyntaxHighLight extends Thread { //implements CaretListener {
 							sd.setCharacterAttributes(lastToken.endColumn+eIni, eEnd-(lastToken.endColumn+eIni), commentStyle, true);					
 						}
 					}
-					
-					// cursor line (check for error in this line)
-					if (jasonID != null && jasonID.fASParser != null) {
-						if (editor.getCaretPosition() >= eIni && editor.getCaretPosition() <= eEnd) {
-							if (jasonID.fASParser.getErrorLine() != -1) {
-								sd.setCharacterAttributes(eIni, eEnd-eIni, errorStyle, false);
-							} else {
-								sd.setCharacterAttributes(eIni, eEnd-eIni, noErrorStyle, false);								
-							}
-						}
-					}
-					
-
 				} catch (TokenMgrError e) {}
 			}
 			
@@ -200,8 +211,20 @@ public class ASSyntaxHighLight extends Thread { //implements CaretListener {
         //int mark = e.getMark();
     }
     */
+
+	protected int getParLineNumber(Element ePar) {
+		Element parent = ePar.getParentElement();
+		for (int curLine=0; curLine<parent.getElementCount(); curLine++) {
+			if (parent.getElement(curLine) == ePar) {
+				return curLine+1;
+			}
+		}
+		return -1;
+	}
 	
-	class DocLis implements DocumentListener {
+	
+	class ASDocListener implements DocumentListener {
+		int lastChange;
 		public void changedUpdate(DocumentEvent arg0) {
 			updateSyntax(arg0);
 		}
@@ -212,7 +235,8 @@ public class ASSyntaxHighLight extends Thread { //implements CaretListener {
 			updateSyntax(arg0);
 		}
 		void updateSyntax(DocumentEvent e) {
-			refresh(e.getOffset());
+			lastChange = e.getOffset(); 
+			//refresh(lastChange); // cause deadlock!
 		}
 	}
 
@@ -225,6 +249,7 @@ public class ASSyntaxHighLight extends Thread { //implements CaretListener {
 		public ASStyles() {
 			super();
 			Style root = getStyle(DEFAULT_STYLE);
+			StyleConstants.setLeftIndent(root, ASEditorPane.NUMBERS_WIDTH);
 
 			tokenStyles = new Style[as2j.tokenImage.length];
 			for (int i = 0; i < tokenStyles.length; i++) {

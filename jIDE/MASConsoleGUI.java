@@ -101,12 +101,12 @@ public class MASConsoleGUI extends JFrame  {
   
 	public void append(String s) {
 		int l = output.getDocument().getLength();
-		if (l > 10000) {
+		if (l > 30000) {
 			output.setText("");
-			l = output.getDocument().getLength();
+			//l = output.getDocument().getLength();
 		}
 		output.append(s);
-		output.setCaretPosition(l);
+		//output.setCaretPosition(l);
     }
     
     public void close() {

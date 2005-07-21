@@ -14,14 +14,17 @@ import javax.swing.text.Element;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
+import javax.swing.text.StyleContext;
 import javax.swing.text.StyledDocument;
 
 public class MAS2JSyntaxHighLight extends ASSyntaxHighLight {
 	mas2jTokenManager tm = new mas2jTokenManager(new SimpleCharStream(new StringReader("")));
-	public MAS2JSyntaxHighLight(JTextPane p) {
-		super(p, null);
+
+	public MAS2JSyntaxHighLight(JTextPane p, JasonID jID) {
+		super(p, jID);
 		context = new MAS2JStyles();
 	}
+	
 	void paintLine() {
 		try {
 			StyledDocument sd = (StyledDocument) editor.getDocument();
@@ -29,17 +32,30 @@ public class MAS2JSyntaxHighLight extends ASSyntaxHighLight {
 			int eIni = ePar.getStartOffset();
 			int eEnd = ePar.getEndOffset();
 			String sPar = sd.getText(eIni, eEnd- eIni);
+			sd.setParagraphAttributes(eIni, eEnd-eIni+1, context.getStyle(StyleContext.DEFAULT_STYLE), false);
 			//System.out.println("$"+sPar+"$");
 			
 			if (sPar.trim().startsWith("//")) {
 				sd.setCharacterAttributes(eIni, eEnd-eIni-1, commentStyle, true);					
 			} else {
+
+				// cursor line (check for error in this line)
+				if (jasonID != null && jasonID.fMAS2jThread != null) {
+					// identify the current line of ePar
+					int curLine = getParLineNumber(ePar);
+					if (jasonID.fMAS2jThread.getErrorLine() == curLine) { // has an error?
+						sd.setCharacterAttributes(eIni, eEnd-eIni, errorStyle, true);
+					} else {
+						sd.setCharacterAttributes(eIni, eEnd-eIni, noErrorStyle, true);								
+					}
+				}
+				
 				tm.ReInit(new SimpleCharStream(new StringReader(sPar)));
 				try {
 					Token lastToken = null;
 					Token t = tm.getNextToken();
 					while (t.kind != mas2jConstants.EOF) {
-						sd.setCharacterAttributes(eIni+t.beginColumn-1, t.endColumn-t.beginColumn+1,	 context.tokenStyles[t.kind], true);
+						sd.setCharacterAttributes(eIni+t.beginColumn-1, t.endColumn-t.beginColumn+1,	 context.tokenStyles[t.kind], false);
 						lastToken = t;
 						t = tm.getNextToken();
 					}
@@ -103,7 +119,7 @@ public class MAS2JSyntaxHighLight extends ASSyntaxHighLight {
 			StyleConstants.setBold(style, true);
 			tokenStyles[mas2jConstants.ARCHV].addAttributes(style);
 
-			// ! ?
+			// ag options
 			style = new SimpleAttributeSet();
 			StyleConstants.setForeground(style, Color.blue);
 			StyleConstants.setBold(style, true);
@@ -111,6 +127,7 @@ public class MAS2JSyntaxHighLight extends ASSyntaxHighLight {
 			tokenStyles[mas2jConstants.ASOIB].addAttributes(style);
 			tokenStyles[mas2jConstants.ASOV].addAttributes(style);
 			tokenStyles[mas2jConstants.ASOSYNC].addAttributes(style);
+			tokenStyles[mas2jConstants.ASONRC].addAttributes(style);
 
 		}
 	}

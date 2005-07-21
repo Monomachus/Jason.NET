@@ -53,7 +53,7 @@ public class CentralisedAgArch extends Thread implements AgentArchitecture {
 	private String agName = "";
     private boolean running = true;
 	
-	private Logger logger;
+	protected Logger logger;
     
     public void initAg(String[] args) throws JasonException {
     	logger = Logger.getLogger(CentralisedAgArch.class.getName()+"."+getAgName());
