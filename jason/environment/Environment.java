@@ -122,8 +122,6 @@ public class Environment {
 	/**
 	 * Returns perceptions for an agent.
 	 * A full copy of both common and agent perceptions lists is returned.
-	 * 
-	 * TODO: turn it final in the v 0.8
 	 */
     public List getPercepts(String agName) {
 		
