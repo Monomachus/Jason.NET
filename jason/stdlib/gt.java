@@ -26,6 +26,7 @@ package jason.stdlib;
 import jason.asSemantics.InternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
+import jason.asSyntax.NumberTerm;
 import jason.asSyntax.Term;
 
 public class gt implements InternalAction {
@@ -35,8 +36,12 @@ public class gt implements InternalAction {
         Term yp = (Term)args[1].clone();
         un.apply(xp);
         un.apply(yp);
-        int x = Integer.parseInt(xp.toString());
-        int y = Integer.parseInt(yp.toString());
-        return x > y;
+        if (xp.isNumber() && yp.isNumber()) {
+        	NumberTerm xt = (NumberTerm)xp;
+        	NumberTerm yt = (NumberTerm)yp;
+        	return xt.solve() > yt.solve();
+        } else {
+        	return xp.toString().compareTo(yp.toString()) > 0;
+        }
     }
 }

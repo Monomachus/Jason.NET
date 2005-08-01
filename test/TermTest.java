@@ -12,10 +12,21 @@ import jason.asSyntax.VarTerm;
 
 import java.util.Iterator;
 
+import org.apache.log4j.ConsoleAppender;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PatternLayout;
+
 import junit.framework.TestCase;
 
 /** JUnit test case for syntax package */
 public class TermTest extends TestCase {
+
+	protected void setUp() throws Exception {
+		super.setUp();
+		Logger.getRootLogger().addAppender(new ConsoleAppender(new PatternLayout("[%c{1}] %m%n")));
+    	Logger.getRootLogger().setLevel(Level.DEBUG);
+	}
 
 	public void testEquals() {
 		Term t1, t2, t3;

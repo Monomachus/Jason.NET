@@ -30,8 +30,6 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
@@ -41,6 +39,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.event.UndoableEditEvent;
 import javax.swing.event.UndoableEditListener;
 import javax.swing.text.AbstractDocument;
@@ -55,8 +55,6 @@ import javax.swing.text.StyleContext;
 import javax.swing.text.StyledEditorKit;
 import javax.swing.text.View;
 import javax.swing.text.ViewFactory;
-import javax.swing.undo.CannotRedoException;
-import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoManager;
 
 class ASEditorPane extends JPanel {
@@ -66,6 +64,7 @@ class ASEditorPane extends JPanel {
 	JScrollPane editorScroller;
 	boolean modified = false;
 	boolean needsParsing = false;
+	//boolean lastKeyWasSave = false;
 
 	private String fileName = "";
 	String extension = "asl";
@@ -81,7 +80,7 @@ class ASEditorPane extends JPanel {
 		this(null, 0);
 	}
 
-	ASEditorPane(JasonID mainID, int tabIndex) {
+	ASEditorPane(final JasonID mainID, final int tabIndex) {
 		super(true);
 		this.mainID = mainID;
 		this.tabIndex = tabIndex;
@@ -135,14 +134,14 @@ class ASEditorPane extends JPanel {
 	
 	void createNewPlainText(String text) {
 		//editor.setDocument(new DefaultStyledDocument());
+		//createUndoManager(); // only when new doc is created
 		try {
 			editor.getDocument().remove(0, editor.getDocument().getLength());
 			editor.getDocument().insertString(0, text, null);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
-		createUndoManager();
-		syntaxThread.addDocListener();
+		//syntaxThread.addDocListener(); // only when new doc is created
 		syntaxThread.repainAll();
 	}
 
@@ -167,50 +166,39 @@ class ASEditorPane extends JPanel {
 	 */
 	protected void createEditor() {
 		editor = new JTextPane();//JEditorPane(); //new JTextArea();
-		
-		editor.addKeyListener(new KeyListener() {
-			boolean lastKeyWasSave = false;
 
-			public void keyTyped(KeyEvent evt) {
-				if (!lastKeyWasSave) {
-					modified = true;
-					needsParsing = true;
-				}
-				if (mainID != null) {
-					mainID.updateTabTitle(tabIndex, ASEditorPane.this, null);
-				}
-				if (!mainID.runMASButton.isEnabled()) {
-					mainID.runMASButton.setEnabled(true);
-				}
-			}
-
-			public void keyPressed(KeyEvent evt) {
-				lastKeyWasSave = false;
-				if ((evt.getKeyCode() == KeyEvent.VK_Z) && (evt.isControlDown())) {
-					try {
-						undo.undo();
-					} catch (CannotUndoException cue) {
-						Toolkit.getDefaultToolkit().beep();
-					}
-				} else if ((evt.getKeyCode() == KeyEvent.VK_Y) && (evt.isControlDown())) {
-					try {
-						undo.redo();
-					} catch (CannotRedoException cue) {
-						Toolkit.getDefaultToolkit().beep();
-					}
-				} else if ((evt.getKeyCode() == KeyEvent.VK_S) && (evt.isControlDown())) {
-					lastKeyWasSave = true;
-				}
-			}
-			
-			public void keyReleased(KeyEvent evt) {
-			}
-		});
 		editor.setDragEnabled(true);
 
 		editor.setEditorKit(new StyledEditorKit() {
 			public ViewFactory getViewFactory() {
 				return new NumberedViewFactory();
+			}
+		});
+		
+		editor.getDocument().addDocumentListener(new DocumentListener() {
+			public void changedUpdate(DocumentEvent arg0) {
+			}
+			public void insertUpdate(DocumentEvent arg0) {
+				updateTab();
+			}
+			public void removeUpdate(DocumentEvent arg0) {
+				updateTab();
+			}
+			void updateTab() {
+				modified = true;
+				needsParsing = true;
+				if (mainID != null) {
+					mainID.updateTabTitle(tabIndex, ASEditorPane.this, null);
+					if (mainID.fASParser != null) {
+						mainID.fASParser.stopWaiting();
+					}
+					if (mainID.fMAS2jThread != null) {
+						mainID.fMAS2jThread.stopWaiting();
+					}
+				}
+				if (!mainID.runMASButton.isEnabled()) {
+					mainID.runMASButton.setEnabled(true);
+				}
 			}
 		});
 
@@ -301,14 +289,16 @@ class ASEditorPane extends JPanel {
 	private void createUndoManager() {
 		// undo support
 		undo = new UndoManager();
-		undo.setLimit(1000);
+		undo.setLimit(200);
 		editor.getDocument().addUndoableEditListener(new UndoableEditListener() {
 			/**
 			 * Messaged when the Document has created an edit, the edit is added
 			 * to <code>undo</code>, an instance of UndoManager.
 			 */
 			public void undoableEditHappened(UndoableEditEvent e) {
-				undo.addEdit(e.getEdit());
+				if (!e.getEdit().getPresentationName().startsWith("style")) {
+					undo.addEdit(e.getEdit());
+				}
 			}
 		});
 	}

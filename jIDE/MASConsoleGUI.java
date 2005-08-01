@@ -95,11 +95,13 @@ public class MASConsoleGUI extends JFrame  {
         getContentPane().add(BorderLayout.SOUTH, pBt);
         pack();
         setBounds(250, 10, 700, 500);
-        setVisible(true);
     }
     
   
 	public void append(String s) {
+		if (!isVisible()) {
+	        setVisible(true);
+		}
 		int l = output.getDocument().getLength();
 		if (l > 30000) {
 			output.setText("");

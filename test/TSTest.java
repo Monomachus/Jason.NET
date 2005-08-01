@@ -12,10 +12,21 @@ import jason.asSyntax.Trigger;
 
 import java.util.List;
 
+import org.apache.log4j.ConsoleAppender;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PatternLayout;
+
 import junit.framework.TestCase;
 
 /** JUnit test case for syntax package */
 public class TSTest extends TestCase {
+	
+	protected void setUp() throws Exception {
+		super.setUp();
+		Logger.getRootLogger().addAppender(new ConsoleAppender(new PatternLayout("[%c{1}] %m%n")));
+    	Logger.getRootLogger().setLevel(Level.DEBUG);
+	}
 	
 	public void testRelevant() {
 		Agent ag = new Agent();

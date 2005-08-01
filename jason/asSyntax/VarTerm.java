@@ -204,6 +204,13 @@ public class VarTerm extends Term implements NumberTerm {
 		}
 	}
 	*/
+	public boolean isNumber() {
+		if (value == null) {
+			return false;
+		} else {
+			return getValue().isNumber();
+		}
+	}
 	
 	public boolean hasVar(Term t) {
 		if (value == null) {

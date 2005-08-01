@@ -7,6 +7,8 @@ import jason.asSemantics.Unifier;
 import jason.asSyntax.BeliefBase;
 import jason.asSyntax.ListTerm;
 import jason.asSyntax.Literal;
+import jason.asSyntax.NumberTerm;
+import jason.asSyntax.NumberTermImpl;
 import jason.asSyntax.Pred;
 import jason.asSyntax.StringTerm;
 import jason.asSyntax.Term;
@@ -18,11 +20,22 @@ import jason.stdlib.removePlan;
 
 import java.util.Iterator;
 
+import org.apache.log4j.ConsoleAppender;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PatternLayout;
+
 import junit.framework.TestCase;
 
 /** JUnit test case for stdlib package */
 public class StdLibTest extends TestCase {
 
+	protected void setUp() throws Exception {
+		super.setUp();
+		Logger.getRootLogger().addAppender(new ConsoleAppender(new PatternLayout("[%c{1}] %m%n")));
+    	Logger.getRootLogger().setLevel(Level.INFO);
+	}
+	
 	public void testAddAnnot() {
 		addAnnot aa = new addAnnot();
 		Unifier u = new Unifier();
@@ -169,6 +182,33 @@ public class StdLibTest extends TestCase {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}	
+	}
+
+	public void testGT() {
+		NumberTerm x = new NumberTermImpl(20);
+		NumberTerm y = new NumberTermImpl(100);
+		VarTerm vy = new VarTerm("Y");
+		Unifier u = new Unifier();
+		u.unifies(vy,(Term)y);
+		try {
+			assertTrue(new jason.stdlib.gt().execute(null, u, new Term[] { vy, (Term)x }));
+			assertFalse(new jason.stdlib.gt().execute(null, u, new Term[] { (Term)x, vy }));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		StringTerm sx = new StringTerm("a");
+		StringTerm sy = new StringTerm("b");
+		VarTerm vsy = new VarTerm("SY");
+		u.unifies(vsy,sy);
+		try {
+			assertTrue(new jason.stdlib.gt().execute(null, u, new Term[] { vsy, sx }));
+			assertFalse(new jason.stdlib.gt().execute(null, u, new Term[] { sx, vsy }));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		System.out.println("U="+u);
 	}
 	
 }

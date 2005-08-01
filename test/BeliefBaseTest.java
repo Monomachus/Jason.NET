@@ -1,5 +1,10 @@
 package test;
 
+import org.apache.log4j.ConsoleAppender;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PatternLayout;
+
 import jason.asSyntax.BeliefBase;
 import jason.asSyntax.Literal;
 import jason.asSyntax.Pred;
@@ -9,6 +14,12 @@ import junit.framework.TestCase;
 
 /** JUnit test case for syntax package */
 public class BeliefBaseTest extends TestCase {
+
+	protected void setUp() throws Exception {
+		super.setUp();
+		Logger.getRootLogger().addAppender(new ConsoleAppender(new PatternLayout("[%c{1}] %m%n")));
+    	Logger.getRootLogger().setLevel(Level.DEBUG);
+	}
 
 	
 	public void testAdd() {

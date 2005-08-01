@@ -75,6 +75,8 @@ import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
+import javax.swing.undo.CannotRedoException;
+import javax.swing.undo.CannotUndoException;
 
 public class JasonID {
     
@@ -207,33 +209,51 @@ public class JasonID {
     static void tryToFixJarFileConf(String jarEntry, String jarName, int minSize) {
     	String jarFile = userProperties.getProperty(jarEntry);
         if (jarFile == null || !checkJar(jarFile)) {
-        	System.out.println("Wrong conf for "+jarName+", current is "+jarFile);
+        	System.out.println("Wrong configuration for "+jarName+", current is "+jarFile);
+
         	// try to get from classpath
         	jarFile = getPathFromClassPath(jarName);
         	if (checkJar(jarFile)) {
         		userProperties.put(jarEntry, jarFile);
     			System.out.println("found at "+jarFile);
-        	} else {
-        		// try from java web start
-        		String jwsDir = System.getProperty("jnlpx.deployment.user.home");
-        		if (jwsDir == null) {
-        			// try another property (windows)
-        			try {
-        				jwsDir = System.getProperty("deployment.user.security.trusted.certs");
-        				jwsDir = new File(jwsDir).getParentFile().getParent();
-        			} catch (Exception e) {}
+    			return;
+        	} 
+    		
+        	// try current dir
+        	jarFile = "."+File.separator+jarName;
+    		if (checkJar(jarFile)) {
+        		userProperties.put(jarEntry, new File(jarFile).getAbsolutePath());
+    			System.out.println("found at "+jarFile);
+    			return;
+    		}
+
+        	// try current dir + lib
+    		jarFile = ".."+File.separator+"lib"+File.separator+jarName;
+    		if (checkJar(jarFile)) {
+        		userProperties.put(jarEntry, new File(jarFile).getAbsolutePath());
+    			System.out.println("found at "+jarFile);
+    			return;
+    		}
+    		
+    		// try from java web start
+    		String jwsDir = System.getProperty("jnlpx.deployment.user.home");
+    		if (jwsDir == null) {
+    			// try another property (windows)
+    			try {
+    				jwsDir = System.getProperty("deployment.user.security.trusted.certs");
+    				jwsDir = new File(jwsDir).getParentFile().getParent();
+    			} catch (Exception e) {}
+    		}
+    		if (jwsDir != null) {
+        		jarFile = findFile(new File(jwsDir), jarName, minSize);
+        		System.out.print("Searching "+jarName+" in "+jwsDir+" ... ");
+        		if (jarFile != null && checkJar(jarFile)) {
+        			System.out.println("found at "+jarFile);
+        			userProperties.put(jarEntry, jarFile);            			
+        		} else {
+        			userProperties.put(jarEntry, File.separator);
         		}
-        		if (jwsDir != null) {
-            		jarFile = findFile(new File(jwsDir), jarName, minSize);
-            		System.out.print("Searching "+jarName+" in "+jwsDir+" ... ");
-            		if (jarFile != null && checkJar(jarFile)) {
-            			System.out.println("found at "+jarFile);
-            			userProperties.put(jarEntry, jarFile);            			
-            		} else {
-            			userProperties.put(jarEntry, File.separator);
-            		}
-        		}
-        	}
+    		}
         }
     	
     }
@@ -514,12 +534,59 @@ public class JasonID {
         jMenuProject.addSeparator();
         
         item = jMenuProject.add(exitAppAct);
-        item.setMnemonic('x');
-        item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, KeyEvent.CTRL_MASK));        
+        //item.setMnemonic('q');
+        item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, KeyEvent.CTRL_MASK));        
         
 
         JMenu jMenuEdit = new JMenu("Edit");
         jMenuEdit.setMnemonic('E');
+
+        item = jMenuEdit.add(new AbstractAction("Undo") { 
+            public void actionPerformed(ActionEvent e) {
+				try {
+	            	((ASEditorPane)tab.getSelectedComponent()).undo.undo();
+				} catch (CannotUndoException cue) {
+					Toolkit.getDefaultToolkit().beep();
+				}
+            }
+         });
+        item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z, KeyEvent.CTRL_MASK));        
+
+        item = jMenuEdit.add(new AbstractAction("Redo") { 
+            public void actionPerformed(ActionEvent e) {
+				try {
+	            	((ASEditorPane)tab.getSelectedComponent()).undo.redo();
+				} catch (CannotRedoException cue) {
+					Toolkit.getDefaultToolkit().beep();
+				}            }
+         });
+        item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Y, KeyEvent.CTRL_MASK));        
+        
+        item = jMenuEdit.add(new AbstractAction("Cut") { 
+            public void actionPerformed(ActionEvent e) {
+            	((ASEditorPane)tab.getSelectedComponent()).editor.cut();
+            }
+         });
+        //item.setMnemonic('x');
+        item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, KeyEvent.CTRL_MASK));        
+
+        item = jMenuEdit.add(new AbstractAction("Copy") { 
+            public void actionPerformed(ActionEvent e) {
+            	((ASEditorPane)tab.getSelectedComponent()).editor.copy();
+            }
+         });
+        item.setMnemonic('c');
+        item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, KeyEvent.CTRL_MASK));        
+        
+        item = jMenuEdit.add(new AbstractAction("Paste") { 
+            public void actionPerformed(ActionEvent e) {
+            	((ASEditorPane)tab.getSelectedComponent()).editor.paste();
+            }
+         });
+        //item.setMnemonic('x');
+        item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, KeyEvent.CTRL_MASK));        
+        
+        jMenuEdit.addSeparator();
         
         item = jMenuEdit.add(new AbstractAction("Find...") { 
             public void actionPerformed(ActionEvent e) {
@@ -705,19 +772,19 @@ public class JasonID {
         
         Thread load(int tabIndex, File f, ASEditorPane pane) {
             pane.createNewPlainText("");
-            pane.modified = false;
-            Thread loader = new FileLoader(f, pane);
+            Thread loader = new FileLoader(f, pane, tabIndex);
             loader.start();
-            updateTabTitle(tabIndex, pane, null);
             return loader;
         }
         
         class FileLoader extends Thread {
             ASEditorPane pane;
             File f;
-            FileLoader(File f, ASEditorPane pane) {
+            int tabIndex;
+            FileLoader(File f, ASEditorPane pane, int index) {
                 this.f = f;
                 this.pane = pane;
+                this.tabIndex = index;
             }
             
             public void run() {
@@ -734,15 +801,16 @@ public class JasonID {
                         doc.insertString(doc.getLength(), new String(buff, 0, nch), null);
                         status.progress.setValue(status.progress.getValue() + nch);
                     }
-                    //status.progress.setValue(0);
+                    status.progress.setValue(0);
                     pane.needsParsing = true;
                     pane.undo.discardAllEdits();
                     if (fMAS2jThread != null) {
                     	fMAS2jThread.stopWaiting();
                     }
 				  	 pane.syntaxThread.repainAll();
+				  	 pane.modified = false;
                 } catch (FileNotFoundException ex) {
-					System.err.println("File does not exists, it will be created!");
+					System.err.println("File "+f+" does not exists, it will be created!");
 				 } catch (java.io.IOException e) {
                 	System.err.println("I/O error for "+f+" -- "+e.getMessage());
                     e.printStackTrace();
@@ -752,6 +820,7 @@ public class JasonID {
                 } finally {
                 	runMASButton.setEnabled(true);
                 	debugMASButton.setEnabled(true);
+                	updateTabTitle(tabIndex, pane, null);
                 }
             }
         }
@@ -784,7 +853,7 @@ public class JasonID {
                         status.progress.setValue(i);
                     }
                     out.close();
-                    //status.progress.setValue(0);
+                    status.progress.setValue(0);
                 } catch (java.io.IOException ex) {
                     ex.printStackTrace();
                 } catch (BadLocationException ex) {
@@ -910,6 +979,7 @@ public class JasonID {
         	d = new JDialog(frame, "Jason Preferences");
         	d.getContentPane().setLayout(new GridLayout(0, 1));
 
+        	
         	// jason home
         	JPanel jasonHomePanel = new JPanel();
         	jasonHomePanel.setBorder(BorderFactory.createTitledBorder(BorderFactory
