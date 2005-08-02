@@ -75,8 +75,6 @@
                      PlanLibrary pp = new PlanLibrary(); Plan pl;
     label_2:
     while (true) {
-      pl = p();
-                     pp.add(pl);
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case TK_LABEL_AT:
       case 25:
@@ -87,6 +85,8 @@
         jj_la1[1] = jj_gen;
         break label_2;
       }
+      pl = p();
+                     pp.add(pl);
     }
                      {if (true) return pp;}
     throw new Error("Missing return statement in function");

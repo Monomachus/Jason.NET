@@ -138,7 +138,7 @@ void bs(List bbl) : { Literal F; }
 PlanLibrary ps() : { PlanLibrary pp = new PlanLibrary(); Plan pl;  }
 {
   ( pl = p()       { pp.add(pl); } 
-  )+ 
+  )*
                    { return pp; }
 }
 
