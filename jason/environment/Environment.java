@@ -67,7 +67,8 @@ public class Environment {
 	
 	
 	/** called before the start of MAS execution, the user environment could override it */
-	public void init() {
+	public void init(String[] args) {
+		// TODO: implement env. args in .mas2j
 	}
 	
 	/** called before the end of MAS execution, the user environment could override it */

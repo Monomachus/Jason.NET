@@ -55,10 +55,10 @@ public class CentralisedEnvironment implements EnvironmentInterface {
         mboxes      = Collections.synchronizedMap(new HashMap());
         agents      = Collections.synchronizedMap(new HashMap());
         
-        try {
-			fUserEnv = (Environment) Class.forName(userEnvClassName).newInstance();
+        try { 
+			fUserEnv = (Environment) getClass().getClassLoader().loadClass(userEnvClassName).newInstance();
 			fUserEnv.setJasonEnvironment(this);
-			fUserEnv.init();
+			fUserEnv.init(null);
         } catch (Exception e) {
             logger.error("Error in Centralised MAS environment creation",e);
             throw new JasonException("The user environment class instantiation '"+userEnvClassName+"' has failed!"+e.getMessage());

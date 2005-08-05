@@ -27,13 +27,14 @@ import jason.architecture.CentralisedAgArch;
 import jason.control.CentralisedExecutionControl;
 import jason.environment.CentralisedEnvironment;
 
-import java.io.BufferedReader;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.swing.JButton;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -52,8 +53,11 @@ public class RunCentralisedMAS {
     CentralisedEnvironment env = null;
     CentralisedExecutionControl control = null;
     List ags = new ArrayList();
-
-    static Logger logger = Logger.getLogger(RunCentralisedMAS.class);
+    boolean insideJIDE = false;
+    
+    private static Logger logger = Logger.getLogger(RunCentralisedMAS.class);
+    private static RunCentralisedMAS runner = null;
+    
     public final static String logPropFile = "log4j.configuration";
     
     //static MASConsoleGUI console;
@@ -64,6 +68,8 @@ public class RunCentralisedMAS {
             System.exit(1);
         }
 
+        runner = new RunCentralisedMAS();
+
         // see for a local log4j configuration
         if (new File(logPropFile).exists()) {
         	PropertyConfigurator.configure(logPropFile);
@@ -73,19 +79,34 @@ public class RunCentralisedMAS {
         	//Logger.getRootLogger().setLevel(Level.INFO);
         }
         
-        
         Document docDOM = parse(args[0]);
         if (docDOM != null) {
-			RunCentralisedMAS r = new RunCentralisedMAS();
 			try {
-				r.createAg(docDOM);
-				r.startAgs();
-			
-				r.startSyncMode();
+				runner.createAg(docDOM);
+				runner.startAgs();
+				runner.startSyncMode();
 			} catch (Exception e) {
 				logger.error("Error!?:",e);
 			}
-			r.waitEnd();
+
+	        if (args.length == 2) { // from inside jIDE
+	        	if (args[1].equals("insideJIDE")) {
+	        		runner.insideJIDE = true;
+	        	}
+	        }
+			
+			// add Button
+	        JButton btStop = new JButton("Stop MAS");
+	        btStop.addActionListener(new ActionListener() {
+	            public void actionPerformed(ActionEvent evt) {
+	                runner.finish();
+	            }
+	        });
+	        MASConsoleGUI.get().addButton(btStop);
+
+	        if (! runner.insideJIDE) {
+	        	runner.waitEnd();
+	        }
         }
     }
     
@@ -106,6 +127,10 @@ public class RunCentralisedMAS {
         }
     }
 
+    public static RunCentralisedMAS getRunner() {
+    	return runner;
+    }
+    
 	void createAg(Document docDOM) {
         
 		// get soc nome
@@ -191,32 +216,44 @@ public class RunCentralisedMAS {
 	
 	void waitEnd() {
 		try {
-			BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-			String line = in.readLine();
-			while (! line.equals("quit")) {
-				logger.info("MAS have read "+line);
-				line = in.readLine();
+			int c = System.in.read();
+			while (c != 1) {
+				c = System.in.read();
 			}
-			
+			finish();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void finish() {
+		try {
 			stopAgs();
 			
 			if (control != null) {
 				control.stop();
+				control = null;
 			}
 			if (env != null) {
 				env.stop();
+				env = null;
 			}
 		
 			if (MASConsoleGUI.hasConsole()) {
 				MASConsoleGUI.get().close();
 			}
 			
+			runner = null;
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		System.exit(0);
+		if (!insideJIDE) {
+			System.exit(0);
+		}
 	}
-
+	
+	
     public static String[] getArrayFromString(String s) {
         if (s == null) {
             return new String[0];

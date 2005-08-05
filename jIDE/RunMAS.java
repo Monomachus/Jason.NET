@@ -23,13 +23,19 @@
 package jIDE;
 
 import java.awt.event.ActionEvent;
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
+import java.io.OutputStream;
 import java.io.PrintStream;
+import java.lang.reflect.Method;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
@@ -78,7 +84,11 @@ class RunMAS extends AbstractAction {
 					compT.start();
 
 					if (jasonID.fMAS2jThread.fParserMAS2J.getArchitecture().equals("Centralised")) {
-						masRunner = new MASRunnerCentralised(compT);
+						if (jasonID.getConf().getProperty("runCentralisedInsideJIDE").equals("true")) {
+							masRunner = new MASRunnerInsideJIDE(compT);
+						} else {
+							masRunner = new MASRunnerCentralised(compT);
+						}
 					} else if (jasonID.fMAS2jThread.fParserMAS2J.getArchitecture().equals("Saci")) {
 						String saciJar = jasonID.getConf().getProperty("saciJar");
 						if (JasonID.checkJar(saciJar)) {
@@ -279,10 +289,11 @@ class RunMAS extends AbstractAction {
 
 	class MASRunner extends Thread {
 		CompileThread compT;
-		private boolean stop = false;
+		protected boolean stop = false;
+		boolean stopOnProcessExit = true;
 		
 		Process masProcess = null;
-		OutputStreamWriter processOut;
+		OutputStream processOut;
 
 		MASRunner(CompileThread t) {
 			super("MASRunner");
@@ -310,17 +321,9 @@ class RunMAS extends AbstractAction {
 
 				BufferedReader in = new BufferedReader(new InputStreamReader(masProcess.getInputStream()));
 				BufferedReader err = new BufferedReader(new InputStreamReader(	masProcess.getErrorStream()));
-				processOut = new OutputStreamWriter(masProcess.getOutputStream());
+				processOut = masProcess.getOutputStream();
 
 				jasonID.stopMASButton.setEnabled(true);
-				
-				
-				/*
-				if (masConsole != null) {
-					masConsole.append("MAS execution\n");
-					masConsole.append("--------------------------------------\n");
-				}
-				*/
 				
 				sleep(500);
 				stop = false;
@@ -332,13 +335,16 @@ class RunMAS extends AbstractAction {
 						System.out.println(err.readLine());
 					}
 					sleep(250); // to not consume cpu
+					
+					if (stopOnProcessExit) {
+						try {
+							masProcess.exitValue();
+							// no exception when the process has finished
+							stop = true;
+						} catch (Exception e) {}
+					}
 				}
 				
-				/*
-				if (masConsole != null) {
-					masConsole.append("\n------\n");
-				}
-				*/
 			} catch (Exception e) {
 				System.err.println("Execution error: " + e);
 				e.printStackTrace();
@@ -358,7 +364,7 @@ class RunMAS extends AbstractAction {
 
 		void stopRunner() {
 			try {
-				processOut.write("quit\n");
+				processOut.write(1);//"quit"+System.getProperty("line.separator"));
 			} catch (Exception e) {
 				System.err.println("Execution error: " + e);
 				e.printStackTrace();
@@ -368,6 +374,71 @@ class RunMAS extends AbstractAction {
 		}
 	}
 
+	
+	class MASRunnerInsideJIDE extends MASRunner {
+		Method getRunnerMethod;
+		Method finishMethod;
+		
+		MASRunnerInsideJIDE(CompileThread t) {
+			super(t);
+		}
+
+		void stopRunner() {
+			try {
+				//RunCentralisedMAS.getRunner().finish();
+				finishMethod.invoke(getRunnerMethod.invoke(null,null),null);
+			} catch (Exception e) {
+				System.err.println("Execution error: " + e);
+				e.printStackTrace();
+			}
+
+			super.stopRunner();
+		}
+
+		public void run() {
+			try {
+				if (compT != null) {
+					if (!compT.waitCompilation()) {
+						return;
+					}
+				}
+				
+				File fXML = new File(jasonID.projectDirectory + File.separator + jasonID.fMAS2jThread.fParserMAS2J.getSocName()+".xml");
+				System.out.println("Running MAS with "+fXML.getAbsolutePath());
+				// create a new RunCentralisedMAS (using my class loader to not cache user classes and to find user project directory)
+				Class rmas = new MASClassLoader(jasonID.projectDirectory).loadClass(RunCentralisedMAS.class.getName());
+				Class[] classParameters = { (new String[2]).getClass() };
+				Method executeMethod = rmas.getDeclaredMethod("main", classParameters);
+				classParameters = new Class[0];
+				getRunnerMethod = rmas.getDeclaredMethod("getRunner", classParameters);
+				finishMethod = rmas.getDeclaredMethod("finish", classParameters);
+				
+				Object objectParameters[] = { new String[] {fXML.getAbsolutePath(), "insideJIDE"} };
+				// Static method, no instance needed
+				executeMethod.invoke(null, objectParameters);
+				//((RunCentralisedMAS)rmas.newInstance()).main(new String[] {fXML.getAbsolutePath(), "insideJIDE"});
+
+				jasonID.stopMASButton.setEnabled(true);
+				
+				stop = false;
+				while (!stop) {
+					sleep(250); // to not consume cpu
+					//if (RunCentralisedMAS.getRunner() == null) {
+					if (getRunnerMethod.invoke(null, null) == null) {
+						stop = true;
+					}
+				}
+			} catch (Exception e) {
+				System.err.println("Execution error: " + e);
+				e.printStackTrace();
+			} finally {
+				jasonID.runMASButton.setEnabled(true);
+				jasonID.debugMASButton.setEnabled(true);
+				jasonID.stopMASButton.setEnabled(false);				
+			}
+		}
+	}
+	
 	class MASRunnerSaci extends MASRunner {
 		StartSaci saciThread;
 		Launcher l;
@@ -376,6 +447,7 @@ class RunMAS extends AbstractAction {
 		
 		MASRunnerSaci(CompileThread t) {
 			super(t);
+			stopOnProcessExit = false;
 		}
 
 		void stopRunner() {
@@ -430,5 +502,77 @@ class RunMAS extends AbstractAction {
 		}
 	}
 	
-}
+	
+	class MASClassLoader extends ClassLoader {
+		
+		String MASDirectory;
+		JarFile jf;
+		
+		MASClassLoader(String masDir) {
+			MASDirectory = masDir;
+			try {
+				jf = new JarFile(jasonID.getConf().getProperty("jasonJar"));
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 
+		public Class loadClass(String name) throws ClassNotFoundException {
+			//System.out.println("loadClass " + name);
+			if (! name.equals(MASConsoleGUI.class.getName())) { // let super loader to get MASConsoleGUI, since it must be shared between RunCentMAS and jIDE
+				if (name.startsWith("jason.") || name.startsWith("jIDE.")) {
+					//System.out.println("loading new ");
+					return findClassInJar(RunMAS.class, name);
+				}
+			}
+			return super.loadClass(name);
+		}
+
+		public Class findClass(String name) {
+			byte[] b = findClassBytes(MASDirectory, name);
+			if (b != null) {
+				//System.out.println(name + " found ");
+				return defineClass(name, b, 0, b.length);
+			} else {
+				return null;
+			}
+		}
+
+		public byte[] findClassBytes(String dir, String className) {
+			try {
+				String pathName = dir + File.separatorChar	+ className.replace('.', File.separatorChar) + ".class";
+				FileInputStream inFile = new FileInputStream(pathName);
+				byte[] classBytes = new byte[inFile.available()];
+				inFile.read(classBytes);
+				return classBytes;
+			} catch (java.io.IOException ioEx) {
+				System.err.println("Error loading class "+className);
+				ioEx.printStackTrace();
+				return null;
+			}
+		}
+
+		public Class findClassInJar(Class c, String className) {
+			try {
+				if (jf == null) 
+					return null;
+				JarEntry je = jf.getJarEntry(className.replace('.', '/') + ".class"); // must be '/' since inside jar / is used not \
+				if (je == null) {
+					System.out.println("does not find class "+className);
+					return null;
+				}
+				InputStream in = new BufferedInputStream(jf.getInputStream(je));
+				//System.out.println(c.getResource("/"+className.replace('.', File.separatorChar) + ".class"));
+				//InputStream in = new BufferedInputStream(c.getResource("/"+className.replace('.', File.separatorChar) + ".class").openStream());
+				byte[] classBytes = new byte[in.available()];
+				in.read(classBytes);
+				//System.out.println(" found "+className+ " size="+classBytes.length);
+				return defineClass(className, classBytes, 0, classBytes.length);
+			} catch (Exception e) {
+				System.err.println("Error loading class "+className);
+				e.printStackTrace();
+				return null;
+			}
+		}
+	}	
+}

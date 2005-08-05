@@ -62,6 +62,7 @@ public class MASConsoleGUI extends JFrame  {
     }
     
     JTextArea output;
+    JPanel    pBt = null;
     PrintStream originalOut = null;
     PrintStream originalErr = null;
     
@@ -78,6 +79,14 @@ public class MASConsoleGUI extends JFrame  {
         
         output = new JTextArea();
         output.setEditable(false);
+
+		pBt = new JPanel();
+		pBt.setLayout(new FlowLayout(FlowLayout.CENTER));
+
+        getContentPane().setLayout(new BorderLayout());
+        getContentPane().add(BorderLayout.CENTER, new JScrollPane(output));
+        getContentPane().add(BorderLayout.SOUTH, pBt);
+
         JButton btClean = new JButton("Clean");
         btClean.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
@@ -85,16 +94,15 @@ public class MASConsoleGUI extends JFrame  {
             }
         });
         
-        JPanel pBt = new JPanel();
-        pBt.setLayout(new FlowLayout(FlowLayout.CENTER));
-        pBt.add(btClean);
+        addButton(btClean);
         
-        
-        getContentPane().setLayout(new BorderLayout());
-        getContentPane().add(BorderLayout.CENTER, new JScrollPane(output));
-        getContentPane().add(BorderLayout.SOUTH, pBt);
-        pack();
         setBounds(250, 10, 700, 500);
+    }
+    
+    public void addButton(JButton jb) {
+    	pBt.add(jb);
+    	pBt.revalidate();
+    	//pack();
     }
     
   

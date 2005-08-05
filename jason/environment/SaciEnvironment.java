@@ -80,7 +80,7 @@ public class SaciEnvironment extends saci.Agent implements EnvironmentInterface 
         try {
             fUserEnv = (Environment)Class.forName(args[0]).newInstance();
             fUserEnv.setJasonEnvironment(this);
-			fUserEnv.init();
+			fUserEnv.init(null);
         } catch (Exception e) {
         	logger.error("Error in Saci Environment initAg",e);
             throw new JasonException("The user environment class instantiation '"+args[0]+"' fail!"+e.getMessage());

@@ -50,9 +50,9 @@ import java.util.StringTokenizer;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
@@ -63,7 +63,6 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
@@ -85,7 +84,7 @@ public class JasonID {
     JTextArea output;
     JTabbedPane tab;
     JToolBar  toolBar;
-    StatusBar status;
+    //StatusBar status;
     JButton runMASButton;
     JButton debugMASButton;
     JButton stopMASButton;
@@ -154,7 +153,7 @@ public class JasonID {
         	tryToFixJarFileConf("saciJar",  "saci.jar",  300000);
         	tryToFixJarFileConf("log4jJar", "log4j.jar", 350000);
 			
-            if (userProperties.get("javaHome") == null) {
+            if (userProperties.get("javaHome") == null || !checkJavaPath(userProperties.getProperty("javaHome"))) {
             	String javaHome = System.getProperty("java.home");
             	if (checkJavaPath(javaHome)) {
             		userProperties.put("javaHome", javaHome);
@@ -171,6 +170,11 @@ public class JasonID {
             }
         
             userProperties.put("version", currJasonVersion);
+            
+            if (userProperties.get("runCentralisedInsideJIDE") == null) {
+            	userProperties.put("runCentralisedInsideJIDE", "true"); // it does not work!
+            }
+            
             jasonConfFile.getParentFile().mkdirs();
             storePrefs();
 
@@ -180,6 +184,7 @@ public class JasonID {
                 jasonID.openAct.loadProject(new File(args[0]));
             } else {
             	jasonID.mas2jPane.createNewPlainText("// use the menu Project->New option to create a new project.");//jasonID.mas2jPane.getDefaultText("anMAS", ""));
+            	jasonID.mas2jPane.modified = false;
             }
             jasonID.startThreads();
 
@@ -358,7 +363,7 @@ public class JasonID {
         panel.add(BorderLayout.NORTH, createToolBar());
         panel.add(BorderLayout.CENTER, split);
         frame.getContentPane().add(BorderLayout.CENTER, panel);
-        frame.getContentPane().add(BorderLayout.SOUTH, createStatusBar());
+        //frame.getContentPane().add(BorderLayout.SOUTH, createStatusBar());
         
         frame.pack();
         frame.setSize((int)(height * 1.618), height);
@@ -369,18 +374,25 @@ public class JasonID {
     }
 
     void startThreads() {
-    	if (fMAS2jThread != null) {
-    		fMAS2jThread.stopParser();
-        	while (fMAS2jThread.isAlive()); // wait it ends
-    	}
-    	if (fASParser != null) {
-    		fASParser.stopParser();
-        	while (fASParser.isAlive()); // wait it ends
-    	}
         fMAS2jThread = new MAS2JParserThread( mas2jPane, this);
         fMAS2jThread.start();
         fASParser = new ASParserThread( this );
         fASParser.start();
+    }
+    
+    void stopThreads() {
+    	if (fMAS2jThread != null) {
+    		fMAS2jThread.stopParser();
+        	while (fMAS2jThread.isAlive()) { // wait it ends
+        		try { Thread.sleep(10); } catch (Exception e) {}
+        	}
+    	}
+    	if (fASParser != null) {
+    		fASParser.stopParser();
+        	while (fASParser.isAlive()) { // wait it ends
+        		try { Thread.sleep(10); } catch (Exception e) {}
+        	}
+    	}
     }
     
     protected boolean checkNeedsSave() {
@@ -445,20 +457,26 @@ public class JasonID {
                 int tabIndex = tab.getComponentCount();
                 ASEditorPane newPane = new ASEditorPane(this, tabIndex);
                 newPane.setFileName(file);
+                openAct.load(file, newPane);
                 tab.add(newPane.getFileName(), newPane);
-                openAct.load(tabIndex, file, newPane);
+                updateTabTitle(tabIndex, newPane, null);
             }
+        }
+        if (fASParser != null) {
+        	fASParser.stopWaiting();
         }
     }
     
     /**
      * Create a status bar
      */
+    /*
     protected Component createStatusBar() {
         // need to do something reasonable here
         status = new StatusBar();
         return status;
     }
+    */
     
     protected Component createOutput() {
         output = new JTextArea();
@@ -646,7 +664,7 @@ public class JasonID {
         }
     }
     
-    
+    /*
     class StatusBar extends JPanel {
         //JLabel text = new JLabel();
         JProgressBar progress = new JProgressBar();
@@ -658,7 +676,7 @@ public class JasonID {
             //add(Box.createHorizontalStrut(5));
             add(progress);
         }
-        
+    */    
         /*
         public void updateText() {
             String status = "";
@@ -671,7 +689,7 @@ public class JasonID {
             text.setText(status);
         }
          */
-    }
+    //}
     
     //
     //
@@ -708,6 +726,7 @@ public class JasonID {
 				} else {
 					return;
 				}
+                stopThreads();
                 
 	            mas2jPane = new MAS2JEditorPane(JasonID.this);
                 mas2jPane.setFileName(tmpFileName);
@@ -762,66 +781,50 @@ public class JasonID {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+            stopThreads();
+            output.setText("");
             mas2jPane = new MAS2JEditorPane(JasonID.this);
             mas2jPane.setFileName(f);
             tab.removeAll();
             tab.add(f.getName(), mas2jPane);
-            load(0, f, mas2jPane);
+            load(f, mas2jPane);
+        	updateTabTitle(0, mas2jPane, null);            
             startThreads();
+            fMAS2jThread.waitCompilation();
+            fMAS2jThread.stopWaiting();
         }
         
-        Thread load(int tabIndex, File f, ASEditorPane pane) {
-            pane.createNewPlainText("");
-            Thread loader = new FileLoader(f, pane, tabIndex);
-            loader.start();
-            return loader;
-        }
-        
-        class FileLoader extends Thread {
-            ASEditorPane pane;
-            File f;
-            int tabIndex;
-            FileLoader(File f, ASEditorPane pane, int index) {
-                this.f = f;
-                this.pane = pane;
-                this.tabIndex = index;
-            }
-            
-            public void run() {
-                try {
-                    pane.needsParsing = false;
-                    Document doc = pane.editor.getDocument();
-                    status.progress.setMinimum(0);
-                    status.progress.setMaximum((int) f.length());
-                    // try to start reading
-                    java.io.Reader in = new java.io.FileReader(f);
-                    char[] buff = new char[1024];
-                    int nch;
-                    while ((nch = in.read(buff, 0, buff.length)) != -1) {
-                        doc.insertString(doc.getLength(), new String(buff, 0, nch), null);
-                        status.progress.setValue(status.progress.getValue() + nch);
-                    }
-                    status.progress.setValue(0);
-                    pane.needsParsing = true;
-                    pane.undo.discardAllEdits();
-                    if (fMAS2jThread != null) {
-                    	fMAS2jThread.stopWaiting();
-                    }
-				  	 pane.syntaxThread.repainAll();
-				  	 pane.modified = false;
-                } catch (FileNotFoundException ex) {
-					System.err.println("File "+f+" does not exists, it will be created!");
-				 } catch (java.io.IOException e) {
-                	System.err.println("I/O error for "+f+" -- "+e.getMessage());
-                    e.printStackTrace();
-                } catch (BadLocationException e) {
-                	System.err.println("BadLocationException error for "+f+" -- "+e.getMessage());
-                    e.printStackTrace();
-                } finally {
-                	runMASButton.setEnabled(true);
-                	debugMASButton.setEnabled(true);
-                	updateTabTitle(tabIndex, pane, null);
+        void load(File f, ASEditorPane pane) {
+            try {
+                pane.createNewPlainText("");
+                pane.needsParsing = false;
+                Document doc = pane.editor.getDocument();
+                //status.progress.setMinimum(0);
+                //status.progress.setMaximum((int) f.length());
+                // try to start reading
+                java.io.Reader in = new java.io.FileReader(f);
+                char[] buff = new char[1024];
+                int nch;
+                while ((nch = in.read(buff, 0, buff.length)) != -1) {
+                    doc.insertString(doc.getLength(), new String(buff, 0, nch), null);
+                    //status.progress.setValue(status.progress.getValue() + nch);
                 }
+                //status.progress.setValue(0);
+                pane.needsParsing = true;
+                pane.undo.discardAllEdits();
+                pane.syntaxHL.repainAll();
+                pane.modified = false;
+            } catch (FileNotFoundException ex) {
+				System.err.println("File "+f+" does not exists, it will be created!");
+			 } catch (java.io.IOException e) {
+            	System.err.println("I/O error for "+f+" -- "+e.getMessage());
+                e.printStackTrace();
+            } catch (BadLocationException e) {
+            	System.err.println("BadLocationException error for "+f+" -- "+e.getMessage());
+                e.printStackTrace();
+            } finally {
+            	runMASButton.setEnabled(true);
+            	debugMASButton.setEnabled(true);
             }
         }
     }
@@ -845,15 +848,15 @@ public class JasonID {
                 try {
                     Document doc  = pane.editor.getDocument();
                     String text = doc.getText(0, doc.getLength());
-                    status.progress.setMinimum(0);
-                    status.progress.setMaximum(doc.getLength());
+                    //status.progress.setMinimum(0);
+                    //status.progress.setMaximum(doc.getLength());
                     java.io.Writer out = new java.io.FileWriter(f);
                     for (int i = 0; i < doc.getLength(); i++) {
                         out.write(text.charAt(i));
-                        status.progress.setValue(i);
+                        //status.progress.setValue(i);
                     }
                     out.close();
-                    status.progress.setValue(0);
+                    //status.progress.setValue(0);
                 } catch (java.io.IOException ex) {
                     ex.printStackTrace();
                 } catch (BadLocationException ex) {
@@ -969,6 +972,7 @@ public class JasonID {
     	JTextField saciTF;
     	JTextField jasonTF;
     	JTextField javaTF;
+    	JCheckBox  insideJIDECBox;
     	JComboBox jBCFont;
     	JComboBox jBCSize;
     	String fonts[] = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
@@ -979,7 +983,6 @@ public class JasonID {
         	d = new JDialog(frame, "Jason Preferences");
         	d.getContentPane().setLayout(new GridLayout(0, 1));
 
-        	
         	// jason home
         	JPanel jasonHomePanel = new JPanel();
         	jasonHomePanel.setBorder(BorderFactory.createTitledBorder(BorderFactory
@@ -1064,6 +1067,13 @@ public class JasonID {
         	javaHomePanel.add(setJava);
         	d.getContentPane().add(javaHomePanel);
 
+        	// run centralised inside jIDE
+        	JPanel insideJIDEPanel = new JPanel();
+        	insideJIDEPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory	.createEtchedBorder(), "Centralised MAS", TitledBorder.LEFT, TitledBorder.TOP));
+        	insideJIDEPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+        	insideJIDECBox = new JCheckBox("Run MAS as an JasonIDE inernal thread instead of another process");
+        	insideJIDEPanel.add(insideJIDECBox);
+        	d.getContentPane().add(insideJIDEPanel);
         	
         	// font
         	JPanel fontPanel = new JPanel();
@@ -1092,6 +1102,9 @@ public class JasonID {
 					}
 					userProperties.put("font", jBCFont.getSelectedItem());
 					userProperties.put("fontSize", jBCSize.getSelectedItem());
+					
+					userProperties.put("runCentralisedInsideJIDE", insideJIDECBox.isSelected()+"");
+					
 					// update all tabs fonts
 					for (int i=0; i<tab.getComponentCount(); i++) {
 				        ((ASEditorPane)tab.getComponentAt(i)).updateFont();
@@ -1134,6 +1147,13 @@ public class JasonID {
         			break;
         		}
         	}
+        	
+        	if (userProperties.getProperty("runCentralisedInsideJIDE").equals("true")) {
+        		insideJIDECBox.setSelected(true);
+        	} else {
+        		insideJIDECBox.setSelected(false);        		
+        	}
+        	
         	d.setVisible(true);
         }
     }

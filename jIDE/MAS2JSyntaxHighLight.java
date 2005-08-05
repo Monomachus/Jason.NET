@@ -25,7 +25,7 @@ public class MAS2JSyntaxHighLight extends ASSyntaxHighLight {
 		context = new MAS2JStyles();
 	}
 	
-	void paintLine() {
+	int paintLine(int offset) {
 		try {
 			StyledDocument sd = (StyledDocument) editor.getDocument();
 			Element ePar = sd.getParagraphElement(offset);
@@ -73,6 +73,7 @@ public class MAS2JSyntaxHighLight extends ASSyntaxHighLight {
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
+		return offset;
 	}
 
 

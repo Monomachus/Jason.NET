@@ -31,38 +31,37 @@ import java.io.StringReader;
 import javax.swing.text.Document;
 
 /** a parser thread to compile MAS2j source while being edited */
-public class MAS2JParserThread extends Thread {
+public class MAS2JParserThread extends ASParserThread { //Thread {
     
-    mas2j fParserMAS2J;
-    MAS2JEditorPane fEditorPanel;
-    JasonID fJasonID;
-    boolean fStop = false;
-    boolean fOk = false;
-    boolean fForegroundCompilation = false;
-    boolean fCompilationDone = true;
-    int errorLine = -1;
+    mas2j           fParserMAS2J;
 
     MAS2JParserThread(MAS2JEditorPane editor, JasonID jasonID) {
-    	super("MAS2JParser");
-        fParserMAS2J = new mas2j(new StringReader(""));
-        fParserMAS2J.setNoOut(true);
-        this.fEditorPanel = editor;
-        this.fJasonID = jasonID;
+    	super("MAS2JParser", jasonID);
     }
 
-    /** returns the line number that contains error, -1 in case there is no errors. Only for current tab */
-    public int getErrorLine() {
-    	return errorLine;
+    void createParser() {
+        try {
+            fParserMAS2J = new mas2j(new StringReader(""));
+            fParserMAS2J.setNoOut(true);
+        } catch (Exception ex) {
+        	System.err.println("error creating mas2j parser!"+ex);
+        	ex.printStackTrace();
+        }    	
     }
     
+    
     void parse() {
-        fOk = false;
         // compile
         try {
+        	if (! fJasonID.mas2jPane.needsParsing) {
+        		return;
+        	}
+            fOk = false;
+            fCompilationDone = false;
             if (fForegroundCompilation) {
                 System.out.print("Parsing project file... ");
             }
-            Document doc  = fEditorPanel.editor.getDocument();
+            Document doc  = fJasonID.mas2jPane.editor.getDocument();
             String text = doc.getText(0, doc.getLength());
             fParserMAS2J.ReInit(new StringReader(text));
             fParserMAS2J.setDestDir( fJasonID.projectDirectory );
@@ -72,6 +71,7 @@ public class MAS2JParserThread extends Thread {
             fParserMAS2J.setJavaHome(fJasonID.getConf().getProperty("javaHome"));
             fParserMAS2J.mas();
             fParserMAS2J.close();
+            
             fOk = true;
             
             if (fForegroundCompilation) {
@@ -79,12 +79,11 @@ public class MAS2JParserThread extends Thread {
                 System.out.println(" parsed successfully!");
                 //System.out.println("scripts was written on "+editorPanel.mainGUI.projectDirectory+".");
             }
-            if (fOk) {
-                fJasonID.openAllASFiles(fParserMAS2J.getAgASFiles().values());
-            }
+            
+            fJasonID.openAllASFiles(fParserMAS2J.getAgASFiles().values());
 
-            errorLine = -1; // set no error!
-            fEditorPanel.syntaxThread.refresh(fEditorPanel.syntaxThread.docListener.lastChange); //errorOffSet); // 1 char was inserted
+            fErrorLine = -1; // set no error!
+            fJasonID.mas2jPane.syntaxHL.paintLine(); //errorOffSet); // 1 char was inserted
             
         } catch (ParseException ex) {
             if (fForegroundCompilation) {
@@ -92,10 +91,9 @@ public class MAS2JParserThread extends Thread {
             } else {
             	if (fJasonID.tab.getSelectedIndex() == 0 && ex.currentToken != null) {
             		//fJasonID.updateTabTitle(0, fEditorPanel, "!line "+ex.currentToken.beginLine);
-            		errorLine = ex.currentToken.beginLine;
-            		fEditorPanel.syntaxThread.refresh(fEditorPanel.syntaxThread.docListener.lastChange);
+            		fErrorLine = ex.currentToken.beginLine;
+            		fJasonID.mas2jPane.syntaxHL.paintLine();
             	}
-            	
             }
         } catch (TokenMgrError ex) {
             if (fForegroundCompilation) {
@@ -104,9 +102,9 @@ public class MAS2JParserThread extends Thread {
                 int p = ex.toString().indexOf("line");
                 int v = ex.toString().indexOf(", ", p);
                 if (p > 0 && v > p) {
-            		errorLine = Integer.parseInt(ex.toString().substring(p+4,v).trim());
+            		fErrorLine = Integer.parseInt(ex.toString().substring(p+4,v).trim());
             		//System.out.println("error line is "+ex.currentToken.beginLine+" buf bline="+inStream.getBeginLine()+" buf eline="+inStream.getEndLine()+" offset="+errorOffSet);
-            		fEditorPanel.syntaxThread.refresh(fEditorPanel.syntaxThread.docListener.lastChange);
+            		fJasonID.mas2jPane.syntaxHL.paintLine();
             		//fJasonID.updateTabTitle(0, fEditorPanel, "!line "+ex.toString().substring(p+4,v).trim());
                 }
             }
@@ -115,58 +113,20 @@ public class MAS2JParserThread extends Thread {
             ex.printStackTrace();
         } finally {
             fCompilationDone = true;
+            fJasonID.mas2jPane.needsParsing = false;
             stopWaiting();
         }
     }
     
-    synchronized void waitSomeTime() {
-        try {
-            wait(2000); // waits 2 seconds
-        } catch (Exception e) { }
-    }
-    
-    synchronized void waitCompilation() {
-    	int trycount = 0;
-        while (!fCompilationDone && trycount < 3) {
-            try {
-                wait(2000); // waits 2 seconds
-                trycount++;
-            } catch (Exception e) { }
-        }
-        if (trycount >= 3) {
-        	System.out.println("stop waiting compilation, some unexpected error ocorred");
-        	fOk = false;
-        }
-    }
-    
-    synchronized void stopWaiting() {
-        notifyAll();
-    }
-    
-    public boolean foregroundCompile() {
+    synchronized public boolean foregroundCompile() {
         fParserMAS2J.setNoOut(false);
         fForegroundCompilation = true;
-        fEditorPanel.needsParsing = true;
-        fCompilationDone = false;
+        fJasonID.mas2jPane.needsParsing = true;
+        fCompilationDone = false; // it is necessary here!
         stopWaiting();
         waitCompilation(); // waits the end of compilation
         fParserMAS2J.setNoOut(true);
         fForegroundCompilation = false;
         return fOk;
-    }
-    
-    public void stopParser() {
-        fStop = true;
-        stopWaiting();
-    }
-    
-    public void run() {
-        while (!fStop) {
-            if (!fStop && fEditorPanel.needsParsing) {
-                parse();
-                fEditorPanel.needsParsing = false;
-            }
-            waitSomeTime();
-        }
     }
 }

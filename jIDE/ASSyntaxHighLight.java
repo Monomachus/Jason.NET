@@ -21,10 +21,10 @@ import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
 import javax.swing.text.StyledDocument;
 
-public class ASSyntaxHighLight extends Thread { //implements CaretListener {
-	int offset = 0;
+public class ASSyntaxHighLight { // extends Thread { //implements CaretListener {
+	//int offset = 0;
 	as2jTokenManager tm = new as2jTokenManager(new SimpleCharStream(new StringReader("")));
-	Object refreshMonitor = new Object();
+	//Object refreshMonitor = new Object();
 	Style commentStyle, planLabelStyle, currentVarStyle, internalActionStyle, specialAnnot, errorStyle, noErrorStyle;
 	JTextPane editor;
 	ASStyles context;
@@ -37,12 +37,11 @@ public class ASSyntaxHighLight extends Thread { //implements CaretListener {
 	//boolean paintOnlyCurVar = false;
 	
 	public ASSyntaxHighLight(JTextPane p, JasonID jasonID) {
-		super("SyntaxColoring");
+		//super("SyntaxColoring");
 		editor = p;
 		this.jasonID = jasonID;
 		
 		context = new ASStyles();
-		setPriority(Thread.MIN_PRIORITY);
 		
 		// create some styles
 		commentStyle = context.addStyle(null, context.getStyle(ASStyles.DEFAULT_STYLE));
@@ -85,13 +84,14 @@ public class ASSyntaxHighLight extends Thread { //implements CaretListener {
 	}
 	
 	public void repainAll() {
-		offset = 0;
+		int offset = 0;
 		while (offset < editor.getDocument().getLength()) {
 			//refresh(offset);
-			paintLine();
+			offset = paintLine(offset);
 		}
 	}
 	
+	/*
 	public void refresh(int offset) {
 		//synchronized (refreshMonitor) {
 		this.offset = offset;
@@ -99,14 +99,17 @@ public class ASSyntaxHighLight extends Thread { //implements CaretListener {
 		//}
 		paintLine();
 	}
+	*/
 	
+	/*
 	public void stopRun() {
 		running = false;
 		refresh(0); // to wakeup the thread
 	}
+	*/
 	
+	/*
 	public void run() {
-		/*
 		synchronized (refreshMonitor) {
 			while (running) {
 				try {
@@ -119,10 +122,15 @@ public class ASSyntaxHighLight extends Thread { //implements CaretListener {
 				}
 			}
 		}
-		*/
+	}
+	*/
+	
+	/** use last change as offset */
+	int paintLine() {
+		return paintLine(docListener.lastChange);
 	}
 	
-	void paintLine() {
+	int paintLine(int offset) {
 		try {
 			StyledDocument sd = (StyledDocument) editor.getDocument();
 			Element ePar = sd.getParagraphElement(offset);
@@ -201,6 +209,7 @@ public class ASSyntaxHighLight extends Thread { //implements CaretListener {
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
+		return offset;
 	}
 
 	/*
@@ -226,7 +235,7 @@ public class ASSyntaxHighLight extends Thread { //implements CaretListener {
 	class ASDocListener implements DocumentListener {
 		int lastChange;
 		public void changedUpdate(DocumentEvent arg0) {
-			updateSyntax(arg0);
+			//updateSyntax(arg0);
 		}
 		public void insertUpdate(DocumentEvent arg0) {
 			updateSyntax(arg0);

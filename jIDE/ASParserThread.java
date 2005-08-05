@@ -35,42 +35,45 @@ import javax.swing.text.Document;
 /** a parser thread to compile AS sources while being edited */
 public class ASParserThread extends Thread {
     
-    as2j parser;
+    as2j    fASParser;
     
-    JasonID jasonID;
+    JasonID fJasonID;
     
-    boolean stop = false;
-    boolean ok = false;
-    boolean foregroundCompilation = false;
+    boolean fStop = false;
+    boolean fOk = false;
+    boolean fForegroundCompilation = false;
     boolean forDone = true;
-    boolean compilationDone = false;
+    boolean fCompilationDone = false;
 
-    int errorLine = -1;
+    int fErrorLine = -1;
     
+    ASParserThread(String name, JasonID jasonID) {
+    	super(name);
+        this.fJasonID = jasonID;
+    }
     ASParserThread(JasonID jasonID) {
-    	super("ASParserThread");
-        this.jasonID = jasonID;
+    	this("ASParserThread", jasonID);
     }
     
     /** returns the line number that contains error, -1 in case there is no errors. Only for current tab */
     public int getErrorLine() {
-    	return errorLine;
+    	return fErrorLine;
     }
     
-    private void createParser() {
+    void createParser() {
         try {
-        	parser = new as2j(new StringReader(""));
+        	fASParser = new as2j(new StringReader(""));
         } catch (Exception ex) {
         	System.err.println("error creating parser!"+ex);
         	ex.printStackTrace();
-        	parser = null;
+        	fASParser = null;
         }    	
     }
     
     boolean parseTab(int tabIndex) {
-    	if (parser == null) {
+    	if (fASParser == null) {
     		createParser();
-    		if (parser == null) {
+    		if (fASParser == null) {
     			return false;
     		}
     	}
@@ -80,36 +83,36 @@ public class ASParserThread extends Thread {
         
         // compile
         try {
-            editorPanel = (ASEditorPane)jasonID.tab.getComponentAt(tabIndex);
+            editorPanel = (ASEditorPane)fJasonID.tab.getComponentAt(tabIndex);
             if (RunCentralisedMAS.logPropFile.startsWith(editorPanel.getFileName())) {
             	return true;
             }
-            if (!editorPanel.needsParsing && !foregroundCompilation) {
+            if (!editorPanel.needsParsing && !fForegroundCompilation) {
                 return true;
             }
-            if (foregroundCompilation) {
+            if (fForegroundCompilation) {
                 System.out.print("Parsing "+editorPanel.getFileName()+"...");
             }
             doc  = editorPanel.editor.getDocument();
             String text = doc.getText(0, doc.getLength());
             
             inStream = new SimpleCharStream(new StringReader(text));
-            parser.ReInit(new as2jTokenManager(inStream));
-            parser.ag(null);
+            fASParser.ReInit(new as2jTokenManager(inStream));
+            fASParser.ag(null);
             
-            if (foregroundCompilation) {
+            if (fForegroundCompilation) {
                 System.out.println(" parsed successfully!");
             }
 
-            errorLine = -1; // set no error!
-            editorPanel.syntaxThread.refresh(editorPanel.syntaxThread.docListener.lastChange); //errorOffSet); // 1 char was inserted
+            fErrorLine = -1; // set no error!
+            editorPanel.syntaxHL.paintLine(); //errorOffSet); // 1 char was inserted
             
             return true;
         } catch (ParseException ex) {
-            if (foregroundCompilation) {
+            if (fForegroundCompilation) {
                 System.out.println("\nas2j: parsing errors found... \n" + ex);
             } else {
-            	if (jasonID.tab.getSelectedIndex() == tabIndex && ex.currentToken != null) {
+            	if (fJasonID.tab.getSelectedIndex() == tabIndex && ex.currentToken != null) {
             		//jasonID.updateTabTitle(tabIndex, editorPanel, "!line "+ex.currentToken.beginLine);
             		//System.out.println("error line is "+ex.currentToken.beginLine+" buf bline="+inStream.getBeginLine()+" buf eline="+inStream.getEndLine());
 
@@ -118,31 +121,31 @@ public class ASParserThread extends Thread {
             		for (int i=0; i<expected.length; i++) {
             			for (int j=0; j<expected[i].length; j++) {
             				if (expected[i][j] == as2j.EOF) {
-                        		errorLine = inStream.getBeginLine();
-                        		editorPanel.syntaxThread.refresh(editorPanel.syntaxThread.docListener.lastChange);
+                        		fErrorLine = inStream.getBeginLine();
+                        		editorPanel.syntaxHL.paintLine();
                         		return false;
             				}
             			}
             		}
 
             		// error is defined by las token
-            		errorLine = ex.currentToken.beginLine;
-            		if (errorLine == 0) { // first token problem
-            			errorLine = 1;
+            		fErrorLine = ex.currentToken.beginLine;
+            		if (fErrorLine == 0) { // first token problem
+            			fErrorLine = 1;
             		}
-            		editorPanel.syntaxThread.refresh(editorPanel.syntaxThread.docListener.lastChange);
+            		editorPanel.syntaxHL.paintLine();
             	}
             }
         } catch (TokenMgrError ex) {
-            if (foregroundCompilation) {
+            if (fForegroundCompilation) {
                 System.out.println("\nas2j: error parsing tokens ... \n" + ex);
             } else {
                 int p = ex.toString().indexOf("line");
                 int v = ex.toString().indexOf(", ", p);
                 if (p > 0 && v > p) {
-            		errorLine = Integer.parseInt(ex.toString().substring(p+4,v).trim());
+            		fErrorLine = Integer.parseInt(ex.toString().substring(p+4,v).trim());
             		//System.out.println("error line is "+ex.currentToken.beginLine+" buf bline="+inStream.getBeginLine()+" buf eline="+inStream.getEndLine()+" offset="+errorOffSet);
-            		editorPanel.syntaxThread.refresh(editorPanel.syntaxThread.docListener.lastChange);
+            		editorPanel.syntaxHL.paintLine();
                    //jasonID.updateTabTitle(tabIndex, editorPanel, "!line "+);
                 }
             }
@@ -155,40 +158,41 @@ public class ASParserThread extends Thread {
         return false;
     }
     
-    private void parseAllTabs() {
-        ok = true;
+    void parse() {
         try {
-            for (int tabIndex=1; tabIndex < jasonID.tab.getComponentCount(); tabIndex++) {
-                ok = parseTab(tabIndex);
-                if (!ok) {
+            fOk = true;
+            fCompilationDone = false;
+            for (int tabIndex=1; tabIndex < fJasonID.tab.getComponentCount(); tabIndex++) {
+                fOk = parseTab(tabIndex);
+                if (!fOk) {
                     break; 
                 }
             }
         } catch (Exception ex) {
             ex.printStackTrace();
         } finally {
-            compilationDone = true;
+            fCompilationDone = true;
             stopWaiting();
         }
     }
     
     synchronized void waitSomeTime() {
         try {
-            wait(2000); // waits 2 seconds
+            wait(5000); // waits 2 seconds
         } catch (Exception e) { }
     }
     
     synchronized void waitCompilation() {
     	int trycount = 0;
-        while (!compilationDone && trycount < 3) {
+        while (!fCompilationDone && trycount < 10) {
             try {
-                wait(2000); // waits 2 seconds
+                wait(500); // waits 1/2 seconds
                 trycount++;
             } catch (Exception e) { }
         }
-        if (trycount >= 3) {
+        if (trycount >= 10) {
         	System.out.println("stop waiting compilation, some unexpected error ocorred");
-        	ok = false;
+        	fOk = false;
         }
     }
     
@@ -196,30 +200,27 @@ public class ASParserThread extends Thread {
         notifyAll();
     }
     
-    public boolean foregroundCompile() {
-        foregroundCompilation = true;
-        compilationDone = false;
-        // TODO: the following two lines (and the run method) was commented
-        // since the AS online parsing does not work properly
+    synchronized public boolean foregroundCompile() {
+        fForegroundCompilation = true;
+        fCompilationDone = false;
         stopWaiting(); // wakeup this thread
         waitCompilation(); // waits the end of compilation
-        //parseAllTabs();
-        foregroundCompilation = false;
-        return ok;
+        fForegroundCompilation = false;
+        return fOk;
     }
     
     public void stopParser() {
-        stop = true;
+        fStop = true;
         stopWaiting();
     }
 
-    public void run() {
+    synchronized public void run() {
         createParser();
-        while (!stop) {
-            waitSomeTime();
-            if (!stop) {
-                parseAllTabs();
+        while (!fStop) {
+            if (!fStop) {
+                parse();
             }
+            waitSomeTime();
         }
     }
 }

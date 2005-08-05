@@ -73,7 +73,7 @@ class ASEditorPane extends JPanel {
 
 	//EditorKit editorKit = new EditorKit(new ASContext(), "text/asl");
 	//ASContext context = new ASContext();
-	ASSyntaxHighLight syntaxThread;
+	ASSyntaxHighLight syntaxHL;
 	
 	
 	ASEditorPane() {
@@ -95,8 +95,8 @@ class ASEditorPane extends JPanel {
 	}
 	
 	void createSyntaxHighlightThread() {
-		syntaxThread = new ASSyntaxHighLight(editor, mainID);
-		syntaxThread.start();
+		syntaxHL = new ASSyntaxHighLight(editor, mainID);
+		//syntaxThread.start();
 	}
 
 	public String getFileName() {
@@ -142,7 +142,7 @@ class ASEditorPane extends JPanel {
 			ex.printStackTrace();
 		}
 		//syntaxThread.addDocListener(); // only when new doc is created
-		syntaxThread.repainAll();
+		syntaxHL.repainAll();
 	}
 
 	void createNewPlainText(InputStream in) {
@@ -199,6 +199,9 @@ class ASEditorPane extends JPanel {
 				if (!mainID.runMASButton.isEnabled()) {
 					mainID.runMASButton.setEnabled(true);
 				}
+				if (!mainID.debugMASButton.isEnabled()) {
+					mainID.debugMASButton.setEnabled(true);
+				}
 			}
 		});
 
@@ -213,6 +216,7 @@ class ASEditorPane extends JPanel {
 		search();
 	}
 	public void search() {
+		if (strToFind == null) return;
 		try {
 			int txtLength = editor.getDocument().getLength();
 			int pos = editor.getCaretPosition()+1;
@@ -256,7 +260,7 @@ class ASEditorPane extends JPanel {
 			try {
 				size = Integer.parseInt(JasonID.userProperties.getProperty("fontSize"));
 			} catch (Exception e) {}
-			syntaxThread.setFont(font, size);
+			syntaxHL.setFont(font, size);
 		}
 	}
 
@@ -359,7 +363,7 @@ class ASEditorPane extends JPanel {
 			int numberX = r.x - getLeftInset();
 			int numberY = r.y + r.height - 5;
 			g.setColor(Color.BLACK);
-			g.setFont(syntaxThread.context.getFont(syntaxThread.context.getStyle(StyleContext.DEFAULT_STYLE)));
+			g.setFont(syntaxHL.context.getFont(syntaxHL.context.getStyle(StyleContext.DEFAULT_STYLE)));
 			g.drawString(sNB, numberX, numberY);
 		}
 
