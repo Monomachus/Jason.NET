@@ -77,6 +77,8 @@ import javax.swing.text.Document;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
+import sun.misc.CRC16;
+
 public class JasonID {
     
     JFrame frame = null;
@@ -133,20 +135,24 @@ public class JasonID {
         }
         
         try {
+            boolean isJWS = false;
+            if (System.getProperty("jnlpx.deployment.user.home") != null || System.getProperty("deployment.user.security.trusted.certs") != null) {
+            	isJWS = true;
+            	currJasonVersion += "-JWS";
+            }
+            
     		// try to load properties from a user preferences file
         	File jasonConfFile = getUserConfFile();
         	if (jasonConfFile.exists()) {
         		userProperties.load(new FileInputStream(jasonConfFile));
-        		/*
-        		 * do not remove. If it is ok, let it!
-        		if (!userProperties.getProperty("version").equals(currJasonVersion)) { 
+        		if (!userProperties.getProperty("version").equals(currJasonVersion) && !currJasonVersion.equals("?")) { 
         			// new version, set all values to default
+        			System.out.println("New version of Jason, reseting configuration.");
         			userProperties.remove("javaHome");
         			userProperties.remove("saciJar");
         			userProperties.remove("jasonJar");
         			userProperties.remove("log4jJar");
         		}
-        		*/
         	} 
 
         	tryToFixJarFileConf("jasonJar", "jason.jar", 300000);
@@ -171,8 +177,11 @@ public class JasonID {
         
             userProperties.put("version", currJasonVersion);
             
-            if (userProperties.get("runCentralisedInsideJIDE") == null) {
-            	userProperties.put("runCentralisedInsideJIDE", "true"); // it does not work!
+            // JWS does not work with class loaders, so do not use run inside
+            if (isJWS) {
+            	userProperties.put("runCentralisedInsideJIDE", "false");
+            } else if (userProperties.get("runCentralisedInsideJIDE") == null) {
+            	userProperties.put("runCentralisedInsideJIDE", "true");
             }
             
             jasonConfFile.getParentFile().mkdirs();
