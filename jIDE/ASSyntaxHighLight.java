@@ -138,7 +138,7 @@ public class ASSyntaxHighLight { // extends Thread { //implements CaretListener 
 			int eEnd = ePar.getEndOffset();
 			String sPar = sd.getText(eIni, eEnd- eIni);
 			sd.setParagraphAttributes(eIni, eEnd-eIni+1, context.getStyle(StyleContext.DEFAULT_STYLE), false);
-			//System.out.println("$"+sPar+"$ line="+getParLineNumber(ePar)+" error line="+jasonID.fASParser.getErrorLine());
+//			System.out.println("$"+sPar+"$ line="+getParLineNumber(ePar)+" error line="+jasonID.fASParser.getErrorLine());
 			
 			if (sPar.trim().startsWith("//")) {
 				sd.setCharacterAttributes(eIni, eEnd-eIni-1, commentStyle, true);					
@@ -206,6 +206,7 @@ public class ASSyntaxHighLight { // extends Thread { //implements CaretListener 
 			}
 			
 			offset = eEnd;
+		} catch (javax.swing.text.BadLocationException ex) {
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}

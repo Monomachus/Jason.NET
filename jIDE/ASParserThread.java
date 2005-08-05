@@ -214,7 +214,7 @@ public class ASParserThread extends Thread {
         stopWaiting();
     }
 
-    synchronized public void run() {
+    public void run() {
         createParser();
         while (!fStop) {
             if (!fStop) {

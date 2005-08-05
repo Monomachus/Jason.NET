@@ -185,10 +185,12 @@ class ASEditorPane extends JPanel {
 				updateTab();
 			}
 			void updateTab() {
-				modified = true;
 				needsParsing = true;
 				if (mainID != null) {
-					mainID.updateTabTitle(tabIndex, ASEditorPane.this, null);
+					if (!modified) {
+						modified = true;
+						mainID.updateTabTitle(tabIndex, ASEditorPane.this, null);
+					}
 					if (mainID.fASParser != null) {
 						mainID.fASParser.stopWaiting();
 					}
@@ -196,6 +198,7 @@ class ASEditorPane extends JPanel {
 						mainID.fMAS2jThread.stopWaiting();
 					}
 				}
+
 				if (!mainID.runMASButton.isEnabled()) {
 					mainID.runMASButton.setEnabled(true);
 				}
