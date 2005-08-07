@@ -545,23 +545,23 @@ public class TransitionSystem {
 
 	private void applyClrInt() throws JasonException {
 		// Rule ClrInt
-		IntendedMeans im = conf.C.SI.peek();
-		if (im.getPlan().getBody().isEmpty()) {
-			if (conf.C.SI.size() > 1) {
-				IntendedMeans oldim = confP.C.SI.pop();
-				im = conf.C.SI.peek();
-				BodyLiteral g = (BodyLiteral) im.getPlan().getBody().remove(0);
-				// use unifier of finished plan accordingly
-				im.unif.compose(g.getLiteral(), oldim.unif);
-				confP.step = SClrInt; // the new top may have become
-				// empty! need to keep checking.
-			} else {
-				confP.C.I.remove(conf.C.SI);
-				conf.C.SI = null;
-				confP.step = SStartRC;
+		confP.step = SStartRC; // default next step
+		if (conf.C.SI != null) {
+			IntendedMeans im = conf.C.SI.peek();
+			if (im.getPlan().getBody().isEmpty()) {
+				if (conf.C.SI.size() > 1) {
+					IntendedMeans oldim = confP.C.SI.pop();
+					im = conf.C.SI.peek();
+					BodyLiteral g = (BodyLiteral) im.getPlan().getBody().remove(0);
+					// use unifier of finished plan accordingly
+					im.unif.compose(g.getLiteral(), oldim.unif);
+					confP.step = SClrInt; // the new top may have become
+					// empty! need to keep checking.
+				} else {
+					confP.C.I.remove(conf.C.SI);
+					conf.C.SI = null;
+				}
 			}
-		} else {
-			confP.step = SStartRC;
 		}
 	}
 
