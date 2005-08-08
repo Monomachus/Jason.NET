@@ -304,15 +304,17 @@ Term t() :         { Token K; Term u; NumberTerm nb;}
 }
 
 
-ListTerm list() : { ListTerm lt; ListTerm last; Token K; Term f; }
+ListTerm list() : { ListTerm lt = new ListTerm(); ListTerm last; Token K; Term f; }
 {
   "["
-  f=t()               { lt = new ListTerm(); last = lt.add(f); }
+  [
+  f=t()               { last = lt.add(f); }
   ( "," f=t()         { last = last.add(f); }
   )*
   [ "|"  ( K=<VAR>    { last.setTail(new VarTerm(K.image)); }
          | f=list()   { last = last.concat((ListTerm)f);	   }
          )           
+  ]
   ]
   "]"                 { return lt; } 
 }
