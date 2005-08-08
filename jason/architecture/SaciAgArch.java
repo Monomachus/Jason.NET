@@ -294,6 +294,13 @@ public class SaciAgArch extends saci.Agent implements AgentArchitecture {
                 String propCont  = null;
                 if (m.get("content") != null) {
                     propCont = m.get("content").toString();
+                    if (propCont.startsWith("\"")) {
+                    	propCont = propCont.substring(1,propCont.length()-1);
+                    	if (Term.parse(propCont) == null) {
+                    		// it was a string indeed
+                    		propCont = m.get("content").toString();
+                    	}
+                    }
                     if (Term.parse(propCont) != null) { // the contents are well formed
                         jason.asSemantics.Message im = new jason.asSemantics.Message(ilForce, sender, receiver, propCont, replyWith);
                         if (irt != null) {

@@ -282,6 +282,11 @@ public class TransitionSystem {
 	}
 
 	private void applyApplPl() throws JasonException {
+		if (confP.C.RP == null) {
+			logger.warn("applyPl was called even RP is null!");
+			confP.step = SProcAct;
+			return;
+		}
 		confP.C.AP = applicablePlans(new ArrayList(confP.C.RP));
 
 		// Rule Appl1
