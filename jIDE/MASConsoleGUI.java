@@ -40,6 +40,7 @@ import javax.swing.JTextArea;
 public class MASConsoleGUI extends JFrame  {
     
     private static MASConsoleGUI masConsole = null;
+    private boolean inPause = false; 
     
     /** for sigleton pattern */
     public static MASConsoleGUI get(String title, RunMAS runMAS) {
@@ -105,10 +106,29 @@ public class MASConsoleGUI extends JFrame  {
     	//pack();
     }
     
+    synchronized public void setPause(boolean b) {
+    	inPause = b;
+    	notifyAll();
+    }
+    
+    synchronized void waitNotPause() {
+    	try {
+    		while (inPause) {
+    			wait();
+    		}
+    	} catch (Exception e) {}
+    }
+    
+    public boolean isPause() {
+    	return inPause;
+    }
   
 	public void append(String s) {
 		if (!isVisible()) {
 	        setVisible(true);
+		}
+		if (inPause) {
+			waitNotPause();
 		}
 		int l = output.getDocument().getLength();
 		if (l > 30000) {

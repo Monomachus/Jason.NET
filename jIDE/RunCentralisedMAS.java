@@ -104,6 +104,23 @@ public class RunCentralisedMAS {
 	        });
 	        MASConsoleGUI.get().addButton(btStop);
 
+	        // add Button
+	        final JButton btPause = new JButton("Pause MAS");
+	        btPause.addActionListener(new ActionListener() {
+	            public void actionPerformed(ActionEvent evt) {
+	            	if (MASConsoleGUI.get().isPause()) {
+	            		btPause.setText("Pause MAS");
+	            		MASConsoleGUI.get().setPause(false);
+	            	} else {
+	            		btPause.setText("Continue");
+	            		MASConsoleGUI.get().setPause(true);
+	            	}
+	            	
+	            }
+	        });
+	        MASConsoleGUI.get().addButton(btPause);
+
+	        
 	        if (! runner.insideJIDE) {
 	        	runner.waitEnd();
 	        }
