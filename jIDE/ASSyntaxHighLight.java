@@ -124,7 +124,15 @@ public class ASSyntaxHighLight { // extends Thread { //implements CaretListener 
 		}
 	}
 	*/
-	
+
+	ASParserThread getParserThread() {
+		if (jasonID != null && jasonID.fASParser != null) {
+			return jasonID.fASParser;
+		} else {
+			return null;
+		}
+	}
+
 	/** use last change as offset */
 	int paintLine() {
 		return paintLine(docListener.lastChange);
@@ -145,72 +153,79 @@ public class ASSyntaxHighLight { // extends Thread { //implements CaretListener 
 			} else {
 				
 				// cursor line (check for error in this line)
-				if (jasonID != null && jasonID.fASParser != null) {
+				if (getParserThread() != null) {
 					
 					// identify the current line of ePar
 					int curLine = getParLineNumber(ePar);
 
-					//if (editor.getCaretPosition() >= eIni && editor.getCaretPosition() <= eEnd) {
-					//if (docListener.lastChange >= eIni && docListener.lastChange <= eEnd) {
-						if (jasonID.fASParser.getErrorLine() == curLine) { // has an error?
-							sd.setCharacterAttributes(eIni, eEnd-eIni, errorStyle, true);
-						} else {
-							sd.setCharacterAttributes(eIni, eEnd-eIni, noErrorStyle, true);								
-						}
-					//}
+					if (getParserThread().getErrorLine() == curLine) { // has an error?
+						sd.setCharacterAttributes(eIni, eEnd-eIni, errorStyle, true);
+						// paint previous line with no error
+						Element p = getPreviousLine(ePar);
+						sd.setCharacterAttributes(p.getStartOffset(), p.getEndOffset()-p.getStartOffset(), noErrorStyle, true);								
+					} else {
+						sd.setCharacterAttributes(eIni, eEnd-eIni, noErrorStyle, true);								
+					}
 				}
 
-				tm.ReInit(new SimpleCharStream(new StringReader(sPar)));
-				try {
-					Token lastToken = null;
-					Token t = tm.getNextToken();
-					while (t.kind != as2j.EOF) {
-						Style s = context.tokenStyles[t.kind];
-						// set plan label style
-						if (lastToken != null && lastToken.kind == as2j.TK_LABEL_AT) {
-							s = planLabelStyle;
-						// set internal action
-						} else if (t.kind == as2j.ATOM && t.image.startsWith(".")) {
-							s = internalActionStyle;
-						// special annots
-						} else if (t.kind == as2j.ATOM && (t.image.equals(Plan.TBreakPoint.getFunctor()) || t.image.equals(Plan.TAtomic.getFunctor()))) {
-							s = specialAnnot;
-						}
-						sd.setCharacterAttributes(eIni+t.beginColumn-1, t.endColumn-t.beginColumn+1, s, false);
-
-						// set currenttoken
-						// TODO: show all var ocoorences
-						/*
-						if (t.kind == as2j.VAR && editor.getCaretPosition() >= t.beginColumn+eIni && editor.getCaretPosition() <= t.endColumn+eIni) {
-							varToken = t;
-							System.out.println("Var="+varToken);
-							paintOnlyCurVar = true;
-							repainAll();
-							paintOnlyCurVar = false;
-							//return;
-						}
-						*/
-
-						lastToken = t;
-						t = tm.getNextToken();
-					}
-					
-					// verify the end of line comments
-					if (lastToken != null && lastToken.endColumn+eIni+1 < eEnd) {
-						sPar = sd.getText(lastToken.endColumn+eIni, eEnd-(lastToken.endColumn+eIni));
-						if (sPar.trim().startsWith("//")) {
-							sd.setCharacterAttributes(lastToken.endColumn+eIni, eEnd-(lastToken.endColumn+eIni), commentStyle, true);					
-						}
-					}
-				} catch (TokenMgrError e) {}
+				changeAttributesBasedOnTokens(sd, eIni, eEnd, sPar);
 			}
 			
 			offset = eEnd;
-		} catch (javax.swing.text.BadLocationException ex) {
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
 		return offset;
+	}
+
+	// will be overriden by MAS2JSyntax
+	void changeAttributesBasedOnTokens(StyledDocument sd, int eIni, int eEnd, String sPar) {
+		try {
+			tm.ReInit(new SimpleCharStream(new StringReader(sPar)));
+			
+			Token lastToken = null;
+			Token t = tm.getNextToken();
+			while (t.kind != as2j.EOF) {
+				Style s = context.tokenStyles[t.kind];
+				// set plan label style
+				if (lastToken != null && lastToken.kind == as2j.TK_LABEL_AT) {
+					s = planLabelStyle;
+				// set internal action
+				} else if (t.kind == as2j.ATOM && t.image.startsWith(".")) {
+					s = internalActionStyle;
+				// special annots
+				} else if (t.kind == as2j.ATOM && (t.image.equals(Plan.TBreakPoint.getFunctor()) || t.image.equals(Plan.TAtomic.getFunctor()))) {
+					s = specialAnnot;
+				}
+				sd.setCharacterAttributes(eIni+t.beginColumn-1, t.endColumn-t.beginColumn+1, s, false);
+
+				// set currenttoken
+				// TODO: show all var ocoorences
+				/*
+				if (t.kind == as2j.VAR && editor.getCaretPosition() >= t.beginColumn+eIni && editor.getCaretPosition() <= t.endColumn+eIni) {
+					varToken = t;
+					System.out.println("Var="+varToken);
+					paintOnlyCurVar = true;
+					repainAll();
+					paintOnlyCurVar = false;
+					//return;
+				}
+				*/
+
+				lastToken = t;
+				t = tm.getNextToken();
+			}
+
+			// verify the end of line comments
+			if (lastToken != null && lastToken.endColumn+eIni+1 < eEnd) {
+				sPar = sd.getText(lastToken.endColumn+eIni, eEnd-(lastToken.endColumn+eIni));
+				if (sPar.trim().startsWith("//")) {
+					sd.setCharacterAttributes(lastToken.endColumn+eIni, eEnd-(lastToken.endColumn+eIni), commentStyle, true);					
+				}
+			}
+		} catch (TokenMgrError e) {
+		} catch (javax.swing.text.BadLocationException ex) {
+		}
 	}
 
 	/*
@@ -230,6 +245,17 @@ public class ASSyntaxHighLight { // extends Thread { //implements CaretListener 
 			}
 		}
 		return -1;
+	}
+	protected Element getPreviousLine(Element ePar) {
+		Element parent = ePar.getParentElement();
+		Element prev = null;
+		for (int curLine=0; curLine<parent.getElementCount(); curLine++) {
+			if (parent.getElement(curLine) == ePar) {
+				return prev;
+			}
+			prev = parent.getElement(curLine);
+		}
+		return prev;
 	}
 	
 	

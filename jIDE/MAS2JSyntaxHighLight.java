@@ -10,11 +10,9 @@ import java.awt.Color;
 import java.io.StringReader;
 
 import javax.swing.JTextPane;
-import javax.swing.text.Element;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
-import javax.swing.text.StyleContext;
 import javax.swing.text.StyledDocument;
 
 public class MAS2JSyntaxHighLight extends ASSyntaxHighLight {
@@ -24,7 +22,17 @@ public class MAS2JSyntaxHighLight extends ASSyntaxHighLight {
 		super(p, jID);
 		context = new MAS2JStyles();
 	}
+
+	ASParserThread getParserThread() {
+		if (jasonID != null && jasonID.fMAS2jThread != null) {
+			return jasonID.fMAS2jThread;
+		} else {
+			return null;
+		}
+	}
+
 	
+	/*
 	int paintLine(int offset) {
 		try {
 			StyledDocument sd = (StyledDocument) editor.getDocument();
@@ -45,6 +53,9 @@ public class MAS2JSyntaxHighLight extends ASSyntaxHighLight {
 					int curLine = getParLineNumber(ePar);
 					if (jasonID.fMAS2jThread.getErrorLine() == curLine) { // has an error?
 						sd.setCharacterAttributes(eIni, eEnd-eIni, errorStyle, true);
+						// paint previous line with no error
+						Element p = getPreviousLine(ePar);
+						sd.setCharacterAttributes(p.getStartOffset(), p.getEndOffset()-p.getStartOffset(), noErrorStyle, true);								
 					} else {
 						sd.setCharacterAttributes(eIni, eEnd-eIni, noErrorStyle, true);								
 					}
@@ -75,7 +86,29 @@ public class MAS2JSyntaxHighLight extends ASSyntaxHighLight {
 		}
 		return offset;
 	}
-
+	*/
+	
+	void changeAttributesBasedOnTokens(StyledDocument sd, int eIni, int eEnd, String sPar) {
+		try {
+			tm.ReInit(new SimpleCharStream(new StringReader(sPar)));
+			Token lastToken = null;
+			Token t = tm.getNextToken();
+			while (t.kind != mas2jConstants.EOF) {
+				sd.setCharacterAttributes(eIni+t.beginColumn-1, t.endColumn-t.beginColumn+1,	 context.tokenStyles[t.kind], false);
+				lastToken = t;
+				t = tm.getNextToken();
+			}
+			// verify the end of line comments
+			if (lastToken != null && lastToken.endColumn+eIni+1 < eEnd) {
+				sPar = sd.getText(lastToken.endColumn+eIni, eEnd-(lastToken.endColumn+eIni));
+				if (sPar.trim().startsWith("//")) {
+					sd.setCharacterAttributes(lastToken.endColumn+eIni, eEnd-(lastToken.endColumn+eIni), commentStyle, true);					
+				}
+			}
+		} catch (TokenMgrError e) {
+		} catch (javax.swing.text.BadLocationException ex) {
+		}
+	}
 
 	public class MAS2JStyles extends ASStyles { 
 		public MAS2JStyles() {
