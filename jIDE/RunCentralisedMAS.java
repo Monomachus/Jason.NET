@@ -16,7 +16,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 // 
 // To contact the authors:
-// http://www.csc.liv.ac.uk/~bordini
+// http://www.dur.ac.uk/r.bordini
 // http://www.inf.furb.br/~jomi
 //----------------------------------------------------------------------------
 
@@ -155,7 +155,7 @@ public class RunCentralisedMAS {
 			Element app = (Element)docDOM.getElementsByTagName("application").item(0);
 			MASConsoleGUI.get().setTitle("MAS Console - " + app.getAttribute("id"));
 		} catch (Exception e) {
-			logger.error("can't get soc nome",e);
+			logger.error("Error geting society name",e);
 		}
 		
         // create the agentes

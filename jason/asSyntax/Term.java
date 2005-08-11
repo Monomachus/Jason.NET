@@ -16,7 +16,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 // 
 // To contact the authors:
-// http://www.csc.liv.ac.uk/~bordini
+// http://www.dur.ac.uk/r.bordini
 // http://www.inf.furb.br/~jomi
 //----------------------------------------------------------------------------
 
@@ -47,7 +47,7 @@ public class Term implements Cloneable, Comparable, Serializable {
 
 	public Term(String fs) {
 		if (fs != null && Character.isUpperCase(fs.charAt(0))) {
-			logger.warn("Are you sure to create a term that begins with upper case ("+fs+")? Should it be a VarTerm?");
+			logger.warn("Are you sure you want to create a term that begins with uppercase ("+fs+")? Should it be a VarTerm instead?");
 		}
 		setFunctor(fs);
 	}

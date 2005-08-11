@@ -85,9 +85,9 @@ public class ExecutionControl {
 	  */
 	public void receiveFinishedCycle(String agName, boolean breakpoint) {
 		if (logger.isDebugEnabled()) {
-			logger.debug("agent "+agName+" has finished a cycle, nb of finished ags is "+(nbFinished+1)+"/"+fJasonControl.getAgentsQty());
+			logger.debug("Agent "+agName+" has finished a cycle, # of finished agents is "+(nbFinished+1)+"/"+fJasonControl.getAgentsQty());
 			if (breakpoint) {
-				logger.debug("agent "+agName+" has achieved a breakpoint");				
+				logger.debug("Agent "+agName+" reached a breakpoint");				
 			}
 		}
 		synchronized(syncAgFinished) {

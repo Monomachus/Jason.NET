@@ -16,7 +16,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 //
 // To contact the authors:
-// http://www.csc.liv.ac.uk/~bordini
+// http://www.dur.ac.uk/r.bordini
 // http://www.inf.furb.br/~jomi
 //----------------------------------------------------------------------------
 
@@ -79,7 +79,7 @@ public class Agent {
 			String asSource = null;
 			if (args.length < 2) { // error
 				throw new JasonException(
-						"The AS source file was not informed for the Agent creation!");
+						"The AgentSpeak source file was not informed, cannot create the Agent!");
 			} else {
 				asSource = args[1].trim();
 			}
@@ -99,8 +99,8 @@ public class Agent {
 			
 			return fTS;
 		} catch (Exception e) {
-			logger.error("Error initializing creating the agent class!",e);
-			throw new JasonException("Error initializing creating the agent class! - " + e);
+			logger.error("Error creating the agent class!",e);
+			throw new JasonException("Error creating the agent class! - " + e);
 		}
     }
 
@@ -119,7 +119,7 @@ public class Agent {
 			logger.debug("as2j: AgentSpeak program '"+asURL+"' parsed successfully!");
 			return true;
 		} catch (IOException e) {
-			logger.error("as2j: the AS source file was not found",e);
+			logger.error("as2j: the AgentSpeak source file was not found",e);
 		} catch (ParseException e) {
 			logger.error("as2j: error parsing \"" + asURL + "\"",e);
 		}
@@ -133,7 +133,7 @@ public class Agent {
 			logger.debug("as2j: AgentSpeak program '"+asFileName+"' parsed successfully!");
 			return true;
 		} catch (FileNotFoundException e) {
-			logger.error("as2j: the AS source file was not found", e);
+			logger.error("as2j: the AgentSpeak source file was not found", e);
 		} catch (ParseException e) {
 			logger.error("as2j: error parsing \"" + asFileName + "\"", e);
 		}
@@ -407,7 +407,7 @@ public class Agent {
 				fPS.remove(i);
 			}
 		} else {
-			logger.error("The plan "+p+" was not found for deletion!");
+			logger.error("Plan "+p+" was not found for deletion!");
 		}
 	}
 

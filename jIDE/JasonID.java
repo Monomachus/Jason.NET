@@ -16,7 +16,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
 // To contact the authors:
-// http://www.csc.liv.ac.uk/~bordini
+// http://www.dur.ac.uk/r.bordini
 // http://www.inf.furb.br/~jomi
 //----------------------------------------------------------------------------
 
@@ -1201,10 +1201,10 @@ public class JasonID {
             "License along with this library; if not, write to the Free Software\n"+
             "Foundation, Inc., 59 Temple Place, Suite 330,\nBoston, MA  02111-1307  USA\n\n"+
 			"About the image: Jason by Gustave Moreau (1865).\n"+
-			"Copyright Photo RMN (Agence Photographique de la Réunion des\n"+
-			"Musées Nationaux, France). Photograph by Hervé Lewandowski.\n\n"+
+			"Copyright Photo RMN (Agence Photographique de la Rï¿½union des\n"+
+			"Musï¿½es Nationaux, France). Photograph by Hervï¿½ Lewandowski.\n\n"+
             "To contact the authors:\n"+
-            "http://www.csc.liv.ac.uk/~bordini\n"+
+            "http://www.dur.ac.uk/r.bordini\n"+
             "http://www.inf.furb.br/~jomi",
             "JasonID - About",
             JOptionPane.INFORMATION_MESSAGE,

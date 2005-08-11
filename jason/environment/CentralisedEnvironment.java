@@ -16,7 +16,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
 // To contact the authors:
-// http://www.csc.liv.ac.uk/~bordini
+// http://www.dur.ac.uk/r.bordini
 // http://www.inf.furb.br/~jomi
 //----------------------------------------------------------------------------
 
@@ -128,7 +128,7 @@ public class CentralisedEnvironment implements EnvironmentInterface {
                 if (agArch != null) {
                     agArch.getTS().newMessageHasArrived();
                 } else {
-                    logger.error("Error sending notify events to agent "+agName+", it does not exist!");
+                    logger.error("Error sending message notification: agent "+agName+" does not exist!");
                 }
             }
         }
@@ -137,7 +137,7 @@ public class CentralisedEnvironment implements EnvironmentInterface {
     
     public void addAgent(CentralisedAgArch agent) {
         if (mboxes.get(agent.getName()) != null) {
-        	logger.warn("Warning: add an agent that already exists: "+ agent.getName());
+        	logger.warn("Warning: adding an agent that already exists: "+ agent.getName());
         }
         mboxes.put(agent.getName(), new LinkedList());
         agents.put(agent.getName(), agent);

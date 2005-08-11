@@ -16,7 +16,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
 // To contact the authors:
-// http://www.csc.liv.ac.uk/~bordini
+// http://www.dur.ac.uk/r.bordini
 // http://www.inf.furb.br/~jomi
 //----------------------------------------------------------------------------
 
@@ -113,6 +113,7 @@ public class Unifier implements Cloneable {
 	
 			return null; // no value!
 		} catch (StackOverflowError e) {
+			// TODO JOMI: isto nao devia ser um log?
 			System.err.println("Stack overflow in unifier.get!\n\t"+this);
 			return null;
 		} catch (ClassCastException e) {
@@ -156,6 +157,11 @@ public class Unifier implements Cloneable {
 		/*
 		// check if an expression needs solving, before anything else
 		RAFA: o apply troca uma expr por seu valor, e eh chamado um pouco acima
+JOMI IMPORTANTE: eu acho que esta tua mudanca deixa mais ineficiente e
+talvez ate errado. Tu ta fazendo calculos de expressao quando nao precisa,
+por exemplo se eu quiser unificar "1 + 3" com "n + 3". Pelo que eu entendi
+do que tu tinha me pedido tu mesmo que queria tratar as expressoes como termos,
+termos complexos tipo arvore e por isto pode serm unificadas sem resolver.
 		
 		try {
 			ExprTerm t1ge = (ExprTerm)t1g;
@@ -165,6 +171,8 @@ public class Unifier implements Cloneable {
 				// t1 is expr but t2 is not
 				// TODO Jomi: ve se tem jeito mais facil de ver se e' inteiro
 				 RAFA: ver toString de NumberTermImpl
+				 JOMI: Joia! Eu sabia que tinha jeito (obvio)
+				 muito mais eficiente. Pode apagar estes comments. 
 				double t1gd = t1ge.solve();
 				String t1gs = Double.toString(t1gd);
 				if (t1gs.endsWith(".0")) {

@@ -16,7 +16,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 //
 // To contact the authors:
-// http://www.csc.liv.ac.uk/~bordini
+// http://www.dur.ac.uk/r.bordini
 // http://www.inf.furb.br/~jomi
 //----------------------------------------------------------------------------
 
@@ -215,7 +215,7 @@ class ASEditorPane extends JPanel {
 	String strToFind = null;
 	public void askSearch() {
 		// search
-		strToFind = JOptionPane.showInputDialog(null, "What to search?", "Find", JOptionPane.QUESTION_MESSAGE);
+		strToFind = JOptionPane.showInputDialog(null, "What to search for?", "Find", JOptionPane.QUESTION_MESSAGE);
 		search();
 	}
 	public void search() {

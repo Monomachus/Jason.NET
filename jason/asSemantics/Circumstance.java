@@ -16,7 +16,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 // 
 // To contact the authors:
-// http://www.csc.liv.ac.uk/~bordini
+// http://www.dur.ac.uk/r.bordini
 // http://www.inf.furb.br/~jomi
 //----------------------------------------------------------------------------
 
@@ -312,7 +312,8 @@ public class Circumstance implements Serializable {
 								selIntEle.setAttribute("pending","true");
 							}
 						} catch (Exception ex2) {
-							System.err.println("Trying to add a unknown pending action "+o.getClass().getName()+" - "+ex2);
+							// TODO JOMI: isto nao devia ser um log??
+							System.err.println("Trying to add an unknown pending action "+o.getClass().getName()+" - "+ex2);
 						}
 					}
 				}

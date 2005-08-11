@@ -16,7 +16,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 // 
 // To contact the authors:
-// http://www.csc.liv.ac.uk/~bordini
+// http://www.dur.ac.uk/r.bordini
 // http://www.inf.furb.br/~jomi
 //----------------------------------------------------------------------------
 
@@ -31,12 +31,6 @@ import java.util.Iterator;
 
 public final class BDIlogic {
 
-	// TODO: maybe these methods could be moved to TS class (or Agent class), since they use TS...
-	// JOMI: o TS ja e' enorme e eu preferia deixar estes metodos separados
-	// porque sao todos relacionados com as definicoes de BDI para AgentSpeak
-	// Faz muita diferenca de eficiencia tirar eles daqui?
-	// RAFA: fica aqui! Qdo vc ler, tira o TODO
-	
     public static final boolean Bel(TransitionSystem ts, Literal l) {
         return ts.ag.believes(l,null)!=null;
     }

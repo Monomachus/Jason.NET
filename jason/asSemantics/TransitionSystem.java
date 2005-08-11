@@ -16,7 +16,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 //
 // To contact the authors:
-// http://www.csc.liv.ac.uk/~bordini
+// http://www.dur.ac.uk/r.bordini
 // http://www.inf.furb.br/~jomi
 //----------------------------------------------------------------------------
 
@@ -370,6 +370,15 @@ public class TransitionSystem {
 		// RAFA: see the new imple of selectAtomicIntention below. Does
 		// it do what you want? 
 		// If so, remove this TODO.
+		// JOMI: Are you sure you can use the conf.C.SI from the
+		// previous reasoning cycle? I'm not sure this isn't changed
+		// in some of the rules. And even if it works, it still doesn't
+		// do what I mean, but it's no important, doesn't need to be
+		// done now. If there is NOT an atomic intention already
+		// selected, it is still checking every single intention.
+		// Wouldn't it be more efficient to have a flag which is set
+		// whenever a plan with [atomic] become intended so that we
+		// "remember" that it worth searching for an atomic?
 
 		// Rule for Atomic Intentions
 		confP.C.SI = selectAtomicIntention();
@@ -446,7 +455,7 @@ public class TransitionSystem {
 				// Static method, no instance needed
 				return ((Boolean) executeMethod.invoke(null, objectParameters)).booleanValue();
 			} catch (Exception e2) {
-				throw new JasonException("The method execute does not exists in class " + name);
+				throw new JasonException("Method execute does not exists in class " + name);
 			}
 	
 		} catch (Exception e) {
@@ -866,7 +875,7 @@ public class TransitionSystem {
 			}
 			
 		} catch (Exception e) {
-			logger.error("*** ERROR detected at transition system: ",e);
+			logger.error("*** ERROR in the transition system: ",e);
 		}
 	}
 

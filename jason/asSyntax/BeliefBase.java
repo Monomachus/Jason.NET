@@ -16,7 +16,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 // 
 // To contact the authors:
-// http://www.csc.liv.ac.uk/~bordini
+// http://www.dur.ac.uk/r.bordini
 // http://www.inf.furb.br/~jomi
 //----------------------------------------------------------------------------
 
@@ -119,7 +119,7 @@ public class BeliefBase {
 				if (l.getAnnots() != null) 
 					((ArrayList)l.getAnnots()).trimToSize();
 			} catch (Exception e) {
-				logger.error("error trim literal's terms/annots!",e);
+				logger.error("Error trimming literal's terms/annotations!",e);
 			}
 
 			String key = l.getFunctorArity();

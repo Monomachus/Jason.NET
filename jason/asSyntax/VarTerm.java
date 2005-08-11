@@ -26,7 +26,7 @@ public class VarTerm extends Term implements NumberTerm {
 
 	public VarTerm(String s) {
 		if (s != null && Character.isLowerCase(s.charAt(0))) {
-			logger.warn("Are you sure to create a VarTerm that begins with lower case ("+s+")? Should it be a Term?");			
+			logger.warn("Are you sure you want to create a VarTerm that begins with lowercase ("+s+")? Should it be a Term instead?");			
 		}
 		setFunctor(s);
 	}
@@ -55,7 +55,7 @@ public class VarTerm extends Term implements NumberTerm {
 			VarTerm vlvl = (VarTerm)((VarTerm)vl).value; // not getValue! (use the "real" value)
 			while (vlvl != null) {
 				if (vlvl == this) {
-					logger.error("Trying to make a loop in VarTerm values of "+this.getFunctor());
+					logger.error("Attempted loop in VarTerm values of "+this.getFunctor());
 					return false;
 				}
 				vlvl = (VarTerm)vlvl.value;
@@ -237,7 +237,7 @@ public class VarTerm extends Term implements NumberTerm {
 		if (hasValue() && value.isNumber()) {
 			return ((NumberTermImpl)value).getValue();
 		} else {
-			logger.error("Error getting numeric value of VarTerm "+this);
+			logger.error("Error getting numerical value of VarTerm "+this);
 		}
 		return 0;
 	}

@@ -16,7 +16,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
 // To contact the authors:
-// http://www.csc.liv.ac.uk/~bordini
+// http://www.dur.ac.uk/r.bordini
 // http://www.inf.furb.br/~jomi
 //----------------------------------------------------------------------------
 
@@ -62,7 +62,7 @@ public class CentralisedAgArch extends Thread implements AgentArchitecture {
             String className = null;
             if (args.length < 1) { // error
             	running = false;
-                throw new JasonException("The Agent class name were not informed for the CentralisedAgArch creation!");
+                throw new JasonException("The Agent class name was not informed for the CentralisedAgArch creation!");
             } else {
                 className = args[0].trim();
             }
@@ -150,7 +150,7 @@ public class CentralisedAgArch extends Thread implements AgentArchitecture {
         m.setSender(getName());
         List mbox = fEnv.getAgMbox(m.getReceiver());
 		if (mbox == null) {
-            throw new JasonException("the receiver '"+m.getReceiver()+"' does not exists! Could not send "+m);
+            throw new JasonException("Receiver '"+m.getReceiver()+"' does not exists! Could not send "+m);
 		}
         synchronized (mbox) {
             mbox.add(new Message(m));

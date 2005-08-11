@@ -16,7 +16,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 // 
 // To contact the authors:
-// http://www.csc.liv.ac.uk/~bordini
+// http://www.dur.ac.uk/r.bordini
 // http://www.inf.furb.br/~jomi
 //----------------------------------------------------------------------------
 
@@ -214,12 +214,11 @@ public class Pred extends Term implements Cloneable, Comparable, Serializable {
 			} else {
 				// TODO: why del? (jomi has removed it since it causes concurrent problems): 
 				// JOMI: o addBel vai precisar so da lista de anotacoes
-				// que foram anotadas pra gerar soment os eventos relativos
-				// aaquelas anotacoes. Eu acho que vai dar pau este teu comentario,
+				// que foram ADICIONADAS pra gerar somente os eventos relativos
+				// aaquelas anotacoesque sao NOVAS. Eu acho que vai dar pau este teu comentario,
 				// so que nao temos teste pra estas coisas ainda -- ou temos teste
 				// e eu que nao entendo mais como funciona isto! :)))
-				// RAFA: o literal do evento gerado não vai ter as annotações não adicionadas, é isso?
-				// Se for, qual o problema de deixas as anotações que já existiam?
+				
 				// Remove what is not new from l 
 				//p.delAnnot(t);
 				//i--;

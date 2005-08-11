@@ -16,7 +16,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
 // To contact the authors:
-// http://www.csc.liv.ac.uk/~bordini
+// http://www.dur.ac.uk/r.bordini
 // http://www.inf.furb.br/~jomi
 //----------------------------------------------------------------------------
 
@@ -82,7 +82,7 @@ public class SaciAgArch extends saci.Agent implements AgentArchitecture {
             String className = null;
             if (args.length < 1) { // error
             	running = false;
-                throw new JasonException("The Agent class name were not informed for the SaciAgArch creation!");
+                throw new JasonException("The Agent class name was not informed for the SaciAgArch creation!");
             } else {
                 className = args[0].trim();
             }
@@ -227,7 +227,7 @@ public class SaciAgArch extends saci.Agent implements AgentArchitecture {
                                     fTS.getC().getFeedbackActions().add(a);
                                 }
                                 else {
-                                	logger.warn("*** Warning: received feedback for an Action that is not pending.");
+                                	logger.error("Error: received feedback for an Action that is not pending.");
                                 }
                             }
                             else {
@@ -309,7 +309,7 @@ public class SaciAgArch extends saci.Agent implements AgentArchitecture {
                         fTS.getC().getMB().add(im);
                         logger.info("received message: " + im);
                     } else {
-                        logger.warn("Warning! Message received cannot be handled:"+m);
+                        logger.warn("Warning! Message received cannot be handled: "+m);
                     }
                 }
             }

@@ -16,7 +16,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 // 
 // To contact the authors:
-// http://www.csc.liv.ac.uk/~bordini
+// http://www.dur.ac.uk/r.bordini
 // http://www.inf.furb.br/~jomi
 //----------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@ public class createAgent implements InternalAction {
 		
 		try {
 			if (!(ts.getAgArch() instanceof CentralisedAgArch)) {
-				throw new JasonException("Create agent is implement only for centralised architecture yet!");				
+				throw new JasonException("Create agent is currently implemented only for the Centralised architecture!");				
 			}
             CentralisedAgArch agArch = new CentralisedAgArch();//(CentralisedAgArch)Class.forName(Agent.class.getName()).newInstance();
             
@@ -68,7 +68,7 @@ public class createAgent implements InternalAction {
             logger.debug("Agent "+name+" created!");
             return true;
 		} catch (IndexOutOfBoundsException e) {
-			throw new JasonException("The internal action 'createAgent' has not received the right number of arguments");
+			throw new JasonException("The internal action 'createAgent' received a wrong number of arguments");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
