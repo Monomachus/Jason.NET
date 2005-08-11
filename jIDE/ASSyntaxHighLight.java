@@ -162,7 +162,9 @@ public class ASSyntaxHighLight { // extends Thread { //implements CaretListener 
 						sd.setCharacterAttributes(eIni, eEnd-eIni, errorStyle, true);
 						// paint previous line with no error
 						Element p = getPreviousLine(ePar);
-						sd.setCharacterAttributes(p.getStartOffset(), p.getEndOffset()-p.getStartOffset(), noErrorStyle, true);								
+						if (p != null) {
+							sd.setCharacterAttributes(p.getStartOffset(), p.getEndOffset()-p.getStartOffset(), noErrorStyle, true);		
+						}
 					} else {
 						sd.setCharacterAttributes(eIni, eEnd-eIni, noErrorStyle, true);								
 					}
