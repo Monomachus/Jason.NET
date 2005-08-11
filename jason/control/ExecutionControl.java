@@ -40,7 +40,7 @@ public class ExecutionControl {
 						try {
 							syncAgFinished.wait(); // waits notify
 							if (fJasonControl != null) { 
-								if (nbFinished == fJasonControl.getAgentsQty()) {
+								if (nbFinished >= fJasonControl.getAgentsQty()) {
 									nbFinished = 0;
 									allAgsFinished();
 									//setAllAgFinished();

@@ -95,9 +95,15 @@ public class CentralisedAgArch extends Thread implements AgentArchitecture {
 	public void setEnv(CentralisedEnvironment env) {
 		fEnv = env;
 	}
-
+	public CentralisedEnvironment getEnv() {
+		return fEnv;
+	}
+	
 	public void setControl(CentralisedExecutionControl pControl) {
 		fControl = pControl;
+	}
+	public CentralisedExecutionControl getControl() {
+		return fControl;
 	}
     
     
