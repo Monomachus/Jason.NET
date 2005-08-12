@@ -18,6 +18,14 @@
 // To contact the authors:
 // http://www.dur.ac.uk/r.bordini
 // http://www.inf.furb.br/~jomi
+//
+// CVS information:
+//   $Date$
+//   $Revision$
+//   $Log$
+//   Revision 1.9  2005/08/12 21:12:50  jomifred
+//   add cvs keywords
+//
 //----------------------------------------------------------------------------
 
 

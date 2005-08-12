@@ -18,6 +18,14 @@
 // To contact the authors:
 // http://www.dur.ac.uk/r.bordini
 // http://www.inf.furb.br/~jomi
+//
+// CVS information:
+//   $Date$
+//   $Revision$
+//   $Log$
+//   Revision 1.14  2005/08/12 21:08:23  jomifred
+//   add cvs keywords
+//
 //----------------------------------------------------------------------------
 
 
@@ -224,7 +232,7 @@ public class RunCentralisedMAS {
             // start the execution, if it is controlled
     		try {
 				Thread.sleep(500); // gives a time to agents enter in wait					
-				control.informAllAgToPerformCycle();
+				control.informAllAgsToPerformCycle();
     		} catch (Exception e) {
     			e.printStackTrace();
             }	
