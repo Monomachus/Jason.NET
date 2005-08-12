@@ -23,10 +23,12 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.6  2005/08/12 20:46:19  jomifred
+//   add cvs keywords
+//
 //   Revision 1.5  2005/08/12 20:45:36  jomifred
 //   change informAgs method name
 //
-
 //----------------------------------------------------------------------------
 
 package jason.control;

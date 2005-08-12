@@ -19,9 +19,13 @@
 // http://www.dur.ac.uk/r.bordini
 // http://www.inf.furb.br/~jomi
 //
-// CVS information: : 
+// CVS information:
 //   $Date$
 //   $Revision$
+//   $Log$
+//   Revision 1.5  2005/08/12 20:41:35  jomifred
+//   add cvs keywords
+//
 //----------------------------------------------------------------------------
 
 package jason.control;
