@@ -113,7 +113,7 @@ public class Unifier implements Cloneable {
 	
 			return null; // no value!
 		} catch (StackOverflowError e) {
-			// TODO JOMI: isto nao devia ser um log?
+			// TODO JOMI: isto nao devia ser um logger.error em vez de println?
 			System.err.println("Stack overflow in unifier.get!\n\t"+this);
 			return null;
 		} catch (ClassCastException e) {
@@ -186,7 +186,6 @@ termos complexos tipo arvore e por isto pode serm unificadas sem resolver.
 			try {
 				ExprTerm t2ge = (ExprTerm)t2g;
 				// t1 is not expr but t2 is
-				// TODO Jomi: ve se tem jeito mais facil de ver se e' inteiro
 				double t2gd = t2ge.solve();
 				String t2gs = Double.toString(t2gd);
 				if (t2gs.endsWith(".0")) {

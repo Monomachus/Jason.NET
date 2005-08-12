@@ -147,7 +147,7 @@ public class JasonID {
         		userProperties.load(new FileInputStream(jasonConfFile));
         		if (!userProperties.getProperty("version").equals(currJasonVersion) && !currJasonVersion.equals("?")) { 
         			// new version, set all values to default
-        			System.out.println("New version of Jason, reseting configuration.");
+        			System.out.println("This is a new version of Jason, reseting configuration...");
         			userProperties.remove("javaHome");
         			userProperties.remove("saciJar");
         			userProperties.remove("jasonJar");
@@ -192,7 +192,7 @@ public class JasonID {
             if (args.length > 0) {
                 jasonID.openAct.loadProject(new File(args[0]));
             } else {
-            	jasonID.mas2jPane.createNewPlainText("// use the menu Project->New option to create a new project.");//jasonID.mas2jPane.getDefaultText("anMAS", ""));
+            	jasonID.mas2jPane.createNewPlainText("// use menu option Project->New to create a new project.");//jasonID.mas2jPane.getDefaultText("anMAS", ""));
             	jasonID.mas2jPane.modified = false;
             }
             jasonID.startThreads();
@@ -713,7 +713,7 @@ public class JasonID {
             super("New project", new ImageIcon( JasonID.class.getResource("/images/new.gif")));
             chooser = new JFileChooser(System.getProperty("user.dir"));
             //chooser.setFileFilter(new DirectoryFileFilter());
-            chooser.setDialogTitle("Select the project directory");
+            chooser.setDialogTitle("Select the project folder");
             chooser.setAcceptAllFileFilterUsed(false);
             chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         }
@@ -824,7 +824,7 @@ public class JasonID {
                 pane.syntaxHL.repainAll();
                 pane.modified = false;
             } catch (FileNotFoundException ex) {
-				System.err.println("File "+f+" does not exists, it will be created!");
+				System.err.println("File "+f+" does not exists; it will be created!");
 			 } catch (java.io.IOException e) {
             	System.err.println("I/O error for "+f+" -- "+e.getMessage());
                 e.printStackTrace();
@@ -1080,7 +1080,7 @@ public class JasonID {
         	JPanel insideJIDEPanel = new JPanel();
         	insideJIDEPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory	.createEtchedBorder(), "Centralised MAS", TitledBorder.LEFT, TitledBorder.TOP));
         	insideJIDEPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-        	insideJIDECBox = new JCheckBox("Run MAS as an JasonIDE inernal thread instead of another process");
+        	insideJIDECBox = new JCheckBox("Run MAS as a JasonIDE inernal thread instead of another process");
         	insideJIDEPanel.add(insideJIDECBox);
         	d.getContentPane().add(insideJIDEPanel);
         	
@@ -1200,7 +1200,7 @@ public class JasonID {
             "You should have received a copy of the GNU Lesser General Public\n"+
             "License along with this library; if not, write to the Free Software\n"+
             "Foundation, Inc., 59 Temple Place, Suite 330,\nBoston, MA  02111-1307  USA\n\n"+
-			"About the image: Jason by Gustave Moreau (1865).\n"+
+			"About the image: \"Jason\" by Gustave Moreau (1865).\n"+
 			"Copyright Photo RMN (Agence Photographique de la R�union des\n"+
 			"Mus�es Nationaux, France). Photograph by Herv� Lewandowski.\n\n"+
             "To contact the authors:\n"+

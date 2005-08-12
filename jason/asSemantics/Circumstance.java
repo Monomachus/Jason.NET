@@ -312,7 +312,7 @@ public class Circumstance implements Serializable {
 								selIntEle.setAttribute("pending","true");
 							}
 						} catch (Exception ex2) {
-							// TODO JOMI: isto nao devia ser um log??
+							// TODO JOMI: isto nao devia ser um logger.error em vez de println??
 							System.err.println("Trying to add an unknown pending action "+o.getClass().getName()+" - "+ex2);
 						}
 					}

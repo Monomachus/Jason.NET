@@ -202,7 +202,7 @@ public class ASSyntaxHighLight { // extends Thread { //implements CaretListener 
 				sd.setCharacterAttributes(eIni+t.beginColumn-1, t.endColumn-t.beginColumn+1, s, false);
 
 				// set currenttoken
-				// TODO: show all var ocoorences
+				// TODO: show all var occurrences
 				/*
 				if (t.kind == as2j.VAR && editor.getCaretPosition() >= t.beginColumn+eIni && editor.getCaretPosition() <= t.endColumn+eIni) {
 					varToken = t;

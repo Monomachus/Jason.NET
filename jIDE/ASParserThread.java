@@ -64,7 +64,7 @@ public class ASParserThread extends Thread {
         try {
         	fASParser = new as2j(new StringReader(""));
         } catch (Exception ex) {
-        	System.err.println("error creating parser!"+ex);
+        	System.err.println("Error creating parser!"+ex);
         	ex.printStackTrace();
         	fASParser = null;
         }    	
@@ -191,7 +191,7 @@ public class ASParserThread extends Thread {
             } catch (Exception e) { }
         }
         if (trycount >= 10) {
-        	System.out.println("stop waiting compilation, some unexpected error ocorred");
+        	System.out.println("Stop waiting for the compilation! Some unexpected error occurred.");
         	fOk = false;
         }
     }

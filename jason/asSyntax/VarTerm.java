@@ -175,6 +175,11 @@ public class VarTerm extends Term implements NumberTerm {
 	/*
 	 * TODO the below is not ok, see the following code where
 	 * x is a VarTerm with a List value!
+	 * TODO JOMI: isto nao e' problema de ter feito "ground" antes?
+	 * Precisa se preocupar com os isXXX pra todas as possibilidades
+	 * dos valores instanciados aa variavel? Se e' var (o cara nao
+	 * deu ground antes) e perguntar isXXX devia mesmo ser falso
+	 * exceto pra isVar nao??? 
 	 *  
 	 * if (x.isList()) {
 	 *    ListTerm lt = (ListTerm)x;

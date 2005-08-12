@@ -63,11 +63,11 @@ class RunMAS extends AbstractAction {
 			
 			String jasonJar = jasonID.getConf().getProperty("jasonJar");
 			if (!JasonID.checkJar(jasonJar)) {
-				System.err.println("The jason.jar file ("+jasonJar+") was not correctly set, the MAS may not run. Go to menu Edit->Preferences and set it.");
+				System.err.println("The path to the jason.jar file ("+jasonJar+") was not correctly set, the MAS may not run. Go to menu Edit->Preferences to configure the path.");
 			}
 			String javaHome = jasonID.getConf().getProperty("javaHome");
 			if (!JasonID.checkJavaPath(javaHome)) {
-				System.err.println("The Java home directory ("+javaHome+") was not correctly set, the MAS may not run. Go to menu Edit->Preferences and set it.");
+				System.err.println("The Java home directory ("+javaHome+") was not correctly set, the MAS may not run. Go to menu Edit->Preferences to configure the path.");
 			}
 			
 			
@@ -94,7 +94,7 @@ class RunMAS extends AbstractAction {
 						if (JasonID.checkJar(saciJar)) {
 							masRunner = new MASRunnerSaci(compT);
 						} else {
-							System.err.println("Error: saci.jar file ("+saciJar+") was not correctly set. Go to menu Edit->Preferences and set it.");
+							System.err.println("The path to the saci.jar file ("+saciJar+") was not correctly set. Go to menu Edit->Preferences to configure the path.");
 							return;
 						}
 					}
@@ -183,7 +183,7 @@ class RunMAS extends AbstractAction {
 					}
 				}
 			} catch (Exception ex) {
-				System.err.println("error running SACI:" + ex);
+				System.err.println("error running saci:" + ex);
 			} finally {
 				stopWaitSaciOk();
 			}
@@ -204,12 +204,12 @@ class RunMAS extends AbstractAction {
 											+ jasonID.projectDirectory
 											+ "\" directory and run the saci-"
 											+ jasonID.fMAS2jThread.fParserMAS2J.getSocName()
-											+ " script.\n\nClick 'ok' when the saci is running.");
+											+ " script.\n\nClick 'ok' when saci is running.");
 					wait(1000);
 					if (!saciOk) {
 						JOptionPane
 								.showMessageDialog(jasonID.frame,
-										"Saci is not running. Use centralised architecture to run the MAS");
+										"Saci might not be properly installed or configure. Use the centralised architecture to run your MAS");
 					}
 				}
 			} catch (Exception e) {

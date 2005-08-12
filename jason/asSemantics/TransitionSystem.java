@@ -301,7 +301,7 @@ public class TransitionSystem {
 			// but note that the event was relevant, yet it is possible
 			// the programmer just wanted to add the belief and it was
 			// relevant by chance, so just carry on instead of dropping the intention
-			// TODO RECONSIDER THIS PROBLEM IN THE SEMANTICS!
+			// TODO: RECONSIDER THIS PROBLEM IN THE SEMANTICS!
 			else if (conf.C.SE.isInternal()) {
 				confP.C.SI = conf.C.SE.intention;
 				updateIntention();
@@ -369,16 +369,18 @@ public class TransitionSystem {
 		
 		// RAFA: see the new imple of selectAtomicIntention below. Does
 		// it do what you want? 
-		// If so, remove this TODO.
+		// If so, remove this "todo".
 		// JOMI: Are you sure you can use the conf.C.SI from the
 		// previous reasoning cycle? I'm not sure this isn't changed
 		// in some of the rules. And even if it works, it still doesn't
-		// do what I mean, but it's no important, doesn't need to be
+		// do what I mean, but it's not important, doesn't need to be
 		// done now. If there is NOT an atomic intention already
-		// selected, it is still checking every single intention.
+		// selected, it is still checking every single intention
+		// trying to find an atomic one.
 		// Wouldn't it be more efficient to have a flag which is set
 		// whenever a plan with [atomic] become intended so that we
-		// "remember" that it worth searching for an atomic?
+		// "remember" that it worth searching for an atomic? Do you
+		// understand what I mean?
 
 		// Rule for Atomic Intentions
 		confP.C.SI = selectAtomicIntention();

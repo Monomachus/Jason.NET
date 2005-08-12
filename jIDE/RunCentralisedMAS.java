@@ -64,7 +64,7 @@ public class RunCentralisedMAS {
     
     public static void main(String[] args) {
         if (args.length < 1) {
-            System.err.println("You must inform only the MAS XML script.");
+            System.err.println("You should inform the MAS XML script only.");
             System.exit(1);
         }
 
@@ -86,7 +86,7 @@ public class RunCentralisedMAS {
 				runner.startAgs();
 				runner.startSyncMode();
 			} catch (Exception e) {
-				logger.error("Error!?:",e);
+				logger.error("Error!?: ",e);
 			}
 
 	        if (args.length == 2) { // from inside jIDE
@@ -155,7 +155,7 @@ public class RunCentralisedMAS {
 			Element app = (Element)docDOM.getElementsByTagName("application").item(0);
 			MASConsoleGUI.get().setTitle("MAS Console - " + app.getAttribute("id"));
 		} catch (Exception e) {
-			logger.error("Error geting society name",e);
+			logger.error("Error getting the society name",e);
 		}
 		
         // create the agentes

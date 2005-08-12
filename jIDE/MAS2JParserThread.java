@@ -44,7 +44,7 @@ public class MAS2JParserThread extends ASParserThread { //Thread {
             fParserMAS2J = new mas2j(new StringReader(""));
             fParserMAS2J.setNoOut(true);
         } catch (Exception ex) {
-        	System.err.println("error creating mas2j parser!"+ex);
+        	System.err.println("Error creating mas2j parser!"+ex);
         	ex.printStackTrace();
         }    	
     }
@@ -109,7 +109,7 @@ public class MAS2JParserThread extends ASParserThread { //Thread {
                 }
             }
         } catch (Exception ex) {
-			System.err.println("Error:"+ex);
+			System.err.println("Error: "+ex);
             ex.printStackTrace();
         } finally {
             fCompilationDone = true;

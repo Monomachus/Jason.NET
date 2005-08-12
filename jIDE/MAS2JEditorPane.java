@@ -49,7 +49,7 @@ public class MAS2JEditorPane extends ASEditorPane {
 				+ "   //environment: <replace with the environment class name>\n\n"
 				+ "   agents:\n"
 				+ "       "+ags+"\n" 
-				+ "       //<add more agents's name here>\n\n" 
+				+ "       //<add more agent names here>\n\n" 
 				+ "}";
 	}
 }
