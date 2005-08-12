@@ -18,6 +18,15 @@
 // To contact the authors:
 // http://www.dur.ac.uk/r.bordini
 // http://www.inf.furb.br/~jomi
+//
+// CVS information:
+//   $Date$
+//   $Revision$
+//   $Log$
+//   Revision 1.5  2005/08/12 20:43:54  jomifred
+//   add cvs keywords and change informAgs method name
+//
+//
 //----------------------------------------------------------------------------
 
 
@@ -47,7 +56,7 @@ public interface ExecutionControlInterface {
     /**
      * informs all agents to continue to its next reasoning cycle.
      */
-    public void informAllAgToPerformCycle();
+    public void informAllAgsToPerformCycle();
 
     /** gets a string list with all the agents names */
     public Collection getAgentsName();
