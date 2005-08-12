@@ -18,13 +18,18 @@
 // To contact the authors:
 // http://www.dur.ac.uk/r.bordini
 // http://www.inf.furb.br/~jomi
+//
+// CVS information:
+//   $Date$
+//   $Revision$
+//   $Log$
+//   Revision 1.3  2005/08/12 22:20:10  jomifred
+//   add cvs keywords
+//
+//
 //----------------------------------------------------------------------------
 
 package jason.stdlib;
-
-import jIDE.RunCentralisedMAS;
-
-import org.apache.log4j.Logger;
 
 import jason.JasonException;
 import jason.architecture.CentralisedAgArch;
@@ -34,6 +39,8 @@ import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.StringTerm;
 import jason.asSyntax.Term;
+
+import org.apache.log4j.Logger;
 
 public class createAgent implements InternalAction {
 

@@ -18,6 +18,15 @@
 // To contact the authors:
 // http://www.dur.ac.uk/r.bordini
 // http://www.inf.furb.br/~jomi
+//
+// CVS information:
+//   $Date$
+//   $Revision$
+//   $Log$
+//   Revision 1.4  2005/08/12 22:20:10  jomifred
+//   add cvs keywords
+//
+//
 //----------------------------------------------------------------------------
 
 package jason.stdlib;
@@ -26,6 +35,8 @@ import jason.asSemantics.InternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.Term;
+
+// TODO: remove this IA in future version of Jason since we have expressions now
 
 public class plus implements InternalAction {
 
