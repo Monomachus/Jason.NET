@@ -1,3 +1,29 @@
+//----------------------------------------------------------------------------
+// Copyright (C) 2003  Rafael H. Bordini, Jomi F. Hubner, et al.
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// 
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+// 
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// 
+// To contact the authors:
+// http://www.dur.ac.uk/r.bordini
+// http://www.inf.furb.br/~jomi
+//
+// CVS information: : 
+//   $Date$
+//   $Revision$
+//----------------------------------------------------------------------------
+
 package jason.control;
 
 import jason.JasonException;
@@ -64,7 +90,7 @@ public class SaciExecutionControl extends saci.Agent implements ExecutionControl
     	try {
     		Thread.sleep(1000); // gives a time to agents enter in wait
     	} catch (Exception e) {}
-    	informAllAgToPerformCycle();
+    	informAllAgsToPerformCycle();
     }
 	
 	public ExecutionControl getUserControl() {
@@ -88,9 +114,9 @@ public class SaciExecutionControl extends saci.Agent implements ExecutionControl
 	}
 
 	/**
-	 * @see jason.control.ExecutionControlInterface#informAllAgToPerformCycle()
+	 * @see jason.control.ExecutionControlInterface#informAllAgsToPerformCycle()
 	 */
-	public void informAllAgToPerformCycle() {
+	public void informAllAgsToPerformCycle() {
 	    Message m = new Message("(tell)");
 	    m.put("ontology", "AS-ExecControl");
 	    m.put("content", "performCycle");
