@@ -18,14 +18,6 @@
 // To contact the authors:
 // http://www.dur.ac.uk/r.bordini
 // http://www.inf.furb.br/~jomi
-//
-// CVS information:
-//   $Date$
-//   $Revision$
-//   $Log$
-//   Revision 1.6  2005/08/12 23:33:49  jomifred
-//   support for saci arch in IA createAgent
-//
 //----------------------------------------------------------------------------
 
 package jason.stdlib;
