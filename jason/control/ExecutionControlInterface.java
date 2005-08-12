@@ -23,9 +23,11 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.6  2005/08/12 20:52:18  jomifred
+//   change in the informAgs method name
+//
 //   Revision 1.5  2005/08/12 20:43:54  jomifred
 //   add cvs keywords and change informAgs method name
-//
 //
 //----------------------------------------------------------------------------
 
