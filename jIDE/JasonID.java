@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.20  2005/08/12 23:29:11  jomifred
+//   support for saci arch in IA createAgent
+//
 //   Revision 1.19  2005/08/12 21:08:23  jomifred
 //   add cvs keywords
 //
@@ -125,10 +128,11 @@ public class JasonID {
     // static start up methods
     // --------------------------------
     
+    public static JasonID currentJasonID = null;
     
     public static void main(String[] args) {
-        JasonID jasonID = new JasonID();
-        jasonID.createMainFrame();
+        currentJasonID = new JasonID();
+        currentJasonID.createMainFrame();
 
         String currJasonVersion;
 
@@ -193,15 +197,15 @@ public class JasonID {
             jasonConfFile.getParentFile().mkdirs();
             storePrefs();
 
-            jasonID.mas2jPane.updateFont();
+            currentJasonID.mas2jPane.updateFont();
 
             if (args.length > 0) {
-                jasonID.openAct.loadProject(new File(args[0]));
+            	currentJasonID.openAct.loadProject(new File(args[0]));
             } else {
-            	jasonID.mas2jPane.createNewPlainText("// use menu option Project->New to create a new project.");//jasonID.mas2jPane.getDefaultText("anMAS", ""));
-            	jasonID.mas2jPane.modified = false;
+            	currentJasonID.mas2jPane.createNewPlainText("// use menu option Project->New to create a new project.");//jasonID.mas2jPane.getDefaultText("anMAS", ""));
+            	currentJasonID.mas2jPane.modified = false;
             }
-            jasonID.startThreads();
+            currentJasonID.startThreads();
 
         } catch (Throwable t) {
             System.out.println("uncaught exception: " + t);
@@ -347,6 +351,10 @@ public class JasonID {
 	    stopMASAct  = new StopMAS();
 	    editLogAct  = new EditLog();
 	    exitAppAct  = new ExitApp();
+    }
+    
+    public String getProjectDirectory() {
+    	return projectDirectory;
     }
     
     JFrame createMainFrame() {
@@ -732,7 +740,9 @@ public class JasonID {
                 if (tmpFileName == null) {
                 	return;
                 }
-
+                if (Character.isUpperCase(tmpFileName.charAt(0))) {
+                	tmpFileName = Character.toLowerCase(tmpFileName.charAt(0)) + tmpFileName.substring(1);
+                }
                 if (chooser.showOpenDialog(frame) == JFileChooser.APPROVE_OPTION) {
 					File f = chooser.getSelectedFile();
 					if (f.isDirectory()) {

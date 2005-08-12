@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.20  2005/08/12 23:29:11  jomifred
+//   support for saci arch in IA createAgent
+//
 //   Revision 1.19  2005/08/12 22:18:37  jomifred
 //   add cvs keywords
 //
@@ -444,7 +447,7 @@ public class TransitionSystem {
 			return objIA.execute(this, un, action.getTermsArray());
 			
 		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
+			logger.error("Error in IA ",e);
 			return false;
 		} catch (ClassCastException e) {
 			// tries it as old internal action (static + string pars)
@@ -470,7 +473,7 @@ public class TransitionSystem {
 			}
 	
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error("Error in IA ",e);
 			return false;
 		}
 	}

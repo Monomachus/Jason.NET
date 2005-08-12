@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.14  2005/08/12 23:29:11  jomifred
+//   support for saci arch in IA createAgent
+//
 //   Revision 1.13  2005/08/12 21:08:23  jomifred
 //   add cvs keywords
 //
@@ -528,9 +531,11 @@ class RunMAS extends AbstractAction {
 		public Class loadClass(String name) throws ClassNotFoundException {
 			//System.out.println("loadClass " + name);
 			if (! name.equals(MASConsoleGUI.class.getName())) { // let super loader to get MASConsoleGUI, since it must be shared between RunCentMAS and jIDE
-				if (name.startsWith("jason.") || name.startsWith("jIDE.")) {
-					//System.out.println("loading new ");
-					return findClassInJar(RunMAS.class, name);
+				if (! name.equals(JasonID.class.getName())) { // let super loader to get MASConsoleGUI, since it must be shared between RunCentMAS and jIDE
+					if (name.startsWith("jason.") || name.startsWith("jIDE.")) {
+						//System.out.println("loading new ");
+						return findClassInJar(RunMAS.class, name);
+					}
 				}
 			}
 			return super.loadClass(name);

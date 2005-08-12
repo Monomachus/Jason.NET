@@ -23,16 +23,18 @@
 //   $Date$
 //   $Revision$
 //   $Log$
-//   Revision 1.3  2005/08/12 22:20:10  jomifred
-//   add cvs keywords
+//   Revision 1.4  2005/08/12 23:29:11  jomifred
+//   support for saci arch in IA createAgent
 //
 //
 //----------------------------------------------------------------------------
 
 package jason.stdlib;
 
+import jIDE.JasonID;
 import jason.JasonException;
 import jason.architecture.CentralisedAgArch;
+import jason.architecture.SaciAgArch;
 import jason.asSemantics.Agent;
 import jason.asSemantics.InternalAction;
 import jason.asSemantics.TransitionSystem;
@@ -40,7 +42,13 @@ import jason.asSemantics.Unifier;
 import jason.asSyntax.StringTerm;
 import jason.asSyntax.Term;
 
+import java.io.File;
+
 import org.apache.log4j.Logger;
+
+import saci.launcher.Command;
+import saci.launcher.Launcher;
+import saci.launcher.LauncherD;
 
 public class createAgent implements InternalAction {
 
@@ -52,33 +60,95 @@ public class createAgent implements InternalAction {
 	public boolean execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
 		
 		try {
-			if (!(ts.getAgArch() instanceof CentralisedAgArch)) {
-				throw new JasonException("Create agent is currently implemented only for the Centralised architecture!");				
-			}
-            CentralisedAgArch agArch = new CentralisedAgArch();//(CentralisedAgArch)Class.forName(Agent.class.getName()).newInstance();
-            
             Term name = (Term)args[0].clone();
             un.apply(name);
-            agArch.setAgName(name.toString());
             
             StringTerm source = (StringTerm)args[1].clone();
             un.apply(source);
             
-            // parameters for ini
-            String[] agArgs = { Agent.class.getName(), source.getValue()};
-            agArch.initAg(agArgs);
+            File fSource = new File(source.getValue());
+            if (! fSource.exists()) {
+            	
+            	// try to get the project directory (only when running inside JasonID)
+            	if (JasonID.currentJasonID != null) {
+            		logger.debug("trying to find the source at "+JasonID.currentJasonID.getProjectDirectory());
+            		fSource = new File(JasonID.currentJasonID.getProjectDirectory()+File.separator+source.getValue());
+                    if (! fSource.exists()) {
+                		throw new JasonException("The file source "+source+" was not found!");
+                    }
+                    logger.debug("Ok, found "+fSource.getAbsolutePath());
+            	} else {
+            		throw new JasonException("The file source "+source+" was not found!");
+            	}
+            }
             
-            agArch.setEnv( ((CentralisedAgArch)ts.getAgArch()).getEnv());
-            agArch.setControl( ((CentralisedAgArch)ts.getAgArch()).getControl());
-            agArch.getEnv().addAgent(agArch);
-            agArch.start();
-            logger.debug("Agent "+name+" created!");
-            return true;
+            if (ts.getAgArch() instanceof CentralisedAgArch) {
+            	return createCentralisedAg(ts, name.toString(), fSource.getAbsolutePath());
+            } else if (ts.getAgArch() instanceof SaciAgArch) {
+            	return createSaciAg(ts, name.toString(), fSource.getAbsolutePath());
+            } else {
+				throw new JasonException("Create agent is currently implemented only for the Centralised architecture!");				
+			}
 		} catch (IndexOutOfBoundsException e) {
 			throw new JasonException("The internal action 'createAgent' received a wrong number of arguments");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return false;
+	}
+	
+	boolean createSaciAg(TransitionSystem ts, String name, String source) {
+		try {
+			logger.debug("Creating saci agent from source "+source);
+    
+			// gets the saci launcher
+			Launcher l = LauncherD.getLauncher();
+			Command c1 = new Command(Command.START_AGENT);
+			c1.addArg("class", SaciAgArch.class.getName());
+			c1.addArg("name", name);
+			c1.addArg("society.name", ((SaciAgArch)ts.getAgArch()).getSociety());;
+			c1.addArg("args", Agent.class.getName() + " " + source);
+			//c1.addArg("host", "?");
+			l.execCommand(c1);
+			/*
+            agArch.setEnv( ((CentralisedAgArch)ts.getAgArch()).getEnv());
+            agArch.setControl( ((CentralisedAgArch)ts.getAgArch()).getControl());
+            if (agArch.getTS().getSettings().isSync()) {
+            	agArch.getTS().getSettings().setSync(true);
+            }
+            agArch.getEnv().addAgent(agArch);
+            agArch.start();
+            */
+            logger.debug("Agent "+name+" created!");
+            return true;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+
+	boolean createCentralisedAg(TransitionSystem ts, String name, String source) {
+		try {
+			logger.debug("Creating centralised agent from source "+source);
+            // parameters for ini
+			
+            String[] agArgs = { Agent.class.getName(), source};
+
+            CentralisedAgArch agArch = new CentralisedAgArch();//(CentralisedAgArch)Class.forName(Agent.class.getName()).newInstance();
+            agArch.setAgName(name.toString());
+            agArch.initAg(agArgs);
+            agArch.setEnv( ((CentralisedAgArch)ts.getAgArch()).getEnv());
+            agArch.setControl( ((CentralisedAgArch)ts.getAgArch()).getControl());
+            if (agArch.getTS().getSettings().isSync()) {
+            	agArch.getTS().getSettings().setSync(true);
+            }
+            agArch.getEnv().addAgent(agArch);
+            agArch.start();
+            logger.debug("Agent "+name+" created!");
+            return true;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return false;	
 	}
 }
