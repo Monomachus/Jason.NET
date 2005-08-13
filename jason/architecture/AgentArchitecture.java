@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.8  2005/08/13 13:55:35  jomifred
+//   java doc updated
+//
 //   Revision 1.7  2005/08/12 22:19:26  jomifred
 //   add cvs keywords
 //
@@ -43,20 +46,34 @@ import java.util.List;
  * architecture; the AS interpreter is only the reasoner (a kind of mind) within such
  * architecture (a kind of body).
  * 
+ * <p>The agent reasoning cycle (implemented in TransitionSystem class)
+ * calls these methods to get perception, action, and communication.
  **/
 
 public interface AgentArchitecture {
 
     // Default functions for the overall agent architecture
     // The user can always override them
+
+    /** gets the agent's perception as a list of Literals */
     public List perceive();
+
+    /** reads the agent's mailbox and adds messages into the agent's circumstance */
     public void checkMail();
+
+    /** executes the action in agent's circumstance (C.A) */
     public void act();
 
+    /** gets the agent's name */
     public String getAgName();
+
+    /** sends a Jason message in a specific infrastructure */
     public void   sendMsg(Message m) throws Exception;
+
+    /** broadcasts a Jason message in a specific infrastructure */
     public void   broadcast(Message m) throws Exception;
     
+    /** checks whether the agent is running */
     public boolean isRunning();
     
     // methods for execution control
@@ -65,7 +82,7 @@ public interface AgentArchitecture {
 	 *  Inform the (centralised/saci) controller that this agent's cycle 
 	 *  has finished its reasoning cycle (used in sync mode).
 	 *  
-	 *  <i>breakpoint</i> is true in case the agent selected one plan 
+	 *  <p><i>breakpoint</i> is true in case the agent selected one plan 
 	 *  with the "breakpoint"  annotation.  
 	 */ 
 	public void informCycleFinished(boolean breakpoint);

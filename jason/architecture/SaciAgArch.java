@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.11  2005/08/13 13:55:35  jomifred
+//   java doc updated
+//
 //   Revision 1.10  2005/08/12 22:19:26  jomifred
 //   add cvs keywords
 //
@@ -58,9 +61,10 @@ import saci.Message;
 import saci.MessageHandler;
 
 /**
- * SACI Infra Structure for a Mulit-Agent Society of AgentSpeak Agents
+ * This class provides an agent architecture when using SACI Infra Structure
+ * to run the MAS.
  * 
- * Execution sequence: initAg, run (perceive, checkMail, act), stopAg.
+ * <p>Execution sequence: initAg, run (perceive, checkMail, act), stopAg.
  */
 
 public class SaciAgArch extends saci.Agent implements AgentArchitecture {

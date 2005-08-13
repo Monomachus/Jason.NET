@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.13  2005/08/13 13:55:35  jomifred
+//   java doc updated
+//
 //   Revision 1.12  2005/08/12 22:19:26  jomifred
 //   add cvs keywords
 //
@@ -47,9 +50,10 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 /**
- * Centralised architecture for a Mulit-Agent Society of AgentSpeak Agents.
+ * This class provides an agent architecture when using Centralised
+ * infrastructure to run the MAS inside Jason.
  * 
- * Execution sequence: initAg, setEnv, setControl, run (perceive, checkMail, act), stopAg.
+ * <p>Execution sequence: initAg, setEnv, setControl, run (perceive, checkMail, act), stopAg.
  */
 public class CentralisedAgArch extends Thread implements AgentArchitecture {
     
