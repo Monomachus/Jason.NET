@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.15  2005/08/14 23:29:40  jomifred
+//   add TODO (use new java class to run process)
+//
 //   Revision 1.14  2005/08/12 23:29:11  jomifred
 //   support for saci arch in IA createAgent
 //
@@ -54,6 +57,9 @@ import javax.swing.JOptionPane;
 
 import saci.launcher.Launcher;
 import saci.launcher.LauncherD;
+
+// TODO: when using jdk 1.5, change RunProcess to ProcessBuilder as
+// explained at http://java.sun.com/developer/JDCTechTips/2005/tt0727.html#1
 
 /** runs an MAS */
 class RunMAS extends AbstractAction {
