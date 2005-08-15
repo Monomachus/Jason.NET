@@ -18,6 +18,14 @@
 // To contact the authors:
 // http://www.dur.ac.uk/r.bordini
 // http://www.inf.furb.br/~jomi
+//
+// CVS information:
+//   $Date$
+//   $Revision$
+//   $Log$
+//   Revision 1.8  2005/08/15 13:18:28  jomifred
+//   create saci agent in sync mode if the creator agent is in sync mode
+//
 //----------------------------------------------------------------------------
 
 package jason.stdlib;
@@ -91,14 +99,18 @@ public class createAgent implements InternalAction {
 	boolean createSaciAg(TransitionSystem ts, String name, String source) {
 		try {
 			logger.debug("Creating saci agent from source "+source);
-    
+
+			String extraOp = "";
+			if (ts.getSettings().isSync()) {
+				extraOp = " options verbose=2,synchronised=true";
+			}
 			// gets the saci launcher
 			Launcher l = LauncherD.getLauncher();
 			Command c1 = new Command(Command.START_AGENT);
 			c1.addArg("class", SaciAgArch.class.getName());
 			c1.addArg("name", name);
 			c1.addArg("society.name", ((SaciAgArch)ts.getAgArch()).getSociety());;
-			c1.addArg("args", Agent.class.getName() + " " + source);
+			c1.addArg("args", Agent.class.getName() + " " + source + extraOp);
 			//c1.addArg("host", "?");
 			l.execCommand(c1);
 			/*
