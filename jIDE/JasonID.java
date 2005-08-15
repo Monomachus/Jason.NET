@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.21  2005/08/15 13:12:37  jomifred
+//   fix a bug that happens when jason.sh do not change the current directory
+//
 //   Revision 1.20  2005/08/12 23:29:11  jomifred
 //   support for saci arch in IA createAgent
 //
@@ -802,7 +805,7 @@ public class JasonID {
         
         void loadProject(File f) {
             try {
-                projectDirectory = f.getParentFile().getCanonicalPath();
+                projectDirectory = f.getAbsoluteFile().getParentFile().getCanonicalPath();
             } catch (Exception e) {
                 e.printStackTrace();
             }
