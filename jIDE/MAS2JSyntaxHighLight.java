@@ -23,8 +23,8 @@
 //   $Date$
 //   $Revision$
 //   $Log$
-//   Revision 1.7  2005/08/12 21:08:23  jomifred
-//   add cvs keywords
+//   Revision 1.8  2005/08/15 13:10:41  jomifred
+//   using infrastructure instead of architecture in mas2j
 //
 //----------------------------------------------------------------------------
 
@@ -166,6 +166,7 @@ public class MAS2JSyntaxHighLight extends ASSyntaxHighLight {
 			tokenStyles[mas2jConstants.AGS].addAttributes(style);
 			tokenStyles[mas2jConstants.CONTROL].addAttributes(style);
 			tokenStyles[mas2jConstants.ARCH].addAttributes(style);
+			tokenStyles[mas2jConstants.INFRA].addAttributes(style);
 
 			// ag pars
 			style = new SimpleAttributeSet();
@@ -181,7 +182,7 @@ public class MAS2JSyntaxHighLight extends ASSyntaxHighLight {
 			float chsb[] = Color.RGBtoHSB(120,20,120,null);
 			StyleConstants.setForeground(style, Color.getHSBColor(chsb[0],chsb[1],chsb[2]));
 			StyleConstants.setBold(style, true);
-			tokenStyles[mas2jConstants.ARCHV].addAttributes(style);
+			tokenStyles[mas2jConstants.INFRAV].addAttributes(style);
 
 			// ag options
 			style = new SimpleAttributeSet();

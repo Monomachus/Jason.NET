@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.14  2005/08/15 13:10:41  jomifred
+//   using infrastructure instead of architecture in mas2j
+//
 //   Revision 1.13  2005/08/12 21:12:16  jomifred
 //   add cvs keywords
 //
@@ -451,7 +454,8 @@ TOKEN : {
 |  <CONTROL:     "executionControl">
 |  <AT:          "at">
 |  <ARCH:        "architecture" >
-|  <ARCHV:       ("Centralised" | "Saci") >
+|  <INFRA:       "infrastructure" >
+|  <INFRAV:       ("Centralised" | "Saci") >
 
 |  <ASOEE:       "events" >
 |  <ASOEEV:      ("discard"|"requeue"|"retrieve") >
@@ -463,7 +467,7 @@ TOKEN : {
 
 |  <ASOV:        "verbose" >
 
-|  <ASOSYNC:     "synchronized" >
+|  <ASOSYNC:     "synchronised" >
 |  <ASOBOOL:     ("true" | "false" ) >
 
 |  <ASAGCLASS:      "agentClass" >
@@ -497,7 +501,7 @@ void mas() :                   {  }
                                  writeInit();}
   "{" 
   
-  arch()
+  infra()
 
   environment()
 
@@ -510,9 +514,12 @@ void mas() :                   {  }
                                  close(); }
 }
 
-void arch() : {Token t;}
-{                           { architecture = "Centralised"; }
-  [ <ARCH> ":" t = <ARCHV>  { architecture = t.image; } ]
+void infra() :                 { Token t; }
+{                              { architecture = "Centralised"; }
+  [ (<ARCH>                    { System.err.println("The id <architecture> was replaced by <infrastructure> in .mas2j syntax, please use the new id."); }
+     | <INFRA>) 
+    ":" t = <INFRAV>           { architecture = t.image; } 
+  ]
 }
 
 
@@ -602,7 +609,7 @@ Map ASoptions() :          { Map opts = new HashMap(); }
   {
     if (controlClass != null) {
       // if there is some control, all agents have sync option
-      opts.put("synchronized","true");
+      opts.put("synchronised","true");
     }
     if (debug) {
       opts.put("verbose", "2");
