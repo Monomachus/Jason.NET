@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.8  2005/08/15 13:05:25  jomifred
+//   using infrastructure instead of architecture in mas2j
+//
 //   Revision 1.7  2005/08/12 22:26:08  jomifred
 //   add cvs keywords
 //
@@ -48,13 +51,14 @@ public class Settings {
     public static final boolean   ONewFocus       = false;
     public static final int       ODefaultNRC     = 1;
     public static final int       ODefaultVerbose = 1;
+    public static final boolean   ODefaultSync    = false;
 	
 	
     byte    events    = ODiscard;
     boolean intBels   = OSameFocus;
     int     nrcbp     = ODefaultNRC;
     int     verbose   = ODefaultVerbose;
-    boolean sync      = false; 
+    boolean sync      = ODefaultSync; 
     
     public Settings() {
     }
@@ -108,7 +112,7 @@ public class Settings {
             setVerbose(verbose);
         }
 
-        String sSync = (String)options.get("synchronized");
+        String sSync = (String)options.get("synchronised");
         if (sSync != null) {
         	if (sSync.equals("true")) {
         		setSync(true);
