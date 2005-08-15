@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.7  2005/08/15 13:03:48  jomifred
+//   close the window when  the MAS stops
+//
 //   Revision 1.6  2005/08/12 20:46:19  jomifred
 //   add cvs keywords
 //
@@ -79,6 +82,7 @@ public class ExecutionControlGUI extends ExecutionControl {
 	}
 
 	// Inteface components
+	JFrame  frame;
 	JButton jBtStep = null;
 	JButton jBtRun = null;
 
@@ -89,7 +93,7 @@ public class ExecutionControlGUI extends ExecutionControl {
 	MyListModel listModel;
 
 	void initComponents() {
-		JFrame frame = new JFrame("MAS Execution Control");
+		frame = new JFrame("MAS Execution Control");
 
 		jBtStep = new JButton("Step");
 		jBtStep.setToolTipText("ask all agents to perform one reasoning cycle");
@@ -183,6 +187,11 @@ public class ExecutionControlGUI extends ExecutionControl {
 		});
 	}
 	
+	public void stop() {
+		super.stop();
+		frame.setVisible(false);
+		frame = null;
+	}
 
 	private void inspectAgent(String agName) {
 		if (agName == null) {
