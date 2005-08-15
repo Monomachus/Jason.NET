@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.14  2005/08/15 17:41:36  jomifred
+//   AgentArchitecture renamed to AgArchInterface
+//
 //   Revision 1.13  2005/08/13 13:55:35  jomifred
 //   java doc updated
 //
@@ -55,7 +58,7 @@ import org.apache.log4j.Logger;
  * 
  * <p>Execution sequence: initAg, setEnv, setControl, run (perceive, checkMail, act), stopAg.
  */
-public class CentralisedAgArch extends Thread implements AgentArchitecture {
+public class CentralisedAgArch extends Thread implements AgArchInterface {
     
 	protected CentralisedEnvironment fEnv = null;
 	

@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.15  2005/08/15 17:41:36  jomifred
+//   AgentArchitecture renamed to AgArchInterface
+//
 //   Revision 1.14  2005/08/12 22:18:37  jomifred
 //   add cvs keywords
 //
@@ -34,7 +37,7 @@ package jason.asSemantics;
 import jIDE.JasonID;
 import jason.JasonException;
 import jason.Settings;
-import jason.architecture.AgentArchitecture;
+import jason.architecture.AgArchInterface;
 import jason.asSyntax.BeliefBase;
 import jason.asSyntax.Literal;
 import jason.asSyntax.Plan;
@@ -81,7 +84,7 @@ public class Agent {
 	 * args[0] is the user Agent class (ignored here)
 	 * args[1] is the AgentSpeak source file
 	 */
-    public TransitionSystem initAg(String[] args, AgentArchitecture arch) throws JasonException {
+    public TransitionSystem initAg(String[] args, AgArchInterface arch) throws JasonException {
         // set the agent
         try {
 			setLogger(arch);
@@ -113,7 +116,7 @@ public class Agent {
 		}
     }
 
-	public void setLogger(AgentArchitecture arch) {
+	public void setLogger(AgArchInterface arch) {
 		if (arch != null) {
 			logger = Logger.getLogger(Agent.class.getName()+"."+arch.getAgName());
 		} else {

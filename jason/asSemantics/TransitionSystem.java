@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.21  2005/08/15 17:41:36  jomifred
+//   AgentArchitecture renamed to AgArchInterface
+//
 //   Revision 1.20  2005/08/12 23:29:11  jomifred
 //   support for saci arch in IA createAgent
 //
@@ -36,7 +39,7 @@ package jason.asSemantics;
 
 import jason.JasonException;
 import jason.Settings;
-import jason.architecture.AgentArchitecture;
+import jason.architecture.AgArchInterface;
 import jason.asSyntax.BeliefBase;
 import jason.asSyntax.BodyLiteral;
 import jason.asSyntax.DefaultLiteral;
@@ -85,7 +88,7 @@ public class TransitionSystem {
 
 	Settings setts = null;
 
-	AgentArchitecture agArch = null;
+	AgArchInterface agArch = null;
 
 	private byte step = SStartRC; // First step of the SOS
 	private int nrcslbr; // number of reasoning cycles since last belief revision
@@ -98,7 +101,7 @@ public class TransitionSystem {
 	// object, this is just to make it look more like the SOS
 	TransitionSystem conf;
 
-	public TransitionSystem(Agent a, Circumstance c, Settings s, AgentArchitecture ar) {
+	public TransitionSystem(Agent a, Circumstance c, Settings s, AgArchInterface ar) {
 		ag = a;
 		C = c;
 		agArch = ar;
@@ -120,7 +123,7 @@ public class TransitionSystem {
 		}
 	}
 	
-	public void setLogger(AgentArchitecture arch) {
+	public void setLogger(AgArchInterface arch) {
 		if (arch != null) {
 			logger = Logger.getLogger(TransitionSystem.class.getName()+"."+arch.getAgName());
 		} else {
@@ -911,7 +914,7 @@ public class TransitionSystem {
 		return setts;
 	}
 
-	public AgentArchitecture getAgArch() {
+	public AgArchInterface getAgArch() {
 		return agArch;
 	}
 	

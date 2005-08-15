@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.12  2005/08/15 17:41:36  jomifred
+//   AgentArchitecture renamed to AgArchInterface
+//
 //   Revision 1.11  2005/08/13 13:55:35  jomifred
 //   java doc updated
 //
@@ -67,7 +70,7 @@ import saci.MessageHandler;
  * <p>Execution sequence: initAg, run (perceive, checkMail, act), stopAg.
  */
 
-public class SaciAgArch extends saci.Agent implements AgentArchitecture {
+public class SaciAgArch extends saci.Agent implements AgArchInterface {
     
     // to get the percepts via SACI (the normal mbox is used for inter-agent com.)
     private MBoxSAg mboxPercept = null;
