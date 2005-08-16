@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.9  2005/08/16 21:03:42  jomifred
+//   add some comments on TODOs
+//
 //   Revision 1.8  2005/08/12 22:18:37  jomifred
 //   add cvs keywords
 //
@@ -45,11 +48,14 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 public class Circumstance implements Serializable {
 
+	static Logger logger = Logger.getLogger(Circumstance.class);
+	
     protected List   E;
     protected List   I;
 
@@ -321,8 +327,7 @@ public class Circumstance implements Serializable {
 								selIntEle.setAttribute("pending","true");
 							}
 						} catch (Exception ex2) {
-							// TODO JOMI: isto nao devia ser um logger.error em vez de println??
-							System.err.println("Trying to add an unknown pending action "+o.getClass().getName()+" - "+ex2);
+							logger.error("Trying to add an unknown pending action "+o.getClass().getName()+" - "+ex2,ex2);
 						}
 					}
 				}

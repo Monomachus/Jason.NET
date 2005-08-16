@@ -23,8 +23,8 @@
 //   $Date$
 //   $Revision$
 //   $Log$
-//   Revision 1.11  2005/08/15 13:36:03  jomifred
-//   change it to kkv in CVS
+//   Revision 1.12  2005/08/16 21:03:43  jomifred
+//   add some comments on TODOs
 //
 //
 //----------------------------------------------------------------------------
@@ -210,7 +210,9 @@ public class VarTerm extends Term implements NumberTerm {
 	 * Precisa se preocupar com os isXXX pra todas as possibilidades
 	 * dos valores instanciados aa variavel? Se e' var (o cara nao
 	 * deu ground antes) e perguntar isXXX devia mesmo ser falso
-	 * exceto pra isVar nao??? 
+	 * exceto pra isVar nao???
+	 * RAFA: o problema eh o cast. x que eh uma VarTerm nao pode fazer cast
+	 * com ListTerm. 
 	 *  
 	 * if (x.isList()) {
 	 *    ListTerm lt = (ListTerm)x;

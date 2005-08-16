@@ -23,8 +23,8 @@
 //   $Date$
 //   $Revision$
 //   $Log$
-//   Revision 1.12  2005/08/15 13:29:48  jomifred
-//   change it to kkv in CVS
+//   Revision 1.13  2005/08/16 21:03:43  jomifred
+//   add some comments on TODOs
 //
 //----------------------------------------------------------------------------
 
@@ -358,7 +358,7 @@ public class ASSyntaxHighLight { // extends Thread { //implements CaretListener 
 			// false
 			tokenStyles[as2j.TK_FALSE].addAttributes(style);
 
-			// @ TODO: add a token id for it in as2j.jcc
+			// @ 
 			style = new SimpleAttributeSet();
 			StyleConstants.setForeground(style, Color.orange);
 			tokenStyles[as2j.TK_LABEL_AT].addAttributes(style);

@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.13  2005/08/16 21:03:42  jomifred
+//   add some comments on TODOs
+//
 //   Revision 1.12  2005/08/15 17:41:36  jomifred
 //   AgentArchitecture renamed to AgArchInterface
 //
@@ -363,7 +366,6 @@ public class SaciAgArch extends saci.Agent implements AgArchInterface {
 	/** inform the remote controller that this agent's cycle was finished (used in sync mode) */ 
 	public void informCycleFinished(boolean breakpoint) {
 		// send a message to the executionControl agent
-		// TODO: add breakpoint
 	    Message m = (Message)cycleFinished.clone();
 	    if (breakpoint) {
 	    	m.put("breakpoint","true");

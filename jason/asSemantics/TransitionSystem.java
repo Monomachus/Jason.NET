@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.22  2005/08/16 21:03:42  jomifred
+//   add some comments on TODOs
+//
 //   Revision 1.21  2005/08/15 17:41:36  jomifred
 //   AgentArchitecture renamed to AgArchInterface
 //
@@ -396,7 +399,13 @@ public class TransitionSystem {
 		// whenever a plan with [atomic] become intended so that we
 		// "remember" that it worth searching for an atomic? Do you
 		// understand what I mean?
-
+		// RAFA: this flag is just the last C.SI and
+		// C.SI.isAtomic (see implementation of this
+		// method, it is not computed every time)?
+		// I guess the current implementation already select
+		// the last atomic with searching all intention.
+		// However, I agree that using C.SI may be "unsafe".
+		
 		// Rule for Atomic Intentions
 		confP.C.SI = selectAtomicIntention();
 		if (confP.C.SI != null) {

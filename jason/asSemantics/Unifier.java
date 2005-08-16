@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.13  2005/08/16 21:03:42  jomifred
+//   add some comments on TODOs
+//
 //   Revision 1.12  2005/08/12 22:18:37  jomifred
 //   add cvs keywords
 //
@@ -33,27 +36,31 @@
 package jason.asSemantics;
 
 import jason.asSyntax.DefaultLiteral;
+import jason.asSyntax.ExprTerm;
 import jason.asSyntax.Literal;
 import jason.asSyntax.NumberTermImpl;
 import jason.asSyntax.Pred;
 import jason.asSyntax.Term;
 import jason.asSyntax.Trigger;
 import jason.asSyntax.VarTerm;
-import jason.asSyntax.ExprTerm;
 
 import java.util.HashMap;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 public class Unifier implements Cloneable {
     
-    private HashMap function = new HashMap();
+	static Logger logger = Logger.getLogger(Unifier.class);
+
+	private HashMap function = new HashMap();
     
     // TODO IMPORTANT: remove unnecessary tail symbols
     // and accompanying extra list when grounding variables
     // that are internal to a list
+	// RAFA: is is already done?
 
     // TODO JOMI: try to not clone and apply before unifing, since this method is
     // a bottleneck (clone/apply consumes memory/cpu). Initial proposal: use
@@ -122,8 +129,7 @@ public class Unifier implements Cloneable {
 	
 			return null; // no value!
 		} catch (StackOverflowError e) {
-			// TODO JOMI: isto nao devia ser um logger.error em vez de println?
-			System.err.println("Stack overflow in unifier.get!\n\t"+this);
+			logger.error("Stack overflow in unifier.get!\n\t"+this,e);
 			return null;
 		} catch (ClassCastException e) {
 			return vl;
@@ -165,23 +171,13 @@ public class Unifier implements Cloneable {
 
 		/*
 		// check if an expression needs solving, before anything else
-		RAFA: o apply troca uma expr por seu valor, e eh chamado um pouco acima
-JOMI IMPORTANTE: eu acho que esta tua mudanca deixa mais ineficiente e
-talvez ate errado. Tu ta fazendo calculos de expressao quando nao precisa,
-por exemplo se eu quiser unificar "1 + 3" com "n + 3". Pelo que eu entendi
-do que tu tinha me pedido tu mesmo que queria tratar as expressoes como termos,
-termos complexos tipo arvore e por isto pode serm unificadas sem resolver.
-		
+		// version with expression unification (X+3 = (2+1)+3) unifies X with (2+1) 
 		try {
 			ExprTerm t1ge = (ExprTerm)t1g;
 			try {
 				ExprTerm t2ge = (ExprTerm)t2g;
 			} catch (ClassCastException e) {
 				// t1 is expr but t2 is not
-				// TODO Jomi: ve se tem jeito mais facil de ver se e' inteiro
-				 RAFA: ver toString de NumberTermImpl
-				 JOMI: Joia! Eu sabia que tinha jeito (obvio)
-				 muito mais eficiente. Pode apagar estes comments. 
 				double t1gd = t1ge.solve();
 				String t1gs = Double.toString(t1gd);
 				if (t1gs.endsWith(".0")) {
