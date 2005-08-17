@@ -22,6 +22,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.19  2005/08/17 18:19:21  jomifred
+//   change AS grammar (unify lt and la implementation)
+//
 //   Revision 1.18  2005/08/12 22:26:08  jomifred
 //   add cvs keywords
 //
@@ -273,35 +276,40 @@ BodyLiteral f() :     { Literal A; Token k;
 
 
 /* Annotated Atomic Formulae */
-Pred at() : { Token K; Pred p = new Pred(); Term t; }
+Pred at() :         { Token K; Pred p = new Pred(); Term t; List l;}
 {
-  K=<ATOM> { p.setFunctor(K.image); } 
+  K=<ATOM>          { p.setFunctor(K.image); } 
   [
-      "(" lt(p) ")"
+      "(" l = lt() 
+      ")"           { p.addTerms(l); }
   ]
   [ 
-      "[" la(p) "]"
+      "[" l = lt() 
+      "]"           { p.addAnnots(l); }
   ] 
   { return p; }
 }
 
 
 /* List of terms as parameters */
-Term lt(Term u) :   { Term v; }
+List lt() :         { List listTerms = new ArrayList(); Term v; }
 {
-  v=t()             { u.addTerm(v); } 
-  ( "," v=t()       { u.addTerm(v); }
+  v=t()             { listTerms.add(v); } 
+  ( "," v=t()       { listTerms.add(v); }
   )* 
-                    { return u; }
+                    { return listTerms; }
 }
 
 /* List of terms as annotations */
+/* NOT USED
 Pred la(Pred p) :  { Term v; }
 {
   v=t()            { p.addAnnot(v); }
   ( "," v=t()      { p.addAnnot(v); }
   )*               { return p; }
 }
+*/
+
 
 Term t() :         { Token K; Term u; NumberTerm nb;}
 {

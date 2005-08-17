@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.9  2005/08/17 18:19:17  jomifred
+//   change AS grammar (unify lt and la implementation)
+//
 //   Revision 1.8  2005/08/12 22:26:08  jomifred
 //   add cvs keywords
 //
@@ -90,6 +93,13 @@ public class Pred extends Term implements Cloneable, Comparable, Serializable {
 			annots = new ArrayList();
 		if (!annots.contains(t))
 			annots.add(t);
+	}
+
+	public void addAnnots(List l) {
+		Iterator i = l.iterator();
+		while (i.hasNext()) {
+			addAnnot( (Term)i.next());
+		}
 	}
 	
 	public void addAnnot(int index, Term t) {

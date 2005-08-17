@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.13  2005/08/17 18:19:18  jomifred
+//   change AS grammar (unify lt and la implementation)
+//
 //   Revision 1.12  2005/08/12 22:26:08  jomifred
 //   add cvs keywords
 //
@@ -126,6 +129,13 @@ public class Term implements Cloneable, Comparable, Serializable {
 			terms = new ArrayList();
 		terms.add(t);
 		functorArityBak = null;
+	}
+	
+	public void addTerms(List l) {
+		Iterator i = l.iterator();
+		while (i.hasNext()) {
+			addTerm( (Term)i.next());
+		}
 	}
 
 	public int getTermsSize() {
