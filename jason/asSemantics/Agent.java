@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.16  2005/08/18 11:38:19  jomifred
+//   do not add <true> or <false> in BB
+//
 //   Revision 1.15  2005/08/15 17:41:36  jomifred
 //   AgentArchitecture renamed to AgArchInterface
 //
@@ -318,6 +321,8 @@ public class Agent {
 	public boolean addBel(Literal l, Term source, Circumstance c, Intention focus) {
 		if (source != null && !source.isGround()) {
 			logger.error("Error: Annotations must be ground!\n Cannot use "+source+" as annotation.");
+		} else if (l.equals(Literal.LTrue) || l.equals(Literal.LFalse)) {
+			logger.error("Error: <true> or <false> can not be added as beliefs.");				
 		} else {
 			l = (Literal)l.clone();
 			if (source != null) {
