@@ -23,8 +23,8 @@
 //   $Date$
 //   $Revision$
 //   $Log$
-//   Revision 1.10  2005/08/15 13:23:52  jomifred
-//   no message
+//   Revision 1.11  2005/08/18 13:31:49  jomifred
+//   change methods interface to be used in environment classes
 //
 //----------------------------------------------------------------------------
 
@@ -40,6 +40,8 @@ import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.StringTerm;
 import jason.asSyntax.Term;
+import jason.control.CentralisedExecutionControl;
+import jason.environment.CentralisedEnvironment;
 
 import java.io.File;
 
@@ -82,11 +84,13 @@ public class createAgent implements InternalAction {
             }
             
             if (ts.getAgArch() instanceof CentralisedAgArch) {
-            	return createCentralisedAg(ts, name.toString(), fSource.getAbsolutePath());
+            	CentralisedAgArch ag = (CentralisedAgArch)ts.getAgArch();
+            	return createCentralisedAg(name.toString(), fSource.getAbsolutePath(), ag.getEnv(), ag.getControl());
             } else if (ts.getAgArch() instanceof SaciAgArch) {
-            	return createSaciAg(ts, name.toString(), fSource.getAbsolutePath());
+            	SaciAgArch ag = (SaciAgArch)ts.getAgArch();
+            	return createSaciAg(name.toString(), ag.getSociety(), fSource.getAbsolutePath(), ts.getSettings().isSync());
             } else {
-				throw new JasonException("Create agent is currently implemented only for the Centralised architecture!");				
+				throw new JasonException("Create agent is currently implemented only for the Centralised/Saci infrastructure!");				
 			}
 		} catch (IndexOutOfBoundsException e) {
 			throw new JasonException("The internal action 'createAgent' received a wrong number of arguments");
@@ -96,12 +100,12 @@ public class createAgent implements InternalAction {
 		return false;
 	}
 	
-	boolean createSaciAg(TransitionSystem ts, String name, String source) {
+	public boolean createSaciAg(String name, String socName, String source, boolean isSync) {
 		try {
 			logger.debug("Creating saci agent from source "+source);
 
 			String extraOp = "";
-			if (ts.getSettings().isSync()) {
+			if (isSync) {
 				extraOp = " options verbose=2,synchronised=true";
 			}
 			// gets the saci launcher
@@ -109,7 +113,7 @@ public class createAgent implements InternalAction {
 			Command c1 = new Command(Command.START_AGENT);
 			c1.addArg("class", SaciAgArch.class.getName());
 			c1.addArg("name", name);
-			c1.addArg("society.name", ((SaciAgArch)ts.getAgArch()).getSociety());;
+			c1.addArg("society.name", socName);
 			c1.addArg("args", Agent.class.getName() + " " + source + extraOp);
 			//c1.addArg("host", "?");
 			l.execCommand(c1);
@@ -130,7 +134,7 @@ public class createAgent implements InternalAction {
 		return false;
 	}
 
-	boolean createCentralisedAg(TransitionSystem ts, String name, String source) {
+	public boolean createCentralisedAg(String name, String source, CentralisedEnvironment env, CentralisedExecutionControl control) {
 		try {
 			logger.debug("Creating centralised agent from source "+source);
             // parameters for ini
@@ -140,8 +144,8 @@ public class createAgent implements InternalAction {
             CentralisedAgArch agArch = new CentralisedAgArch();//(CentralisedAgArch)Class.forName(Agent.class.getName()).newInstance();
             agArch.setAgName(name.toString());
             agArch.initAg(agArgs);
-            agArch.setEnv( ((CentralisedAgArch)ts.getAgArch()).getEnv());
-            agArch.setControl( ((CentralisedAgArch)ts.getAgArch()).getControl());
+            agArch.setEnv(env);
+            agArch.setControl(control);
             if (agArch.getTS().getSettings().isSync()) {
             	agArch.getTS().getSettings().setSync(true);
             }
