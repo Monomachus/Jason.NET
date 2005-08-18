@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.8  2005/08/18 20:37:55  jomifred
+//   no message
+//
 //   Revision 1.7  2005/08/12 22:26:08  jomifred
 //   add cvs keywords
 //
@@ -83,35 +86,6 @@ public class CentralisedEnvironment implements EnvironmentInterface {
     	return fUserEnv;
     }
     
-    /** make a copy of the percepts with synchronized access to the percepts list */
-	/*
-    public List getSafePerceptsCopy(String agName) {
-    	List userPercepts = fUserEnv.getPercepts(agName);
-        synchronized (userPercepts) {
-            // make a local copy of the environment percepts
-        	List l = new ArrayList(userPercepts.size());
-        	Iterator i = userPercepts.iterator();
-        	while (i.hasNext()) {
-        		l.add( ((Term)i.next()).clone());
-        	}
-			return l;
-        }
-    	
-    }
-    */
-
-
-    /** make a copy of the neg percepts with synchronized access to the percepts list */
-    /*
-     public List getSafeNegPerceptsCopy(String agName) {
-    	List userNegPercepts = fUserEnv.getNegativePercepts(agName);
-        synchronized (userNegPercepts) {
-            // make a local copy of the environment percepts
-            return new ArrayList(userNegPercepts);
-        }
-    }
-    */
-
 	/**
 	 * @see jason.environment.EnvironmentInterface#informAgsEnvironmentChanged()
 	 */
