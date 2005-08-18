@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.4  2005/08/18 01:22:21  jomifred
+//   (AS grammar) arithmeticExpression renamed to ae
+//
 //   Revision 1.3  2005/08/12 22:26:08  jomifred
 //   add cvs keywords
 //
@@ -71,7 +74,7 @@ public class ExprTerm extends VarTerm implements NumberTerm {
     public static NumberTerm parseExpr(String sExpr) {
         as2j parser = new as2j(new StringReader(sExpr));
         try {
-            return (NumberTerm)parser.arithmeticExpression();
+            return (NumberTerm)parser.ae();
         } catch (Exception e) {
             logger.error("Error parsing expression "+sExpr,e);
 			return null;

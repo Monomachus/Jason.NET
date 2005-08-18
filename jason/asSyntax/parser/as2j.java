@@ -227,7 +227,7 @@
       jj_la1[9] = jj_gen;
       ;
     }
-    rel = relationalExpression();
+    rel = re();
                         if (rel.isVar()) {
                           {if (true) return new DefaultLiteral(isPos, (VarTerm)rel);}
                         } else if (rel.isLiteral()) {
@@ -317,7 +317,7 @@
       case 26:
       case 31:
         // actions or expressions
-          rel = relationalExpression();
+          rel = re();
                         if (rel.isVar()) {
                           {if (true) return new BodyLiteral(formType, (VarTerm)rel);} // the action is the Var content
                         } else if (rel.isLiteral()) {
@@ -366,7 +366,7 @@
     throw new Error("Missing return statement in function");
   }
 
-/* List of terms as parameters */
+/* List of terms */
   final public List lt() throws ParseException {
                       List listTerms = new ArrayList(); Term v;
     v = t();
@@ -389,15 +389,6 @@
     throw new Error("Missing return statement in function");
   }
 
-/* List of terms as annotations */
-/*
-Pred la(Pred p) :  { Term v; }
-{
-  v=t()            { p.addAnnot(v); }
-  ( "," v=t()      { p.addAnnot(v); }
-  )*               { return p; }
-}
-*/
   final public Term t() throws ParseException {
                      Token K; Term u; NumberTerm nb;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -416,8 +407,8 @@ Pred la(Pred p) :  { Term v; }
     case VAR:
     case 26:
     case 31:
-      nb = arithmeticExpression();
-                                {if (true) return (Term)nb;}
+      nb = ae();
+                     {if (true) return (Term)nb;}
       break;
     case STRING:
       K = jj_consume_token(STRING);
@@ -500,8 +491,8 @@ Pred la(Pred p) :  { Term v; }
    | <LITERAL>  [ <OPREL> <EXP> ]  --> returns the Literal
    | <EXP> <OPREL> <EXP>           --> returns a Term like .gt(<Term>,<Term>)
 */
-  final public Term relationalExpression() throws ParseException {
-                                             Token k;
+  final public Term re() throws ParseException {
+                                            Token k;
                                              Term op1 = null;
                                              Term op2 = null;
                                              NumberTerm nb;
@@ -513,7 +504,7 @@ Pred la(Pred p) :  { Term v; }
     case VAR:
     case 26:
     case 31:
-      nb = arithmeticExpression();
+      nb = ae();
                                              op1 = (Term)nb;
       break;
     case TK_TRUE:
@@ -578,7 +569,7 @@ Pred la(Pred p) :  { Term v; }
       case VAR:
       case 26:
       case 31:
-        nb = arithmeticExpression();
+        nb = ae();
                                              op2 = (Term)nb;
         break;
       case TK_TRUE:
@@ -621,8 +612,8 @@ Pred la(Pred p) :  { Term v; }
   }
 
 /* arithmetic expression */
-  final public NumberTerm arithmeticExpression() throws ParseException {
-                                      NumberTerm t1, t2; int op;
+  final public NumberTerm ae() throws ParseException {
+                       NumberTerm t1, t2; int op;
     t1 = trm();
                        op = -1;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -642,7 +633,7 @@ Pred la(Pred p) :  { Term v; }
         jj_consume_token(-1);
         throw new ParseException();
       }
-      t2 = arithmeticExpression();
+      t2 = ae();
                        {if (true) return new ExprTerm(t1,op,t2);}
       break;
     default:
@@ -735,9 +726,9 @@ Pred la(Pred p) :  { Term v; }
       break;
     case 31:
       jj_consume_token(31);
-      t = arithmeticExpression();
+      t = ae();
       jj_consume_token(32);
-                                         {if (true) return t;}
+                      {if (true) return t;}
       break;
     default:
       jj_la1[32] = jj_gen;
@@ -754,6 +745,11 @@ Pred la(Pred p) :  { Term v; }
     finally { jj_save(0, xla); }
   }
 
+  final private boolean jj_3R_30() {
+    if (jj_scan_token(NUMBER)) return true;
+    return false;
+  }
+
   final private boolean jj_3R_16() {
     if (jj_scan_token(ATOM)) return true;
     Token xsp;
@@ -761,6 +757,27 @@ Pred la(Pred p) :  { Term v; }
     if (jj_3R_17()) jj_scanpos = xsp;
     xsp = jj_scanpos;
     if (jj_3R_18()) jj_scanpos = xsp;
+    return false;
+  }
+
+  final private boolean jj_3R_29() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_30()) {
+    jj_scanpos = xsp;
+    if (jj_3R_31()) {
+    jj_scanpos = xsp;
+    if (jj_3R_32()) {
+    jj_scanpos = xsp;
+    if (jj_3R_33()) return true;
+    }
+    }
+    }
+    return false;
+  }
+
+  final private boolean jj_3R_28() {
+    if (jj_3R_29()) return true;
     return false;
   }
 
@@ -774,13 +791,18 @@ Pred la(Pred p) :  { Term v; }
     return false;
   }
 
+  final private boolean jj_3R_10() {
+    if (jj_scan_token(VAR)) return true;
+    return false;
+  }
+
   final private boolean jj_3R_23() {
     if (jj_3R_26()) return true;
     return false;
   }
 
-  final private boolean jj_3R_27() {
-    if (jj_3R_28()) return true;
+  final private boolean jj_3R_9() {
+    if (jj_3R_11()) return true;
     return false;
   }
 
@@ -789,8 +811,33 @@ Pred la(Pred p) :  { Term v; }
     return false;
   }
 
+  final private boolean jj_3R_8() {
+    if (jj_scan_token(26)) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_27() {
+    if (jj_3R_28()) return true;
+    return false;
+  }
+
   final private boolean jj_3R_21() {
     if (jj_3R_11()) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_7() {
+    if (jj_scan_token(25)) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_6() {
+    if (jj_scan_token(28)) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_5() {
+    if (jj_scan_token(27)) return true;
     return false;
   }
 
@@ -807,41 +854,6 @@ Pred la(Pred p) :  { Term v; }
     }
     }
     }
-    return false;
-  }
-
-  final private boolean jj_3R_10() {
-    if (jj_scan_token(VAR)) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_9() {
-    if (jj_3R_11()) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_8() {
-    if (jj_scan_token(26)) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_26() {
-    if (jj_3R_27()) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_7() {
-    if (jj_scan_token(25)) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_6() {
-    if (jj_scan_token(28)) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_5() {
-    if (jj_scan_token(27)) return true;
     return false;
   }
 
@@ -866,44 +878,13 @@ Pred la(Pred p) :  { Term v; }
     return false;
   }
 
+  final private boolean jj_3R_26() {
+    if (jj_3R_27()) return true;
+    return false;
+  }
+
   final private boolean jj_3R_19() {
     if (jj_3R_20()) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_33() {
-    if (jj_scan_token(31)) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_32() {
-    if (jj_scan_token(26)) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_31() {
-    if (jj_scan_token(VAR)) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_30() {
-    if (jj_scan_token(NUMBER)) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_29() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_30()) {
-    jj_scanpos = xsp;
-    if (jj_3R_31()) {
-    jj_scanpos = xsp;
-    if (jj_3R_32()) {
-    jj_scanpos = xsp;
-    if (jj_3R_33()) return true;
-    }
-    }
-    }
     return false;
   }
 
@@ -934,11 +915,26 @@ Pred la(Pred p) :  { Term v; }
     return false;
   }
 
+  final private boolean jj_3R_33() {
+    if (jj_scan_token(31)) return true;
+    return false;
+  }
+
   final private boolean jj_3R_12() {
     Token xsp;
     xsp = jj_scanpos;
     if (jj_3R_15()) jj_scanpos = xsp;
     if (jj_3R_16()) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_32() {
+    if (jj_scan_token(26)) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_31() {
+    if (jj_scan_token(VAR)) return true;
     return false;
   }
 
@@ -952,11 +948,6 @@ Pred la(Pred p) :  { Term v; }
     if (jj_3R_14()) return true;
     }
     }
-    return false;
-  }
-
-  final private boolean jj_3R_28() {
-    if (jj_3R_29()) return true;
     return false;
   }
 

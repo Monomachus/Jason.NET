@@ -22,6 +22,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.20  2005/08/18 01:22:21  jomifred
+//   (AS grammar) arithmeticExpression renamed to ae
+//
 //   Revision 1.19  2005/08/17 18:19:21  jomifred
 //   change AS grammar (unify lt and la implementation)
 //
@@ -33,7 +36,6 @@
 
 
 options {
-   //LOOKAHEAD=3;
    FORCE_LA_CHECK=true;
    STATIC=false;
 }
@@ -87,9 +89,6 @@ TOKEN : {
 | <TK_LABEL_AT: "@">
 
 // Numbers
-//|   <NUMBER: ("-")? ["0"-"9"] (["0"-"9"])*
-//          | (("-")? ["0"-"9"])* "." (["0"-"9"])+ (<EXPONENT>)?
-//          | (("-")? ["0"-"9"])+ <EXPONENT> >
 |   <NUMBER: ["0"-"9"] (["0"-"9"])*
           | (["0"-"9"])* "." (["0"-"9"])+ (<EXPONENT>)?
           | (["0"-"9"])+ <EXPONENT> >
@@ -216,7 +215,7 @@ DefaultLiteral dl() : { boolean isPos = DefaultLiteral.LDefPos;
   [ <TK_NOT>          { isPos = DefaultLiteral.LDefNeg; }
   ]
 
-  rel = relationalExpression() 
+  rel = re() 
                       { if (rel.isVar()) {
                           return new DefaultLiteral(isPos, (VarTerm)rel);
                         } else if (rel.isLiteral()) {
@@ -262,7 +261,7 @@ BodyLiteral f() :     { Literal A; Token k;
    )
  |
   // actions or expressions
-  rel = relationalExpression() 
+  rel = re() 
                       { if (rel.isVar()) {
                           return new BodyLiteral(formType, (VarTerm)rel); // the action is the Var content
                         } else if (rel.isLiteral()) {
@@ -291,7 +290,7 @@ Pred at() :         { Token K; Pred p = new Pred(); Term t; List l;}
 }
 
 
-/* List of terms as parameters */
+/* List of terms */
 List lt() :         { List listTerms = new ArrayList(); Term v; }
 {
   v=t()             { listTerms.add(v); } 
@@ -300,22 +299,12 @@ List lt() :         { List listTerms = new ArrayList(); Term v; }
                     { return listTerms; }
 }
 
-/* List of terms as annotations */
-/* NOT USED
-Pred la(Pred p) :  { Term v; }
-{
-  v=t()            { p.addAnnot(v); }
-  ( "," v=t()      { p.addAnnot(v); }
-  )*               { return p; }
-}
-*/
-
 
 Term t() :         { Token K; Term u; NumberTerm nb;}
 {
   ( u=l()          { return u; }
   | u=list()       { return u; } 
-  | nb=arithmeticExpression() { return (Term)nb; }
+  | nb=ae()        { return (Term)nb; }
   | K=<STRING>     { return new StringTerm(K.image.replaceAll("\"", "\\\"")); } 
   )
 }
@@ -344,7 +333,7 @@ ListTerm list() : { ListTerm lt = new ListTerm(); ListTerm last; Token K; Term f
    | <LITERAL>  [ <OPREL> <EXP> ]  --> returns the Literal
    | <EXP> <OPREL> <EXP>           --> returns a Term like .gt(<Term>,<Term>)
 */
-Term relationalExpression() :              { Token k;
+Term re() :                               { Token k;
                                              Term op1 = null;
                                              Term op2 = null;
                                              NumberTerm nb; 
@@ -353,7 +342,7 @@ Term relationalExpression() :              { Token k;
                                              Term rel = null;
                                            }
 {
-    (   nb = arithmeticExpression()        { op1 = (Term)nb; }
+    (   nb = ae()                          { op1 = (Term)nb; }
       | op1 = l()
       | k = <STRING>                       { op1 = new StringTerm(k.image); }
     )
@@ -368,7 +357,7 @@ Term relationalExpression() :              { Token k;
        | "="                               { operator = ".unifies"; } 
        )
 
-       (   nb = arithmeticExpression()     { op2 = (Term)nb; }
+       (   nb = ae()                       { op2 = (Term)nb; }
          | op2 = l()
          | k = <STRING>                    { op2 = new StringTerm(k.image); }
        )
@@ -396,14 +385,13 @@ Term relationalExpression() :              { Token k;
 
 
 /* arithmetic expression */
-NumberTerm arithmeticExpression() : { NumberTerm t1, t2; int op;}
+NumberTerm ae() :    { NumberTerm t1, t2; int op;}
 {
    t1 = trm()        { op = -1; }
 [  ( "+"             { op = ExprTerm.EOplus;} 
    | "-"             { op = ExprTerm.EOminus;}
    )
-   t2 = arithmeticExpression()
-                     { return new ExprTerm(t1,op,t2); }
+   t2 = ae()         { return new ExprTerm(t1,op,t2); }
 ]                    { return t1; }
 }
 
@@ -433,7 +421,7 @@ NumberTerm simple():{ Token K; NumberTerm t;}
  ( K = <NUMBER>     { return new NumberTermImpl(K.image); }
  | K = <VAR>        { return new VarTerm(K.image); }
  | "-" t = simple() { return new ExprTerm(ExprTerm.EOminus, t); }
- | "(" t = arithmeticExpression() ")"  { return t; }
+ | "(" t = ae() ")" { return t; }
  )
 }
 
