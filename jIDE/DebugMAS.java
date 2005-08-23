@@ -24,6 +24,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.5  2005/08/23 17:09:28  jomifred
+//   fix bug in logger
+//
 //   Revision 1.4  2005/08/12 21:08:23  jomifred
 //   add cvs keywords
 //
@@ -35,6 +38,9 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
+
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 
 /** runs an MAS in debug mode */
 class DebugMAS extends AbstractAction {
@@ -52,6 +58,7 @@ class DebugMAS extends AbstractAction {
 			jasonID.runMASAct.actionPerformed(e);
 		} finally {
 			jasonID.fMAS2jThread.fParserMAS2J.debugOff();
+			Logger.getRootLogger().setLevel(Level.INFO);
 		}
 	}
 

@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.17  2005/08/23 17:09:28  jomifred
+//   fix bug in logger
+//
 //   Revision 1.16  2005/08/18 11:38:19  jomifred
 //   do not add <true> or <false> in BB
 //
@@ -103,9 +106,9 @@ public class Agent {
 			if (args.length > 2) {
 				if (args[2].equals("options")) {
 					setts.setOptions("[" + args[3] + "]");
-					logger.setLevel(setts.log4JLevel());
 				}
 			}
+			logger.setLevel(setts.log4JLevel());
 			setTS(new TransitionSystem(this, C, setts, arch));
 
 			parseAS(asSource);
