@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.15  2005/08/23 17:11:13  jomifred
+//   fix bug in the script that starts saci
+//
 //   Revision 1.14  2005/08/15 13:10:41  jomifred
 //   using infrastructure instead of architecture in mas2j
 //
@@ -353,7 +356,7 @@ public class mas2j {
                     out.println("set CLASSPATH="+classPath+"\n");
                     //out.println("cd \""+saciHome+"\"");
                     //out.println("saci &"); 
-                    out.println("java -Djava.security.policy=jar:file:"+saciJar+"!/policy saci.tools.SaciMenu");
+                    out.println("java -Djava.security.policy=\"jar:file:"+saciJar+"!/policy\" saci.tools.SaciMenu");
                     out.close();
                 }
             } else {
@@ -407,7 +410,7 @@ public class mas2j {
                     out.println("export CLASSPATH="+classPath+"\n");
                     //out.println("cd \""+saciHome+"\""); 
                     //out.println("./saci &"); 
-                    out.println("java -Djava.security.policy=jar:file:"+saciJar+"!/policy saci.tools.SaciMenu");
+                    out.println("java -Djava.security.policy=\"jar:file:"+saciJar+"!/policy\" saci.tools.SaciMenu");
                     out.close();
                 }
             }

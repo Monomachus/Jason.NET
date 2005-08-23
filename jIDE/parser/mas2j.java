@@ -314,7 +314,7 @@ public class mas2j implements mas2jConstants {
                     out.println("set CLASSPATH="+classPath+"\n");
                     //out.println("cd \""+saciHome+"\"");
                     //out.println("saci &"); 
-                    out.println("java -Djava.security.policy=jar:file:"+saciJar+"!/policy saci.tools.SaciMenu");
+                    out.println("java -Djava.security.policy=\"jar:file:"+saciJar+"!/policy\" saci.tools.SaciMenu");
                     out.close();
                 }
             } else {
@@ -368,7 +368,7 @@ public class mas2j implements mas2jConstants {
                     out.println("export CLASSPATH="+classPath+"\n");
                     //out.println("cd \""+saciHome+"\""); 
                     //out.println("./saci &"); 
-                    out.println("java -Djava.security.policy=jar:file:"+saciJar+"!/policy saci.tools.SaciMenu");
+                    out.println("java -Djava.security.policy=\"jar:file:"+saciJar+"!/policy\" saci.tools.SaciMenu");
                     out.close();
                 }
             }
