@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.7  2005/08/23 17:10:32  jomifred
+//   change architecture to infrastructure in the initial empty project
+//
 //   Revision 1.6  2005/08/12 21:08:23  jomifred
 //   add cvs keywords
 //
@@ -53,7 +56,7 @@ public class MAS2JEditorPane extends ASEditorPane {
 			s = "<replace with project name>";
 		}
 		return "MAS " + s + " {\n"
-				+ "   architecture: Centralised\n\n"
+				+ "   infrastructure: Centralised\n\n"
 				+ "   //environment: <replace with the environment class name>\n\n"
 				+ "   agents:\n"
 				+ "       "+ags+"\n" 
