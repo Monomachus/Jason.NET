@@ -248,12 +248,26 @@ public class mas2j implements mas2jConstants {
                 if (dDir.endsWith(File.separator)) {
                         dDir = dDir.substring(0, dDir.length()-1);
                 }
+
+                String sLib = "";
+                File lib = new File(dDir + File.separator + "lib");
+                // add all jar files in lib dir
+                if (lib.exists()) {
+                        File[] fs = lib.listFiles();
+                        for (int i=0; i<fs.length; i++) {
+                                if (fs[i].getName().endsWith(".jar")) {
+                                        sLib += indelim+fs[i].getAbsolutePath()+indelim+File.pathSeparator;
+                                }
+                        }
+                }
+
         return outdelim+
                "."+File.pathSeparator+
                indelim+jasonJar+indelim+File.pathSeparator+
                indelim+saciJar+indelim+File.pathSeparator+
                indelim+log4jJar+indelim+File.pathSeparator+
                indelim+dDir+indelim+File.pathSeparator+
+               sLib+
                clPath+
                outdelim;
     }
