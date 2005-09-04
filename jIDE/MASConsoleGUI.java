@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.9  2005/09/04 17:03:23  jomifred
+//   using dispose instead of setVisible(false)
+//
 //   Revision 1.8  2005/08/12 21:08:23  jomifred
 //   add cvs keywords
 //
@@ -150,7 +153,7 @@ public class MASConsoleGUI extends JFrame  {
     public void close() {
     	if (masConsole == null) return;
     	
-        masConsole.setVisible(false);
+        masConsole.dispose();
         if (masConsole.originalOut != null) {
             System.setOut(masConsole.originalOut);
         }

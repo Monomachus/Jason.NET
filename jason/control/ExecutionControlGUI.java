@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.8  2005/09/04 17:03:23  jomifred
+//   using dispose instead of setVisible(false)
+//
 //   Revision 1.7  2005/08/15 13:03:48  jomifred
 //   close the window when  the MAS stops
 //
@@ -189,7 +192,7 @@ public class ExecutionControlGUI extends ExecutionControl {
 	
 	public void stop() {
 		super.stop();
-		frame.setVisible(false);
+		frame.dispose();
 		frame = null;
 	}
 
@@ -210,19 +213,25 @@ public class ExecutionControlGUI extends ExecutionControl {
 				return;
 			}
 		}
-		
-		Document agState = fJasonControl.getAgState(agName);
 
-		StringWriter so = new StringWriter();
+		Document agState = null;
 		try {
-			agTransformer.transform(new DOMSource(agState),
-					                new StreamResult(so));
-			jTA.setText(so.toString());
+			agState = fJasonControl.getAgState(agName);
 		} catch (Exception e) {
-			jTA.setText("Error in XML transformation!" + e + "\n");
-			e.printStackTrace();
+			jTA.setText("can not get the state of agent "+agName);
 		}
 		
+		if (agState != null) {
+			StringWriter so = new StringWriter();
+			try {
+				agTransformer.transform(new DOMSource(agState),
+						                new StreamResult(so));
+				jTA.setText(so.toString());
+			} catch (Exception e) {
+				jTA.setText("Error in XML transformation!" + e + "\n");
+				e.printStackTrace();
+			}
+		}
 	}
 
 	/** 
