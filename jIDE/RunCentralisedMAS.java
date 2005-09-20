@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.15  2005/09/20 16:59:14  jomifred
+//   do not use MASConsole when the logger in Console (and so, do not need an X11)
+//
 //   Revision 1.14  2005/08/12 21:08:23  jomifred
 //   add cvs keywords
 //
@@ -103,31 +106,32 @@ public class RunCentralisedMAS {
 	        	}
 	        }
 			
-			// add Button
-	        JButton btStop = new JButton("Stop MAS");
-	        btStop.addActionListener(new ActionListener() {
-	            public void actionPerformed(ActionEvent evt) {
-	                runner.finish();
-	            }
-	        });
-	        MASConsoleGUI.get().addButton(btStop);
-
-	        // add Button
-	        final JButton btPause = new JButton("Pause MAS");
-	        btPause.addActionListener(new ActionListener() {
-	            public void actionPerformed(ActionEvent evt) {
-	            	if (MASConsoleGUI.get().isPause()) {
-	            		btPause.setText("Pause MAS");
-	            		MASConsoleGUI.get().setPause(false);
-	            	} else {
-	            		btPause.setText("Continue");
-	            		MASConsoleGUI.get().setPause(true);
-	            	}
-	            	
-	            }
-	        });
-	        MASConsoleGUI.get().addButton(btPause);
-
+	        if (MASConsoleGUI.hasConsole()) {
+				// add Button
+		        JButton btStop = new JButton("Stop MAS");
+		        btStop.addActionListener(new ActionListener() {
+		            public void actionPerformed(ActionEvent evt) {
+		                runner.finish();
+		            }
+		        });
+		        MASConsoleGUI.get().addButton(btStop);
+	
+		        // add Button
+		        final JButton btPause = new JButton("Pause MAS");
+		        btPause.addActionListener(new ActionListener() {
+		            public void actionPerformed(ActionEvent evt) {
+		            	if (MASConsoleGUI.get().isPause()) {
+		            		btPause.setText("Pause MAS");
+		            		MASConsoleGUI.get().setPause(false);
+		            	} else {
+		            		btPause.setText("Continue");
+		            		MASConsoleGUI.get().setPause(true);
+		            	}
+		            	
+		            }
+		        });
+		        MASConsoleGUI.get().addButton(btPause);
+	        }
 	        
 	        if (! runner.insideJIDE) {
 	        	runner.waitEnd();
@@ -161,7 +165,9 @@ public class RunCentralisedMAS {
 		// get soc nome
 		try {
 			Element app = (Element)docDOM.getElementsByTagName("application").item(0);
-			MASConsoleGUI.get().setTitle("MAS Console - " + app.getAttribute("id"));
+	        if (MASConsoleGUI.hasConsole()) {
+	        	MASConsoleGUI.get().setTitle("MAS Console - " + app.getAttribute("id"));
+	        }
 		} catch (Exception e) {
 			logger.error("Error getting the society name",e);
 		}

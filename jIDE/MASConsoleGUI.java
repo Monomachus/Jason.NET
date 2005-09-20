@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.10  2005/09/20 16:59:14  jomifred
+//   do not use MASConsole when the logger in Console (and so, do not need an X11)
+//
 //   Revision 1.9  2005/09/04 17:03:23  jomifred
 //   using dispose instead of setVisible(false)
 //
@@ -48,10 +51,9 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
 /** runs a MAS */
-public class MASConsoleGUI extends JFrame  {
+public class MASConsoleGUI  {
     
     private static MASConsoleGUI masConsole = null;
-    private boolean inPause = false; 
     
     /** for sigleton pattern */
     public static MASConsoleGUI get(String title, RunMAS runMAS) {
@@ -73,14 +75,17 @@ public class MASConsoleGUI extends JFrame  {
         return masConsole != null;
     }
     
+    JFrame frame = null;
     JTextArea output;
     JPanel    pBt = null;
     PrintStream originalOut = null;
     PrintStream originalErr = null;
+
+    private boolean inPause = false; 
     
     private MASConsoleGUI(String title, final RunMAS runMAS) {
-    	super(title);
-    	addWindowListener(new WindowAdapter() {
+    	frame = new JFrame(title);
+    	frame.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
                 if (runMAS != null) {
                     runMAS.stopMAS();
@@ -95,9 +100,9 @@ public class MASConsoleGUI extends JFrame  {
 		pBt = new JPanel();
 		pBt.setLayout(new FlowLayout(FlowLayout.CENTER));
 
-        getContentPane().setLayout(new BorderLayout());
-        getContentPane().add(BorderLayout.CENTER, new JScrollPane(output));
-        getContentPane().add(BorderLayout.SOUTH, pBt);
+        frame.getContentPane().setLayout(new BorderLayout());
+        frame.getContentPane().add(BorderLayout.CENTER, new JScrollPane(output));
+        frame.getContentPane().add(BorderLayout.SOUTH, pBt);
 
         JButton btClean = new JButton("Clean");
         btClean.addActionListener(new ActionListener() {
@@ -108,7 +113,11 @@ public class MASConsoleGUI extends JFrame  {
         
         addButton(btClean);
         
-        setBounds(250, 10, 700, 500);
+        frame.setBounds(250, 10, 700, 500);
+    }
+    
+    public void setTitle(String s) {
+    	frame.setTitle(s);
     }
     
     public void addButton(JButton jb) {
@@ -135,8 +144,8 @@ public class MASConsoleGUI extends JFrame  {
     }
   
 	public void append(String s) {
-		if (!isVisible()) {
-	        setVisible(true);
+		if (!frame.isVisible()) {
+			frame.setVisible(true);
 		}
 		if (inPause) {
 			waitNotPause();
@@ -153,7 +162,7 @@ public class MASConsoleGUI extends JFrame  {
     public void close() {
     	if (masConsole == null) return;
     	
-        masConsole.dispose();
+        masConsole.frame.dispose();
         if (masConsole.originalOut != null) {
             System.setOut(masConsole.originalOut);
         }
