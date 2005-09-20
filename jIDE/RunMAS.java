@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.16  2005/09/20 17:00:26  jomifred
+//   load classes from the project lib directory
+//
 //   Revision 1.15  2005/08/14 23:29:40  jomifred
 //   add TODO (use new java class to run process)
 //
@@ -46,7 +49,9 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -524,11 +529,27 @@ class RunMAS extends AbstractAction {
 		
 		String MASDirectory;
 		JarFile jf;
+		List libDirJars = new ArrayList();
 		
 		MASClassLoader(String masDir) {
 			MASDirectory = masDir;
 			try {
 				jf = new JarFile(jasonID.getConf().getProperty("jasonJar"));
+				
+				// create the jars from application lib directory
+				if (MASDirectory != null) {
+					File lib = new File(MASDirectory + File.separator + "lib");
+					// add all jar files in lib dir
+					if (lib.exists()) {
+						File[] fs = lib.listFiles();
+						for (int i=0; i<fs.length; i++) {
+							if (fs[i].getName().endsWith(".jar")) {
+								libDirJars.add(new JarFile(fs[i].getAbsolutePath()));
+							}
+						}
+					}
+					
+				}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -540,7 +561,12 @@ class RunMAS extends AbstractAction {
 				if (! name.equals(JasonID.class.getName())) { // let super loader to get MASConsoleGUI, since it must be shared between RunCentMAS and jIDE
 					if (name.startsWith("jason.") || name.startsWith("jIDE.")) {
 						//System.out.println("loading new ");
-						return findClassInJar(RunMAS.class, name);
+						Class c = findClassInJar(jf, name);
+						if (c == null) {
+							System.out.println("does not find class "+name+" in jason.jar");
+						} else {
+							return c;
+						}
 					}
 				}
 			}
@@ -553,6 +579,16 @@ class RunMAS extends AbstractAction {
 				//System.out.println(name + " found ");
 				return defineClass(name, b, 0, b.length);
 			} else {
+				// try in lib dir
+				Iterator i = libDirJars.iterator();
+				while (i.hasNext()) {
+					JarFile j = (JarFile)i.next();
+					Class c = findClassInJar(j, name);
+					if (c != null) {
+						return c;
+					}
+				}
+				System.err.println("Error loading class "+name);
 				return null;
 			}
 		}
@@ -565,19 +601,17 @@ class RunMAS extends AbstractAction {
 				inFile.read(classBytes);
 				return classBytes;
 			} catch (java.io.IOException ioEx) {
-				System.err.println("Error loading class "+className);
-				ioEx.printStackTrace();
+				//ioEx.printStackTrace();
 				return null;
 			}
 		}
 
-		public Class findClassInJar(Class c, String className) {
+		public Class findClassInJar(JarFile jf, String className) {
 			try {
 				if (jf == null) 
 					return null;
 				JarEntry je = jf.getJarEntry(className.replace('.', '/') + ".class"); // must be '/' since inside jar / is used not \
 				if (je == null) {
-					System.out.println("does not find class "+className);
 					return null;
 				}
 				InputStream in = new BufferedInputStream(jf.getInputStream(je));
