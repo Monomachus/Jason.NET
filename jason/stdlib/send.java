@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.6  2005/09/26 11:46:59  jomifred
+//   do not send source annots in message content
+//
 //   Revision 1.5  2005/08/12 22:20:10  jomifred
 //   add cvs keywords
 //
@@ -37,6 +40,7 @@ import jason.asSemantics.InternalAction;
 import jason.asSemantics.Message;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
+import jason.asSyntax.Pred;
 import jason.asSyntax.Term;
 
 public class send implements InternalAction {
@@ -56,7 +60,8 @@ public class send implements InternalAction {
 	        to   = (Term)args[0].clone();
 	        ilf  = (Term)args[1].clone();
 	        pcnt = (Term)args[2].clone();
-
+	        
+	        
 			//System.out.println("Send un="+un);
 			//System.out.println("To="+to);
 			//System.out.println("Content="+pcnt);
@@ -97,6 +102,12 @@ public class send implements InternalAction {
             //pcnt = Term.parse(args[2]);
             //}
 	        un.apply(pcnt);
+	        
+	        // remove source annots in the content (in case it is a pred)
+	        try {
+	        	((Pred)pcnt).delSources();
+	        } catch (Exception e) {}
+
         } catch (ArrayIndexOutOfBoundsException e) {
             throw new JasonException("The internal action 'send' has not received three arguments");
         } 
