@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.10  2005/09/26 11:45:46  jomifred
+//   fix bug with source add/remove
+//
 //   Revision 1.9  2005/08/17 18:19:17  jomifred
 //   change AS grammar (unify lt and la implementation)
 //
@@ -207,7 +210,20 @@ public class Pred extends Term implements Cloneable, Comparable, Serializable {
 			Iterator i = annots.iterator();
 			while (i.hasNext()) {
 				Term t = (Term)i.next();
-				if (t.getFunctor().equals("sources")) {
+				if (t.getFunctor().equals("source")) {
+					return true;
+				}
+			}
+		}
+		return false;		
+	}
+
+	public boolean hasSource(Term s) {
+		if (annots != null) {
+			Iterator i = annots.iterator();
+			while (i.hasNext()) {
+				Term t = (Term)i.next();
+				if (t.equals(s)) {
 					return true;
 				}
 			}
@@ -245,6 +261,7 @@ public class Pred extends Term implements Cloneable, Comparable, Serializable {
 		}
 	}
 
+	/** removes all annots in this pred that are in <i>p</i> */
 	public void delAnnot(Pred p) {
 		if (p.annots == null) {
 			return;

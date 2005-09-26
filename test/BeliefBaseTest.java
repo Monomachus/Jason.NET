@@ -119,17 +119,24 @@ public class BeliefBaseTest extends TestCase {
 		l2.addAnnot(new Term("a"));
 		assertTrue(bb.contains(l2) != null);
 		assertFalse(bb.contains(l2).hasSubsetAnnot(l2)); //
-		assertFalse(bb.remove(l2));
+		assertTrue(bb.remove(l2));
 
 		l2.addAnnot(new Term("b"));
 		l2.addAnnot(BeliefBase.TPercept);
-		l2.addSource("ag1");
-		bb.remove(l2);
-		
-		System.out.println("remove "+l2);
+		l2.delAnnot(new Term("a"));
+		assertTrue(bb.remove(l2));
+		System.out.println("removed "+l2);
 		System.out.println("BB="+bb);
 		System.out.println("Percepts="+bb.getPercepts());
 		assertEquals(bb.getPercepts().size(), 0);
+		assertEquals(bb.size(), 1);
+		
+		l3 = Literal.parseLiteral("pos[source(ag1)]");
+		assertTrue(bb.remove(l3));
+		
+		System.out.println("removed "+l3);
+		System.out.println("BB="+bb);
+		assertEquals(bb.size(), 0);
 	}
 
 }

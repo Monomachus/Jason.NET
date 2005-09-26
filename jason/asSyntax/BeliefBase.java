@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.8  2005/09/26 11:45:45  jomifred
+//   fix bug with source add/remove
+//
 //   Revision 1.7  2005/08/12 22:26:08  jomifred
 //   add cvs keywords
 //
@@ -63,6 +66,16 @@ public class BeliefBase {
 	List percepts = new ArrayList();
 
 	public BeliefBase() {
+	}
+
+	public int size() {
+		int c = 0;
+		Iterator i = belsMap.values().iterator();
+		while (i.hasNext()) {
+			List  listFunctor = (List)i.next();
+			c += listFunctor.size();
+		}
+		return c;
 	}
 
 	/*
@@ -192,7 +205,10 @@ public class BeliefBase {
 	public boolean remove(Literal l) {
 		Literal bl = contains(l);
 		if (bl != null) {
-			if (bl.hasSubsetAnnot(l)) {
+			if (l.hasSubsetAnnot(bl)) {
+				if (bl.hasSource(TPercept)) {
+					removePercept(bl);
+				}
 				bl.delAnnot((Pred) l);
 				if (bl.emptyAnnot()) {
 					String key = l.getFunctorArity();
@@ -201,7 +217,6 @@ public class BeliefBase {
 					if (listFunctor.isEmpty()) {
 						belsMap.remove(key);
 					}
-					removePercept(bl);
 				}
 				return true;
 			} else {

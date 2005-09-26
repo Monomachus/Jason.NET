@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.23  2005/09/26 11:46:25  jomifred
+//   fix bug with source add/remove
+//
 //   Revision 1.22  2005/08/16 21:03:42  jomifred
 //   add some comments on TODOs
 //
@@ -555,10 +558,14 @@ public class TransitionSystem {
 				//    X = ~p(a); +p(X)
 				l = Literal.parseLiteral(l.toString());
 				if (l != null) {
+					Term source = BeliefBase.TSelf;
+					if (l.hasSource()) {
+						source = null; // do not add source(self) in case the programmer set the source
+					}
 					if (setts.sameFocus())
-						conf.ag.addBel(l, BeliefBase.TSelf, conf.C, conf.C.SI);
+						conf.ag.addBel(l, source, conf.C, conf.C.SI);
 					else {
-						conf.ag.addBel(l, BeliefBase.TSelf, conf.C, Intention.EmptyInt);
+						conf.ag.addBel(l, source, conf.C, Intention.EmptyInt);
 						updateIntention();
 					}
 				}
@@ -569,10 +576,14 @@ public class TransitionSystem {
 				ubel = conf.ag.believes((Literal)l, u);
 				if (ubel != null) {
 					ubel.apply(l);
+					Term source = BeliefBase.TSelf;
+					if (l.hasSource()) {
+						source = null; // do not add source(self) in case the programmer set the source
+					}
 					if (setts.sameFocus())
-						conf.ag.delBel(l, BeliefBase.TSelf, conf.C, conf.C.SI);
+						conf.ag.delBel(l, source, conf.C, conf.C.SI);
 					else {
-						conf.ag.delBel(l, BeliefBase.TSelf, conf.C, Intention.EmptyInt);
+						conf.ag.delBel(l, source, conf.C, Intention.EmptyInt);
 						updateIntention();
 					}
 				} else
