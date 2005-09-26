@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.8  2005/09/26 11:44:56  jomifred
+//   fix TAB problem with syntax highlight
+//
 //   Revision 1.7  2005/08/12 21:08:23  jomifred
 //   add cvs keywords
 //
@@ -52,17 +55,22 @@ import javax.swing.event.DocumentListener;
 import javax.swing.event.UndoableEditEvent;
 import javax.swing.event.UndoableEditListener;
 import javax.swing.text.AbstractDocument;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
 import javax.swing.text.BoxView;
 import javax.swing.text.ComponentView;
+import javax.swing.text.DocumentFilter;
 import javax.swing.text.Element;
 import javax.swing.text.IconView;
 import javax.swing.text.LabelView;
 import javax.swing.text.ParagraphView;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
+import javax.swing.text.StyledDocument;
 import javax.swing.text.StyledEditorKit;
 import javax.swing.text.View;
 import javax.swing.text.ViewFactory;
+import javax.swing.text.DocumentFilter.FilterBypass;
 import javax.swing.undo.UndoManager;
 
 class ASEditorPane extends JPanel {
@@ -216,7 +224,29 @@ class ASEditorPane extends JPanel {
 			}
 		});
 
-		//editor.setEditorKitForContentType(editorKit.getContentType(), editorKit);
+		StyledDocument styledDoc = editor.getStyledDocument();
+		if (styledDoc instanceof AbstractDocument) {
+			AbstractDocument doc = (AbstractDocument)styledDoc;
+		    doc.setDocumentFilter(new DocumentFilter() {
+		        public void insertString(FilterBypass fb, int offs, String str,
+						AttributeSet a) throws BadLocationException {
+		        	//System.out.println("*"+str);
+		        	super.insertString(fb, offs, str, a);
+				}
+
+				public void replace(FilterBypass fb, int offs, int length,
+						String str, AttributeSet a) throws BadLocationException {
+		        	//System.out.println("-"+str+"-"+offs+"-"+length);
+		        	if (str.charAt(0) == '\t') {
+		        		super.replace(fb, offs, length, "    ", a);		        		
+		        	} else {
+		        		super.replace(fb, offs, length, str, a);
+		        	}
+				}
+			});
+		}
+		// editor.setEditorKitForContentType(editorKit.getContentType(),
+		// editorKit);
 		//editor.setContentType("text/asl");
 	}
 
