@@ -23,8 +23,8 @@
 //   $Date$
 //   $Revision$
 //   $Log$
-//   Revision 1.11  2005/08/18 13:31:49  jomifred
-//   change methods interface to be used in environment classes
+//   Revision 1.12  2005/09/30 22:47:55  jomifred
+//   add comments
 //
 //----------------------------------------------------------------------------
 
@@ -55,8 +55,8 @@ public class createAgent implements InternalAction {
 
     private static Logger logger = Logger.getLogger(createAgent.class);
 
-	/* args[0] the agent name
-	 * args[1] the agent code (as StringTerm)
+	/** args[0] is the agent name
+	 *  args[1] is the agent code (as StringTerm)
 	 */
 	public boolean execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
 		
@@ -117,15 +117,6 @@ public class createAgent implements InternalAction {
 			c1.addArg("args", Agent.class.getName() + " " + source + extraOp);
 			//c1.addArg("host", "?");
 			l.execCommand(c1);
-			/*
-            agArch.setEnv( ((CentralisedAgArch)ts.getAgArch()).getEnv());
-            agArch.setControl( ((CentralisedAgArch)ts.getAgArch()).getControl());
-            if (agArch.getTS().getSettings().isSync()) {
-            	agArch.getTS().getSettings().setSync(true);
-            }
-            agArch.getEnv().addAgent(agArch);
-            agArch.start();
-            */
             logger.debug("Agent "+name+" created!");
             return true;
 		} catch (Exception e) {
