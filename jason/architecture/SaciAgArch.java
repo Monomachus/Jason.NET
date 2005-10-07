@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.14  2005/10/07 18:53:35  jomifred
+//   fix a bug in console (it tried to use X11 event with Console logger)
+//
 //   Revision 1.13  2005/08/16 21:03:42  jomifred
 //   add some comments on TODOs
 //
@@ -42,6 +45,7 @@
 package jason.architecture;
 
 
+import jIDE.MASConsoleGUI;
 import jIDE.RunCentralisedMAS;
 import jason.JasonException;
 import jason.asSemantics.ActionExec;
@@ -85,9 +89,7 @@ public class SaciAgArch extends saci.Agent implements AgArchInterface {
     // this is used by SACI to initialize the agent
     public void initAg(String[] args) throws JasonException {
 
-    	// create the jasonId console
-    	jIDE.MASConsoleGUI.get("MAS Console - "+getSociety(), null).setAsDefaultOut();
-    	
+        
     	// create a logger
     	logger = Logger.getLogger(SaciAgArch.class.getName()+"."+getAgName());
         if (new File(RunCentralisedMAS.logPropFile).exists()) {
@@ -95,7 +97,13 @@ public class SaciAgArch extends saci.Agent implements AgArchInterface {
         } else {
         	PropertyConfigurator.configure(SaciAgArch.class.getResource("/"+RunCentralisedMAS.logPropFile));
         }
-    
+
+    	// create the jasonId console
+        if (MASConsoleGUI.hasConsole()) { // the logger created the MASConsole
+        	MASConsoleGUI.get().setTitle("MAS Console - "+getSociety());
+        	MASConsoleGUI.get().setAsDefaultOut();
+        }
+
         // set the agent class
         try {
             String className = null;
