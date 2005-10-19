@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.16  2005/10/19 21:41:51  jomifred
+//   fixed the bug  continue/stop when running the MAS
+//
 //   Revision 1.15  2005/09/20 16:59:14  jomifred
 //   do not use MASConsole when the logger in Console (and so, do not need an X11)
 //
@@ -111,7 +114,8 @@ public class RunCentralisedMAS {
 		        JButton btStop = new JButton("Stop MAS");
 		        btStop.addActionListener(new ActionListener() {
 		            public void actionPerformed(ActionEvent evt) {
-		                runner.finish();
+		            	MASConsoleGUI.get().setPause(false);
+		            	runner.finish();
 		            }
 		        });
 		        MASConsoleGUI.get().addButton(btStop);
