@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.25  2005/10/19 15:57:49  bordini
+//   as last log, just had forgotten to add .clone() in saving the Trigger.
+//
 //   Revision 1.24  2005/10/19 15:09:49  bordini
 //   Fixed 2 bugs related to the plan failure mechanism:
 //     - generated event, in case a plan failed by an action, was
@@ -360,7 +363,7 @@ public class TransitionSystem {
 	private void applyAddIM() throws JasonException {
 		// create a new intended means
 		IntendedMeans im = new IntendedMeans(conf.C.SO);
-		im.setTrigger(conf.C.SE.getTrigger());
+		im.setTrigger((Trigger) conf.C.SE.getTrigger().clone());
 
 		// Rule ExtEv
 		if (conf.C.SE.intention == Intention.EmptyInt) {
