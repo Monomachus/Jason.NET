@@ -23,6 +23,16 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.24  2005/10/19 15:09:49  bordini
+//   Fixed 2 bugs related to the plan failure mechanism:
+//     - generated event, in case a plan failed by an action, was
+//       not post as originally (lacked unification), see generateGoalDeletion,
+//       rather than generateGoalDeletionFromEvent
+//     - old (faild) plan which is kept in the intention wasn't removed
+//       when the goal deletion plan finished (ClrInt)
+//   To solve the first problem, the IntendedMeans class now has an extra
+//   member variable called "Trigger" which record the original event.
+//
 //   Revision 1.23  2005/09/26 11:46:25  jomifred
 //   fix bug with source add/remove
 //
@@ -350,6 +360,7 @@ public class TransitionSystem {
 	private void applyAddIM() throws JasonException {
 		// create a new intended means
 		IntendedMeans im = new IntendedMeans(conf.C.SO);
+		im.setTrigger(conf.C.SE.getTrigger());
 
 		// Rule ExtEv
 		if (conf.C.SE.intention == Intention.EmptyInt) {
@@ -602,6 +613,10 @@ public class TransitionSystem {
 			if (im.getPlan().getBody().isEmpty()) {
 				if (conf.C.SI.size() > 1) {
 					IntendedMeans oldim = confP.C.SI.pop();
+					if (im.getTrigger().isGoal() && !im.getTrigger().isAddition()) {
+						// needs to get rid of the failed plan when finished handling failure
+						confP.C.SI.pop();
+					}
 					im = conf.C.SI.peek();
 					BodyLiteral g = (BodyLiteral) im.getPlan().getBody().remove(0);
 					// use unifier of finished plan accordingly
@@ -739,19 +754,16 @@ public class TransitionSystem {
 
 	private void generateGoalDeletion() throws JasonException {
 		IntendedMeans im = conf.C.SI.peek();
-		Trigger tevent = im.getPlan().getTriggerEvent();
+		Trigger tevent = im.getTrigger();
 		if (tevent.isAddition() && tevent.isGoal())
-			confP.C.delGoal(tevent.getGoal(), tevent, conf.C.SI); // intention
-		// will be suspended
+			confP.C.delGoal(tevent.getGoal(), tevent, conf.C.SI); // intention will be suspended
 		// if "discard" is set, we are deleting the whole intention!
-		// it is simply not going back to I nor anywhere else!
+		// it is simply not going back to 'I' nor anywhere else!
 		else if (setts.requeue()) {
 			// get the external event (or the one that started
 			// the whole focus of attentiont) and requeue it
 			im = conf.C.SI.get(0);
-			Trigger tr = (Trigger) tevent.clone();
-			im.unif.apply((Pred) tr);
-			confP.C.addExternalEv(tr);
+			confP.C.addExternalEv(tevent);
 		} else {
 			logger.warn("Could not finish intention: " + conf.C.SI);
 		}
@@ -762,7 +774,7 @@ public class TransitionSystem {
 		Event ev = conf.C.SE;
 		// TODO: double check all cases here
 		if (ev.trigger.isAddition() && ev.trigger.isGoal() && ev.isInternal()) {
-			confP.C.delGoal(ev.getTrigger().getGoal(), (Literal) ev.trigger, ev.intention);
+			confP.C.delGoal(ev.getTrigger().getGoal(), ev.getTrigger(), ev.intention);
 			logger.warn("Generating goal deletion from event: " + ev);
 		}
 		else if (ev.isInternal()) {

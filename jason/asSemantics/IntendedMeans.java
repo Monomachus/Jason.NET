@@ -23,6 +23,16 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.5  2005/10/19 15:09:49  bordini
+//   Fixed 2 bugs related to the plan failure mechanism:
+//     - generated event, in case a plan failed by an action, was
+//       not post as originally (lacked unification), see generateGoalDeletion,
+//       rather than generateGoalDeletionFromEvent
+//     - old (faild) plan which is kept in the intention wasn't removed
+//       when the goal deletion plan finished (ClrInt)
+//   To solve the first problem, the IntendedMeans class now has an extra
+//   member variable called "Trigger" which record the original event.
+//
 //   Revision 1.4  2005/08/12 22:18:37  jomifred
 //   add cvs keywords
 //
@@ -33,6 +43,8 @@
 package jason.asSemantics;
 
 import jason.asSyntax.Plan;
+import jason.asSyntax.Trigger; // To remember the triggering event that generated
+                               // this intended means (e.g., for failure)
 
 import java.io.Serializable;
 
@@ -43,6 +55,7 @@ public class IntendedMeans implements Serializable {
 
 	protected Unifier unif = null;
 	protected Plan plan;
+	protected Trigger trigger;
     
     public IntendedMeans(Option opt) {
     	plan = (Plan)opt.plan.clone();
@@ -56,7 +69,14 @@ public class IntendedMeans implements Serializable {
     public Unifier getUnif() {
     	return unif;
     }
-    
+
+    public Trigger getTrigger() {
+    	return trigger;
+    }
+    public void setTrigger(Trigger tr) {
+    	trigger = tr;
+    }
+
 	public boolean isAtomic() {
 		if (plan != null) {
 			return plan.isAtomic();
