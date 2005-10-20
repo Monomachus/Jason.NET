@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.9  2005/10/20 21:40:09  jomifred
+//   add some comments
+//
 //   Revision 1.8  2005/08/15 13:05:25  jomifred
 //   using infrastructure instead of architecture in mas2j
 //
@@ -42,6 +45,7 @@ import java.util.Map;
 
 import org.apache.log4j.Level;
 
+/** MAS Runtime Settings (from mas2j file) */
 public class Settings {
 	
     public static final byte      ODiscard        = 1;
