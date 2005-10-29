@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.11  2005/10/29 21:46:22  jomifred
+//   add a new class (MAS2JProject) to store information parsed by the mas2j parser. This new class also create the project scripts
+//
 //   Revision 1.10  2005/08/12 21:08:23  jomifred
 //   add cvs keywords
 //
@@ -30,6 +33,7 @@
 
 package jIDE;
 
+import jIDE.mas2j.MAS2JProject;
 import jIDE.parser.ParseException;
 import jIDE.parser.TokenMgrError;
 import jIDE.parser.mas2j;
@@ -42,15 +46,23 @@ import javax.swing.text.Document;
 public class MAS2JParserThread extends ASParserThread { //Thread {
     
     mas2j           fParserMAS2J;
-
+    MAS2JProject    fCurrentProject;
+    boolean         fDebug;
+    
     MAS2JParserThread(MAS2JEditorPane editor, JasonID jasonID) {
     	super("MAS2JParser", jasonID);
+    }
+
+    public void debugOn() {
+    	fDebug = true;
+    }
+    public void debugOff() {
+    	fDebug = false;
     }
 
     void createParser() {
         try {
             fParserMAS2J = new mas2j(new StringReader(""));
-            fParserMAS2J.setNoOut(true);
         } catch (Exception ex) {
         	System.err.println("Error creating mas2j parser!"+ex);
         	ex.printStackTrace();
@@ -72,23 +84,28 @@ public class MAS2JParserThread extends ASParserThread { //Thread {
             Document doc  = fJasonID.mas2jPane.editor.getDocument();
             String text = doc.getText(0, doc.getLength());
             fParserMAS2J.ReInit(new StringReader(text));
-            fParserMAS2J.setDestDir( fJasonID.projectDirectory );
-            fParserMAS2J.setJasonJar(fJasonID.getConf().getProperty("jasonJar"));
-            fParserMAS2J.setSaciJar(fJasonID.getConf().getProperty("saciJar"));
-            fParserMAS2J.setLog4jJar(fJasonID.getConf().getProperty("log4jJar"));
-            fParserMAS2J.setJavaHome(fJasonID.getConf().getProperty("javaHome"));
-            fParserMAS2J.mas();
-            fParserMAS2J.close();
+            fCurrentProject = fParserMAS2J.mas();
+            fCurrentProject.setProjectDir( fJasonID.projectDirectory );
             
             fOk = true;
             
             if (fForegroundCompilation) {
-                fParserMAS2J.writeScripts();
+                fCurrentProject.setJasonJar(fJasonID.getConf().getProperty("jasonJar"));
+                fCurrentProject.setSaciJar(fJasonID.getConf().getProperty("saciJar"));
+                fCurrentProject.setLog4jJar(fJasonID.getConf().getProperty("log4jJar"));
+                fCurrentProject.setJavaHome(fJasonID.getConf().getProperty("javaHome"));
+                if (fDebug) {
+                	fCurrentProject.debugOn();
+                } else {
+            		fCurrentProject.debugOff();            		
+                }
+            	fCurrentProject.writeXMLScript();
+            	fCurrentProject.writeScripts();
                 System.out.println(" parsed successfully!");
                 //System.out.println("scripts was written on "+editorPanel.mainGUI.projectDirectory+".");
             }
             
-            fJasonID.openAllASFiles(fParserMAS2J.getAgASFiles().values());
+            fJasonID.openAllASFiles(fCurrentProject.getAllASFiles());
 
             fErrorLine = -1; // set no error!
             fJasonID.mas2jPane.syntaxHL.paintLine(); //errorOffSet); // 1 char was inserted
@@ -127,13 +144,11 @@ public class MAS2JParserThread extends ASParserThread { //Thread {
     }
     
     synchronized public boolean foregroundCompile() {
-        fParserMAS2J.setNoOut(false);
         fForegroundCompilation = true;
         fJasonID.mas2jPane.needsParsing = true;
         fCompilationDone = false; // it is necessary here!
         stopWaiting();
         waitCompilation(); // waits the end of compilation
-        fParserMAS2J.setNoOut(true);
         fForegroundCompilation = false;
         return fOk;
     }

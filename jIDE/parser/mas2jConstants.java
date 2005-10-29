@@ -23,14 +23,15 @@ public interface mas2jConstants {
   int ASAGCLASS = 23;
   int ASAGARCHCLASS = 24;
   int NUMBER = 25;
-  int ASID = 26;
-  int CLASSID = 27;
-  int PATH = 28;
-  int DRIVER = 29;
-  int LETTER = 30;
-  int LC_LETTER = 31;
-  int UP_LETTER = 32;
-  int DIGIT = 33;
+  int STRING = 26;
+  int ASID = 27;
+  int CLASSID = 28;
+  int PATH = 29;
+  int DRIVER = 30;
+  int LETTER = 31;
+  int LC_LETTER = 32;
+  int UP_LETTER = 33;
+  int DIGIT = 34;
 
   int DEFAULT = 0;
 
@@ -61,6 +62,7 @@ public interface mas2jConstants {
     "\"agentClass\"",
     "\"agentArchClass\"",
     "<NUMBER>",
+    "<STRING>",
     "<ASID>",
     "<CLASSID>",
     "<PATH>",

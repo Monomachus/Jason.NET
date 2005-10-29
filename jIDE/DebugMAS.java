@@ -24,6 +24,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.6  2005/10/29 21:46:22  jomifred
+//   add a new class (MAS2JProject) to store information parsed by the mas2j parser. This new class also create the project scripts
+//
 //   Revision 1.5  2005/08/23 17:09:28  jomifred
 //   fix bug in logger
 //
@@ -54,10 +57,10 @@ class DebugMAS extends AbstractAction {
 
 	public void actionPerformed(ActionEvent e) {
 		try {
-			jasonID.fMAS2jThread.fParserMAS2J.debugOn();
+			jasonID.fMAS2jThread.debugOn();
 			jasonID.runMASAct.actionPerformed(e);
 		} finally {
-			jasonID.fMAS2jThread.fParserMAS2J.debugOff();
+			jasonID.fMAS2jThread.debugOff();
 			Logger.getRootLogger().setLevel(Level.INFO);
 		}
 	}

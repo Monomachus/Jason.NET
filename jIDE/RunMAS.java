@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.17  2005/10/29 21:46:22  jomifred
+//   add a new class (MAS2JProject) to store information parsed by the mas2j parser. This new class also create the project scripts
+//
 //   Revision 1.16  2005/09/20 17:00:26  jomifred
 //   load classes from the project lib directory
 //
@@ -95,23 +98,23 @@ class RunMAS extends AbstractAction {
 			
 			boolean ok = jasonID.fMAS2jThread.foregroundCompile();
 			if (ok) {
-				jasonID.openAllASFiles(jasonID.fMAS2jThread.fParserMAS2J.getAgASFiles().values());
+				jasonID.openAllASFiles(jasonID.fMAS2jThread.fCurrentProject.getAllASFiles());
 				ok = jasonID.fASParser.foregroundCompile();
 				if (ok) {
 					jasonID.runMASButton.setEnabled(false);
 					jasonID.debugMASButton.setEnabled(false);
 
 					// compile some files
-					CompileThread compT = new CompileThread(jasonID.fMAS2jThread.fParserMAS2J.getAllUserJavaFiles());
+					CompileThread compT = new CompileThread(jasonID.fMAS2jThread.fCurrentProject.getAllUserJavaFiles());
 					compT.start();
 
-					if (jasonID.fMAS2jThread.fParserMAS2J.getArchitecture().equals("Centralised")) {
+					if (jasonID.fMAS2jThread.fCurrentProject.getArchitecture().equals("Centralised")) {
 						if (jasonID.getConf().getProperty("runCentralisedInsideJIDE").equals("true")) {
 							masRunner = new MASRunnerInsideJIDE(compT);
 						} else {
 							masRunner = new MASRunnerCentralised(compT);
 						}
-					} else if (jasonID.fMAS2jThread.fParserMAS2J.getArchitecture().equals("Saci")) {
+					} else if (jasonID.fMAS2jThread.fCurrentProject.getArchitecture().equals("Saci")) {
 						String saciJar = jasonID.getConf().getProperty("saciJar");
 						if (JasonID.checkJar(saciJar)) {
 							masRunner = new MASRunnerSaci(compT);
@@ -185,7 +188,7 @@ class RunMAS extends AbstractAction {
 			//stopSaci();
 			try {
 				//String command = getAsScriptCommand(jasonID.projectDirectory + File.separator + "saci-" + jasonID.getFileName());
-				String command = getAsScriptCommand("saci-" + jasonID.fMAS2jThread.fParserMAS2J.getSocName(), true);
+				String command = getAsScriptCommand("saci-" + jasonID.fMAS2jThread.fCurrentProject.getSocName(), true);
 				saciProcess = Runtime.getRuntime().exec(command, null,
 						//new File(JasonID.saciHome + File.separator + "bin"));
 						new File(jasonID.projectDirectory));
@@ -225,7 +228,7 @@ class RunMAS extends AbstractAction {
 									"Fail to automatically start saci! \nGo to \""
 											+ jasonID.projectDirectory
 											+ "\" directory and run the saci-"
-											+ jasonID.fMAS2jThread.fParserMAS2J.getSocName()
+											+ jasonID.fMAS2jThread.fCurrentProject.getSocName()
 											+ " script.\n\nClick 'ok' when saci is running.");
 					wait(1000);
 					if (!saciOk) {
@@ -267,7 +270,7 @@ class RunMAS extends AbstractAction {
 		public void run() {
 			try {
 				if (needsComp()) {
-					String command = getAsScriptCommand("compile-" + jasonID.fMAS2jThread.fParserMAS2J.getSocName());
+					String command = getAsScriptCommand("compile-" + jasonID.fMAS2jThread.fCurrentProject.getSocName());
 					System.out.println("Compiling user class with " + command);
 					Process p = Runtime.getRuntime().exec(command, null, new File(jasonID.projectDirectory));
 					p.waitFor();
@@ -336,7 +339,7 @@ class RunMAS extends AbstractAction {
 						return;
 					}
 				}
-				String command = getAsScriptCommand(jasonID.fMAS2jThread.fParserMAS2J.getSocName());
+				String command = getAsScriptCommand(jasonID.fMAS2jThread.fCurrentProject.getSocName());
 				System.out.println("Executing MAS with " + command);
 				masProcess = Runtime.getRuntime().exec(command, null,
 						new File(jasonID.projectDirectory));
@@ -425,7 +428,7 @@ class RunMAS extends AbstractAction {
 					}
 				}
 				
-				File fXML = new File(jasonID.projectDirectory + File.separator + jasonID.fMAS2jThread.fParserMAS2J.getSocName()+".xml");
+				File fXML = new File(jasonID.projectDirectory + File.separator + jasonID.fMAS2jThread.fCurrentProject.getSocName()+".xml");
 				System.out.println("Running MAS with "+fXML.getAbsolutePath());
 				// create a new RunCentralisedMAS (using my class loader to not cache user classes and to find user project directory)
 				Class rmas = new MASClassLoader(jasonID.projectDirectory).loadClass(RunCentralisedMAS.class.getName());
@@ -474,7 +477,7 @@ class RunMAS extends AbstractAction {
 
 		void stopRunner() {
 			try {
-				String socName = jasonID.fMAS2jThread.fParserMAS2J.getSocName();
+				String socName = jasonID.fMAS2jThread.fCurrentProject.getSocName();
 				if (l != null) {
 					l.killFacilitatorAgs(socName);
 					l.killFacilitator(socName);
