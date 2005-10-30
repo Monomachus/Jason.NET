@@ -23,8 +23,8 @@
 //   $Date$
 //   $Revision$
 //   $Log$
-//   Revision 1.12  2005/09/30 22:47:55  jomifred
-//   add comments
+//   Revision 1.13  2005/10/30 18:39:48  jomifred
+//   change in the AgArch customisation  support (the same customisation is used both to Cent and Saci infrastructures0
 //
 //----------------------------------------------------------------------------
 
@@ -32,6 +32,7 @@ package jason.stdlib;
 
 import jIDE.JasonID;
 import jason.JasonException;
+import jason.architecture.AgArch;
 import jason.architecture.CentralisedAgArch;
 import jason.architecture.SaciAgArch;
 import jason.asSemantics.Agent;
@@ -51,6 +52,7 @@ import saci.launcher.Command;
 import saci.launcher.Launcher;
 import saci.launcher.LauncherD;
 
+// TODO: test
 public class createAgent implements InternalAction {
 
     private static Logger logger = Logger.getLogger(createAgent.class);
@@ -83,11 +85,11 @@ public class createAgent implements InternalAction {
             	}
             }
             
-            if (ts.getAgArch() instanceof CentralisedAgArch) {
-            	CentralisedAgArch ag = (CentralisedAgArch)ts.getAgArch();
-            	return createCentralisedAg(name.toString(), fSource.getAbsolutePath(), ag.getEnv(), ag.getControl());
-            } else if (ts.getAgArch() instanceof SaciAgArch) {
-            	SaciAgArch ag = (SaciAgArch)ts.getAgArch();
+            if ( ((AgArch)ts.getAgArch()).getInfraArch() instanceof CentralisedAgArch) {
+            	CentralisedAgArch ag = (CentralisedAgArch)((AgArch)ts.getAgArch()).getInfraArch();
+            	return createCentralisedAg(name.toString(), fSource.getAbsolutePath(), ag.getEnv(), ag.getControl(), ts.getSettings().isSync());
+            } else if (((AgArch)ts.getAgArch()).getInfraArch() instanceof SaciAgArch) {
+            	SaciAgArch ag = (SaciAgArch)((AgArch)ts.getAgArch()).getInfraArch();
             	return createSaciAg(name.toString(), ag.getSociety(), fSource.getAbsolutePath(), ts.getSettings().isSync());
             } else {
 				throw new JasonException("Create agent is currently implemented only for the Centralised/Saci infrastructure!");				
@@ -114,7 +116,7 @@ public class createAgent implements InternalAction {
 			c1.addArg("class", SaciAgArch.class.getName());
 			c1.addArg("name", name);
 			c1.addArg("society.name", socName);
-			c1.addArg("args", Agent.class.getName() + " " + source + extraOp);
+			c1.addArg("args", AgArch.class.getName()+" "+Agent.class.getName() + " " + source + extraOp);
 			//c1.addArg("host", "?");
 			l.execCommand(c1);
             logger.debug("Agent "+name+" created!");
@@ -125,22 +127,22 @@ public class createAgent implements InternalAction {
 		return false;
 	}
 
-	public boolean createCentralisedAg(String name, String source, CentralisedEnvironment env, CentralisedExecutionControl control) {
+	public boolean createCentralisedAg(String name, String source, CentralisedEnvironment env, CentralisedExecutionControl control, boolean isSync) {
 		try {
 			logger.debug("Creating centralised agent from source "+source);
             // parameters for ini
 			
-            String[] agArgs = { Agent.class.getName(), source};
+            String[] agArgs = { AgArch.class.getName(), Agent.class.getName(), source};
 
             CentralisedAgArch agArch = new CentralisedAgArch();//(CentralisedAgArch)Class.forName(Agent.class.getName()).newInstance();
             agArch.setAgName(name.toString());
             agArch.initAg(agArgs);
             agArch.setEnv(env);
             agArch.setControl(control);
-            if (agArch.getTS().getSettings().isSync()) {
-            	agArch.getTS().getSettings().setSync(true);
+            if (isSync) {
+            	agArch.getUserAgArch().getTS().getSettings().setSync(true);
             }
-            agArch.getEnv().addAgent(agArch);
+            agArch.getEnv().addAgent(agArch.getUserAgArch());
             agArch.start();
             logger.debug("Agent "+name+" created!");
             return true;

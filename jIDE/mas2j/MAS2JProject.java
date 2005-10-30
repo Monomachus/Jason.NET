@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.2  2005/10/30 18:39:48  jomifred
+//   change in the AgArch customisation  support (the same customisation is used both to Cent and Saci infrastructures0
+//
 //   Revision 1.1  2005/10/29 21:46:22  jomifred
 //   add a new class (MAS2JProject) to store information parsed by the mas2j parser. This new class also create the project scripts
 //
@@ -30,6 +33,8 @@
 //----------------------------------------------------------------------------
 
 package jIDE.mas2j;
+
+import jason.control.ExecutionControlGUI;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -262,15 +267,18 @@ public class MAS2JProject {
 		}
 		
 		// controller
-		if (controlClass != null) {
+        String fControlClass = controlClass;
+		if (debug && fControlClass == null) {
+			fControlClass = ExecutionControlGUI.class.getName();
+		}
+		if (fControlClass != null) {
 			out.println("\t<startAgent "); 
 			out.println("\t\tname=\"controller\" "); 
 			out.println("\t\tsociety.name=\""+soc+"-env\" "); 
 
-            String fControlClass = controlClass;
             if (architecture.equals("Saci")) {
+            	out.println("\t\targs=\""+fControlClass+"\"");
             	fControlClass = jason.control.SaciExecutionControl.class.getName();
-            	out.println("\t\targs=\""+controlClass+"\"");
             }
             out.println("\t\tclass=\""+fControlClass+"\" ");
             if (controlHost != null) {

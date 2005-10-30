@@ -1,5 +1,7 @@
 package jIDE.mas2j;
 
+import jason.architecture.AgArch;
+
 import java.io.File;
 import java.util.Iterator;
 import java.util.Map;
@@ -48,22 +50,23 @@ public class AgentParameters {
         s.append("\n\t\tname=\""+name+"\" "); 
         s.append("\n\t\tsociety.name=\""+soc+"\" ");
         
-        String tmpAgArchClass = archClass;
-        if (tmpAgArchClass == null) {
-        	tmpAgArchClass = jason.architecture.CentralisedAgArch.class.getName();
-        	if (architecture.equals("Saci")) {
-        		tmpAgArchClass = jason.architecture.SaciAgArch.class.getName();
-        	}
-        }
-        s.append("\n\t\tclass=\""+tmpAgArchClass+"\"");
+        String tmpInfraClass = jason.architecture.CentralisedAgArch.class.getName();
+    	if (architecture.equals("Saci")) {
+    		tmpInfraClass = jason.architecture.SaciAgArch.class.getName();
+    	}
+        s.append("\n\t\tclass=\""+tmpInfraClass+"\"");
 
         String tmpAgClass = agClass;
         if (tmpAgClass == null) {
         	tmpAgClass = jason.asSemantics.Agent.class.getName();
         }
+        String tmpAgArchClass = archClass;
+        if (tmpAgArchClass == null) {
+        	tmpAgArchClass = AgArch.class.getName();
+        }
         
         File tmpAsSrc = new File(proDir + File.separator + asSource);
-        s.append("\n\t\targs=\""+tmpAgClass+" '"+tmpAsSrc.getAbsolutePath()+"'"+getOptsStr(debug, forceSync)+"\"");
+        s.append("\n\t\targs=\""+tmpAgArchClass+" "+tmpAgClass+" '"+tmpAsSrc.getAbsolutePath()+"'"+getOptsStr(debug, forceSync)+"\"");
         if (qty > 1) {
         	s.append("\n\t\tqty=\""+qty+"\" ");
         }
@@ -81,7 +84,7 @@ public class AgentParameters {
 	    	s += "verbose=2";
 	    	v = ",";
 	    }
-	    if (forceSync) {
+	    if (forceSync || debug) {
 	    	s += v+"synchronised=true";
 	    	v = ",";
 	    }

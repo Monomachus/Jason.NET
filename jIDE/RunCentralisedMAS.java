@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.17  2005/10/30 18:39:48  jomifred
+//   change in the AgArch customisation  support (the same customisation is used both to Cent and Saci infrastructures0
+//
 //   Revision 1.16  2005/10/19 21:41:51  jomifred
 //   fixed the bug  continue/stop when running the MAS
 //
@@ -207,7 +210,7 @@ public class RunCentralisedMAS {
                         agArch.setAgName(numberedAg);
                         agArch.initAg(agArgs);
                         agArch.setEnv(env);
-                        env.addAgent(agArch);
+                        env.addAgent(agArch.getUserAgArch());
                         ags.add(agArch);
                     }
                 }
@@ -301,21 +304,31 @@ public class RunCentralisedMAS {
         char lookingFor = ' ';
         for (int i = 0; i < s.length(); i++) {
         		if (s.charAt(i) == lookingFor) {
-        			if (token.length() > 0) {
+        			if (token.length() > 0 && lookingFor == ' ') {
+        				token = token.trim();
+        				if (token.startsWith("\"") && token.endsWith("\"")) {
+        					token = token.substring(1,token.length()-1);
+        				}
         				v.add(token);
+            			token = "";
         			}
-        			token = "";
         			if (lookingFor == '\'') {
+            			token += "\"";
         				lookingFor = ' ';
         			}
         		} else if (s.charAt(i) == '\'') {
         			lookingFor = '\'';
+        			token += "\"";
         		} else {
         			token += s.charAt(i);
         		}
         }
         if (token.length() > 0) {
-        		v.add(token);
+			token = token.trim();
+			if (token.startsWith("\"") && token.endsWith("\"")) {
+				token = token.substring(1,token.length()-1);
+			}
+			v.add(token);
         }
         
         String[] a = new String[v.size()];

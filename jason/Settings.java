@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.10  2005/10/30 18:39:48  jomifred
+//   change in the AgArch customisation  support (the same customisation is used both to Cent and Saci infrastructures0
+//
 //   Revision 1.9  2005/10/20 21:40:09  jomifred
 //   add some comments
 //
@@ -41,9 +44,12 @@ package jason;
 import jIDE.parser.mas2j;
 
 import java.io.StringReader;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 
 /** MAS Runtime Settings (from mas2j file) */
 public class Settings {
@@ -63,6 +69,10 @@ public class Settings {
     int     nrcbp     = ODefaultNRC;
     int     verbose   = ODefaultVerbose;
     boolean sync      = ODefaultSync; 
+
+    Map userParameters = new HashMap();
+    
+    Logger logger = Logger.getLogger(Settings.class);			
     
     public Settings() {
     }
@@ -72,57 +82,60 @@ public class Settings {
     }
     
     public void setOptions(String options) {
+        logger.debug("Setting options from "+options);
         mas2j parser = new mas2j( new StringReader(options));
         try {
             setOptions(parser.ASoptions());
+            logger.debug("Settings are "+userParameters);
         } catch (Exception e) {
-            System.err.println("Error parsing options "+options);
-            e.printStackTrace();
+            logger.error("Error parsing options "+options,e);
         }
     }
     
     public void setOptions(Map options) {
         if (options == null) return;
+        userParameters = options;
         
-        //System.out.println("setting option from "+options);
-        
-        String events = (String)options.get("events");
-        if (events != null) {
-            if (events.equals("discard")) {
-                setEvents(ODiscard);
-            } else if (events.equals("requeue")) {
-                setEvents(ORequeue);
-            } else if (events.equals("retrieve")) {
-                setEvents(ORetrieve);
-            }
-        }
-        
-        String intBels = (String)options.get("intBels");
-        if (intBels != null) {
-            if (intBels.equals("sameFocus")) {
-                setIntBels(OSameFocus);
-            } else if (intBels.equals("newFocus")) {
-            	setIntBels(ONewFocus);
-            }
-        }
+        Iterator i = options.keySet().iterator();
+        while (i.hasNext()) {
+        	String key = (String)i.next();
+        	
+        	if (key.equals("events")) {
+		        String events = (String)options.get("events");
+	            if (events.equals("discard")) {
+	                setEvents(ODiscard);
+	            } else if (events.equals("requeue")) {
+	                setEvents(ORequeue);
+	            } else if (events.equals("retrieve")) {
+	                setEvents(ORetrieve);
+	            }
 
-        String nrc = (String)options.get("nrcbp");
-        if (nrc != null) {
-            setNRCBP(nrc);
-        }
+        	} else if (key.equals("intBels")) {
+		        String intBels = (String)options.get("intBels");
+	            if (intBels.equals("sameFocus")) {
+	                setIntBels(OSameFocus);
+	            } else if (intBels.equals("newFocus")) {
+	            	setIntBels(ONewFocus);
+	            }
 
-        String verbose = (String)options.get("verbose");
-        if (verbose != null) {
-            setVerbose(verbose);
-        }
-
-        String sSync = (String)options.get("synchronised");
-        if (sSync != null) {
-        	if (sSync.equals("true")) {
-        		setSync(true);
+        	} else if (key.equals("nrcbp")) {
+		        String nrc = (String)options.get("nrcbp");
+	            setNRCBP(nrc);
+	
+        	} else if (key.equals("verbose")) {
+        		String verbose = (String)options.get("verbose");
+	            setVerbose(verbose);
+	
+        	} else if (key.equals("synchronised")) {
+        		String sSync = (String)options.get("synchronised");
+	        	if (sSync.equals("true")) {
+	        		setSync(true);
+	        	} else {
+	        		setSync(false);
+	        	}
         	} else {
-        		setSync(false);
-        	}
+        		//userParameters.put(key, options.get(key));
+	        }
         }
     }
 
@@ -201,5 +214,9 @@ public class Settings {
     
     public void setSync(boolean pSync) {
     	sync = pSync;
+    }
+    
+    public String getUserParameter(String key) {
+    	return (String)userParameters.get(key);
     }
 }

@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.5  2005/10/30 18:39:48  jomifred
+//   change in the AgArch customisation  support (the same customisation is used both to Cent and Saci infrastructures0
+//
 //   Revision 1.4  2005/08/12 20:52:18  jomifred
 //   change in the informAgs method name
 //
@@ -32,7 +35,7 @@
 package jason.control;
 
 import jason.JasonException;
-import jason.architecture.CentralisedAgArch;
+import jason.architecture.AgArch;
 import jason.environment.CentralisedEnvironment;
 
 import java.util.Collection;
@@ -106,7 +109,7 @@ public class CentralisedExecutionControl implements ExecutionControlInterface {
 		synchronized(fEnv.getAgents()) { 
 			Iterator i = fEnv.getAgents().values().iterator();
 			while (i.hasNext()) {
-				CentralisedAgArch ag = (CentralisedAgArch)i.next();
+				AgArch ag = (AgArch)i.next();
 				ag.getTS().receiveSyncSignal();
 			}
 		}

@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.2  2005/10/30 18:37:27  jomifred
+//   change in the AgArch customisation  support (the same customisation is used both to Cent and Saci infrastructures0
+//
 //   Revision 1.1  2005/08/15 17:40:55  jomifred
 //   AgentArchitecture renamed to AgArchInterface
 //
@@ -45,7 +48,7 @@ import java.util.List;
 
 
 /**
- * This interface should be used for defining the overall agent
+ * This interface should be used to define the overall agent
  * architecture; the AS interpreter is only the reasoner (a kind of mind) within such
  * architecture (a kind of body).
  * 

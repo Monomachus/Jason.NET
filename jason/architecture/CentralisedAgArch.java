@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.15  2005/10/30 18:37:27  jomifred
+//   change in the AgArch customisation  support (the same customisation is used both to Cent and Saci infrastructures0
+//
 //   Revision 1.14  2005/08/15 17:41:36  jomifred
 //   AgentArchitecture renamed to AgArchInterface
 //
@@ -40,9 +43,7 @@ package jason.architecture;
 
 import jason.JasonException;
 import jason.asSemantics.ActionExec;
-import jason.asSemantics.Agent;
 import jason.asSemantics.Message;
-import jason.asSemantics.TransitionSystem;
 import jason.asSyntax.Term;
 import jason.control.CentralisedExecutionControl;
 import jason.environment.CentralisedEnvironment;
@@ -64,8 +65,11 @@ public class CentralisedAgArch extends Thread implements AgArchInterface {
 	
 	private CentralisedExecutionControl fControl = null;
 
-	protected TransitionSystem fTS = null;
-
+	//protected TransitionSystem fTS = null;
+	
+	/** the user implementation of the architecture */
+	protected AgArch fUserAgArh;
+	
 	private String agName = "";
     private boolean running = true;
 	
@@ -75,17 +79,18 @@ public class CentralisedAgArch extends Thread implements AgArchInterface {
     	logger = Logger.getLogger(CentralisedAgArch.class.getName()+"."+getAgName());
         // set the agent
         try {
-            String className = null;
+            String archClassName = null;
             if (args.length < 1) { // error
-            	running = false;
-                throw new JasonException("The Agent class name was not informed for the CentralisedAgArch creation!");
+                throw new JasonException("The agent architecture class name was not informed for the CentralisedAgArch creation!");
             } else {
-                className = args[0].trim();
+            	archClassName = args[0].trim();
             }
-            Agent ag = (Agent)Class.forName(className).newInstance();
-            fTS = ag.initAg(args, this);
-    		logger.setLevel(fTS.getSettings().log4JLevel());
+            fUserAgArh = (AgArch)Class.forName(archClassName).newInstance();
+            fUserAgArh.setInfraArch(this);
+            fUserAgArh.initAg(args);
+    		logger.setLevel(fUserAgArh.getTS().getSettings().log4JLevel());
         } catch (Exception e) {
+        	running = false;
         	logger.error("as2j: error creating the agent class! - ",e);
             throw new JasonException("as2j: error creating the agent class! - "+e);
         }
@@ -100,13 +105,16 @@ public class CentralisedAgArch extends Thread implements AgArchInterface {
     	return agName;
     }
     
+    public AgArch getUserAgArch() {
+    	return fUserAgArh;
+    }
+
+    /*
     public void setTS(TransitionSystem ts) {
         this.fTS = ts;
     }
+    */
     
-    public TransitionSystem getTS() {
-    	return fTS;
-    }
 
 	public void setEnv(CentralisedEnvironment env) {
 		fEnv = env;
@@ -125,13 +133,14 @@ public class CentralisedAgArch extends Thread implements AgArchInterface {
     
     private Object syncStopRun = new Object();
     
-    /** stop the agent */
+    /** stops the agent */
     public void stopAg() {
     	running = false;
-    	fTS.receiveSyncSignal(); // in case the agent is wainting .....
+    	fUserAgArh.getTS().receiveSyncSignal(); // in case the agent is wainting .....
     	synchronized(syncStopRun) {
-    		fEnv.delAgent(this);
+    		fEnv.delAgent(fUserAgArh);
     	}
+    	fUserAgArh.stopAg();
     }
 
     public boolean isRunning() {
@@ -141,7 +150,7 @@ public class CentralisedAgArch extends Thread implements AgArchInterface {
     public void run() {
     	synchronized(syncStopRun) {
 	        while (running) {
-	            fTS.reasoningCycle();
+	            fUserAgArh.getTS().reasoningCycle();
 	        }
     	}
     }
@@ -159,7 +168,7 @@ public class CentralisedAgArch extends Thread implements AgArchInterface {
     public void sendMsg(jason.asSemantics.Message m) throws Exception {
     	// suspend intention if it is an ask
     	if (m.isAsk()) {
-            fTS.getC().getPendingActions().put(m.getMsgId(), fTS.getC().getSelectedIntention());    		
+    		fUserAgArh.getTS().getC().getPendingActions().put(m.getMsgId(), fUserAgArh.getTS().getC().getSelectedIntention());    		
     	}
 
     	// actually send the message
@@ -171,15 +180,15 @@ public class CentralisedAgArch extends Thread implements AgArchInterface {
         synchronized (mbox) {
             mbox.add(new Message(m));
         }
-        fEnv.getAgent(m.getReceiver()).fTS.newMessageHasArrived();
+        fEnv.getAgent(m.getReceiver()).getTS().newMessageHasArrived();
     }
 
     public void broadcast(jason.asSemantics.Message m) throws Exception {
     	Iterator i = fEnv.getAgents().values().iterator();
     	while (i.hasNext()) {
-    		CentralisedAgArch ag = (CentralisedAgArch)i.next();
-    		if (! ag.getName().equals(this.getName())) {
-    	        m.setReceiver(ag.getName());
+    		AgArch ag = (AgArch)i.next();
+    		if (! ag.getAgName().equals(this.getAgName())) {
+    	        m.setReceiver(ag.getAgName());
     	        sendMsg(m);
     		}
     	}
@@ -193,7 +202,7 @@ public class CentralisedAgArch extends Thread implements AgArchInterface {
             Iterator i = mbox.iterator();
             while (i.hasNext()) {
                 Message im = (Message)i.next();
-                fTS.getC().getMB().add(im);
+                fUserAgArh.getTS().getC().getMB().add(im);
                 i.remove();
                 logger.info("received message: " + im);
             }
@@ -203,7 +212,7 @@ public class CentralisedAgArch extends Thread implements AgArchInterface {
     // Default acting on the environment
     // it gets action from ts.C.A; 
     public void act() {
-    	ActionExec acExec = fTS.getC().getAction(); 
+    	ActionExec acExec = fUserAgArh.getTS().getC().getAction(); 
         if (acExec == null) {
             return;
         }
@@ -215,7 +224,7 @@ public class CentralisedAgArch extends Thread implements AgArchInterface {
         } else {
             acExec.setResult(false);
         }
-        fTS.getC().getFeedbackActions().add(acExec);
+        fUserAgArh.getTS().getC().getFeedbackActions().add(acExec);
     }
     
     // methods for execution control

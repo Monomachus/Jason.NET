@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.10  2005/10/30 18:39:48  jomifred
+//   change in the AgArch customisation  support (the same customisation is used both to Cent and Saci infrastructures0
+//
 //   Revision 1.9  2005/10/30 16:07:33  jomifred
 //   add comments
 //
@@ -39,7 +42,7 @@
 package jason.environment;
 
 import jason.JasonException;
-import jason.architecture.CentralisedAgArch;
+import jason.architecture.AgArch;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -96,7 +99,7 @@ public class CentralisedEnvironment implements EnvironmentInterface {
     public void informAgsEnvironmentChanged() {
         Iterator i = agents.values().iterator();
         while (i.hasNext()) {
-        	CentralisedAgArch agArch = (CentralisedAgArch)i.next();
+        	AgArch agArch = (AgArch)i.next();
         	agArch.getTS().newMessageHasArrived();
         }
     }
@@ -111,7 +114,7 @@ public class CentralisedEnvironment implements EnvironmentInterface {
             Iterator i = agentsToNotify.iterator();
             while (i.hasNext()) {
                 String agName = i.next().toString();
-                CentralisedAgArch agArch = getAgent(agName);
+                AgArch agArch = getAgent(agName);
                 if (agArch != null) {
                     agArch.getTS().newMessageHasArrived();
                 } else {
@@ -122,17 +125,17 @@ public class CentralisedEnvironment implements EnvironmentInterface {
     }
 
     
-    public void addAgent(CentralisedAgArch agent) {
-        if (mboxes.get(agent.getName()) != null) {
-        	logger.warn("Warning: adding an agent that already exists: "+ agent.getName());
+    public void addAgent(AgArch agent) {
+        if (mboxes.get(agent.getAgName()) != null) {
+        	logger.warn("Warning: adding an agent that already exists: "+ agent.getAgName());
         }
-        mboxes.put(agent.getName(), new LinkedList());
-        agents.put(agent.getName(), agent);
+        mboxes.put(agent.getAgName(), new LinkedList());
+        agents.put(agent.getAgName(), agent);
     }
 
-    public void delAgent(CentralisedAgArch agent) {
-        mboxes.remove(agent.getName());
-        agents.remove(agent.getName());
+    public void delAgent(AgArch agent) {
+        mboxes.remove(agent.getAgName());
+        agents.remove(agent.getAgName());
     }
     
     public List getAgMbox(String name) {
@@ -141,14 +144,14 @@ public class CentralisedEnvironment implements EnvironmentInterface {
     
     /** 
      * returns the agents map, key is the agent name (String) and value 
-     * is the CentralisedAgArch agent object.
+     * is the AgArch agent object.
      */
     public Map getAgents() {
     	return agents;
     }
         
-    public CentralisedAgArch getAgent(String name) {
-        return (CentralisedAgArch)agents.get(name);
+    public AgArch getAgent(String name) {
+        return (AgArch)agents.get(name);
     }
 
 }

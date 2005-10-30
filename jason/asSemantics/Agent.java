@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.18  2005/10/30 18:38:34  jomifred
+//   change in the AgArch customisation  support (the same customisation is used both to Cent and Saci infrastructures0
+//
 //   Revision 1.17  2005/08/23 17:09:28  jomifred
 //   fix bug in logger
 //
@@ -87,25 +90,27 @@ public class Agent {
 	
 	
 	/**
-	 * args[0] is the user Agent class (ignored here)
-	 * args[1] is the AgentSpeak source file
+	 * args[0] is the agent architecture class (ignored here)
+	 * args[1] is the user Agent class (ignored here)
+	 * args[2] is the AgentSpeak source file
+	 * args[3] "options"
+	 * args[4] options
 	 */
     public TransitionSystem initAg(String[] args, AgArchInterface arch) throws JasonException {
         // set the agent
         try {
 			setLogger(arch);
 			String asSource = null;
-			if (args.length < 2) { // error
-				throw new JasonException(
-						"The AgentSpeak source file was not informed, cannot create the Agent!");
+			if (args.length < 3) { // error
+				throw new JasonException("The AgentSpeak source file was not informed, cannot create the Agent!");
 			} else {
-				asSource = args[1].trim();
+				asSource = args[2].trim();
 			}
 			Circumstance C = new Circumstance();
 			Settings setts = new Settings();
-			if (args.length > 2) {
-				if (args[2].equals("options")) {
-					setts.setOptions("[" + args[3] + "]");
+			if (args.length > 3) {
+				if (args[3].equals("options")) {
+					setts.setOptions("[" + args[4] + "]");
 				}
 			}
 			logger.setLevel(setts.log4JLevel());
