@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.12  2005/10/30 16:07:33  jomifred
+//   add comments
+//
 //   Revision 1.11  2005/08/12 22:26:08  jomifred
 //   add cvs keywords
 //
@@ -51,7 +54,7 @@ import java.util.Set;
  * 
  * It is overridden by the user application to define the environment "behaviour".
  * 
- * Execution sequence: 	setJasonEnvironment, init, (getPercept|executeAction)*, stop.
+ * Execution sequence: 	setEnvironmentInfraTier, init, (getPercept|executeAction)*, stop.
  * 
  * <p>An example of interaction:
  * <img src="../../../uml/environmentInteraction.gif" />
@@ -69,7 +72,8 @@ public class Environment {
 	private List oldPercepts = Collections.synchronizedList(new ArrayList());
     private List oldNegPercepts = Collections.synchronizedList(new ArrayList());
 
-	private EnvironmentInterface jasonEnvironment = null;
+    /** the infrastructure tier for environment (Centralised, Saci, ...) */
+	private EnvironmentInterface environmentInfraTier = null;
 
 	// set of agents that already received the last version of perception
 	private Set uptodateAgs = Collections.synchronizedSet(new HashSet());
@@ -86,13 +90,13 @@ public class Environment {
 	
 	
 	/**
-	 * sets the jason part of the environment (saci or centralised)
+	 * sets the infrastructure tier of the environment (saci, centralised, ...)
 	 */
-	protected void setJasonEnvironment(EnvironmentInterface je) {
-		jasonEnvironment = je;
+	protected void setEnvironmentInfraTier(EnvironmentInterface je) {
+		environmentInfraTier = je;
 	}
-	protected EnvironmentInterface getJasonEnvironment() {
-		return jasonEnvironment;
+	protected EnvironmentInterface getEnvironmentInfraTier() {
+		return environmentInfraTier;
 	}
 
     
@@ -100,8 +104,8 @@ public class Environment {
 	 * @see jason.environment.EnvironmentInterface#informAgsEnvironmentChanged(java.util.Collection)
 	 */
     public void informAgsEnvironmentChanged(Collection agents) {
-        if (jasonEnvironment != null) {
-            jasonEnvironment.informAgsEnvironmentChanged(agents);
+        if (environmentInfraTier != null) {
+            environmentInfraTier.informAgsEnvironmentChanged(agents);
         }
     }
 
@@ -109,8 +113,8 @@ public class Environment {
 	 * @see jason.environment.EnvironmentInterface#informAgsEnvironmentChanged()
 	 */
     public void informAgsEnvironmentChanged() {
-        if (jasonEnvironment != null) {
-            jasonEnvironment.informAgsEnvironmentChanged();
+        if (environmentInfraTier != null) {
+            environmentInfraTier.informAgsEnvironmentChanged();
         }
     }
 

@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.5  2005/10/30 16:07:33  jomifred
+//   add comments
+//
 //   Revision 1.4  2005/08/12 22:26:08  jomifred
 //   add cvs keywords
 //
@@ -34,7 +37,8 @@ package jason.environment;
 
 import java.util.Collection;
 
-/** The enviroment interface.
+/** The infrastructure tier interface for Environment.
+ * 
  *  <p>It is implemented by jason to ecapsulate the communication side 
  *  of the distributed/centralised environment, so the user environment can call 
  *  "informAgsEnvironmentChanged" either in centralised or distributed

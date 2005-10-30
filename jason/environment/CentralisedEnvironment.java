@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.9  2005/10/30 16:07:33  jomifred
+//   add comments
+//
 //   Revision 1.8  2005/08/18 20:37:55  jomifred
 //   no message
 //
@@ -49,8 +52,8 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 
 /**
- * This class implements the centralised version of the environment and
- * the agents mailbox.
+ * This class implements the centralised version of the environment tier.
+ * It manages the current agents inside the MAS, their mailboxes, etc.
  */
 
 public class CentralisedEnvironment implements EnvironmentInterface {
@@ -59,6 +62,7 @@ public class CentralisedEnvironment implements EnvironmentInterface {
     private Map mboxes;
     private Map agents;
     
+    /** the user customisation class for the environment */
 	private Environment fUserEnv;
     
     static Logger logger = Logger.getLogger(CentralisedEnvironment.class);
@@ -69,7 +73,7 @@ public class CentralisedEnvironment implements EnvironmentInterface {
         
         try { 
 			fUserEnv = (Environment) getClass().getClassLoader().loadClass(userEnvClassName).newInstance();
-			fUserEnv.setJasonEnvironment(this);
+			fUserEnv.setEnvironmentInfraTier(this);
 			fUserEnv.init(null);
         } catch (Exception e) {
             logger.error("Error in Centralised MAS environment creation",e);
