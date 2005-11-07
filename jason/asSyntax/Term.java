@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.14  2005/11/07 12:43:26  jomifred
+//   add comments
+//
 //   Revision 1.13  2005/08/17 18:19:18  jomifred
 //   change AS grammar (unify lt and la implementation)
 //
@@ -115,7 +118,7 @@ public class Term implements Cloneable, Comparable, Serializable {
 		return getFunctorArity().hashCode();
 	}
 
-	/** returns the i-th term */
+	/** returns the i-th term (first term is 0) */
 	public Term getTerm(int i) {
 		if (terms != null && terms.size() > i) {
 			return (Term)terms.get(i);
