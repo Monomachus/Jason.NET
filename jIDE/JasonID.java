@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.22  2005/11/07 18:35:40  jomifred
+//   no message
+//
 //   Revision 1.21  2005/08/15 13:12:37  jomifred
 //   fix a bug that happens when jason.sh do not change the current directory
 //
@@ -444,7 +447,7 @@ public class JasonID {
         return true;
     }
     
-    void openAllASFiles(Collection files) {
+    synchronized void openAllASFiles(Collection files) {
         // remove files not used anymore
         for (int i = 1; i<tab.getComponentCount(); i++) {
         	ASEditorPane pane = (ASEditorPane) tab.getComponent(i);
