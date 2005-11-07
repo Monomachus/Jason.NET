@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.16  2005/11/07 12:42:23  jomifred
+//   receive message is shown only in debug mode
+//
 //   Revision 1.15  2005/10/30 18:37:27  jomifred
 //   change in the AgArch customisation  support (the same customisation is used both to Cent and Saci infrastructures0
 //
@@ -338,7 +341,7 @@ public class SaciAgArch extends saci.Agent implements AgArchInterface {
                         	im.setInReplyTo(irt);
                         }
                         fUserAgArh.getTS().getC().getMB().add(im);
-                        logger.info("received message: " + im);
+                        logger.debug("received message: " + im);
                     } else {
                         logger.warn("Warning! Message received cannot be handled: "+m);
                     }
