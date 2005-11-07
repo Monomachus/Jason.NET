@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.18  2005/11/07 12:41:31  jomifred
+//   no message
+//
 //   Revision 1.17  2005/10/30 18:39:48  jomifred
 //   change in the AgArch customisation  support (the same customisation is used both to Cent and Saci infrastructures0
 //
@@ -208,8 +211,8 @@ public class RunCentralisedMAS {
                         logger.info("Creating agent "+numberedAg+" ("+(cAg+1)+"/"+qty+") from "+className);
                         CentralisedAgArch agArch = (CentralisedAgArch)Class.forName(className).newInstance();
                         agArch.setAgName(numberedAg);
-                        agArch.initAg(agArgs);
                         agArch.setEnv(env);
+                        agArch.initAg(agArgs);
                         env.addAgent(agArch.getUserAgArch());
                         ags.add(agArch);
                     }
