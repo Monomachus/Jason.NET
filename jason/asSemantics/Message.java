@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.5  2005/11/07 12:43:00  jomifred
+//   Message content can be an object (not string)
+//
 //   Revision 1.4  2005/08/12 22:18:37  jomifred
 //   add cvs keywords
 //
@@ -38,7 +41,7 @@ public class Message {
     String ilForce  = null;
     String sender   = null;
     String receiver = null;
-    String propCont = null;
+    Object propCont = null;
     String msgId    = null;
     String inReplyTo = null;
     //String askVar   = null; // used for 'send(ag1, askOne, value, R)' askVar is R
@@ -81,9 +84,13 @@ public class Message {
 		return ilForce.equals("tell");
 	}
 
-	public String getPropCont() {
+	public void setPropCont(Object o) {
+		propCont = o;
+	}
+	public Object getPropCont() {
 		return propCont;
 	}
+	
 	public String getReceiver() {
 		return receiver;
 	}

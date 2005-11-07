@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.26  2005/11/07 12:43:00  jomifred
+//   Message content can be an object (not string)
+//
 //   Revision 1.25  2005/10/19 15:57:49  bordini
 //   as last log, just had forgotten to add .clone() in saving the Trigger.
 //
@@ -207,14 +210,14 @@ public class TransitionSystem {
 				// the send that put the intention in Pending state was something like
 				//  .send(ask, ag1, value, X)
 				// if the answer was 3, unifies X=3
-            	Term ans = Term.parse(m.getPropCont());
+            	Term ans = Term.parse(m.getPropCont().toString());
             	BodyLiteral send = (BodyLiteral)intention.peek().getPlan().getBody().remove(0);
             	intention.peek().getUnif().unifies(send.getLiteral().getTerm(3),ans);
 				getC().getIntentions().add(intention);
                 
             // the message is not an ask answer
             } else if (conf.ag.socAcc(m)) {
-				Term content = Term.parse(m.getPropCont());
+				Term content = Term.parse(m.getPropCont().toString());
 				
 				//Literal content = Literal.parseLiteral(m.getPropCont());
 				//content.addAnnot(Term.parse("source("+m.getSender()+")")); 
