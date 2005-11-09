@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.18  2005/11/09 22:38:53  jomifred
+//   fixed bug
+//
 //   Revision 1.17  2005/10/29 21:46:22  jomifred
 //   add a new class (MAS2JProject) to store information parsed by the mas2j parser. This new class also create the project scripts
 //
@@ -107,6 +110,9 @@ class RunMAS extends AbstractAction {
 					// compile some files
 					CompileThread compT = new CompileThread(jasonID.fMAS2jThread.fCurrentProject.getAllUserJavaFiles());
 					compT.start();
+					if (masRunner != null) {
+						masRunner.stopRunner();
+					}
 
 					if (jasonID.fMAS2jThread.fCurrentProject.getArchitecture().equals("Centralised")) {
 						if (jasonID.getConf().getProperty("runCentralisedInsideJIDE").equals("true")) {
