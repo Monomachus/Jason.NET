@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.19  2005/11/09 23:37:19  jomifred
+//   fixed bug
+//
 //   Revision 1.18  2005/11/09 22:38:53  jomifred
 //   fixed bug
 //
@@ -407,8 +410,8 @@ class RunMAS extends AbstractAction {
 
 	
 	class MASRunnerInsideJIDE extends MASRunner {
-		Method getRunnerMethod;
-		Method finishMethod;
+		Method getRunnerMethod = null;
+		Method finishMethod = null;
 		
 		MASRunnerInsideJIDE(CompileThread t) {
 			super(t);
@@ -417,7 +420,9 @@ class RunMAS extends AbstractAction {
 		void stopRunner() {
 			try {
 				//RunCentralisedMAS.getRunner().finish();
-				finishMethod.invoke(getRunnerMethod.invoke(null,null),null);
+				if (getRunnerMethod != null && finishMethod != null) {
+					finishMethod.invoke(getRunnerMethod.invoke(null,null),null);
+				}
 			} catch (Exception e) {
 				System.err.println("Execution error: " + e);
 				e.printStackTrace();
@@ -466,6 +471,8 @@ class RunMAS extends AbstractAction {
 				jasonID.runMASButton.setEnabled(true);
 				jasonID.debugMASButton.setEnabled(true);
 				jasonID.stopMASButton.setEnabled(false);				
+				getRunnerMethod = null;
+				finishMethod = null;
 			}
 		}
 	}
