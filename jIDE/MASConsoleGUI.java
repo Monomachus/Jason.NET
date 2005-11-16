@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.11  2005/11/16 18:35:25  jomifred
+//   fixed the print(int) on console bug
+//
 //   Revision 1.10  2005/09/20 16:59:14  jomifred
 //   do not use MASConsole when the logger in Console (and so, do not need an X11)
 //
@@ -184,13 +187,49 @@ public class MASConsoleGUI  {
         MyOutputStream() {
             super(System.out);
         }
-        public void print(String s) {
-			append(s);
+        public void print(Object s) {
+			append(s.toString());
         }
-        public void println(String s) {
+        public void println(Object s) {
             append(s+"\n");
         }
-        public void println() {
+        public void print(boolean arg) {
+        	append(arg+"");
+		}
+		public void print(char arg0) {
+			append(arg0+"");
+		}
+		public void print(double arg0) {
+			append(arg0+"");
+		}
+		public void print(float arg0) {
+			append(arg0+"");
+		}
+		public void print(int arg0) {
+			append(arg0+"");
+		}
+		public void print(long arg0) {
+			append(arg0+"");
+		}
+		public void println(boolean arg0) {
+			append(arg0+"\n");
+		}
+		public void println(char arg0) {
+			append(arg0+"\n");
+		}
+		public void println(double arg0) {
+			append(arg0+"\n");
+		}
+		public void println(float arg0) {
+			append(arg0+"\n");
+		}
+		public void println(int arg0) {
+			append(arg0+"\n");
+		}
+		public void println(long arg0) {
+			append(arg0+"\n");
+		}
+		public void println() {
             append("\n");
         }
     }

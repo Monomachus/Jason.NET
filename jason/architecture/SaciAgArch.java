@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.17  2005/11/16 18:35:25  jomifred
+//   fixed the print(int) on console bug
+//
 //   Revision 1.16  2005/11/07 12:42:23  jomifred
 //   receive message is shown only in debug mode
 //
@@ -195,6 +198,9 @@ public class SaciAgArch extends saci.Agent implements AgArchInterface {
     public void stopAg() {
         super.stopAg();
         mboxPercept.disconnect();
+        if (MASConsoleGUI.hasConsole()) { // the logger created the MASConsole
+        	MASConsoleGUI.get().close();
+        }
     }
     
     public void run() {

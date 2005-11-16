@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.19  2005/11/16 18:35:25  jomifred
+//   fixed the print(int) on console bug
+//
 //   Revision 1.18  2005/11/07 12:41:31  jomifred
 //   no message
 //
@@ -141,6 +144,7 @@ public class RunCentralisedMAS {
 		            }
 		        });
 		        MASConsoleGUI.get().addButton(btPause);
+		        MASConsoleGUI.get().setAsDefaultOut();
 	        }
 	        
 	        if (! runner.insideJIDE) {
