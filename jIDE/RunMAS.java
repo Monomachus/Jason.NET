@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.21  2005/11/17 20:14:44  jomifred
+//   no message
+//
 //   Revision 1.20  2005/11/17 20:11:50  jomifred
 //   fix a bug in openning a project
 //
@@ -146,13 +149,6 @@ class RunMAS extends AbstractAction {
 			masRunner.stopRunner();
 		}
 		masRunner = null;
-	}
-
-	void exitJason() {
-		stopMAS();
-		//if (saciProcess != null) { // i've created saci
-		//	stopSaci();
-		//}
 	}
 
 

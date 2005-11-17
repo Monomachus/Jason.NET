@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.24  2005/11/17 20:14:44  jomifred
+//   no message
+//
 //   Revision 1.23  2005/11/17 20:11:50  jomifred
 //   fix a bug in openning a project
 //
@@ -971,7 +974,7 @@ public class JasonID {
         
         public void actionPerformed(ActionEvent e) {
             if (checkNeedsSave()) {
-                runMASAct.exitJason();
+                runMASAct.stopMAS();
                 System.exit(0);
             }
         }
