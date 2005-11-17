@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.13  2005/11/17 20:11:50  jomifred
+//   fix a bug in openning a project
+//
 //   Revision 1.12  2005/08/12 21:08:23  jomifred
 //   add cvs keywords
 //
@@ -136,7 +139,7 @@ public class ASParserThread extends Thread {
             			}
             		}
 
-            		// error is defined by las token
+            		// error is defined by last token
             		fErrorLine = ex.currentToken.beginLine;
             		if (fErrorLine == 0) { // first token problem
             			fErrorLine = 1;
@@ -225,10 +228,10 @@ public class ASParserThread extends Thread {
     public void run() {
         createParser();
         while (!fStop) {
+        	parse();
             if (!fStop) {
-                parse();
+            	waitSomeTime();
             }
-            waitSomeTime();
         }
     }
 }

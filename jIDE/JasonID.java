@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.23  2005/11/17 20:11:50  jomifred
+//   fix a bug in openning a project
+//
 //   Revision 1.22  2005/11/07 18:35:40  jomifred
 //   no message
 //
@@ -412,13 +415,15 @@ public class JasonID {
     void stopThreads() {
     	if (fMAS2jThread != null) {
     		fMAS2jThread.stopParser();
-        	while (fMAS2jThread.isAlive()) { // wait it ends
+    		int i = 0;
+        	while (fMAS2jThread.isAlive() && i < 2000) { // wait it ends
         		try { Thread.sleep(10); } catch (Exception e) {}
         	}
     	}
     	if (fASParser != null) {
     		fASParser.stopParser();
-        	while (fASParser.isAlive()) { // wait it ends
+    		int i = 0;
+        	while (fASParser.isAlive() && i < 2000) { // wait it ends
         		try { Thread.sleep(10); } catch (Exception e) {}
         	}
     	}
@@ -812,17 +817,23 @@ public class JasonID {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            stopThreads();
-            output.setText("");
-            mas2jPane = new MAS2JEditorPane(JasonID.this);
-            mas2jPane.setFileName(f);
-            tab.removeAll();
-            tab.add(f.getName(), mas2jPane);
-            load(f, mas2jPane);
-        	updateTabTitle(0, mas2jPane, null);            
-            startThreads();
-            fMAS2jThread.waitCompilation();
-            fMAS2jThread.stopWaiting();
+            try {
+            	runMASButton.setEnabled(false);
+            	debugMASButton.setEnabled(false);
+
+            	stopThreads();
+	            output.setText("");
+	            mas2jPane = new MAS2JEditorPane(JasonID.this);
+	            mas2jPane.setFileName(f);
+	            tab.removeAll();
+	            tab.add(f.getName(), mas2jPane);
+	            load(f, mas2jPane);
+	            updateTabTitle(0, mas2jPane, null);            
+	            startThreads();
+            } finally {
+            	runMASButton.setEnabled(true);
+            	debugMASButton.setEnabled(true);
+            }
         }
         
         void load(File f, ASEditorPane pane) {
@@ -847,15 +858,12 @@ public class JasonID {
                 pane.modified = false;
             } catch (FileNotFoundException ex) {
 				System.err.println("File "+f+" does not exists; it will be created!");
-			 } catch (java.io.IOException e) {
+            } catch (java.io.IOException e) {
             	System.err.println("I/O error for "+f+" -- "+e.getMessage());
                 e.printStackTrace();
             } catch (BadLocationException e) {
             	System.err.println("BadLocationException error for "+f+" -- "+e.getMessage());
                 e.printStackTrace();
-            } finally {
-            	runMASButton.setEnabled(true);
-            	debugMASButton.setEnabled(true);
             }
         }
     }

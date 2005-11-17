@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.20  2005/11/17 20:11:50  jomifred
+//   fix a bug in openning a project
+//
 //   Revision 1.19  2005/11/09 23:37:19  jomifred
 //   fixed bug
 //
@@ -102,38 +105,36 @@ class RunMAS extends AbstractAction {
 			}
 			
 			
-			boolean ok = jasonID.fMAS2jThread.foregroundCompile();
-			if (ok) {
-				jasonID.openAllASFiles(jasonID.fMAS2jThread.fCurrentProject.getAllASFiles());
-				ok = jasonID.fASParser.foregroundCompile();
-				if (ok) {
-					jasonID.runMASButton.setEnabled(false);
-					jasonID.debugMASButton.setEnabled(false);
+			if (jasonID.fMAS2jThread.foregroundCompile() &&
+				jasonID.fASParser.foregroundCompile()) {
+				
+				// the foregroun do it. jasonID.openAllASFiles(jasonID.fMAS2jThread.fCurrentProject.getAllASFiles());
+				jasonID.runMASButton.setEnabled(false);
+				jasonID.debugMASButton.setEnabled(false);
 
-					// compile some files
-					CompileThread compT = new CompileThread(jasonID.fMAS2jThread.fCurrentProject.getAllUserJavaFiles());
-					compT.start();
-					if (masRunner != null) {
-						masRunner.stopRunner();
-					}
-
-					if (jasonID.fMAS2jThread.fCurrentProject.getArchitecture().equals("Centralised")) {
-						if (jasonID.getConf().getProperty("runCentralisedInsideJIDE").equals("true")) {
-							masRunner = new MASRunnerInsideJIDE(compT);
-						} else {
-							masRunner = new MASRunnerCentralised(compT);
-						}
-					} else if (jasonID.fMAS2jThread.fCurrentProject.getArchitecture().equals("Saci")) {
-						String saciJar = jasonID.getConf().getProperty("saciJar");
-						if (JasonID.checkJar(saciJar)) {
-							masRunner = new MASRunnerSaci(compT);
-						} else {
-							System.err.println("The path to the saci.jar file ("+saciJar+") was not correctly set. Go to menu Edit->Preferences to configure the path.");
-							return;
-						}
-					}
-					masRunner.start();
+				// compile some files
+				CompileThread compT = new CompileThread(jasonID.fMAS2jThread.fCurrentProject.getAllUserJavaFiles());
+				compT.start();
+				if (masRunner != null) {
+					masRunner.stopRunner();
 				}
+
+				if (jasonID.fMAS2jThread.fCurrentProject.getArchitecture().equals("Centralised")) {
+					if (jasonID.getConf().getProperty("runCentralisedInsideJIDE").equals("true")) {
+						masRunner = new MASRunnerInsideJIDE(compT);
+					} else {
+						masRunner = new MASRunnerCentralised(compT);
+					}
+				} else if (jasonID.fMAS2jThread.fCurrentProject.getArchitecture().equals("Saci")) {
+					String saciJar = jasonID.getConf().getProperty("saciJar");
+					if (JasonID.checkJar(saciJar)) {
+						masRunner = new MASRunnerSaci(compT);
+					} else {
+						System.err.println("The path to the saci.jar file ("+saciJar+") was not correctly set. Go to menu Edit->Preferences to configure the path.");
+						return;
+					}
+				}
+				masRunner.start();
 			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -534,6 +535,7 @@ class RunMAS extends AbstractAction {
 			if (start) {
 				sStart = " start "; 
 			}
+			// TODO: get comspec env. variable
 			return "cmd /c " + sStart + scriptName + ".bat";
 		} else {
 			return "/bin/sh " + scriptName + ".sh";
