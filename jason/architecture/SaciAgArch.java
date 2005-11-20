@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.18  2005/11/20 16:53:17  jomifred
+//   the canSleep method in TS asks the agent arch if it can sleep.
+//
 //   Revision 1.17  2005/11/16 18:35:25  jomifred
 //   fixed the print(int) on console bug
 //
@@ -381,6 +384,15 @@ public class SaciAgArch extends saci.Agent implements AgArchInterface {
         } catch (Exception e) {
         	logger.error("Error sending action "+ ts.getC().getAction(),e);
         }
+    }
+
+    
+    public boolean canSleep() {
+    	try {
+    		return getMBox().getMessages(null, 1, 0, false).size() == 0;
+    	} catch (Exception e) {
+    		return true;
+    	}
     }
 
     private static Message cycleFinished = new Message("(tell :receiver controller :ontology AS-ExecControl :content cycleFinished)");

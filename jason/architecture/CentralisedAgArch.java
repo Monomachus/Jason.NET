@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.17  2005/11/20 16:53:17  jomifred
+//   the canSleep method in TS asks the agent arch if it can sleep.
+//
 //   Revision 1.16  2005/11/07 12:42:23  jomifred
 //   receive message is shown only in debug mode
 //
@@ -229,6 +232,12 @@ public class CentralisedAgArch extends Thread implements AgArchInterface {
         }
         fUserAgArh.getTS().getC().getFeedbackActions().add(acExec);
     }
+    
+    public boolean canSleep() {
+        List mbox = (List)fEnv.getAgMbox(getName());
+        return mbox.size() == 0;
+    }
+    
     
     // methods for execution control
 

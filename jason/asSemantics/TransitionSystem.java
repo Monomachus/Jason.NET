@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.27  2005/11/20 16:53:16  jomifred
+//   the canSleep method in TS asks the agent arch if it can sleep.
+//
 //   Revision 1.26  2005/11/07 12:43:00  jomifred
 //   Message content can be an object (not string)
 //
@@ -462,6 +465,15 @@ public class TransitionSystem {
 	static Class classParameters[] = { jason.asSemantics.TransitionSystem.class, jason.asSemantics.Unifier.class, (new String[3]).getClass() };
 	private Map agInternalAction = new HashMap(); // this agent internal actions (key->IA'name, value->InternalAction object)
 	
+	public InternalAction getIA(String iaName) throws Exception {
+		InternalAction objIA = (InternalAction)agInternalAction.get(iaName);
+		if (objIA == null) {
+			objIA = (InternalAction)Class.forName(iaName).newInstance();
+			agInternalAction.put(iaName, objIA);
+		}
+		return objIA;
+	}
+	
 	public boolean execInternalAction(Term action, Unifier un) throws JasonException {
 		String name = action.getFunctor();
 		if (name.indexOf('.') == 0)
@@ -470,13 +482,16 @@ public class TransitionSystem {
 		// if it implements InternalAction
 		try {
 			// check if  the agent already has this InternalAction object
-			InternalAction objIA = (InternalAction)agInternalAction.get(name);
+			//InternalAction objIA = ;
+			/*
+			(InternalAction)agInternalAction.get(name);
 			if (objIA == null) {
 				objIA = (InternalAction)Class.forName(name).newInstance();
 				agInternalAction.put(name, objIA);
 			}
+			*/
 			// calls execute
-			return objIA.execute(this, un, action.getTermsArray());
+			return getIA(name).execute(this, un, action.getTermsArray());
 			
 		} catch (ClassNotFoundException e) {
 			logger.error("Error in IA ",e);
@@ -798,16 +813,13 @@ public class TransitionSystem {
 	/** ********************************************************************* */
 
 	boolean canSleep() {
-		if (conf.C.E.isEmpty() && conf.C.I.isEmpty() && conf.C.MB.isEmpty()
-				&& conf.C.FA.isEmpty())
-			return true;
-		else
-			return false;
+		return conf.C.E.isEmpty() && conf.C.I.isEmpty() && conf.C.MB.isEmpty() && conf.C.FA.isEmpty() && agArch.canSleep();
 	}
 
 	/** waits for a new message */
 	synchronized private void waitMessage() {
 		try {
+			logger.debug("Waiting message....");
 			wait(500); // wait for messages
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -868,11 +880,12 @@ public class TransitionSystem {
 				waitSyncSignal();
 			} else if (canSleep()) {
 				// changed here: now conditinal on NRCSLBR
-				if(nrcslbr <= 1)
+				if (nrcslbr <= 1)
 					waitMessage();
 			}
 			
 			C.reset();
+
 
 			if (nrcslbr >= setts.nrcbp() || canSleep()) {
 				nrcslbr = 0;

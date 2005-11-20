@@ -22,6 +22,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.2  2005/11/20 16:53:17  jomifred
+//   the canSleep method in TS asks the agent arch if it can sleep.
+//
 //   Revision 1.1  2005/10/30 18:37:27  jomifred
 //   change in the AgArch customisation  support (the same customisation is used both to Cent and Saci infrastructures0
 //
@@ -108,6 +111,10 @@ public class AgArch implements AgArchInterface {
 	public void act() {
 		archTier.act();
 	}
+
+	public boolean canSleep() {
+		return archTier.canSleep();
+    }
 
     /** gets the agent's name */
 	public String getAgName() {
