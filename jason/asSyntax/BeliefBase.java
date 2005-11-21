@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.9  2005/11/21 19:09:11  jomifred
+//   added method remove-all-with-functor/arity
+//
 //   Revision 1.8  2005/09/26 11:45:45  jomifred
 //   fix bug with source add/remove
 //
@@ -225,6 +228,22 @@ public class BeliefBase {
 		} else {
 			return false;
 		}
+	}
+	
+	/** remove all believes with the same functor/arity than <i>l</i> */
+	public boolean removeAll(Literal l) {
+		boolean result = false;
+		List all = getRelevant(l);
+		if (all != null) {
+			Iterator i = all.iterator();
+			while (i.hasNext()) {
+				if (((Literal)i.next()).getFunctor().equals(l.getFunctor())) {
+					i.remove();
+					result = true;
+				}
+			}
+		}		
+		return result;
 	}
 
 	/*
