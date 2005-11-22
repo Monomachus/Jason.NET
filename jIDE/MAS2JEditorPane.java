@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.8  2005/11/22 00:05:32  jomifred
+//   no message
+//
 //   Revision 1.7  2005/08/23 17:10:32  jomifred
 //   change architecture to infrastructure in the initial empty project
 //
@@ -38,13 +41,12 @@ package jIDE;
 public class MAS2JEditorPane extends ASEditorPane {
     
     public MAS2JEditorPane(JasonID mainID) {
-        super(mainID,0);
+        super(mainID, 0);
         extension   = "mas2j";
     }
     
-	void createSyntaxHighlightThread() {
+	void createSyntaxHighlight() {
 		syntaxHL = new MAS2JSyntaxHighLight(editor, this.mainID);
-		//syntaxThread.start();
 	}
     
 	String getDefaultText(String s) {

@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.12  2005/11/22 00:05:32  jomifred
+//   no message
+//
 //   Revision 1.11  2005/10/29 21:46:22  jomifred
 //   add a new class (MAS2JProject) to store information parsed by the mas2j parser. This new class also create the project scripts
 //
@@ -73,7 +76,7 @@ public class MAS2JParserThread extends ASParserThread { //Thread {
     void parse() {
         // compile
         try {
-        	if (! fJasonID.mas2jPane.needsParsing) {
+        	if (!fJasonID.mas2jPane.needsParsing && !fForegroundCompilation) {
         		return;
         	}
             fOk = false;
@@ -144,6 +147,7 @@ public class MAS2JParserThread extends ASParserThread { //Thread {
     }
     
     synchronized public boolean foregroundCompile() {
+    	waitCompilation(); // waits the eventual running parsing
         fForegroundCompilation = true;
         fJasonID.mas2jPane.needsParsing = true;
         fCompilationDone = false; // it is necessary here!

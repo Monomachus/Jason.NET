@@ -23,14 +23,12 @@
 //   $Date$
 //   $Revision$
 //   $Log$
-//   Revision 1.24  2005/11/17 20:14:44  jomifred
+//   Revision 1.25  2005/11/22 00:05:32  jomifred
 //   no message
+//
 //
 //   Revision 1.23  2005/11/17 20:11:50  jomifred
 //   fix a bug in openning a project
-//
-//   Revision 1.22  2005/11/07 18:35:40  jomifred
-//   no message
 //
 //   Revision 1.21  2005/08/15 13:12:37  jomifred
 //   fix a bug that happens when jason.sh do not change the current directory
@@ -64,7 +62,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.io.PrintStream;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Properties;
@@ -100,6 +97,7 @@ import javax.swing.text.Document;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
+/** The main class of the Jason IDE */
 public class JasonID {
     
     JFrame frame = null;
@@ -119,11 +117,10 @@ public class JasonID {
     
     String projectDirectory = "";
 
+    OutputStreamAdapter myOut;
+    
     static Properties userProperties = new Properties();
-    
-    PrintStream originalOut;
-    PrintStream originalErr;
-    
+
     AbstractAction newAct;
     OpenProject    openAct;
     Save           saveAct;
@@ -423,6 +420,7 @@ public class JasonID {
         		try { Thread.sleep(10); } catch (Exception e) {}
         	}
     	}
+    	fMAS2jThread = null;
     	if (fASParser != null) {
     		fASParser.stopParser();
     		int i = 0;
@@ -430,6 +428,7 @@ public class JasonID {
         		try { Thread.sleep(10); } catch (Exception e) {}
         	}
     	}
+    	fASParser = null;
     }
     
     protected boolean checkNeedsSave() {
@@ -520,29 +519,10 @@ public class JasonID {
         output.setEditable(false);
         //output.setEnabled(false);
         JScrollPane scroller = new JScrollPane(output);
-        MyOutputStream out = new MyOutputStream();
-        originalOut = System.out;
-        originalErr = System.err;
-        System.setOut(out);
-        System.setErr(out);
+        myOut = new OutputStreamAdapter(null, output);
+        myOut.setAsDefaultOut();
         return scroller;
     }
-    
-    
-    class MyOutputStream extends java.io.PrintStream {
-        MyOutputStream() {
-            super(System.out);
-        }
-        public void print(String s) {
-			output.append(s);
-			output.setCaretPosition(output.getDocument().getLength());
-        }
-        public void println(String s) {
-			output.append(s+"\n");
-			output.setCaretPosition(output.getDocument().getLength());
-        }
-    }
-    
     
     protected JToolBar createToolBar() {
         toolBar = new JToolBar();
@@ -686,17 +666,17 @@ public class JasonID {
     
     
     protected void updateTabTitle(int index, ASEditorPane pane, String error) {
-        String title = "";
-        if (pane.getFileName().length() > 0) {
-            title = pane.getFileName() + "." + pane.extension;
-        }
-        if (pane.modified) {
-            title += " [*]";
-        }
-        if (error != null) {
-            title += " "+error;
-        }
         if (index < tab.getTabCount()) {
+	        String title = "";
+	        if (pane.getFileName().length() > 0) {
+	            title = pane.getFileName() + "." + pane.extension;
+	        }
+	        if (pane.modified) {
+	            title += " [*]";
+	        }
+	        if (error != null) {
+	            title += " "+error;
+	        }
             tab.setTitleAt(index, title);
         }
     }
@@ -826,13 +806,18 @@ public class JasonID {
 
             	stopThreads();
 	            output.setText("");
-	            mas2jPane = new MAS2JEditorPane(JasonID.this);
-	            mas2jPane.setFileName(f);
+            	System.out.println("* thread paradas");
 	            tab.removeAll();
+	            mas2jPane = new MAS2JEditorPane(JasonID.this);
+            	System.out.println("* criado mas2j");
+	            mas2jPane.setFileName(f);
 	            tab.add(f.getName(), mas2jPane);
 	            load(f, mas2jPane);
-	            updateTabTitle(0, mas2jPane, null);            
+            	System.out.println("* lido arquivo");
+	            updateTabTitle(0, mas2jPane, null);
+	            System.out.println("* Tudo carregado");
 	            startThreads();
+	            System.out.println("* novas thread iniciadas");
             } finally {
             	runMASButton.setEnabled(true);
             	debugMASButton.setEnabled(true);
@@ -843,6 +828,7 @@ public class JasonID {
             try {
                 pane.createNewPlainText("");
                 pane.needsParsing = false;
+                pane.modified = false;
                 Document doc = pane.editor.getDocument();
                 //status.progress.setMinimum(0);
                 //status.progress.setMaximum((int) f.length());

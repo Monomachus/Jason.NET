@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.12  2005/11/22 00:05:32  jomifred
+//   no message
+//
 //   Revision 1.11  2005/11/16 18:35:25  jomifred
 //   fixed the print(int) on console bug
 //
@@ -45,7 +48,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.PrintStream;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -53,7 +55,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
-/** runs a MAS */
+/** the GUI console to output log messages  */
 public class MASConsoleGUI  {
     
     private static MASConsoleGUI masConsole = null;
@@ -81,9 +83,8 @@ public class MASConsoleGUI  {
     JFrame frame = null;
     JTextArea output;
     JPanel    pBt = null;
-    PrintStream originalOut = null;
-    PrintStream originalErr = null;
-
+    OutputStreamAdapter out;
+    
     private boolean inPause = false; 
     
     private MASConsoleGUI(String title, final RunMAS runMAS) {
@@ -164,74 +165,14 @@ public class MASConsoleGUI  {
     
     public void close() {
     	if (masConsole == null) return;
-    	
         masConsole.frame.dispose();
-        if (masConsole.originalOut != null) {
-            System.setOut(masConsole.originalOut);
-        }
-        if (masConsole.originalErr != null) {
-            System.setOut(masConsole.originalErr);
-        }
+        out.restoreOriginalOut();
         masConsole = null;
     }
     
     public void setAsDefaultOut() {
-        MyOutputStream out = new MyOutputStream();
-        originalOut = System.out;
-        originalErr = System.err;
-        System.setOut(out);
-        System.setErr(out);
-    }
-    
-    class MyOutputStream extends PrintStream {
-        MyOutputStream() {
-            super(System.out);
-        }
-        public void print(Object s) {
-			append(s.toString());
-        }
-        public void println(Object s) {
-            append(s+"\n");
-        }
-        public void print(boolean arg) {
-        	append(arg+"");
-		}
-		public void print(char arg0) {
-			append(arg0+"");
-		}
-		public void print(double arg0) {
-			append(arg0+"");
-		}
-		public void print(float arg0) {
-			append(arg0+"");
-		}
-		public void print(int arg0) {
-			append(arg0+"");
-		}
-		public void print(long arg0) {
-			append(arg0+"");
-		}
-		public void println(boolean arg0) {
-			append(arg0+"\n");
-		}
-		public void println(char arg0) {
-			append(arg0+"\n");
-		}
-		public void println(double arg0) {
-			append(arg0+"\n");
-		}
-		public void println(float arg0) {
-			append(arg0+"\n");
-		}
-		public void println(int arg0) {
-			append(arg0+"\n");
-		}
-		public void println(long arg0) {
-			append(arg0+"\n");
-		}
-		public void println() {
-            append("\n");
-        }
+        out = new OutputStreamAdapter(this, null);
+        out.setAsDefaultOut();
     }
     
 }

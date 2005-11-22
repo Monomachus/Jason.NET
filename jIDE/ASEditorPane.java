@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.9  2005/11/22 00:05:32  jomifred
+//   no message
+//
 //   Revision 1.8  2005/09/26 11:44:56  jomifred
 //   fix TAB problem with syntax highlight
 //
@@ -70,7 +73,6 @@ import javax.swing.text.StyledDocument;
 import javax.swing.text.StyledEditorKit;
 import javax.swing.text.View;
 import javax.swing.text.ViewFactory;
-import javax.swing.text.DocumentFilter.FilterBypass;
 import javax.swing.undo.UndoManager;
 
 class ASEditorPane extends JPanel {
@@ -106,11 +108,11 @@ class ASEditorPane extends JPanel {
 		editorScroller.getViewport().add(editor);
 		setLayout(new BorderLayout());
 		add(BorderLayout.CENTER, editorScroller);
-		createSyntaxHighlightThread();
+		createSyntaxHighlight();
 		updateFont();
 	}
 	
-	void createSyntaxHighlightThread() {
+	void createSyntaxHighlight() {
 		syntaxHL = new ASSyntaxHighLight(editor, mainID);
 		//syntaxThread.start();
 	}
@@ -342,6 +344,7 @@ class ASEditorPane extends JPanel {
 			 */
 			public void undoableEditHappened(UndoableEditEvent e) {
 				if (!e.getEdit().getPresentationName().startsWith("style")) {
+					//System.out.println(e.getEdit().getPresentationName()+"*"+e.getEdit()+"-"+e.getSource());
 					undo.addEdit(e.getEdit());
 				}
 			}

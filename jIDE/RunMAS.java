@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.22  2005/11/22 00:05:32  jomifred
+//   no message
+//
 //   Revision 1.21  2005/11/17 20:14:44  jomifred
 //   no message
 //
@@ -168,7 +171,7 @@ class RunMAS extends AbstractAction {
 			PrintStream err = System.err;
 			Launcher l = null;
 			try {
-				System.setErr(jasonID.originalErr);
+				System.setErr(jasonID.myOut.originalErr);
 				l = LauncherD.getLauncher();
 				return l;
 			} catch (Exception e) {

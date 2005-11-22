@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.14  2005/11/22 00:05:32  jomifred
+//   no message
+//
 //   Revision 1.13  2005/11/17 20:11:50  jomifred
 //   fix a bug in openning a project
 //
@@ -189,7 +192,7 @@ public class ASParserThread extends Thread {
     
     synchronized void waitSomeTime() {
         try {
-            wait(5000); // waits 2 seconds
+            wait(5000); // waits 5 seconds
         } catch (Exception e) { }
     }
     
@@ -197,7 +200,7 @@ public class ASParserThread extends Thread {
     	int trycount = 0;
         while (!fCompilationDone && trycount < 10) {
             try {
-                wait(500); // waits 1/2 seconds
+                wait(200); // waits some time
                 trycount++;
             } catch (Exception e) { }
         }
@@ -212,6 +215,7 @@ public class ASParserThread extends Thread {
     }
     
     synchronized public boolean foregroundCompile() {
+    	waitCompilation(); // waits the eventual running parsing
         fForegroundCompilation = true;
         fCompilationDone = false;
         stopWaiting(); // wakeup this thread
