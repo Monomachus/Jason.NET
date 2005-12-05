@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.6  2005/12/05 16:04:47  jomifred
+//   Message content can be object
+//
 //   Revision 1.5  2005/11/07 12:43:00  jomifred
 //   Message content can be an object (not string)
 //
@@ -51,11 +54,11 @@ public class Message {
     public Message() {
     }
 
-    public Message(String ilf, String s, String r, String c) {
+    public Message(String ilf, String s, String r, Object c) {
     	this(ilf, s, r, c, "mid"+(idCount++));
     }
     
-    public Message(String ilf, String s, String r, String c, String id) {
+    public Message(String ilf, String s, String r, Object c, String id) {
         ilForce  = ilf;
         sender   = s;
         receiver = r;

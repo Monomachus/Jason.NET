@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.10  2005/12/05 16:04:47  jomifred
+//   Message content can be object
+//
 //   Revision 1.9  2005/11/22 00:05:32  jomifred
 //   no message
 //
@@ -215,13 +218,13 @@ class ASEditorPane extends JPanel {
 					if (mainID.fMAS2jThread != null) {
 						mainID.fMAS2jThread.stopWaiting();
 					}
-				}
 
-				if (!mainID.runMASButton.isEnabled()) {
-					mainID.runMASButton.setEnabled(true);
-				}
-				if (!mainID.debugMASButton.isEnabled()) {
-					mainID.debugMASButton.setEnabled(true);
+					if (!mainID.runMASButton.isEnabled()) {
+						mainID.runMASButton.setEnabled(true);
+					}
+					if (!mainID.debugMASButton.isEnabled()) {
+						mainID.debugMASButton.setEnabled(true);
+					}
 				}
 			}
 		});

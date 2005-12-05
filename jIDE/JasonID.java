@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.26  2005/12/05 16:04:47  jomifred
+//   Message content can be object
+//
 //   Revision 1.25  2005/11/22 00:05:32  jomifred
 //   no message
 //
@@ -806,18 +809,18 @@ public class JasonID {
 
             	stopThreads();
 	            output.setText("");
-            	System.out.println("* thread paradas");
+	            //System.out.println("* thread paradas");
 	            tab.removeAll();
 	            mas2jPane = new MAS2JEditorPane(JasonID.this);
-            	System.out.println("* criado mas2j");
+            	//System.out.println("* criado mas2j");
 	            mas2jPane.setFileName(f);
 	            tab.add(f.getName(), mas2jPane);
 	            load(f, mas2jPane);
-            	System.out.println("* lido arquivo");
+	            //System.out.println("* lido arquivo");
 	            updateTabTitle(0, mas2jPane, null);
-	            System.out.println("* Tudo carregado");
+	            //System.out.println("* Tudo carregado");
 	            startThreads();
-	            System.out.println("* novas thread iniciadas");
+	            //System.out.println("* novas thread iniciadas");
             } finally {
             	runMASButton.setEnabled(true);
             	debugMASButton.setEnabled(true);

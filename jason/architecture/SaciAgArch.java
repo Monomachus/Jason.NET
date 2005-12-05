@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.19  2005/12/05 16:04:47  jomifred
+//   Message content can be object
+//
 //   Revision 1.18  2005/11/20 16:53:17  jomifred
 //   the canSleep method in TS asks the agent arch if it can sleep.
 //
@@ -328,32 +331,42 @@ public class SaciAgArch extends saci.Agent implements AgArchInterface {
             	logger.error("Error receiving message.",e);
             }
             if (m != null) {
+            	if (logger.isDebugEnabled()) {
+            		logger.debug("Received message: " + m + ". Content class is "+m.get("content").getClass().getName());
+            	}
                 String ilForce   = (String)m.get("performative");
                 String sender    = (String)m.get("sender");
                 String receiver  = (String)m.get("receiver");
                 String replyWith = (String)m.get("reply-with");
                 String irt       = (String)m.get("in-reply-to");
                 
-                String propCont  = null;
-                if (m.get("content") != null) {
-                    propCont = m.get("content").toString();
-                    if (propCont.startsWith("\"")) {
-                    	propCont = propCont.substring(1,propCont.length()-1);
-                    	if (Term.parse(propCont) == null) {
-                    		// it was a string indeed
-                    		propCont = m.get("content").toString();
+                Object propCont  = m.get("content");
+                if (propCont != null) {
+                    propCont = m.get("content");
+                    String sPropCont = propCont.toString();
+                    if (sPropCont.startsWith("\"")) { // deal with a term closed by "
+                    	sPropCont = sPropCont.substring(1,sPropCont.length()-1);
+                    	if (Term.parse(sPropCont) != null) {
+                    		// it was a term with "
+                    		propCont = sPropCont.trim();
                     	}
                     }
-                    if (Term.parse(propCont) != null) { // the contents are well formed
-                        jason.asSemantics.Message im = new jason.asSemantics.Message(ilForce, sender, receiver, propCont, replyWith);
-                        if (irt != null) {
-                        	im.setInReplyTo(irt);
-                        }
-                        fUserAgArh.getTS().getC().getMB().add(im);
-                        logger.debug("received message: " + im);
-                    } else {
-                        logger.warn("Warning! Message received cannot be handled: "+m);
+                    
+                    jason.asSemantics.Message im = new jason.asSemantics.Message(ilForce, sender, receiver, propCont, replyWith);
+                    if (irt != null) {
+                    	im.setInReplyTo(irt);
                     }
+                    fUserAgArh.getTS().getC().getMB().add(im);
+
+                    /*
+                    if (Term.parse(sPropCont) != null) { // the contents are well formed
+                        
+                    } else { 
+                    	// the content is a Java Object (architectures deals with this kind of content)
+                       //logger.warn("Warning! Message received cannot be handled: "+m);
+                    	
+                    }
+                    */
                 }
             }
         } while (m != null);

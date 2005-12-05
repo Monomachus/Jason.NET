@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.18  2005/12/05 16:04:47  jomifred
+//   Message content can be object
+//
 //   Revision 1.17  2005/11/20 16:53:17  jomifred
 //   the canSleep method in TS asks the agent arch if it can sleep.
 //
@@ -143,6 +146,7 @@ public class CentralisedAgArch extends Thread implements AgArchInterface {
     public void stopAg() {
     	running = false;
     	fUserAgArh.getTS().receiveSyncSignal(); // in case the agent is wainting .....
+    	fUserAgArh.getTS().newMessageHasArrived(); // in case the agent is wainting .....
     	synchronized(syncStopRun) {
     		fEnv.delAgent(fUserAgArh);
     	}
