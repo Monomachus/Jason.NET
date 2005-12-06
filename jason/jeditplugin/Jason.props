@@ -1,0 +1,26 @@
+### Plugin properties
+
+plugin.jason.jeditplugin.JasonIDPlugin.name=Jason
+plugin.jason.jeditplugin.JasonIDPlugin.version=0.1
+plugin.jason.jeditplugin.JasonIDPlugin.author=Jomi F. Hubner
+plugin.jason.jeditplugin.JasonIDPlugin.docs=index.html
+plugin.jason.jeditplugin.JasonIDPlugin.activate=startup
+
+plugin.jason.JasonPlugin.depend.0=jedit 04.02.10.00
+#plugin.console.ConsolePlugin.depend.1=plugin errorlist.ErrorListPlugin 1.2
+
+
+# application menu items
+plugin.jason.jeditplugin.JasonIDPlugin.menu=jason - jason.run-mas jason.debug-mas jason.stop-mas
+
+# action labels
+jason.title=Jason IDE
+jason.label=Jason
+jason.run-mas.label=Run MAS
+jason.debug-mas.label=Debug MAS
+jason.stop-mas.label=Stop current running MAS
+
+# plugin toolbar buttons
+#jason.run-mas.icon=run.png
+#jason.debug-mas.icon=Debug MAS
+#jason.stop-mas.icon=Stop current running MAS

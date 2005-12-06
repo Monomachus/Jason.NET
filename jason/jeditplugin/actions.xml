@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE ACTIONS SYSTEM "actions.dtd">
+
+<ACTIONS>
+	<ACTION NAME="jason.run-mas">
+		<CODE>
+			wm.addDockableWindow(jason.jeditplugin.JasonIDPlugin.NAME);
+			wm.getDockable(jason.jeditplugin.JasonIDPlugin.NAME).runMAS();
+		</CODE>
+	</ACTION>
+	<ACTION NAME="jason.debug-mas">
+		<CODE>
+			wm.addDockableWindow(jason.jeditplugin.JasonIDPlugin.NAME);
+			wm.getDockable(jason.jeditplugin.JasonIDPlugin.NAME).debugMAS();
+		</CODE>
+	</ACTION>
+	<ACTION NAME="jason.stop-mas">
+		<CODE>
+			wm.addDockableWindow(jason.jeditplugin.JasonIDPlugin.NAME);
+			wm.getDockable(jason.jeditplugin.JasonIDPlugin.NAME).stopMAS();
+		</CODE>
+	</ACTION>
+</ACTIONS>
