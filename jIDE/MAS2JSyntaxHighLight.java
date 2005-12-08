@@ -23,18 +23,18 @@
 //   $Date$
 //   $Revision$
 //   $Log$
-//   Revision 1.10  2005/08/15 13:29:48  jomifred
-//   change it to kkv in CVS
+//   Revision 1.11  2005/12/08 20:05:01  jomifred
+//   changes for JasonIDE plugin
 //
 //----------------------------------------------------------------------------
 
 package jIDE;
 
-import jIDE.parser.SimpleCharStream;
-import jIDE.parser.Token;
-import jIDE.parser.TokenMgrError;
-import jIDE.parser.mas2jConstants;
-import jIDE.parser.mas2jTokenManager;
+import jason.mas2j.parser.SimpleCharStream;
+import jason.mas2j.parser.Token;
+import jason.mas2j.parser.TokenMgrError;
+import jason.mas2j.parser.mas2jConstants;
+import jason.mas2j.parser.mas2jTokenManager;
 
 import java.awt.Color;
 import java.io.StringReader;

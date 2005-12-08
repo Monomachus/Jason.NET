@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.1  2005/12/08 20:14:28  jomifred
+//   changes for JasonIDE plugin
+//
 //   Revision 1.19  2005/11/16 18:35:25  jomifred
 //   fixed the print(int) on console bug
 //
@@ -44,7 +47,7 @@
 //----------------------------------------------------------------------------
 
 
-package jIDE;
+package jason.runtime;
 
 import jason.architecture.CentralisedAgArch;
 import jason.control.CentralisedExecutionControl;

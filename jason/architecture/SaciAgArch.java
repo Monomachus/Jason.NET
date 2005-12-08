@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.20  2005/12/08 20:06:59  jomifred
+//   changes for JasonIDE plugin
+//
 //   Revision 1.19  2005/12/05 16:04:47  jomifred
 //   Message content can be object
 //
@@ -60,13 +63,13 @@
 package jason.architecture;
 
 
-import jIDE.MASConsoleGUI;
-import jIDE.RunCentralisedMAS;
 import jason.JasonException;
 import jason.asSemantics.ActionExec;
 import jason.asSemantics.TransitionSystem;
 import jason.asSyntax.ListTerm;
 import jason.asSyntax.Term;
+import jason.runtime.MASConsoleGUI;
+import jason.runtime.RunCentralisedMAS;
 
 import java.io.File;
 import java.util.List;

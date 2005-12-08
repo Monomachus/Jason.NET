@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.1  2005/12/08 20:13:53  jomifred
+//   changes for JasonIDE plugin
+//
 //   Revision 1.18  2005/10/29 21:46:22  jomifred
 //   add a new class (MAS2JProject) to store information parsed by the mas2j parser. This new class also create the project scripts
 //
@@ -50,11 +53,12 @@ options {
 
 PARSER_BEGIN(mas2j)
 
-package jIDE.parser;
+package jason.mas2j.parser;
 
 import java.util.*;
 import java.io.*;
-import jIDE.mas2j.*;
+import jason.mas2j.*;
+import jIDE.*;
 
 public class mas2j {
 
@@ -68,7 +72,7 @@ public class mas2j {
       mas2j parser;
       MAS2JProject project = new MAS2JProject();
       
-      if (args.length==2) {
+      if (args.length==1) {
         name = args[0];
         System.err.println("mas2j: reading from file " + name + " ..." );
 		try {
@@ -79,7 +83,7 @@ public class mas2j {
         }
       } else {
 		System.out.println("mas2j: usage must be:");
-		System.out.println("      java mas2j <MASConfFile> <JasonHome>");
+		System.out.println("      java mas2j <MASConfFile>");
 		System.out.println("Output to file <MASName>.xml");
         return;
       }
@@ -87,9 +91,7 @@ public class mas2j {
       // parsing
       try {
 		project = parser.mas();
-        project.setJasonJar(args[1]+"/bin/jason.jar");
-        project.setLog4jJar(args[1]+"/lib/log4j.jar");
-        project.setSaciJar(args[1]+"/lib/saci.jar");
+		Config.get().fix();
         project.setProjectDir(new File(".").getAbsolutePath());
 		System.out.println("mas2j: "+name+" parsed successfully!\n");
 		project.writeXMLScript();

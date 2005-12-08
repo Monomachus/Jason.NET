@@ -23,7 +23,7 @@
 //   $Date$
 //   $Revision$
 //   $Log$
-//   Revision 1.2  2005/12/08 20:06:59  jomifred
+//   Revision 1.1  2005/12/08 20:15:00  jomifred
 //   changes for JasonIDE plugin
 //
 //
@@ -31,33 +31,18 @@
 
 package jason.jeditplugin;
 
+import org.gjt.sp.jedit.AbstractOptionPane;
 
-import org.gjt.sp.jedit.EBMessage;
-import org.gjt.sp.jedit.EBPlugin;
-import org.gjt.sp.jedit.gui.DockableWindowManager;
+public class JasonIDOptionPanel extends AbstractOptionPane  {
 
-public class JasonIDPlugin extends EBPlugin {
-	public static final String NAME = "jason";
-    public static final String MENU = "jason.menu";
-    public static final String PROPERTY_PREFIX = "plugin.jason.";
-    public static final String OPTION_PREFIX   = "options.jason.";
-
-
-    public void handleMessage(EBMessage msg) {
-    	DockableWindowManager d = org.gjt.sp.jedit.jEdit.getViews()[0].getDockableWindowManager();
-    	if (!d.isDockableWindowVisible(NAME)) {
-    		d.addDockableWindow(NAME);
-        }
+	public JasonIDOptionPanel() {
+		super("Jason");
 	}
 
-    /*
-    public void createMenuItems(Vector menuItems) {
-        menuItems.addElement(GUIUtilities.loadMenu(MENU));
-    }
-    
-    public void createOptionPanes(OptionsDialog od) {
-		od.addOptionPane(new JasonOptionPanel());
-    }
-    */
+	protected void _init() {
+	}
+
+	protected void _save() {
+	}
 
 }

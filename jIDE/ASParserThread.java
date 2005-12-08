@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.15  2005/12/08 20:05:01  jomifred
+//   changes for JasonIDE plugin
+//
 //   Revision 1.14  2005/11/22 00:05:32  jomifred
 //   no message
 //
@@ -41,6 +44,7 @@ import jason.asSyntax.parser.SimpleCharStream;
 import jason.asSyntax.parser.TokenMgrError;
 import jason.asSyntax.parser.as2j;
 import jason.asSyntax.parser.as2jTokenManager;
+import jason.runtime.RunCentralisedMAS;
 
 import java.io.StringReader;
 

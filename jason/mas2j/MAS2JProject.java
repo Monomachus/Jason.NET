@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.1  2005/12/08 20:13:53  jomifred
+//   changes for JasonIDE plugin
+//
 //   Revision 1.2  2005/10/30 18:39:48  jomifred
 //   change in the AgArch customisation  support (the same customisation is used both to Cent and Saci infrastructures0
 //
@@ -32,8 +35,9 @@
 //
 //----------------------------------------------------------------------------
 
-package jIDE.mas2j;
+package jason.mas2j;
 
+import jIDE.Config;
 import jason.control.ExecutionControlGUI;
 
 import java.io.File;
@@ -52,6 +56,10 @@ import java.util.Set;
  */
 public class MAS2JProject {
 
+	public static final String SACI_ARCH = "Saci";
+	public static final String CENT_ARCH = "Centralised";
+
+	
 	String soc;
 
 	String envClass = null; 
@@ -62,20 +70,13 @@ public class MAS2JProject {
 	
 	boolean debug = false;
 
-	String architecture = "Centralised";
+	String architecture = CENT_ARCH;
 
 	String projectDir = "." + File.separator;
-	String saciJar = "saci.jar";
-	String saciHome = null;
-	String jasonJar = "jason.jar";
-	String log4jJar = "log4j.jar";
-	String javaHome = File.separator;
-
 	
 	List agents = new ArrayList();
 	
-	
-	public void setProjectDir(String d) {
+	public void setDirectory(String d) {
 		if (d != null) {
 			projectDir = d;
 			if (projectDir.length() > 0) {
@@ -85,35 +86,13 @@ public class MAS2JProject {
 			}
 		}
 	}
+	public String getDirectory() {
+		return projectDir;
+	}
+	
 	
 	public String getXmlScriptFile() {
 		return projectDir + soc + ".xml";
-	}
-
-	public void setJasonJar(String s) {
-		jasonJar = s;
-	}
-
-	public void setLog4jJar(String s) {
-		log4jJar = s;
-	}
-
-	public void setSaciJar(String s) {
-		saciJar = s;
-		try {
-			saciHome = new File(saciJar).getParent().toString();
-		} catch (Exception e) {
-			saciHome = null;
-		}
-	}
-
-	public void setJavaHome(String s) {
-		if (s != null) {
-			javaHome = new File(s).getAbsolutePath();
-			if (!javaHome.endsWith(File.separator)) {
-				javaHome += File.separator;
-			}
-		}
 	}
 
 	public void setArchitecture(String a) {
@@ -142,6 +121,13 @@ public class MAS2JProject {
 		return soc;
 	}
 
+	public boolean isSaciArch() {
+		return architecture.equals(SACI_ARCH);
+	}
+	public boolean isCentArch() {
+		return architecture.equals(CENT_ARCH);
+	}
+	
 	public void setControlClass(String sControl) {
 		controlClass = sControl;
 	}
@@ -249,7 +235,7 @@ public class MAS2JProject {
         } else {
             tmpEnvClass = envClass;
         }        
-        if (architecture.equals("Saci")) {
+        if (isSaciArch()) {
             out.println("\t\targs=\""+tmpEnvClass+"\" ");
             tmpEnvClass = jason.environment.SaciEnvironment.class.getName();
         }
@@ -276,7 +262,7 @@ public class MAS2JProject {
 			out.println("\t\tname=\"controller\" "); 
 			out.println("\t\tsociety.name=\""+soc+"-env\" "); 
 
-            if (architecture.equals("Saci")) {
+            if (isSaciArch()) {
             	out.println("\t\targs=\""+fControlClass+"\"");
             	fControlClass = jason.control.SaciExecutionControl.class.getName();
             }
@@ -320,9 +306,9 @@ public class MAS2JProject {
 			}
 		}
 
-		return outdelim + "." + File.pathSeparator + indelim + jasonJar
-				+ indelim + File.pathSeparator + indelim + saciJar + indelim
-				+ File.pathSeparator + indelim + log4jJar + indelim
+		return outdelim + "." + File.pathSeparator + indelim + Config.get().getJasonJar()
+				+ indelim + File.pathSeparator + indelim + Config.get().getSaciJar() + indelim
+				+ File.pathSeparator + indelim + Config.get().getProperty(Config.LOG4J_JAR) + indelim
 				+ File.pathSeparator + indelim + dDir + indelim
 				+ File.pathSeparator + sLib + clPath + outdelim;
 	}
@@ -331,7 +317,8 @@ public class MAS2JProject {
 		try {
 
 			String classPath = getFullClassPath();
-
+			String javaHome = Config.get().getJavaHome();
+			
 			String dirsToCompile = "";
 			Iterator i = getAllUserJavaDirectories().iterator();
 			while (i.hasNext()) {
@@ -348,13 +335,13 @@ public class MAS2JProject {
 				if (javaHome != null) {
 					out.println("set PATH=\"" + javaHome + "bin\";%PATH%\n");
 				}
-				if (architecture.equals("Saci")) {
+				if (isSaciArch()) {
 					out.println("java -classpath " + classPath + " "
 							+ saci.tools.runApplicationScript.class.getName()
 							+ " \"" + soc + ".xml\"");
-				} else if (architecture.equals("Centralised")) {
+				} else if (isCentArch()) {
 					out.println("java -classpath " + classPath + " "
-							+ jIDE.RunCentralisedMAS.class.getName() + " \""
+							+ jason.runtime.RunCentralisedMAS.class.getName() + " \""
 							+ soc + ".xml\" ");
 				}
 				out.close();
@@ -374,7 +361,7 @@ public class MAS2JProject {
 				out.println("echo ok");
 				out.close();
 
-				if (architecture.equals("Saci")) {
+				if (isSaciArch()) {
 					out = new PrintWriter(new FileWriter(projectDir + "saci-"
 							+ soc + ".bat"));
 					out.println("@echo off");
@@ -389,7 +376,7 @@ public class MAS2JProject {
 					// out.println("cd \""+saciHome+"\"");
 					// out.println("saci &");
 					out.println("java -Djava.security.policy=\"jar:file:"
-							+ saciJar + "!/policy\" saci.tools.SaciMenu");
+							+ Config.get().getSaciJar() + "!/policy\" saci.tools.SaciMenu");
 					out.close();
 				}
 			} else {
@@ -401,13 +388,13 @@ public class MAS2JProject {
 				if (javaHome != null) {
 					out.println("export PATH=\"" + javaHome + "bin\":$PATH\n");
 				}
-				if (architecture.equals("Saci")) {
+				if (isSaciArch()) {
 					out.println("java -classpath " + classPath + " "
 							+ saci.tools.runApplicationScript.class.getName()
 							+ " \"" + soc + ".xml\"");
-				} else if (architecture.equals("Centralised")) {
+				} else if (isCentArch()) {
 					out.println("java -classpath " + classPath + " "
-							+ jIDE.RunCentralisedMAS.class.getName() + " \""
+							+ jason.runtime.RunCentralisedMAS.class.getName() + " \""
 							+ soc + ".xml\"");
 				}
 				out.close();
@@ -434,7 +421,7 @@ public class MAS2JProject {
 				out.println("echo ok");
 				out.close();
 
-				if (architecture.equals("Saci")) {
+				if (isSaciArch()) {
 					out = new PrintWriter(new FileWriter(projectDir + "saci-"
 							+ soc + ".sh"));
 					out.println("#!/bin/sh");
@@ -452,7 +439,7 @@ public class MAS2JProject {
 					// out.println("cd \""+saciHome+"\"");
 					// out.println("./saci &");
 					out.println("java -Djava.security.policy=\"jar:file:"
-							+ saciJar + "!/policy\" saci.tools.SaciMenu");
+							+ Config.get().getSaciJar() + "!/policy\" saci.tools.SaciMenu");
 					out.close();
 				}
 			}

@@ -23,13 +23,17 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.1  2005/12/08 20:14:28  jomifred
+//   changes for JasonIDE plugin
+//
 //   Revision 1.1  2005/12/05 16:04:17  jomifred
 //   no message
 //
 //
 //----------------------------------------------------------------------------
 
-package jIDE;
+package jason.runtime;
+
 
 import java.io.PrintStream;
 
@@ -41,10 +45,10 @@ public class OutputStreamAdapter extends PrintStream {
 	MASConsoleGUI masConsole;
 	JTextArea     ta;
 
-    PrintStream originalOut = null;
-    PrintStream originalErr = null;
+    public PrintStream originalOut = null;
+    public PrintStream originalErr = null;
 	
-    OutputStreamAdapter(MASConsoleGUI m, JTextArea t) {
+    public OutputStreamAdapter(MASConsoleGUI m, JTextArea t) {
         super(System.out);
     	masConsole = m;
     	ta = t;

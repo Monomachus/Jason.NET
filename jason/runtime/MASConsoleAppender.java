@@ -23,12 +23,16 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.1  2005/12/08 20:14:28  jomifred
+//   changes for JasonIDE plugin
+//
 //   Revision 1.3  2005/08/12 21:08:23  jomifred
 //   add cvs keywords
 //
 //----------------------------------------------------------------------------
 
-package jIDE;
+package jason.runtime;
+
 
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.Layout;

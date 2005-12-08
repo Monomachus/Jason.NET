@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.27  2005/12/08 20:05:01  jomifred
+//   changes for JasonIDE plugin
+//
 //   Revision 1.26  2005/12/05 16:04:47  jomifred
 //   Message content can be object
 //
@@ -47,6 +50,9 @@
 package jIDE;
 
 
+import jason.runtime.OutputStreamAdapter;
+import jason.runtime.RunCentralisedMAS;
+
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -63,12 +69,10 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Properties;
-import java.util.StringTokenizer;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -101,7 +105,7 @@ import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
 /** The main class of the Jason IDE */
-public class JasonID {
+public class JasonID implements RunningMASListener {
     
     JFrame frame = null;
 	JMenuBar  menuBar;
@@ -122,7 +126,7 @@ public class JasonID {
 
     OutputStreamAdapter myOut;
     
-    static Properties userProperties = new Properties();
+    static Config userProperties = Config.get();
 
     AbstractAction newAct;
     OpenProject    openAct;
@@ -146,16 +150,8 @@ public class JasonID {
         currentJasonID = new JasonID();
         currentJasonID.createMainFrame();
 
-        String currJasonVersion;
+        String currJasonVersion = userProperties.getJasonRunningVersion();
 
-        try {
-            Properties p = new Properties();
-            p.load(JasonID.class.getResource("/dist.properties").openStream());
-            currJasonVersion = p.getProperty("version") + "." + p.getProperty("release");
-        } catch (Exception ex) { 
-        	currJasonVersion = "?";
-        }
-        
         try {
             boolean isJWS = false;
             if (System.getProperty("jnlpx.deployment.user.home") != null || System.getProperty("deployment.user.security.trusted.certs") != null) {
@@ -163,51 +159,30 @@ public class JasonID {
             	currJasonVersion += "-JWS";
             }
             
-    		// try to load properties from a user preferences file
-        	File jasonConfFile = getUserConfFile();
-        	if (jasonConfFile.exists()) {
-        		userProperties.load(new FileInputStream(jasonConfFile));
+    		// check new version
+        	//File jasonConfFile = getUserConfFile();
+        	if (userProperties.getProperty("version") != null) {
+        		//userProperties.load(new FileInputStream(jasonConfFile));
         		if (!userProperties.getProperty("version").equals(currJasonVersion) && !currJasonVersion.equals("?")) { 
         			// new version, set all values to default
         			System.out.println("This is a new version of Jason, reseting configuration...");
-        			userProperties.remove("javaHome");
-        			userProperties.remove("saciJar");
-        			userProperties.remove("jasonJar");
-        			userProperties.remove("log4jJar");
+        			userProperties.remove(Config.JAVA_HOME);
+        			userProperties.remove(Config.SACI_JAR);
+        			userProperties.remove(Config.JASON_JAR);
+        			userProperties.remove(Config.LOG4J_JAR);
         		}
         	} 
 
-        	tryToFixJarFileConf("jasonJar", "jason.jar", 300000);
-        	tryToFixJarFileConf("saciJar",  "saci.jar",  300000);
-        	tryToFixJarFileConf("log4jJar", "log4j.jar", 350000);
-			
-            if (userProperties.get("javaHome") == null || !checkJavaPath(userProperties.getProperty("javaHome"))) {
-            	String javaHome = System.getProperty("java.home");
-            	if (checkJavaPath(javaHome)) {
-            		userProperties.put("javaHome", javaHome);
-            	} else {
-            		userProperties.put("javaHome", File.separator);            		
-            	}
-            }
-
-            if (userProperties.get("font") == null) {
-            	userProperties.put("font", "Monospaced");
-            }
-            if (userProperties.get("fontSize") == null) {
-            	userProperties.put("fontSize", "14");
-            }
-        
-            userProperties.put("version", currJasonVersion);
+        	userProperties.fix();
             
             // JWS does not work with class loaders, so do not use run inside
             if (isJWS) {
-            	userProperties.put("runCentralisedInsideJIDE", "false");
-            } else if (userProperties.get("runCentralisedInsideJIDE") == null) {
-            	userProperties.put("runCentralisedInsideJIDE", "true");
+            	userProperties.put(Config.RUN_AS_THREAD, "false");
+            } else if (userProperties.get(Config.RUN_AS_THREAD) == null) {
+            	userProperties.put(Config.RUN_AS_THREAD, "true");
             }
             
-            jasonConfFile.getParentFile().mkdirs();
-            storePrefs();
+            userProperties.store();
 
             currentJasonID.mas2jPane.updateFont();
 
@@ -225,127 +200,7 @@ public class JasonID {
         }
     }
 
-    public static File getUserConfFile() {
-    	return new File(System.getProperties().get("user.home") + File.separator + ".jason/user.properties");
-    }
-    
-    public static void storePrefs() {
-    	try {
-    		userProperties.store(new FileOutputStream(getUserConfFile()), "Jason user configuration");
-    	} catch (Exception e) {
-    		System.err.println("Error writting preferences");
-    		e.printStackTrace();
-    	}
-    }
-    
-    public Properties getConf() {
-    	return userProperties;
-    }
-
-    static void tryToFixJarFileConf(String jarEntry, String jarName, int minSize) {
-    	String jarFile = userProperties.getProperty(jarEntry);
-        if (jarFile == null || !checkJar(jarFile)) {
-        	System.out.println("Wrong configuration for "+jarName+", current is "+jarFile);
-
-        	// try to get from classpath
-        	jarFile = getPathFromClassPath(jarName);
-        	if (checkJar(jarFile)) {
-        		userProperties.put(jarEntry, jarFile);
-    			System.out.println("found at "+jarFile);
-    			return;
-        	} 
-    		
-        	// try current dir
-        	jarFile = "."+File.separator+jarName;
-    		if (checkJar(jarFile)) {
-        		userProperties.put(jarEntry, new File(jarFile).getAbsolutePath());
-    			System.out.println("found at "+jarFile);
-    			return;
-    		}
-
-        	// try current dir + lib
-    		jarFile = ".."+File.separator+"lib"+File.separator+jarName;
-    		if (checkJar(jarFile)) {
-        		userProperties.put(jarEntry, new File(jarFile).getAbsolutePath());
-    			System.out.println("found at "+jarFile);
-    			return;
-    		}
-    		
-    		// try from java web start
-    		String jwsDir = System.getProperty("jnlpx.deployment.user.home");
-    		if (jwsDir == null) {
-    			// try another property (windows)
-    			try {
-    				jwsDir = System.getProperty("deployment.user.security.trusted.certs");
-    				jwsDir = new File(jwsDir).getParentFile().getParent();
-    			} catch (Exception e) {}
-    		}
-    		if (jwsDir != null) {
-        		jarFile = findFile(new File(jwsDir), jarName, minSize);
-        		System.out.print("Searching "+jarName+" in "+jwsDir+" ... ");
-        		if (jarFile != null && checkJar(jarFile)) {
-        			System.out.println("found at "+jarFile);
-        			userProperties.put(jarEntry, jarFile);            			
-        		} else {
-        			userProperties.put(jarEntry, File.separator);
-        		}
-    		}
-        }
-    	
-    }
-    
-    static String findFile(File p, String file, int minSize) {
-    	if (p.isDirectory()) {
-    		File[] files = p.listFiles();
-    		for (int i=0; i<files.length; i++) {
-    			if (files[i].isDirectory()) {
-    				String r = findFile(files[i], file, minSize);
-    				if (r != null) {
-    					return r;
-    				}
-    			} else {
-    				if (files[i].getName().endsWith(file) && files[i].length() > minSize) {
-    					return files[i].getAbsolutePath();
-    				}
-    			}
-    		}
-    	}
-    	return null;
-    }
-    
-	static boolean checkJar(String jar) {
-        try {
-        	if (jar != null && new File(jar).exists() && jar.endsWith(".jar")) {
-        		return true;
-            }
-        } catch (Exception e) {}
-        return false;
-    }
-    
-    static boolean checkJavaPath(String javaHome) {
-        try {
-        	if (!javaHome.endsWith(File.separator)) {
-        		javaHome += File.separator;
-        	}
-            File javac1 = new File(javaHome + "bin" + File.separatorChar + "javac");
-            File javac2 = new File(javaHome + "bin" + File.separatorChar + "javac.exe");
-            if (javac1.exists() || javac2.exists()) {
-        		return true;
-            }
-        } catch (Exception e) {}
-        return false;
-    }
-	static String getPathFromClassPath(String file) {
-		StringTokenizer st = new StringTokenizer(System.getProperty("java.class.path"), File.pathSeparator);
-		while (st.hasMoreTokens()) {
-			String token = st.nextToken();
-			if (token.endsWith(file)) {
-				return new File(token).getAbsolutePath();
-			}
-		}
-		return null;
- 	}
-
+   
     // --------------------------------
     // non-static methods
     // --------------------------------
@@ -433,6 +288,15 @@ public class JasonID {
     	}
     	fASParser = null;
     }
+    
+	//
+	// RunningMASListener methods
+	//
+	public void masFinished() {
+		runMASButton.setEnabled(true);
+		debugMASButton.setEnabled(true);
+		stopMASButton.setEnabled(false);
+	}
     
     protected boolean checkNeedsSave() {
         for (int i = 0; i<tab.getComponentCount(); i++) {
@@ -1032,7 +896,7 @@ public class JasonID {
 		                //chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 		                if (chooser.showOpenDialog(frame) == JFileChooser.APPROVE_OPTION) {
 		                	String jasonJar = (new File(chooser.getSelectedFile().getPath())).getCanonicalPath();
-		                	if (checkJar(jasonJar)) {
+		                	if (userProperties.checkJar(jasonJar)) {
 								jasonTF.setText(jasonJar);
 		                	}
 		                }
@@ -1061,7 +925,7 @@ public class JasonID {
 						//chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 		                if (chooser.showOpenDialog(frame) == JFileChooser.APPROVE_OPTION) {
 		                	String saciJar = (new File(chooser.getSelectedFile().getPath())).getCanonicalPath();
-		                	if (checkJar(saciJar)) {
+		                	if (userProperties.checkJar(saciJar)) {
 		                		saciTF.setText(saciJar);
 		                	}
 		                }
@@ -1088,7 +952,7 @@ public class JasonID {
 		                chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 		                if (chooser.showOpenDialog(frame) == JFileChooser.APPROVE_OPTION) {
 		                	String javaHome = (new File(chooser.getSelectedFile().getPath())).getCanonicalPath();
-		                	if (checkJavaPath(javaHome)) {
+		                	if (userProperties.checkJavaHomePath(javaHome)) {
 		                		javaTF.setText(javaHome);
 		                	}
 		                }
@@ -1122,25 +986,25 @@ public class JasonID {
         	btPanel.add(okBt);
         	okBt.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent arg0) {
-					if (checkJar(saciTF.getText())) {
-						userProperties.put("saciJar", saciTF.getText());
+					if (userProperties.checkJar(saciTF.getText())) {
+						userProperties.put(Config.SACI_JAR, saciTF.getText());
 					}
-					if (checkJar(jasonTF.getText())) {
-						userProperties.put("jasonJar", jasonTF.getText());
+					if (userProperties.checkJar(jasonTF.getText())) {
+						userProperties.put(Config.JASON_JAR, jasonTF.getText());
 					}
-					if (checkJavaPath(javaTF.getText())) {
-						userProperties.put("javaHome", javaTF.getText());
+					if (userProperties.checkJavaHomePath(javaTF.getText())) {
+						userProperties.put(Config.JAVA_HOME, javaTF.getText());
 					}
 					userProperties.put("font", jBCFont.getSelectedItem());
 					userProperties.put("fontSize", jBCSize.getSelectedItem());
 					
-					userProperties.put("runCentralisedInsideJIDE", insideJIDECBox.isSelected()+"");
+					userProperties.put(Config.RUN_AS_THREAD, insideJIDECBox.isSelected()+"");
 					
 					// update all tabs fonts
 					for (int i=0; i<tab.getComponentCount(); i++) {
 				        ((ASEditorPane)tab.getComponentAt(i)).updateFont();
 					}
-					storePrefs();
+					userProperties.store();
 					d.setVisible(false);
 				}
         	});
@@ -1158,9 +1022,9 @@ public class JasonID {
         }
         
         public void actionPerformed(ActionEvent e) {
-        	saciTF.setText(userProperties.getProperty("saciJar"));
-        	jasonTF.setText(userProperties.getProperty("jasonJar"));
-        	javaTF.setText(userProperties.getProperty("javaHome"));
+        	saciTF.setText(userProperties.getSaciJar());
+        	jasonTF.setText(userProperties.getJasonJar());
+        	javaTF.setText(userProperties.getJavaHome());
 
         	// search the current font
         	String curFont = userProperties.getProperty("font");
@@ -1179,7 +1043,7 @@ public class JasonID {
         		}
         	}
         	
-        	if (userProperties.getProperty("runCentralisedInsideJIDE").equals("true")) {
+        	if (userProperties.getProperty(Config.RUN_AS_THREAD).equals("true")) {
         		insideJIDECBox.setSelected(true);
         	} else {
         		insideJIDECBox.setSelected(false);        		

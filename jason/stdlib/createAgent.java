@@ -23,8 +23,8 @@
 //   $Date$
 //   $Revision$
 //   $Log$
-//   Revision 1.13  2005/10/30 18:39:48  jomifred
-//   change in the AgArch customisation  support (the same customisation is used both to Cent and Saci infrastructures0
+//   Revision 1.14  2005/12/08 20:06:59  jomifred
+//   changes for JasonIDE plugin
 //
 //----------------------------------------------------------------------------
 
@@ -52,7 +52,6 @@ import saci.launcher.Command;
 import saci.launcher.Launcher;
 import saci.launcher.LauncherD;
 
-// TODO: test
 public class createAgent implements InternalAction {
 
     private static Logger logger = Logger.getLogger(createAgent.class);

@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.13  2005/12/08 20:05:01  jomifred
+//   changes for JasonIDE plugin
+//
 //   Revision 1.12  2005/11/22 00:05:32  jomifred
 //   no message
 //
@@ -36,10 +39,8 @@
 
 package jIDE;
 
-import jIDE.mas2j.MAS2JProject;
-import jIDE.parser.ParseException;
-import jIDE.parser.TokenMgrError;
-import jIDE.parser.mas2j;
+import jason.mas2j.parser.*;
+import jason.mas2j.MAS2JProject;
 
 import java.io.StringReader;
 
@@ -88,15 +89,11 @@ public class MAS2JParserThread extends ASParserThread { //Thread {
             String text = doc.getText(0, doc.getLength());
             fParserMAS2J.ReInit(new StringReader(text));
             fCurrentProject = fParserMAS2J.mas();
-            fCurrentProject.setProjectDir( fJasonID.projectDirectory );
+            fCurrentProject.setDirectory( fJasonID.projectDirectory );
             
             fOk = true;
             
             if (fForegroundCompilation) {
-                fCurrentProject.setJasonJar(fJasonID.getConf().getProperty("jasonJar"));
-                fCurrentProject.setSaciJar(fJasonID.getConf().getProperty("saciJar"));
-                fCurrentProject.setLog4jJar(fJasonID.getConf().getProperty("log4jJar"));
-                fCurrentProject.setJavaHome(fJasonID.getConf().getProperty("javaHome"));
                 if (fDebug) {
                 	fCurrentProject.debugOn();
                 } else {

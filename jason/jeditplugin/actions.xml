@@ -21,4 +21,16 @@
 			wm.getDockable(jason.jeditplugin.JasonIDPlugin.NAME).stopMAS();
 		</CODE>
 	</ACTION>
+	<ACTION NAME="jason.new-mas">
+		<CODE>
+			wm.addDockableWindow(jason.jeditplugin.JasonIDPlugin.NAME);
+			wm.getDockable(jason.jeditplugin.JasonIDPlugin.NAME).newMAS();
+		</CODE>
+	</ACTION>
+	<ACTION NAME="jason.edit-log">
+		<CODE>
+			wm.addDockableWindow(jason.jeditplugin.JasonIDPlugin.NAME);
+			wm.getDockable(jason.jeditplugin.JasonIDPlugin.NAME).editLog();
+		</CODE>
+	</ACTION>
 </ACTIONS>

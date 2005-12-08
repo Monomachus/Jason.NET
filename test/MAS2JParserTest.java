@@ -1,8 +1,9 @@
 package test;
 
-import jIDE.RunCentralisedMAS;
-import jIDE.mas2j.MAS2JProject;
-import jIDE.parser.mas2j;
+import jason.mas2j.parser.mas2j;
+
+import jason.mas2j.MAS2JProject;
+import jason.runtime.RunCentralisedMAS;
 
 import java.io.StringReader;
 import java.util.Map;
@@ -29,7 +30,7 @@ public class MAS2JParserTest extends TestCase {
 	public void testParser() {
 		try {
 			MAS2JProject project = parser.mas();
-	    	project.setProjectDir("/tmp");
+	    	project.setDirectory("/tmp");
 			//System.out.println(project);
 			
 			project.debugOn();

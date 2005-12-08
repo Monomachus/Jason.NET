@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.11  2005/12/08 20:06:59  jomifred
+//   changes for JasonIDE plugin
+//
 //   Revision 1.10  2005/10/30 18:39:48  jomifred
 //   change in the AgArch customisation  support (the same customisation is used both to Cent and Saci infrastructures0
 //
@@ -40,8 +43,6 @@
 
 
 package jason;
-
-import jIDE.parser.mas2j;
 
 import java.io.StringReader;
 import java.util.HashMap;
@@ -83,7 +84,7 @@ public class Settings {
     
     public void setOptions(String options) {
         logger.debug("Setting options from "+options);
-        mas2j parser = new mas2j( new StringReader(options));
+        jason.mas2j.parser.mas2j parser = new jason.mas2j.parser.mas2j( new StringReader(options));
         try {
             setOptions(parser.ASoptions());
             logger.debug("Settings are "+userParameters);

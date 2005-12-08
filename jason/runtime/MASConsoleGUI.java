@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.1  2005/12/08 20:14:28  jomifred
+//   changes for JasonIDE plugin
+//
 //   Revision 1.12  2005/11/22 00:05:32  jomifred
 //   no message
 //
@@ -40,7 +43,9 @@
 //
 //----------------------------------------------------------------------------
 
-package jIDE;
+package jason.runtime;
+
+import jIDE.RunMAS;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;

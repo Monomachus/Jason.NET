@@ -6,21 +6,27 @@ plugin.jason.jeditplugin.JasonIDPlugin.author=Jomi F. Hubner
 plugin.jason.jeditplugin.JasonIDPlugin.docs=index.html
 plugin.jason.jeditplugin.JasonIDPlugin.activate=startup
 
-plugin.jason.JasonPlugin.depend.0=jedit 04.02.10.00
-#plugin.console.ConsolePlugin.depend.1=plugin errorlist.ErrorListPlugin 1.2
+plugin.jason.jeditplugin.JasonIDPlugin.depend.0=jedit 04.02.10.00
+plugin.jason.jeditplugin.JasonIDPlugin.depend.2=plugin errorlist.ErrorListPlugin 1.4
 
 
 # application menu items
-plugin.jason.jeditplugin.JasonIDPlugin.menu=jason - jason.run-mas jason.debug-mas jason.stop-mas
+plugin.jason.jeditplugin.JasonIDPlugin.menu=jason - jason.run-mas jason.debug-mas jason.stop-mas jason.new-mas jason.edit-log
 
 # action labels
-jason.title=Jason IDE
-jason.label=Jason
 jason.run-mas.label=Run MAS
 jason.debug-mas.label=Debug MAS
 jason.stop-mas.label=Stop current running MAS
+jason.new-mas.label=New Project
+jason.edit-log.label=Edit MAS log parameters
+
+# Dockables
+jason.title=Jason IDE
+jason.label=Jason
+
 
 # plugin toolbar buttons
 #jason.run-mas.icon=run.png
 #jason.debug-mas.icon=Debug MAS
 #jason.stop-mas.icon=Stop current running MAS
+

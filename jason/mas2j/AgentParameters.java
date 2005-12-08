@@ -1,4 +1,4 @@
-package jIDE.mas2j;
+package jason.mas2j;
 
 import jason.architecture.AgArch;
 
