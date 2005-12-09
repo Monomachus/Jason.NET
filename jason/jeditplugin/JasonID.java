@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.4  2005/12/09 21:34:45  jomifred
+//   no message
+//
 //   Revision 1.3  2005/12/09 14:47:40  jomifred
 //   no message
 //
@@ -34,6 +37,7 @@
 
 package jason.jeditplugin;
 
+import jIDE.MAS2JEditorPane;
 import jIDE.RunMAS;
 import jIDE.RunningMASListener;
 import jason.mas2j.MAS2JProject;
@@ -58,7 +62,9 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.Icon;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -105,6 +111,7 @@ public class JasonID extends JPanel implements EBComponent, RunningMASListener {
 
 		textArea = new JTextArea();
 		textArea.setEditable(false);
+		textArea.setText("Use the menu Plugin->Jason->New to create a new project.");
 		JScrollPane pane = new JScrollPane(textArea);
 		add(BorderLayout.CENTER, pane);
 
@@ -371,8 +378,28 @@ public class JasonID extends JPanel implements EBComponent, RunningMASListener {
 	}
 
 	public void newMAS() {
-		// TODO: implement
-		textArea.setText("New not implemented!");
+        String tmpFileName = JOptionPane.showInputDialog("What is the new project name?");
+
+        if (tmpFileName == null) {
+        	return;
+        }
+        if (Character.isUpperCase(tmpFileName.charAt(0))) {
+        	tmpFileName = Character.toLowerCase(tmpFileName.charAt(0)) + tmpFileName.substring(1);
+        }
+        JFileChooser chooser = new JFileChooser(System.getProperty("user.dir"));
+        chooser.setDialogTitle("Select the project folder");
+        chooser.setAcceptAllFileFilterUsed(false);
+        chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+			File f = chooser.getSelectedFile();
+			if (f.isDirectory()) {
+				String pFile = f.getAbsolutePath() + File.separator + tmpFileName + ".mas2j";
+				Buffer b = org.gjt.sp.jedit.jEdit.openFile(view, pFile);
+				b.insert(0,MAS2JEditorPane.getDefaultText(tmpFileName, "ag1;"));
+			}
+		} else {
+			return;
+		}
 	}
 
 	public void editLog() {

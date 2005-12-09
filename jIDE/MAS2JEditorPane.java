@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.9  2005/12/09 21:34:44  jomifred
+//   no message
+//
 //   Revision 1.8  2005/11/22 00:05:32  jomifred
 //   no message
 //
@@ -49,11 +52,11 @@ public class MAS2JEditorPane extends ASEditorPane {
 		syntaxHL = new MAS2JSyntaxHighLight(editor, this.mainID);
 	}
     
-	String getDefaultText(String s) {
+	public String getDefaultText(String s) {
 		return getDefaultText(s, "ag1;");
 	}
 	
-	String getDefaultText(String s, String ags) {
+	public static String getDefaultText(String s, String ags) {
 		if (s.length() == 0) {
 			s = "<replace with project name>";
 		}
@@ -62,7 +65,7 @@ public class MAS2JEditorPane extends ASEditorPane {
 				+ "   //environment: <replace with the environment class name>\n\n"
 				+ "   agents:\n"
 				+ "       "+ags+"\n" 
-				+ "       //<add more agent names here>\n\n" 
+				+ "       //<add more agent names here>\n" 
 				+ "}";
 	}
 }
