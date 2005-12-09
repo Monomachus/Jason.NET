@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.3  2005/12/09 14:47:40  jomifred
+//   no message
+//
 //   Revision 1.2  2005/12/08 20:06:59  jomifred
 //   changes for JasonIDE plugin
 //
@@ -44,10 +47,12 @@ public class JasonIDPlugin extends EBPlugin {
 
 
     public void handleMessage(EBMessage msg) {
-    	DockableWindowManager d = org.gjt.sp.jedit.jEdit.getViews()[0].getDockableWindowManager();
-    	if (!d.isDockableWindowVisible(NAME)) {
-    		d.addDockableWindow(NAME);
-        }
+    	if (org.gjt.sp.jedit.jEdit.getViews().length > 0) {
+	    	DockableWindowManager d = org.gjt.sp.jedit.jEdit.getViews()[0].getDockableWindowManager();
+	    	if (!d.isDockableWindowVisible(NAME)) {
+	    		d.addDockableWindow(NAME);
+	        }
+    	}
 	}
 
     /*

@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.3  2005/12/09 14:47:40  jomifred
+//   no message
+//
 //   Revision 1.2  2005/12/08 20:06:59  jomifred
 //   changes for JasonIDE plugin
 //
@@ -251,7 +254,7 @@ public class JasonID extends JPanel implements EBComponent, RunningMASListener {
             
         } catch (ParseException ex) {
         	textArea.append("\nmas2j: parsing errors found... \n" + ex + "\n");
-        	if (ex.currentToken != null && ex.currentToken.next != null) {
+        	if (ex.currentToken != null && ex.currentToken.next != null && errorSource != null) {
         		errorSource.addError(new DefaultErrorSource.DefaultError(
         				errorSource, 
         				ErrorSource.ERROR, 
@@ -283,7 +286,7 @@ public class JasonID extends JPanel implements EBComponent, RunningMASListener {
             
         } catch (jason.asSyntax.parser.ParseException ex) {
         	textArea.append("\nas2j: parsing errors found... \n" + ex + "\n");
-        	if (ex.currentToken != null && ex.currentToken.next != null) {
+        	if (ex.currentToken != null && ex.currentToken.next != null && errorSource != null) {
         		errorSource.addError(new DefaultErrorSource.DefaultError(
         				errorSource, 
         				ErrorSource.ERROR, 
@@ -291,6 +294,11 @@ public class JasonID extends JPanel implements EBComponent, RunningMASListener {
         				ex.currentToken.next.beginLine-1, 0, 0,
         		    	ex.toString()));
         	}
+	    	DockableWindowManager d = view.getDockableWindowManager();
+	    	if (!d.isDockableWindowVisible("error-list")) {
+	    		d.addDockableWindow("error-list");
+	        }
+        	
         } catch (TokenMgrError ex) {
         	textArea.append("\nmas2j: error parsing tokens ... \n" + ex + "\n");
         } catch (Exception ex) {
@@ -317,7 +325,7 @@ public class JasonID extends JPanel implements EBComponent, RunningMASListener {
 	public void runMAS(boolean debug) {
 		Buffer b = getProjectBuffer();
 		if (b == null) {
-			textArea.setText("There is no Jason project open!\n");
+			textArea.setText("There is no Jason project opened!\n");
 		} else {
 			textArea.setText("Running project "+b.getName()+"\n");
 			if (errorSource == null) {

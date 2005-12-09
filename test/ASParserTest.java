@@ -31,7 +31,7 @@ public class ASParserTest extends TestCase {
 		
 		ag = new Agent();
 		ag.setLogger(null);
-		assertTrue(ag.parseAS("examples/Simple/as/ag0.asl"));
-		assertTrue(ag.parseAS("examples/Simple/as/ag1.asl"));		
+		assertTrue(ag.parseAS("examples/Test/as/ag0.asl"));
+		assertTrue(ag.parseAS("examples/Test/as/ag1.asl"));		
 	}
 }
