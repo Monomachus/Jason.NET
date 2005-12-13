@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.5  2005/12/13 18:23:39  jomifred
+//   no message
+//
 //   Revision 1.4  2005/12/09 21:34:45  jomifred
 //   no message
 //
@@ -332,7 +335,7 @@ public class JasonID extends JPanel implements EBComponent, RunningMASListener {
 	public void runMAS(boolean debug) {
 		Buffer b = getProjectBuffer();
 		if (b == null) {
-			textArea.setText("There is no Jason project opened!\n");
+			textArea.setText("There is no Jason project opened!");
 		} else {
 			textArea.setText("Running project "+b.getName()+"\n");
 			if (errorSource == null) {

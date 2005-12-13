@@ -1,0 +1,21 @@
+# default properties of jedit
+# when used with Jason
+#
+firstTime=false
+view.fontsize=14
+view.antiAlias=true
+view.eolMarkers=false
+view.gutter.lineNumbers=true
+view.toolbar.alternateLayout=true
+view.y=1
+view.x=82
+view.height=531
+view.width=826
+jason.dock-position=bottom
+buffertabs.color-tabs=true
+buffertabs.color-variation=true
+buffertabs.icons=true
+buffertabs.enable=true
+buffertabs.location=top
+error-list.dock-position=bottom
+projectviewer.dock-position=left
