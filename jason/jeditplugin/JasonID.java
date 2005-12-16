@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.7  2005/12/16 22:41:16  jomifred
+//   no message
+//
 //   Revision 1.6  2005/12/16 22:09:20  jomifred
 //   no message
 //
@@ -445,28 +448,30 @@ public class JasonID extends JPanel implements EBComponent, RunningMASListener {
 	
 	private void checkProjectView(String projName, File projDirectory) {
 		// add in project viewer
-		EditPlugin pv = org.gjt.sp.jedit.jEdit.getPlugin("projectviewer.ProjectPlugin",false);
-		if (pv != null) {
-			// we can use the projectviewer plugin
-			ProjectManager pm = ProjectManager.getInstance();
-			ProjectViewer projView = ProjectViewer.getViewer(view);
-			if (! pm.hasProject(projName)) {
-				VPTProject proj = new VPTProject(projName);
-				proj.setRootPath(projDirectory.getAbsolutePath());
+		EditPlugin pv = org.gjt.sp.jedit.jEdit.getPlugin(projectviewer.ProjectPlugin.class.getName(),false);
+		if (pv == null) {
+			return;
+		}
 
-				pm.addProject(proj, VPTRoot.getInstance()); //(VPTGroup)projView.getRoot()); //(VPTGroup)projView.getRoot()
-				projView.setActiveNode(view, proj);
-				
-				FileImporter fi = new FileImporter(proj, projView);
-				fi.doImport();
-								
-				// add special actions (new agent, run, ....)
-			} else {
-				// show it
-				VPTProject proj = pm.getProject(projName);
-				projView.setActiveNode(view, proj);
-			}
-		}				
+		// we can use the projectviewer plugin
+		ProjectManager pm = ProjectManager.getInstance();
+		ProjectViewer projView = ProjectViewer.getViewer(view);
+		if (! pm.hasProject(projName)) {
+			VPTProject proj = new VPTProject(projName);
+			proj.setRootPath(projDirectory.getAbsolutePath());
+
+			pm.addProject(proj, VPTRoot.getInstance());
+			projView.setActiveNode(view, proj);
+			
+			FileImporter fi = new FileImporter(proj, projView);
+			fi.doImport();
+							
+			// add special actions (new agent, run, ....)
+		} else {
+			// show it
+			VPTProject proj = pm.getProject(projName);
+			projView.setActiveNode(view, proj);
+		}
 	}
 	
 	public void editLog() {
