@@ -11,18 +11,28 @@ plugin.jason.jeditplugin.JasonIDPlugin.depend.2=plugin errorlist.ErrorListPlugin
 
 
 # application menu items
-plugin.jason.jeditplugin.JasonIDPlugin.menu=jason - jason.run-mas jason.debug-mas jason.stop-mas jason.new-mas jason.edit-log
+plugin.jason.jeditplugin.JasonIDPlugin.menu=jason - \
+  jason.run-mas jason.debug-mas jason.stop-mas \
+  - \
+  jason.new-mas \
+  - \
+  jason.edit-log
 
 # action labels
 jason.run-mas.label=Run MAS
 jason.debug-mas.label=Debug MAS
 jason.stop-mas.label=Stop current running MAS
 jason.new-mas.label=New Project
-jason.edit-log.label=Edit MAS log parameters
+jason.edit-log.label=Edit log parameters
 
 # Dockables
 jason.title=Jason IDE
 jason.label=Jason
+
+# Options
+plugin.jason.jeditplugin.JasonIDPlugin.option-pane=general
+options.general.label=Jason
+options.general.code=new jason.jeditplugin.JasonIDOptionPanel();
 
 
 # plugin toolbar buttons

@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.6  2005/12/16 22:09:20  jomifred
+//   no message
+//
 //   Revision 1.5  2005/12/13 18:23:39  jomifred
 //   no message
 //
@@ -47,6 +50,7 @@ import jason.mas2j.MAS2JProject;
 import jason.mas2j.parser.ParseException;
 import jason.mas2j.parser.TokenMgrError;
 import jason.runtime.OutputStreamAdapter;
+import jason.runtime.RunCentralisedMAS;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -56,8 +60,12 @@ import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.EOFException;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringReader;
 import java.util.Iterator;
 
@@ -78,12 +86,18 @@ import org.gjt.sp.jedit.Buffer;
 import org.gjt.sp.jedit.EBComponent;
 import org.gjt.sp.jedit.EBMessage;
 import org.gjt.sp.jedit.EditBus;
+import org.gjt.sp.jedit.EditPlugin;
 import org.gjt.sp.jedit.GUIUtilities;
 import org.gjt.sp.jedit.View;
 import org.gjt.sp.jedit.gui.AnimatedIcon;
 import org.gjt.sp.jedit.gui.DockableWindowManager;
 import org.gjt.sp.jedit.gui.RolloverButton;
+import org.gjt.sp.jedit.msg.BufferUpdate;
 
+import projectviewer.ProjectManager;
+import projectviewer.ProjectViewer;
+import projectviewer.vpt.VPTProject;
+import projectviewer.vpt.VPTRoot;
 import errorlist.DefaultErrorSource;
 import errorlist.ErrorSource;
 
@@ -150,12 +164,6 @@ public class JasonID extends JPanel implements EBComponent, RunningMASListener {
 		animationLabel.setIcon(animation);
 		toolBar.add(animationLabel);
 		
-		toolBar.add(createToolBarButton("New MAS", GUIUtilities.loadIcon("New.png"), new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
-				newMAS();
-			}
-		}));
-		
 		btRun = createToolBarButton("Run MAS", GUIUtilities.loadIcon("Run.png"), new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				runMAS();
@@ -177,7 +185,15 @@ public class JasonID extends JPanel implements EBComponent, RunningMASListener {
 		});
 		btStop.setEnabled(false);
 		toolBar.add(btStop);
+
+		toolBar.addSeparator();
+		toolBar.add(createToolBarButton("New MAS", GUIUtilities.loadIcon("New.png"), new ActionListener() {
+			public void actionPerformed(ActionEvent evt) {
+				newMAS();
+			}
+		}));
 		
+		toolBar.addSeparator();
 		toolBar.add(createToolBarButton("Clear panel", GUIUtilities.loadIcon("Clear.png"), new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				textArea.setText("");
@@ -203,18 +219,18 @@ public class JasonID extends JPanel implements EBComponent, RunningMASListener {
     	/*
         if (message instanceof PropertiesChanged) {
             propertiesChanged();
-        } else if (message instanceof BufferUpdate) {
+        } else */
+
+    	if (message instanceof BufferUpdate) {
         	BufferUpdate bu = (BufferUpdate)message;
-        	if (bu.getBuffer().getPath().endsWith("mas2j")) {
-        		if (bu.getWhat() == BufferUpdate.CLOSED) {
-        			//projectBufffer = null;
-        		} else {
-        			projectBufffer = bu.getBuffer();
-        			textArea.append("*"+projectBufffer.getPath());
-        		}
+        	
+        	if (bu.getWhat() == BufferUpdate.CREATED &&
+        		bu.getBuffer().getPath().endsWith(MAS2JProject.EXT)) {
+        		
+        		String projName = bu.getBuffer().getName().substring(0, bu.getBuffer().getName().length()-(MAS2JProject.EXT.length()+1));
+        		checkProjectView(projName, new File(bu.getBuffer().getDirectory()));
         	}
         }
-        */
     }
 
 
@@ -228,10 +244,24 @@ public class JasonID extends JPanel implements EBComponent, RunningMASListener {
         EditBus.removeFromBus(this);
     }
 
+	/** returns the current MAS2J project */
 	private Buffer getProjectBuffer() {
+		if (view.getBuffer().getPath().endsWith(MAS2JProject.EXT)) {
+			return view.getBuffer();
+		}
 		Buffer[] bufs = org.gjt.sp.jedit.jEdit.getBuffers();
         for (int i = 0; i < bufs.length; i++) {
-            if (bufs[i].getPath().endsWith(".mas2j")) {
+            if (bufs[i].getPath().endsWith(MAS2JProject.EXT)) {
+            	return bufs[i];
+            }
+        }
+        return null;
+	}
+	
+	private Buffer getProjectBuffer(String name) {
+		Buffer[] bufs = org.gjt.sp.jedit.jEdit.getBuffers();
+        for (int i = 0; i < bufs.length; i++) {
+            if (bufs[i].getPath().endsWith(name)) {
             	return bufs[i];
             }
         }
@@ -381,33 +411,89 @@ public class JasonID extends JPanel implements EBComponent, RunningMASListener {
 	}
 
 	public void newMAS() {
-        String tmpFileName = JOptionPane.showInputDialog("What is the new project name?");
+        String projName = JOptionPane.showInputDialog("What is the new project name?");
 
-        if (tmpFileName == null) {
+        if (projName == null) {
         	return;
         }
-        if (Character.isUpperCase(tmpFileName.charAt(0))) {
-        	tmpFileName = Character.toLowerCase(tmpFileName.charAt(0)) + tmpFileName.substring(1);
+        if (Character.isUpperCase(projName.charAt(0))) {
+        	projName = Character.toLowerCase(projName.charAt(0)) + projName.substring(1);
         }
+        
+        if (getProjectBuffer(projName + "." + MAS2JProject.EXT) != null) {
+        	textArea.setText("There already is a project called "+projName);
+        	return;
+        }
+        
         JFileChooser chooser = new JFileChooser(System.getProperty("user.dir"));
         chooser.setDialogTitle("Select the project folder");
         chooser.setAcceptAllFileFilterUsed(false);
         chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
-			File f = chooser.getSelectedFile();
-			if (f.isDirectory()) {
-				String pFile = f.getAbsolutePath() + File.separator + tmpFileName + ".mas2j";
+			File projDirectory = chooser.getSelectedFile();
+			if (projDirectory.isDirectory()) {
+				String pFile = projDirectory.getAbsolutePath() + File.separator + projName + "." + MAS2JProject.EXT;
 				Buffer b = org.gjt.sp.jedit.jEdit.openFile(view, pFile);
-				b.insert(0,MAS2JEditorPane.getDefaultText(tmpFileName, "ag1;"));
+				b.insert(0,MAS2JEditorPane.getDefaultText(projName, "ag1;"));
+				checkProjectView(projName, projDirectory);
+
+				textArea.setText("Project created!");
 			}
-		} else {
-			return;
 		}
 	}
 
+	
+	private void checkProjectView(String projName, File projDirectory) {
+		// add in project viewer
+		EditPlugin pv = org.gjt.sp.jedit.jEdit.getPlugin("projectviewer.ProjectPlugin",false);
+		if (pv != null) {
+			// we can use the projectviewer plugin
+			ProjectManager pm = ProjectManager.getInstance();
+			ProjectViewer projView = ProjectViewer.getViewer(view);
+			if (! pm.hasProject(projName)) {
+				VPTProject proj = new VPTProject(projName);
+				proj.setRootPath(projDirectory.getAbsolutePath());
+
+				pm.addProject(proj, VPTRoot.getInstance()); //(VPTGroup)projView.getRoot()); //(VPTGroup)projView.getRoot()
+				projView.setActiveNode(view, proj);
+				
+				FileImporter fi = new FileImporter(proj, projView);
+				fi.doImport();
+								
+				// add special actions (new agent, run, ....)
+			} else {
+				// show it
+				VPTProject proj = pm.getProject(projName);
+				projView.setActiveNode(view, proj);
+			}
+		}				
+	}
+	
 	public void editLog() {
-		// TODO: implement
-		textArea.setText("EditLog not implemented!");
+		Buffer curBuf = getProjectBuffer();
+        try {
+        	InputStream in = JasonID.class.getResource("/"+RunCentralisedMAS.logPropFile).openStream();
+        	File f = new File(curBuf.getDirectory() + File.separator + RunCentralisedMAS.logPropFile);
+        	if (f.exists()) {
+        		in = new FileInputStream(f);
+        	}
+    		StringBuffer content = new StringBuffer();
+    		try {
+    			int c = in.read();
+    			while (c != -1) {
+    				content.append((char)c);
+    				c = in.read();
+    			}
+    		} catch (EOFException e) {
+    		} catch (IOException e) {
+    			System.err.println("Error reading text!");
+    			e.printStackTrace();
+    		}
+    		Buffer b = org.gjt.sp.jedit.jEdit.openFile(view, f.getAbsolutePath());
+    		b.insert(0,content.toString());
+        } catch (Exception ex) {
+        	ex.printStackTrace();
+        }
 	}
 	
 }

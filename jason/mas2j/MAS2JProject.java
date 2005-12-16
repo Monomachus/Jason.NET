@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.3  2005/12/16 22:09:20  jomifred
+//   no message
+//
 //   Revision 1.2  2005/12/13 12:43:50  jomifred
 //   no message
 //
@@ -62,6 +65,7 @@ public class MAS2JProject {
 	public static final String SACI_ARCH = "Saci";
 	public static final String CENT_ARCH = "Centralised";
 
+	public static final String EXT       = "mas2j";
 	
 	String soc;
 

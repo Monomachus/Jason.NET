@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.4  2005/12/16 22:09:20  jomifred
+//   no message
+//
 //   Revision 1.3  2005/12/09 14:47:40  jomifred
 //   no message
 //
@@ -49,20 +52,12 @@ public class JasonIDPlugin extends EBPlugin {
     public void handleMessage(EBMessage msg) {
     	if (org.gjt.sp.jedit.jEdit.getViews().length > 0) {
 	    	DockableWindowManager d = org.gjt.sp.jedit.jEdit.getViews()[0].getDockableWindowManager();
-	    	if (!d.isDockableWindowVisible(NAME)) {
-	    		d.addDockableWindow(NAME);
+	    	if (d.getDockableWindow(NAME) != null) {
+	    		if (!d.isDockableWindowVisible(NAME)) {
+	    			d.addDockableWindow(NAME);
+	    		}
 	        }
     	}
 	}
-
-    /*
-    public void createMenuItems(Vector menuItems) {
-        menuItems.addElement(GUIUtilities.loadMenu(MENU));
-    }
-    
-    public void createOptionPanes(OptionsDialog od) {
-		od.addOptionPane(new JasonOptionPanel());
-    }
-    */
 
 }

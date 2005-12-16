@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.2  2005/12/16 22:09:20  jomifred
+//   no message
+//
 //   Revision 1.1  2005/12/08 20:06:02  jomifred
 //   changes for JasonIDE plugin
 //
@@ -234,7 +237,7 @@ public class Config extends Properties {
         return false;
     }
     
-    static boolean checkJavaHomePath(String javaHome) {
+    public static boolean checkJavaHomePath(String javaHome) {
         try {
         	if (!javaHome.endsWith(File.separator)) {
         		javaHome += File.separator;
