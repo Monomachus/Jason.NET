@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.3  2005/12/17 19:28:47  jomifred
+//   no message
+//
 //   Revision 1.2  2005/12/16 22:09:20  jomifred
 //   no message
 //
@@ -37,6 +40,7 @@ package jason.jeditplugin;
 import jIDE.Config;
 
 import java.awt.FlowLayout;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -91,6 +95,7 @@ public class JasonIDOptionPanel extends AbstractOptionPane  {
 	}
 	
 	private void initGUI() {
+		JPanel pop = new JPanel(new GridLayout(0,1));
     	// jason home
     	JPanel jasonHomePanel = new JPanel();
     	jasonHomePanel.setBorder(BorderFactory.createTitledBorder(BorderFactory
@@ -117,7 +122,7 @@ public class JasonIDOptionPanel extends AbstractOptionPane  {
 			}
     	});
     	jasonHomePanel.add(setJason);
-    	addComponent(jasonHomePanel);
+    	pop.add(jasonHomePanel);
     	
     	
     	// saci home
@@ -146,7 +151,7 @@ public class JasonIDOptionPanel extends AbstractOptionPane  {
 			}
     	});
     	saciHomePanel.add(setSaci);
-    	addComponent(saciHomePanel);
+    	pop.add(saciHomePanel);
 
     	// java home
     	JPanel javaHomePanel = new JPanel();
@@ -173,7 +178,8 @@ public class JasonIDOptionPanel extends AbstractOptionPane  {
 			}
     	});
     	javaHomePanel.add(setJava);
-    	addComponent(javaHomePanel);
+    	pop.add(javaHomePanel);
+    	addComponent(pop);
     	
     	saciTF.setText(userProperties.getSaciJar());
     	jasonTF.setText(userProperties.getJasonJar());

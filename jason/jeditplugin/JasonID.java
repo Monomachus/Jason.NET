@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.8  2005/12/17 19:28:46  jomifred
+//   no message
+//
 //   Revision 1.7  2005/12/16 22:41:16  jomifred
 //   no message
 //
@@ -57,7 +60,7 @@ import jason.runtime.RunCentralisedMAS;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.Image;
 import java.awt.Insets;
 import java.awt.Toolkit;
@@ -75,6 +78,7 @@ import java.util.Iterator;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
@@ -118,6 +122,7 @@ public class JasonID extends JPanel implements EBComponent, RunningMASListener {
 	JButton btDebug;
 	
 	DefaultErrorSource errorSource = null;
+
 	
 	public JasonID(View view, String position) {
 		super(new BorderLayout());
@@ -141,12 +146,20 @@ public class JasonID extends JPanel implements EBComponent, RunningMASListener {
 	}
 	
 	public synchronized void start() {
+		//handleMessage(null); // to try to add parser in sidekick
 	}
 	
 	public synchronized void stop() {
         stopMAS();
+        /*
+		EditPlugin pv = org.gjt.sp.jedit.jEdit.getPlugin(SideKickPlugin.class.getName(),false);
+		if (pv != null) {
+			SideKickPlugin.unregisterParser(msp);
+		}
+		*/
     }
-	
+
+
 	private JPanel createToolBar() {
 		JToolBar toolBar = new JToolBar();
 		toolBar.setLayout(new BoxLayout(toolBar,BoxLayout.X_AXIS));
@@ -203,8 +216,14 @@ public class JasonID extends JPanel implements EBComponent, RunningMASListener {
 			}
 		}));
 		add(Box.createGlue());
-		JPanel p = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-		p.add(toolBar);
+		
+		JPanel p = new JPanel(new BorderLayout());
+		p.add(toolBar, BorderLayout.EAST);
+		
+		JLabel jasonLabel = new JLabel("Jason IDE", new ImageIcon(JasonID.class.getResource("/images/Jason-GMoreau-Small-Icon.jpg")), JLabel.CENTER);
+		jasonLabel.setFont(new Font("Times", Font.BOLD | Font.ITALIC, 16));
+		p.add(jasonLabel, BorderLayout.WEST);
+				
 		return p;
 	}
 	
@@ -220,6 +239,19 @@ public class JasonID extends JPanel implements EBComponent, RunningMASListener {
 	 	
     public void handleMessage(EBMessage message) {
     	/*
+    	if (msp == null) {
+    		EditPlugin pv = org.gjt.sp.jedit.jEdit.getPlugin(SideKickPlugin.class.getName(),false);
+    		if (pv != null) {
+    			msp = new JasonSideKickParser();
+    			SideKickPlugin.registerParser(msp);
+    			Log.log(Log.DEBUG,this,"Registered "+msp);
+    		}
+    	}
+    	*/
+    	
+    	if (message == null) return;
+    	
+    	/*
         if (message instanceof PropertiesChanged) {
             propertiesChanged();
         } else */
@@ -227,12 +259,21 @@ public class JasonID extends JPanel implements EBComponent, RunningMASListener {
     	if (message instanceof BufferUpdate) {
         	BufferUpdate bu = (BufferUpdate)message;
         	
-        	if (bu.getWhat() == BufferUpdate.CREATED &&
+        	if ((bu.getWhat() == BufferUpdate.LOADED || bu.getWhat() == BufferUpdate.CREATED) &&
         		bu.getBuffer().getPath().endsWith(MAS2JProject.EXT)) {
         		
         		String projName = bu.getBuffer().getName().substring(0, bu.getBuffer().getName().length()-(MAS2JProject.EXT.length()+1));
         		checkProjectView(projName, new File(bu.getBuffer().getDirectory()));
+        		
+        		//bu.getBuffer().setProperty("sidekick.parser",JasonSideKickParser.ID);
+
         	}
+        	/*
+          	if (bu.getWhat() == BufferUpdate.LOADED &&
+            	bu.getBuffer().getPath().endsWith(MAS2JProject.AS_EXT)) {
+          		bu.getBuffer().setProperty("sidekick.parser", AgentSpeakSideKickParser.ID);
+            } 
+            */       	
         }
     }
 
@@ -249,6 +290,7 @@ public class JasonID extends JPanel implements EBComponent, RunningMASListener {
 
 	/** returns the current MAS2J project */
 	private Buffer getProjectBuffer() {
+
 		if (view.getBuffer().getPath().endsWith(MAS2JProject.EXT)) {
 			return view.getBuffer();
 		}
@@ -282,7 +324,16 @@ public class JasonID extends JPanel implements EBComponent, RunningMASListener {
         // compile
         try {
         	textArea.append("Parsing project file... ");
-        	jason.mas2j.parser.mas2j parser = new jason.mas2j.parser.mas2j(new StringReader(projectBufffer.getText(0, projectBufffer.getLength())));
+        	
+        	String text;
+    		try	{
+    			projectBufffer.readLock();
+    			text = projectBufffer.getText(0,projectBufffer.getLength());
+    		} finally {
+    			projectBufffer.readUnlock();
+    		}
+
+        	jason.mas2j.parser.mas2j parser = new jason.mas2j.parser.mas2j(new StringReader(text));
         	MAS2JProject project = parser.mas();
         	project.setDirectory( projectBufffer.getDirectory());
             if (debug) {
@@ -375,6 +426,14 @@ public class JasonID extends JPanel implements EBComponent, RunningMASListener {
 				errorSource = new DefaultErrorSource("JasonIDE");
 				ErrorSource.registerErrorSource(errorSource);
 			}
+			
+			
+			Buffer[] bufs = org.gjt.sp.jedit.jEdit.getBuffers();
+			for (int i = 0; i < bufs.length; i++) {
+	        	System.out.println(bufs[i].getStringProperty("sidekick.parser"));
+	        }
+			
+			
 			errorSource.clear();
 			MAS2JProject project = parseProject(b, debug);
 			if (project != null) {
@@ -437,9 +496,22 @@ public class JasonID extends JPanel implements EBComponent, RunningMASListener {
 			if (projDirectory.isDirectory()) {
 				String pFile = projDirectory.getAbsolutePath() + File.separator + projName + "." + MAS2JProject.EXT;
 				Buffer b = org.gjt.sp.jedit.jEdit.openFile(view, pFile);
-				b.insert(0,MAS2JEditorPane.getDefaultText(projName, "ag1;"));
+				try {
+					b.writeLock();
+					b.insert(0, MAS2JEditorPane.getDefaultText(projName, "ag1;"));
+					b.save(view,pFile);
+				} finally {
+					b.writeUnlock();
+				}
 				checkProjectView(projName, projDirectory);
 
+		    	DockableWindowManager d = view.getDockableWindowManager();
+		    	if (d.getDockableWindow("projectviewer") != null) {
+		    		if (!d.isDockableWindowVisible("projectviewer")) {
+		    			d.addDockableWindow("projectviewer");
+		    		}
+		    	}
+				
 				textArea.setText("Project created!");
 			}
 		}
@@ -463,14 +535,14 @@ public class JasonID extends JPanel implements EBComponent, RunningMASListener {
 			pm.addProject(proj, VPTRoot.getInstance());
 			projView.setActiveNode(view, proj);
 			
-			FileImporter fi = new FileImporter(proj, projView);
+			JasonProjectImporter fi = new JasonProjectImporter(proj, projView);
 			fi.doImport();
 							
 			// add special actions (new agent, run, ....)
 		} else {
 			// show it
-			VPTProject proj = pm.getProject(projName);
-			projView.setActiveNode(view, proj);
+			//VPTProject proj = pm.getProject(projName);
+			//projView.setActiveNode(view, proj);
 		}
 	}
 	
@@ -495,7 +567,14 @@ public class JasonID extends JPanel implements EBComponent, RunningMASListener {
     			e.printStackTrace();
     		}
     		Buffer b = org.gjt.sp.jedit.jEdit.openFile(view, f.getAbsolutePath());
-    		b.insert(0,content.toString());
+			try {
+				b.writeLock();
+				b.insert(0,content.toString());
+				b.save(view,f.getAbsolutePath());
+			} finally {
+				b.writeUnlock();
+			}
+				
         } catch (Exception ex) {
         	ex.printStackTrace();
         }

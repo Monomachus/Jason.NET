@@ -22,6 +22,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.21  2005/12/17 19:28:45  jomifred
+//   no message
+//
 //   Revision 1.20  2005/08/18 01:22:21  jomifred
 //   (AS grammar) arithmeticExpression renamed to ae
 //
@@ -154,13 +157,20 @@ PlanLibrary ps() : { PlanLibrary pp = new PlanLibrary(); Plan pl;  }
 }
 
 /* Plan */
-Plan p() :         { Trigger T; ArrayList C; ArrayList H; Pred L = null; }
+Plan p() :         { Token k; Trigger T; ArrayList C; ArrayList H; Pred L = null; int start = -1, end;}
 {
-    [ <TK_LABEL_AT> L=at() ] 
-    T=te() 
-    ":" C=ct() 
-    "<-" H=bd() "." 
-                   { return new Plan(L,T,C,H);  }
+    [ k = <TK_LABEL_AT> L=at()  
+                   { start = k.beginLine; } 
+    ]
+    T=te()         
+    k = ":"        { if (start == -1) start = k.beginLine; }
+    C=ct() 
+    "<-" H=bd() 
+    k = "." 
+                   { end = k.beginLine;
+                     Plan p = new Plan(L,T,C,H);  
+                     p.setSourceLines(start,end);
+                     return p;}
 }
 
 /* Trigger */

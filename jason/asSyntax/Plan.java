@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.9  2005/12/17 19:28:44  jomifred
+//   no message
+//
 //   Revision 1.8  2005/08/12 22:26:08  jomifred
 //   add cvs keywords
 //
@@ -56,6 +59,9 @@ public class Plan implements Cloneable, Serializable {
 
 	Boolean isAtomic = null; // if the label has atomic annotation, used to cache the value, so we do not need to seach all label annotations each isAtomic()
 	
+	private int startSourceLine = 0; // the line number in the AS source
+	private int endSourceLine = 0; // the line number in the AS source
+	
 	static private Logger logger = Logger.getLogger(Plan.class.getName());
 
 	
@@ -85,6 +91,17 @@ public class Plan implements Cloneable, Serializable {
 		}
 	}
 
+	public void setSourceLines(int b, int e) {
+		startSourceLine = b;
+		endSourceLine = e;
+	}
+	public int getStartSourceLine() {
+		return startSourceLine;
+	}
+	public int getEndSourceLine() {
+		return endSourceLine;
+	}
+	
 	public Pred getLabel() {
 		return label;
 	}

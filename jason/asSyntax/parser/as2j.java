@@ -94,23 +94,28 @@
 
 /* Plan */
   final public Plan p() throws ParseException {
-                     Trigger T; ArrayList C; ArrayList H; Pred L = null;
+                     Token k; Trigger T; ArrayList C; ArrayList H; Pred L = null; int start = -1, end;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case TK_LABEL_AT:
-      jj_consume_token(TK_LABEL_AT);
+      k = jj_consume_token(TK_LABEL_AT);
       L = at();
+                                  start = k.beginLine;
       break;
     default:
       jj_la1[2] = jj_gen;
       ;
     }
     T = te();
-    jj_consume_token(23);
+    k = jj_consume_token(23);
+                     if (start == -1) start = k.beginLine;
     C = ct();
     jj_consume_token(24);
     H = bd();
-    jj_consume_token(22);
-                     {if (true) return new Plan(L,T,C,H);}
+    k = jj_consume_token(22);
+                     end = k.beginLine;
+                     Plan p = new Plan(L,T,C,H);
+                     p.setSourceLines(start,end);
+                     {if (true) return p;}
     throw new Error("Missing return statement in function");
   }
 

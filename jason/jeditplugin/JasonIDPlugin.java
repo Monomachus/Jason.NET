@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.5  2005/12/17 19:28:47  jomifred
+//   no message
+//
 //   Revision 1.4  2005/12/16 22:09:20  jomifred
 //   no message
 //
@@ -38,9 +41,19 @@
 package jason.jeditplugin;
 
 
+import jason.mas2j.MAS2JProject;
+
+import org.apache.log4j.ConsoleAppender;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PatternLayout;
 import org.gjt.sp.jedit.EBMessage;
 import org.gjt.sp.jedit.EBPlugin;
 import org.gjt.sp.jedit.gui.DockableWindowManager;
+import org.gjt.sp.jedit.msg.BufferUpdate;
+import org.gjt.sp.util.Log;
+
+import sidekick.SideKickPlugin;
 
 public class JasonIDPlugin extends EBPlugin {
 	public static final String NAME = "jason";
@@ -48,16 +61,45 @@ public class JasonIDPlugin extends EBPlugin {
     public static final String PROPERTY_PREFIX = "plugin.jason.";
     public static final String OPTION_PREFIX   = "options.jason.";
 
-
+    static {
+		Logger.getRootLogger().addAppender(new ConsoleAppender(new PatternLayout("[%c{1}] %m%n")));
+		Logger.getRootLogger().setLevel(Level.INFO);    	
+    }
+    
     public void handleMessage(EBMessage msg) {
     	if (org.gjt.sp.jedit.jEdit.getViews().length > 0) {
 	    	DockableWindowManager d = org.gjt.sp.jedit.jEdit.getViews()[0].getDockableWindowManager();
 	    	if (d.getDockableWindow(NAME) != null) {
 	    		if (!d.isDockableWindowVisible(NAME)) {
 	    			d.addDockableWindow(NAME);
+	    			d.toggleDockableWindow(NAME);
+	    			//d.floatDockableWindow(NAME);
+	    	    	//Log.log(Log.DEBUG,this,"Add to dock");
+	    			//JasonID jid = (JasonID)d.getDockableWindow(NAME);
+	    			//jid.start();
 	    		}
 	        }
     	}
+    	
+    	if (msg != null && msg instanceof BufferUpdate) {
+        	BufferUpdate bu = (BufferUpdate)msg;
+        	if ((bu.getWhat() == BufferUpdate.LOADED || bu.getWhat() == BufferUpdate.CREATED) &&
+            	bu.getBuffer().getPath().endsWith(MAS2JProject.AS_EXT)) {
+          		bu.getBuffer().setProperty("sidekick.parser", AgentSpeakSideKickParser.ID);
+            }
+    	}
 	}
-
+    
+    AgentSpeakSideKickParser jskp = new AgentSpeakSideKickParser(); 
+    
+	public void start() {
+    	SideKickPlugin.registerParser(jskp);
+    	Log.log(Log.DEBUG,this,"Registered "+jskp);
+    	
+    	handleMessage(null);
+    } 
+	
+	public void stop() {
+		SideKickPlugin.unregisterParser(jskp);
+	}
 }
