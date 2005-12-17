@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.9  2005/12/17 19:51:58  jomifred
+//   no message
+//
 //   Revision 1.8  2005/12/17 19:28:46  jomifred
 //   no message
 //
@@ -134,7 +137,7 @@ public class JasonID extends JPanel implements EBComponent, RunningMASListener {
 		boolean floating = position.equals(DockableWindowManager.FLOATING);
 		if (floating) this.setPreferredSize(new Dimension(500, 250));
 
-		textArea = new JTextArea();
+		textArea = new JTextArea(5,10);
 		textArea.setEditable(false);
 		textArea.setText("Use the menu Plugin->Jason->New to create a new project.");
 		JScrollPane pane = new JScrollPane(textArea);
@@ -142,7 +145,6 @@ public class JasonID extends JPanel implements EBComponent, RunningMASListener {
 
         myOut = new OutputStreamAdapter(null, textArea);
         myOut.setAsDefaultOut();
-
 	}
 	
 	public synchronized void start() {
@@ -426,13 +428,6 @@ public class JasonID extends JPanel implements EBComponent, RunningMASListener {
 				errorSource = new DefaultErrorSource("JasonIDE");
 				ErrorSource.registerErrorSource(errorSource);
 			}
-			
-			
-			Buffer[] bufs = org.gjt.sp.jedit.jEdit.getBuffers();
-			for (int i = 0; i < bufs.length; i++) {
-	        	System.out.println(bufs[i].getStringProperty("sidekick.parser"));
-	        }
-			
 			
 			errorSource.clear();
 			MAS2JProject project = parseProject(b, debug);

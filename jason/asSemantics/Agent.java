@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.19  2005/12/17 19:51:57  jomifred
+//   no message
+//
 //   Revision 1.18  2005/10/30 18:38:34  jomifred
 //   change in the AgArch customisation  support (the same customisation is used both to Cent and Saci infrastructures0
 //
@@ -375,9 +378,11 @@ public class Agent {
 
 	// only add External Event if it is relevant in respect to the PlanLibrary
 	public void updateEvents(Event e, Circumstance c) {
-		if (e.isInternal() || fPS.isRelevant(e.trigger)) {
-			c.E.add(e);
-			logger.debug("Added event "+e);
+		if (c != null) {
+			if (e.isInternal() || fPS.isRelevant(e.trigger)) {
+				c.E.add(e);
+				logger.debug("Added event "+e);
+			}
 		}
 	}
 

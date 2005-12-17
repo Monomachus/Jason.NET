@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.6  2005/12/17 19:51:58  jomifred
+//   no message
+//
 //   Revision 1.5  2005/12/17 19:28:47  jomifred
 //   no message
 //
@@ -40,6 +43,8 @@
 
 package jason.jeditplugin;
 
+
+import javax.swing.SwingUtilities;
 
 import jason.mas2j.MAS2JProject;
 
@@ -68,16 +73,23 @@ public class JasonIDPlugin extends EBPlugin {
     
     public void handleMessage(EBMessage msg) {
     	if (org.gjt.sp.jedit.jEdit.getViews().length > 0) {
-	    	DockableWindowManager d = org.gjt.sp.jedit.jEdit.getViews()[0].getDockableWindowManager();
-	    	if (d.getDockableWindow(NAME) != null) {
+	    	final DockableWindowManager d = org.gjt.sp.jedit.jEdit.getViews()[0].getDockableWindowManager();
+	    	if (d.getDockableWindow(NAME) == null) {
+	    		/*
 	    		if (!d.isDockableWindowVisible(NAME)) {
 	    			d.addDockableWindow(NAME);
-	    			d.toggleDockableWindow(NAME);
 	    			//d.floatDockableWindow(NAME);
 	    	    	//Log.log(Log.DEBUG,this,"Add to dock");
 	    			//JasonID jid = (JasonID)d.getDockableWindow(NAME);
 	    			//jid.start();
 	    		}
+	        } else {
+	        */
+    			SwingUtilities.invokeLater(new Thread() {
+    				public void run() {
+    					d.addDockableWindow(NAME);
+    				}
+    			});
 	        }
     	}
     	

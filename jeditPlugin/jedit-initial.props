@@ -21,3 +21,4 @@ error-list.dock-position=bottom
 projectviewer.dock-position=left
 buffer.sidekick.keystroke-parse=true
 sidekick-tree.dock-position=left
+tip.show=false
