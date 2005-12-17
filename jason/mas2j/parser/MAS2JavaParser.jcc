@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.2  2005/12/17 17:36:20  jomifred
+//   no message
+//
 //   Revision 1.1  2005/12/08 20:13:53  jomifred
 //   changes for JasonIDE plugin
 //
@@ -92,7 +95,7 @@ public class mas2j {
       try {
 		project = parser.mas();
 		Config.get().fix();
-        project.setProjectDir(new File(".").getAbsolutePath());
+        project.setDirectory(new File(".").getAbsolutePath());
 		System.out.println("mas2j: "+name+" parsed successfully!\n");
 		project.writeXMLScript();
         project.writeScripts();
