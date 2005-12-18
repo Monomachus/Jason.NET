@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.10  2005/12/18 15:31:02  jomifred
+//   no message
+//
 //   Revision 1.9  2005/12/09 21:34:44  jomifred
 //   no message
 //
@@ -52,7 +55,7 @@ public class MAS2JEditorPane extends ASEditorPane {
 		syntaxHL = new MAS2JSyntaxHighLight(editor, this.mainID);
 	}
     
-	public String getDefaultText(String s) {
+	public static String getDefaultText(String s) {
 		return getDefaultText(s, "ag1;");
 	}
 	

@@ -19,7 +19,7 @@ import errorlist.DefaultErrorSource;
 import errorlist.ErrorSource;
 
 public class AgentSpeakSideKickParser extends sidekick.SideKickParser {
-	public static final String ID = "jason_parser";
+	public static final String ID = "as_parser";
 	
 	public AgentSpeakSideKickParser() {
 		super(ID);
@@ -65,8 +65,6 @@ public class AgentSpeakSideKickParser extends sidekick.SideKickParser {
         }
     	return null;		
 	}
-	
-
 	
 	
 	public String toString() {
@@ -119,5 +117,3 @@ public class AgentSpeakSideKickParser extends sidekick.SideKickParser {
 		}
 	}
 }
-
-

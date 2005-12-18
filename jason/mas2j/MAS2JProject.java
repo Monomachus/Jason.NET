@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.5  2005/12/18 15:31:02  jomifred
+//   no message
+//
 //   Revision 1.4  2005/12/17 17:36:19  jomifred
 //   no message
 //
@@ -65,8 +68,8 @@ import java.util.Set;
  */
 public class MAS2JProject {
 
-	public static final String SACI_ARCH = "Saci";
-	public static final String CENT_ARCH = "Centralised";
+	public static final String SACI_INFRA = "Saci";
+	public static final String CENT_INFRA = "Centralised";
 
 	public static final String EXT       = "mas2j";
 	public static final String AS_EXT    = "asl";
@@ -81,7 +84,7 @@ public class MAS2JProject {
 	
 	boolean debug = false;
 
-	String architecture = CENT_ARCH;
+	String infrastructure = CENT_INFRA;
 
 	String projectDir = "." + File.separator;
 	
@@ -106,11 +109,11 @@ public class MAS2JProject {
 		return projectDir + soc + ".xml";
 	}
 
-	public void setArchitecture(String a) {
-		architecture = a;
+	public void setInfrastructure(String a) {
+		infrastructure = a;
 	}
-	public String getArchitecture() {
-		return architecture;
+	public String getInfrastructure() {
+		return infrastructure;
 	}
 
 	public void setEnvClass(String e) {
@@ -133,10 +136,10 @@ public class MAS2JProject {
 	}
 
 	public boolean isSaciArch() {
-		return architecture.equals(SACI_ARCH);
+		return infrastructure.equals(SACI_INFRA);
 	}
 	public boolean isCentArch() {
-		return architecture.equals(CENT_ARCH);
+		return infrastructure.equals(CENT_INFRA);
 	}
 	
 	public void setControlClass(String sControl) {
@@ -171,6 +174,10 @@ public class MAS2JProject {
 			}
 		}
 		return null;
+	}
+	
+	public List getAgents() {
+		return agents;
 	}
 	
 	public Set getAllASFiles() {
@@ -261,7 +268,7 @@ public class MAS2JProject {
 		Iterator iag = agents.iterator();
 		while (iag.hasNext()) {
 			AgentParameters agp = (AgentParameters)iag.next();
-			out.println(agp.getAsXMLScript(projectDir, soc, architecture, debug, controlClass != null));
+			out.println(agp.getAsXMLScript(projectDir, soc, infrastructure, debug, controlClass != null));
 		}
 		
 		// controller
@@ -464,7 +471,7 @@ public class MAS2JProject {
 
 	public String toString() {
 		StringBuffer s = new StringBuffer("MAS " + getSocName() + " {\n");
-		s.append("   infrastructure: "+getArchitecture()+"\n");
+		s.append("   infrastructure: "+getInfrastructure()+"\n");
 		s.append("   environment: "+getEnvClass());
 		if (envHost != null) {
 			s.append(" at "+envHost);

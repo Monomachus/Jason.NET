@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.10  2005/12/18 15:31:02  jomifred
+//   no message
+//
 //   Revision 1.9  2005/12/17 19:51:58  jomifred
 //   no message
 //
@@ -52,7 +55,6 @@
 
 package jason.jeditplugin;
 
-import jIDE.MAS2JEditorPane;
 import jIDE.RunMAS;
 import jIDE.RunningMASListener;
 import jason.mas2j.MAS2JProject;
@@ -83,9 +85,7 @@ import javax.swing.BoxLayout;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JFileChooser;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -148,17 +148,10 @@ public class JasonID extends JPanel implements EBComponent, RunningMASListener {
 	}
 	
 	public synchronized void start() {
-		//handleMessage(null); // to try to add parser in sidekick
 	}
 	
 	public synchronized void stop() {
         stopMAS();
-        /*
-		EditPlugin pv = org.gjt.sp.jedit.jEdit.getPlugin(SideKickPlugin.class.getName(),false);
-		if (pv != null) {
-			SideKickPlugin.unregisterParser(msp);
-		}
-		*/
     }
 
 
@@ -182,21 +175,14 @@ public class JasonID extends JPanel implements EBComponent, RunningMASListener {
 		animationLabel.setIcon(animation);
 		toolBar.add(animationLabel);
 		
-		btRun = createToolBarButton("Run MAS", GUIUtilities.loadIcon("Run.png"), new ActionListener() {
+		btRun = createToolBarButton("Run MAS", GUIUtilities.loadIcon("Play.png"), new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				runMAS();
 			}
 		});
 		toolBar.add(btRun);
 		
-		btDebug = createToolBarButton("Debug MAS", GUIUtilities.loadIcon("RunAgain.png"), new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				debugMAS();
-			}
-		});
-		toolBar.add(btDebug);
-		
-		btStop = createToolBarButton("Stop MAS", GUIUtilities.loadIcon("Cancel.png"), new ActionListener() {
+		btStop = createToolBarButton("Stop MAS", GUIUtilities.loadIcon("Stop.png"), new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				stopMAS();
 			}
@@ -204,12 +190,32 @@ public class JasonID extends JPanel implements EBComponent, RunningMASListener {
 		btStop.setEnabled(false);
 		toolBar.add(btStop);
 
+		btDebug = createToolBarButton("Debug MAS", GUIUtilities.loadIcon("RunAgain.png"), new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				debugMAS();
+			}
+		});
+		toolBar.add(btDebug);
+		
+
 		toolBar.addSeparator();
-		toolBar.add(createToolBarButton("New MAS", GUIUtilities.loadIcon("New.png"), new ActionListener() {
+		toolBar.add(createToolBarButton("New MAS", GUIUtilities.loadIcon("NewDir.png"), new ActionListener() {
 			public void actionPerformed(ActionEvent evt) {
 				newMAS();
 			}
 		}));
+
+		toolBar.add(createToolBarButton("New Agent", GUIUtilities.loadIcon("NextFile.png"), new ActionListener() {
+			public void actionPerformed(ActionEvent evt) {
+				Buffer b = getProjectBuffer();
+				if (b == null) {
+					textArea.setText("There is no Jason project opened to add an agent, create a project first.");
+				} else {
+					new NewAgentGUI("New agent for project "+b.getName(), b, view);
+				}
+			}
+		}));
+		
 		
 		toolBar.addSeparator();
 		toolBar.add(createToolBarButton("Clear panel", GUIUtilities.loadIcon("Clear.png"), new ActionListener() {
@@ -222,9 +228,17 @@ public class JasonID extends JPanel implements EBComponent, RunningMASListener {
 		JPanel p = new JPanel(new BorderLayout());
 		p.add(toolBar, BorderLayout.EAST);
 		
-		JLabel jasonLabel = new JLabel("Jason IDE", new ImageIcon(JasonID.class.getResource("/images/Jason-GMoreau-Small-Icon.jpg")), JLabel.CENTER);
+		JButton about = createToolBarButton("About Jason", new ImageIcon(JasonID.class.getResource("/images/Jason-GMoreau-Small-Icon.jpg")), new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				AboutGUI.show(view);
+			}
+		});
+		JLabel jasonLabel = new JLabel("Jason IDE");
 		jasonLabel.setFont(new Font("Times", Font.BOLD | Font.ITALIC, 16));
-		p.add(jasonLabel, BorderLayout.WEST);
+		JPanel pAbt = new JPanel();
+		pAbt.add(about);
+		pAbt.add(jasonLabel);
+		p.add(pAbt, BorderLayout.WEST);
 				
 		return p;
 	}
@@ -239,18 +253,9 @@ public class JasonID extends JPanel implements EBComponent, RunningMASListener {
 		return button;
 	}
 	 	
+	
+	
     public void handleMessage(EBMessage message) {
-    	/*
-    	if (msp == null) {
-    		EditPlugin pv = org.gjt.sp.jedit.jEdit.getPlugin(SideKickPlugin.class.getName(),false);
-    		if (pv != null) {
-    			msp = new JasonSideKickParser();
-    			SideKickPlugin.registerParser(msp);
-    			Log.log(Log.DEBUG,this,"Registered "+msp);
-    		}
-    	}
-    	*/
-    	
     	if (message == null) return;
     	
     	/*
@@ -270,12 +275,6 @@ public class JasonID extends JPanel implements EBComponent, RunningMASListener {
         		//bu.getBuffer().setProperty("sidekick.parser",JasonSideKickParser.ID);
 
         	}
-        	/*
-          	if (bu.getWhat() == BufferUpdate.LOADED &&
-            	bu.getBuffer().getPath().endsWith(MAS2JProject.AS_EXT)) {
-          		bu.getBuffer().setProperty("sidekick.parser", AgentSpeakSideKickParser.ID);
-            } 
-            */       	
         }
     }
 
@@ -305,7 +304,7 @@ public class JasonID extends JPanel implements EBComponent, RunningMASListener {
         return null;
 	}
 	
-	private Buffer getProjectBuffer(String name) {
+	Buffer getProjectBuffer(String name) {
 		Buffer[] bufs = org.gjt.sp.jedit.jEdit.getBuffers();
         for (int i = 0; i < bufs.length; i++) {
             if (bufs[i].getPath().endsWith(name)) {
@@ -468,6 +467,8 @@ public class JasonID extends JPanel implements EBComponent, RunningMASListener {
 	}
 
 	public void newMAS() {
+		new NewProjectGUI("New Jason Project", view, this);
+		/*
         String projName = JOptionPane.showInputDialog("What is the new project name?");
 
         if (projName == null) {
@@ -510,10 +511,11 @@ public class JasonID extends JPanel implements EBComponent, RunningMASListener {
 				textArea.setText("Project created!");
 			}
 		}
+		*/
 	}
 
 	
-	private void checkProjectView(String projName, File projDirectory) {
+	void checkProjectView(String projName, File projDirectory) {
 		// add in project viewer
 		EditPlugin pv = org.gjt.sp.jedit.jEdit.getPlugin(projectviewer.ProjectPlugin.class.getName(),false);
 		if (pv == null) {
@@ -534,10 +536,6 @@ public class JasonID extends JPanel implements EBComponent, RunningMASListener {
 			fi.doImport();
 							
 			// add special actions (new agent, run, ....)
-		} else {
-			// show it
-			//VPTProject proj = pm.getProject(projName);
-			//projView.setActiveNode(view, proj);
 		}
 	}
 	

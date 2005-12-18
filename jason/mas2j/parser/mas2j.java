@@ -48,7 +48,7 @@ public class mas2j implements mas2jConstants {
         //System.out.println("  1. chmod u+x *.sh");
         System.out.println("  "+step+". compile the java files (script ./compile-"+project.getSocName()+".sh)");
         step++;
-        if (project.getArchitecture().equals("Saci")) {
+        if (project.getInfrastructure().equals("Saci")) {
              System.out.println("  "+step+". run saci (script ./saci-"+project.getSocName()+".sh)");
              step++;
         }
@@ -78,7 +78,7 @@ public class mas2j implements mas2jConstants {
 
   final public void infra() throws ParseException {
                               Token t;
-                              project.setArchitecture("Centralised");
+                              project.setInfrastructure("Centralised");
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case ARCH:
     case INFRA:
@@ -97,7 +97,7 @@ public class mas2j implements mas2jConstants {
       }
       jj_consume_token(37);
       t = jj_consume_token(INFRAV);
-                              project.setArchitecture(t.image);
+                              project.setInfrastructure(t.image);
       break;
     default:
       jj_la1[1] = jj_gen;

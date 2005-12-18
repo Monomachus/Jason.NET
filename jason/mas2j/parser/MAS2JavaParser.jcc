@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.3  2005/12/18 15:31:02  jomifred
+//   no message
+//
 //   Revision 1.2  2005/12/17 17:36:20  jomifred
 //   no message
 //
@@ -105,7 +108,7 @@ public class mas2j {
         //System.out.println("  1. chmod u+x *.sh");
         System.out.println("  "+step+". compile the java files (script ./compile-"+project.getSocName()+".sh)");
         step++;
-        if (project.getArchitecture().equals("Saci")) {
+        if (project.getInfrastructure().equals("Saci")) {
              System.out.println("  "+step+". run saci (script ./saci-"+project.getSocName()+".sh)");
              step++;
         }
@@ -204,10 +207,10 @@ MAS2JProject mas() :           { Token soc; }
 }
 
 void infra() :              { Token t; }
-{                           { project.setArchitecture("Centralised"); }
+{                           { project.setInfrastructure("Centralised"); }
   [ (<ARCH>                 { System.err.println("The id <architecture> was replaced by <infrastructure> in .mas2j syntax, please use the new id."); }
      | <INFRA>) 
-    ":" t = <INFRAV>        { project.setArchitecture(t.image); } 
+    ":" t = <INFRAV>        { project.setInfrastructure(t.image); } 
   ]
 }
 

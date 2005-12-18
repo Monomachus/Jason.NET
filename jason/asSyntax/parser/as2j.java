@@ -99,7 +99,7 @@
     case TK_LABEL_AT:
       k = jj_consume_token(TK_LABEL_AT);
       L = at();
-                                  start = k.beginLine;
+                     start = k.beginLine;
       break;
     default:
       jj_la1[2] = jj_gen;
@@ -750,11 +750,6 @@
     finally { jj_save(0, xla); }
   }
 
-  final private boolean jj_3R_28() {
-    if (jj_3R_29()) return true;
-    return false;
-  }
-
   final private boolean jj_3R_25() {
     if (jj_scan_token(33)) return true;
     return false;
@@ -953,6 +948,11 @@
     }
     }
     }
+    return false;
+  }
+
+  final private boolean jj_3R_28() {
+    if (jj_3R_29()) return true;
     return false;
   }
 

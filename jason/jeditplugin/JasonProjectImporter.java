@@ -26,7 +26,7 @@ public class JasonProjectImporter extends Importer {
 		
 		addTree(new File(project.getRootPath()), 
 				project, 
-				new GlobFilter("*.asl *.xml *.mas2j *.java log4j.configuration","*"), //GlobFilter.getImportSettingsFilter(),
+				new GlobFilter("*.asl *.xml *.mas2j *.java log4j.configuration",""), //GlobFilter.getImportSettingsFilter(),
 				false); // filtro: 
 		
 		if (state != null) {

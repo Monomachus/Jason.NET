@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.7  2005/12/18 15:31:02  jomifred
+//   no message
+//
 //   Revision 1.6  2005/12/17 19:51:58  jomifred
 //   no message
 //
@@ -44,9 +47,9 @@
 package jason.jeditplugin;
 
 
-import javax.swing.SwingUtilities;
-
 import jason.mas2j.MAS2JProject;
+
+import javax.swing.SwingUtilities;
 
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Level;
@@ -95,23 +98,31 @@ public class JasonIDPlugin extends EBPlugin {
     	
     	if (msg != null && msg instanceof BufferUpdate) {
         	BufferUpdate bu = (BufferUpdate)msg;
-        	if ((bu.getWhat() == BufferUpdate.LOADED || bu.getWhat() == BufferUpdate.CREATED) &&
-            	bu.getBuffer().getPath().endsWith(MAS2JProject.AS_EXT)) {
-          		bu.getBuffer().setProperty("sidekick.parser", AgentSpeakSideKickParser.ID);
+        	if ((bu.getWhat() == BufferUpdate.LOADED || bu.getWhat() == BufferUpdate.CREATED)) {
+        		if (bu.getBuffer().getPath().endsWith(MAS2JProject.EXT)) {
+        			bu.getBuffer().setProperty("sidekick.parser", JasonProjectSideKickParser.ID);
+        		}
+    			if (bu.getBuffer().getPath().endsWith(MAS2JProject.AS_EXT)) {
+    				bu.getBuffer().setProperty("sidekick.parser", AgentSpeakSideKickParser.ID);
+    			}
             }
     	}
 	}
     
-    AgentSpeakSideKickParser jskp = new AgentSpeakSideKickParser(); 
+    AgentSpeakSideKickParser asskp = new AgentSpeakSideKickParser(); 
+    JasonProjectSideKickParser jpskp = new JasonProjectSideKickParser();
     
 	public void start() {
-    	SideKickPlugin.registerParser(jskp);
-    	Log.log(Log.DEBUG,this,"Registered "+jskp);
+    	SideKickPlugin.registerParser(asskp);
+    	SideKickPlugin.registerParser(jpskp);
+    	Log.log(Log.DEBUG,this,"Registered "+asskp);
+    	Log.log(Log.DEBUG,this,"Registered "+jpskp);
     	
     	handleMessage(null);
     } 
 	
 	public void stop() {
-		SideKickPlugin.unregisterParser(jskp);
+		SideKickPlugin.unregisterParser(asskp);
+		SideKickPlugin.unregisterParser(jpskp);
 	}
 }

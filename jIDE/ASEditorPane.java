@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.11  2005/12/18 15:31:02  jomifred
+//   no message
+//
 //   Revision 1.10  2005/12/05 16:04:47  jomifred
 //   Message content can be object
 //
@@ -78,7 +81,7 @@ import javax.swing.text.View;
 import javax.swing.text.ViewFactory;
 import javax.swing.undo.UndoManager;
 
-class ASEditorPane extends JPanel {
+public class ASEditorPane extends JPanel {
 
 	JTextPane editor;
 	UndoManager undo;
@@ -354,7 +357,7 @@ class ASEditorPane extends JPanel {
 		});
 	}
 
-	String getDefaultText(String s) {
+	public static String getDefaultText(String s) {
 		return "// "+s+"\ndemo.\n+demo : true <- .print(\"hello world.\").";
 	}
 
