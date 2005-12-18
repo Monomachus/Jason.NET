@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.24  2005/12/18 16:08:39  jomifred
+//   no message
+//
 //   Revision 1.23  2005/12/08 20:05:01  jomifred
 //   changes for JasonIDE plugin
 //
@@ -129,7 +132,7 @@ public class RunMAS extends AbstractAction {
 		try {
 			String jasonJar = Config.get().getJasonJar();
 			if (!Config.checkJar(jasonJar)) {
-				System.err.println("The path to the jason.jar file ("+jasonJar+") was not correctly set, the MAS may not run. Go to menu Edit->Preferences to configure the path.");
+				System.err.println("The path to the jason.jar file ("+jasonJar+") was not correctly set, the MAS may not run. Go to menu Plugins->Plugins Options->Jason to configure the path.");
 			}
 			String javaHome = Config.get().getJavaHome();
 			if (!Config.checkJavaHomePath(javaHome)) {
