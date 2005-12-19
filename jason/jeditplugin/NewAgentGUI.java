@@ -34,7 +34,10 @@ public class NewAgentGUI extends JDialog {
 	private JTextField nbAgs;
 	private JTextField agHost;
 	private JComboBox  verbose;
-	
+
+	JPanel pFields = new JPanel(new GridLayout(0,1));
+	JPanel pLabels = new JPanel(new GridLayout(0,1));
+
 	JButton ok;
 	JButton cancel;
 	
@@ -59,33 +62,35 @@ public class NewAgentGUI extends JDialog {
 		getContentPane().setLayout(new BorderLayout());
 		
 		// Fields
-		JPanel fields = new JPanel(new GridLayout(0,1));
 		
 		agName = new JTextField(10);
-		createField(fields, "Agent name", agName, "The agent name. The file will be this name + .asl.");
+		createField("Agent name", agName, "The agent name. The file will be this name + .asl.");
 		
-		agClass = new JTextField(10);
-		createField(fields, "Agent class", agClass, "The customisation class for the agent (<package.classname>). If not filled, the default agent class will be used.");
+		agClass = new JTextField(20);
+		createField("Agent class", agClass, "The customisation class for the agent (<package.classname>). If not filled, the default agent class will be used.");
 		
-		archClass = new JTextField(10);
-		createField(fields, "Architecture class", archClass, "The customisation class for the agent architecture (<package.classname>). If not filled, the default architecture will be used.");
+		archClass = new JTextField(20);
+		createField("Architecture class", archClass, "The customisation class for the agent architecture (<package.classname>). If not filled, the default architecture will be used.");
 
-		nbAgs = new JTextField(5);
+		nbAgs = new JTextField(4);
 		nbAgs.setText("1");
-		createField(fields, "Number of agents", nbAgs, "The number of agents that will be instantiated from this declaration.");
+		createField("Number of agents", nbAgs, "The number of agents that will be instantiated from this declaration.");
 
 		verbose = new JComboBox(new String[] { "no output", "normal", "debug" });
 		verbose.setSelectedIndex(1);
-		createField(fields, "Verbose", verbose, "Set the verbose level");
+		createField("Verbose", verbose, "Set the verbose level");
 
 		agHost = new JTextField(10);
 		agHost.setText("localhost");
-		createField(fields, "Host to run", agHost, "The host where this agent will run. The infrastructure must support distributed launching.");
+		createField( "Host to run", agHost, "The host where this agent will run. The infrastructure must support distributed launching.");
 		
-		fields.setBorder(BorderFactory.createTitledBorder(BorderFactory
+		JPanel p = new JPanel(new BorderLayout());
+		p.setBorder(BorderFactory.createTitledBorder(BorderFactory
 				.createEtchedBorder(), "New agent parameters", TitledBorder.LEFT, TitledBorder.TOP));
-
-		getContentPane().add(fields, BorderLayout.CENTER);
+		p.add(pLabels, BorderLayout.CENTER);
+		p.add(pFields, BorderLayout.EAST);
+		
+		getContentPane().add(p, BorderLayout.CENTER);
 		getContentPane().add(createButtonsPanel(), BorderLayout.SOUTH);
 	}
 
@@ -113,6 +118,7 @@ public class NewAgentGUI extends JDialog {
 		return bts;
 	}
 
+	/*
 	void createField(JPanel fields, String label, JComponent tf, String tooltip) {
 		JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		JLabel jl = new JLabel(label+": ");
@@ -122,7 +128,18 @@ public class NewAgentGUI extends JDialog {
 		tf.setToolTipText(tooltip);
 		fields.add(p);
 	}
-	
+	*/
+
+	void createField(String label, JComponent tf, String tooltip) {
+		JLabel jl = new JLabel(label+": ");
+		jl.setToolTipText(tooltip);
+		tf.setToolTipText(tooltip);
+		pLabels.add(jl);
+		JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		p.add(tf);
+		pFields.add(p);
+	}
+
 	boolean ok() {
 		String agDecl = getAgDecl();
 		if  (agDecl == null) {

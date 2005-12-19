@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.12  2005/12/19 12:45:29  jomifred
+//   no message
+//
 //   Revision 1.11  2005/12/19 00:14:53  jomifred
 //   no message
 //
@@ -210,12 +213,7 @@ public class JasonID extends JPanel implements EBComponent, RunningMASListener {
 
 		toolBar.add(createToolBarButton("New Agent", GUIUtilities.loadIcon("NextFile.png"), new ActionListener() {
 			public void actionPerformed(ActionEvent evt) {
-				Buffer b = getProjectBuffer();
-				if (b == null) {
-					textArea.setText("There is no Jason project opened to add an agent, create a project first.");
-				} else {
-					new NewAgentGUI("New agent for project "+b.getName(), b, view);
-				}
+				newAg();
 			}
 		}));
 		
@@ -471,6 +469,15 @@ public class JasonID extends JPanel implements EBComponent, RunningMASListener {
 
 	public void newMAS() {
 		new NewProjectGUI("New Jason Project", view, this);
+	}
+
+	public void newAg() {
+		Buffer b = getProjectBuffer();
+		if (b == null) {
+			textArea.setText("There is no Jason project opened to add an agent, create a project first.");
+		} else {
+			new NewAgentGUI("New agent for project "+b.getName(), b, view);
+		}
 	}
 
 	

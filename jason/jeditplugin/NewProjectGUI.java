@@ -4,7 +4,6 @@ import jason.mas2j.MAS2JProject;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -45,20 +44,18 @@ public class NewProjectGUI extends NewAgentGUI {
 
 		
 		// Fields
-		JPanel fields = new JPanel(new GridLayout(0,1));
-		
 		projName = new JTextField(10);
-		createField(fields, "Project name", projName, "The project name");
+		createField("Project name", projName, "The project name");
 		
-		projEnv = new JTextField(10);
-		createField(fields, "Environment class", projEnv, "The java class that implements the environment (<package.classname>). If not filled, the default class will be used.");
+		projEnv = new JTextField(20);
+		createField("Environment class", projEnv, "The java class that implements the environment (<package.classname>). If not filled, the default class will be used.");
 		
 		projInfra = new JComboBox(new String[] { "Centralised", "Saci" });
 		projInfra.setSelectedIndex(0);
-		createField(fields, "Infrastructure", projInfra, "Set the Infrastructure");
+		createField("Infrastructure", projInfra, "Set the Infrastructure");
 
     	JPanel jasonHomePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-    	jasonHomePanel.add(new JLabel("Root location:"));
+    	pLabels.add(new JLabel("Root location:"));
     	projDir = new JTextField(20);
     	projDir.setText(System.getProperty("user.home"));
     	jasonHomePanel.add(projDir);
@@ -79,10 +76,10 @@ public class NewProjectGUI extends NewAgentGUI {
 			}
     	});
     	jasonHomePanel.add(setDir);
-    	fields.add(jasonHomePanel);
+    	pFields.add(jasonHomePanel);
 	
     	projFinalDir = new JLabel();
-    	createField(fields, "Directory", projFinalDir, "The directory that will be created for the project.");
+    	createField("Directory", projFinalDir, "The directory that will be created for the project.");
 		// doc listener for Final proj dir
 		DocumentListener docLis = new DocumentListener() {
 		    public void insertUpdate(DocumentEvent e) {
@@ -98,11 +95,13 @@ public class NewProjectGUI extends NewAgentGUI {
 		projName.getDocument().addDocumentListener(docLis);
 		projDir.getDocument().addDocumentListener(docLis);
 
-		
-		fields.setBorder(BorderFactory.createTitledBorder(BorderFactory
+		JPanel p = new JPanel(new BorderLayout());
+		p.setBorder(BorderFactory.createTitledBorder(BorderFactory
 				.createEtchedBorder(), "New project parameters", TitledBorder.LEFT, TitledBorder.TOP));
-
-		getContentPane().add(fields, BorderLayout.CENTER);
+		p.add(pLabels, BorderLayout.CENTER);
+		p.add(pFields, BorderLayout.EAST);
+		
+		getContentPane().add(p, BorderLayout.CENTER);
 		getContentPane().add(createButtonsPanel(), BorderLayout.SOUTH);
 	}
 

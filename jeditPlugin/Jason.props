@@ -17,6 +17,7 @@ plugin.jason.jeditplugin.JasonIDPlugin.menu=jason - \
   jason.run-mas jason.debug-mas jason.stop-mas \
   - \
   jason.new-mas \
+  jason.new-ag \
   - \
   jason.edit-log
 
@@ -25,6 +26,7 @@ jason.run-mas.label=Run MAS
 jason.debug-mas.label=Debug MAS
 jason.stop-mas.label=Stop current running MAS
 jason.new-mas.label=New Project
+jason.new-ag.label=New Agent
 jason.edit-log.label=Edit log parameters
 
 # Dockables
