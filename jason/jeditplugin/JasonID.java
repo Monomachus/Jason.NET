@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.13  2005/12/19 13:11:04  jomifred
+//   no message
+//
 //   Revision 1.12  2005/12/19 12:45:29  jomifred
 //   no message
 //
@@ -350,14 +353,7 @@ public class JasonID extends JPanel implements EBComponent, RunningMASListener {
             
         } catch (ParseException ex) {
         	textArea.append("\nmas2j: parsing errors found... \n" + ex + "\n");
-        	if (ex.currentToken != null && ex.currentToken.next != null && errorSource != null) {
-        		errorSource.addError(new DefaultErrorSource.DefaultError(
-        				errorSource, 
-        				ErrorSource.ERROR, 
-        				projectBufffer.getPath(),
-        				ex.currentToken.next.beginLine-1, 0, 0,
-        		    	ex.toString()));
-        	}
+        	JasonProjectSideKickParser.addError(ex, errorSource, projectBufffer.getPath());
         } catch (TokenMgrError ex) {
         	textArea.append("\nmas2j: error parsing tokens ... \n" + ex + "\n");
         } catch (Exception ex) {
@@ -382,14 +378,7 @@ public class JasonID extends JPanel implements EBComponent, RunningMASListener {
             
         } catch (jason.asSyntax.parser.ParseException ex) {
         	textArea.append("\nas2j: parsing errors found... \n" + ex + "\n");
-        	if (ex.currentToken != null && ex.currentToken.next != null && errorSource != null) {
-        		errorSource.addError(new DefaultErrorSource.DefaultError(
-        				errorSource, 
-        				ErrorSource.ERROR, 
-        				asFile.getAbsolutePath(),
-        				ex.currentToken.next.beginLine-1, 0, 0,
-        		    	ex.toString()));
-        	}
+        	AgentSpeakSideKickParser.addError(ex, errorSource, asFile.getAbsolutePath());
 	    	DockableWindowManager d = view.getDockableWindowManager();
 	    	if (!d.isDockableWindowVisible("error-list")) {
 	    		d.addDockableWindow("error-list");

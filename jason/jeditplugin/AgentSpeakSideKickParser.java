@@ -52,20 +52,25 @@ public class AgentSpeakSideKickParser extends sidekick.SideKickParser {
         		return pd;
         		
         } catch (jason.asSyntax.parser.ParseException ex) {
-        	if (ex.currentToken != null && ex.currentToken.next != null && errorSource != null) {
-        		errorSource.addError(new DefaultErrorSource.DefaultError(
-        				errorSource, 
-        				ErrorSource.ERROR, 
-        				buf.getPath(),
-        				ex.currentToken.next.beginLine-1, 0, 0,
-        		    	ex.toString()));
-        	}	
+        	addError(ex, errorSource, buf.getPath());
         } catch (Exception e) {
         	e.printStackTrace();
         }
     	return null;		
 	}
-	
+
+	public static void addError(jason.asSyntax.parser.ParseException ex, DefaultErrorSource errorSource, String path) {
+    	if (ex.currentToken != null && ex.currentToken.next != null && errorSource != null) {
+    		int line = ex.currentToken.next.beginLine-1;
+    		if (line < 0) line = 0;
+    		errorSource.addError(new DefaultErrorSource.DefaultError(
+    				errorSource, 
+    				ErrorSource.ERROR, 
+    				path,
+    				line, 0, 0,
+    		    	ex.toString()));
+    	}		
+	}
 	
 	public String toString() {
 		return ID;
