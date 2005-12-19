@@ -10,7 +10,6 @@ import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -118,18 +117,6 @@ public class NewAgentGUI extends JDialog {
 		return bts;
 	}
 
-	/*
-	void createField(JPanel fields, String label, JComponent tf, String tooltip) {
-		JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT));
-		JLabel jl = new JLabel(label+": ");
-		jl.setToolTipText(tooltip);
-		p.add(jl);
-		p.add(tf);
-		tf.setToolTipText(tooltip);
-		fields.add(p);
-	}
-	*/
-
 	void createField(String label, JComponent tf, String tooltip) {
 		JLabel jl = new JLabel(label+": ");
 		jl.setToolTipText(tooltip);
@@ -161,7 +148,7 @@ public class NewAgentGUI extends JDialog {
 		}
 		
 		// create new agent buffer
-		String agFile = buffer.getDirectory() + File.separator + agName.getText().trim() + "." + MAS2JProject.AS_EXT;
+		String agFile = buffer.getDirectory() + agName.getText().trim() + "." + MAS2JProject.AS_EXT;
 		
 		Buffer nb = org.gjt.sp.jedit.jEdit.openFile(view, agFile);
 		try {

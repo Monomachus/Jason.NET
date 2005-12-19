@@ -22,43 +22,6 @@
 // CVS information:
 //   $Date$
 //   $Revision$
-//   $Log$
-//   Revision 1.13  2005/12/19 13:11:04  jomifred
-//   no message
-//
-//   Revision 1.12  2005/12/19 12:45:29  jomifred
-//   no message
-//
-//   Revision 1.11  2005/12/19 00:14:53  jomifred
-//   no message
-//
-//   Revision 1.10  2005/12/18 15:31:02  jomifred
-//   no message
-//
-//   Revision 1.9  2005/12/17 19:51:58  jomifred
-//   no message
-//
-//   Revision 1.8  2005/12/17 19:28:46  jomifred
-//   no message
-//
-//   Revision 1.7  2005/12/16 22:41:16  jomifred
-//   no message
-//
-//   Revision 1.6  2005/12/16 22:09:20  jomifred
-//   no message
-//
-//   Revision 1.5  2005/12/13 18:23:39  jomifred
-//   no message
-//
-//   Revision 1.4  2005/12/09 21:34:45  jomifred
-//   no message
-//
-//   Revision 1.3  2005/12/09 14:47:40  jomifred
-//   no message
-//
-//   Revision 1.2  2005/12/08 20:06:59  jomifred
-//   changes for JasonIDE plugin
-//
 //
 //----------------------------------------------------------------------------
 
@@ -105,18 +68,12 @@ import org.gjt.sp.jedit.Buffer;
 import org.gjt.sp.jedit.EBComponent;
 import org.gjt.sp.jedit.EBMessage;
 import org.gjt.sp.jedit.EditBus;
-import org.gjt.sp.jedit.EditPlugin;
 import org.gjt.sp.jedit.GUIUtilities;
 import org.gjt.sp.jedit.View;
 import org.gjt.sp.jedit.gui.AnimatedIcon;
 import org.gjt.sp.jedit.gui.DockableWindowManager;
 import org.gjt.sp.jedit.gui.RolloverButton;
-import org.gjt.sp.jedit.msg.BufferUpdate;
 
-import projectviewer.ProjectManager;
-import projectviewer.ProjectViewer;
-import projectviewer.vpt.VPTProject;
-import projectviewer.vpt.VPTRoot;
 import errorlist.DefaultErrorSource;
 import errorlist.ErrorSource;
 
@@ -267,6 +224,7 @@ public class JasonID extends JPanel implements EBComponent, RunningMASListener {
             propertiesChanged();
         } else */
 
+	/*
     	if (message instanceof BufferUpdate) {
         	BufferUpdate bu = (BufferUpdate)message;
         	
@@ -280,6 +238,7 @@ public class JasonID extends JPanel implements EBComponent, RunningMASListener {
 
         	}
         }
+	*/
     }
 
 
@@ -469,7 +428,7 @@ public class JasonID extends JPanel implements EBComponent, RunningMASListener {
 		}
 	}
 
-	
+	/*
 	void checkProjectView(String projName, File projDirectory) {
 		// add in project viewer
 		EditPlugin pv = org.gjt.sp.jedit.jEdit.getPlugin(projectviewer.ProjectPlugin.class.getName(),false);
@@ -493,6 +452,7 @@ public class JasonID extends JPanel implements EBComponent, RunningMASListener {
 			// add special actions (new agent, run, ....)
 		}
 	}
+	*/
 	
 	public void editLog() {
 		Buffer curBuf = getProjectBuffer();

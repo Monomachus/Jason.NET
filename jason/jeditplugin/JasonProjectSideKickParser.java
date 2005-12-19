@@ -89,7 +89,6 @@ public class JasonProjectSideKickParser extends sidekick.SideKickParser {
 	
 	class ProjectAsset extends Asset {
 
-		
 		int type = 1;
 		
 		public ProjectAsset(String pre, String vl, Buffer buf, int type) {

@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.8  2005/12/19 22:53:31  jomifred
+//   no message
+//
 //   Revision 1.7  2005/12/18 15:31:02  jomifred
 //   no message
 //
@@ -71,7 +74,11 @@ public class JasonIDPlugin extends EBPlugin {
 
     static {
 		Logger.getRootLogger().addAppender(new ConsoleAppender(new PatternLayout("[%c{1}] %m%n")));
-		Logger.getRootLogger().setLevel(Level.INFO);    	
+		Logger.getRootLogger().setLevel(Level.INFO);    
+		
+		try {
+			Class.forName(JasonIDOptionPanel.class.getName()); // just to run static init
+		} catch (Exception e) {}
     }
     
     public void handleMessage(EBMessage msg) {

@@ -1,19 +1,9 @@
 package jason.jeditplugin;
 
-import java.io.File;
-import java.io.FilenameFilter;
-import java.util.Collection;
-
-import projectviewer.ProjectViewer;
-import projectviewer.importer.GlobFilter;
-import projectviewer.importer.Importer;
-import projectviewer.vpt.VPTFile;
-import projectviewer.vpt.VPTNode;
-import projectviewer.vpt.VPTProject;
 
 /** based on FileImporter of ProjectView plugin */
-public class JasonProjectImporter extends Importer {
-
+public class JasonProjectImporter { //extends Importer {
+/*
 	public JasonProjectImporter(VPTProject node, ProjectViewer viewer) {
 		super(node, viewer);
 	}
@@ -34,7 +24,7 @@ public class JasonProjectImporter extends Importer {
 		}
 		return null;
 	}
-
+*/
 	/**
 	 *	Adds a directory tree to the given node.
 	 *
@@ -43,6 +33,7 @@ public class JasonProjectImporter extends Importer {
 	 *	@param	filter	The filter to use to select files.
 	 *	@param	flatten	Whether to "flat import" (add all files to top directory).
 	 */
+	/*
 	protected void addTree(File root, VPTNode where,
 						   FilenameFilter filter, boolean flatten)
 	{
@@ -83,5 +74,6 @@ public class JasonProjectImporter extends Importer {
 
 		where.sortChildren();
 	}
+	*/
 }
 

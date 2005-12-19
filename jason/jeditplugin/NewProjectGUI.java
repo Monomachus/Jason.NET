@@ -22,7 +22,6 @@ import javax.swing.event.DocumentListener;
 
 import org.gjt.sp.jedit.Buffer;
 import org.gjt.sp.jedit.View;
-import org.gjt.sp.jedit.gui.DockableWindowManager;
 
 public class NewProjectGUI extends NewAgentGUI {
 
@@ -106,7 +105,11 @@ public class NewProjectGUI extends NewAgentGUI {
 	}
 
 	void updateProjDir() {
-		projFinalDir.setText(projDir.getText() + File.separator + projName.getText());
+		String s = "";
+		if (!projDir.getText().endsWith(File.separator)) {
+			s = File.separator;
+		}
+		projFinalDir.setText(projDir.getText() + s + projName.getText());
 	}
 
 	
@@ -135,6 +138,7 @@ public class NewProjectGUI extends NewAgentGUI {
 		} finally {
 			b.writeUnlock();
 		}
+		/*
 		jasonID.checkProjectView(projName.getText(), finalDir);
 
     	DockableWindowManager d = view.getDockableWindowManager();
@@ -143,6 +147,7 @@ public class NewProjectGUI extends NewAgentGUI {
     			d.addDockableWindow("projectviewer");
     		}
     	}
+    	*/
 		
     	jasonID.textArea.setText("Project created!");
 		return true;

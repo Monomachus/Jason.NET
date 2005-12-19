@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.4  2005/12/19 22:53:31  jomifred
+//   no message
+//
 //   Revision 1.3  2005/12/17 19:28:47  jomifred
 //   no message
 //
@@ -62,18 +65,9 @@ public class JasonIDOptionPanel extends AbstractOptionPane  {
 	JTextField jasonTF;
 	JTextField javaTF;
 
-	Config userProperties = Config.get();
-	
-	public JasonIDOptionPanel() {
-		super("Jason");
-	}
+	static Config userProperties = Config.get();
 
-	protected void _init() {
-		initConfig();
-		initGUI();
-	}
-
-	private void initConfig() {
+	static {
         String currJasonVersion = userProperties.getJasonRunningVersion();
 
 		// check new version
@@ -83,10 +77,14 @@ public class JasonIDOptionPanel extends AbstractOptionPane  {
     		if (!userProperties.getProperty("version").equals(currJasonVersion) && !currJasonVersion.equals("?")) { 
     			// new version, set all values to default
     			System.out.println("This is a new version of Jason, reseting configuration...");
+    			userProperties.clear();
+    			/*
     			userProperties.remove(Config.JAVA_HOME);
     			userProperties.remove(Config.SACI_JAR);
     			userProperties.remove(Config.JASON_JAR);
     			userProperties.remove(Config.LOG4J_JAR);
+    			userProperties.remove(Config.RUN_AS_THREAD);
+    			*/
     		}
     	} 
 
@@ -94,7 +92,11 @@ public class JasonIDOptionPanel extends AbstractOptionPane  {
     	userProperties.store();
 	}
 	
-	private void initGUI() {
+	public JasonIDOptionPanel() {
+		super("Jason");
+	}
+
+	protected void _init() {
 		JPanel pop = new JPanel(new GridLayout(0,1));
     	// jason home
     	JPanel jasonHomePanel = new JPanel();
