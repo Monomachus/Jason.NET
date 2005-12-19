@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.11  2005/12/19 00:14:53  jomifred
+//   no message
+//
 //   Revision 1.10  2005/12/18 15:31:02  jomifred
 //   no message
 //
@@ -468,50 +471,6 @@ public class JasonID extends JPanel implements EBComponent, RunningMASListener {
 
 	public void newMAS() {
 		new NewProjectGUI("New Jason Project", view, this);
-		/*
-        String projName = JOptionPane.showInputDialog("What is the new project name?");
-
-        if (projName == null) {
-        	return;
-        }
-        if (Character.isUpperCase(projName.charAt(0))) {
-        	projName = Character.toLowerCase(projName.charAt(0)) + projName.substring(1);
-        }
-        
-        if (getProjectBuffer(projName + "." + MAS2JProject.EXT) != null) {
-        	textArea.setText("There already is a project called "+projName);
-        	return;
-        }
-        
-        JFileChooser chooser = new JFileChooser(System.getProperty("user.dir"));
-        chooser.setDialogTitle("Select the project folder");
-        chooser.setAcceptAllFileFilterUsed(false);
-        chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
-			File projDirectory = chooser.getSelectedFile();
-			if (projDirectory.isDirectory()) {
-				String pFile = projDirectory.getAbsolutePath() + File.separator + projName + "." + MAS2JProject.EXT;
-				Buffer b = org.gjt.sp.jedit.jEdit.openFile(view, pFile);
-				try {
-					b.writeLock();
-					b.insert(0, MAS2JEditorPane.getDefaultText(projName, "ag1;"));
-					b.save(view,pFile);
-				} finally {
-					b.writeUnlock();
-				}
-				checkProjectView(projName, projDirectory);
-
-		    	DockableWindowManager d = view.getDockableWindowManager();
-		    	if (d.getDockableWindow("projectviewer") != null) {
-		    		if (!d.isDockableWindowVisible("projectviewer")) {
-		    			d.addDockableWindow("projectviewer");
-		    		}
-		    	}
-				
-				textArea.setText("Project created!");
-			}
-		}
-		*/
 	}
 
 	

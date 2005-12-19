@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.13  2005/12/19 00:14:53  jomifred
+//   no message
+//
 //   Revision 1.12  2005/10/30 16:07:33  jomifred
 //   add comments
 //
@@ -36,7 +39,6 @@
 package jason.environment;
 
 import jason.asSyntax.Literal;
-import jason.asSyntax.Pred;
 import jason.asSyntax.Term;
 
 import java.util.ArrayList;
@@ -44,7 +46,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -68,10 +69,6 @@ public class Environment {
 	private List percepts = Collections.synchronizedList(new ArrayList());
 	private Map  agPercepts = Collections.synchronizedMap(new HashMap());
 	
-	// TODO: remove in v 0.8
-	private List oldPercepts = Collections.synchronizedList(new ArrayList());
-    private List oldNegPercepts = Collections.synchronizedList(new ArrayList());
-
     /** the infrastructure tier for environment (Centralised, Saci, ...) */
 	private EnvironmentInterface environmentInfraTier = null;
 
@@ -118,21 +115,6 @@ public class Environment {
         }
     }
 
-	/** 
-	 * @deprecated use add/rem Percept to change the perceptions, this method will be
-	 * removed in the future a version
-	 */
-	public List getPercepts() {
-		return oldPercepts;
-	}
-	/** 
-	 * @deprecated use add/rem Percept to change the perceptions, this method will be
-	 * removed in the future a version
-	 */
-	public List getNegativePercepts() {
-		return oldNegPercepts;
-	}
-
 	/**
 	 * Returns perceptions for an agent.
 	 * A full copy of both common and agent perceptions lists is returned.
@@ -140,7 +122,7 @@ public class Environment {
     public List getPercepts(String agName) {
 		
 		// check whether this agent needs the current version of perception
-		if (uptodateAgs.contains(agName) && !oldNegPercepts.isEmpty() && !oldPercepts.isEmpty()) {
+		if (uptodateAgs.contains(agName)) {
 			return null;
 		}
 		// add agName in the set of uptodate agents
@@ -162,25 +144,6 @@ public class Environment {
 	        synchronized (agl) {
 				p.addAll(agl);
 	        }
-		}
-		
-		// add old style perceptions (where they are Terms)
-		// TODO: remove it in v 0.8
-		if (!oldPercepts.isEmpty()) {
-			synchronized (oldPercepts) {
-				Iterator i = oldPercepts.iterator();
-				while (i.hasNext()) {
-					p.add( new Literal(Literal.LPos, new Pred((Term)i.next())));
-				}
-			}
-		}
-		if (!oldNegPercepts.isEmpty()) {
-			synchronized (oldNegPercepts) {
-				Iterator i = oldNegPercepts.iterator();
-				while (i.hasNext()) {
-					p.add( new Literal(Literal.LNeg, new Pred((Term)i.next())));
-				}
-			}
 		}
 		
         return p;
@@ -271,8 +234,6 @@ public class Environment {
 			}
 		}
 	}
-	
-	
 	
     /**
      * called by the agent architecture to execute an action on the environment.

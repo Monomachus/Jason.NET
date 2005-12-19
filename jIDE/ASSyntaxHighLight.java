@@ -23,8 +23,8 @@
 //   $Date$
 //   $Revision$
 //   $Log$
-//   Revision 1.13  2005/08/16 21:03:43  jomifred
-//   add some comments on TODOs
+//   Revision 1.14  2005/12/19 00:14:46  jomifred
+//   no message
 //
 //----------------------------------------------------------------------------
 
@@ -232,7 +232,6 @@ public class ASSyntaxHighLight { // extends Thread { //implements CaretListener 
 				sd.setCharacterAttributes(eIni+t.beginColumn-1, t.endColumn-t.beginColumn+1, s, false);
 
 				// set currenttoken
-				// TODO: show all var occurrences
 				/*
 				if (t.kind == as2j.VAR && editor.getCaretPosition() >= t.beginColumn+eIni && editor.getCaretPosition() <= t.endColumn+eIni) {
 					varToken = t;

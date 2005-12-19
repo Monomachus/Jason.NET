@@ -23,26 +23,14 @@
 //   $Date$
 //   $Revision$
 //   $Log$
-//   Revision 1.24  2005/12/18 16:08:39  jomifred
+//   Revision 1.25  2005/12/19 00:14:46  jomifred
 //   no message
 //
 //   Revision 1.23  2005/12/08 20:05:01  jomifred
 //   changes for JasonIDE plugin
 //
-//   Revision 1.22  2005/11/22 00:05:32  jomifred
-//   no message
-//
-//   Revision 1.21  2005/11/17 20:14:44  jomifred
-//   no message
-//
 //   Revision 1.20  2005/11/17 20:11:50  jomifred
 //   fix a bug in openning a project
-//
-//   Revision 1.19  2005/11/09 23:37:19  jomifred
-//   fixed bug
-//
-//   Revision 1.18  2005/11/09 22:38:53  jomifred
-//   fixed bug
 //
 //   Revision 1.17  2005/10/29 21:46:22  jomifred
 //   add a new class (MAS2JProject) to store information parsed by the mas2j parser. This new class also create the project scripts
@@ -51,7 +39,7 @@
 //   load classes from the project lib directory
 //
 //   Revision 1.15  2005/08/14 23:29:40  jomifred
-//   add TODO (use new java class to run process)
+//   use new java class to run process
 //
 //   Revision 1.14  2005/08/12 23:29:11  jomifred
 //   support for saci arch in IA createAgent
