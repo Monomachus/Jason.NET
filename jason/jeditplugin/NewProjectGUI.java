@@ -18,6 +18,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 import org.gjt.sp.jedit.Buffer;
 import org.gjt.sp.jedit.View;
@@ -27,6 +29,7 @@ public class NewProjectGUI extends NewAgentGUI {
 
 	JTextField projName;
 	JTextField projDir;
+	JLabel     projFinalDir;
 	JTextField projEnv;
 	JComboBox  projInfra;
 	
@@ -39,6 +42,7 @@ public class NewProjectGUI extends NewAgentGUI {
 	
 	void initComponents() {
 		getContentPane().setLayout(new BorderLayout());
+
 		
 		// Fields
 		JPanel fields = new JPanel(new GridLayout(0,1));
@@ -54,7 +58,7 @@ public class NewProjectGUI extends NewAgentGUI {
 		createField(fields, "Infrastructure", projInfra, "Set the Infrastructure");
 
     	JPanel jasonHomePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-    	jasonHomePanel.add(new JLabel("Location:"));
+    	jasonHomePanel.add(new JLabel("Root location:"));
     	projDir = new JTextField(20);
     	projDir.setText(System.getProperty("user.home"));
     	jasonHomePanel.add(projDir);
@@ -77,12 +81,33 @@ public class NewProjectGUI extends NewAgentGUI {
     	jasonHomePanel.add(setDir);
     	fields.add(jasonHomePanel);
 	
+    	projFinalDir = new JLabel();
+    	createField(fields, "Directory", projFinalDir, "The directory that will be created for the project.");
+		// doc listener for Final proj dir
+		DocumentListener docLis = new DocumentListener() {
+		    public void insertUpdate(DocumentEvent e) {
+		        updateProjDir();
+		    }
+		    public void removeUpdate(DocumentEvent e) {
+		        updateProjDir();
+		    }
+		    public void changedUpdate(DocumentEvent e) {
+		        updateProjDir();
+		    }
+		};
+		projName.getDocument().addDocumentListener(docLis);
+		projDir.getDocument().addDocumentListener(docLis);
+
 		
 		fields.setBorder(BorderFactory.createTitledBorder(BorderFactory
 				.createEtchedBorder(), "New project parameters", TitledBorder.LEFT, TitledBorder.TOP));
 
 		getContentPane().add(fields, BorderLayout.CENTER);
 		getContentPane().add(createButtonsPanel(), BorderLayout.SOUTH);
+	}
+
+	void updateProjDir() {
+		projFinalDir.setText(projDir.getText() + File.separator + projName.getText());
 	}
 
 	
@@ -92,7 +117,17 @@ public class NewProjectGUI extends NewAgentGUI {
 			return false;
 		}
 		
-		String pFile = projDir.getText() + File.separator + projName.getText() + "." + MAS2JProject.EXT;
+		File finalDir = new File(projFinalDir.getText().trim());
+		try {
+			if (!finalDir.exists()) {
+				finalDir.mkdirs();
+			}
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(this, "Error creating project directory: "+e);
+			return false;
+		}
+		
+		String pFile = finalDir + File.separator + projName.getText() + "." + MAS2JProject.EXT;
 		Buffer b = org.gjt.sp.jedit.jEdit.openFile(view, pFile);
 		try {
 			b.writeLock();
@@ -117,11 +152,6 @@ public class NewProjectGUI extends NewAgentGUI {
 	private String getProjDecl() {
 		if  (projName.getText().trim().length() == 0) {
 			JOptionPane.showMessageDialog(this, "A project name must be informed.");
-			return null;
-		}
-		File f = new File(projDir.getText());  
-		if (!f.exists() || !f.isDirectory()) {
-			JOptionPane.showMessageDialog(this, "Invalid project directory.");
 			return null;
 		}
 		String name = projName.getText().trim();
