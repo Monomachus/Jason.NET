@@ -23,8 +23,8 @@
 //   $Date$
 //   $Revision$
 //   $Log$
-//   Revision 1.12  2005/08/16 21:03:43  jomifred
-//   add some comments on TODOs
+//   Revision 1.13  2005/12/20 19:52:05  jomifred
+//   no message
 //
 //
 //----------------------------------------------------------------------------
@@ -42,12 +42,9 @@ import org.apache.log4j.Logger;
  * 
  * @author jomi
  */
-public class VarTerm extends Term implements NumberTerm {
+public class VarTerm extends Literal implements NumberTerm {
 
 	static private Logger logger = Logger.getLogger(VarTerm.class.getName());
-	
-	
-	// TODO: do not use super.functor to store the var name
 	
 	private Term value = null;
 	
@@ -80,6 +77,7 @@ public class VarTerm extends Term implements NumberTerm {
 		return getValue() != null;
 	}
 	
+	/** grounds a variable, set a value for this var (e.g. X = 10; Y = a(b,c); ...) */
 	public boolean setValue(Term vl) {
 		try {
 			// If vl is a Var, find out a possible loop
@@ -102,7 +100,7 @@ public class VarTerm extends Term implements NumberTerm {
 	}
 	
 	/** 
-	 * When a var has a var as value, returns the last var in the chain.
+	 * When a var has another var as value, returns the last var in the chain.
 	 * Otherwise, return this. 
 	 * The returned VarTerm is normally used to set/get a value for the var. 
 	 */
@@ -116,7 +114,7 @@ public class VarTerm extends Term implements NumberTerm {
 	
 	/** 
 	 * returns the value of this var. 
-	 * if value is a var, returns the value of these var
+	 * if value is also a var, returns the value of this latter var
 	 * 
 	 * @return
 	 */
@@ -171,6 +169,20 @@ public class VarTerm extends Term implements NumberTerm {
 		}
 	}
 
+	
+	public String getFunctorArity() {
+		if (value != null)
+			return value.getFunctorArity();
+		else 
+			return null;
+	}
+
+	public int hashCode() {
+		if (value != null)
+			return value.hashCode();
+		else 
+			return super.hashCode();
+	}
 
 	public Term getTerm(int i) {
 		if (value == null) {
@@ -201,7 +213,24 @@ public class VarTerm extends Term implements NumberTerm {
 			return getValue().getTerms();
 		}
 	}
-	
+
+	public void addTerms(List l) {
+		if (value != null) {
+			value.addTerms(l);
+		}
+	}
+
+	public Term[] getTermsArray() {
+		if (value == null) {
+			return null;
+		} else {
+			return value.getTermsArray();
+		}
+	}
+
+	public boolean isInternalAction() {
+		return value != null && getValue().isInternalAction();
+	}
 	
 	/*
 	 * TODO the below is not ok, see the following code where
@@ -218,36 +247,22 @@ public class VarTerm extends Term implements NumberTerm {
 	 *    ListTerm lt = (ListTerm)x;
 	 *    
 	 * To solve it, we must use ListTerm, StringTerm, ... interfaces
-	 *    
+	 */    
+
 	public boolean isList() {
-		if (value == null) {
-			return false;
-		} else {
-			return getValue().isList();
-		}
+		return value != null && getValue().isList();
 	}
-	
 	public boolean isString() {
-		if (value == null) {
-			return false;
-		} else {
-			return getValue().isString();
-		}
+		return value != null && getValue().isString();
 	}
-	public boolean isInternalAction() {
-		if (value == null) {
-			return false;
-		} else {
-			return getValue().isInternalAction();
-		}
-	}
-	*/
 	public boolean isNumber() {
-		if (value == null) {
-			return false;
-		} else {
-			return getValue().isNumber();
-		}
+		return value != null && getValue().isNumber();
+	}
+	public boolean isPred() {
+		return value != null && getValue().isPred();
+	}
+	public boolean isLiteral() {
+		return value != null && getValue().isLiteral();
 	}
 	
 	public boolean hasVar(Term t) {
@@ -268,9 +283,114 @@ public class VarTerm extends Term implements NumberTerm {
 		}
 	}
 
+	
+	// ----------
+	// Pred methods overridden
+	// 
+	// in case this VarTerm has a value, use value's methods
+	// ----------
+
+	public void addAnnot(int index, Term t) {
+		if (value != null && getValue().isPred())
+			((Pred)getValue()).addAnnot(index, t);
+	}
+
+	public void importAnnots(Pred p) {
+		if (value != null && getValue().isPred())
+			((Pred)getValue()).importAnnots(p);
+	}
+
+	public void addAnnot(Term t) {
+		if (value != null && getValue().isPred())
+			((Pred)getValue()).addAnnot(t);
+	}
+
+	public void addAnnots(List l) {
+		if (value != null && getValue().isPred())
+			((Pred)getValue()).addAnnots(l);
+	}
+
+	public void clearAnnots() {
+		if (value != null && getValue().isPred())
+			((Pred)getValue()).clearAnnots();
+	}
+
+	public void delAnnot(Pred p) {
+		if (value != null && getValue().isPred())
+			((Pred)getValue()).delAnnot(p);
+	}
+
+	public void delAnnot(Term t) {
+		if (value != null && getValue().isPred())
+			((Pred)getValue()).delAnnot(t);
+	}
+
+	public boolean hasAnnot(Term t) {
+		return value != null && getValue().isPred() && ((Pred)getValue()).hasAnnot(t);
+	}
+
+	public boolean hasNoAnnot() {
+		return value != null && getValue().isPred() && ((Pred)getValue()).hasNoAnnot();
+	}
+
+	public List getAnnots() {
+		if (value != null && getValue().isPred())
+			return ((Pred)getValue()).getAnnots();
+		else 
+			return null;
+	}
+
+	public void addSource(String s) {
+		if (value != null && getValue().isPred())
+			((Pred)getValue()).addSource(s);
+	}
+
+	public void addSource(Term t) {
+		if (value != null && getValue().isPred())
+			((Pred)getValue()).addSource(t);
+	}
+
+	public boolean delSource(Term s) {
+		return value != null && getValue().isPred() && ((Pred)getValue()).delSource(s);
+	}
+
+	public void delSources() {
+		if (value != null && getValue().isPred())
+			((Pred)getValue()).delSources();
+	}
+
+	public ListTerm getSources() {
+		if (value != null && getValue().isPred())
+			return ((Pred)getValue()).getSources();
+		else 
+			return null;
+	}
+
+	public boolean hasSource() {
+		return value != null && getValue().isPred() && ((Pred)getValue()).hasSource();
+	}
+
+	public boolean hasSource(Term s) {
+		return value != null && getValue().isPred() && ((Pred)getValue()).hasSource(s);
+	}
+	
+	
+	// ----------
+	// Literal methods overridden
+	// 
+	// in case this VarTerm has a value, use value's methods
+	// ----------
+	
+	public boolean negated() {
+		return value != null && getValue().isLiteral() && ((Literal)getValue()).negated();
+	}
+	
+	
 	// ----------
 	// ArithmeticExpression methods overridden
+	// Interface INumberTerm
 	// ----------
+
 	public double solve() {
 		if (hasValue() && value.isNumber()) {
 			return ((NumberTermImpl)value).getValue();
@@ -279,6 +399,5 @@ public class VarTerm extends Term implements NumberTerm {
 		}
 		return 0;
 	}
-
 
 }

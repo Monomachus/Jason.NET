@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.15  2005/12/20 19:52:05  jomifred
+//   no message
+//
 //   Revision 1.14  2005/11/07 12:43:26  jomifred
 //   add comments
 //
@@ -184,6 +187,9 @@ public class Term implements Cloneable, Comparable, Serializable {
 		return false;
 	}
 	public boolean isNumber() {
+		return false;
+	}
+	public boolean isPred() {
 		return false;
 	}
 	

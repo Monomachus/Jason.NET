@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.11  2005/12/20 19:52:05  jomifred
+//   no message
+//
 //   Revision 1.10  2005/09/26 11:45:46  jomifred
 //   fix bug with source add/remove
 //
@@ -90,6 +93,9 @@ public class Pred extends Term implements Cloneable, Comparable, Serializable {
 		copyAnnot(p);
 	}
 
+	public boolean isPred() {
+		return true;
+	}
 	
 	public void addAnnot(Term t) {
 		if (annots == null)
@@ -117,7 +123,7 @@ public class Pred extends Term implements Cloneable, Comparable, Serializable {
 			annots.remove(t);
 	}
 
-	public void clearAnnot() {
+	public void clearAnnots() {
 		if (annots != null)
 			annots.clear();
 	}
@@ -132,7 +138,8 @@ public class Pred extends Term implements Cloneable, Comparable, Serializable {
 		return annots.contains(t);
 	}
 
-	public boolean emptyAnnot() {
+	/** returns true if the pred has at least one annot */
+	public boolean hasNoAnnot() {
 		if (annots == null)
 			return true;
 		else
@@ -234,11 +241,11 @@ public class Pred extends Term implements Cloneable, Comparable, Serializable {
 	/** 
 	 * "import" Annotations from another Predicate
 	 */
-	public void addAnnot(Pred p) {
+	public void importAnnots(Pred p) {
 		if (p.annots == null) {
 			return;
 		}
-		if (annots == null && !p.emptyAnnot()) {
+		if (annots == null && !p.hasNoAnnot()) {
 			annots = new ArrayList(p.annots.size());
 		}
 		for (int i=0; i < p.annots.size(); i++) {
@@ -261,17 +268,18 @@ public class Pred extends Term implements Cloneable, Comparable, Serializable {
 		}
 	}
 
-	/** removes all annots in this pred that are in <i>p</i> */
+	/** removes all annots in this pred that are in <i>p</i>
+	 *  p will only contain the annots actually deleted (for Event)
+	 */
 	public void delAnnot(Pred p) {
 		if (p.annots == null) {
 			return;
 		}
-		if (emptyAnnot()) {
-			p.clearAnnot();
+		if (hasNoAnnot()) {
+			p.clearAnnots();
 		} else {
 			for (int i=0; i < p.annots.size(); i++) {
 				Term t = (Term) p.annots.get(i);
-				// p will only contain the annots actually deleted (for Event)
 				if (annots.contains(t)) {
 					annots.remove(t);
 				} else {
@@ -312,15 +320,15 @@ public class Pred extends Term implements Cloneable, Comparable, Serializable {
 	public boolean hasSubsetAnnot(Pred p, Unifier u) {
 		if (annots == null)
 			return true;
-		if (annots != null && p.annots == null)
+		if (annots != null && p.getAnnots() == null)
 			return false;
 		for (int i=0; i<annots.size(); i++) {
 			Term annot = (Term)annots.get(i);
-			if (!p.annots.contains(annot)) {
+			if (!p.getAnnots().contains(annot)) {
 				if (p.annots.size() <= i) {
 					return false;
 				}
-				Term pAnnot = (Term)p.annots.get(i);
+				Term pAnnot = (Term)p.getAnnots().get(i);
 				if (! u.unifies(annot, pAnnot)) {
 					return false;
 				}

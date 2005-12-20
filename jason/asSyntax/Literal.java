@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.8  2005/12/20 19:52:05  jomifred
+//   no message
+//
 //   Revision 1.7  2005/08/12 22:26:08  jomifred
 //   add cvs keywords
 //
@@ -50,6 +53,9 @@ public class Literal extends Pred implements Cloneable {
     static private Logger logger = Logger.getLogger(Literal.class.getName());
 
 	boolean type = LPos;
+
+	public Literal() {
+	}
 
 	/** if pos == true, the literal is positive, else it is negative */
 	public Literal(boolean pos, Pred p) {
@@ -87,12 +93,13 @@ public class Literal extends Pred implements Cloneable {
 	public boolean isInternalAction() {
 		return (getFunctor().indexOf('.') >= 0);
 	}
+	
+	public boolean isLiteral() {
+		return true;
+	}
 
 	public boolean negated() {
 		return (type == LNeg);
-	}
-	public boolean isLiteral() {
-		return true;
 	}
 
 	public boolean equals(Object o) {

@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.14  2005/12/20 19:52:05  jomifred
+//   no message
+//
 //   Revision 1.13  2005/08/16 21:03:42  jomifred
 //   add some comments on TODOs
 //
@@ -159,13 +162,7 @@ public class Unifier implements Cloneable {
         }
     }
     
-    public boolean unifies(Term t1, Term t2) {
-        Term t1g = (Term)t1.clone();
-        apply(t1g);
-        Term t2g = (Term)t2.clone();
-        apply(t2g);
-        //System.out.println(t1+"="+t2);
-        
+    private boolean unifiesNoClone(Term t1g, Term t2g) {
 		List t1gl = t1g.getTerms();
 		List t2gl = t2g.getTerms();
 
@@ -270,15 +267,43 @@ public class Unifier implements Cloneable {
 		}
 		return true;
     }
+
+    public boolean unifies(Term t1, Term t2) {
+        Term t1g = (Term)t1.clone();
+        Term t2g = (Term)t2.clone();
+        apply(t1g);
+        apply(t2g);
+        //System.out.println("TermUn: "+t1+"="+t2+" : "+t1g+"="+t2g);
+        return unifiesNoClone(t1g, t2g);
+    }
     
    	public boolean unifies(Pred p1, Pred p2) {
+   		Pred np1 = (Pred)p1.clone();
+   		Pred np2 = (Pred)p2.clone();
+   		apply(np1);
+   		apply(np2);
+        //System.out.println("PredUn: "+p1+"="+p2+" : "+np1+"="+np2);
+        return unifiesNoClone((Pred)np1, (Pred)np2); 
+    }
+   	private boolean unifiesNoClone(Pred np1, Pred np2) {
         // unification with annotation:
         // terms unify and annotations are subset
-        return unifies((Term)p1, (Term)p2) && p1.hasSubsetAnnot(p2, this);        
+        if (!np1.isVar() && !np2.isVar() && !np1.hasSubsetAnnot(np2, this)) {
+        	return false;
+        }
+        return unifiesNoClone((Term)np1, (Term)np2); 
     }
     
     public boolean unifies(Literal l1, Literal l2) {
-        return l1.negated()==l2.negated() && unifies((Pred)l1,(Pred)l2);
+    	Literal nl1 = (Literal)l1.clone();
+   		Literal nl2 = (Literal)l2.clone();
+   		apply(nl1);
+   		apply(nl2);
+   		//System.out.println("LiteralUn: "+l1+"="+l2+" : "+nl1+"="+nl2);
+        if (!nl1.isVar() && !nl2.isVar() && nl1.negated() != nl2.negated()) {
+        	return false;
+        }
+        return unifiesNoClone((Pred)nl1,(Pred)nl2);
     }
     
     public boolean unifies(DefaultLiteral d1, DefaultLiteral d2) {

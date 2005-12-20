@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.5  2005/12/20 19:52:05  jomifred
+//   no message
+//
 //   Revision 1.4  2005/08/18 01:22:21  jomifred
 //   (AS grammar) arithmeticExpression renamed to ae
 //
@@ -40,6 +43,11 @@ import java.io.StringReader;
 
 import org.apache.log4j.Logger;
 
+/** represents an arithmetic expression like [ <ae> ] <+ | - | * | ...> <ae>.
+ * 
+ *  It is a var, so unifier.apply(ExprTerm) computes (via solve()) the expression value. 
+ *  The var value has the result of this evaluation. 
+ */
 public class ExprTerm extends VarTerm implements NumberTerm {
 
 	public static final int EOplus  = 1; 
@@ -184,7 +192,14 @@ public class ExprTerm extends VarTerm implements NumberTerm {
 	public boolean isExpr() {
 		return !hasValue();
 	}
+	
 	public boolean isVar() {
+		return false;
+	}
+	public boolean isPred() {
+		return false;
+	}
+	public boolean isLiteral() {
 		return false;
 	}
 	
@@ -203,7 +218,7 @@ public class ExprTerm extends VarTerm implements NumberTerm {
 		//} catch (Exception e) {
 		double l = lhs.solve();
 		//}
-		if (rhs==null && op == EOminus) {
+		if (rhs == null && op == EOminus) {
 			return -l;
 		} else if (rhs != null) {
 

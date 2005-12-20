@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.10  2005/12/20 19:52:05  jomifred
+//   no message
+//
 //   Revision 1.9  2005/11/21 19:09:11  jomifred
 //   added method remove-all-with-functor/arity
 //
@@ -132,7 +135,7 @@ public class BeliefBase {
 			if (l.hasSubsetAnnot(bl)) // the current bel bl already has l's annots
 				return false;
 			else {
-				bl.addAnnot((Pred) l); // "import" annots from the new bel 
+				bl.importAnnots((Pred) l); // "import" annots from the new bel 
 				addPercept(bl); // check if it needs to be added in the percepts list
 				return true;
 			}
@@ -213,7 +216,7 @@ public class BeliefBase {
 					removePercept(bl);
 				}
 				bl.delAnnot((Pred) l);
-				if (bl.emptyAnnot()) {
+				if (bl.hasNoAnnot()) {
 					String key = l.getFunctorArity();
 					List listFunctor = (List)belsMap.get(key);
 					listFunctor.remove(bl);

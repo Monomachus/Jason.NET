@@ -3,21 +3,17 @@ package test;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.BeliefBase;
 import jason.asSyntax.DefaultLiteral;
-import jason.asSyntax.ListTerm;
 import jason.asSyntax.Literal;
 import jason.asSyntax.Pred;
 import jason.asSyntax.Term;
 import jason.asSyntax.Trigger;
 import jason.asSyntax.VarTerm;
-
-import java.util.Iterator;
+import junit.framework.TestCase;
 
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
-
-import junit.framework.TestCase;
 
 /** JUnit test case for syntax package */
 public class TermTest extends TestCase {
@@ -215,9 +211,9 @@ public class TermTest extends TestCase {
 		assertFalse(u.unifies(p1, p2));
 		//System.out.println("u="+u);
 
-		p1.clearAnnot();
+		p1.clearAnnots();
 		p1.addAnnot(new Term("ag2"));
-		p2.clearAnnot();
+		p2.clearAnnots();
 		p2.addAnnot(new Term("ag1"));
 		p2.addAnnot(new Term("ag2"));
 		p2.addAnnot(new Term("ag3"));
@@ -295,34 +291,5 @@ public class TermTest extends TestCase {
 		assertEquals(l1.toString(), l2.toString());
 		
 	}
-	
-	public void testVarTerm() {
-		VarTerm x1 = new VarTerm("X1");
-		VarTerm x2 = new VarTerm("X2");
-		VarTerm x3 = new VarTerm("X3");
-		
-		x1.setValue(x2);
-		x2.setValue(x3);
-		
-		x3.setValue(new Term("a"));
-		// x1's value is x3's value (a)
-		assertEquals(x1.getValue().toString(), "a");
-		
-		
-		// test x1 -> x2 -> x3 -> x1!
-		assertFalse(x3.setValue(x1));
-		
-		VarTerm v1 = new VarTerm("L");
-		ListTerm lt = ListTerm.parseList("[a,B,a(B)]");
-		Unifier u = new Unifier();
-		u.unifies(new VarTerm("B"), new Term("oi"));
-		u.unifies(v1, lt);
-		u.apply(v1);
-		lt = (ListTerm)v1.getValue();
-		Iterator i = lt.termsIterator();
-		i.next();i.next();
-		Term third = (Term)i.next();
-		assertTrue(third.equals(Term.parse("a(oi)")));
-		
-	}
+
 }
