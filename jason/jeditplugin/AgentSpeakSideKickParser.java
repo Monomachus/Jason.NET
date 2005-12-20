@@ -48,7 +48,7 @@ public class AgentSpeakSideKickParser extends sidekick.SideKickParser {
             		Plan p = (Plan)i.next();
             		DefaultMutableTreeNode node = new PlanAsset(p, buf).createTreeNode();
             	    pd.root.add(node);
-            	}
+            	}          
         		return pd;
         		
         } catch (jason.asSyntax.parser.ParseException ex) {

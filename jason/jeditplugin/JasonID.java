@@ -29,6 +29,7 @@ package jason.jeditplugin;
 
 import jIDE.RunMAS;
 import jIDE.RunningMASListener;
+import jason.mas2j.AgentParameters;
 import jason.mas2j.MAS2JProject;
 import jason.mas2j.parser.ParseException;
 import jason.mas2j.parser.TokenMgrError;
@@ -52,17 +53,24 @@ import java.io.InputStream;
 import java.io.StringReader;
 import java.util.Iterator;
 
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.DefaultListModel;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JToolBar;
+import javax.swing.ListSelectionModel;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.TitledBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 import org.gjt.sp.jedit.Buffer;
 import org.gjt.sp.jedit.EBComponent;
@@ -89,6 +97,9 @@ public class JasonID extends JPanel implements EBComponent, RunningMASListener {
 	JButton btStop;
 	JButton btRun;
 	JButton btDebug;
+
+	static DefaultListModel listModel = new DefaultListModel();
+	static JList  lstAgs = new JList(listModel);
 	
 	DefaultErrorSource errorSource = null;
 
@@ -106,9 +117,28 @@ public class JasonID extends JPanel implements EBComponent, RunningMASListener {
 		textArea = new JTextArea(5,10);
 		textArea.setEditable(false);
 		textArea.setText("Use the menu Plugin->Jason->New to create a new project.");
-		JScrollPane pane = new JScrollPane(textArea);
+		
+		JPanel pane = new JPanel(new BorderLayout());
+		pane.add(BorderLayout.CENTER, new JScrollPane(textArea));
+		pane.setBorder(BorderFactory.createTitledBorder(BorderFactory
+				.createEtchedBorder(), "Jason console", TitledBorder.LEFT, TitledBorder.TOP));
 		add(BorderLayout.CENTER, pane);
 
+		JPanel pLst = new JPanel(new BorderLayout());
+		pLst.setBorder(BorderFactory.createTitledBorder(BorderFactory
+				.createEtchedBorder(), "Project agents", TitledBorder.LEFT, TitledBorder.TOP));
+
+		pLst.add(BorderLayout.CENTER, new JScrollPane(lstAgs));
+		//pLst.setMinimumSize(new Dimension(100,50));
+		lstAgs.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		lstAgs.addListSelectionListener(new ListSelectionListener() {
+		    public void valueChanged(ListSelectionEvent e) {
+		    	openAgentBuffer((AgentParameters)lstAgs.getSelectedValue());
+		    }
+		});
+		pLst.setPreferredSize(new Dimension(120,50));
+		add(BorderLayout.EAST, pLst);
+		
         myOut = new OutputStreamAdapter(null, textArea);
         myOut.setAsDefaultOut();
 	}
@@ -214,7 +244,12 @@ public class JasonID extends JPanel implements EBComponent, RunningMASListener {
 		return button;
 	}
 	 	
-	
+	void openAgentBuffer(AgentParameters ap) {
+    	try {
+    		org.gjt.sp.jedit.jEdit.openFile(view, ap.asSource.getAbsolutePath());
+    		//textArea.append(lstAgs.getSelectedValue()+"");
+    	} catch (Exception ex) {}
+	}
 	
     public void handleMessage(EBMessage message) {
     	if (message == null) return;

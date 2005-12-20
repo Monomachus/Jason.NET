@@ -16,8 +16,14 @@ public class AgentParameters {
 	public String host      = null;
 	
 	public String toString() {
+		return getAsInMASProject();
+	}
+	
+	public String getAsInMASProject() {
 		StringBuffer s = new StringBuffer(name+" ");
-		s.append(asSource+" ");
+		if (asSource != null && !asSource.getName().startsWith(name)) {
+			s.append(asSource+" ");
+		}
 		if (options != null && options.size() > 0) {
 			s.append("[");
 			Iterator i = options.keySet().iterator();
@@ -30,19 +36,19 @@ public class AgentParameters {
 			}
 			s.append("] ");
 		}
-		if (archClass != null) {
+		if (archClass != null && archClass.length() > 0) {
 			s.append("agentArchClass "+archClass+" ");
 		}
-		if (agClass != null) {
+		if (agClass != null && agClass.length() > 0) {
 			s.append("agentClass "+agClass+" ");
 		}
 		if (qty > 1) {
 			s.append("#"+qty+" ");
 		}
-		if (host != null) {
+		if (host != null && host.length() > 0) {
 			s.append("at "+host);
 		}
-		return s.toString().trim();
+		return s.toString().trim() + ";";
 	}
 
 	public String getAsXMLScript(String proDir, String soc, String architecture, boolean debug, boolean forceSync) {

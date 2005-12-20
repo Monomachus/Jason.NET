@@ -1,6 +1,7 @@
 package jason.jeditplugin;
 
 import jIDE.ASEditorPane;
+import jason.mas2j.AgentParameters;
 import jason.mas2j.MAS2JProject;
 
 import java.awt.BorderLayout;
@@ -10,6 +11,8 @@ import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.util.HashMap;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -128,7 +131,7 @@ public class NewAgentGUI extends JDialog {
 	}
 
 	boolean ok() {
-		String agDecl = getAgDecl();
+		AgentParameters agDecl = getAgDecl();
 		if  (agDecl == null) {
 			JOptionPane.showMessageDialog(this, "An agent name must be informed.");
 			return false;
@@ -142,7 +145,7 @@ public class NewAgentGUI extends JDialog {
 			} else {
 				pos = buffer.getLength();
 			}
-			buffer.insert(pos, "\n\t\t"+agDecl);
+			buffer.insert(pos, "\n\t\t"+agDecl.getAsInMASProject());
 		} finally {
 			buffer.writeUnlock();
 		}
@@ -159,33 +162,39 @@ public class NewAgentGUI extends JDialog {
 			nb.writeUnlock();
 		}
 		
+		agDecl.asSource = new File(agFile);
+		JasonID.listModel.addElement(agDecl);
 		return true;
 	}
 	
-	private String getAgDecl() {
+	private AgentParameters getAgDecl() {
 		if  (agName.getText().trim().length() == 0) {
 			return null;
 		}
-		
-		String agDecl = agName.getText().trim();
+		AgentParameters ap = new AgentParameters();
+		ap.name = agName.getText().trim();
 		if (verbose.getSelectedIndex() != 1) {
-			agDecl += " [verbose="+verbose.getSelectedIndex()+"]";
+			ap.options = new HashMap();
+			ap.options.put("verbose", verbose.getSelectedIndex()+"");
 		}
 		
 		if (archClass.getText().trim().length() > 0) {
-			agDecl += " agentArchClass "+archClass.getText().trim();
+			ap.archClass = archClass.getText().trim();
 		}
 
 		if (agClass.getText().trim().length() > 0) {
-			agDecl += " agentClass "+agClass.getText().trim();
+			ap.agClass = agClass.getText().trim();
 		}
 		if (!nbAgs.getText().trim().equals("1")) {
-			agDecl += " #"+nbAgs.getText().trim();			
+			try {
+				ap.qty = Integer.parseInt(nbAgs.getText().trim());
+			} catch (Exception e) {
+				System.err.println("Number of hosts is not a number!");
+			}
 		}
 		if (!agHost.getText().trim().equals("localhost")) {
-			agDecl += " at "+agHost.getText().trim();			
+			ap.host = agHost.getText().trim();			
 		}
-		agDecl += ";";
-		return agDecl;
+		return ap;
 	}
 }
