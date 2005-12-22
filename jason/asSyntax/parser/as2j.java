@@ -427,8 +427,8 @@
     throw new Error("Missing return statement in function");
   }
 
-  final public ListTerm list() throws ParseException {
-                    ListTerm lt = new ListTerm(); ListTerm last; Token K; Term f;
+  final public ListTermImpl list() throws ParseException {
+                        ListTermImpl lt = new ListTermImpl(); ListTerm last; Token K; Term f;
     jj_consume_token(33);
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case TK_TRUE:

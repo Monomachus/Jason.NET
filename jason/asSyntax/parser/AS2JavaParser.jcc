@@ -22,6 +22,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.22  2005/12/22 00:04:18  jomifred
+//   ListTerm is now an interface implemented by ListTermImpl
+//
 //   Revision 1.21  2005/12/17 19:28:45  jomifred
 //   no message
 //
@@ -320,7 +323,7 @@ Term t() :         { Token K; Term u; NumberTerm nb;}
 }
 
 
-ListTerm list() : { ListTerm lt = new ListTerm(); ListTerm last; Token K; Term f; }
+ListTermImpl list() : { ListTermImpl lt = new ListTermImpl(); ListTerm last; Token K; Term f; }
 {
   "["
   [

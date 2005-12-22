@@ -2,8 +2,8 @@ package test;
 
 import jason.asSemantics.Unifier;
 import jason.asSyntax.ExprTerm;
-import jason.asSyntax.NumberTerm;
 import jason.asSyntax.ListTerm;
+import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Literal;
 import jason.asSyntax.NumberTermImpl;
 import jason.asSyntax.Pred;
@@ -57,13 +57,13 @@ public class VarTermTest extends TestCase {
 		
 		// unification with lists
 		VarTerm v1 = new VarTerm("L");
-		ListTerm lt = ListTerm.parseList("[a,B,a(B)]");
+		ListTerm lt = ListTermImpl.parseList("[a,B,a(B)]");
 		u = new Unifier();
 		u.unifies(new VarTerm("B"), new Term("oi"));
-		u.unifies(v1, lt);
+		u.unifies(v1, (Term)lt);
 		u.apply(v1);
 		lt = (ListTerm)v1.getValue();
-		Iterator i = lt.termsIterator();
+		Iterator i = lt.iterator();
 		i.next();i.next();
 		Term third = (Term)i.next();
 		assertTrue(third.equals(Term.parse("a(oi)")));
@@ -110,6 +110,30 @@ public class VarTermTest extends TestCase {
 		assertFalse(k.isVar());
 		assertTrue(k.isLiteral());
 		assertTrue(k.negated());
+	}
+
+	/** test when a var is ground with a List */
+	public void testVarTermAsList() {
+		VarTerm k = new VarTerm("K");
+		Unifier u = new Unifier();
+		Term l1 = (Term)ListTermImpl.parseList("[a,b,c]");
+		assertTrue(l1.isList());
+		assertTrue(u.unifies(k,l1));
+		assertFalse(k.isList());
+		//u.apply(k);
+		//assertTrue(k.isList());
+		//assertEquals(k.size(),3);
+
+		ListTerm l2 = ListTermImpl.parseList("[d,e|K]");
+		//System.out.println("l2="+l2);
+		VarTerm nl = new VarTerm("NK");
+		u.unifies(nl, (Term)l2);
+		u.apply(nl);
+		//System.out.println(nl+ " un="+u);
+		assertEquals(nl.size(), 5);
+		
+		u.apply((Term)l2);
+		assertEquals(l2.size(), 5);
 	}
 
 	/** test when a var is ground with a Number */

@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.16  2005/12/22 00:03:30  jomifred
+//   ListTerm is now an interface implemented by ListTermImpl
+//
 //   Revision 1.15  2005/12/20 19:52:05  jomifred
 //   no message
 //
@@ -53,7 +56,7 @@ import org.apache.log4j.Logger;
 /**
  * Represents a Term (a predicate parameter), e.g.: val(10,x(3)).
  */
-public class Term implements Cloneable, Comparable, Serializable {
+public class Term implements TermInterface, Comparable, Serializable {
 
 	private String functor = null;
 	private List   terms;

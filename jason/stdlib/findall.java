@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.6  2005/12/22 00:04:19  jomifred
+//   ListTerm is now an interface implemented by ListTermImpl
+//
 //   Revision 1.5  2005/08/12 22:20:10  jomifred
 //   add cvs keywords
 //
@@ -36,6 +39,7 @@ import jason.asSemantics.InternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.ListTerm;
+import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Literal;
 import jason.asSyntax.Term;
 
@@ -57,7 +61,7 @@ public class findall implements InternalAction {
 			un.apply(bel);
 
 			// find all bel in belief base and build a list with them
-			ListTerm all = new ListTerm();
+			ListTerm all = new ListTermImpl();
 			List relB = ts.getAg().getBS().getRelevant(bel);
 			if (relB != null) {
 				for (int i = 0; i < relB.size(); i++) {
@@ -76,7 +80,7 @@ public class findall implements InternalAction {
 			}
 			Term list = args[2];
 			//System.out.println("all="+all);
-			return un.unifies(list, all);
+			return un.unifies(list, (Term)all);
 		} catch (ArrayIndexOutOfBoundsException e) {
 			throw new JasonException("The internal action 'findall' has not received three arguments");
 		} catch (Exception e) {

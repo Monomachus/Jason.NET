@@ -23,15 +23,18 @@
 //   $Date$
 //   $Revision$
 //   $Log$
-//   Revision 1.13  2005/12/20 19:52:05  jomifred
-//   no message
+//   Revision 1.14  2005/12/22 00:03:30  jomifred
+//   ListTerm is now an interface implemented by ListTermImpl
 //
 //
 //----------------------------------------------------------------------------
 
 package jason.asSyntax;
 
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 
 import org.apache.log4j.Logger;
 
@@ -42,8 +45,8 @@ import org.apache.log4j.Logger;
  * 
  * @author jomi
  */
-public class VarTerm extends Literal implements NumberTerm {
-
+public class VarTerm extends Literal implements NumberTerm, ListTerm {
+// TODO: implements String
 	static private Logger logger = Logger.getLogger(VarTerm.class.getName());
 	
 	private Term value = null;
@@ -388,7 +391,7 @@ public class VarTerm extends Literal implements NumberTerm {
 	
 	// ----------
 	// ArithmeticExpression methods overridden
-	// Interface INumberTerm
+	// Interface NumberTerm
 	// ----------
 
 	public double solve() {
@@ -400,4 +403,205 @@ public class VarTerm extends Literal implements NumberTerm {
 		return 0;
 	}
 
+	
+	// ----------
+	//
+	// ListTerm methods overridden
+	// 
+	// ----------
+
+
+	public void add(int index, Object o) {
+		if (value != null && getValue().isList())
+			((ListTerm)getValue()).add(index, o);
+	}
+	public boolean add(Object o) {
+		return value != null && getValue().isList() && ((ListTerm)getValue()).add(o);
+	}
+	public boolean addAll(Collection c) {
+		return value != null && getValue().isList() && ((ListTerm)getValue()).addAll(c);
+	}
+	public boolean addAll(int index, Collection c) {
+		return value != null && getValue().isList() && ((ListTerm)getValue()).addAll(index, c);
+	}
+	public void clear() {
+		if (value != null && getValue().isList())
+			((ListTerm)getValue()).clear();
+	}
+	public boolean contains(Object o) {
+		return value != null && getValue().isList() && ((ListTerm)getValue()).contains(o);
+	}
+	public boolean containsAll(Collection c) {
+		return value != null && getValue().isList() && ((ListTerm)getValue()).containsAll(c);
+	}
+	public Object get(int index) {
+		if (value != null && getValue().isList())
+			return ((ListTerm)getValue()).get(index);
+		else 
+			return null;
+	}
+	public int indexOf(Object o) {
+		if (value != null && getValue().isList())
+			return ((ListTerm)getValue()).indexOf(o);
+		else 
+			return -1;
+	}
+	public int lastIndexOf(Object o) {
+		if (value != null && getValue().isList())
+			return ((ListTerm)getValue()).lastIndexOf(o);
+		else 
+			return -1;
+	}
+	public Iterator iterator() {
+		if (value != null && getValue().isList())
+			return ((ListTerm)getValue()).iterator();
+		else 
+			return null;
+	}
+	public ListIterator listIterator() {
+		if (value != null && getValue().isList())
+			return ((ListTerm)getValue()).listIterator();
+		else 
+			return null;
+	}
+	public ListIterator listIterator(int index) {
+		if (value != null && getValue().isList())
+			return ((ListTerm)getValue()).listIterator(index);
+		else 
+			return null;
+	}
+	public Object remove(int index) {
+		if (value != null && getValue().isList())
+			return ((ListTerm)getValue()).remove(index);
+		else 
+			return null;
+	}
+	public boolean remove(Object o) {
+		if (value != null && getValue().isList())
+			return ((ListTerm)getValue()).remove(o);
+		else 
+			return false;
+	}
+	public boolean removeAll(Collection c) {
+		if (value != null && getValue().isList())
+			return ((ListTerm)getValue()).removeAll(c);
+		else 
+			return false;
+	}
+	public boolean retainAll(Collection c) {
+		if (value != null && getValue().isList())
+			return ((ListTerm)getValue()).retainAll(c);
+		else 
+			return false;
+	}
+	public Object set(int index, Object o) {
+		if (value != null && getValue().isList())
+			return ((ListTerm)getValue()).set(index, o);
+		else 
+			return null;
+	}
+	public List subList(int arg0, int arg1) {
+		if (value != null && getValue().isList())
+			return ((ListTerm)getValue()).subList(arg0, arg1);
+		else 
+			return null;
+	}
+	public Object[] toArray() {
+		if (value != null && getValue().isList())
+			return ((ListTerm)getValue()).toArray();
+		else 
+			return null;
+	}
+	public Object[] toArray(Object[] arg0) {
+		if (value != null && getValue().isList())
+			return ((ListTerm)getValue()).toArray(arg0);
+		else 
+			return null;
+	}
+
+	// from ListTerm
+	
+	public ListTerm add(int index, Term t) {
+		if (value != null && getValue().isList())
+			return ((ListTerm)getValue()).add(index, t);
+		else 
+			return null;
+	}
+	public ListTerm add(Term t) {
+		if (value != null && getValue().isList())
+			return ((ListTerm)getValue()).add(t);
+		else 
+			return null;
+	}
+	public ListTerm concat(ListTerm lt) {
+		if (value != null && getValue().isList())
+			return ((ListTerm)getValue()).concat(lt);
+		else 
+			return null;
+	}
+	public List getAsList() {
+		if (value != null && getValue().isList())
+			return ((ListTerm)getValue()).getAsList();
+		else 
+			return null;
+	}
+
+	public ListTerm getLast() {
+		if (value != null && getValue().isList())
+			return ((ListTerm)getValue()).getLast();
+		else 
+			return null;
+	}
+
+	public ListTerm getNext() {
+		if (value != null && getValue().isList())
+			return ((ListTerm)getValue()).getNext();
+		else 
+			return null;
+	}
+
+	public Term getTail() {
+		if (value != null && getValue().isList())
+			return ((ListTerm)getValue()).getTail();
+		else 
+			return null;
+	}
+
+	public Term getTerm() {
+		if (value != null && getValue().isList())
+			return ((ListTerm)getValue()).getTerm();
+		else 
+			return null;
+	}
+
+	public boolean isEmpty() {
+		return value != null && getValue().isList() && ((ListTerm)getValue()).isEmpty();
+	}
+
+	public boolean isEnd() {
+		return value != null && getValue().isList() && ((ListTerm)getValue()).isEnd();
+	}
+
+	public boolean isTail() {
+		return value != null && getValue().isList();// && ((ListTerm)getValue()).isTail();
+	}
+
+	public Iterator listTermIterator() {
+		if (value != null && getValue().isList())
+			return ((ListTerm)getValue()).listTermIterator();
+		else 
+			return null;
+	}
+
+	public void setTail(Term t) {
+		if (value != null && getValue().isList())
+			((ListTerm)getValue()).setTail(t);
+	}
+
+	public int size() {
+		if (value != null && getValue().isList())
+			return ((ListTerm)getValue()).size();
+		else 
+			return -1;
+	}
 }

@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.7  2005/12/22 00:04:19  jomifred
+//   ListTerm is now an interface implemented by ListTermImpl
+//
 //   Revision 1.6  2005/08/12 21:12:50  jomifred
 //   add cvs keywords
 //
@@ -53,7 +56,7 @@ public class addPlan implements InternalAction {
 			Term source = args[1];
         	if (plans.isList()) { // if arg[0] is a list
 				ListTerm lt = (ListTerm)plans;
-        		Iterator i = lt.termsIterator();
+        		Iterator i = lt.iterator();
         		while (i.hasNext()) {
 					ts.getAg().addPlan( (StringTerm)i.next(), source);
         		}

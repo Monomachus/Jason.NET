@@ -6,6 +6,7 @@ import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.BeliefBase;
 import jason.asSyntax.ListTerm;
+import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Literal;
 import jason.asSyntax.NumberTerm;
 import jason.asSyntax.NumberTermImpl;
@@ -20,12 +21,12 @@ import jason.stdlib.removePlan;
 
 import java.util.Iterator;
 
+import junit.framework.TestCase;
+
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
-
-import junit.framework.TestCase;
 
 /** JUnit test case for stdlib package */
 public class StdLibTest extends TestCase {
@@ -58,7 +59,7 @@ public class StdLibTest extends TestCase {
 		Term annotL = Term.parse("source(rafa)");
 		assertEquals(msgL.toString(), "[ok(10),[ok(20),ok(30),[ok(40),ok(50),ok(60)]]]");
 		try {
-			aa.execute(null, u, new Term[] { msgL, annotL, Y });
+			aa.execute(null, u, new Term[] { (Term)msgL, annotL, Y });
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -131,7 +132,7 @@ public class StdLibTest extends TestCase {
 		
 		// add plans returned from getRelevantPlans
 		// using IA addPlan
-		Iterator i = plans.termsIterator();
+		Iterator i = plans.iterator();
 		try {
 			while (i.hasNext()) {
 				StringTerm t = (StringTerm)i.next();
@@ -145,7 +146,7 @@ public class StdLibTest extends TestCase {
 		// add again plans returned from getRelevantPlans
 		// using IA addPlan receiving a list of plans
 		try {
-			new addPlan().execute(ts, new Unifier(), new Term[] { plans, new Term("fromLT") });
+			new addPlan().execute(ts, new Unifier(), new Term[] { (Term)plans, new Term("fromLT") });
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -161,15 +162,15 @@ public class StdLibTest extends TestCase {
 	
 	
 	public void testConcat() {
-		ListTerm l1 = ListTerm.parseList("[a,b,c]");
-		ListTerm l2 = ListTerm.parseList("[d,e,f]");
-		ListTerm l3 = ListTerm.parseList("[a,b,c,d,e,f]");
+		ListTerm l1 = ListTermImpl.parseList("[a,b,c]");
+		ListTerm l2 = ListTermImpl.parseList("[d,e,f]");
+		ListTerm l3 = ListTermImpl.parseList("[a,b,c,d,e,f]");
 
 		VarTerm X = new VarTerm("X");
 		Unifier u = new Unifier();
 
 		try {
-			assertTrue(new jason.stdlib.concat().execute(null, u, new Term[] { l1, l2, X }));
+			assertTrue(new jason.stdlib.concat().execute(null, u, new Term[] { (Term)l1, (Term)l2, X }));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -178,7 +179,7 @@ public class StdLibTest extends TestCase {
 		assertEquals( ((ListTerm)u.get("X")), l3);
 		
 		try {
-			assertTrue(new jason.stdlib.concat().execute(null, new Unifier(), new Term[] { l1, l2, l3 }));
+			assertTrue(new jason.stdlib.concat().execute(null, new Unifier(), new Term[] { (Term)l1, (Term)l2, (Term)l3 }));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}	

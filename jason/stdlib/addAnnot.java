@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.10  2005/12/22 00:04:19  jomifred
+//   ListTerm is now an interface implemented by ListTermImpl
+//
 //   Revision 1.9  2005/08/12 21:12:50  jomifred
 //   add cvs keywords
 //
@@ -31,15 +34,16 @@
 
 package jason.stdlib;
 
-import java.util.Iterator;
-
 import jason.JasonException;
 import jason.asSemantics.InternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
+import jason.asSyntax.ListTerm;
+import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Literal;
 import jason.asSyntax.Term;
-import jason.asSyntax.ListTerm;
+
+import java.util.Iterator;
 
 public class addAnnot implements InternalAction {
 
@@ -71,16 +75,16 @@ public class addAnnot implements InternalAction {
 			unif.apply(l);
 		}
 		if (l.isList()) {
-			ListTerm result = new ListTerm();
+			ListTerm result = new ListTermImpl();
 			ListTerm lt = (ListTerm)l;
-			Iterator i = lt.termsIterator();
+			Iterator i = lt.iterator();
 			while (i.hasNext()) {
 				Term t = addAnnotToList( unif, (Term)i.next(), annot);
 				if (t != null) {
 					result.add(t);
 				}
 			}
-			return result;
+			return (Term)result;
 		} else {
 			try {
 				// if it can be parsed as a literal, OK to add annot

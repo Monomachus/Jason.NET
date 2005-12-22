@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.5  2005/12/22 00:04:19  jomifred
+//   ListTerm is now an interface implemented by ListTermImpl
+//
 //   Revision 1.4  2005/11/09 23:39:01  jomifred
 //   works for strings, numbers, ...
 //
@@ -63,7 +66,7 @@ public class concat implements InternalAction {
 		
 			ListTerm l1l = (ListTerm)l1;
 			l1l.concat((ListTerm)l2);
-			return un.unifies(l3, l1l);
+			return un.unifies(l3, (Term)l1l);
 		} else {
 			String v1 = l1.toString();
 			if (l1.isString()) {

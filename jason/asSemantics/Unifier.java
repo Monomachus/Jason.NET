@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.15  2005/12/22 00:03:30  jomifred
+//   ListTerm is now an interface implemented by ListTermImpl
+//
 //   Revision 1.14  2005/12/20 19:52:05  jomifred
 //   no message
 //
@@ -276,7 +279,7 @@ public class Unifier implements Cloneable {
         //System.out.println("TermUn: "+t1+"="+t2+" : "+t1g+"="+t2g);
         return unifiesNoClone(t1g, t2g);
     }
-    
+  
    	public boolean unifies(Pred p1, Pred p2) {
    		Pred np1 = (Pred)p1.clone();
    		Pred np2 = (Pred)p2.clone();

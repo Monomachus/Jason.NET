@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.7  2005/12/22 00:04:19  jomifred
+//   ListTerm is now an interface implemented by ListTermImpl
+//
 //   Revision 1.6  2005/08/12 22:20:10  jomifred
 //   add cvs keywords
 //
@@ -37,6 +40,7 @@ import jason.asSemantics.Option;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.ListTerm;
+import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Plan;
 import jason.asSyntax.StringTerm;
 import jason.asSyntax.Term;
@@ -60,7 +64,7 @@ public class getRelevantPlans implements InternalAction {
 			if (te == null) {
 				throw new JasonException("The first argument is not a TE (getRelevantPlans internal action)");
 			}
-			ListTerm lt = new ListTerm();
+			ListTerm lt = new ListTermImpl();
 			Iterator i = ts.relevantPlans(te).iterator();
 			while (i.hasNext()) {
 				Option opt = (Option) i.next();
@@ -81,7 +85,7 @@ public class getRelevantPlans implements InternalAction {
 			//}
 
 			// un.unifies(new Term(sPlanList.toString()), listVar);
-			return un.unifies(lt, listVar);
+			return un.unifies((Term)lt, listVar);
 			// System.out.println("*** un = "+un);
 		} catch (ArrayIndexOutOfBoundsException e) {
 			throw new JasonException("The internal action 'getRelevantPlans' has not received two arguments (TE and a VAR)");

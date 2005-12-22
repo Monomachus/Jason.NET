@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.6  2005/12/22 00:03:30  jomifred
+//   ListTerm is now an interface implemented by ListTermImpl
+//
 //   Revision 1.5  2005/12/20 19:52:05  jomifred
 //   no message
 //
@@ -194,12 +197,6 @@ public class ExprTerm extends VarTerm implements NumberTerm {
 	}
 	
 	public boolean isVar() {
-		return false;
-	}
-	public boolean isPred() {
-		return false;
-	}
-	public boolean isLiteral() {
 		return false;
 	}
 	

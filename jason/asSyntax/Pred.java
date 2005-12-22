@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.12  2005/12/22 00:03:30  jomifred
+//   ListTerm is now an interface implemented by ListTermImpl
+//
 //   Revision 1.11  2005/12/20 19:52:05  jomifred
 //   no message
 //
@@ -185,7 +188,7 @@ public class Pred extends Term implements Cloneable, Comparable, Serializable {
 	 * it returns [a,b] 
 	 */
 	public ListTerm getSources() {
-		ListTerm ls = new ListTerm();
+		ListTerm ls = new ListTermImpl();
 		if (annots != null) {
 			Iterator i = annots.iterator();
 			while (i.hasNext()) {

@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.3  2005/12/22 00:03:30  jomifred
+//   ListTerm is now an interface implemented by ListTermImpl
+//
 //   Revision 1.2  2005/08/12 22:26:08  jomifred
 //   add cvs keywords
 //
@@ -31,8 +34,6 @@
 
 package jason.asSyntax;
 
-public interface NumberTerm extends Cloneable {
+public interface NumberTerm extends TermInterface {
 	public double solve();
-	public Object clone();
-	public boolean isGround();	
 }

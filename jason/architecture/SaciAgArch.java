@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.21  2005/12/22 00:03:26  jomifred
+//   ListTerm is now an interface implemented by ListTermImpl
+//
 //   Revision 1.20  2005/12/08 20:06:59  jomifred
 //   changes for JasonIDE plugin
 //
@@ -66,7 +69,7 @@ package jason.architecture;
 import jason.JasonException;
 import jason.asSemantics.ActionExec;
 import jason.asSemantics.TransitionSystem;
-import jason.asSyntax.ListTerm;
+import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Term;
 import jason.runtime.MASConsoleGUI;
 import jason.runtime.RunCentralisedMAS;
@@ -245,7 +248,7 @@ public class SaciAgArch extends saci.Agent implements AgArchInterface {
         if (m != null) {
 			String content = (String) m.get("content");
 			if (content != null) {
-				percepts = ListTerm.parseList(content).getAsList();
+				percepts = ListTermImpl.parseList(content).getAsList();
 				if (logger.isDebugEnabled()) {
 					logger.debug("received percepts: "+percepts);
 				}

@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.6  2005/12/22 00:04:19  jomifred
+//   ListTerm is now an interface implemented by ListTermImpl
+//
 //   Revision 1.5  2005/08/12 22:20:10  jomifred
 //   add cvs keywords
 //
@@ -54,7 +57,7 @@ public class removePlan implements InternalAction {
         try {
         	if (args[0].isList()) { // if arg[0] is a list
         		ListTerm lt = (ListTerm)args[0];
-        		Iterator i = lt.termsIterator();
+        		Iterator i = lt.iterator();
         		while (i.hasNext()) {
             		ts.getAg().removePlan( (StringTerm)i.next(), args[1]);
         		}
