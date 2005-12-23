@@ -23,8 +23,8 @@
 //   $Date$
 //   $Revision$
 //   $Log$
-//   Revision 1.14  2005/12/08 20:06:59  jomifred
-//   changes for JasonIDE plugin
+//   Revision 1.15  2005/12/23 00:51:00  jomifred
+//   StringTerm is now an interface implemented by StringTermImpl
 //
 //----------------------------------------------------------------------------
 
@@ -66,15 +66,15 @@ public class createAgent implements InternalAction {
             un.apply(name);
             
             StringTerm source = (StringTerm)args[1].clone();
-            un.apply(source);
+            un.apply((Term)source);
             
-            File fSource = new File(source.getValue());
+            File fSource = new File(source.getString());
             if (! fSource.exists()) {
             	
             	// try to get the project directory (only when running inside JasonID)
             	if (JasonID.currentJasonID != null) {
             		logger.debug("trying to find the source at "+JasonID.currentJasonID.getProjectDirectory());
-            		fSource = new File(JasonID.currentJasonID.getProjectDirectory()+File.separator+source.getValue());
+            		fSource = new File(JasonID.currentJasonID.getProjectDirectory()+File.separator+source.getString());
                     if (! fSource.exists()) {
                 		throw new JasonException("The file source "+source+" was not found!");
                     }

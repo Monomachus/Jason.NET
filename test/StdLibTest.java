@@ -12,6 +12,7 @@ import jason.asSyntax.NumberTerm;
 import jason.asSyntax.NumberTermImpl;
 import jason.asSyntax.Pred;
 import jason.asSyntax.StringTerm;
+import jason.asSyntax.StringTermImpl;
 import jason.asSyntax.Term;
 import jason.asSyntax.VarTerm;
 import jason.stdlib.addAnnot;
@@ -96,19 +97,19 @@ public class StdLibTest extends TestCase {
 	public void testGetRelevantPlansAndAddPlan() {
 		Agent ag = new Agent();
 		ag.setLogger(null);
-		StringTerm pt1 = new StringTerm("@t1 +a : g(10) <- .print(\"ok 10\").");
+		StringTerm pt1 = new StringTermImpl("@t1 +a : g(10) <- .print(\"ok 10\").");
 		ag.addPlan(pt1, new Term("nosource"));
-		ag.addPlan(new StringTerm("@t2 +a : g(20) <- .print(\"ok 20\")."), new Term("nosource"));
-		ag.addPlan(new StringTerm("@t3 +b : true <- true."), new Term("nosource"));
+		ag.addPlan(new StringTermImpl("@t2 +a : g(20) <- .print(\"ok 20\")."), new Term("nosource"));
+		ag.addPlan(new StringTermImpl("@t3 +b : true <- true."), new Term("nosource"));
 		//System.out.println(ag.getPS());
 		TransitionSystem ts = new TransitionSystem(ag, null, null, null);
 
 		Unifier u = new Unifier();
-		StringTerm ste = new StringTerm("+a");
+		StringTerm ste = new StringTermImpl("+a");
 		VarTerm X = new VarTerm("X");
 		//System.out.println(ag.getPS().getAllRelevant(Trigger.parseTrigger(ste.getFunctor())));
 		try {
-			new getRelevantPlans().execute(ts, u, new Term[] { ste, X });
+			new getRelevantPlans().execute(ts, u, new Term[] { (Term)ste, X });
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -121,7 +122,7 @@ public class StdLibTest extends TestCase {
 		assertEquals(ag.getPS().getPlans().size(), 3);
 		// remove plan t1 from PS
 		try {
-			new removePlan().execute(ts, new Unifier(), new Term[] { pt1, new Term("nosource") });
+			new removePlan().execute(ts, new Unifier(), new Term[] { (Term)pt1, new Term("nosource") });
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -136,7 +137,7 @@ public class StdLibTest extends TestCase {
 		try {
 			while (i.hasNext()) {
 				StringTerm t = (StringTerm)i.next();
-				new addPlan().execute(ts, new Unifier(), new Term[] { t, new Term("fromGR") });
+				new addPlan().execute(ts, new Unifier(), new Term[] { (Term)t, new Term("fromGR") });
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -198,13 +199,13 @@ public class StdLibTest extends TestCase {
 			e.printStackTrace();
 		}
 		
-		StringTerm sx = new StringTerm("a");
-		StringTerm sy = new StringTerm("b");
+		StringTerm sx = new StringTermImpl("a");
+		StringTerm sy = new StringTermImpl("b");
 		VarTerm vsy = new VarTerm("SY");
-		u.unifies(vsy,sy);
+		u.unifies(vsy,(Term)sy);
 		try {
-			assertTrue(new jason.stdlib.gt().execute(null, u, new Term[] { vsy, sx }));
-			assertFalse(new jason.stdlib.gt().execute(null, u, new Term[] { sx, vsy }));
+			assertTrue(new jason.stdlib.gt().execute(null, u, new Term[] { vsy, (Term)sx }));
+			assertFalse(new jason.stdlib.gt().execute(null, u, new Term[] { (Term)sx, vsy }));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

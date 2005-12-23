@@ -23,8 +23,8 @@
 //   $Date$
 //   $Revision$
 //   $Log$
-//   Revision 1.14  2005/12/22 00:03:30  jomifred
-//   ListTerm is now an interface implemented by ListTermImpl
+//   Revision 1.15  2005/12/23 00:48:23  jomifred
+//   StringTerm is now an interface implemented by StringTermImpl
 //
 //
 //----------------------------------------------------------------------------
@@ -45,8 +45,7 @@ import org.apache.log4j.Logger;
  * 
  * @author jomi
  */
-public class VarTerm extends Literal implements NumberTerm, ListTerm {
-// TODO: implements String
+public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm {
 	static private Logger logger = Logger.getLogger(VarTerm.class.getName());
 	
 	private Term value = null;
@@ -235,23 +234,6 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm {
 		return value != null && getValue().isInternalAction();
 	}
 	
-	/*
-	 * TODO the below is not ok, see the following code where
-	 * x is a VarTerm with a List value!
-	 * TODO JOMI: isto nao e' problema de ter feito "ground" antes?
-	 * Precisa se preocupar com os isXXX pra todas as possibilidades
-	 * dos valores instanciados aa variavel? Se e' var (o cara nao
-	 * deu ground antes) e perguntar isXXX devia mesmo ser falso
-	 * exceto pra isVar nao???
-	 * RAFA: o problema eh o cast. x que eh uma VarTerm nao pode fazer cast
-	 * com ListTerm. 
-	 *  
-	 * if (x.isList()) {
-	 *    ListTerm lt = (ListTerm)x;
-	 *    
-	 * To solve it, we must use ListTerm, StringTerm, ... interfaces
-	 */    
-
 	public boolean isList() {
 		return value != null && getValue().isList();
 	}
@@ -604,4 +586,26 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm {
 		else 
 			return -1;
 	}
+	
+	// -----------------------
+	// StringTerm interface implementation
+	// -----------------------
+	
+	public void setString(String s) {
+		if (value != null && getValue().isString())
+			((StringTerm)getValue()).setString(s);
+	}
+	public String getString() {
+		if (value != null && getValue().isString())
+			return ((StringTerm)getValue()).getString();
+		else
+			return null;
+	}
+	public int length() {
+		if (value != null && getValue().isString())
+			return ((StringTerm)getValue()).length();
+		else
+			return -1;
+	}
+
 }

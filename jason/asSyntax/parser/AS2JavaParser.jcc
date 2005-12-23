@@ -22,6 +22,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.23  2005/12/23 00:48:23  jomifred
+//   StringTerm is now an interface implemented by StringTermImpl
+//
 //   Revision 1.22  2005/12/22 00:04:18  jomifred
 //   ListTerm is now an interface implemented by ListTermImpl
 //
@@ -318,7 +321,7 @@ Term t() :         { Token K; Term u; NumberTerm nb;}
   ( u=l()          { return u; }
   | u=list()       { return u; } 
   | nb=ae()        { return (Term)nb; }
-  | K=<STRING>     { return new StringTerm(K.image.replaceAll("\"", "\\\"")); } 
+  | K=<STRING>     { return new StringTermImpl(K.image.replaceAll("\"", "\\\"")); } 
   )
 }
 
@@ -357,7 +360,7 @@ Term re() :                               { Token k;
 {
     (   nb = ae()                          { op1 = (Term)nb; }
       | op1 = l()
-      | k = <STRING>                       { op1 = new StringTerm(k.image); }
+      | k = <STRING>                       { op1 = new StringTermImpl(k.image); }
     )
                      
     [
@@ -372,7 +375,7 @@ Term re() :                               { Token k;
 
        (   nb = ae()                       { op2 = (Term)nb; }
          | op2 = l()
-         | k = <STRING>                    { op2 = new StringTerm(k.image); }
+         | k = <STRING>                    { op2 = new StringTermImpl(k.image); }
        )
 
                                            { rel = new Term(operator);

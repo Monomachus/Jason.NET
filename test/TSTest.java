@@ -7,17 +7,18 @@ import jason.asSemantics.Option;
 import jason.asSemantics.TransitionSystem;
 import jason.asSyntax.Literal;
 import jason.asSyntax.StringTerm;
+import jason.asSyntax.StringTermImpl;
 import jason.asSyntax.Term;
 import jason.asSyntax.Trigger;
 
 import java.util.List;
 
+import junit.framework.TestCase;
+
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
-
-import junit.framework.TestCase;
 
 /** JUnit test case for syntax package */
 public class TSTest extends TestCase {
@@ -31,10 +32,10 @@ public class TSTest extends TestCase {
 	public void testRelevant() {
 		Agent ag = new Agent();
 		Circumstance c = new Circumstance();
-		StringTerm pt1 = new StringTerm("@t1 +a(X) : g(10) <- .print(\"ok 10\").");
+		StringTerm pt1 = new StringTermImpl("@t1 +a(X) : g(10) <- .print(\"ok 10\").");
 		ag.addPlan(pt1, new Term("nosource"));
-		ag.addPlan(new StringTerm("@t2 +a(X) : true <- .print(\"ok 20\")."), new Term("nosource"));
-		ag.addPlan(new StringTerm("@t3 +b : true <- true."), new Term("nosource"));
+		ag.addPlan(new StringTermImpl("@t2 +a(X) : true <- .print(\"ok 20\")."), new Term("nosource"));
+		ag.addPlan(new StringTermImpl("@t3 +b : true <- true."), new Term("nosource"));
 		TransitionSystem ts = new TransitionSystem(ag, c, null, null);
 		Literal content = Literal.parseLiteral("~alliance");
 		content.addSource("ag1");

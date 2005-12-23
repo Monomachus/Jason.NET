@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.20  2005/12/23 00:48:22  jomifred
+//   StringTerm is now an interface implemented by StringTermImpl
+//
 //   Revision 1.19  2005/12/17 19:51:57  jomifred
 //   no message
 //
@@ -389,7 +392,7 @@ public class Agent {
 	// TODO IMPORTANT: this is not making sure the label of the new plan is unique!!!
 	// TODO: use pl contains (to have only a MAP in plan library)
 	public void addPlan(StringTerm stPlan, Term tSource) {
-		String sPlan = stPlan.getValue();
+		String sPlan = stPlan.getString();
 		try {
 			// remove quotes \" -> "
 			StringBuffer sTemp = new StringBuffer();

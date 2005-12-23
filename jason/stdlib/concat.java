@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.6  2005/12/23 00:51:00  jomifred
+//   StringTerm is now an interface implemented by StringTermImpl
+//
 //   Revision 1.5  2005/12/22 00:04:19  jomifred
 //   ListTerm is now an interface implemented by ListTermImpl
 //
@@ -70,17 +73,17 @@ public class concat implements InternalAction {
 		} else {
 			String v1 = l1.toString();
 			if (l1.isString()) {
-				v1 = ((StringTerm)l1).getValue();
+				v1 = ((StringTerm)l1).getString();
 			}
 			String v2 = l2.toString();
 			if (l2.isString()) {
-				v2 = ((StringTerm)l2).getValue();
+				v2 = ((StringTerm)l2).getString();
 			}
 			if (!l3.isVar() && !l3.isString()) {
 				throw new JasonException("arg[2] is not a string or variable (concat)");
 			}
 		
-			return un.unifies(l3, new StringTerm(v1+v2));
+			return un.unifies(l3, new StringTermImpl(v1+v2));
 		}
 	}
 }

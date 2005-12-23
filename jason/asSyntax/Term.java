@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.17  2005/12/23 00:48:23  jomifred
+//   StringTerm is now an interface implemented by StringTermImpl
+//
 //   Revision 1.16  2005/12/22 00:03:30  jomifred
 //   ListTerm is now an interface implemented by ListTermImpl
 //
@@ -57,7 +60,9 @@ import org.apache.log4j.Logger;
  * Represents a Term (a predicate parameter), e.g.: val(10,x(3)).
  */
 public class Term implements TermInterface, Comparable, Serializable {
-
+// TODO: define Term as an interface, and this class will be TermImpl
+// Many casts from stringTerm/listTerm/numberTerm to (Term) can be avoided
+	
 	private String functor = null;
 	private List   terms;
 

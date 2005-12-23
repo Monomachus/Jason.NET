@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.8  2005/12/23 00:51:00  jomifred
+//   StringTerm is now an interface implemented by StringTermImpl
+//
 //   Revision 1.7  2005/12/22 00:04:19  jomifred
 //   ListTerm is now an interface implemented by ListTermImpl
 //
@@ -43,6 +46,7 @@ import jason.asSyntax.ListTerm;
 import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Plan;
 import jason.asSyntax.StringTerm;
+import jason.asSyntax.StringTermImpl;
 import jason.asSyntax.Term;
 import jason.asSyntax.Trigger;
 
@@ -73,7 +77,7 @@ public class getRelevantPlans implements InternalAction {
 				if (np.getLabel() != null) {
 					np.getLabel().delSources();
 				}
-				StringTerm stplan = new StringTerm(np.toASString().replaceAll("\\\"", "\\\\\""));
+				StringTerm stplan = new StringTermImpl(np.toASString().replaceAll("\\\"", "\\\\\""));
 				lt.add(stplan);
 			}
 

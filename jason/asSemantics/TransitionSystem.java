@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.28  2005/12/23 00:48:22  jomifred
+//   StringTerm is now an interface implemented by StringTermImpl
+//
 //   Revision 1.27  2005/11/20 16:53:16  jomifred
 //   the canSleep method in TS asks the agent arch if it can sleep.
 //
@@ -699,6 +702,8 @@ public class TransitionSystem {
 		Literal l;
 		if (dflTerm.isVar()) {
 			un.apply(dflTerm);
+			// TODO: check if it necessary to test (isVar) hence VarTerm is a Literal
+			// do it in all fonts!
 			l = (Literal) ((VarTerm)dflTerm).getValue();
 		} else {
 			l = (Literal) dflTerm;

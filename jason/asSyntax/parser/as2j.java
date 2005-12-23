@@ -417,7 +417,7 @@
       break;
     case STRING:
       K = jj_consume_token(STRING);
-                     {if (true) return new StringTerm(K.image.replaceAll("\"", "\\\""));}
+                     {if (true) return new StringTermImpl(K.image.replaceAll("\"", "\\\""));}
       break;
     default:
       jj_la1[17] = jj_gen;
@@ -520,7 +520,7 @@
       break;
     case STRING:
       k = jj_consume_token(STRING);
-                                             op1 = new StringTerm(k.image);
+                                             op1 = new StringTermImpl(k.image);
       break;
     default:
       jj_la1[22] = jj_gen;
@@ -585,7 +585,7 @@
         break;
       case STRING:
         k = jj_consume_token(STRING);
-                                             op2 = new StringTerm(k.image);
+                                             op2 = new StringTermImpl(k.image);
         break;
       default:
         jj_la1[24] = jj_gen;
@@ -748,11 +748,6 @@
     try { return !jj_3_1(); }
     catch(LookaheadSuccess ls) { return true; }
     finally { jj_save(0, xla); }
-  }
-
-  final private boolean jj_3R_25() {
-    if (jj_scan_token(33)) return true;
-    return false;
   }
 
   final private boolean jj_3R_24() {
@@ -953,6 +948,11 @@
 
   final private boolean jj_3R_28() {
     if (jj_3R_29()) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_25() {
+    if (jj_scan_token(33)) return true;
     return false;
   }
 

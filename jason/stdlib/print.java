@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.9  2005/12/23 00:51:00  jomifred
+//   StringTerm is now an interface implemented by StringTermImpl
+//
 //   Revision 1.8  2005/08/12 22:20:10  jomifred
 //   add cvs keywords
 //
@@ -49,7 +52,7 @@ public class print implements InternalAction {
 		for (int i = 0; i < args.length; i++) {
 			if (args[i].isString()) {
 				StringTerm st = (StringTerm)args[i];
-				sout.append(st.getValue());
+				sout.append(st.getString());
 			} else {
 				Term t = (Term)args[i].clone();
 				un.apply(t);
