@@ -134,6 +134,7 @@ public class VarTermTest extends TestCase {
 		
 		u.apply((Term)l2);
 		assertEquals(l2.size(), 5);
+		assertEquals(l2.toString(),"[d,e,a,b,c]");
 	}
 
 	/** test when a var is ground with a Number */

@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.2  2005/12/23 12:44:04  jomifred
+//   fix a bug in VarTerm (isTail)
+//
 //   Revision 1.1  2005/12/22 00:04:34  jomifred
 //   ListTerm is now an interface implemented by ListTermImpl
 //
@@ -268,15 +271,11 @@ public class ListTermImpl extends Term implements ListTerm {
 		return new Iterator() {
 			ListTerm current = lt;
 			public boolean hasNext() {
-				return current != null && !current.isEmpty() 
-				       && current.isList(); // in case current is a var 
+				return current != null && !current.isEmpty(); 
 			}
 			public Object next() {
 				Object o = current;
 				current = current.getNext();
-				try {
-					current = (ListTerm)((VarTerm)current).getValue();
-				} catch (Exception e) {}
 				return o;
 			}
 			public void remove() {	

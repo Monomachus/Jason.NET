@@ -23,8 +23,8 @@
 //   $Date$
 //   $Revision$
 //   $Log$
-//   Revision 1.15  2005/12/23 00:48:23  jomifred
-//   StringTerm is now an interface implemented by StringTermImpl
+//   Revision 1.16  2005/12/23 12:44:04  jomifred
+//   fix a bug in VarTerm (isTail)
 //
 //
 //----------------------------------------------------------------------------
@@ -47,6 +47,8 @@ import org.apache.log4j.Logger;
  */
 public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm {
 	static private Logger logger = Logger.getLogger(VarTerm.class.getName());
+	
+	// TODO: check all (VarTerm) cast or isVar() if it is necessary
 	
 	private Term value = null;
 	
@@ -565,7 +567,7 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
 	}
 
 	public boolean isTail() {
-		return value != null && getValue().isList();// && ((ListTerm)getValue()).isTail();
+		return value != null && getValue().isList() && ((ListTerm)getValue()).isTail();
 	}
 
 	public Iterator listTermIterator() {
