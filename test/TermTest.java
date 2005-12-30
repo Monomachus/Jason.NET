@@ -168,6 +168,7 @@ public class TermTest extends TestCase {
 		//System.out.println("p1="+p1+"; p2="+p2);
 		assertTrue(u.unifies(p1, p2));
 	}
+	
 	public static void main(String[] a) {
 		new TermTest().testAnnotsUnify1();
 	}
@@ -236,7 +237,7 @@ public class TermTest extends TestCase {
 	
 	public void testTriggetAnnot() {
 		Literal content = Literal.parseLiteral("~alliance");
-		content.addSource("ag1");
+		content.addSource(new Term("ag1"));
 		Literal received = new Literal(Literal.LPos, new Pred("received"));
 		received.addTerm(new Term("ag1"));
 		received.addTerm(new Term("tell"));
@@ -258,7 +259,7 @@ public class TermTest extends TestCase {
 		Unifier u = new Unifier();
 		assertTrue(u.unifies(t1,t2));
 		//System.out.println(u);
-		u.apply(t2);
+		u.apply(t2.getLiteral());
 		//System.out.println("t2 with apply = "+t2);
 		
 		assertEquals(t1.toString(), t2.toString());
@@ -274,7 +275,7 @@ public class TermTest extends TestCase {
 	
 	public void testLiteralUnify() {
 		Literal content = Literal.parseLiteral("~alliance");
-		content.addSource("ag1");
+		content.addSource(new Term("ag1"));
 		Literal l1 = new Literal(Literal.LPos, new Pred("received"));
 		l1.addTerm(new Term("ag1"));
 		l1.addTerm(new Term("tell"));
@@ -291,5 +292,38 @@ public class TermTest extends TestCase {
 		assertEquals(l1.toString(), l2.toString());
 		
 	}
+	
+	public void testSubsetAnnot() {
+		Pred p1 = Pred.parsePred("p1(t1,t2)[a1,a(2,3),a(3)]");
+		Pred p2 = Pred.parsePred("p2(t1,t2)[a(2,3),a(3)]");
+		assertTrue(p2.hasSubsetAnnot(p1));
+		assertFalse(p1.hasSubsetAnnot(p2));
+		
+		Pred p3 = Pred.parsePred("p2(t1,t2)[a(A,_),a(X)]");
+		Unifier u = new Unifier();
+		assertTrue(p3.hasSubsetAnnot(p2,u));
+		assertEquals(u.get("A").toString(),"2");
+		assertEquals(u.get("X").toString(),"3");
+		assertTrue(p3.hasSubsetAnnot(p1,u));
+	}
+	
+	public void testAnnotUnifAsList() {
+		Pred p1 = Pred.parsePred("p[b(2),x]");
+		Pred p2 = Pred.parsePred("p[a,b(2),c]");
+		Unifier u = new Unifier();
+		
+		assertFalse(u.unifies(p1,p2));
+		
+		p1 = Pred.parsePred("p(t1,t2)[z,a(1),a(2,3),a(3)]");
+		p2 = Pred.parsePred("p(t1,B)[a(X)|R]");
 
+		assertTrue(u.unifies(p2,p1));
+		assertEquals(u.get("R").toString(),"[z,a(2,3),a(3)]");
+		
+		u = new Unifier();
+		assertTrue(u.unifies(p1,p2));
+		
+		u.apply(p2);
+		assertEquals(p2.toString(),"p(t1,t2)[a(1),z,a(2,3),a(3)]");
+	}
 }

@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.21  2005/12/30 20:40:16  jomifred
+//   new features: unnamed var, var with annots, TE as var
+//
 //   Revision 1.20  2005/12/23 00:48:22  jomifred
 //   StringTerm is now an interface implemented by StringTermImpl
 //
@@ -93,7 +96,6 @@ public class Agent {
 	protected TransitionSystem fTS = null;
 
 	private Logger logger;
-	
 	
 	/**
 	 * args[0] is the agent architecture class (ignored here)

@@ -38,7 +38,7 @@ public class TSTest extends TestCase {
 		ag.addPlan(new StringTermImpl("@t3 +b : true <- true."), new Term("nosource"));
 		TransitionSystem ts = new TransitionSystem(ag, c, null, null);
 		Literal content = Literal.parseLiteral("~alliance");
-		content.addSource("ag1");
+		content.addSource(new Term("ag1"));
 
 		Trigger te1 = Trigger.parseTrigger("+a(10)");
 		

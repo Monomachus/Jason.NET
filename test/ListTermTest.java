@@ -7,6 +7,7 @@ import jason.asSyntax.Term;
 import jason.asSyntax.VarTerm;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import junit.framework.TestCase;
@@ -48,6 +49,11 @@ public class ListTermTest extends TestCase {
 		l.add(new Term("a"));
 		l.add(new Term("a"));
 		assertEquals(l.size(), 3);		
+	}
+
+	public void testToString() {
+		assertEquals(l1.toString(),"[a,b,c]");
+		assertEquals(l2.toString(),"[a(1,2),b(r,t)|T]");
 	}
 	
 	public void testUnify() {
@@ -99,7 +105,19 @@ public class ListTermTest extends TestCase {
 		assertTrue(l1.remove(new Term("a2")));
 		assertEquals(l1.size(), 3);
 		
-		//System.out.println(l1);
+		Iterator i = l1.iterator();
+		while (i.hasNext()) {
+			Term t = (Term)i.next();
+			//System.out.println("-"+t);
+			if (t.equals(new Term("a"))) {
+				i.remove();
+			}
+		}
+		assertEquals(l1.toString(), "[b2,c]");
+		i = l1.iterator();
+		i.next(); i.next(); // c is the current
+		i.remove(); // remove c
+		assertEquals(l1.toString(), "[b2]");
 	}
 	
 	public void testClone() {

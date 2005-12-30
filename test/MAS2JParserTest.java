@@ -34,7 +34,7 @@ public class MAS2JParserTest extends TestCase {
 			//System.out.println(project);
 			
 			project.debugOn();
-			project.writeXMLScript(System.out);
+			//project.writeXMLScript(System.out);
 			//project.writeScripts();
 			Map ag1Opt = project.getAg("ag1").options;
 			assertEquals(ag1Opt.size(),3);
@@ -46,8 +46,8 @@ public class MAS2JParserTest extends TestCase {
 
 	public void testParseArrayFromString() {
 		String[] args = RunCentralisedMAS.getArrayFromString("jason.asSemantics.Agent '/Users/jomi/programming/cvs/Jason/examples/Simple/./agCount.asl' options y='a a a',verbose=1,x=1,bla='blas/x1 y/t.txt'");
-		System.out.println("*"+args[1]);		
-		System.out.println("*"+args[2]+" "+args[3]);
+		//System.out.println("*"+args[1]);		
+		//System.out.println("*"+args[2]+" "+args[3]);
 		assertEquals(args.length, 4);
 	}	
 

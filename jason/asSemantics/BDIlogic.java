@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.7  2005/12/30 20:40:16  jomifred
+//   new features: unnamed var, var with annots, TE as var
+//
 //   Revision 1.6  2005/08/12 22:18:37  jomifred
 //   add cvs keywords
 //
@@ -55,7 +58,7 @@ public final class BDIlogic {
             Trigger t = (Trigger)ei.trigger;
             if (ei.intention!=Intention.EmptyInt) {
                 t = (Trigger)t.clone();
-                ((IntendedMeans)ei.intention.peek()).unif.apply(t);
+                ((IntendedMeans)ei.intention.peek()).unif.apply(t.getLiteral());
             }
             if(new Unifier().unifies(t,teFromL)) {
                 return true;
@@ -110,7 +113,7 @@ public final class BDIlogic {
             Trigger t = (Trigger)ei.trigger;
             if (ei.intention!=Intention.EmptyInt) {
                 t = (Trigger)t.clone();
-                ((IntendedMeans)ei.intention.peek()).unif.apply(t);
+                ((IntendedMeans)ei.intention.peek()).unif.apply(t.getLiteral());
             }
             if(new Unifier().unifies(t,e.trigger)) {
                 t.setTrigType(Trigger.TEDel); // Just changing "+!g" to "-!g" !!!

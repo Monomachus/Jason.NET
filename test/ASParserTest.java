@@ -15,7 +15,7 @@ public class ASParserTest extends TestCase {
 	protected void setUp() throws Exception {
 		super.setUp();
 		Logger.getRootLogger().addAppender(new ConsoleAppender(new PatternLayout("[%c{1}] %m%n")));
-    	Logger.getRootLogger().setLevel(Level.DEBUG);
+    	Logger.getRootLogger().setLevel(Level.INFO);
 	}
 
 	public void testKQML() {

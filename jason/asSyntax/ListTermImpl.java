@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.3  2005/12/30 20:40:16  jomifred
+//   new features: unnamed var, var with annots, TE as var
+//
 //   Revision 1.2  2005/12/23 12:44:04  jomifred
 //   fix a bug in VarTerm (isTail)
 //
@@ -109,10 +112,17 @@ public class ListTermImpl extends Term implements ListTerm {
 		}
 	}
 	
+	public void setTerm(Term t) {
+		term = t;
+	}
 	
 	/** gets the term of this ListTerm */
 	public Term getTerm() {
 		return term;
+	}
+	
+	public void setNext(Term l) {
+		next = l;
 	}
 	
 	public ListTerm getNext() {
@@ -155,7 +165,7 @@ public class ListTermImpl extends Term implements ListTerm {
 	}
 	
 	public void addTerm(Term t) {
-		logger.warn("Do not use addTerm in lists!");
+		logger.warn("Do not use addTerm in lists! Use add.");
 	}
 
 	public int size() {
@@ -189,19 +199,27 @@ public class ListTermImpl extends Term implements ListTerm {
 		return true;
 	}
 	
-	public void setTail(Term t) {
-		next = t;
-	}
 	public boolean isTail() {
 		return next != null && next.isVar();
 	}
 	
-	/** returns this ListTerm's tail element in case this ListTerm has the Tail, otherwise, returns null */
-	public Term getTail() {
+	/** returns this ListTerm's tail element in case the List has the Tail, otherwise, returns null */
+	public VarTerm getTail() {
 		if (isTail()) {
-			return next;
+			return (VarTerm)next;
+		} else if (next != null) {
+			return getNext().getTail();
 		} else {
 			return null;
+		}
+	}
+	
+	/** set the tail of this list */
+	public void setTail(VarTerm v) {
+		if (getNext().isEmpty()) {
+			next = v;
+		} else {
+			getNext().setTail(v);
 		}
 	}
 	
@@ -216,7 +234,8 @@ public class ListTermImpl extends Term implements ListTerm {
 	}
 	
 	
-	/** add a term in the end of the list
+	/** 
+	 * add a term in the end of the list
 	 * @return the ListTerm where the term was added
 	 */
 	public ListTerm add(Term t) {
@@ -269,16 +288,24 @@ public class ListTermImpl extends Term implements ListTerm {
 	public Iterator listTermIterator() {
 		final ListTermImpl lt = this;
 		return new Iterator() {
-			ListTerm current = lt;
+			ListTerm nextLT  = lt;
+			ListTerm current = null;
 			public boolean hasNext() {
-				return current != null && !current.isEmpty(); 
+				return nextLT != null && !nextLT.isEmpty() && nextLT.isList(); 
 			}
 			public Object next() {
-				Object o = current;
-				current = current.getNext();
-				return o;
+				current = nextLT;
+				nextLT = nextLT.getNext();
+				return current;
 			}
-			public void remove() {	
+			public void remove() {
+				if (current != null) {
+					if (nextLT != null) {
+						current.setTerm(nextLT.getTerm());
+						current.setNext((Term)nextLT.getNext());
+						nextLT = current;
+					}
+				}
 			}
 		};
 	}
@@ -291,10 +318,10 @@ public class ListTermImpl extends Term implements ListTerm {
 				return i.hasNext();
 			}
 			public Object next() {
-				ListTerm lt = (ListTerm)i.next();
-				return lt.getTerm();
+				return ((ListTerm)i.next()).getTerm();
 			}
-			public void remove() {	
+			public void remove() {
+				i.remove();
 			}
 		};
 	}
@@ -302,7 +329,7 @@ public class ListTermImpl extends Term implements ListTerm {
 	
 	/** 
 	 * Returns this ListTerm as a Java List. 
-	 * Note: the list Tail is considered just the last element of the list!
+	 * Note: the list Tail is considered just as the last element of the list!
 	 */
     public List getAsList() {
         List l = new ArrayList();
@@ -323,7 +350,7 @@ public class ListTermImpl extends Term implements ListTerm {
 			s.append( lt.getTerm() );
 			if (lt.isTail()) {
 				s.append("|");
-				s.append(lt.getTail());
+				s.append(lt.getNext());
 			} else if (i.hasNext()) {
 				s.append(",");
 			}
@@ -365,7 +392,7 @@ public class ListTermImpl extends Term implements ListTerm {
 
 	public boolean contains(Object o) {
 		Term t = (Term)o;
-		if (this.term.equals(t)) {
+		if (term != null && term.equals(t)) {
 			return true;
 		} else if (getNext() != null) {
 			return getNext().contains(o);

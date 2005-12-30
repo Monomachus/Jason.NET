@@ -209,8 +209,5 @@ public class StdLibTest extends TestCase {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
-		System.out.println("U="+u);
 	}
-	
 }

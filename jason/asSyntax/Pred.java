@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.13  2005/12/30 20:40:16  jomifred
+//   new features: unnamed var, var with annots, TE as var
+//
 //   Revision 1.12  2005/12/22 00:03:30  jomifred
 //   ListTerm is now an interface implemented by ListTermImpl
 //
@@ -49,7 +52,6 @@ import jason.asSyntax.parser.as2j;
 
 import java.io.Serializable;
 import java.io.StringReader;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -60,7 +62,7 @@ import org.apache.log4j.Logger;
  */
 public class Pred extends Term implements Cloneable, Comparable, Serializable {
 
-	private ArrayList annots;
+	private ListTerm annots;
 
 	static private Logger logger = Logger.getLogger(Pred.class.getName());
 
@@ -76,7 +78,8 @@ public class Pred extends Term implements Cloneable, Comparable, Serializable {
 	}
 
 	public Pred(Pred p) {
-		set(p);
+		this((Term)p);
+		copyAnnot(p);
 	}
 
 	public static Pred parsePred(String sPred) {
@@ -91,22 +94,28 @@ public class Pred extends Term implements Cloneable, Comparable, Serializable {
 
 
 	/** copy all attributes of Pred <i>p</i> */
+	/*
 	public void set(Pred p) {
 		super.set((Term)p);
 		copyAnnot(p);
 	}
-
+	*/
+	
 	public boolean isPred() {
 		return true;
 	}
 	
+	public void setAnnots(ListTerm l) {
+		annots = l;
+	}
+
 	public void addAnnot(Term t) {
 		if (annots == null)
-			annots = new ArrayList();
+			annots = new ListTermImpl(); //new ArrayList();
 		if (!annots.contains(t))
 			annots.add(t);
 	}
-
+	
 	public void addAnnots(List l) {
 		Iterator i = l.iterator();
 		while (i.hasNext()) {
@@ -116,7 +125,7 @@ public class Pred extends Term implements Cloneable, Comparable, Serializable {
 	
 	public void addAnnot(int index, Term t) {
 		if (annots == null)
-			annots = new ArrayList();
+			annots = new ListTermImpl();
 		if (!annots.contains(t))
 			annots.add(index, t);
 	}
@@ -131,7 +140,7 @@ public class Pred extends Term implements Cloneable, Comparable, Serializable {
 			annots.clear();
 	}
 	
-	public List getAnnots() {
+	public ListTerm getAnnots() {
 		return annots;
 	}
 
@@ -141,23 +150,11 @@ public class Pred extends Term implements Cloneable, Comparable, Serializable {
 		return annots.contains(t);
 	}
 
-	/** returns true if the pred has at least one annot */
-	public boolean hasNoAnnot() {
-		if (annots == null)
-			return true;
-		else
-			return annots.isEmpty();
+	/** returns true if the pred has at leat one annot */
+	public boolean hasAnnot() {
+		return annots != null && !annots.isEmpty();
 	}
 	
-	/**
-	 * Add a source annotation like "source(<s>)". 
-	 */
-	public void addSource(String s) {
-		Term ts = new Term("source");
-		ts.addTerm(new Term(s));
-		addAnnot(ts);
-	}
-
 	/**
 	 * Add a source annotation like "source(<t>)". 
 	 */
@@ -169,7 +166,11 @@ public class Pred extends Term implements Cloneable, Comparable, Serializable {
 
 	/** del source(<s>) */
 	public boolean delSource(Term s) {
-		if (annots != null) {	
+		if (annots != null) {
+			Term ts = new Term("source");
+			ts.addTerm(s);
+			return annots.remove(ts);
+			/*
 			Iterator i = annots.iterator();
 			while (i.hasNext()) {
 				Term t = (Term)i.next();
@@ -178,13 +179,14 @@ public class Pred extends Term implements Cloneable, Comparable, Serializable {
 					return true;
 				}
 			}
+			*/
 		}
 		return false;
 	}
 	
 	/** 
-	 * return the sources of this Pred as a list.
-	 * from annots [souce(a), source(b)]
+	 * return the sources of this Pred as a new list.
+	 * e.g.: from annots [souce(a), source(b)],
 	 * it returns [a,b] 
 	 */
 	public ListTerm getSources() {
@@ -228,8 +230,14 @@ public class Pred extends Term implements Cloneable, Comparable, Serializable {
 		return false;		
 	}
 
+	
+	/** returns true if this pred has a source(<s>) */
 	public boolean hasSource(Term s) {
 		if (annots != null) {
+			Term ts = new Term("source");
+			ts.addTerm(s);
+			return annots.contains(ts);
+			/*
 			Iterator i = annots.iterator();
 			while (i.hasNext()) {
 				Term t = (Term)i.next();
@@ -237,6 +245,7 @@ public class Pred extends Term implements Cloneable, Comparable, Serializable {
 					return true;
 				}
 			}
+			*/
 		}
 		return false;		
 	}
@@ -245,14 +254,15 @@ public class Pred extends Term implements Cloneable, Comparable, Serializable {
 	 * "import" Annotations from another Predicate
 	 */
 	public void importAnnots(Pred p) {
-		if (p.annots == null) {
+		if (p.getAnnots() == null) {
 			return;
 		}
-		if (annots == null && !p.hasNoAnnot()) {
-			annots = new ArrayList(p.annots.size());
+		if (annots == null && p.hasAnnot()) {
+			annots = new ListTermImpl();
 		}
-		for (int i=0; i < p.annots.size(); i++) {
-			Term t = (Term) p.annots.get(i);
+		Iterator i = p.getAnnots().iterator();
+		while (i.hasNext()) {
+			Term t = (Term) i.next();
 			// p will only contain the annots actually added (for Event)
 			if (!annots.contains(t)) {
 				annots.add(t.clone());
@@ -275,19 +285,19 @@ public class Pred extends Term implements Cloneable, Comparable, Serializable {
 	 *  p will only contain the annots actually deleted (for Event)
 	 */
 	public void delAnnot(Pred p) {
-		if (p.annots == null) {
+		if (p.getAnnots() == null) {
 			return;
 		}
-		if (hasNoAnnot()) {
+		if (!hasAnnot()) {
 			p.clearAnnots();
 		} else {
-			for (int i=0; i < p.annots.size(); i++) {
-				Term t = (Term) p.annots.get(i);
+			Iterator i = p.getAnnots().iterator();
+			while (i.hasNext()) {
+				Term t = (Term)i.next();				
 				if (annots.contains(t)) {
 					annots.remove(t);
 				} else {
-					p.delAnnot(t);
-					i--;
+					i.remove();
 				}
 			}
 		}
@@ -295,10 +305,7 @@ public class Pred extends Term implements Cloneable, Comparable, Serializable {
 
 	public void copyAnnot(Pred p) {
 		if (p.annots != null) {
-			annots = new ArrayList(p.annots.size());
-			for (int i=0; i < p.annots.size(); i++) {
-				annots.add( ((Term)p.annots.get(i)).clone());
-			}
+			annots = (ListTerm)p.getAnnots().clone();
 		} else {
 			annots = null;
 		}
@@ -308,35 +315,75 @@ public class Pred extends Term implements Cloneable, Comparable, Serializable {
 	public boolean hasSubsetAnnot(Pred p) {
 		if (annots == null)
 			return true;
-		if (annots != null && p.annots == null)
+		if (annots != null && p.getAnnots() == null)
 			return false;
-		for (int i=0; i<annots.size(); i++) {
-			Term myAnnot = (Term)annots.get(i);
-			if (!p.annots.contains(myAnnot)) {
+		Iterator i = annots.iterator();
+		while (i.hasNext()) {
+			Term myAnnot = (Term)i.next();
+			if (!p.getAnnots().contains(myAnnot)) {
 				return false;
 			}
 		}
 		return true;
 	}
 
-	/** this version unifies the annot list */
+	/** 
+	 * returns true if all this predicate annots are in p's annots
+	 * (this version unifies the annot list)
+	 */
 	public boolean hasSubsetAnnot(Pred p, Unifier u) {
 		if (annots == null)
 			return true;
 		if (annots != null && p.getAnnots() == null)
 			return false;
-		for (int i=0; i<annots.size(); i++) {
-			Term annot = (Term)annots.get(i);
-			if (!p.getAnnots().contains(annot)) {
-				if (p.annots.size() <= i) {
-					return false;
-				}
-				Term pAnnot = (Term)p.getAnnots().get(i);
-				if (! u.unifies(annot, pAnnot)) {
-					return false;
+
+		p = (Pred)p.clone(); // clone p to change its annots, the remaining annots will unify this annots Tail
+
+		// if p annots has a Tail, p annots's Tail will receive this annots
+		VarTerm pTail = null;
+		try {
+			pTail = (VarTerm)p.getAnnots().getTail();
+		}  catch (Exception e) {}
+		
+		Iterator i = annots.iterator();
+		while (i.hasNext()) {
+			Term annot = (Term)i.next();
+			
+			// search annot in p's annots
+			boolean ok = false;
+			Iterator j = p.getAnnots().iterator();
+			while (j.hasNext() && !ok) {
+				Term pAnnot = (Term)j.next();
+				if (u.unifies(annot, pAnnot)) {
+					ok = true;
+					j.remove();
 				}
 			}
+			
+			// if p has a tail, add annot in p's tail
+			if (!ok && pTail != null) {
+				ListTerm pTailAnnots = (ListTerm)u.get(pTail.getFunctor());
+				if (pTailAnnots == null) {
+					pTailAnnots = new ListTermImpl();
+					u.unifies(pTail, (Term)pTailAnnots);
+					pTailAnnots = (ListTerm)u.get(pTail.getFunctor());
+				}
+				pTailAnnots.add(annot);
+				ok = true;
+			}
+			if (!ok)
+				return false;
 		}
+		
+		// if this Pred has a Tail, unify it with p remaining annots
+		try {
+			VarTerm tail = (VarTerm)annots.getTail();
+			if (tail != null) {
+				//System.out.println("tail="+tail+"/"+p.getAnnots());
+				u.unifies(tail, (Term)p.getAnnots());
+			}
+		}  catch (Exception e) {}
+		
 		return true;
 	}
 	
@@ -363,9 +410,9 @@ public class Pred extends Term implements Cloneable, Comparable, Serializable {
 		c = super.compareTo(p);
 		if (c != 0)
 			return c;
-		if (annots.size() < ((Pred) p).annots.size())
+		if (annots.size() < ((Pred) p).getAnnots().size())
 			return -1;
-		if (annots.size() > ((Pred) p).annots.size())
+		if (annots.size() > ((Pred) p).getAnnots().size())
 			return 1;
 		return 0;
 	}
@@ -379,14 +426,7 @@ public class Pred extends Term implements Cloneable, Comparable, Serializable {
 		String s;
 		s = super.toString();
 		if (annots != null && !annots.isEmpty()) {
-			s += "[";
-			Iterator i = annots.iterator();
-			while (i.hasNext()) {
-				s += i.next();
-				if (i.hasNext())
-					s += ",";
-			}
-			s += "]";
+			s += annots.toString();
 		}
 		return s;
 	}

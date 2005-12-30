@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.16  2005/12/30 20:40:16  jomifred
+//   new features: unnamed var, var with annots, TE as var
+//
 //   Revision 1.15  2005/12/22 00:03:30  jomifred
 //   ListTerm is now an interface implemented by ListTermImpl
 //
@@ -43,6 +46,7 @@ package jason.asSemantics;
 
 import jason.asSyntax.DefaultLiteral;
 import jason.asSyntax.ExprTerm;
+import jason.asSyntax.ListTerm;
 import jason.asSyntax.Literal;
 import jason.asSyntax.NumberTermImpl;
 import jason.asSyntax.Pred;
@@ -51,6 +55,7 @@ import jason.asSyntax.Trigger;
 import jason.asSyntax.VarTerm;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -63,11 +68,6 @@ public class Unifier implements Cloneable {
 
 	private HashMap function = new HashMap();
     
-    // TODO IMPORTANT: remove unnecessary tail symbols
-    // and accompanying extra list when grounding variables
-    // that are internal to a list
-	// RAFA: is is already done?
-
     // TODO JOMI: try to not clone and apply before unifing, since this method is
     // a bottleneck (clone/apply consumes memory/cpu). Initial proposal: use
     // "t1.equals(t2, this)", ie, the equals will consider the unifier to check
@@ -102,8 +102,13 @@ public class Unifier implements Cloneable {
     public void apply(Pred p) {
     	apply((Term) p);
 		if (p.getAnnots() != null) {
-			for (int i = 0; i < p.getAnnots().size(); i++) {
-				apply((Term) p.getAnnots().get(i));
+			Iterator i = p.getAnnots().listTermIterator();
+			while (i.hasNext()) {
+				ListTerm lt = (ListTerm)i.next();
+				apply(lt.getTerm());
+				if (lt.isTail()) {
+					apply((Term)lt.getNext());
+				}
 			}
 		}
     }
@@ -238,7 +243,8 @@ public class Unifier implements Cloneable {
 				}
 			} catch (Exception e) {}
 			
-			function.put(t1g.getFunctor(), t2g);
+			if (! ((VarTerm)t1g).isUnnamedVar())
+				function.put(t1g.getFunctor(), t2g);
 			return true;
 		}
 
@@ -252,7 +258,8 @@ public class Unifier implements Cloneable {
 				}
 			} catch (Exception e) {}
 			
-			function.put(t2g.getFunctor(), t1g);
+			if (! ((VarTerm)t2g).isUnnamedVar())
+				function.put(t2g.getFunctor(), t1g);
 			//System.out.println("Unified." + t1 + "=" + t2);
 			return true;
 		}
@@ -285,16 +292,43 @@ public class Unifier implements Cloneable {
    		Pred np2 = (Pred)p2.clone();
    		apply(np1);
    		apply(np2);
-        //System.out.println("PredUn: "+p1+"="+p2+" : "+np1+"="+np2);
+   		//System.out.println("PredUn: "+p1+"="+p2+" : "+np1+"="+np2);
         return unifiesNoClone((Pred)np1, (Pred)np2); 
     }
    	private boolean unifiesNoClone(Pred np1, Pred np2) {
         // unification with annotation:
         // terms unify and annotations are subset
+   		
         if (!np1.isVar() && !np2.isVar() && !np1.hasSubsetAnnot(np2, this)) {
         	return false;
         }
-        return unifiesNoClone((Term)np1, (Term)np2); 
+        
+        // tests when np1 or np2 are Vars with annots
+        ListTerm newAnnots1 = null; // new annots for np1 (e.g. np1 is X[a,b,c] and np2 is p[a,b,c,d], newAnnots1 will be [d])
+        if (np1.isVar() && np1.hasAnnot()) {
+        	VarTerm tail = np1.getAnnots().getTail(); 
+        	if (tail == null) {
+        		tail = new VarTerm("Auto___Tail");
+        		np1.getAnnots().setTail(tail);
+        	}
+        	if (!np1.hasSubsetAnnot(np2, this)) {
+        		return false;
+        	}
+        	newAnnots1 = (ListTerm)get(tail.getFunctor());
+        	function.remove(tail.getFunctor());
+        }
+
+        if (np2.isVar() && np2.hasAnnot() && !np1.hasSubsetAnnot(np2, this)) {
+        	return false;
+        }
+        
+        // unify as Term
+        boolean ok = unifiesNoClone((Term)np1, (Term)np2);
+        if (ok && newAnnots1 != null) {
+        	((Pred)function.get(np1.getFunctor())).setAnnots(newAnnots1);
+        	//System.out.println("np1="+np1.getFunctor()+"/"+this+":"+newAnnots1);
+        }
+        return ok;
     }
     
     public boolean unifies(Literal l1, Literal l2) {
@@ -314,7 +348,7 @@ public class Unifier implements Cloneable {
     }
     
     public boolean unifies(Trigger te1, Trigger te2) {
-        return te1.sameType(te2) && unifies((Literal)te1,(Literal)te2);
+        return te1.sameType(te2) && unifies(te1.getLiteral(),te2.getLiteral());
     }
     
     public void clear() {

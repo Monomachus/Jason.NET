@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.18  2005/12/30 20:40:16  jomifred
+//   new features: unnamed var, var with annots, TE as var
+//
 //   Revision 1.17  2005/12/23 00:48:23  jomifred
 //   StringTerm is now an interface implemented by StringTermImpl
 //
@@ -79,7 +82,8 @@ public class Term implements TermInterface, Comparable, Serializable {
 	}
 
 	public Term(Term t) {
-		set(t);
+		setFunctor(t.getFunctor());
+		setTerms(t.getDeepCopyOfTerms());
 	}
 
 	public static Term parse(String sTerm) {
@@ -93,15 +97,17 @@ public class Term implements TermInterface, Comparable, Serializable {
 	}
 
 	/** copy all attributes of <i>t</i> */
+	/*
 	public void set(Term t) {
 		try {
-			setFunctor(t.functor);
-			terms = t.getDeepCopyOfTerms();
+			setFunctor(t.getFunctor());
+			setTerms(t.getDeepCopyOfTerms());
 		} catch (Exception e) {
 			logger.error("Error setting value for term ",e);
 		}
 	}
-
+	*/
+	
 	public void setFunctor(String fs) {
 		functor = fs;
 		functorArityBak = null;
@@ -145,6 +151,10 @@ public class Term implements TermInterface, Comparable, Serializable {
 		functorArityBak = null;
 	}
 	
+	public void setTerms(List l) {
+		terms = l;
+	}
+		
 	public void addTerms(List l) {
 		Iterator i = l.iterator();
 		while (i.hasNext()) {
@@ -297,8 +307,8 @@ public class Term implements TermInterface, Comparable, Serializable {
 		if (terms == null) {
 			return null;
 		}
-		List l = new ArrayList(terms.size());
-		Iterator i = terms.iterator();
+		List l = new ArrayList(getTerms().size());
+		Iterator i = getTerms().iterator();
 		while (i.hasNext()) {
 			Term ti = (Term)i.next();
 			l.add(ti.clone());

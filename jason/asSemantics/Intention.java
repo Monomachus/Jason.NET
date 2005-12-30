@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.6  2005/12/30 20:40:16  jomifred
+//   new features: unnamed var, var with annots, TE as var
+//
 //   Revision 1.5  2005/08/12 22:18:37  jomifred
 //   add cvs keywords
 //
@@ -98,7 +101,7 @@ public class Intention implements Serializable {
         while (j.hasNext()) {
             IntendedMeans im = (IntendedMeans)j.next();
             Trigger it = (Trigger) im.getPlan().getTriggerEvent().clone();
-            im.unif.apply(it);
+            im.unif.apply(it.getLiteral());
             if (new Unifier().unifies(g,it)) {
                 return true;
             }

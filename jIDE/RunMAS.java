@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.26  2005/12/30 20:40:16  jomifred
+//   new features: unnamed var, var with annots, TE as var
+//
 //   Revision 1.25  2005/12/19 00:14:46  jomifred
 //   no message
 //
@@ -546,14 +549,14 @@ public class RunMAS extends AbstractAction {
 	String getAsScriptCommand(String scriptName, boolean start) {
 		if (System.getProperty("os.name").indexOf("indows") > 0) {
 			//command = "command.com /e:2048 /c "+command+".bat";
-			String sStart = "";
+			String sStart = " ";
 			if (start) {
 				sStart = " start "; 
 			}
 			// TODO: get comspec env. variable
-			return "cmd /c " + sStart + scriptName + ".bat";
+			return Config.get().getShellCommand() + sStart + scriptName + ".bat";
 		} else {
-			return "/bin/sh " + scriptName + ".sh";
+			return Config.get().getShellCommand() + " " + scriptName + ".sh";
 		}
 	}
 	

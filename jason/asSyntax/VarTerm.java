@@ -23,14 +23,17 @@
 //   $Date$
 //   $Revision$
 //   $Log$
-//   Revision 1.16  2005/12/23 12:44:04  jomifred
-//   fix a bug in VarTerm (isTail)
+//   Revision 1.17  2005/12/30 20:40:16  jomifred
+//   new features: unnamed var, var with annots, TE as var
 //
 //
 //----------------------------------------------------------------------------
 
 package jason.asSyntax;
 
+import jason.asSyntax.parser.as2j;
+
+import java.io.StringReader;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -48,8 +51,6 @@ import org.apache.log4j.Logger;
 public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm {
 	static private Logger logger = Logger.getLogger(VarTerm.class.getName());
 	
-	// TODO: check all (VarTerm) cast or isVar() if it is necessary
-	
 	private Term value = null;
 	
 	public VarTerm() {
@@ -63,6 +64,16 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
 		setFunctor(s);
 	}
 	
+	public static VarTerm parseVar(String sVar) {
+		as2j parser = new as2j(new StringReader(sVar));
+		try {
+			return parser.var();
+		} catch (Exception e) {
+			logger.error("Error parsing var " + sVar,e);
+			return null;
+		}
+	}
+
 	public Object clone() {
 		// do not call constructor with term parameter!
 		VarTerm t = new VarTerm();
@@ -70,11 +81,18 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
 		if (value != null) {
 			t.value = (Term)value.clone();
 		}
+		if (getAnnots() != null && !getAnnots().isEmpty()) {
+			t.setAnnots((ListTerm)getAnnots().clone());
+		}
 		return t;
 	}
 	
 	public boolean isVar() {
 		return !isGround();
+	}
+	
+	public boolean isUnnamedVar() {
+		return false;
 	}
 
 	public boolean isGround() {
@@ -134,17 +152,25 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
 			Term vl = getValue();
 			//System.out.println("cheking equals form "+tAsTerm.funcSymb+"="+this.funcSymb+" my value "+vl);
 			if (vl == null) {
-				// is other also a var? (its value must also be null)
+				// is t also a var? (its value must also be null)
 				try {
 					VarTerm tAsVT = (VarTerm)t;
 					if (tAsVT.getValue() != null) {
-						//System.out.println("returning false*");
 						return false;
 					}
 
-					// no value, the var names must be equal
-					//System.out.println("will return "+funcSymb.equals(tAsTerm.funcSymb));
-					return getFunctor().equals(tAsTerm.getFunctor());
+					boolean ok = getFunctor().equals(tAsTerm.getFunctor());
+					if (!ok) {
+						return false;
+					}
+					// no value, the var names and annots must be equal
+					if (getAnnots() == null && tAsVT.getAnnots() != null) {
+						return false;
+					}
+					if (getAnnots() != null && !getAnnots().equals(tAsVT.getAnnots())) {
+						return false;
+					}
+					return true;
 				} catch (Exception e) {
 					return false;
 				}
@@ -217,7 +243,13 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
 			return getValue().getTerms();
 		}
 	}
-
+	
+	public void setTerms(List l) {
+		if (value != null) {
+			value.setTerms(l);
+		}
+	}
+	
 	public void addTerms(List l) {
 		if (value != null) {
 			value.addTerms(l);
@@ -263,7 +295,11 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
 	public String toString() {
 		if (value == null) {
 			// no value, the var name must be equal
-			return getFunctor();
+			String s = getFunctor();
+			if (getAnnots() != null && !getAnnots().isEmpty()) {
+				s += getAnnots();
+			}
+			return s;
 		} else {
 			// campare the values
 			return getValue().toString();
@@ -277,88 +313,124 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
 	// in case this VarTerm has a value, use value's methods
 	// ----------
 
+	public void setAnnots(ListTerm l) {
+		if (value != null && getValue().isPred())
+			((Pred)getValue()).setAnnots(l);
+		else
+			super.setAnnots(l);
+	}
+
 	public void addAnnot(int index, Term t) {
 		if (value != null && getValue().isPred())
 			((Pred)getValue()).addAnnot(index, t);
+		else
+			super.addAnnot(index,t);
 	}
 
 	public void importAnnots(Pred p) {
 		if (value != null && getValue().isPred())
 			((Pred)getValue()).importAnnots(p);
+		else
+			super.importAnnots(p);
 	}
 
 	public void addAnnot(Term t) {
 		if (value != null && getValue().isPred())
 			((Pred)getValue()).addAnnot(t);
+		else
+			super.addAnnot(t);
 	}
 
 	public void addAnnots(List l) {
 		if (value != null && getValue().isPred())
 			((Pred)getValue()).addAnnots(l);
+		else
+			super.addAnnots(l);
 	}
 
 	public void clearAnnots() {
 		if (value != null && getValue().isPred())
 			((Pred)getValue()).clearAnnots();
+		else
+			super.clearAnnots();
 	}
 
 	public void delAnnot(Pred p) {
 		if (value != null && getValue().isPred())
 			((Pred)getValue()).delAnnot(p);
+		else
+			super.delAnnot(p);
 	}
 
 	public void delAnnot(Term t) {
 		if (value != null && getValue().isPred())
 			((Pred)getValue()).delAnnot(t);
+		else
+			super.delAnnot(t);
 	}
 
 	public boolean hasAnnot(Term t) {
-		return value != null && getValue().isPred() && ((Pred)getValue()).hasAnnot(t);
+		if (value != null && getValue().isPred())
+			return ((Pred)getValue()).hasAnnot(t);
+		else
+			return super.hasAnnot(t);
 	}
 
-	public boolean hasNoAnnot() {
-		return value != null && getValue().isPred() && ((Pred)getValue()).hasNoAnnot();
+	public boolean hasAnnot() {
+		if (value != null && getValue().isPred())
+			return ((Pred)getValue()).hasAnnot();
+		else
+			return super.hasAnnot();
 	}
 
-	public List getAnnots() {
+	public ListTerm getAnnots() {
 		if (value != null && getValue().isPred())
 			return ((Pred)getValue()).getAnnots();
 		else 
-			return null;
-	}
-
-	public void addSource(String s) {
-		if (value != null && getValue().isPred())
-			((Pred)getValue()).addSource(s);
+			return super.getAnnots();
 	}
 
 	public void addSource(Term t) {
 		if (value != null && getValue().isPred())
 			((Pred)getValue()).addSource(t);
+		else
+			super.addSource(t);
+		
 	}
 
 	public boolean delSource(Term s) {
-		return value != null && getValue().isPred() && ((Pred)getValue()).delSource(s);
+		if (value != null && getValue().isPred())
+			return ((Pred)getValue()).delSource(s);
+		else
+			return super.delSource(s);
 	}
 
 	public void delSources() {
 		if (value != null && getValue().isPred())
 			((Pred)getValue()).delSources();
+		else
+			super.delSources();
 	}
 
 	public ListTerm getSources() {
 		if (value != null && getValue().isPred())
 			return ((Pred)getValue()).getSources();
 		else 
-			return null;
+			return super.getSources();
 	}
 
 	public boolean hasSource() {
-		return value != null && getValue().isPred() && ((Pred)getValue()).hasSource();
+		if (value != null && getValue().isPred())
+			return ((Pred)getValue()).hasSource();
+		else
+			return super.hasSource();
 	}
 
 	public boolean hasSource(Term s) {
-		return value != null && getValue().isPred() && ((Pred)getValue()).hasSource(s);
+		if (value != null && getValue().isPred())
+			return ((Pred)getValue()).hasSource(s);
+		else
+			return super.hasSource(s);
 	}
 	
 	
@@ -505,6 +577,16 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
 
 	// from ListTerm
 	
+	public void setTerm(Term t) {
+		if (value != null && getValue().isList())
+			((ListTerm)getValue()).setTerm(t);
+	}
+
+	public void setNext(Term t) {
+		if (value != null && getValue().isList())
+			((ListTerm)getValue()).setNext(t);
+	}
+
 	public ListTerm add(int index, Term t) {
 		if (value != null && getValue().isList())
 			return ((ListTerm)getValue()).add(index, t);
@@ -544,13 +626,6 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
 			return null;
 	}
 
-	public Term getTail() {
-		if (value != null && getValue().isList())
-			return ((ListTerm)getValue()).getTail();
-		else 
-			return null;
-	}
-
 	public Term getTerm() {
 		if (value != null && getValue().isList())
 			return ((ListTerm)getValue()).getTerm();
@@ -569,6 +644,17 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
 	public boolean isTail() {
 		return value != null && getValue().isList() && ((ListTerm)getValue()).isTail();
 	}
+	public void setTail(VarTerm v) {
+		if (value != null && getValue().isList())
+			((ListTerm)getValue()).setTail(v);
+	}
+	public VarTerm getTail() {
+		if (value != null && getValue().isList())
+			return ((ListTerm)getValue()).getTail();
+		else 
+			return null;
+	}
+
 
 	public Iterator listTermIterator() {
 		if (value != null && getValue().isList())
@@ -577,10 +663,6 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
 			return null;
 	}
 
-	public void setTail(Term t) {
-		if (value != null && getValue().isList())
-			((ListTerm)getValue()).setTail(t);
-	}
 
 	public int size() {
 		if (value != null && getValue().isList())

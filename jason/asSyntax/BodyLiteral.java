@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.10  2005/12/30 20:40:16  jomifred
+//   new features: unnamed var, var with annots, TE as var
+//
 //   Revision 1.9  2005/08/12 22:26:08  jomifred
 //   add cvs keywords
 //
@@ -41,17 +44,12 @@ public class BodyLiteral implements Cloneable {
     public static final byte      HAddBel    = 3;
     public static final byte      HDelBel    = 4;	
 	
-	Term literal;
-    byte formType;
+	Literal literal;
+    byte    formType;
 
     public BodyLiteral(byte t, Literal l) {
-        literal = (Term)l.clone();
+        literal = (Literal)l.clone();
         formType = t;
-    }
-    public BodyLiteral(byte t, VarTerm v) {
-        //super((Term)v);
-		literal = (Term)v.clone();
-		formType = t;
     }
 
     public byte getType() {
@@ -89,11 +87,7 @@ public class BodyLiteral implements Cloneable {
     }
     
     public Object clone() {
-		if (literal.isVar()) {
-			return new BodyLiteral(formType, (VarTerm)literal);			
-		} else {
-			return new BodyLiteral(formType, (Literal)literal);
-		}
+		return new BodyLiteral(formType, literal);
     }
     
     public String toString() {

@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.5  2005/12/30 20:40:17  jomifred
+//   new features: unnamed var, var with annots, TE as var
+//
 //   Revision 1.4  2005/12/19 22:53:31  jomifred
 //   no message
 //
@@ -64,6 +67,8 @@ public class JasonIDOptionPanel extends AbstractOptionPane  {
 	JTextField saciTF;
 	JTextField jasonTF;
 	JTextField javaTF;
+	JTextField shellTF;
+	//JCheckBox  insideJIDECBox;
 
 	static Config userProperties = Config.get();
 
@@ -141,7 +146,7 @@ public class JasonIDOptionPanel extends AbstractOptionPane  {
 	            try {
 	                JFileChooser chooser = new JFileChooser(System.getProperty("user.dir"));
 					chooser.setDialogTitle("Select the Saci.jar file");
-					chooser.setFileFilter(new JarFileFilter("saci.jar", "The Saci.jar file"));
+					chooser.setFileFilter(new JarFileFilter("saci.jar", "The saci.jar file"));
 					//chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 	                if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
 	                	String saciJar = (new File(chooser.getSelectedFile().getPath())).getCanonicalPath();
@@ -181,24 +186,48 @@ public class JasonIDOptionPanel extends AbstractOptionPane  {
     	});
     	javaHomePanel.add(setJava);
     	pop.add(javaHomePanel);
+    	
+    	// shell command
+    	JPanel shellPanel = new JPanel();
+    	shellPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory
+				.createEtchedBorder(), "Shell command", TitledBorder.LEFT, TitledBorder.TOP));
+    	shellPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+    	shellTF = new JTextField(30);
+    	shellTF.setToolTipText("This command will be used to run the scripts that run the MAS.");
+    	shellPanel.add(shellTF);
+    	pop.add(shellPanel);
+
+    	// run centralised inside jIDE
+    	/*
+    	JPanel insideJIDEPanel = new JPanel();
+    	insideJIDEPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Centralised MAS execution mode", TitledBorder.LEFT, TitledBorder.TOP));
+    	insideJIDEPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+    	insideJIDECBox = new JCheckBox("Run MAS as a JasonIDE internal thread instead of another process.");
+    	insideJIDEPanel.add(insideJIDECBox);
+    	pop.add(insideJIDEPanel);
+    	*/
+    	
     	addComponent(pop);
     	
     	saciTF.setText(userProperties.getSaciJar());
     	jasonTF.setText(userProperties.getJasonJar());
     	javaTF.setText(userProperties.getJavaHome());
-
+    	shellTF.setText(userProperties.getShellCommand());
+    	//insideJIDECBox.setSelected(userProperties.runAsInternalTread());
 	}
 
 	protected void _save() {
 		if (userProperties.checkJar(saciTF.getText())) {
-			userProperties.put(Config.SACI_JAR, saciTF.getText());
+			userProperties.put(Config.SACI_JAR, saciTF.getText().trim());
 		}
 		if (userProperties.checkJar(jasonTF.getText())) {
-			userProperties.put(Config.JASON_JAR, jasonTF.getText());
+			userProperties.put(Config.JASON_JAR, jasonTF.getText().trim());
 		}
 		if (userProperties.checkJavaHomePath(javaTF.getText())) {
-			userProperties.put(Config.JAVA_HOME, javaTF.getText());
+			userProperties.put(Config.JAVA_HOME, javaTF.getText().trim());
 		}
+		userProperties.put(Config.SHELL_CMD, shellTF.getText().trim());
+		//userProperties.put(Config.RUN_AS_THREAD, insideJIDECBox.isSelected()+"");
 		userProperties.store();
 	}
 
@@ -220,5 +249,4 @@ public class JasonIDOptionPanel extends AbstractOptionPane  {
             return ds;
         }
     }
-	
 }

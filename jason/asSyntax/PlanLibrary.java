@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.5  2005/12/30 20:40:16  jomifred
+//   new features: unnamed var, var with annots, TE as var
+//
 //   Revision 1.4  2005/08/12 22:26:08  jomifred
 //   add cvs keywords
 //
@@ -55,8 +58,11 @@ public class PlanLibrary {
 	 * All plans as defined in the AS code
 	 */
 	List plans = new ArrayList();
+	
+	/** list of plans that have var as TE */
+	List varPlans = new ArrayList();
+	
 
-    
     public void add(Plan p) {
     	// trim the plan
     	if (p.body != null) {
@@ -65,16 +71,27 @@ public class PlanLibrary {
     	if (p.context != null) {
     		p.context.trimToSize();
     	}
-    	List codesList = (List)relPlans.get(p.tevent.getFunctorArity());
-    	if (codesList == null) {
-    		codesList = new ArrayList();
-        	relPlans.put(p.tevent.getFunctorArity(), codesList);
-    	}
-    	codesList.add(p);
-    	
+        if (p.getTriggerEvent().getLiteral().isVar()) {
+        	varPlans.add(p);
+        	// add plan p in all entries
+        	Iterator i = relPlans.values().iterator();
+        	while (i.hasNext()) {
+        		List li = (List)i.next();
+        		li.add(p);
+        	}
+        } else {
+	    	List codesList = (List)relPlans.get(p.tevent.getFunctorArity());
+	    	if (codesList == null) {
+	    		codesList = new ArrayList();
+		    	codesList.addAll(varPlans);
+	        	relPlans.put(p.tevent.getFunctorArity(), codesList);
+	    	}
+	    	codesList.add(p);
+        }
     	
         //codes.add(new Integer(p.tevent.hashCode()));
         plans.add(p);
+        
     }
 
 	public void addAll(PlanLibrary pl) {
@@ -100,22 +117,37 @@ public class PlanLibrary {
     public Plan remove(int i) {
         //codes.remove(i);
         Plan p = (Plan)plans.remove(i);
-    	List codesList = (List)relPlans.get(p.tevent.getFunctorArity());
-        codesList.remove(p);
-        if (codesList.isEmpty()) {
-        	// no more plans for this TE
-        	relPlans.remove(p.tevent.getFunctorArity());
+        if (p.getTriggerEvent().getLiteral().isVar()) {
+        	varPlans.remove(p);
+        	// remove p from all entries
+        	Iterator ip = relPlans.values().iterator();
+        	while (ip.hasNext()) {
+        		List li = (List)ip.next();
+        		li.remove(p);
+        	}
+        } else {
+        	List codesList = (List)relPlans.get(p.tevent.getFunctorArity());
+            codesList.remove(p);
+            if (codesList.isEmpty()) {
+            	// no more plans for this TE
+            	relPlans.remove(p.tevent.getFunctorArity());
+            }
         }
         return p;
     }
 
     public boolean isRelevant(Trigger t) {
         //return codes.contains(new Integer(t.hashCode()));
-    	return getAllRelevant(t) != null;
+    	List l = getAllRelevant(t);
+    	return l != null && l.size() > 0;
     }
 
     public List getAllRelevant(Trigger t) {
-    	return (List)relPlans.get(t.getFunctorArity()); 
+    	List l = (List)relPlans.get(t.getFunctorArity());
+    	if ((l == null || l.size() == 0) && varPlans.size() > 0) { // no rel plan, try varPlan
+    		l = varPlans;
+    	}
+    	return l;
     	/*
         if (!isRelevant(t))
             return null;

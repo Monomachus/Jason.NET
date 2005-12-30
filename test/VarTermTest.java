@@ -77,11 +77,11 @@ public class VarTermTest extends TestCase {
 		assertFalse(k.isPred());
 		u.apply(k);
 		assertTrue(k.isPred());
-		assertTrue(k.hasNoAnnot());
+		assertFalse(k.hasAnnot());
 		k.addAnnot(new Term("annot1"));
-		assertFalse(k.hasNoAnnot());
+		assertTrue(k.hasAnnot());
 
-		k.addSource("marcos");
+		k.addSource(new Term("marcos"));
 		assertEquals(k.getAnnots().size(), 2);
 		k.delSources();
 		assertEquals(k.getAnnots().size(), 1);
@@ -89,9 +89,10 @@ public class VarTermTest extends TestCase {
 		// test with var not ground
 		k = new VarTerm("K");
 		u = new Unifier();
-		u.unifies(k, new Pred("p"));
+		u.unifies(k, Pred.parsePred("p[a]"));
 		k.addAnnot(new Term("annot1"));
-		assertEquals(k.getAnnots(), null);		
+		k.addAnnot(new Term("annot2"));
+		assertEquals(k.getAnnots().size(), 2);		
 	}
 
 	/** test when a var is ground with a Literal */
@@ -175,5 +176,41 @@ public class VarTermTest extends TestCase {
 		u = new Unifier();
 		assertTrue(u.unifies(k2,l3));
 		assertTrue(u.unifies(k2,l1));
+		
+		VarTerm v1 = VarTerm.parseVar("Y[b(2)]");
+		VarTerm v2 = VarTerm.parseVar("X");
+		u.clear();
+		u.unifies(v2,Pred.parsePred("a(4)[b(2)]"));
+		u.unifies(v1,v2);
+		assertEquals(u.get("Y").toString(), "a(4)");
+	}
+	
+	public void testVarWithAnnots() {
+		VarTerm v1 = VarTerm.parseVar("X[a,b,c]");
+		VarTerm v2 = VarTerm.parseVar("X[a,b]");
+		assertFalse(v1.equals(v2));
+		v2.addAnnot(new Term("c"));
+		assertTrue(v1.equals(v2));
+		assertTrue(v2.equals(v1));
+		
+		Unifier u = new Unifier();
+		Pred p1 = Pred.parsePred("p(t1,t2)[a,c]");
+		//X[a,b,c] = p[a,c] nok
+		assertFalse(u.unifies(v1,p1));
+		
+		//p[a,c] = X[a,b,c] ok (X is p[a,c])
+		assertTrue(u.unifies(p1,v1));
+		assertEquals(u.get("X").toString(), "p(t1,t2)[a,c]");
+
+		p1.addAnnot(new Term("b"));
+		p1.addAnnot(new Term("d"));
+		u.clear();
+		// p[a,c,b,d] = X[a,b,c] nok
+		assertFalse(u.unifies(p1,v1));
+
+		u.clear();
+		// X[a,b,c] = p[a,c,b,d] ok (X is p[d])
+		assertTrue(u.unifies(v1,p1));
+		assertEquals(u.get("X").toString(), "p(t1,t2)[d]");
 	}
 }

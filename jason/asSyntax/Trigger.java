@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.8  2005/12/30 20:40:16  jomifred
+//   new features: unnamed var, var with annots, TE as var
+//
 //   Revision 1.7  2005/08/12 22:26:08  jomifred
 //   add cvs keywords
 //
@@ -37,7 +40,7 @@ import java.io.StringReader;
 
 import org.apache.log4j.Logger;
 
-public class Trigger extends Literal implements Cloneable {
+public class Trigger implements Cloneable {
 
 
     public static final byte      TEBel      = 0;
@@ -50,11 +53,11 @@ public class Trigger extends Literal implements Cloneable {
     
     
 	boolean trigType = TEAdd;
-
 	byte goal = TEBel;
-
+	Literal literal;
+	
 	public Trigger(boolean t, byte g, Literal l) {
-		super(l);
+		literal = (Literal)l.clone();
 		trigType = t;
 		goal = g;
 	}
@@ -99,7 +102,7 @@ public class Trigger extends Literal implements Cloneable {
 	}
 
 	public Object clone() {
-		return new Trigger(trigType, goal, (Literal) super.clone());
+		return new Trigger(trigType, goal, literal); //(Literal) super.clone());
 	}
 
 	/** return [+|-][!|?] super.getFucntorArity */
@@ -113,9 +116,13 @@ public class Trigger extends Literal implements Cloneable {
 			s += "!";
 		else if (goal == TETestG)
 			s += "?";
-		return s + super.getFunctorArity();
+		return s + literal.getFunctorArity();
 	}
 
+	public Literal getLiteral() {
+		return literal;
+	}
+	
 	public int hashCode() {
 		return getFunctorArity().hashCode();
 	}
@@ -130,7 +137,7 @@ public class Trigger extends Literal implements Cloneable {
 			s += "!";
 		else if (goal == TETestG)
 			s += "?";
-		s += super.toString();
+		s += literal.toString();
 		return s;
 	}
 

@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.11  2005/12/30 20:40:16  jomifred
+//   new features: unnamed var, var with annots, TE as var
+//
 //   Revision 1.10  2005/08/12 22:26:08  jomifred
 //   add cvs keywords
 //
@@ -38,15 +41,11 @@ public class DefaultLiteral implements Cloneable {
 	public static final boolean   LDefPos    = true;
     public static final boolean   LDefNeg    = false;
 	
-	Term literal;
+	Literal literal;
 	boolean defType;
 
     public DefaultLiteral(boolean t, Literal l) {
-        literal = (Term)l.clone();
-        defType = t;
-    }
-    public DefaultLiteral(boolean t, VarTerm v) {
-        literal = (Term)v.clone();
+        literal = (Literal)l.clone();
         defType = t;
     }
 
@@ -73,11 +72,7 @@ public class DefaultLiteral implements Cloneable {
     }
 
     public Object clone() {
-		if (literal.isVar()) {
-			return new DefaultLiteral(defType, (VarTerm)literal);			
-		} else {
-			return new DefaultLiteral(defType, (Literal)literal);
-		}
+		return new DefaultLiteral(defType, literal);
     }
 	    
     public String toString() {
@@ -86,5 +81,4 @@ public class DefaultLiteral implements Cloneable {
         else
             return "not " + literal.toString();
     }
-
 }

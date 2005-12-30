@@ -23,49 +23,43 @@
 //   $Date$
 //   $Revision$
 //   $Log$
-//   Revision 1.8  2005/12/30 20:40:16  jomifred
+//   Revision 1.1  2005/12/30 20:40:16  jomifred
 //   new features: unnamed var, var with annots, TE as var
-//
-//   Revision 1.7  2005/12/22 00:03:30  jomifred
-//   ListTerm is now an interface implemented by ListTermImpl
-//
-//   Revision 1.6  2005/08/12 22:26:08  jomifred
-//   add cvs keywords
 //
 //
 //----------------------------------------------------------------------------
 
 package jason.asSyntax;
 
-import java.util.Iterator;
-import java.util.List;
+import org.apache.log4j.Logger;
+
 
 /**
- * List of Terms Interface
+ * Represents an unnamed variable '_'. 
  * 
  * @author jomi
  */
-public interface ListTerm extends java.util.List, TermInterface {
+public class UnnamedVar extends VarTerm {
+	static private Logger logger = Logger.getLogger(UnnamedVar.class.getName());
 	
-	public void setTerm(Term t);
-	public Term getTerm();
-	public void setNext(Term l);
-	public ListTerm getNext();
-	public boolean isList();
+	public UnnamedVar() {
+		super();
+	}
+
+	public Object clone() {
+		return new UnnamedVar();
+	}
 	
-	public void addTerm(Term t);
-	public int size();
-	public boolean isEmpty();
-	public boolean isEnd();
-	public boolean isGround();
+	/** overridden VarTerm setValue, this method does nothing, so the Var never has value */
+	public boolean setValue(Term vl) {
+		return true;
+	}
 	
-	public boolean isTail();
-	public VarTerm getTail();
-	public void setTail(VarTerm v);
-	public ListTerm getLast();
-	public ListTerm add(Term t);
-	public ListTerm add(int index, Term t);
-	public ListTerm concat(ListTerm lt);
-	public Iterator listTermIterator();
-    public List getAsList();
+	public boolean isUnnamedVar() {
+		return true;
+	}
+	
+	public String toString() {
+		return "_";
+	}
 }

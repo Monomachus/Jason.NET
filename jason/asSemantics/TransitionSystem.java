@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.29  2005/12/30 20:40:16  jomifred
+//   new features: unnamed var, var with annots, TE as var
+//
 //   Revision 1.28  2005/12/23 00:48:22  jomifred
 //   StringTerm is now an interface implemented by StringTermImpl
 //
@@ -76,7 +79,6 @@ import jason.asSyntax.Plan;
 import jason.asSyntax.Pred;
 import jason.asSyntax.Term;
 import jason.asSyntax.Trigger;
-import jason.asSyntax.VarTerm;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -538,14 +540,7 @@ public class TransitionSystem {
 			Unifier     u = im.unif;
 			BodyLiteral h = (BodyLiteral) im.getPlan().getBody().get(0);
 		
-			Term bodyTerm = (Term)h.getLiteral().clone();
-			Literal l;
-			if (bodyTerm.isVar()) {
-				u.apply(bodyTerm);
-				l = (Literal) ((VarTerm)bodyTerm).getValue();
-			} else {
-				l = (Literal) bodyTerm;
-			}
+			Literal l = (Literal)h.getLiteral().clone();			
 			u.apply(l);
 			
 			switch (h.getType()) {
@@ -557,8 +552,7 @@ public class TransitionSystem {
 						if (!h.isAsk()) {
 							updateIntention();
 						}
-					}
-					else {
+					} else {
 						generateGoalDeletion();
 					}
 				} else {
@@ -698,16 +692,17 @@ public class TransitionSystem {
 
 		DefaultLiteral dfl = (DefaultLiteral) ctxt.next();
 
+		/*
 		Term dflTerm = (Term)dfl.getLiteral().clone();
 		Literal l;
 		if (dflTerm.isVar()) {
 			un.apply(dflTerm);
-			// TODO: check if it necessary to test (isVar) hence VarTerm is a Literal
-			// do it in all fonts!
 			l = (Literal) ((VarTerm)dflTerm).getValue();
 		} else {
 			l = (Literal) dflTerm;
 		}
+		*/
+		Literal l = (Literal)dfl.getLiteral().clone();
 		un.apply(l); // in case we have ... & X & ...
 		
 		if (l.isInternalAction()) {
@@ -782,7 +777,7 @@ public class TransitionSystem {
 		IntendedMeans im = conf.C.SI.peek();
 		Trigger tevent = im.getTrigger();
 		if (tevent.isAddition() && tevent.isGoal())
-			confP.C.delGoal(tevent.getGoal(), tevent, conf.C.SI); // intention will be suspended
+			confP.C.delGoal(tevent.getGoal(), tevent.getLiteral(), conf.C.SI); // intention will be suspended
 		// if "discard" is set, we are deleting the whole intention!
 		// it is simply not going back to 'I' nor anywhere else!
 		else if (setts.requeue()) {
@@ -800,7 +795,7 @@ public class TransitionSystem {
 		Event ev = conf.C.SE;
 		// TODO: double check all cases here
 		if (ev.trigger.isAddition() && ev.trigger.isGoal() && ev.isInternal()) {
-			confP.C.delGoal(ev.getTrigger().getGoal(), ev.getTrigger(), ev.intention);
+			confP.C.delGoal(ev.getTrigger().getGoal(), ev.getTrigger().getLiteral(), ev.intention);
 			logger.warn("Generating goal deletion from event: " + ev);
 		}
 		else if (ev.isInternal()) {

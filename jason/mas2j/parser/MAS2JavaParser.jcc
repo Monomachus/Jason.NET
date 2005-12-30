@@ -23,20 +23,15 @@
 //   $Date$
 //   $Revision$
 //   $Log$
-//   Revision 1.3  2005/12/18 15:31:02  jomifred
-//   no message
+//   Revision 1.4  2005/12/30 20:40:59  jomifred
+//   new features: unnamed var, var with annots, TE as var
 //
-//   Revision 1.2  2005/12/17 17:36:20  jomifred
-//   no message
 //
 //   Revision 1.1  2005/12/08 20:13:53  jomifred
 //   changes for JasonIDE plugin
 //
 //   Revision 1.18  2005/10/29 21:46:22  jomifred
 //   add a new class (MAS2JProject) to store information parsed by the mas2j parser. This new class also create the project scripts
-//
-//   Revision 1.17  2005/09/20 17:01:22  jomifred
-//   no message
 //
 //   Revision 1.16  2005/09/02 19:19:16  jomifred
 //   add files in project lib dir on classpath
@@ -46,9 +41,6 @@
 //
 //   Revision 1.14  2005/08/15 13:10:41  jomifred
 //   using infrastructure instead of architecture in mas2j
-//
-//   Revision 1.13  2005/08/12 21:12:16  jomifred
-//   add cvs keywords
 //
 //----------------------------------------------------------------------------
 

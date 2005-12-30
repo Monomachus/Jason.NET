@@ -14,11 +14,12 @@ public interface as2jConstants {
   int STRING = 14;
   int ATOM = 15;
   int VAR = 16;
-  int CHAR = 17;
-  int LETTER = 18;
-  int LC_LETTER = 19;
-  int UP_LETTER = 20;
-  int DIGIT = 21;
+  int UNNAMEDVAR = 17;
+  int CHAR = 18;
+  int LETTER = 19;
+  int LC_LETTER = 20;
+  int UP_LETTER = 21;
+  int DIGIT = 22;
 
   int DEFAULT = 0;
 
@@ -40,6 +41,7 @@ public interface as2jConstants {
     "<STRING>",
     "<ATOM>",
     "<VAR>",
+    "\"_\"",
     "<CHAR>",
     "<LETTER>",
     "<LC_LETTER>",
@@ -56,10 +58,10 @@ public interface as2jConstants {
     "\";\"",
     "\"(\"",
     "\")\"",
-    "\"[\"",
-    "\"]\"",
     "\",\"",
+    "\"[\"",
     "\"|\"",
+    "\"]\"",
     "\"<\"",
     "\"<=\"",
     "\">\"",

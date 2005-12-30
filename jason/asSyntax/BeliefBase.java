@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.11  2005/12/30 20:40:16  jomifred
+//   new features: unnamed var, var with annots, TE as var
+//
 //   Revision 1.10  2005/12/20 19:52:05  jomifred
 //   no message
 //
@@ -141,11 +144,9 @@ public class BeliefBase {
 			}
 		} else {
 			try {
-				// minimize the allocation space of terms/annots
+				// minimize the allocation space of terms
 				if (l.getTerms() != null) 
 					((ArrayList)l.getTerms()).trimToSize();
-				if (l.getAnnots() != null) 
-					((ArrayList)l.getAnnots()).trimToSize();
 			} catch (Exception e) {
 				logger.error("Error trimming literal's terms/annotations!",e);
 			}
@@ -175,20 +176,15 @@ public class BeliefBase {
 	}
 	*/
 
-	/** returns a iterator for all Beliefs. */
-	/*
-	public Iterator allIterator() {
+	/** returns a list with all beliefs. */
+	public List getAllBeliefs() {
 		List all = new ArrayList();
 		Iterator i = belsMap.values().iterator();
 		while (i.hasNext()) {
-			Iterator j = ((List)i.next()).iterator();
-			while (j.hasNext()) {
-				all.add(j.next());
-			}
+			all.addAll((List)i.next());
 		}
-		return all.iterator();
+		return all;
 	}
-	*/
 
 	/*
 	public boolean removeOld(Literal l) {
@@ -212,11 +208,11 @@ public class BeliefBase {
 		Literal bl = contains(l);
 		if (bl != null) {
 			if (l.hasSubsetAnnot(bl)) {
-				if (bl.hasSource(TPercept)) {
+				if (bl.hasAnnot(TPercept)) {
 					removePercept(bl);
 				}
 				bl.delAnnot((Pred) l);
-				if (bl.hasNoAnnot()) {
+				if (!bl.hasAnnot()) {
 					String key = l.getFunctorArity();
 					List listFunctor = (List)belsMap.get(key);
 					listFunctor.remove(bl);
@@ -275,8 +271,13 @@ public class BeliefBase {
 	}
 
 	public List getRelevant(Literal l) {
-		String key = l.getFunctorArity();
-		return (List)belsMap.get(key);
+		if (l.isVar()) {
+			// all bels are relevant
+			return getAllBeliefs();
+		} else {
+			String key = l.getFunctorArity();
+			return (List)belsMap.get(key);
+		}
 	}
 
 	public String toString() {

@@ -22,24 +22,20 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.24  2005/12/30 20:40:17  jomifred
+//   new features: unnamed var, var with annots, TE as var
+//
 //   Revision 1.23  2005/12/23 00:48:23  jomifred
 //   StringTerm is now an interface implemented by StringTermImpl
 //
 //   Revision 1.22  2005/12/22 00:04:18  jomifred
 //   ListTerm is now an interface implemented by ListTermImpl
 //
-//   Revision 1.21  2005/12/17 19:28:45  jomifred
-//   no message
-//
 //   Revision 1.20  2005/08/18 01:22:21  jomifred
 //   (AS grammar) arithmeticExpression renamed to ae
 //
 //   Revision 1.19  2005/08/17 18:19:21  jomifred
 //   change AS grammar (unify lt and la implementation)
-//
-//   Revision 1.18  2005/08/12 22:26:08  jomifred
-//   add cvs keywords
-//
 //
 //----------------------------------------------------------------------------
 
@@ -110,13 +106,14 @@ TOKEN : {
                         | ["0"-"3"] ["0"-"7"] ["0"-"7"]))* "\"">
 
 // Identifiers
-|  <ATOM: (<LC_LETTER> | "." <CHAR>) (<CHAR> | "." <CHAR>)*>
-|  <VAR:  <UP_LETTER> (<CHAR>)*>
-|  <CHAR: (<LETTER> | <DIGIT> | "_")>
-|  <LETTER: ( <LC_LETTER> | <UP_LETTER> )>
-|  <LC_LETTER: ["a"-"z"]>
-|  <UP_LETTER: ["A"-"Z"]>
-|  <DIGIT: ["0"-"9"]>
+|  <ATOM      : (<LC_LETTER> | "." <CHAR>) (<CHAR> | "." <CHAR>)*>
+|  <VAR       :  <UP_LETTER> (<CHAR>)*>
+|  <UNNAMEDVAR:  "_">
+|  <CHAR      : (<LETTER> | <DIGIT> | "_")>
+|  <LETTER    : ( <LC_LETTER> | <UP_LETTER> )>
+|  <LC_LETTER : ["a"-"z"]>
+|  <UP_LETTER : ["A"-"Z"]>
+|  <DIGIT     : ["0"-"9"]>
 }
 
 /* AgentSpeak Grammar */
@@ -195,7 +192,9 @@ Trigger te() : {
     )
   ]
   
-  F=l()        { return new Trigger(teType,teGoal,F); }
+  ( F=l()
+  | F=var()
+  )            { return new Trigger(teType,teGoal,F); }
 }
 
 /* Literal */
@@ -232,9 +231,7 @@ DefaultLiteral dl() : { boolean isPos = DefaultLiteral.LDefPos;
   ]
 
   rel = re() 
-                      { if (rel.isVar()) {
-                          return new DefaultLiteral(isPos, (VarTerm)rel);
-                        } else if (rel.isLiteral()) {
+                      { if (rel.isVar() || rel.isLiteral()) {
                           return new DefaultLiteral(isPos, (Literal)rel);
                         } else {
                           return new DefaultLiteral(isPos, new Literal(rel)); 
@@ -262,6 +259,7 @@ ArrayList bd() : { BodyLiteral F;
 BodyLiteral f() :     { Literal A; Token k;
                         byte formType = BodyLiteral.HAction;
                         Term rel;
+                        VarTerm v;
                       }
 {
  
@@ -273,14 +271,12 @@ BodyLiteral f() :     { Literal A; Token k;
     | "-"             { formType = BodyLiteral.HDelBel; }
    )
    ( A=l()            { return new BodyLiteral(formType,A); }
-   | k = <VAR>        { return new BodyLiteral(formType,new VarTerm(k.image)); } // used in communication "+C"
+   | v = var()        { return new BodyLiteral(formType,v); } // used in communication "+C"
    )
  |
   // actions or expressions
   rel = re() 
-                      { if (rel.isVar()) {
-                          return new BodyLiteral(formType, (VarTerm)rel); // the action is the Var content
-                        } else if (rel.isLiteral()) {
+                      { if (rel.isVar() || rel.isLiteral()) {
                           return new BodyLiteral(formType, (Literal)rel);
                         } else {
                           return new BodyLiteral(formType, new Literal(rel)); 
@@ -291,7 +287,7 @@ BodyLiteral f() :     { Literal A; Token k;
 
 
 /* Annotated Atomic Formulae */
-Pred at() :         { Token K; Pred p = new Pred(); Term t; List l;}
+Pred at() :         { Token K; Pred p = new Pred(); Term t; List l; ListTerm lt;}
 {
   K=<ATOM>          { p.setFunctor(K.image); } 
   [
@@ -299,8 +295,7 @@ Pred at() :         { Token K; Pred p = new Pred(); Term t; List l;}
       ")"           { p.addTerms(l); }
   ]
   [ 
-      "[" l = lt() 
-      "]"           { p.addAnnots(l); }
+      lt = list()   { p.setAnnots(lt); }
   ] 
   { return p; }
 }
@@ -326,30 +321,32 @@ Term t() :         { Token K; Term u; NumberTerm nb;}
 }
 
 
-ListTermImpl list() : { ListTermImpl lt = new ListTermImpl(); ListTerm last; Token K; Term f; }
+ListTermImpl list() : { ListTermImpl lt = new ListTermImpl(); ListTerm last; 
+                        Token K; Term f; }
 {
   "["
   [
-  f=t()               { last = lt.add(f); }
-  ( "," f=t()         { last = last.add(f); }
+  f=t()                   { last = lt.add(f); }
+  ( "," f=t()             { last = last.add(f); }
   )*
-  [ "|"  ( K=<VAR>    { last.setTail(new VarTerm(K.image)); }
-         | f=list()   { last = last.concat((ListTerm)f);	   }
+  [ "|"  ( K=<VAR>        { last.setNext(new VarTerm(K.image)); }
+         | K=<UNNAMEDVAR> { last.setNext(new UnnamedVar()); }
+         | f=list()       { last = last.concat((ListTerm)f);	   }
          )           
   ]
   ]
-  "]"                 { return lt; } 
+  "]"                     { return lt; } 
 }
 
 
 /* relational expression 
-   used in context and body
+   used in context, body and term
    
      <VAR>      [ <OPREL> <EXP> ]  --> this method returns the VarTerm
    | <LITERAL>  [ <OPREL> <EXP> ]  --> returns the Literal
    | <EXP> <OPREL> <EXP>           --> returns a Term like .gt(<Term>,<Term>)
 */
-Term re() :                               { Token k;
+Term re() :                               {  Token k;
                                              Term op1 = null;
                                              Term op2 = null;
                                              NumberTerm nb; 
@@ -432,12 +429,25 @@ NumberTerm factor():{ NumberTerm t1, t2; int op;}
 }
 
 
-NumberTerm simple():{ Token K; NumberTerm t;}
+NumberTerm simple():{ Token K; NumberTerm t; VarTerm v; }
 {
  ( K = <NUMBER>     { return new NumberTermImpl(K.image); }
- | K = <VAR>        { return new VarTerm(K.image); }
+ //| K = <VAR>        { return new VarTerm(K.image); }
+ //| K = <UNNAMEDVAR> { return new UnnamedVar(); }
  | "-" t = simple() { return new ExprTerm(ExprTerm.EOminus, t); }
  | "(" t = ae() ")" { return t; }
+ | v = var()        { return v; }
  )
+}
+
+VarTerm var():      { Token K; VarTerm v; ListTerm lt; }
+{
+ ( K = <VAR>        { v = new VarTerm(K.image); }
+ | K = <UNNAMEDVAR> { v = new UnnamedVar(); }
+ )
+ [ 
+   lt = list()      { v.setAnnots(lt); }
+ ]
+                    { return v; }
 }
 

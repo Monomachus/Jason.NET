@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.3  2005/12/30 20:40:16  jomifred
+//   new features: unnamed var, var with annots, TE as var
+//
 //   Revision 1.2  2005/12/16 22:09:20  jomifred
 //   no message
 //
@@ -52,6 +55,7 @@ public class Config extends Properties {
 	public static final String LOG4J_JAR = "log4jJar";
 	public static final String JAVA_HOME = "javaHome";
 	public static final String RUN_AS_THREAD = "runCentralisedInsideJIDE";
+	public static final String SHELL_CMD = "shellCommand";
 		
 	private static Config singleton = null;
 	
@@ -102,8 +106,15 @@ public class Config extends Properties {
 	}
 	
 	public boolean runAsInternalTread() {
+		return false; // it not works with jedit
+		/*
 		String r = getProperty(RUN_AS_THREAD);
 		return r != null && r.equals("true");
+		*/
+	}
+	
+	public String getShellCommand() {
+		return getProperty(SHELL_CMD);
 	}
 	
 	public void fix() {
@@ -130,6 +141,15 @@ public class Config extends Properties {
         }
         if (get("fontSize") == null) {
         	put("fontSize", "14");
+        }
+        
+        // shell command
+        if (get(SHELL_CMD) == null) {
+    		if (System.getProperty("os.name").indexOf("indows") > 0) {
+    			put(SHELL_CMD, "cmd /c ");
+    		} else {
+    			put(SHELL_CMD, "/bin/sh ");
+    		}
         }
 	}
 	

@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.9  2005/12/30 20:40:16  jomifred
+//   new features: unnamed var, var with annots, TE as var
+//
 //   Revision 1.8  2005/12/20 19:52:05  jomifred
 //   no message
 //
@@ -84,10 +87,12 @@ public class Literal extends Pred implements Cloneable {
 	}
 
 	/** copy all attributes from literal <i>l</i> */
+	/*
 	public void set(Literal l) {
 		super.set((Pred)l);
 		type = l.type;
 	}
+	*/
 	
 	
 	public boolean isInternalAction() {

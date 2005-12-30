@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.10  2005/12/30 20:40:16  jomifred
+//   new features: unnamed var, var with annots, TE as var
+//
 //   Revision 1.9  2005/08/16 21:03:42  jomifred
 //   add some comments on TODOs
 //
@@ -92,17 +95,11 @@ public class Circumstance implements Serializable {
     }
 
     public void addAchvGoal(Literal l, Intention i) {
-        E.add(new Event(new Trigger(Trigger.TEAdd,Trigger.TEAchvG,l), i));
+        E.add(new Event(new Trigger(Trigger.TEAdd,Trigger.TEAchvG, l), i));
     }
-    //public void addAchvGoal(String sl, Intention i) {
-    //    addAchvGoal(Literal.parseLiteral(sl), i);
-    //}
     public void addTestGoal(Literal l, Intention i) {
-        E.add(new Event(new Trigger(Trigger.TEAdd,Trigger.TETestG,l), i));
+        E.add(new Event(new Trigger(Trigger.TEAdd,Trigger.TETestG, l), i));
     }
-    //public void addTestGoal(String sl, Intention i) {
-    //    addTestGoal(Literal.parseLiteral(sl), i);
-    //}
 
     public void addGoal(byte g, Literal l, Intention i) throws JasonException {
         if (g==Trigger.TEAchvG)
