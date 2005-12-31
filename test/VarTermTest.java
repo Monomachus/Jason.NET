@@ -198,9 +198,9 @@ public class VarTermTest extends TestCase {
 		//X[a,b,c] = p[a,c] nok
 		assertFalse(u.unifies(v1,p1));
 		
-		//p[a,c] = X[a,b,c] ok (X is p[a,c])
+		//p[a,c] = X[a,b,c] ok (X is p)
 		assertTrue(u.unifies(p1,v1));
-		assertEquals(u.get("X").toString(), "p(t1,t2)[a,c]");
+		assertEquals(u.get("X").toString(), "p(t1,t2)");
 
 		p1.addAnnot(new Term("b"));
 		p1.addAnnot(new Term("d"));
@@ -209,8 +209,8 @@ public class VarTermTest extends TestCase {
 		assertFalse(u.unifies(p1,v1));
 
 		u.clear();
-		// X[a,b,c] = p[a,c,b,d] ok (X is p[d])
+		// X[a,b,c] = p[a,c,b,d] ok (X is p)
 		assertTrue(u.unifies(v1,p1));
-		assertEquals(u.get("X").toString(), "p(t1,t2)[d]");
+		assertEquals(u.get("X").toString(), "p(t1,t2)");
 	}
 }

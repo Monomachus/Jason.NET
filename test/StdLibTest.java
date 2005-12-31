@@ -10,6 +10,7 @@ import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Literal;
 import jason.asSyntax.NumberTerm;
 import jason.asSyntax.NumberTermImpl;
+import jason.asSyntax.Plan;
 import jason.asSyntax.Pred;
 import jason.asSyntax.StringTerm;
 import jason.asSyntax.StringTermImpl;
@@ -18,6 +19,7 @@ import jason.asSyntax.VarTerm;
 import jason.stdlib.addAnnot;
 import jason.stdlib.addPlan;
 import jason.stdlib.getRelevantPlans;
+import jason.stdlib.literalBuilder;
 import jason.stdlib.removePlan;
 
 import java.util.Iterator;
@@ -113,6 +115,7 @@ public class StdLibTest extends TestCase {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		assertTrue(ag.getPS().getPlans().get(0).equals(Plan.parse(pt1.getString())));
 		
 		ListTerm plans = (ListTerm)u.get("X");
 		//System.out.println("plans="+plans);
@@ -127,7 +130,6 @@ public class StdLibTest extends TestCase {
 			e.printStackTrace();
 		}
 		//ag.getPS().remove(0);
-		//System.out.println("PS="+ag.getPS());
 		assertEquals(ag.getPS().getPlans().size(), 2);
 		
 		
@@ -206,6 +208,43 @@ public class StdLibTest extends TestCase {
 		try {
 			assertTrue(new jason.stdlib.gt().execute(null, u, new Term[] { vsy, (Term)sx }));
 			assertFalse(new jason.stdlib.gt().execute(null, u, new Term[] { (Term)sx, vsy }));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void testLiteralBuilder() {
+		try {
+		Literal l = Literal.parseLiteral("~p(t1,t2)[a1,a2]");
+		assertEquals(l.getAsListOfTerms().size(), 4);
+
+		ListTerm lt1 = ListTermImpl.parseList("[~p,[a1,a2],t1,t2]");
+		assertTrue(l.equals(Literal.newFromListOfTerms(lt1)));
+		ListTerm lt2 = ListTermImpl.parseList("[p,[a1,a2],t1,t2]");
+		assertFalse(l.equals(Literal.newFromListOfTerms(lt2)));
+		ListTerm lt3 = ListTermImpl.parseList("[~p,[a1,a2,a3],t1,t2]");
+		assertFalse(l.equals(Literal.newFromListOfTerms(lt3)));
+		
+		Unifier u = new Unifier();
+		assertFalse(u.unifies((Term)lt1,(Term)lt2));
+		
+		assertTrue(new literalBuilder().execute(null, u, new Term[] { l, (Term)lt1 }));
+		assertFalse(new literalBuilder().execute(null, u, new Term[] { l, (Term)lt2 }));
+		assertFalse(new literalBuilder().execute(null, u, new Term[] { l, (Term)lt3 }));
+
+		VarTerm v = new VarTerm("X");
+		u.clear();
+		assertTrue(new literalBuilder().execute(null, u, new Term[] { v, (Term)lt1 }));
+		assertEquals(u.get("X").toString(), l.toString());
+		assertEquals(u.get("X"), l);
+		assertEquals(l, u.get("X"));
+		
+		u.clear();
+		assertTrue(new literalBuilder().execute(null, u, new Term[] { l, v }));
+		assertEquals(u.get("X").toString(), lt1.toString());
+		assertEquals(u.get("X"), lt1);
+		assertEquals(lt1, u.get("X"));
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

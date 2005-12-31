@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.22  2005/12/31 16:29:58  jomifred
+//   add operator =..
+//
 //   Revision 1.21  2005/12/30 20:40:16  jomifred
 //   new features: unnamed var, var with annots, TE as var
 //
@@ -431,7 +434,7 @@ public class Agent {
 	 * that comes from source (normally the agent name)
 	 */
 	public void removePlan(StringTerm sPlan, Term source) {
-		Plan p = Plan.parse(sPlan.getFunctor());
+		Plan p = Plan.parse(sPlan.getString());
 		int i = fPS.indexOf(p);
 		if (i >= 0) {
 			p = (Plan)fPS.get(i);
@@ -442,7 +445,7 @@ public class Agent {
 				fPS.remove(i);
 			}
 		} else {
-			logger.error("Plan "+p+" was not found for deletion!");
+			logger.error("Plan '"+p+"' was not found for deletion!");
 		}
 	}
 

@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.5  2005/12/31 16:29:58  jomifred
+//   add operator =..
+//
 //   Revision 1.4  2005/08/12 22:20:10  jomifred
 //   add cvs keywords
 //
@@ -52,6 +55,6 @@ public class plus implements InternalAction {
 		int y = Integer.parseInt(yp.toString());
 		int r = x + y;
 		Term rsp = new Term(r+"");
-		return un.unifies(rp, rsp);
+		return un.unifiesNoClone(rp, rsp);
 	}
 }

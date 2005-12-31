@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.9  2005/12/31 16:29:58  jomifred
+//   add operator =..
+//
 //   Revision 1.8  2005/12/30 20:40:16  jomifred
 //   new features: unnamed var, var with annots, TE as var
 //
@@ -82,7 +85,7 @@ public class Trigger implements Cloneable {
 
 	public boolean equals(Object obj) {
 		Trigger t = (Trigger) obj;
-		return (trigType == t.trigType && goal == t.goal && super.equals(t));
+		return (trigType == t.trigType && goal == t.goal && literal.equals(t.getLiteral()));
 	}
 
 	public boolean isAchvGoal() {
@@ -102,7 +105,7 @@ public class Trigger implements Cloneable {
 	}
 
 	public Object clone() {
-		return new Trigger(trigType, goal, literal); //(Literal) super.clone());
+		return new Trigger(trigType, goal, literal); 
 	}
 
 	/** return [+|-][!|?] super.getFucntorArity */

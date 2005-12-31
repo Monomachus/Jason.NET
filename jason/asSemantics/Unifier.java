@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.17  2005/12/31 16:29:58  jomifred
+//   add operator =..
+//
 //   Revision 1.16  2005/12/30 20:40:16  jomifred
 //   new features: unnamed var, var with annots, TE as var
 //
@@ -170,7 +173,7 @@ public class Unifier implements Cloneable {
         }
     }
     
-    private boolean unifiesNoClone(Term t1g, Term t2g) {
+    public boolean unifiesNoClone(Term t1g, Term t2g) {
 		List t1gl = t1g.getTerms();
 		List t2gl = t2g.getTerms();
 
@@ -272,7 +275,7 @@ public class Unifier implements Cloneable {
 		} 
 					    
 		for (int i=0; i < t1g.getTermsSize(); i++) {
-            if (!unifies(t1g.getTerm(i),t2g.getTerm(i)))
+            if (!unifies2NoClone(t1g.getTerm(i),t2g.getTerm(i)))
                 return false;
 		}
 		return true;
@@ -286,8 +289,36 @@ public class Unifier implements Cloneable {
         //System.out.println("TermUn: "+t1+"="+t2+" : "+t1g+"="+t2g);
         return unifiesNoClone(t1g, t2g);
     }
-  
-   	public boolean unifies(Pred p1, Pred p2) {
+
+    /** this version of unify tries to call the appropriate unify method (Literal, Pred, or Term versions) */
+    public boolean unifies2(Term t1, Term t2) {
+        Term t1g = (Term)t1.clone();
+        Term t2g = (Term)t2.clone();
+        apply(t1g);
+        apply(t2g);
+        return unifies2NoClone(t1g,t2g);
+    }
+
+    public boolean unifies2NoClone(Term t1g, Term t2g) {
+    	// try to cast both to Literal
+    	try {
+            return unifiesNoClone((Literal)t1g, (Literal)t2g);    		
+    	} catch (Exception e1) {
+    		// try to cast both to Pred
+    		try {
+    			return unifiesNoClone((Pred)t1g, (Pred)t2g);
+    		} catch (Exception e2) {
+    			// use args as Terms
+    			return unifiesNoClone(t1g, t2g);
+    		}
+    	}
+        //System.out.println("TermUn: "+t1+"="+t2+" : "+t1g+"="+t2g);
+        //return unifiesNoClone(t1g, t2g);
+    }
+
+   	// ----- Pred
+
+    public boolean unifies(Pred p1, Pred p2) {
    		Pred np1 = (Pred)p1.clone();
    		Pred np2 = (Pred)p2.clone();
    		apply(np1);
@@ -304,7 +335,14 @@ public class Unifier implements Cloneable {
         }
         
         // tests when np1 or np2 are Vars with annots
-        ListTerm newAnnots1 = null; // new annots for np1 (e.g. np1 is X[a,b,c] and np2 is p[a,b,c,d], newAnnots1 will be [d])
+        if (np1.isVar() && np1.hasAnnot() && !np1.hasSubsetAnnot(np2, this)) {
+        	return false;
+        }
+        if (np2.isVar() && np2.hasAnnot() && !np1.hasSubsetAnnot(np2, this)) {
+        	return false;
+        }
+    	/* (code used when remains in X some annots)
+    	 ListTerm newAnnots1 = null; // new annots for np1 (e.g. np1 is X[a,b,c] and np2 is p[a,b,c,d], newAnnots1 will be [d])
         if (np1.isVar() && np1.hasAnnot()) {
         	VarTerm tail = np1.getAnnots().getTail(); 
         	if (tail == null) {
@@ -317,30 +355,35 @@ public class Unifier implements Cloneable {
         	newAnnots1 = (ListTerm)get(tail.getFunctor());
         	function.remove(tail.getFunctor());
         }
-
-        if (np2.isVar() && np2.hasAnnot() && !np1.hasSubsetAnnot(np2, this)) {
-        	return false;
-        }
+       	*/
         
         // unify as Term
         boolean ok = unifiesNoClone((Term)np1, (Term)np2);
-        if (ok && newAnnots1 != null) {
-        	((Pred)function.get(np1.getFunctor())).setAnnots(newAnnots1);
+        if (ok && np1.isVar() && np1.hasAnnot()) { //newAnnots1 != null) {
+        	((Pred)function.get(np1.getFunctor())).setAnnots(null);
+        	//((Pred)function.get(np1.getFunctor())).setAnnots(newAnnots1);
         	//System.out.println("np1="+np1.getFunctor()+"/"+this+":"+newAnnots1);
+        }
+        if (ok && np2.isVar() && np2.hasAnnot()) {
+        	((Pred)function.get(np2.getFunctor())).setAnnots(null);
         }
         return ok;
     }
     
+   	// ----- Literal
+   	
     public boolean unifies(Literal l1, Literal l2) {
     	Literal nl1 = (Literal)l1.clone();
    		Literal nl2 = (Literal)l2.clone();
    		apply(nl1);
    		apply(nl2);
-   		//System.out.println("LiteralUn: "+l1+"="+l2+" : "+nl1+"="+nl2);
-        if (!nl1.isVar() && !nl2.isVar() && nl1.negated() != nl2.negated()) {
+        return unifiesNoClone(nl1,nl2);
+    }
+    private boolean unifiesNoClone(Literal l1, Literal l2) {
+        if (!l1.isVar() && !l2.isVar() && l1.negated() != l2.negated()) {
         	return false;
         }
-        return unifiesNoClone((Pred)nl1,(Pred)nl2);
+        return unifiesNoClone((Pred)l1,(Pred)l2);
     }
     
     public boolean unifies(DefaultLiteral d1, DefaultLiteral d2) {

@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.10  2005/12/31 16:29:58  jomifred
+//   add operator =..
+//
 //   Revision 1.9  2005/12/17 19:28:44  jomifred
 //   no message
 //
@@ -146,7 +149,7 @@ public class Plan implements Cloneable, Serializable {
 
 	public boolean equals(Object o) {
 		Plan p = (Plan) o;
-		return (tevent.equals(p.tevent) && context.equals(p.context) && body.equals(p.body));
+		return tevent.equals(p.tevent) && context.equals(p.context) && body.equals(p.body);
 	}
 
 	public Object clone() {
@@ -195,15 +198,18 @@ public class Plan implements Cloneable, Serializable {
 	}
 
 	public String toString() {
-		return ("<<" + ((label == null) ? "" : label.toString() + " -> ")
+		return toASString();
+		/*
+		return ("<<" + ((label == null) ? "" : label.toString())
 				+ tevent.toString() + " : " + listToString(context, " & ") + " <- "
 				+ listToString(body, "; ") + ">>");
+		*/
 	}
 
 	/** returns this plan in a string compliant with AS syntax */
 	public String toASString() {
 		return  ((label == null) ? "" : "@" + label.toString() + " ")
-				+ tevent.toString() + " : " + 
+				+ tevent + " : " + 
 				((context.size() == 0) ? "true" : listToString(context, " & "))
 				+ " <- " +
 				((body.size() == 0) ? "true" : listToString(body, "; ")) 

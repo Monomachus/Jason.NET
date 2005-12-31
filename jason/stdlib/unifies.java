@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.6  2005/12/31 16:29:58  jomifred
+//   add operator =..
+//
 //   Revision 1.5  2005/12/30 20:40:40  jomifred
 //   new features: unnamed var, var with annots, TE as var
 //
@@ -38,23 +41,10 @@ package jason.stdlib;
 import jason.asSemantics.InternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
-import jason.asSyntax.Literal;
-import jason.asSyntax.Pred;
 import jason.asSyntax.Term;
 
 public class unifies implements InternalAction {
     public boolean execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
-    	// try to cast both to Literal
-    	try {
-            return un.unifies((Literal)args[0], (Literal)args[1]);    		
-    	} catch (Exception e1) {
-    		// try to cast both to Pred
-    		try {
-    			return un.unifies((Pred)args[0], (Pred)args[1]);
-    		} catch (Exception e2) {
-    			// use args as Terms
-    			return un.unifies(args[0], args[1]);
-    		}
-    	}
+    	return un.unifies2NoClone(args[0], args[1]);
     }
 }

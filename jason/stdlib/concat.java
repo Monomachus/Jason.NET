@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.7  2005/12/31 16:29:58  jomifred
+//   add operator =..
+//
 //   Revision 1.6  2005/12/23 00:51:00  jomifred
 //   StringTerm is now an interface implemented by StringTermImpl
 //
@@ -69,7 +72,7 @@ public class concat implements InternalAction {
 		
 			ListTerm l1l = (ListTerm)l1;
 			l1l.concat((ListTerm)l2);
-			return un.unifies(l3, (Term)l1l);
+			return un.unifiesNoClone(l3, (Term)l1l);
 		} else {
 			String v1 = l1.toString();
 			if (l1.isString()) {
