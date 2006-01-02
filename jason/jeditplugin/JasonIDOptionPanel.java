@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.6  2006/01/02 14:25:34  jomifred
+//   no message
+//
 //   Revision 1.5  2005/12/30 20:40:17  jomifred
 //   new features: unnamed var, var with annots, TE as var
 //
@@ -224,7 +227,7 @@ public class JasonIDOptionPanel extends AbstractOptionPane  {
 			userProperties.put(Config.JASON_JAR, jasonTF.getText().trim());
 		}
 		if (userProperties.checkJavaHomePath(javaTF.getText())) {
-			userProperties.put(Config.JAVA_HOME, javaTF.getText().trim());
+			userProperties.setJavaHome(javaTF.getText().trim());
 		}
 		userProperties.put(Config.SHELL_CMD, shellTF.getText().trim());
 		//userProperties.put(Config.RUN_AS_THREAD, insideJIDECBox.isSelected()+"");
