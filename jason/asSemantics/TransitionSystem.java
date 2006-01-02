@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.30  2006/01/02 13:49:00  jomifred
+//   add plan unique id, fix some bugs
+//
 //   Revision 1.29  2005/12/30 20:40:16  jomifred
 //   new features: unnamed var, var with annots, TE as var
 //
@@ -427,24 +430,28 @@ public class TransitionSystem {
 		// whenever a plan with [atomic] become intended so that we
 		// "remember" that it worth searching for an atomic? Do you
 		// understand what I mean?
-		// RAFA: this flag is just the last C.SI and
-		// C.SI.isAtomic (see implementation of this
-		// method, it is not computed every time)?
-		// I guess the current implementation already select
-		// the last atomic with searching all intention.
-		// However, I agree that using C.SI may be "unsafe".
+		// RAFA: Yes. But I do not fix it yet. (i've tried, see comments in this method 
+		// and ClrInt)
+
+		confP.step = SExecInt; // default next step
 		
 		// Rule for Atomic Intentions
 		confP.C.SI = selectAtomicIntention();
 		if (confP.C.SI != null) {
-			confP.step = SExecInt;
+		//if (confP.C.AI != null) {
+			//confP.C.SI = confP.C.AI;
 			return;
 		}
 
 		// Rule SelInt1
 		if (!conf.C.I.isEmpty()) {
 			confP.C.SI = conf.ag.selectIntention(conf.C.I);
-			confP.step = SExecInt;
+			/* the following was not enought to remove selectAtomicIntention
+			if (confP.C.SI.isAtomic()) {
+				confP.C.AI = confP.C.SI;
+				System.out.println("new AI="+confP.C.AI);
+			}
+			*/
 			return;
 		}
 		
@@ -548,10 +555,8 @@ public class TransitionSystem {
 			// Rule Action
 			case BodyLiteral.HAction:
 				if (l.isInternalAction()) {
-					if (execInternalAction(l, u)) {
-						if (!h.isAsk()) {
-							updateIntention();
-						}
+					if (execInternalAction(l, u) && !h.isAsk()) {
+						updateIntention();
 					} else {
 						generateGoalDeletion();
 					}
@@ -582,30 +587,24 @@ public class TransitionSystem {
 			// Rule AddBel
 			case BodyLiteral.HAddBel:
 				
-				// translate l to a string and parse again to identify
-				// problems such as:
-				//    X = ~p(a); +p(X)
-				l = Literal.parseLiteral(l.toString());
-				if (l != null) {
-					Term source = BeliefBase.TSelf;
-					if (l.hasSource()) {
-						source = null; // do not add source(self) in case the programmer set the source
-					}
-					if (setts.sameFocus())
-						conf.ag.addBel(l, source, conf.C, conf.C.SI);
-					else {
-						conf.ag.addBel(l, source, conf.C, Intention.EmptyInt);
-						updateIntention();
-					}
+				Term source = BeliefBase.TSelf;
+				if (l.hasSource()) {
+					source = null; // do not add source(self) in case the programmer set the source
+				}
+				if (setts.sameFocus())
+					conf.ag.addBel(l, source, conf.C, conf.C.SI);
+				else {
+					conf.ag.addBel(l, source, conf.C, Intention.EmptyInt);
+					updateIntention();
 				}
 				break;
 				
 			// Rule DelBel
 			case BodyLiteral.HDelBel:
-				ubel = conf.ag.believes((Literal)l, u);
+				ubel = conf.ag.believes(l, u);
 				if (ubel != null) {
 					ubel.apply(l);
-					Term source = BeliefBase.TSelf;
+					source = BeliefBase.TSelf;
 					if (l.hasSource()) {
 						source = null; // do not add source(self) in case the programmer set the source
 					}
@@ -615,8 +614,9 @@ public class TransitionSystem {
 						conf.ag.delBel(l, source, conf.C, Intention.EmptyInt);
 						updateIntention();
 					}
-				} else
-					generateGoalDeletion(); //
+				} else {
+					generateGoalDeletion();
+				}
 				break;
 			}
 		}
@@ -640,9 +640,22 @@ public class TransitionSystem {
 					// use unifier of finished plan accordingly
 					im.unif.compose(g.getLiteral(), oldim.unif);
 					confP.step = SClrInt; // the new top may have become
-					// empty! need to keep checking.
+					                      // empty! need to keep checking.
+					
+					/* the following was not enought to remove selectAtomicIntention
+					if (!conf.C.SI.isAtomic()) { // not atomic intention anymore
+						conf.C.AI = null;
+						System.out.println("111");
+					}
+					*/
 				} else {
 					confP.C.I.remove(conf.C.SI);
+					/* the following was not enought to remove selectAtomicIntention
+					if (conf.C.SI.isAtomic()) { // remove atomic intention
+						conf.C.AI = null;
+						System.out.println("2222");
+					}
+					*/
 					conf.C.SI = null;
 				}
 			}

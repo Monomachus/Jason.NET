@@ -23,8 +23,8 @@
 //   $Date$
 //   $Revision$
 //   $Log$
-//   Revision 1.17  2005/12/30 20:40:16  jomifred
-//   new features: unnamed var, var with annots, TE as var
+//   Revision 1.18  2006/01/02 13:49:00  jomifred
+//   add plan unique id, fix some bugs
 //
 //
 //----------------------------------------------------------------------------
@@ -452,7 +452,7 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
 
 	public double solve() {
 		if (hasValue() && value.isNumber()) {
-			return ((NumberTermImpl)value).getValue();
+			return ((NumberTerm)value).solve();
 		} else {
 			logger.error("Error getting numerical value of VarTerm "+this);
 		}

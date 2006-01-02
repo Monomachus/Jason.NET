@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.23  2006/01/02 13:49:00  jomifred
+//   add plan unique id, fix some bugs
+//
 //   Revision 1.22  2005/12/31 16:29:58  jomifred
 //   add operator =..
 //
@@ -228,7 +231,7 @@ public class Agent {
 	*/
 
 	/** Agent's Source Plans Initialisation (called by the parser) */
-	public void addPS(PlanLibrary pp) {
+	public void addPS(PlanLibrary pp) throws JasonException {
 		fPS.addAll(pp);
 	}
 
@@ -269,7 +272,7 @@ public class Agent {
             	}
             }
             if (!wasPercepted) {
-                if (delBel(l,BeliefBase.TPercept,fTS.getC())) {
+                if (delBel(l,BeliefBase.TPercept,fTS.getC(), Intention.EmptyInt)) {
                 	i--;
                 }
             }
@@ -320,20 +323,6 @@ public class Agent {
 		return null;
 	}
 	
-	
-	/*
-	public boolean addBel(String sl, String sSource, Circumstance c) {
-		return addBel(Literal.parseLiteral(sl), Term.parse("source("+sSource+")"), c, D.EmptyInt);
-	}
-
-	public boolean addBel(String sl, Term source, Circumstance c) {
-		return addBel(Literal.parseLiteral(sl), source, c, D.EmptyInt);
-	}
-
-	public boolean addBel(Literal l, Term source, Circumstance c) {
-		return addBel(l, source, c, D.EmptyInt);
-	}
-	*/
 
 	/** Adds a new Literal <i>l</i> in BB with "source(<i>source</i>)" annotation.
 	 *  <i>l</i> will be cloned before being added in the BB */
@@ -357,26 +346,16 @@ public class Agent {
 		return false;
 	}
 
-	
-	public boolean delBel(String sl, String sSource, Circumstance c) {
-		return delBel(Literal.parseLiteral(sl), Term.parse("source("+sSource+")"), c);
-	}
-
-	public boolean delBel(Literal l, Term source, Circumstance c) {
-		return delBel(l, source, c, Intention.EmptyInt);
-	}
-
 	public boolean delBel(Literal l, Term source, Circumstance c, Intention focus) {
-		if(source != null && !source.isGround()) {
+		if (source != null && !source.isGround()) {
 			logger.error("Error: Annotations must be ground!\n Cannot use "+source+" as annotation.");
 		} else {
 			if (source != null) {
 				//l.clearAnnot();
 				l.addAnnot(source);
 			}
-			//System.out.println("removing "+l);
 			if (fBS.remove(l)) {
-				//System.out.println("removed "+l);
+				logger.debug("Removed belief "+l);
 				updateEvents(new Event(new Trigger(Trigger.TEDel, Trigger.TEBel, l), focus), c);
 				return true;
 			}
@@ -394,8 +373,6 @@ public class Agent {
 		}
 	}
 
-	// TODO IMPORTANT: this is not making sure the label of the new plan is unique!!!
-	// TODO: use pl contains (to have only a MAP in plan library)
 	public void addPlan(StringTerm stPlan, Term tSource) {
 		String sPlan = stPlan.getString();
 		try {
@@ -414,10 +391,6 @@ public class Agent {
 			} else {
 				p = (Plan) fPS.get(i);
 			}
-			if (p.getLabel() == null) {
-				p.setLabel("alabel");
-			}
-			//p.getLabel().addAnnot(Term.parse("source("+sSource+")"));
 			if (tSource != null) {
 				p.getLabel().addSource(tSource);
 			}

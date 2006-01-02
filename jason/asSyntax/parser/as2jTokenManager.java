@@ -4,6 +4,7 @@ import java.util.*;
 import java.io.*;
 import jason.asSyntax.*;
 import jason.asSemantics.*;
+import jason.*;
 
 public class as2jTokenManager implements as2jConstants
 {

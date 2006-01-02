@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.3  2006/01/02 13:49:00  jomifred
+//   add plan unique id, fix some bugs
+//
 //   Revision 1.2  2005/08/12 22:26:08  jomifred
 //   add cvs keywords
 //
@@ -53,7 +56,7 @@ public class NumberTermImpl extends Term implements NumberTerm {
 	}
 	
 	public NumberTermImpl(NumberTermImpl t) {
-		setValue(t.getValue());
+		setValue(t.solve());
 	}
 
 	public void setValue(String s) {
@@ -68,16 +71,12 @@ public class NumberTermImpl extends Term implements NumberTerm {
 		setFunctor(d+"");
 	}
 	
-	public double getValue() {
-		return fValue;
-	}
-	
 	public double solve() {
 		return fValue;
 	}
-	
+
 	public Object clone() {
-		return new NumberTermImpl(getValue());
+		return new NumberTermImpl(solve());
 	}
 	
 
@@ -97,10 +96,12 @@ public class NumberTermImpl extends Term implements NumberTerm {
 		return true;
 	}
 	
-	public boolean equals(Object t) {
+	public boolean equals(Object o) {
 		try {
-			NumberTermImpl st = (NumberTermImpl)t;
-			return this.getValue() == st.getValue();
+			Term t = (Term)o;
+			if (t.isVar()) return false;
+			NumberTerm st = (NumberTerm)t;
+			return solve() == st.solve();
 		} catch (Exception e) {}
 		return false;
 	}

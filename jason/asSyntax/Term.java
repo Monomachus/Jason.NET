@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.19  2006/01/02 13:49:00  jomifred
+//   add plan unique id, fix some bugs
+//
 //   Revision 1.18  2005/12/30 20:40:16  jomifred
 //   new features: unnamed var, var with annots, TE as var
 //
@@ -259,6 +262,7 @@ public class Term implements TermInterface, Comparable, Serializable {
 				return false;
 
 			for (int i=0; i<getTermsSize(); i++) {
+//System.out.println("term* "+getTerm(i)+getTerm(i).getClass().getName()+"="+tAsTerm.getTerm(i)+getTerm(i).getClass().getName()+" deu "+getTerm(i).equals(tAsTerm.getTerm(i)));				
 				if (!getTerm(i).equals(tAsTerm.getTerm(i))) {
 					return false;
 				}

@@ -22,6 +22,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.26  2006/01/02 13:49:01  jomifred
+//   add plan unique id, fix some bugs
+//
 //   Revision 1.25  2005/12/31 16:29:58  jomifred
 //   add operator =..
 //
@@ -56,6 +59,7 @@ PARSER_BEGIN(as2j)
   import java.io.*;
   import jason.asSyntax.*;
   import jason.asSemantics.*;
+  import jason.*;
 
   public class as2j {
 
@@ -127,6 +131,7 @@ void ag(Agent a) : { List bbl = new LinkedList(); PlanLibrary pp;  }
   pp = ps()
   <EOF>
               { if (a != null) {
+                  try {
                     a.addPS(pp); 
   
                     // add beliefs (when the plans are loaded, so the events are relevant
@@ -139,8 +144,11 @@ void ag(Agent a) : { List bbl = new LinkedList(); PlanLibrary pp;  }
                        } catch (Exception e) {}
                        a.addBel(l, BeliefBase.TSelf, c, Intention.EmptyInt);
                     }
-                 }
-               }
+                  } catch (JasonException je) {
+                     System.err.println("Error:"+je);
+                  }
+                }
+              }
 }
 
 /* Beliefs */
@@ -157,7 +165,12 @@ void bs(List bbl) : { Literal F; }
 /* Plans */
 PlanLibrary ps() : { PlanLibrary pp = new PlanLibrary(); Plan pl;  }
 {
-  ( pl = p()       { pp.add(pl); } 
+  ( pl = p()       { try {
+                       pp.add(pl); 
+                     } catch (JasonException je) {
+                       System.err.println("Error adding plan:"+je);
+                     }
+                   } 
   )*
                    { return pp; }
 }

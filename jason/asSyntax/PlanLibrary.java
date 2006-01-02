@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.6  2006/01/02 13:49:00  jomifred
+//   add plan unique id, fix some bugs
+//
 //   Revision 1.5  2005/12/30 20:40:16  jomifred
 //   new features: unnamed var, var with annots, TE as var
 //
@@ -36,11 +39,15 @@
 package jason.asSyntax;
 
 
+import jason.JasonException;
+
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -62,8 +69,27 @@ public class PlanLibrary {
 	/** list of plans that have var as TE */
 	List varPlans = new ArrayList();
 	
+	/** Set of plans labels */
+	Set planLabels = new HashSet();
+	
+	private static int lastPlanLabel = 0;
 
-    public void add(Plan p) {
+    public void add(Plan p) throws JasonException {
+    	// test p.label
+    	if (p.getLabel() != null && planLabels.contains(p.getLabel())) {
+    		throw new JasonException("There already is a plan with label "+p.getLabel());
+    	}
+    	
+    	// add label, if necessary
+    	if (p.getLabel() == null) {
+    		String l;
+    		do {
+    			l = "l"+(lastPlanLabel++);
+    		} while (planLabels.contains(l));
+    		p.setLabel(l);
+    	}
+    	planLabels.add(p.getLabel());
+    	
     	// trim the plan
     	if (p.body != null) {
     		p.body.trimToSize();
@@ -91,10 +117,9 @@ public class PlanLibrary {
     	
         //codes.add(new Integer(p.tevent.hashCode()));
         plans.add(p);
-        
     }
 
-	public void addAll(PlanLibrary pl) {
+	public void addAll(PlanLibrary pl) throws JasonException {
 		Iterator i = pl.getPlans().iterator();
 		while (i.hasNext()) {
 			Plan p = (Plan)i.next(); 
@@ -133,6 +158,7 @@ public class PlanLibrary {
             	relPlans.remove(p.tevent.getFunctorArity());
             }
         }
+        planLabels.remove(p.getLabel());
         return p;
     }
 

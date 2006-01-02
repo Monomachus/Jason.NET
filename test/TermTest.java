@@ -88,7 +88,6 @@ public class TermTest extends TestCase {
 	}
 
 	public void testUnifies() {
-		
 		assertTrue(new Unifier().unifies(new Term("a"), new Term("a")));
 		assertTrue(new Unifier().unifies(new Term("a"), new VarTerm("X")));
 		

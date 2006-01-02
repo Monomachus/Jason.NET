@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.18  2006/01/02 13:49:00  jomifred
+//   add plan unique id, fix some bugs
+//
 //   Revision 1.17  2005/12/31 16:29:58  jomifred
 //   add operator =..
 //
@@ -71,11 +74,6 @@ public class Unifier implements Cloneable {
 
 	private HashMap function = new HashMap();
     
-    // TODO JOMI: try to not clone and apply before unifing, since this method is
-    // a bottleneck (clone/apply consumes memory/cpu). Initial proposal: use
-    // "t1.equals(t2, this)", ie, the equals will consider the unifier to check
-    // equality.
-
     public void apply(Term t) {
     	if (t.isExpr()) {
     		ExprTerm et = (ExprTerm)t;
@@ -173,8 +171,10 @@ public class Unifier implements Cloneable {
         }
     }
     
+    // ----- Unify for Terms
+    
     public boolean unifiesNoClone(Term t1g, Term t2g) {
-		List t1gl = t1g.getTerms();
+    	List t1gl = t1g.getTerms();
 		List t2gl = t2g.getTerms();
 
 		/*
@@ -275,6 +275,9 @@ public class Unifier implements Cloneable {
 		} 
 					    
 		for (int i=0; i < t1g.getTermsSize(); i++) {
+			//System.out.println("*un "+t1g.getTerm(i)+"="+t2g.getTerm(i)+" result "+unifies2(t1g.getTerm(i),t2g.getTerm(i))+" u="+this);
+			apply(t1g.getTerm(i));
+			apply(t2g.getTerm(i));
             if (!unifies2NoClone(t1g.getTerm(i),t2g.getTerm(i)))
                 return false;
 		}

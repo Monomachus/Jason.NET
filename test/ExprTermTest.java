@@ -31,7 +31,6 @@ public class ExprTermTest extends TestCase {
 		//System.out.println(nb+"="+nb.solve());
 		assertTrue(nb.solve() == 13.2);
 	}
-
 	public void testApply() {
 		NumberTerm nb = ExprTerm.parseExpr("(30-X)/(2*X)");
 		Unifier u = new Unifier();

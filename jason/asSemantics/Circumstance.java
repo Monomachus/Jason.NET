@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.11  2006/01/02 13:49:00  jomifred
+//   add plan unique id, fix some bugs
+//
 //   Revision 1.10  2005/12/30 20:40:16  jomifred
 //   new features: unnamed var, var with annots, TE as var
 //
@@ -73,6 +76,7 @@ public class Circumstance implements Serializable {
 	protected Option    SO;
 
     protected Intention SI;
+    //protected Intention AI; // atomic intention
     protected Map       PA;
     protected List      FA;
 

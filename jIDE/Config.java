@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.4  2006/01/02 13:49:00  jomifred
+//   add plan unique id, fix some bugs
+//
 //   Revision 1.3  2005/12/30 20:40:16  jomifred
 //   new features: unnamed var, var with annots, TE as var
 //
@@ -124,7 +127,7 @@ public class Config extends Properties {
 		
     	// fix java home
         if (get(JAVA_HOME) == null || !checkJavaHomePath(getProperty(JAVA_HOME))) {
-        	String javaHome = System.getProperty(JAVA_HOME);
+        	String javaHome = System.getProperty("java.home");
         	if (checkJavaHomePath(javaHome)) {
         		setJavaHome(javaHome);
         	} else {
@@ -282,4 +285,7 @@ public class Config extends Properties {
 		return null;
  	}
     
+	public static void main(String[] args) {
+		Config.get().fix();
+	}
 }
