@@ -23,18 +23,17 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.11  2006/01/02 14:50:40  jomifred
+//   change in =.. (annots is the last arg)
+//
 //   Revision 1.10  2005/12/31 16:29:58  jomifred
 //   add operator =..
 //
 //   Revision 1.9  2005/12/30 20:40:16  jomifred
 //   new features: unnamed var, var with annots, TE as var
 //
-//   Revision 1.8  2005/12/20 19:52:05  jomifred
-//   no message
-//
 //   Revision 1.7  2005/08/12 22:26:08  jomifred
 //   add cvs keywords
-//
 //
 //----------------------------------------------------------------------------
 
@@ -138,33 +137,37 @@ public class Literal extends Pred implements Cloneable {
 		return getFunctorArity().hashCode();
 	}
 
-	/** returns this literal as a list [<functor>, <list of annots>, <term1>, <term2>, ...] */
+	/** returns this literal as a list [<functor>, <term1>, <term2>, ..., <list of annots>] */
 	public ListTerm getAsListOfTerms() {
 		ListTerm l = new ListTermImpl();
 		l.add(new Literal(type, new Pred(getFunctor())));
-		if (getAnnots() == null || getAnnots().isEmpty()) {
-			l.add(new ListTermImpl());
-		} else {
-			l.add(getAnnots().clone());
-		}
 		if (getTerms() != null) {
 			Iterator i = getTerms().iterator();
 			while (i.hasNext()) {
 				l.add( ((Term)i.next()).clone());
 			}
 		}
+		if (getAnnots() == null || getAnnots().isEmpty()) {
+			l.add(new ListTermImpl());
+		} else {
+			l.add(getAnnots().clone());
+		}
 		return l;
 	}
 
-	/** creates a literal from a list [<functor>, <list of annots>, <term1>, <term2>, ...] */
+	/** creates a literal from a list [<functor>, <term1>, <term2>, ..., <list of annots>] */
 	public static Literal newFromListOfTerms(ListTerm lt) throws JasonException {
 		try {
 			Iterator i = lt.iterator();
 			Literal l = (Literal)((Literal)i.next()).clone();
-			if (i.hasNext()) {
-				l.setAnnots((ListTerm)((ListTerm)i.next()).clone());
-				while (i.hasNext()) {
-					l.addTerm((Term)((Term)i.next()).clone());
+			while (i.hasNext()) {
+				Term t = (Term)((Term)i.next()).clone();
+				// is the last term (list of annots)
+				if (!i.hasNext() && t.isList()) {
+					l.setAnnots((ListTerm)t);
+				} else {
+					// t is a term
+					l.addTerm(t);
 				}
 			}
 			return l;

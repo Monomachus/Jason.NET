@@ -218,11 +218,11 @@ public class StdLibTest extends TestCase {
 		Literal l = Literal.parseLiteral("~p(t1,t2)[a1,a2]");
 		assertEquals(l.getAsListOfTerms().size(), 4);
 
-		ListTerm lt1 = ListTermImpl.parseList("[~p,[a1,a2],t1,t2]");
+		ListTerm lt1 = ListTermImpl.parseList("[~p,t1,t2,[a1,a2]]");
 		assertTrue(l.equals(Literal.newFromListOfTerms(lt1)));
-		ListTerm lt2 = ListTermImpl.parseList("[p,[a1,a2],t1,t2]");
+		ListTerm lt2 = ListTermImpl.parseList("[p,t1,t2,[a1,a2]]");
 		assertFalse(l.equals(Literal.newFromListOfTerms(lt2)));
-		ListTerm lt3 = ListTermImpl.parseList("[~p,[a1,a2,a3],t1,t2]");
+		ListTerm lt3 = ListTermImpl.parseList("[~p,t1,t2,[a1,a2,a3]]");
 		assertFalse(l.equals(Literal.newFromListOfTerms(lt3)));
 		
 		Unifier u = new Unifier();
