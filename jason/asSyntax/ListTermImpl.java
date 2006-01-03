@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.4  2006/01/03 00:17:05  jomifred
+//   change in =.. (using two lists, list of terms and list of annots)
+//
 //   Revision 1.3  2005/12/30 20:40:16  jomifred
 //   new features: unnamed var, var with annots, TE as var
 //
@@ -370,9 +373,10 @@ public class ListTermImpl extends Term implements ListTerm {
 		return add((Term)o) != null;
 	}
 	public boolean addAll(Collection c) {
+		ListTerm lt = this; // where to add
 		Iterator i = c.iterator();
 		while (i.hasNext()) {
-			add(i.next());
+			lt = lt.add((Term)i.next());
 		}
 		return true;
 	}

@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.2  2006/01/03 00:17:05  jomifred
+//   change in =.. (using two lists, list of terms and list of annots)
+//
 //   Revision 1.1  2005/12/31 16:29:11  jomifred
 //   add operator =..
 //
@@ -43,13 +46,13 @@ import jason.asSyntax.Term;
 /** 
  * This IA implements the =.. operator
  * 
- * Literal =.. [functor, list of annots, term0, term1, ... ]
+ * Literal =.. [functor, list of terms, list of annots]
  * 
- * Example: X =.. [~p, [a1,a2], t1, t2]
+ * Example: X =.. [~p, [t1, t2], [a1,a2]]
  *          X is ~p(t1,t2)[a1,a2]
  *          
- *          ~p(t1,t2)[a1,a2] = X
- *          X is [~p, [a1,a2], t1, t2]
+ *          ~p(t1,t2)[a1,a2] =.. X
+ *          X is [~p, [t1, t2], [a1,a2]]
  * 
  * @author jomi
  */

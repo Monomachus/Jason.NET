@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.12  2006/01/03 00:17:05  jomifred
+//   change in =.. (using two lists, list of terms and list of annots)
+//
 //   Revision 1.11  2006/01/02 14:50:40  jomifred
 //   change in =.. (annots is the last arg)
 //
@@ -137,38 +140,33 @@ public class Literal extends Pred implements Cloneable {
 		return getFunctorArity().hashCode();
 	}
 
-	/** returns this literal as a list [<functor>, <term1>, <term2>, ..., <list of annots>] */
+	/** returns this literal as a list [<functor>, <list of terms>, <list of annots>] */
 	public ListTerm getAsListOfTerms() {
 		ListTerm l = new ListTermImpl();
 		l.add(new Literal(type, new Pred(getFunctor())));
+		ListTerm lt = new ListTermImpl();
 		if (getTerms() != null) {
-			Iterator i = getTerms().iterator();
-			while (i.hasNext()) {
-				l.add( ((Term)i.next()).clone());
-			}
+			lt.addAll(getTerms());
 		}
-		if (getAnnots() == null || getAnnots().isEmpty()) {
-			l.add(new ListTermImpl());
-		} else {
+		l.add(lt);
+		if (getAnnots() != null && !getAnnots().isEmpty()) {
 			l.add(getAnnots().clone());
+		} else {
+			l.add(new ListTermImpl());
 		}
 		return l;
 	}
 
-	/** creates a literal from a list [<functor>, <term1>, <term2>, ..., <list of annots>] */
+	/** creates a literal from a list [<functor>, <list of terms>, <list of annots>] */
 	public static Literal newFromListOfTerms(ListTerm lt) throws JasonException {
 		try {
 			Iterator i = lt.iterator();
 			Literal l = (Literal)((Literal)i.next()).clone();
-			while (i.hasNext()) {
-				Term t = (Term)((Term)i.next()).clone();
-				// is the last term (list of annots)
-				if (!i.hasNext() && t.isList()) {
-					l.setAnnots((ListTerm)t);
-				} else {
-					// t is a term
-					l.addTerm(t);
-				}
+			if (i.hasNext()) {
+				l.addTerms((ListTerm)((ListTerm)i.next()).clone());
+			}
+			if (i.hasNext()) {
+				l.setAnnots((ListTerm)((ListTerm)i.next()).clone());
 			}
 			return l;
 		} catch (Exception e) {
