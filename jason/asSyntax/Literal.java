@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.13  2006/01/04 02:54:41  jomifred
+//   using java log API instead of apache log
+//
 //   Revision 1.12  2006/01/03 00:17:05  jomifred
 //   change in =.. (using two lists, list of terms and list of annots)
 //
@@ -47,8 +50,9 @@ import jason.asSyntax.parser.as2j;
 
 import java.io.StringReader;
 import java.util.Iterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import org.apache.log4j.Logger;
 
 /**
  * A Literal is a Pred with strong negation (~).
@@ -88,7 +92,7 @@ public class Literal extends Pred implements Cloneable {
 		try {
 			return parser.l();
 		} catch (Exception e) {
-			logger.error("Error parsing literal " + sLiteral,e);
+			logger.log(Level.SEVERE,"Error parsing literal " + sLiteral,e);
 			return null;
 		}
 	}
@@ -124,7 +128,7 @@ public class Literal extends Pred implements Cloneable {
 	}
 
 	public Object clone() {
-		return new Literal(type, (Pred) super.clone());
+		return new Literal(type, (Pred)this);
 	}
 
 	

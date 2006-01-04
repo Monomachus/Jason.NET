@@ -97,8 +97,12 @@ public class AgentParameters {
 		Iterator i = options.keySet().iterator();
 		while (i.hasNext()) {
 			String key = (String) i.next();
-			s += v + key + "=" + changeQuotes((String)options.get(key));
-			v = ",";
+			if (!(debug && key.equals("verbose"))) {
+				if (!( (forceSync || debug) && key.equals("synchronised"))) {
+					s += v + key + "=" + changeQuotes((String)options.get(key));
+					v = ",";
+				}
+			}
 		}
 		if (s.length() > 0) {
 			s = " options " + s;

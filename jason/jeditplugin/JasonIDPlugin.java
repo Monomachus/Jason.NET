@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.9  2006/01/04 03:00:46  jomifred
+//   using java log API instead of apache log
+//
 //   Revision 1.8  2005/12/19 22:53:31  jomifred
 //   no message
 //
@@ -54,10 +57,6 @@ import jason.mas2j.MAS2JProject;
 
 import javax.swing.SwingUtilities;
 
-import org.apache.log4j.ConsoleAppender;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PatternLayout;
 import org.gjt.sp.jedit.EBMessage;
 import org.gjt.sp.jedit.EBPlugin;
 import org.gjt.sp.jedit.gui.DockableWindowManager;
@@ -73,9 +72,6 @@ public class JasonIDPlugin extends EBPlugin {
     public static final String OPTION_PREFIX   = "options.jason.";
 
     static {
-		Logger.getRootLogger().addAppender(new ConsoleAppender(new PatternLayout("[%c{1}] %m%n")));
-		Logger.getRootLogger().setLevel(Level.INFO);    
-		
 		try {
 			Class.forName(JasonIDOptionPanel.class.getName()); // just to run static init
 		} catch (Exception e) {}

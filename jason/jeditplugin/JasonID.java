@@ -46,7 +46,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.EOFException;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -177,14 +176,6 @@ public class JasonID extends JPanel implements EBComponent, RunningMASListener {
 			}
 		});
 		toolBar.add(btRun);
-		
-		btStop = createToolBarButton("Stop MAS", GUIUtilities.loadIcon("Stop.png"), new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				stopMAS();
-			}
-		});
-		btStop.setEnabled(false);
-		toolBar.add(btStop);
 
 		btDebug = createToolBarButton("Debug MAS", GUIUtilities.loadIcon("RunAgain.png"), new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -193,6 +184,14 @@ public class JasonID extends JPanel implements EBComponent, RunningMASListener {
 		});
 		toolBar.add(btDebug);
 		
+		
+		btStop = createToolBarButton("Stop MAS", GUIUtilities.loadIcon("Stop.png"), new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				stopMAS();
+			}
+		});
+		btStop.setEnabled(false);
+		toolBar.add(btStop);
 
 		toolBar.addSeparator();
 		toolBar.add(createToolBarButton("New MAS", GUIUtilities.loadIcon("NewDir.png"), new ActionListener() {
@@ -492,32 +491,32 @@ public class JasonID extends JPanel implements EBComponent, RunningMASListener {
 	public void editLog() {
 		Buffer curBuf = getProjectBuffer();
         try {
-        	InputStream in = JasonID.class.getResource("/"+RunCentralisedMAS.logPropFile).openStream();
         	File f = new File(curBuf.getDirectory() + File.separator + RunCentralisedMAS.logPropFile);
         	if (f.exists()) {
-        		in = new FileInputStream(f);
+        		Buffer b = org.gjt.sp.jedit.jEdit.openFile(view, f.getAbsolutePath());
+        	} else {
+        		InputStream in = JasonID.class.getResource("/"+RunCentralisedMAS.logPropFile).openStream();
+        		StringBuffer content = new StringBuffer();
+	    		try {
+	    			int c = in.read();
+	    			while (c != -1) {
+	    				content.append((char)c);
+	    				c = in.read();
+	    			}
+	    		} catch (EOFException e) {
+	    		} catch (IOException e) {
+	    			System.err.println("Error reading text!");
+	    			e.printStackTrace();
+	    		}
+	    		Buffer b = org.gjt.sp.jedit.jEdit.openFile(view, f.getAbsolutePath());
+				try {
+					b.writeLock();
+					b.insert(0,content.toString());
+					b.save(view,f.getAbsolutePath());
+				} finally {
+					b.writeUnlock();
+				}
         	}
-    		StringBuffer content = new StringBuffer();
-    		try {
-    			int c = in.read();
-    			while (c != -1) {
-    				content.append((char)c);
-    				c = in.read();
-    			}
-    		} catch (EOFException e) {
-    		} catch (IOException e) {
-    			System.err.println("Error reading text!");
-    			e.printStackTrace();
-    		}
-    		Buffer b = org.gjt.sp.jedit.jEdit.openFile(view, f.getAbsolutePath());
-			try {
-				b.writeLock();
-				b.insert(0,content.toString());
-				b.save(view,f.getAbsolutePath());
-			} finally {
-				b.writeUnlock();
-			}
-				
         } catch (Exception ex) {
         	ex.printStackTrace();
         }

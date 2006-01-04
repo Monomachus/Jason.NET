@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.27  2006/01/04 02:54:41  jomifred
+//   using java log API instead of apache log
+//
 //   Revision 1.26  2005/12/30 20:40:16  jomifred
 //   new features: unnamed var, var with annots, TE as var
 //
@@ -553,7 +556,6 @@ public class RunMAS extends AbstractAction {
 			if (start) {
 				sStart = " start "; 
 			}
-			// TODO: get comspec env. variable
 			return Config.get().getShellCommand() + sStart + scriptName + ".bat";
 		} else {
 			return Config.get().getShellCommand() + " " + scriptName + ".sh";

@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.6  2006/01/04 03:00:46  jomifred
+//   using java log API instead of apache log
+//
 //   Revision 1.5  2005/12/18 15:31:02  jomifred
 //   no message
 //
@@ -325,9 +328,13 @@ public class MAS2JProject {
 			}
 		}
 
-		return outdelim + "." + File.pathSeparator + indelim + Config.get().getJasonJar()
-				+ indelim + File.pathSeparator + indelim + Config.get().getSaciJar() + indelim
-				+ File.pathSeparator + indelim + Config.get().getProperty(Config.LOG4J_JAR) + indelim
+		String saciJar = "";
+		if (isSaciArch()) {
+			saciJar = File.pathSeparator + indelim + Config.get().getSaciJar() + indelim;
+		}
+		return outdelim + "." + File.pathSeparator + indelim + Config.get().getJasonJar() + indelim
+				+ saciJar
+				//+ File.pathSeparator + indelim + Config.get().getProperty(Config.LOG4J_JAR) + indelim
 				+ File.pathSeparator + indelim + dDir + indelim
 				+ File.pathSeparator + sLib + clPath + outdelim;
 	}

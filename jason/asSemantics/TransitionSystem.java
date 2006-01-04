@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.31  2006/01/04 02:54:41  jomifred
+//   using java log API instead of apache log
+//
 //   Revision 1.30  2006/01/02 13:49:00  jomifred
 //   add plan unique id, fix some bugs
 //
@@ -72,7 +75,6 @@
 package jason.asSemantics;
 
 import jason.JasonException;
-import jason.Settings;
 import jason.architecture.AgArchInterface;
 import jason.asSyntax.BeliefBase;
 import jason.asSyntax.BodyLiteral;
@@ -82,6 +84,7 @@ import jason.asSyntax.Plan;
 import jason.asSyntax.Pred;
 import jason.asSyntax.Term;
 import jason.asSyntax.Trigger;
+import jason.runtime.Settings;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -89,8 +92,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.log4j.Logger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class TransitionSystem {
 
@@ -152,7 +155,7 @@ public class TransitionSystem {
 		
 		setLogger(agArch);
 		if (setts != null) {
-			logger.setLevel(setts.log4JLevel());
+			logger.setLevel(setts.logLevel());
 		}
 	}
 	
@@ -314,7 +317,7 @@ public class TransitionSystem {
 		else {
 			if (conf.C.SE.trigger.isGoal()) {
 				generateGoalDeletionFromEvent();
-				logger.warn("Found a goal for which there is no relevant plan:\n"+ conf.C.SE);
+				logger.warning("Found a goal for which there is no relevant plan:\n"+ conf.C.SE);
 			}
 			// e.g. belief addition as internal event, just go ahead
 			else if (conf.C.SE.isInternal()) {
@@ -331,7 +334,7 @@ public class TransitionSystem {
 
 	private void applyApplPl() throws JasonException {
 		if (confP.C.RP == null) {
-			logger.warn("applyPl was called even RP is null!");
+			logger.warning("applyPl was called even RP is null!");
 			confP.step = SProcAct;
 			return;
 		}
@@ -343,7 +346,7 @@ public class TransitionSystem {
 		} else { // Rule Appl2
 			if (conf.C.SE.trigger.isGoal()) {
 				generateGoalDeletionFromEvent(); // can't carry on, no applicable plan.
-				logger.warn("Found a goal for which there is no applicable plan:\n"+ conf.C.SE);
+				logger.warning("Found a goal for which there is no applicable plan:\n"+ conf.C.SE);
 			}
 			// e.g. belief addition as internal event, just go ahead
 			// but note that the event was relevant, yet it is possible
@@ -368,7 +371,7 @@ public class TransitionSystem {
 		if (confP.C.SO != null) {
 			confP.step = SAddIM;
 		} else {
-			logger.warn("selectOption returned null.");
+			logger.warning("selectOption returned null.");
 			generateGoalDeletionFromEvent(); // can't carry on, no applicable plan.
 			confP.step = SProcAct;
 		}
@@ -431,7 +434,7 @@ public class TransitionSystem {
 		// "remember" that it worth searching for an atomic? Do you
 		// understand what I mean?
 		// RAFA: Yes. But I do not fix it yet. (i've tried, see comments in this method 
-		// and ClrInt)
+		// and ClrInt) Circumstance.AI
 
 		confP.step = SExecInt; // default next step
 		
@@ -506,7 +509,7 @@ public class TransitionSystem {
 			return getIA(name).execute(this, un, action.getTermsArray());
 			
 		} catch (ClassNotFoundException e) {
-			logger.error("Error in IA ",e);
+			logger.log(Level.SEVERE, "Error in IA ", e);
 			return false;
 		} catch (ClassCastException e) {
 			// tries it as old internal action (static + string pars)
@@ -532,7 +535,7 @@ public class TransitionSystem {
 			}
 	
 		} catch (Exception e) {
-			logger.error("Error in IA ",e);
+			logger.log(Level.SEVERE,"Error in IA ",e);
 			return false;
 		}
 	}
@@ -578,7 +581,7 @@ public class TransitionSystem {
 					im.unif = ubel;
 					updateIntention();
 				} else {
-					logger.warn("Test Goal '"+h+"' failed as simple query. Generating internal event for it...");
+					logger.warning("Test Goal '"+h+"' failed as simple query. Generating internal event for it...");
 					u.apply(l);
 					conf.C.addTestGoal(l, conf.C.SI);
 				}
@@ -586,7 +589,6 @@ public class TransitionSystem {
 				
 			// Rule AddBel
 			case BodyLiteral.HAddBel:
-				
 				Term source = BeliefBase.TSelf;
 				if (l.hasSource()) {
 					source = null; // do not add source(self) in case the programmer set the source
@@ -799,7 +801,7 @@ public class TransitionSystem {
 			im = conf.C.SI.get(0);
 			confP.C.addExternalEv(tevent);
 		} else {
-			logger.warn("Could not finish intention: " + conf.C.SI);
+			logger.warning("Could not finish intention: " + conf.C.SI);
 		}
 	}
 
@@ -809,18 +811,18 @@ public class TransitionSystem {
 		// TODO: double check all cases here
 		if (ev.trigger.isAddition() && ev.trigger.isGoal() && ev.isInternal()) {
 			confP.C.delGoal(ev.getTrigger().getGoal(), ev.getTrigger().getLiteral(), ev.intention);
-			logger.warn("Generating goal deletion from event: " + ev);
+			logger.warning("Generating goal deletion from event: " + ev);
 		}
 		else if (ev.isInternal()) {
-			logger.warn("Could not finish intention: " + ev.intention);
+			logger.warning("Could not finish intention: " + ev.intention);
 		}
 		// if "discard" is set, we are deleting the whole intention!
 		// it is simply not going back to I nor anywhere else!
 		else if (setts.requeue()) {
 			confP.C.addEvent(ev);
-			logger.warn("Requeing external event: " + ev);
+			logger.warning("Requeing external event: " + ev);
 		} else
-			logger.warn("Discarding external event: " + ev);
+			logger.warning("Discarding external event: " + ev);
 	}
 
 	/** ********************************************************************* */
@@ -832,7 +834,7 @@ public class TransitionSystem {
 	/** waits for a new message */
 	synchronized private void waitMessage() {
 		try {
-			logger.debug("Waiting message....");
+			logger.fine("Waiting message....");
 			wait(500); // wait for messages
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -903,13 +905,13 @@ public class TransitionSystem {
 			if (nrcslbr >= setts.nrcbp() || canSleep()) {
 				nrcslbr = 0;
 				
-				logger.debug("perceiving...");
+				//logger.fine("perceiving...");
 				List percept = agArch.perceive();
 
-				logger.debug("checking mail...");
+				//logger.fine("checking mail...");
 				agArch.checkMail();
 
-				logger.debug("doing belief revision...");
+				//logger.fine("doing belief revision...");
 				ag.brf(percept);
 			}
 
@@ -935,7 +937,7 @@ public class TransitionSystem {
 				applySemanticRule();
 			} while (step != SStartRC); // finished a reasoning cycle
 
-			logger.debug("acting... ");
+			//logger.fine("acting... ");
 			agArch.act();
 
 			// counting number of cycles since last belief revision
@@ -949,14 +951,14 @@ public class TransitionSystem {
 					// no problem, the plan has no label
 					//logger.error("E!",e);
 				}
-				if (logger.isDebugEnabled()) {
-					logger.debug("Informing controller that I finished a reasoning cycle. Breakpoint is "+isBreakPoint);
+				if (logger.isLoggable(Level.FINE)) {
+					logger.fine("Informing controller that I finished a reasoning cycle. Breakpoint is "+isBreakPoint);
 				}
 				agArch.informCycleFinished(isBreakPoint);
 			}
 			
 		} catch (Exception e) {
-			logger.error("*** ERROR in the transition system: ",e);
+			logger.log(Level.SEVERE, "*** ERROR in the transition system: ",e);
 		}
 	}
 

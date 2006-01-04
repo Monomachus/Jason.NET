@@ -12,11 +12,6 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.apache.log4j.ConsoleAppender;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PatternLayout;
-
 /** JUnit test case for syntax package */
 public class ListTermTest extends TestCase {
 
@@ -25,8 +20,8 @@ public class ListTermTest extends TestCase {
 	protected void setUp() throws Exception {
 		super.setUp();
 
-		Logger.getRootLogger().addAppender(new ConsoleAppender(new PatternLayout("[%c{1}] %m%n")));
-    	Logger.getRootLogger().setLevel(Level.DEBUG);
+		//Logger.getRootLogger().addAppender(new ConsoleAppender(new PatternLayout("[%c{1}] %m%n")));
+    	//Logger.getRootLogger().setLevel(Level.DEBUG);
 
 		l1 = ListTermImpl.parseList("[a,b,c]");
 		l2 = ListTermImpl.parseList("[a(1,2),b(r,t)|T]");

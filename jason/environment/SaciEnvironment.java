@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.10  2006/01/04 03:00:46  jomifred
+//   using java log API instead of apache log
+//
 //   Revision 1.9  2005/10/30 16:07:33  jomifred
 //   add comments
 //
@@ -41,8 +44,8 @@ import jason.asSyntax.Term;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-
-import org.apache.log4j.Logger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import saci.MessageHandler;
 
@@ -50,7 +53,7 @@ public class SaciEnvironment extends saci.Agent implements EnvironmentInterface 
 
 	private Environment fUserEnv;
 
-	static Logger logger = Logger.getLogger(SaciEnvironment.class);
+	static Logger logger = Logger.getLogger(SaciEnvironment.class.getName());
 
     public SaciEnvironment() {
     }
@@ -63,7 +66,7 @@ public class SaciEnvironment extends saci.Agent implements EnvironmentInterface 
             saci.Message m = new saci.Message("(tell :content environmentChanged)");
             mbox.broadcast(m);
         } catch (Exception e) {
-            logger.error("Error sending notifyEvents ",e);
+            logger.log(Level.SEVERE,"Error sending notifyEvents ",e);
         }
     }
 
@@ -83,7 +86,7 @@ public class SaciEnvironment extends saci.Agent implements EnvironmentInterface 
                 }
             }
         } catch (Exception e) {
-        	logger.error("Error sending notifyEvents ",e);
+        	logger.log(Level.SEVERE,"Error sending notifyEvents ",e);
         }
     }
     
@@ -94,7 +97,7 @@ public class SaciEnvironment extends saci.Agent implements EnvironmentInterface 
             fUserEnv.setEnvironmentInfraTier(this);
 			fUserEnv.init(null);
         } catch (Exception e) {
-        	logger.error("Error in Saci Environment initAg",e);
+        	logger.log(Level.SEVERE,"Error in Saci Environment initAg",e);
             throw new JasonException("The user environment class instantiation '"+args[0]+"' fail!"+e.getMessage());
         }
         
@@ -124,7 +127,7 @@ public class SaciEnvironment extends saci.Agent implements EnvironmentInterface 
 						mbox.sendMsg(r);
                         
                     } catch (Exception e) {
-                    	logger.error("Error sending message "+r,e);
+                    	logger.log(Level.SEVERE,"Error sending message "+r,e);
                     }
                     return true; // no other message handler gives this message
                 }
@@ -158,7 +161,7 @@ public class SaciEnvironment extends saci.Agent implements EnvironmentInterface 
                         
                         mbox.sendMsg(r);
                     } catch (Exception e) {
-                    	logger.error("Error sending message "+e,e);
+                    	logger.log(Level.SEVERE,"Error sending message "+e,e);
                     }
                     return true; // no other message handler gives this message
                 }
@@ -166,7 +169,7 @@ public class SaciEnvironment extends saci.Agent implements EnvironmentInterface 
             
             
         } catch (Exception e) {
-        	logger.error("Error starting agent",e);
+        	logger.log(Level.SEVERE,"Error starting agent",e);
         }
     }
 

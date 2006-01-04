@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.19  2006/01/04 02:54:41  jomifred
+//   using java log API instead of apache log
+//
 //   Revision 1.18  2006/01/02 13:49:00  jomifred
 //   add plan unique id, fix some bugs
 //
@@ -63,14 +66,14 @@ import jason.asSyntax.VarTerm;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Logger;
 
-import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 public class Unifier implements Cloneable {
     
-	static Logger logger = Logger.getLogger(Unifier.class);
+	static Logger logger = Logger.getLogger(Unifier.class.getName());
 
 	private HashMap function = new HashMap();
     
@@ -78,9 +81,9 @@ public class Unifier implements Cloneable {
     	if (t.isExpr()) {
     		ExprTerm et = (ExprTerm)t;
     		// apply values to expression variables
-    		apply( (Term)et.getLHS()); // TODO: remove this cast when NumberTerm is sub-term interface
+    		apply( (Term)et.getLHS());
     		if (!et.isUnary()) {
-    			apply( (Term)et.getRHS());// TODO: remove this cast when NumberTerm is sub-term interface
+    			apply( (Term)et.getRHS());
     		}
     		et.setValue(new NumberTermImpl(et.solve()));
     	} else if (t.isVar()) {
@@ -95,7 +98,7 @@ public class Unifier implements Cloneable {
 			}
 			return;
 		}
-		for (int i = 0; i < t.getTermsSize(); i++) {
+		for (int i = 0; i < t.getTermsSize(); i++) { // do not use iterator! (see ListTermImpl class)
 			apply(t.getTerm(i));
 		}
     }
@@ -141,7 +144,7 @@ public class Unifier implements Cloneable {
 	
 			return null; // no value!
 		} catch (StackOverflowError e) {
-			logger.error("Stack overflow in unifier.get!\n\t"+this,e);
+			logger.severe("Stack overflow in unifier.get!\n\t"+this);
 			return null;
 		} catch (ClassCastException e) {
 			return vl;
@@ -174,8 +177,8 @@ public class Unifier implements Cloneable {
     // ----- Unify for Terms
     
     public boolean unifiesNoClone(Term t1g, Term t2g) {
-    	List t1gl = t1g.getTerms();
-		List t2gl = t2g.getTerms();
+    	List t1gts = t1g.getTerms();
+		List t2gts = t2g.getTerms();
 
 		/*
 		// check if an expression needs solving, before anything else
@@ -226,8 +229,7 @@ public class Unifier implements Cloneable {
         	}
             
 			// different arities
-        	if ( (t1gl==null && t2gl!=null)   ||
-					(t1gl!=null && t2gl==null) ) {
+        	if ( (t1gts==null && t2gts!=null) || (t1gts!=null && t2gts==null) ) {
 				return false;
 			}
 			if (t1g.getTermsSize() != t2g.getTermsSize()) {
@@ -268,18 +270,18 @@ public class Unifier implements Cloneable {
 		}
 		
         // both are structures, same funcSymb, same arity
-		if (!t1g.isList() && !t2g.isList()) { // lists have always terms == null
-            if (t1gl == null &&  t2gl == null) {
-                return true;
-            }
+        if (t1gts == null && t2gts == null && !t1g.isList() && !t2g.isList()) { // lists have always terms == null
+        	return true;
 		} 
 					    
-		for (int i=0; i < t1g.getTermsSize(); i++) {
-			//System.out.println("*un "+t1g.getTerm(i)+"="+t2g.getTerm(i)+" result "+unifies2(t1g.getTerm(i),t2g.getTerm(i))+" u="+this);
-			apply(t1g.getTerm(i));
-			apply(t2g.getTerm(i));
-            if (!unifies2NoClone(t1g.getTerm(i),t2g.getTerm(i)))
+		for (int i=0; i < t1g.getTermsSize(); i++) { // do not use iterator! (see ListTermImpl class)
+			Term t1 = t1g.getTerm(i);
+			Term t2 = t2g.getTerm(i);
+			apply(t1);
+			apply(t2);
+            if (!unifies2NoClone(t1,t2)) {
                 return false;
+            }
 		}
 		return true;
     }
@@ -362,6 +364,8 @@ public class Unifier implements Cloneable {
         
         // unify as Term
         boolean ok = unifiesNoClone((Term)np1, (Term)np2);
+
+        // clear annots of vars
         if (ok && np1.isVar() && np1.hasAnnot()) { //newAnnots1 != null) {
         	((Pred)function.get(np1.getFunctor())).setAnnots(null);
         	//((Pred)function.get(np1.getFunctor())).setAnnots(newAnnots1);

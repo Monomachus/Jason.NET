@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.14  2006/01/04 02:54:41  jomifred
+//   using java log API instead of apache log
+//
 //   Revision 1.13  2005/12/30 20:40:16  jomifred
 //   new features: unnamed var, var with annots, TE as var
 //
@@ -54,8 +57,9 @@ import java.io.Serializable;
 import java.io.StringReader;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import org.apache.log4j.Logger;
 
 /** 
  * A Pred is a Term with annotations, eg a(1)[an1,an2].
@@ -87,7 +91,7 @@ public class Pred extends Term implements Cloneable, Comparable, Serializable {
 		try {
 			return parser.at();
 		} catch (Exception e) {
-			logger.error("Error parsing predicate " + sPred,e);
+			logger.log(Level.SEVERE,"Error parsing predicate " + sPred,e);
 			return null;
 		}
 	}
@@ -251,7 +255,8 @@ public class Pred extends Term implements Cloneable, Comparable, Serializable {
 	}
 
 	/** 
-	 * "import" Annotations from another Predicate
+	 * "import" Annotations from another Predicate <i>p</i>.
+	 *  p will only contain the annots actually imported (for Event)
 	 */
 	public void importAnnots(Pred p) {
 		if (p.getAnnots() == null) {
@@ -267,16 +272,8 @@ public class Pred extends Term implements Cloneable, Comparable, Serializable {
 			if (!annots.contains(t)) {
 				annots.add(t.clone());
 			} else {
-				// TODO: why del? (jomi has removed it since it causes concurrent problems): 
-				// JOMI: o addBel vai precisar so da lista de anotacoes
-				// que foram ADICIONADAS pra gerar somente os eventos relativos
-				// aaquelas anotacoesque sao NOVAS. Eu acho que vai dar pau este teu comentario,
-				// so que nao temos teste pra estas coisas ainda -- ou temos teste
-				// e eu que nao entendo mais como funciona isto! :)))
-				
-				// Remove what is not new from l 
-				//p.delAnnot(t);
-				//i--;
+				// Remove what is not new from p 
+				i.remove();
 			}
 		}
 	}

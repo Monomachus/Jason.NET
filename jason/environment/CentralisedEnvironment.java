@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.11  2006/01/04 03:00:46  jomifred
+//   using java log API instead of apache log
+//
 //   Revision 1.10  2005/10/30 18:39:48  jomifred
 //   change in the AgArch customisation  support (the same customisation is used both to Cent and Saci infrastructures0
 //
@@ -51,8 +54,9 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import org.apache.log4j.Logger;
 
 /**
  * This class implements the centralised version of the environment tier.
@@ -68,7 +72,7 @@ public class CentralisedEnvironment implements EnvironmentInterface {
     /** the user customisation class for the environment */
 	private Environment fUserEnv;
     
-    static Logger logger = Logger.getLogger(CentralisedEnvironment.class);
+    static Logger logger = Logger.getLogger(CentralisedEnvironment.class.getName());
 	
     public CentralisedEnvironment(String userEnvClassName) throws JasonException {
         mboxes      = Collections.synchronizedMap(new HashMap());
@@ -79,7 +83,7 @@ public class CentralisedEnvironment implements EnvironmentInterface {
 			fUserEnv.setEnvironmentInfraTier(this);
 			fUserEnv.init(null);
         } catch (Exception e) {
-            logger.error("Error in Centralised MAS environment creation",e);
+            logger.log(Level.SEVERE,"Error in Centralised MAS environment creation",e);
             throw new JasonException("The user environment class instantiation '"+userEnvClassName+"' has failed!"+e.getMessage());
         }
     }
@@ -118,7 +122,7 @@ public class CentralisedEnvironment implements EnvironmentInterface {
                 if (agArch != null) {
                     agArch.getTS().newMessageHasArrived();
                 } else {
-                    logger.error("Error sending message notification: agent "+agName+" does not exist!");
+                    logger.log(Level.SEVERE,"Error sending message notification: agent "+agName+" does not exist!");
                 }
             }
         }
@@ -127,7 +131,7 @@ public class CentralisedEnvironment implements EnvironmentInterface {
     
     public void addAgent(AgArch agent) {
         if (mboxes.get(agent.getAgName()) != null) {
-        	logger.warn("Warning: adding an agent that already exists: "+ agent.getAgName());
+        	logger.warning("Warning: adding an agent that already exists: "+ agent.getAgName());
         }
         mboxes.put(agent.getAgName(), new LinkedList());
         agents.put(agent.getAgName(), agent);

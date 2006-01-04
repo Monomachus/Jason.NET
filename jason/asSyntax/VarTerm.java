@@ -23,8 +23,8 @@
 //   $Date$
 //   $Revision$
 //   $Log$
-//   Revision 1.18  2006/01/02 13:49:00  jomifred
-//   add plan unique id, fix some bugs
+//   Revision 1.19  2006/01/04 02:54:41  jomifred
+//   using java log API instead of apache log
 //
 //
 //----------------------------------------------------------------------------
@@ -38,8 +38,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
-
-import org.apache.log4j.Logger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 /**
@@ -59,7 +59,7 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
 
 	public VarTerm(String s) {
 		if (s != null && Character.isLowerCase(s.charAt(0))) {
-			logger.warn("Are you sure you want to create a VarTerm that begins with lowercase ("+s+")? Should it be a Term instead?");			
+			logger.warning("Are you sure you want to create a VarTerm that begins with lowercase ("+s+")? Should it be a Term instead?");			
 		}
 		setFunctor(s);
 	}
@@ -69,7 +69,7 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
 		try {
 			return parser.var();
 		} catch (Exception e) {
-			logger.error("Error parsing var " + sVar,e);
+			logger.log(Level.SEVERE,"Error parsing var " + sVar,e);
 			return null;
 		}
 	}
@@ -80,9 +80,10 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
 		t.setFunctor(super.getFunctor());
 		if (value != null) {
 			t.value = (Term)value.clone();
-		}
-		if (getAnnots() != null && !getAnnots().isEmpty()) {
-			t.setAnnots((ListTerm)getAnnots().clone());
+		} else {
+			if (getAnnots() != null && !getAnnots().isEmpty()) {
+				t.setAnnots((ListTerm)getAnnots().clone());
+			}
 		}
 		return t;
 	}
@@ -106,7 +107,7 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
 			VarTerm vlvl = (VarTerm)((VarTerm)vl).value; // not getValue! (use the "real" value)
 			while (vlvl != null) {
 				if (vlvl == this) {
-					logger.error("Attempted loop in VarTerm values of "+this.getFunctor());
+					logger.warning("Attempted loop in VarTerm values of "+this.getFunctor());
 					return false;
 				}
 				vlvl = (VarTerm)vlvl.value;
@@ -283,6 +284,9 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
 	public boolean isLiteral() {
 		return value != null && getValue().isLiteral();
 	}
+	public boolean isExpr() {
+		return value != null && getValue().isExpr();
+	}
 	
 	public boolean hasVar(Term t) {
 		if (value == null) {
@@ -454,7 +458,7 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
 		if (hasValue() && value.isNumber()) {
 			return ((NumberTerm)value).solve();
 		} else {
-			logger.error("Error getting numerical value of VarTerm "+this);
+			logger.warning("Error getting numerical value of VarTerm "+this);
 		}
 		return 0;
 	}

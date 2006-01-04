@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.7  2006/01/04 02:54:41  jomifred
+//   using java log API instead of apache log
+//
 //   Revision 1.6  2005/12/22 00:03:30  jomifred
 //   ListTerm is now an interface implemented by ListTermImpl
 //
@@ -43,8 +46,10 @@ package jason.asSyntax;
 import jason.asSyntax.parser.as2j;
 
 import java.io.StringReader;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import org.apache.log4j.Logger;
+
 
 /** represents an arithmetic expression like [ <ae> ] <+ | - | * | ...> <ae>.
  * 
@@ -87,7 +92,7 @@ public class ExprTerm extends VarTerm implements NumberTerm {
         try {
             return (NumberTerm)parser.ae();
         } catch (Exception e) {
-            logger.error("Error parsing expression "+sExpr,e);
+            logger.log(Level.SEVERE,"Error parsing expression "+sExpr,e);
 			return null;
         }
     }
@@ -96,14 +101,18 @@ public class ExprTerm extends VarTerm implements NumberTerm {
 	public Object clone() {
 		// do not call constructor with term parameter!
 		ExprTerm t = new ExprTerm();
-		if (lhs != null) {
-			t.lhs = (NumberTerm) lhs.clone();
-		}
-
-		t.op = this.op;
-		
-		if (rhs != null) {
-			t.rhs = (NumberTerm) rhs.clone();
+		if (hasValue()) {
+			t.setValue((Term)getValue().clone());
+		} else {
+			if (lhs != null) {
+				t.lhs = (NumberTerm) lhs.clone();
+			}
+	
+			t.op = this.op;
+			
+			if (rhs != null) {
+				t.rhs = (NumberTerm) rhs.clone();
+			}
 		}
 		return t;
 	}
@@ -189,23 +198,25 @@ public class ExprTerm extends VarTerm implements NumberTerm {
 */	
 
 	public void addTerm(Term t) {
-		logger.warn("Do not use addTerm in expressions!");
+		logger.warning("Do not use addTerm in expressions!");
 	}
 
 	public boolean isExpr() {
 		return !hasValue();
 	}
 	
+	/*
 	public boolean isVar() {
 		return false;
 	}
+	*/
 	
 	public boolean isUnary() {
 		return rhs == null;
 	}
 
 	public boolean isGround() {
-		return lhs.isGround() && rhs.isGround();
+		return hasValue() || (lhs.isGround() && rhs.isGround());
 	}
 	
 	public double solve() {
@@ -234,7 +245,7 @@ public class ExprTerm extends VarTerm implements NumberTerm {
 			case EOpow:   return Math.pow(l,r);
 			}
 		}
-		logger.error("ERROR IN EXPRESION!");
+		logger.log(Level.SEVERE,"ERROR IN EXPRESION!");
 		return 0;
 	}
 

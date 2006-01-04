@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.12  2006/01/04 02:54:41  jomifred
+//   using java log API instead of apache log
+//
 //   Revision 1.11  2005/12/30 20:40:16  jomifred
 //   new features: unnamed var, var with annots, TE as var
 //
@@ -49,8 +52,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -148,7 +152,7 @@ public class BeliefBase {
 				if (l.getTerms() != null) 
 					((ArrayList)l.getTerms()).trimToSize();
 			} catch (Exception e) {
-				logger.error("Error trimming literal's terms/annotations!",e);
+				logger.log(Level.SEVERE,"Error trimming literal's terms/annotations!",e);
 			}
 
 			String key = l.getFunctorArity();

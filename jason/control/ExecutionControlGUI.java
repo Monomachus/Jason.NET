@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.9  2006/01/04 03:00:46  jomifred
+//   using java log API instead of apache log
+//
 //   Revision 1.8  2005/09/04 17:03:23  jomifred
 //   using dispose instead of setVisible(false)
 //
@@ -48,12 +51,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
-import javax.swing.AbstractListModel;
 import javax.swing.BorderFactory;
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JList;
@@ -92,8 +92,9 @@ public class ExecutionControlGUI extends ExecutionControl {
 	JTextPane jTA = null;
 
 	JList jList = null;
-
-	MyListModel listModel;
+	JPanel spList;
+	
+	DefaultListModel listModel;
 
 	void initComponents() {
 		frame = new JFrame("MAS Execution Control");
@@ -125,7 +126,8 @@ public class ExecutionControlGUI extends ExecutionControl {
 		jTA.setContentType("text/html");
 		jTA.setAutoscrolls(false);
 		
-		JScrollPane spTA = new JScrollPane(jTA);
+		JPanel spTA = new JPanel(new BorderLayout());
+		spTA.add(BorderLayout.CENTER, new JScrollPane(jTA));
 		spTA.setBorder(BorderFactory.createTitledBorder(BorderFactory
 				.createEtchedBorder(), "Agent Inspection", TitledBorder.LEFT,
 				TitledBorder.TOP));
@@ -139,9 +141,10 @@ public class ExecutionControlGUI extends ExecutionControl {
 				TitledBorder.TOP));
         */
 		
-		listModel = new MyListModel();
+		listModel = new DefaultListModel();//MyListModel();
 		jList = new JList(listModel);
-		JScrollPane spList = new JScrollPane(jList);
+		spList = new JPanel(new BorderLayout());
+		spList.add(BorderLayout.CENTER, new JScrollPane(jList));
 		spList.setBorder(BorderFactory.createTitledBorder(BorderFactory
 				.createEtchedBorder(), "Agents", TitledBorder.LEFT,
 				TitledBorder.TOP));
@@ -243,7 +246,13 @@ public class ExecutionControlGUI extends ExecutionControl {
 		if (breakpoint) {
 			inRunMode = false;
 		}
-		listModel.addAgent(agName);
+		if (!listModel.contains(agName)) {
+			logger.fine("New agent "+agName);
+			listModel.addElement(agName);
+			//spList.removeAll();
+			//spList.add(new JScrollPane(jList));
+		}
+		//listModel.addAgent(agName);
 		super.receiveFinishedCycle(agName, breakpoint);
 	}
 
@@ -259,6 +268,7 @@ public class ExecutionControlGUI extends ExecutionControl {
 		}
 	}
 
+	/*
 	class MyListModel extends AbstractListModel {
 		List agents = new ArrayList();
 
@@ -279,4 +289,5 @@ public class ExecutionControlGUI extends ExecutionControl {
 			return agents.size();
 		}
 	}
+	*/
 }

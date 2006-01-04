@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.19  2006/01/04 02:54:41  jomifred
+//   using java log API instead of apache log
+//
 //   Revision 1.18  2005/12/05 16:04:47  jomifred
 //   Message content can be object
 //
@@ -59,8 +62,9 @@ import jason.environment.CentralisedEnvironment;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import org.apache.log4j.Logger;
 
 /**
  * This class provides an agent architecture when using Centralised
@@ -97,11 +101,10 @@ public class CentralisedAgArch extends Thread implements AgArchInterface {
             fUserAgArh = (AgArch)Class.forName(archClassName).newInstance();
             fUserAgArh.setInfraArch(this);
             fUserAgArh.initAg(args);
-    		logger.setLevel(fUserAgArh.getTS().getSettings().log4JLevel());
+    		logger.setLevel(fUserAgArh.getTS().getSettings().logLevel());
         } catch (Exception e) {
         	running = false;
-        	logger.error("as2j: error creating the agent class! - ",e);
-            throw new JasonException("as2j: error creating the agent class! - "+e);
+        	throw new JasonException("as2j: error creating the agent class! - "+e);
         }
     }
     
@@ -168,8 +171,8 @@ public class CentralisedAgArch extends Thread implements AgArchInterface {
     // Default perception assumes Complete and Accurate sensing.
     public List perceive() {
     	List percepts = fEnv.getUserEnvironment().getPercepts(getName());
-    	if (logger.isDebugEnabled()) { // to salve CPU time building the string
-    		logger.debug("percepts: "+percepts);
+    	if (logger.isLoggable(Level.FINE)) { // to salve CPU time building the string
+    		logger.fine("percepts: "+percepts);
     	}
         return percepts;
     }
@@ -214,7 +217,9 @@ public class CentralisedAgArch extends Thread implements AgArchInterface {
                 Message im = (Message)i.next();
                 fUserAgArh.getTS().getC().getMB().add(im);
                 i.remove();
-                logger.debug("received message: " + im);
+                if (logger.isLoggable(Level.FINE)) {
+                	logger.fine("received message: " + im);
+                }
             }
         }
     }

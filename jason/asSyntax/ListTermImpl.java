@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.5  2006/01/04 02:54:41  jomifred
+//   using java log API instead of apache log
+//
 //   Revision 1.4  2006/01/03 00:17:05  jomifred
 //   change in =.. (using two lists, list of terms and list of annots)
 //
@@ -51,8 +54,9 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import org.apache.log4j.Logger;
 
 /**
  * Each nth-ListTerm has both a term and the next ListTerm.
@@ -62,7 +66,6 @@ import org.apache.log4j.Logger;
  * @author jomi
  */
 public class ListTermImpl extends Term implements ListTerm {
-	// TODO: when using java 1.5, set List<Term>
 	
 	private Term term;
 	private Term next;
@@ -78,7 +81,7 @@ public class ListTermImpl extends Term implements ListTerm {
         try {
             return (ListTerm)parser.list();
         } catch (Exception e) {
-            logger.error("Error parsing list "+sList,e);
+            logger.log(Level.SEVERE,"Error parsing list "+sList,e);
 			return null;
         }
     }
@@ -168,7 +171,7 @@ public class ListTermImpl extends Term implements ListTerm {
 	}
 	
 	public void addTerm(Term t) {
-		logger.warn("Do not use addTerm in lists! Use add.");
+		logger.warning("Do not use addTerm in lists! Use add.");
 	}
 
 	public int size() {
@@ -439,11 +442,11 @@ public class ListTermImpl extends Term implements ListTerm {
 	}
 
 	public ListIterator listIterator() {
-		logger.error("listIterator() is not implemented!");
+		logger.warning("listIterator() is not implemented!");
 		return null;
 	}
 	public ListIterator listIterator(int arg0) {
-		logger.error("listIterator() is not implemented!");
+		logger.warning("listIterator() is not implemented!");
 		return null;
 	}
 

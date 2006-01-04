@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.1  2006/01/04 02:55:57  jomifred
+//   using java log API instead of apache log
+//
 //   Revision 1.11  2005/12/08 20:06:59  jomifred
 //   changes for JasonIDE plugin
 //
@@ -42,15 +45,15 @@
 //----------------------------------------------------------------------------
 
 
-package jason;
+package jason.runtime;
 
 import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 
 /** MAS Runtime Settings (from mas2j file) */
 public class Settings {
@@ -73,7 +76,7 @@ public class Settings {
 
     Map userParameters = new HashMap();
     
-    Logger logger = Logger.getLogger(Settings.class);			
+    Logger logger = Logger.getLogger(Settings.class.getName());			
     
     public Settings() {
     }
@@ -83,13 +86,13 @@ public class Settings {
     }
     
     public void setOptions(String options) {
-        logger.debug("Setting options from "+options);
+        logger.fine("Setting options from "+options);
         jason.mas2j.parser.mas2j parser = new jason.mas2j.parser.mas2j( new StringReader(options));
         try {
             setOptions(parser.ASoptions());
-            logger.debug("Settings are "+userParameters);
+            logger.fine("Settings are "+userParameters);
         } catch (Exception e) {
-            logger.error("Error parsing options "+options,e);
+            logger.log(Level.SEVERE, "Error parsing options "+options,e);
         }
     }
     
@@ -199,6 +202,7 @@ public class Settings {
         return verbose;
     }
     
+    /*
     public Level log4JLevel() {
     	 switch(verbose) {
     	 case 0 : return Level.WARN;
@@ -207,6 +211,16 @@ public class Settings {
     	 }
     	 return Level.INFO;
     }
+    */
+    
+    public java.util.logging.Level logLevel() {
+	   	 switch(verbose) {
+	   	 case 0 : return java.util.logging.Level.WARNING;
+	   	 case 1 : return java.util.logging.Level.INFO;
+	   	 case 2 : return java.util.logging.Level.FINE;
+	   	 }
+	   	 return java.util.logging.Level.INFO;
+   }
     
     /** returns true if the execution is synchronized */
     public boolean isSync() {

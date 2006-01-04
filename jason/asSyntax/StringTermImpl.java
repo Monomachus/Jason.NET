@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.2  2006/01/04 02:54:41  jomifred
+//   using java log API instead of apache log
+//
 //   Revision 1.1  2005/12/23 00:49:57  jomifred
 //   StringTerm is now an interface implemented by StringTermImpl
 //
@@ -37,8 +40,8 @@ package jason.asSyntax;
 import jason.asSyntax.parser.as2j;
 
 import java.io.StringReader;
-
-import org.apache.log4j.Logger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class StringTermImpl extends Term implements StringTerm {
 
@@ -86,7 +89,7 @@ public class StringTermImpl extends Term implements StringTerm {
 		try {
 			return (StringTerm)parser.t();
 		} catch (Exception e) {
-			logger.error("Error parsing string term " + sTerm,e);
+			logger.log(Level.SEVERE,"Error parsing string term " + sTerm,e);
 			return null;
 		}
 	}

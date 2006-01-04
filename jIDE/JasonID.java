@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.29  2006/01/04 02:54:41  jomifred
+//   using java log API instead of apache log
+//
 //   Revision 1.28  2005/12/18 15:31:02  jomifred
 //   no message
 //
@@ -76,7 +79,6 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.Properties;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -173,7 +175,7 @@ public class JasonID implements RunningMASListener {
         			userProperties.remove(Config.JAVA_HOME);
         			userProperties.remove(Config.SACI_JAR);
         			userProperties.remove(Config.JASON_JAR);
-        			userProperties.remove(Config.LOG4J_JAR);
+        			//userProperties.remove(Config.LOG4J_JAR);
         		}
         	} 
 

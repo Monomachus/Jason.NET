@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.2  2006/01/04 03:00:47  jomifred
+//   using java log API instead of apache log
+//
 //   Revision 1.1  2005/08/18 13:32:45  jomifred
 //   initial implementation (based on createAg)
 //
@@ -40,8 +43,7 @@ import jason.asSyntax.Term;
 import jason.environment.CentralisedEnvironment;
 
 import java.util.Iterator;
-
-import org.apache.log4j.Logger;
+import java.util.logging.Logger;
 
 import saci.launcher.AgentId;
 import saci.launcher.Launcher;
@@ -49,7 +51,7 @@ import saci.launcher.LauncherD;
 
 public class killAgent implements InternalAction {
 
-    private static Logger logger = Logger.getLogger(killAgent.class);
+    private static Logger logger = Logger.getLogger(killAgent.class.getName());
 
 	/* args[0] the agent name */
 	public boolean execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
@@ -79,7 +81,7 @@ public class killAgent implements InternalAction {
 	
 	public boolean killSaciAg(String name, String socName) {
 		try {
-			logger.debug("Killing Saci agent "+name);
+			logger.fine("Killing Saci agent "+name);
 			
 			// gets the saci launcher
 			Launcher l = LauncherD.getLauncher();
@@ -98,7 +100,7 @@ public class killAgent implements InternalAction {
 
 	public boolean killCentralisedAg(String name, CentralisedEnvironment env) {
 		try {
-			logger.debug("Killing centralised agent "+name);
+			logger.fine("Killing centralised agent "+name);
 			env.getAgent(name).stopAg();
             return true;
 		} catch (Exception e) {

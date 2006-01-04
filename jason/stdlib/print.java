@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.10  2006/01/04 03:00:47  jomifred
+//   using java log API instead of apache log
+//
 //   Revision 1.9  2005/12/23 00:51:00  jomifred
 //   StringTerm is now an interface implemented by StringTermImpl
 //
@@ -63,7 +66,7 @@ public class print implements InternalAction {
 				}
 			}
 		}
-		ts.getLogger().info(sout);
+		ts.getLogger().info(sout.toString());
 
 		return true;
 	}

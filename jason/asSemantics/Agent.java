@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.24  2006/01/04 02:54:41  jomifred
+//   using java log API instead of apache log
+//
 //   Revision 1.23  2006/01/02 13:49:00  jomifred
 //   add plan unique id, fix some bugs
 //
@@ -60,7 +63,6 @@ package jason.asSemantics;
 
 import jIDE.JasonID;
 import jason.JasonException;
-import jason.Settings;
 import jason.architecture.AgArchInterface;
 import jason.asSyntax.BeliefBase;
 import jason.asSyntax.Literal;
@@ -71,6 +73,7 @@ import jason.asSyntax.Term;
 import jason.asSyntax.Trigger;
 import jason.asSyntax.parser.ParseException;
 import jason.asSyntax.parser.as2j;
+import jason.runtime.Settings;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -79,11 +82,12 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -127,7 +131,7 @@ public class Agent {
 					setts.setOptions("[" + args[4] + "]");
 				}
 			}
-			logger.setLevel(setts.log4JLevel());
+			logger.setLevel(setts.logLevel());
 			setTS(new TransitionSystem(this, C, setts, arch));
 
 			parseAS(asSource);
@@ -136,7 +140,7 @@ public class Agent {
 			
 			return fTS;
 		} catch (Exception e) {
-			logger.error("Error creating the agent class!",e);
+			logger.log(Level.SEVERE,"Error creating the agent class!",e);
 			throw new JasonException("Error creating the agent class! - " + e);
 		}
     }
@@ -153,12 +157,12 @@ public class Agent {
 	public boolean parseAS(URL asURL) {
 		try {
 			parseAS(asURL.openStream());
-			logger.debug("as2j: AgentSpeak program '"+asURL+"' parsed successfully!");
+			logger.fine("as2j: AgentSpeak program '"+asURL+"' parsed successfully!");
 			return true;
 		} catch (IOException e) {
-			logger.error("as2j: the AgentSpeak source file was not found",e);
+			logger.log(Level.SEVERE,"as2j: the AgentSpeak source file was not found",e);
 		} catch (ParseException e) {
-			logger.error("as2j: error parsing \"" + asURL + "\"",e);
+			logger.log(Level.SEVERE,"as2j: error parsing \"" + asURL + "\"",e);
 		}
 		return false;
 	}
@@ -167,12 +171,12 @@ public class Agent {
 	public boolean parseAS(String asFileName) {
 		try {
 			parseAS(new FileInputStream(asFileName));
-			logger.debug("as2j: AgentSpeak program '"+asFileName+"' parsed successfully!");
+			logger.fine("as2j: AgentSpeak program '"+asFileName+"' parsed successfully!");
 			return true;
 		} catch (FileNotFoundException e) {
-			logger.error("as2j: the AgentSpeak source file was not found", e);
+			logger.log(Level.SEVERE,"as2j: the AgentSpeak source file was not found", e);
 		} catch (ParseException e) {
-			logger.error("as2j: error parsing \"" + asFileName + "\"", e);
+			logger.log(Level.SEVERE,"as2j: error parsing \"" + asFileName + "\"", e);
 		}
 		return false;
 	}
@@ -286,7 +290,7 @@ public class Agent {
 			try {
 				addBel( l, BeliefBase.TPercept, fTS.getC(), Intention.EmptyInt);
 			} catch (Exception e) {
-				logger.error("Error adding percetion "+l,e);
+				logger.log(Level.SEVERE,"Error adding percetion "+l,e);
 			}
         }
     }
@@ -328,16 +332,16 @@ public class Agent {
 	 *  <i>l</i> will be cloned before being added in the BB */
 	public boolean addBel(Literal l, Term source, Circumstance c, Intention focus) {
 		if (source != null && !source.isGround()) {
-			logger.error("Error: Annotations must be ground!\n Cannot use "+source+" as annotation.");
+			logger.log(Level.SEVERE,"Error: Annotations must be ground!\n Cannot use "+source+" as annotation.");
 		} else if (l.equals(Literal.LTrue) || l.equals(Literal.LFalse)) {
-			logger.error("Error: <true> or <false> can not be added as beliefs.");				
+			logger.log(Level.SEVERE,"Error: <true> or <false> can not be added as beliefs.");				
 		} else {
 			l = (Literal)l.clone();
 			if (source != null) {
 				l.addAnnot(source);
 			}
 			if (fBS.add(l)) {
-				logger.debug("Added belief "+l);
+				logger.fine("Added belief "+l);
 				updateEvents(new Event(new Trigger(Trigger.TEAdd, Trigger.TEBel, l), focus), c);
 				return true;
 			}
@@ -348,14 +352,14 @@ public class Agent {
 
 	public boolean delBel(Literal l, Term source, Circumstance c, Intention focus) {
 		if (source != null && !source.isGround()) {
-			logger.error("Error: Annotations must be ground!\n Cannot use "+source+" as annotation.");
+			logger.log(Level.SEVERE,"Error: Annotations must be ground!\n Cannot use "+source+" as annotation.");
 		} else {
 			if (source != null) {
 				//l.clearAnnot();
 				l.addAnnot(source);
 			}
 			if (fBS.remove(l)) {
-				logger.debug("Removed belief "+l);
+				logger.fine("Removed belief "+l);
 				updateEvents(new Event(new Trigger(Trigger.TEDel, Trigger.TEBel, l), focus), c);
 				return true;
 			}
@@ -368,7 +372,7 @@ public class Agent {
 		if (c != null) {
 			if (e.isInternal() || fPS.isRelevant(e.trigger)) {
 				c.E.add(e);
-				logger.debug("Added event "+e);
+				logger.fine("Added event "+e);
 			}
 		}
 	}
@@ -398,7 +402,7 @@ public class Agent {
 			//System.out.println("**** adding plan "+p+" from "+sSource);		
 
 		} catch (Exception e) {
-			logger.error("Error adding plan "+sPlan,e);
+			logger.log(Level.SEVERE,"Error adding plan "+sPlan,e);
 		}
 	}
 
@@ -418,7 +422,7 @@ public class Agent {
 				fPS.remove(i);
 			}
 		} else {
-			logger.error("Plan '"+p+"' was not found for deletion!");
+			logger.log(Level.SEVERE,"Plan '"+p+"' was not found for deletion!");
 		}
 	}
 
@@ -431,7 +435,7 @@ public class Agent {
 			try {
 				builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 			} catch (Exception e) {
-				logger.error("Error creating XML builder\n");
+				logger.log(Level.SEVERE,"Error creating XML builder\n");
 				return null;
 			}
 		}

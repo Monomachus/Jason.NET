@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.2  2006/01/04 03:00:46  jomifred
+//   using java log API instead of apache log
+//
 //   Revision 1.1  2005/12/08 20:14:28  jomifred
 //   changes for JasonIDE plugin
 //
@@ -56,16 +59,18 @@ import jason.environment.CentralisedEnvironment;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
 
 import javax.swing.JButton;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -81,10 +86,10 @@ public class RunCentralisedMAS {
     List ags = new ArrayList();
     boolean insideJIDE = false;
     
-    private static Logger logger = Logger.getLogger(RunCentralisedMAS.class);
+    private static Logger logger = Logger.getLogger(RunCentralisedMAS.class.getName());
     private static RunCentralisedMAS runner = null;
     
-    public final static String logPropFile = "log4j.configuration";
+    public final static String logPropFile = "logging.properties";
     
     //static MASConsoleGUI console;
     
@@ -96,14 +101,7 @@ public class RunCentralisedMAS {
 
         runner = new RunCentralisedMAS();
 
-        // see for a local log4j configuration
-        if (new File(logPropFile).exists()) {
-        	PropertyConfigurator.configure(logPropFile);
-        } else {
-        	PropertyConfigurator.configure(RunCentralisedMAS.class.getResource("/"+logPropFile));
-        	//Logger.getRootLogger().addAppender(new ConsoleAppender(new PatternLayout("[%c{1}] %m%n")));
-        	//Logger.getRootLogger().setLevel(Level.INFO);
-        }
+        setupLogger();
         
         Document docDOM = parse(args[0]);
         if (docDOM != null) {
@@ -112,7 +110,7 @@ public class RunCentralisedMAS {
 				runner.startAgs();
 				runner.startSyncMode();
 			} catch (Exception e) {
-				logger.error("Error!?: ",e);
+				logger.log(Level.SEVERE,"Error!?: ",e);
 			}
 
 	        if (args.length == 2) { // from inside jIDE
@@ -156,6 +154,40 @@ public class RunCentralisedMAS {
         }
     }
     
+    
+    public static void setupLogger() {
+        // see for a local log4j configuration
+        if (new File(logPropFile).exists()) {
+        	// PropertyConfigurator.configure(logPropFile);
+        	try {
+        		LogManager.getLogManager().readConfiguration(new FileInputStream(logPropFile));
+        	} catch (Exception e) {
+        		System.err.println("Error setting up logger:"+e);
+        	}
+        } else {
+        	try {
+        		LogManager.getLogManager().readConfiguration(RunCentralisedMAS.class.getResource("/"+logPropFile).openStream());
+        	} catch (Exception e) {
+        		System.err.println("Error setting up logger:"+e);
+        	}
+        	/*
+            // remove current handlers
+            Handler[] hs = Logger.getLogger("").getHandlers();
+            for (int i = 0; i < hs.length; i++) {
+            	Logger.getLogger("").removeHandler(hs[i]);
+            }
+            
+            Handler h = new MASConsoleLogHandler(); 
+            h.setFormatter(new MASConsoleLogFormatter());
+            Logger.getLogger("").addHandler(h);
+            Logger.getLogger("").setLevel(Level.INFO);
+            */
+            // PropertyConfigurator.configure(RunCentralisedMAS.class.getResource("/"+logPropFile));
+        	//Logger.getRootLogger().addAppender(new ConsoleAppender(new PatternLayout("[%c{1}] %m%n")));
+        	//Logger.getRootLogger().setLevel(Level.INFO);
+        }
+    }
+    
     public static Document parse(String file) {
         try {
             if (file.startsWith("\"")) {
@@ -168,7 +200,7 @@ public class RunCentralisedMAS {
             DocumentBuilder builder = factory.newDocumentBuilder();
             return builder.parse( new File( file ) );
         } catch (Exception e) {
-            logger.error("Error parsing the script file",e);
+            logger.log(Level.SEVERE,"Error parsing the script file",e);
             return null;
         }
     }
@@ -186,7 +218,7 @@ public class RunCentralisedMAS {
 	        	MASConsoleGUI.get().setTitle("MAS Console - " + app.getAttribute("id"));
 	        }
 		} catch (Exception e) {
-			logger.error("Error getting the society name",e);
+			logger.log(Level.SEVERE,"Error getting the society name",e);
 		}
 		
         // create the agentes
@@ -226,7 +258,7 @@ public class RunCentralisedMAS {
                 }
                 
             } catch (Exception e) {
-            	logger.error("Error creating agent "+agName,e);
+            	logger.log(Level.SEVERE,"Error creating agent "+agName,e);
             }
         } // for
 	}

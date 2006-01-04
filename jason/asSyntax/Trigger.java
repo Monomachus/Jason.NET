@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.10  2006/01/04 02:54:41  jomifred
+//   using java log API instead of apache log
+//
 //   Revision 1.9  2005/12/31 16:29:58  jomifred
 //   add operator =..
 //
@@ -40,8 +43,8 @@ package jason.asSyntax;
 import jason.asSyntax.parser.as2j;
 
 import java.io.StringReader;
-
-import org.apache.log4j.Logger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Trigger implements Cloneable {
 
@@ -70,7 +73,7 @@ public class Trigger implements Cloneable {
 		try {
 			return parser.te(); 
 		} catch (Exception e) {
-			logger.error("Error parsing trigger" + sTe,e);
+			logger.log(Level.SEVERE,"Error parsing trigger" + sTe,e);
 			return null;
 		}
 	}

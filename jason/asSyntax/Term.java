@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.20  2006/01/04 02:54:41  jomifred
+//   using java log API instead of apache log
+//
 //   Revision 1.19  2006/01/02 13:49:00  jomifred
 //   add plan unique id, fix some bugs
 //
@@ -59,8 +62,8 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
-import org.apache.log4j.Logger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Represents a Term (a predicate parameter), e.g.: val(10,x(3)).
@@ -79,7 +82,7 @@ public class Term implements TermInterface, Comparable, Serializable {
 
 	public Term(String fs) {
 		if (fs != null && Character.isUpperCase(fs.charAt(0))) {
-			logger.warn("Are you sure you want to create a term that begins with uppercase ("+fs+")? Should it be a VarTerm instead?");
+			logger.warning("Are you sure you want to create a term that begins with uppercase ("+fs+")? Should it be a VarTerm instead?");
 		}
 		setFunctor(fs);
 	}
@@ -94,7 +97,7 @@ public class Term implements TermInterface, Comparable, Serializable {
 		try {
 			return parser.t(); // parse.t() may returns a Pred/List...
 		} catch (Exception e) {
-			logger.error("Error parsing term " + sTerm,e);
+			logger.log(Level.SEVERE,"Error parsing term " + sTerm,e);
 			return null;
 		}
 	}

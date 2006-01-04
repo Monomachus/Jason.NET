@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.22  2006/01/04 02:54:41  jomifred
+//   using java log API instead of apache log
+//
 //   Revision 1.21  2005/12/22 00:03:26  jomifred
 //   ListTerm is now an interface implemented by ListTermImpl
 //
@@ -74,14 +77,13 @@ import jason.asSyntax.Term;
 import jason.runtime.MASConsoleGUI;
 import jason.runtime.RunCentralisedMAS;
 
-import java.io.File;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
 import org.w3c.dom.Document;
 
 import saci.Config;
@@ -112,12 +114,8 @@ public class SaciAgArch extends saci.Agent implements AgArchInterface {
 
         
     	// create a logger
+    	RunCentralisedMAS.setupLogger();
     	logger = Logger.getLogger(SaciAgArch.class.getName()+"."+getAgName());
-        if (new File(RunCentralisedMAS.logPropFile).exists()) {
-        	PropertyConfigurator.configure(RunCentralisedMAS.logPropFile);
-        } else {
-        	PropertyConfigurator.configure(SaciAgArch.class.getResource("/"+RunCentralisedMAS.logPropFile));
-        }
 
     	// create the jasonId console
         if (MASConsoleGUI.hasConsole()) { // the logger created the MASConsole
@@ -136,7 +134,7 @@ public class SaciAgArch extends saci.Agent implements AgArchInterface {
             fUserAgArh = (AgArch)Class.forName(archClassName).newInstance();
             fUserAgArh.setInfraArch(this);
             fUserAgArh.initAg(args);
-    		logger.setLevel(fUserAgArh.getTS().getSettings().log4JLevel());
+    		logger.setLevel(fUserAgArh.getTS().getSettings().logLevel());
         } catch (Exception e) {
         	running = false;
             throw new JasonException("as2j: error creating the agent class! - "+e.getMessage());
@@ -183,7 +181,7 @@ public class SaciAgArch extends saci.Agent implements AgArchInterface {
 
                             mboxPercept.sendMsg(r);
                         } catch (Exception e) {
-                        	logger.error("Error sending message "+r,e);
+                        	logger.log(Level.SEVERE, "Error sending message "+r,e);
                         }
                         return true; // no other message handler gives this message
                     }
@@ -199,7 +197,7 @@ public class SaciAgArch extends saci.Agent implements AgArchInterface {
 
             
         } catch (Exception e) {
-        	logger.error("Error entering the environment's society.",e);
+        	logger.log(Level.SEVERE, "Error entering the environment's society.",e);
         }
     }
     
@@ -219,7 +217,7 @@ public class SaciAgArch extends saci.Agent implements AgArchInterface {
         while (running) {
         	fUserAgArh.getTS().reasoningCycle();
         }
-        logger.debug("finished running.\n");
+        logger.fine("finished running.\n");
     }
     
     // Default functions for the overall agent architecture (based on SACI)
@@ -243,14 +241,14 @@ public class SaciAgArch extends saci.Agent implements AgArchInterface {
         try {
             m = mboxPercept.ask(askMsg);
         } catch (Exception e) {
-        	logger.error("Error receiving perceptions.",e);
+        	logger.log(Level.SEVERE, "Error receiving perceptions.",e);
         }
         if (m != null) {
 			String content = (String) m.get("content");
 			if (content != null) {
 				percepts = ListTermImpl.parseList(content).getAsList();
-				if (logger.isDebugEnabled()) {
-					logger.debug("received percepts: "+percepts);
+				if (logger.isLoggable(Level.FINE)) {
+					logger.fine("received percepts: "+percepts);
 				}
 			} else {
 				percepts = null; // used to indicate that are nothing new in the environment, no BRF needed
@@ -279,7 +277,7 @@ public class SaciAgArch extends saci.Agent implements AgArchInterface {
                                     fUserAgArh.getTS().getC().getFeedbackActions().add(a);
                                 }
                                 else {
-                                	logger.error("Error: received feedback for an Action that is not pending.");
+                                	logger.log(Level.SEVERE, "Error: received feedback for an Action that is not pending.");
                                 }
                             }
                             else {
@@ -290,7 +288,7 @@ public class SaciAgArch extends saci.Agent implements AgArchInterface {
                 }
             } while (m != null);
         } catch (Exception e) {
-        	logger.error("Error receiving message.",e);
+        	logger.log(Level.SEVERE, "Error receiving message.",e);
         }
 		return percepts;
     }
@@ -325,7 +323,7 @@ public class SaciAgArch extends saci.Agent implements AgArchInterface {
             return;
         }
         if (getMBox() == null) {
-            logger.warn("I have no mail box!");
+            logger.warning("I have no mail box!");
             return;
         }
         
@@ -334,11 +332,11 @@ public class SaciAgArch extends saci.Agent implements AgArchInterface {
             try {
                 m  = getMBox().receive();
             } catch (Exception e) {
-            	logger.error("Error receiving message.",e);
+            	logger.log(Level.SEVERE, "Error receiving message.",e);
             }
             if (m != null) {
-            	if (logger.isDebugEnabled()) {
-            		logger.debug("Received message: " + m + ". Content class is "+m.get("content").getClass().getName());
+            	if (logger.isLoggable(Level.FINE)) {
+            		logger.fine("Received message: " + m + ". Content class is "+m.get("content").getClass().getName());
             	}
                 String ilForce   = (String)m.get("performative");
                 String sender    = (String)m.get("sender");
@@ -401,7 +399,7 @@ public class SaciAgArch extends saci.Agent implements AgArchInterface {
             
             ts.getC().getPendingActions().put(rw, ts.getC().getAction());
         } catch (Exception e) {
-        	logger.error("Error sending action "+ ts.getC().getAction(),e);
+        	logger.log(Level.SEVERE, "Error sending action "+ ts.getC().getAction(),e);
         }
     }
 

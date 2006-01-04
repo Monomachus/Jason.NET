@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.6  2006/01/04 03:00:46  jomifred
+//   using java log API instead of apache log
+//
 //   Revision 1.5  2005/10/30 18:39:48  jomifred
 //   change in the AgArch customisation  support (the same customisation is used both to Cent and Saci infrastructures0
 //
@@ -40,8 +43,9 @@ import jason.environment.CentralisedEnvironment;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 
 /**
@@ -52,7 +56,7 @@ public class CentralisedExecutionControl implements ExecutionControlInterface {
 	private CentralisedEnvironment    fEnv;
 	private ExecutionControl          fUserControl;
 	
-	static Logger logger = Logger.getLogger(CentralisedExecutionControl.class);
+	static Logger logger = Logger.getLogger(CentralisedExecutionControl.class.getName());
 	
 	public CentralisedExecutionControl(CentralisedEnvironment env, String userControlClass) throws JasonException {
 		fEnv = env;
@@ -62,7 +66,7 @@ public class CentralisedExecutionControl implements ExecutionControlInterface {
         	//fUserControl.setJasonDir(jasonDir);
         	fUserControl.init();
         } catch (Exception e) {
-            logger.error("Error ",e);
+            logger.log(Level.SEVERE,"Error ",e);
             throw new JasonException("The user execution control class instantiation '"+userControlClass+"' has failed!"+e.getMessage());
         }
 	}

@@ -26,18 +26,13 @@ import java.util.Iterator;
 
 import junit.framework.TestCase;
 
-import org.apache.log4j.ConsoleAppender;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PatternLayout;
-
 /** JUnit test case for stdlib package */
 public class StdLibTest extends TestCase {
 
 	protected void setUp() throws Exception {
 		super.setUp();
-		Logger.getRootLogger().addAppender(new ConsoleAppender(new PatternLayout("[%c{1}] %m%n")));
-    	Logger.getRootLogger().setLevel(Level.INFO);
+		//Logger.getRootLogger().addAppender(new ConsoleAppender(new PatternLayout("[%c{1}] %m%n")));
+    	//Logger.getRootLogger().setLevel(Level.INFO);
 	}
 	
 	public void testAddAnnot() {

@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.5  2006/01/04 02:54:41  jomifred
+//   using java log API instead of apache log
+//
 //   Revision 1.4  2006/01/02 13:49:00  jomifred
 //   add plan unique id, fix some bugs
 //
@@ -47,7 +50,7 @@ import java.util.Properties;
 import java.util.StringTokenizer;
 
 /** 
- * Jason configuration 
+ * Jason configuration (used by JasonID to generate the project's scripts)
  *  
  * @author jomi
  */
@@ -55,7 +58,7 @@ public class Config extends Properties {
 
 	public static final String JASON_JAR = "jasonJar";
 	public static final String SACI_JAR  = "saciJar";
-	public static final String LOG4J_JAR = "log4jJar";
+	//public static final String LOG4J_JAR = "log4jJar";
 	public static final String JAVA_HOME = "javaHome";
 	public static final String RUN_AS_THREAD = "runCentralisedInsideJIDE";
 	public static final String SHELL_CMD = "shellCommand";
@@ -123,7 +126,7 @@ public class Config extends Properties {
 	public void fix() {
     	tryToFixJarFileConf(JASON_JAR, "jason.jar", 300000);
     	tryToFixJarFileConf(SACI_JAR,  "saci.jar",  300000);
-    	tryToFixJarFileConf(LOG4J_JAR, "log4j.jar", 350000);
+    	//tryToFixJarFileConf(LOG4J_JAR, "log4j.jar", 350000);
 		
     	// fix java home
         if (get(JAVA_HOME) == null || !checkJavaHomePath(getProperty(JAVA_HOME))) {

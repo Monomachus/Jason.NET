@@ -23,8 +23,8 @@
 //   $Date$
 //   $Revision$
 //   $Log$
-//   Revision 1.15  2005/12/23 00:51:00  jomifred
-//   StringTerm is now an interface implemented by StringTermImpl
+//   Revision 1.16  2006/01/04 03:00:47  jomifred
+//   using java log API instead of apache log
 //
 //----------------------------------------------------------------------------
 
@@ -45,8 +45,7 @@ import jason.control.CentralisedExecutionControl;
 import jason.environment.CentralisedEnvironment;
 
 import java.io.File;
-
-import org.apache.log4j.Logger;
+import java.util.logging.Logger;
 
 import saci.launcher.Command;
 import saci.launcher.Launcher;
@@ -54,7 +53,7 @@ import saci.launcher.LauncherD;
 
 public class createAgent implements InternalAction {
 
-    private static Logger logger = Logger.getLogger(createAgent.class);
+    private static Logger logger = Logger.getLogger(createAgent.class.getName());
 
 	/** args[0] is the agent name
 	 *  args[1] is the agent code (as StringTerm)
@@ -73,12 +72,12 @@ public class createAgent implements InternalAction {
             	
             	// try to get the project directory (only when running inside JasonID)
             	if (JasonID.currentJasonID != null) {
-            		logger.debug("trying to find the source at "+JasonID.currentJasonID.getProjectDirectory());
+            		logger.fine("trying to find the source at "+JasonID.currentJasonID.getProjectDirectory());
             		fSource = new File(JasonID.currentJasonID.getProjectDirectory()+File.separator+source.getString());
                     if (! fSource.exists()) {
                 		throw new JasonException("The file source "+source+" was not found!");
                     }
-                    logger.debug("Ok, found "+fSource.getAbsolutePath());
+                    logger.fine("Ok, found "+fSource.getAbsolutePath());
             	} else {
             		throw new JasonException("The file source "+source+" was not found!");
             	}
@@ -103,7 +102,7 @@ public class createAgent implements InternalAction {
 	
 	public boolean createSaciAg(String name, String socName, String source, boolean isSync) {
 		try {
-			logger.debug("Creating saci agent from source "+source);
+			logger.fine("Creating saci agent from source "+source);
 
 			String extraOp = "";
 			if (isSync) {
@@ -118,7 +117,7 @@ public class createAgent implements InternalAction {
 			c1.addArg("args", AgArch.class.getName()+" "+Agent.class.getName() + " " + source + extraOp);
 			//c1.addArg("host", "?");
 			l.execCommand(c1);
-            logger.debug("Agent "+name+" created!");
+            logger.fine("Agent "+name+" created!");
             return true;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -128,7 +127,7 @@ public class createAgent implements InternalAction {
 
 	public boolean createCentralisedAg(String name, String source, CentralisedEnvironment env, CentralisedExecutionControl control, boolean isSync) {
 		try {
-			logger.debug("Creating centralised agent from source "+source);
+			logger.fine("Creating centralised agent from source "+source);
             // parameters for ini
 			
             String[] agArgs = { AgArch.class.getName(), Agent.class.getName(), source};
@@ -143,7 +142,7 @@ public class createAgent implements InternalAction {
             }
             agArch.getEnv().addAgent(agArch.getUserAgArch());
             agArch.start();
-            logger.debug("Agent "+name+" created!");
+            logger.fine("Agent "+name+" created!");
             return true;
 		} catch (Exception e) {
 			e.printStackTrace();

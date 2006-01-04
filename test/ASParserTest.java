@@ -4,18 +4,13 @@ import jIDE.JasonID;
 import jason.asSemantics.Agent;
 import junit.framework.TestCase;
 
-import org.apache.log4j.ConsoleAppender;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PatternLayout;
-
 /** JUnit test case for syntax package */
 public class ASParserTest extends TestCase {
 
 	protected void setUp() throws Exception {
 		super.setUp();
-		Logger.getRootLogger().addAppender(new ConsoleAppender(new PatternLayout("[%c{1}] %m%n")));
-    	Logger.getRootLogger().setLevel(Level.INFO);
+		//Logger.getRootLogger().addAppender(new ConsoleAppender(new PatternLayout("[%c{1}] %m%n")));
+    	//Logger.getRootLogger().setLevel(Level.INFO);
 	}
 
 	public void testKQML() {

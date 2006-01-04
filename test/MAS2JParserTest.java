@@ -1,19 +1,13 @@
 package test;
 
-import jason.mas2j.parser.mas2j;
-
 import jason.mas2j.MAS2JProject;
+import jason.mas2j.parser.mas2j;
 import jason.runtime.RunCentralisedMAS;
 
 import java.io.StringReader;
 import java.util.Map;
 
 import junit.framework.TestCase;
-
-import org.apache.log4j.ConsoleAppender;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PatternLayout;
 
 /** JUnit test case for syntax package */
 public class MAS2JParserTest extends TestCase {
@@ -22,8 +16,8 @@ public class MAS2JParserTest extends TestCase {
 	 
 	protected void setUp() throws Exception {
 		super.setUp();
-		Logger.getRootLogger().addAppender(new ConsoleAppender(new PatternLayout("[%c{1}] %m%n")));
-    	Logger.getRootLogger().setLevel(Level.DEBUG);
+		//Logger.getRootLogger().addAppender(new ConsoleAppender(new PatternLayout("[%c{1}] %m%n")));
+    	//Logger.getRootLogger().setLevel(Level.DEBUG);
     	parser = new mas2j(new StringReader("MAS auctionCent {  infrastructure: Centralised environment: myEnv at \"x.edu\" executionControl: myController agents: ag1 [events=discard,intBels=newFocus,osfile=\"a/x.xml\"]; ag2 /home/agTest.asl agentClass mypkg.MyAgent #2; ag3 at \"x.edu\"; auctionner agentArchClass AuctionnerGUI;}"));
 	}
 

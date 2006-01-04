@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.8  2006/01/04 03:00:46  jomifred
+//   using java log API instead of apache log
+//
 //   Revision 1.7  2005/08/12 20:52:18  jomifred
 //   change in the informAgs method name
 //
@@ -31,9 +34,8 @@
 
 package jason.control;
 
-import org.apache.log4j.Logger;
-
-
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 /**
@@ -58,7 +60,7 @@ public class ExecutionControl {
 
 	//private String jasonDir = "..";
 
-	static Logger logger = Logger.getLogger(ExecutionControl.class);
+	static Logger logger = Logger.getLogger(ExecutionControl.class.getName());
 
 
 	public ExecutionControl() {
@@ -115,10 +117,10 @@ public class ExecutionControl {
 	 * annotation. 
 	  */
 	public void receiveFinishedCycle(String agName, boolean breakpoint) {
-		if (logger.isDebugEnabled()) {
-			logger.debug("Agent "+agName+" has finished a cycle, # of finished agents is "+(nbFinished+1)+"/"+fJasonControl.getAgentsQty());
+		if (logger.isLoggable(Level.FINE)) {
+			logger.fine("Agent "+agName+" has finished a cycle, # of finished agents is "+(nbFinished+1)+"/"+fJasonControl.getAgentsQty());
 			if (breakpoint) {
-				logger.debug("Agent "+agName+" reached a breakpoint");				
+				logger.fine("Agent "+agName+" reached a breakpoint");				
 			}
 		}
 		synchronized(syncAgFinished) {

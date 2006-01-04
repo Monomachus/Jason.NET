@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.11  2006/01/04 02:54:41  jomifred
+//   using java log API instead of apache log
+//
 //   Revision 1.10  2005/12/31 16:29:58  jomifred
 //   add operator =..
 //
@@ -45,8 +48,9 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -89,7 +93,7 @@ public class Plan implements Cloneable, Serializable {
 		try {
 			return parser.p();
 		} catch (Exception e) {
-			logger.error("Error parsing plan " + sPlan,e);
+			logger.log(Level.SEVERE,"Error parsing plan " + sPlan,e);
 			return null;
 		}
 	}

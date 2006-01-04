@@ -24,6 +24,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.7  2006/01/04 02:54:41  jomifred
+//   using java log API instead of apache log
+//
 //   Revision 1.6  2005/10/29 21:46:22  jomifred
 //   add a new class (MAS2JProject) to store information parsed by the mas2j parser. This new class also create the project scripts
 //
@@ -38,12 +41,11 @@
 package jIDE;
 
 import java.awt.event.ActionEvent;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
-
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 
 /** runs an MAS in debug mode */
 class DebugMAS extends AbstractAction {
@@ -61,7 +63,7 @@ class DebugMAS extends AbstractAction {
 			jasonID.runMASAct.actionPerformed(e);
 		} finally {
 			jasonID.fMAS2jThread.debugOff();
-			Logger.getRootLogger().setLevel(Level.INFO);
+			Logger.getLogger("").setLevel(Level.INFO);
 		}
 	}
 

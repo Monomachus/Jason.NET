@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.4  2006/01/04 02:54:41  jomifred
+//   using java log API instead of apache log
+//
 //   Revision 1.3  2006/01/02 13:49:00  jomifred
 //   add plan unique id, fix some bugs
 //
@@ -34,7 +37,8 @@
 
 package jason.asSyntax;
 
-import org.apache.log4j.Logger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /** implements a term that represents a number */
 public class NumberTermImpl extends Term implements NumberTerm {
@@ -63,7 +67,7 @@ public class NumberTermImpl extends Term implements NumberTerm {
 		try {
 			setValue(Double.parseDouble(s));
 		} catch (Exception e) {
-			logger.error("Error setting number term value from "+s,e);
+			logger.log(Level.SEVERE,"Error setting number term value from "+s,e);
 		}
 	}
 	public void setValue(double d) {

@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.12  2006/01/04 02:54:41  jomifred
+//   using java log API instead of apache log
+//
 //   Revision 1.11  2006/01/02 13:49:00  jomifred
 //   add plan unique id, fix some bugs
 //
@@ -53,14 +56,15 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 public class Circumstance implements Serializable {
 
-	static Logger logger = Logger.getLogger(Circumstance.class);
+	static Logger logger = Logger.getLogger(Circumstance.class.getName());
 	
     protected List   E;
     protected List   I;
@@ -328,7 +332,7 @@ public class Circumstance implements Serializable {
 								selIntEle.setAttribute("pending","true");
 							}
 						} catch (Exception ex2) {
-							logger.error("Trying to add an unknown pending action "+o.getClass().getName()+" - "+ex2,ex2);
+							logger.log(Level.SEVERE,"Trying to add an unknown pending action "+o.getClass().getName()+" - "+ex2,ex2);
 						}
 					}
 				}
