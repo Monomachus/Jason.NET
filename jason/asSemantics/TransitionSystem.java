@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.32  2006/01/05 17:10:26  jomifred
+//   no message
+//
 //   Revision 1.31  2006/01/04 02:54:41  jomifred
 //   using java log API instead of apache log
 //
@@ -558,8 +561,10 @@ public class TransitionSystem {
 			// Rule Action
 			case BodyLiteral.HAction:
 				if (l.isInternalAction()) {
-					if (execInternalAction(l, u) && !h.isAsk()) {
-						updateIntention();
+					if (execInternalAction(l, u)) {
+						if (!h.isAsk()) {
+							updateIntention();
+						}
 					} else {
 						generateGoalDeletion();
 					}
