@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.8  2006/01/05 15:36:19  jomifred
+//   fixed bug in equals
+//
 //   Revision 1.7  2006/01/04 02:54:41  jomifred
 //   using java log API instead of apache log
 //
@@ -120,25 +123,29 @@ public class ExprTerm extends VarTerm implements NumberTerm {
 
 	public boolean equals(Object t) {
 		try {
-			ExprTerm eprt = (ExprTerm)t;
-			if (lhs == null && eprt.lhs != null) {
-				return false;
+			if (hasValue()) {
+				return getValue().equals(t);
+			} else {
+				ExprTerm eprt = (ExprTerm)t;
+				if (lhs == null && eprt.lhs != null) {
+					return false;
+				}
+				if (lhs != null && !lhs.equals(eprt.lhs)) {
+					return false;
+				}
+				
+				if (op != eprt.op) {
+					return false;
+				}
+	
+				if (rhs == null && eprt.rhs != null) {
+					return false;
+				}
+				if (rhs != null && !rhs.equals(eprt.rhs)) {
+					return false;
+				}
+				return true;
 			}
-			if (lhs != null && !lhs.equals(eprt.lhs)) {
-				return false;
-			}
-			
-			if (op != eprt.op) {
-				return false;
-			}
-
-			if (rhs == null && eprt.rhs != null) {
-				return false;
-			}
-			if (rhs != null && !rhs.equals(eprt.rhs)) {
-				return false;
-			}
-			return true;
 		} catch (ClassCastException e) {
 			return false;
 		}
@@ -220,6 +227,10 @@ public class ExprTerm extends VarTerm implements NumberTerm {
 	}
 	
 	public double solve() {
+		if (hasValue()) {
+			// this expr already has a value
+			return ((NumberTerm)getValue()).solve();
+		}
 		//try {
 			//ExprTerm et = (ExprTerm)lhs;
 			//l = et.solve();

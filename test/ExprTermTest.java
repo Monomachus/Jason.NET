@@ -50,4 +50,26 @@ public class ExprTermTest extends TestCase {
 		u.apply(t2);
 		assertEquals(t2.toString(),"p(10)");
 	}
+
+	public void testAddAddAdd() {
+		Literal t1 = Literal.parseLiteral("p(X+1)");
+		Unifier u = new Unifier();
+		u.unifies(new VarTerm("X"), new NumberTermImpl(0));
+		u.apply(t1);
+		
+		u = new Unifier();
+		u.unifies(Literal.parseLiteral("p(CurVl)"), t1);
+		u.unifies(new VarTerm("CurVl"), new VarTerm("X"));
+		t1 = Literal.parseLiteral("p(X+1)");
+		u.apply(t1);
+		
+		u = new Unifier();
+		u.unifies(Literal.parseLiteral("p(CurVl)"), t1);
+		u.unifies(new VarTerm("CurVl"), new VarTerm("X"));
+		t1 = Literal.parseLiteral("p(X+1)");
+		u.apply(t1);
+
+		assertEquals(t1.toString(), "p(3)");
+	}
+
 }
