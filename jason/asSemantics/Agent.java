@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.25  2006/01/06 12:05:37  jomifred
+//   operator - removes bel from BB and changes the current unifier.
+//
 //   Revision 1.24  2006/01/04 02:54:41  jomifred
 //   using java log API instead of apache log
 //
@@ -296,20 +299,21 @@ public class Agent {
     }
 	
 	// Other auxiliary methods
-
-	public Unifier believes(Literal l, Unifier un) {
+	public boolean believes(Literal l, Unifier un) {
 		List relB = fBS.getRelevant(l);
 		if (relB != null) {
 			for (int i=0; i < relB.size(); i++) {
 				Literal b = (Literal) relB.get(i);
-				Unifier newUn = (un == null) ? new Unifier() : (Unifier) un.clone();
+				// old version Unifier newUn = (un == null) ? new Unifier() : (Unifier) un.clone();
 				// recall that order is important because of annotations!
-				if (newUn.unifies(l,b))
+				if (un.unifies(l,b)) {
 					// if literals are negated or not
-					return newUn;
+					//old version return newUn;
+					return true;
+				}
 			}
 		}
-		return null;
+		return false;
 	}
 
 	public Literal findBel(Literal l, Unifier un) {

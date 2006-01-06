@@ -23,14 +23,14 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.28  2006/01/06 12:05:37  jomifred
+//   operator - removes bel from BB and changes the current unifier.
+//
 //   Revision 1.27  2006/01/04 02:54:41  jomifred
 //   using java log API instead of apache log
 //
 //   Revision 1.26  2005/12/30 20:40:16  jomifred
 //   new features: unnamed var, var with annots, TE as var
-//
-//   Revision 1.25  2005/12/19 00:14:46  jomifred
-//   no message
 //
 //   Revision 1.23  2005/12/08 20:05:01  jomifred
 //   changes for JasonIDE plugin
@@ -130,7 +130,7 @@ public class RunMAS extends AbstractAction {
 			}
 			String javaHome = Config.get().getJavaHome();
 			if (!Config.checkJavaHomePath(javaHome)) {
-				System.err.println("The Java home directory ("+javaHome+") was not correctly set, the MAS may not run. Go to menu Edit->Preferences to configure the path.");
+				System.err.println("The Java home directory ("+javaHome+") was not correctly set, the MAS may not run. Go to the Plugins->Options->Jason menu to configure the path.");
 			}
 			
 			// compile some files

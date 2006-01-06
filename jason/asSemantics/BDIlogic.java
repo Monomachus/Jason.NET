@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.8  2006/01/06 12:05:37  jomifred
+//   operator - removes bel from BB and changes the current unifier.
+//
 //   Revision 1.7  2005/12/30 20:40:16  jomifred
 //   new features: unnamed var, var with annots, TE as var
 //
@@ -44,7 +47,7 @@ import java.util.Iterator;
 public final class BDIlogic {
 
     public static final boolean Bel(TransitionSystem ts, Literal l) {
-        return ts.ag.believes(l,null)!=null;
+        return ts.ag.believes(l,new Unifier());
     }
 
     /** 

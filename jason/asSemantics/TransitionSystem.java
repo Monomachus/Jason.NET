@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.33  2006/01/06 12:05:37  jomifred
+//   operator - removes bel from BB and changes the current unifier.
+//
 //   Revision 1.32  2006/01/05 17:10:26  jomifred
 //   no message
 //
@@ -580,14 +583,15 @@ public class TransitionSystem {
 				
 			// Rule Test
 			case BodyLiteral.HTest:
-				Unifier ubel = conf.ag.believes(l, u);
-				if (ubel != null) {
-					im = conf.C.SI.peek();
-					im.unif = ubel;
+				//old version Unifier ubel = conf.ag.believes(l, u);
+				//old version if (ubel != null) {
+				if (conf.ag.believes(l, u)) {
+					//old version im = conf.C.SI.peek();
+					//old version im.unif = ubel;
 					updateIntention();
 				} else {
 					logger.warning("Test Goal '"+h+"' failed as simple query. Generating internal event for it...");
-					u.apply(l);
+					//old version  see above u.apply(l);
 					conf.C.addTestGoal(l, conf.C.SI);
 				}
 				break;
@@ -608,9 +612,11 @@ public class TransitionSystem {
 				
 			// Rule DelBel
 			case BodyLiteral.HDelBel:
-				ubel = conf.ag.believes(l, u);
-				if (ubel != null) {
-					ubel.apply(l);
+				//old version ubel = conf.ag.believes(l, u);
+				//old version if (ubel != null) {
+				if (conf.ag.believes(l, u)) {
+					//old version ubel.apply(l);
+					u.apply(l); // apply again, since believes may add some unification
 					source = BeliefBase.TSelf;
 					if (l.hasSource()) {
 						source = null; // do not add source(self) in case the programmer set the source
