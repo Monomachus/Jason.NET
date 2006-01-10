@@ -151,9 +151,10 @@ public class JasonID extends JPanel implements EBComponent, RunningMASListener {
 
 
 	private JPanel createToolBar() {
-		JToolBar toolBar = new JToolBar();
+		//JToolBar toolBar = new JToolBar();
+		JPanel toolBar = new JPanel();
 		toolBar.setLayout(new BoxLayout(toolBar,BoxLayout.X_AXIS));
-		toolBar.setFloatable(false);
+		//toolBar.setFloatable(false);
 		
 		JLabel animationLabel = new JLabel();
 		animationLabel.setBorder(new EmptyBorder(2,3,2,3));
@@ -193,7 +194,7 @@ public class JasonID extends JPanel implements EBComponent, RunningMASListener {
 		btStop.setEnabled(false);
 		toolBar.add(btStop);
 
-		toolBar.addSeparator();
+		//toolBar.addSeparator();
 		toolBar.add(createToolBarButton("New MAS", GUIUtilities.loadIcon("NewDir.png"), new ActionListener() {
 			public void actionPerformed(ActionEvent evt) {
 				newMAS();
@@ -207,7 +208,7 @@ public class JasonID extends JPanel implements EBComponent, RunningMASListener {
 		}));
 		
 		
-		toolBar.addSeparator();
+		//toolBar.addSeparator();
 		toolBar.add(createToolBarButton("Clear panel", GUIUtilities.loadIcon("Clear.png"), new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				textArea.setText("");
