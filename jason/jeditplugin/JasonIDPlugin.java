@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.10  2006/01/11 18:31:52  jomifred
+//   no message
+//
 //   Revision 1.9  2006/01/04 03:00:46  jomifred
 //   using java log API instead of apache log
 //
@@ -53,10 +56,12 @@
 package jason.jeditplugin;
 
 
+import jIDE.Config;
 import jason.mas2j.MAS2JProject;
 
 import javax.swing.SwingUtilities;
 
+import org.gjt.sp.jedit.Buffer;
 import org.gjt.sp.jedit.EBMessage;
 import org.gjt.sp.jedit.EBPlugin;
 import org.gjt.sp.jedit.gui.DockableWindowManager;
@@ -104,6 +109,16 @@ public class JasonIDPlugin extends EBPlugin {
         	if ((bu.getWhat() == BufferUpdate.LOADED || bu.getWhat() == BufferUpdate.CREATED)) {
         		if (bu.getBuffer().getPath().endsWith(MAS2JProject.EXT)) {
         			bu.getBuffer().setProperty("sidekick.parser", JasonProjectSideKickParser.ID);
+
+            		if (Config.get().getBoolean(Config.CLOSEALL) && org.gjt.sp.jedit.jEdit.getViews().length > 0) {
+    	        		// close all other files
+    	        		Buffer[] bufs = org.gjt.sp.jedit.jEdit.getBuffers();
+    	                for (int i = 0; i < bufs.length; i++) {
+    	                    if (! bufs[i].equals(bu.getBuffer())) {
+    	                    	org.gjt.sp.jedit.jEdit.closeBuffer(org.gjt.sp.jedit.jEdit.getViews()[0],bufs[i]);
+    	                    }
+    	                }
+            		}
         		}
     			if (bu.getBuffer().getPath().endsWith(MAS2JProject.AS_EXT)) {
     				bu.getBuffer().setProperty("sidekick.parser", AgentSpeakSideKickParser.ID);

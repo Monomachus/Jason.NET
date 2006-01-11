@@ -27,7 +27,6 @@
 
 package jason.jeditplugin;
 
-import jIDE.Config;
 import jIDE.RunMAS;
 import jIDE.RunningMASListener;
 import jason.mas2j.AgentParameters;
@@ -76,10 +75,11 @@ import org.gjt.sp.jedit.EBComponent;
 import org.gjt.sp.jedit.EBMessage;
 import org.gjt.sp.jedit.EditBus;
 import org.gjt.sp.jedit.View;
+import org.gjt.sp.jedit.browser.VFSBrowser;
+import org.gjt.sp.jedit.browser.VFSFileChooserDialog;
 import org.gjt.sp.jedit.gui.AnimatedIcon;
 import org.gjt.sp.jedit.gui.DockableWindowManager;
 import org.gjt.sp.jedit.gui.RolloverButton;
-import org.gjt.sp.jedit.msg.BufferUpdate;
 
 import errorlist.DefaultErrorSource;
 import errorlist.ErrorSource;
@@ -171,14 +171,14 @@ public class JasonID extends JPanel implements EBComponent, RunningMASListener {
 		animationLabel.setIcon(animation);
 		toolBar.add(animationLabel);
 		
-		btRun = createToolBarButton("Run MAS", new ImageIcon(JasonID.class.getResource("/images/execute.gif")), new ActionListener() { //GUIUtilities.loadIcon("Play.png")
+		btRun = createToolBarButton("Run MAS", new ImageIcon(JasonID.class.getResource("/images/run.gif")), new ActionListener() { //GUIUtilities.loadIcon("Play.png")
 			public void actionPerformed(ActionEvent arg0) {
 				runMAS();
 			}
 		});
 		toolBar.add(btRun);
 
-		btDebug = createToolBarButton("Debug MAS", new ImageIcon(JasonID.class.getResource("/images/startDebugger.gif")), //GUIUtilities.loadIcon("RunAgain.png"), 
+		btDebug = createToolBarButton("Debug MAS", new ImageIcon(JasonID.class.getResource("/images/debug.gif")), //GUIUtilities.loadIcon("RunAgain.png"), 
 				new ActionListener() {
 					public void actionPerformed(ActionEvent arg0) {
 						debugMAS();
@@ -196,8 +196,18 @@ public class JasonID extends JPanel implements EBComponent, RunningMASListener {
 		btStop.setEnabled(false);
 		toolBar.add(btStop);
 
-		//toolBar.addSeparator();
-		toolBar.add(createToolBarButton("New Project", new ImageIcon(JasonID.class.getResource("/images/new.gif")), //GUIUtilities.loadIcon("NewDir.png"), 
+		toolBar.add(new JLabel(" | "));
+		
+		toolBar.add(createToolBarButton("Open Project", new ImageIcon(JasonID.class.getResource("/images/openProject.gif")), //GUIUtilities.loadIcon("NewDir.png"), 
+				new ActionListener() {
+					public void actionPerformed(ActionEvent evt) {
+						VFSFileChooserDialog dialog = new VFSFileChooserDialog(view, ".", VFSBrowser.OPEN_DIALOG, false);
+						if (dialog.getSelectedFiles() != null && dialog.getSelectedFiles().length > 0) {
+							org.gjt.sp.jedit.jEdit.openFile(view, dialog.getSelectedFiles()[0].toString());
+						}
+					}
+				}));
+		toolBar.add(createToolBarButton("New Project", new ImageIcon(JasonID.class.getResource("/images/newProject.gif")), //GUIUtilities.loadIcon("NewDir.png"), 
 				new ActionListener() {
 					public void actionPerformed(ActionEvent evt) {
 						newMAS();
@@ -212,7 +222,7 @@ public class JasonID extends JPanel implements EBComponent, RunningMASListener {
 			}));
 		
 		
-		//toolBar.addSeparator();
+		toolBar.add(new JLabel(" | "));
 		toolBar.add(createToolBarButton("Clear panel", new ImageIcon(JasonID.class.getResource("/images/clear.gif")),//GUIUtilities.loadIcon("Clear.png"), 
 				new ActionListener() {
 					public void actionPerformed(ActionEvent arg0) {
@@ -264,7 +274,8 @@ public class JasonID extends JPanel implements EBComponent, RunningMASListener {
             propertiesChanged();
         } else */
 
-	
+    		
+    	/*
     	if (message instanceof BufferUpdate) {
         	BufferUpdate bu = (BufferUpdate)message;
         	
@@ -272,26 +283,14 @@ public class JasonID extends JPanel implements EBComponent, RunningMASListener {
         		bu.getBuffer().getPath().endsWith(MAS2JProject.EXT)) {
         		
         		//String projName = bu.getBuffer().getName().substring(0, bu.getBuffer().getName().length()-(MAS2JProject.EXT.length()+1));
-
-        		
-        		if (Config.get().getBoolean(Config.CLOSEALL)) {
-	        		// close all other files
-	        		Buffer[] bufs = org.gjt.sp.jedit.jEdit.getBuffers();
-	                for (int i = 0; i < bufs.length; i++) {
-	                    if (! bufs[i].equals(bu.getBuffer())) {
-	                    	org.gjt.sp.jedit.jEdit.closeBuffer(view,bufs[i]);
-	                    }
-	                }
-        		}
-              
-                
+               
         		//checkProjectView(projName, new File(bu.getBuffer().getDirectory()));
         		
         		//bu.getBuffer().setProperty("sidekick.parser",JasonSideKickParser.ID);
 
         	}
         }
-	
+        */
     }
 
 
