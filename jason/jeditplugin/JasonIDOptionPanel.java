@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.7  2006/01/11 15:14:39  jomifred
+//   add close all befere opening a mas2j project
+//
 //   Revision 1.6  2006/01/02 14:25:34  jomifred
 //   no message
 //
@@ -56,6 +59,7 @@ import java.io.File;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -72,6 +76,7 @@ public class JasonIDOptionPanel extends AbstractOptionPane  {
 	JTextField javaTF;
 	JTextField shellTF;
 	//JCheckBox  insideJIDECBox;
+	JCheckBox  closeAllCBox;
 
 	static Config userProperties = Config.get();
 
@@ -209,7 +214,15 @@ public class JasonIDOptionPanel extends AbstractOptionPane  {
     	insideJIDEPanel.add(insideJIDECBox);
     	pop.add(insideJIDEPanel);
     	*/
-    	
+
+    	// close all before opening mas project
+    	JPanel closeAllPanel = new JPanel();
+    	closeAllPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "jEdit options", TitledBorder.LEFT, TitledBorder.TOP));
+    	closeAllPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+    	closeAllCBox = new JCheckBox("Close all files before opening a new Jason Project.");
+    	closeAllPanel.add(closeAllCBox);
+    	pop.add(closeAllPanel);
+
     	addComponent(pop);
     	
     	saciTF.setText(userProperties.getSaciJar());
@@ -217,6 +230,7 @@ public class JasonIDOptionPanel extends AbstractOptionPane  {
     	javaTF.setText(userProperties.getJavaHome());
     	shellTF.setText(userProperties.getShellCommand());
     	//insideJIDECBox.setSelected(userProperties.runAsInternalTread());
+    	closeAllCBox.setSelected(userProperties.getBoolean(Config.CLOSEALL));
 	}
 
 	protected void _save() {
@@ -231,6 +245,7 @@ public class JasonIDOptionPanel extends AbstractOptionPane  {
 		}
 		userProperties.put(Config.SHELL_CMD, shellTF.getText().trim());
 		//userProperties.put(Config.RUN_AS_THREAD, insideJIDECBox.isSelected()+"");
+		userProperties.put(Config.CLOSEALL, closeAllCBox.isSelected()+"");
 		userProperties.store();
 	}
 

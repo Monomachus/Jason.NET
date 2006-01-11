@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.6  2006/01/11 15:14:39  jomifred
+//   add close all befere opening a mas2j project
+//
 //   Revision 1.5  2006/01/04 02:54:41  jomifred
 //   using java log API instead of apache log
 //
@@ -62,6 +65,7 @@ public class Config extends Properties {
 	public static final String JAVA_HOME = "javaHome";
 	public static final String RUN_AS_THREAD = "runCentralisedInsideJIDE";
 	public static final String SHELL_CMD = "shellCommand";
+	public static final String CLOSEALL = "closeAllBeforeOpenMAS2J";
 		
 	private static Config singleton = null;
 	
@@ -90,6 +94,10 @@ public class Config extends Properties {
     		System.err.println("Error reading preferences");
     		e.printStackTrace();
     	}
+	}
+	
+	public boolean getBoolean(String key) {
+		return get(key)!=null && get(key).equals("true");
 	}
 	
 	public String getJasonJar() {
@@ -156,6 +164,11 @@ public class Config extends Properties {
     		} else {
     			put(SHELL_CMD, "/bin/sh ");
     		}
+        }
+        
+        // close all
+        if (get(CLOSEALL) == null) {
+        	put(CLOSEALL, "true");
         }
 	}
 	

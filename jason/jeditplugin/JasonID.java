@@ -27,6 +27,7 @@
 
 package jason.jeditplugin;
 
+import jIDE.Config;
 import jIDE.RunMAS;
 import jIDE.RunningMASListener;
 import jason.mas2j.AgentParameters;
@@ -64,7 +65,6 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import javax.swing.JToolBar;
 import javax.swing.ListSelectionModel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
@@ -75,11 +75,11 @@ import org.gjt.sp.jedit.Buffer;
 import org.gjt.sp.jedit.EBComponent;
 import org.gjt.sp.jedit.EBMessage;
 import org.gjt.sp.jedit.EditBus;
-import org.gjt.sp.jedit.GUIUtilities;
 import org.gjt.sp.jedit.View;
 import org.gjt.sp.jedit.gui.AnimatedIcon;
 import org.gjt.sp.jedit.gui.DockableWindowManager;
 import org.gjt.sp.jedit.gui.RolloverButton;
+import org.gjt.sp.jedit.msg.BufferUpdate;
 
 import errorlist.DefaultErrorSource;
 import errorlist.ErrorSource;
@@ -264,21 +264,34 @@ public class JasonID extends JPanel implements EBComponent, RunningMASListener {
             propertiesChanged();
         } else */
 
-	/*
+	
     	if (message instanceof BufferUpdate) {
         	BufferUpdate bu = (BufferUpdate)message;
         	
         	if ((bu.getWhat() == BufferUpdate.LOADED || bu.getWhat() == BufferUpdate.CREATED) &&
         		bu.getBuffer().getPath().endsWith(MAS2JProject.EXT)) {
         		
-        		String projName = bu.getBuffer().getName().substring(0, bu.getBuffer().getName().length()-(MAS2JProject.EXT.length()+1));
-        		checkProjectView(projName, new File(bu.getBuffer().getDirectory()));
+        		//String projName = bu.getBuffer().getName().substring(0, bu.getBuffer().getName().length()-(MAS2JProject.EXT.length()+1));
+
+        		
+        		if (Config.get().getBoolean(Config.CLOSEALL)) {
+	        		// close all other files
+	        		Buffer[] bufs = org.gjt.sp.jedit.jEdit.getBuffers();
+	                for (int i = 0; i < bufs.length; i++) {
+	                    if (! bufs[i].equals(bu.getBuffer())) {
+	                    	org.gjt.sp.jedit.jEdit.closeBuffer(view,bufs[i]);
+	                    }
+	                }
+        		}
+              
+                
+        		//checkProjectView(projName, new File(bu.getBuffer().getDirectory()));
         		
         		//bu.getBuffer().setProperty("sidekick.parser",JasonSideKickParser.ID);
 
         	}
         }
-	*/
+	
     }
 
 
