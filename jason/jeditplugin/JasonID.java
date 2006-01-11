@@ -171,49 +171,54 @@ public class JasonID extends JPanel implements EBComponent, RunningMASListener {
 		animationLabel.setIcon(animation);
 		toolBar.add(animationLabel);
 		
-		btRun = createToolBarButton("Run MAS", GUIUtilities.loadIcon("Play.png"), new ActionListener() {
+		btRun = createToolBarButton("Run MAS", new ImageIcon(JasonID.class.getResource("/images/execute.gif")), new ActionListener() { //GUIUtilities.loadIcon("Play.png")
 			public void actionPerformed(ActionEvent arg0) {
 				runMAS();
 			}
 		});
 		toolBar.add(btRun);
 
-		btDebug = createToolBarButton("Debug MAS", GUIUtilities.loadIcon("RunAgain.png"), new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				debugMAS();
-			}
-		});
+		btDebug = createToolBarButton("Debug MAS", new ImageIcon(JasonID.class.getResource("/images/startDebugger.gif")), //GUIUtilities.loadIcon("RunAgain.png"), 
+				new ActionListener() {
+					public void actionPerformed(ActionEvent arg0) {
+						debugMAS();
+					}
+				});
 		toolBar.add(btDebug);
 		
 		
-		btStop = createToolBarButton("Stop MAS", GUIUtilities.loadIcon("Stop.png"), new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				stopMAS();
-			}
-		});
+		btStop = createToolBarButton("Stop MAS", new ImageIcon(JasonID.class.getResource("/images/suspend.gif")), //GUIUtilities.loadIcon("Stop.png"), 
+				new ActionListener() {
+					public void actionPerformed(ActionEvent arg0) {
+						stopMAS();
+					}
+				});
 		btStop.setEnabled(false);
 		toolBar.add(btStop);
 
 		//toolBar.addSeparator();
-		toolBar.add(createToolBarButton("New MAS", GUIUtilities.loadIcon("NewDir.png"), new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
-				newMAS();
-			}
-		}));
+		toolBar.add(createToolBarButton("New Project", new ImageIcon(JasonID.class.getResource("/images/new.gif")), //GUIUtilities.loadIcon("NewDir.png"), 
+				new ActionListener() {
+					public void actionPerformed(ActionEvent evt) {
+						newMAS();
+					}
+				}));
 
-		toolBar.add(createToolBarButton("New Agent", GUIUtilities.loadIcon("NextFile.png"), new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
-				newAg();
-			}
-		}));
+		toolBar.add(createToolBarButton("New Agent", new ImageIcon(JasonID.class.getResource("/images/newAgent.gif")), //GUIUtilities.loadIcon("NextFile.png"), 
+				new ActionListener() {
+				public void actionPerformed(ActionEvent evt) {
+					newAg();
+				}
+			}));
 		
 		
 		//toolBar.addSeparator();
-		toolBar.add(createToolBarButton("Clear panel", GUIUtilities.loadIcon("Clear.png"), new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				textArea.setText("");
-			}
-		}));
+		toolBar.add(createToolBarButton("Clear panel", new ImageIcon(JasonID.class.getResource("/images/clear.gif")),//GUIUtilities.loadIcon("Clear.png"), 
+				new ActionListener() {
+					public void actionPerformed(ActionEvent arg0) {
+						textArea.setText("");
+					}
+				}));
 		add(Box.createGlue());
 		
 		JPanel p = new JPanel(new BorderLayout());

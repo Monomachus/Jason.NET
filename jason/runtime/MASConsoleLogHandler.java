@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.2  2006/01/11 14:52:38  jomifred
+//   no message
+//
 //   Revision 1.1  2006/01/04 02:55:57  jomifred
 //   using java log API instead of apache log
 //
@@ -74,6 +77,8 @@ public class MASConsoleLogHandler extends StreamHandler  {
 	}
 
 	public void publish(LogRecord l) {
-		fGUI.append(getFormatter().format(l));
+		if (l.getLoggerName().startsWith("jason") || l.getLoggerName().startsWith("jIDE")) {
+			fGUI.append(getFormatter().format(l));
+		}
 	}
 }
