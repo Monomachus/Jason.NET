@@ -115,7 +115,7 @@ public class JasonID extends JPanel implements EBComponent, RunningMASListener {
 
 		textArea = new JTextArea(5,10);
 		textArea.setEditable(false);
-		textArea.setText("Use the menu Plugin->Jason->New to create a new project.");
+		textArea.setText("Jason functions are also available in the Plugin-Jason menu.");
 		
 		JPanel pane = new JPanel(new BorderLayout());
 		pane.add(BorderLayout.CENTER, new JScrollPane(textArea));
