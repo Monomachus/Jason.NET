@@ -4,7 +4,7 @@
 
 <!--	
     Syntax color for Jason projects (see http://jason.sf.net)
-	written by Jomi F. Hubner
+	written by Jomi F. Hubner and Rafael H. Bordini
 -->
 
 <MODE>
@@ -17,7 +17,7 @@
 	<RULES ESCAPE="\" IGNORE_CASE="FALSE" HIGHLIGHT_DIGITS="TRUE">
 	
 		<!-- Comments -->
-		<EOL_SPAN TYPE="COMMENT4">//</EOL_SPAN>
+		<EOL_SPAN TYPE="COMMENT1">//</EOL_SPAN>
 		<!--- ISO compliant C-style comments -->
 		<SPAN TYPE="COMMENT1">
 			<BEGIN>/*</BEGIN>
@@ -25,39 +25,39 @@
 		</SPAN>
 		
 		<!-- String literals -->
-		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+		<SPAN TYPE="COMMENT2" NO_LINE_BREAK="TRUE">
 			<BEGIN>"</BEGIN>
 			<END>"</END>
 		</SPAN>
 
 		<!-- keywords -->
  		<SEQ TYPE="MARKUP">MAS</SEQ>
- 		<SEQ TYPE="KEYWORD1">agents</SEQ>
- 		<SEQ TYPE="KEYWORD1">environment</SEQ>
- 		<SEQ TYPE="KEYWORD1">executionControl</SEQ>
- 		<SEQ TYPE="KEYWORD1">infrastructure</SEQ>
+ 		<SEQ TYPE="MARKUP">agents</SEQ>
+ 		<SEQ TYPE="MARKUP">environment</SEQ>
+ 		<SEQ TYPE="MARKUP">executionControl</SEQ>
+ 		<SEQ TYPE="MARKUP">infrastructure</SEQ>
 
- 		<SEQ TYPE="KEYWORD2">at</SEQ>
- 		<SEQ TYPE="KEYWORD2">events</SEQ>
- 		<SEQ TYPE="KEYWORD2">intBels</SEQ>
- 		<SEQ TYPE="KEYWORD2">nrcbp</SEQ>
- 		<SEQ TYPE="KEYWORD2">verbose</SEQ>
- 		<SEQ TYPE="KEYWORD2">synchronised</SEQ>
- 		<SEQ TYPE="KEYWORD2">agentClass</SEQ>
- 		<SEQ TYPE="KEYWORD2">agentArchClass</SEQ>
+ 		<SEQ TYPE="COMMENT3">at</SEQ>
+ 		<SEQ TYPE="COMMENT3">events</SEQ>
+ 		<SEQ TYPE="COMMENT3">intBels</SEQ>
+ 		<SEQ TYPE="COMMENT3">nrcbp</SEQ>
+ 		<SEQ TYPE="COMMENT3">verbose</SEQ>
+ 		<SEQ TYPE="COMMENT3">synchronised</SEQ>
+ 		<SEQ TYPE="COMMENT3">agentClass</SEQ>
+ 		<SEQ TYPE="COMMENT3">agentArchClass</SEQ>
 
 
 		<!-- values -->
- 		<SEQ TYPE="LITERAL4">Centralised</SEQ>
- 		<SEQ TYPE="LITERAL4">Saci</SEQ>
+ 		<SEQ TYPE="COMMENT2">Centralised</SEQ>
+ 		<SEQ TYPE="COMMENT2">Saci</SEQ>
 
- 		<SEQ TYPE="LITERAL1">discard</SEQ>
- 		<SEQ TYPE="LITERAL1">requeue</SEQ>
- 		<SEQ TYPE="LITERAL1">retrieve</SEQ>
- 		<SEQ TYPE="LITERAL1">sameFocus</SEQ>
- 		<SEQ TYPE="LITERAL1">newFocus</SEQ>
- 		<SEQ TYPE="LITERAL1">true</SEQ>
- 		<SEQ TYPE="LITERAL1">false</SEQ>
+ 		<SEQ TYPE="FUNCTION">discard</SEQ>
+ 		<SEQ TYPE="FUNCTION">requeue</SEQ>
+ 		<SEQ TYPE="FUNCTION">retrieve</SEQ>
+ 		<SEQ TYPE="FUNCTION">sameFocus</SEQ>
+ 		<SEQ TYPE="FUNCTION">newFocus</SEQ>
+ 		<SEQ TYPE="FUNCTION">true</SEQ>
+ 		<SEQ TYPE="FUNCTION">false</SEQ>
 
 		<!-- Parentheses -->
 		<SEQ TYPE="MARKUP">{</SEQ>
