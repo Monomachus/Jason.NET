@@ -163,7 +163,6 @@ public class NewAgentGUI extends JDialog {
 		}
 		
 		agDecl.asSource = new File(agFile);
-		JasonID.listModel.addElement(agDecl);
 		return true;
 	}
 	

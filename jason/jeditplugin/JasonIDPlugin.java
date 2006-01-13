@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.11  2006/01/13 19:54:47  jomifred
+//   handle multiple instances of the plugin
+//
 //   Revision 1.10  2006/01/11 18:31:52  jomifred
 //   no message
 //
@@ -127,8 +130,8 @@ public class JasonIDPlugin extends EBPlugin {
     	}
 	}
     
-    AgentSpeakSideKickParser asskp = new AgentSpeakSideKickParser(); 
-    JasonProjectSideKickParser jpskp = new JasonProjectSideKickParser();
+    static AgentSpeakSideKickParser asskp = new AgentSpeakSideKickParser(); 
+    static JasonProjectSideKickParser jpskp = new JasonProjectSideKickParser();
     
 	public void start() {
     	SideKickPlugin.registerParser(asskp);

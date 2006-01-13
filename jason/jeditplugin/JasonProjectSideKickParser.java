@@ -1,4 +1,4 @@
- package jason.jeditplugin;
+package jason.jeditplugin;
 
 import jason.mas2j.AgentParameters;
 import jason.mas2j.MAS2JProject;
@@ -6,7 +6,9 @@ import jason.mas2j.parser.mas2j;
 
 import java.io.File;
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import javax.swing.Icon;
 import javax.swing.text.Position;
@@ -22,9 +24,15 @@ import errorlist.ErrorSource;
 
 public class JasonProjectSideKickParser extends sidekick.SideKickParser {
 	public static final String ID = "jason_parser";
+
+	List jasonPluginInstance = new ArrayList();
 	
 	public JasonProjectSideKickParser() {
 		super(ID);
+	}
+	
+	public void addPluginInstance(JasonID p) {
+		jasonPluginInstance.add(p);
 	}
 	
 	public SideKickParsedData parse(Buffer buf, DefaultErrorSource errorSource) {
@@ -48,19 +56,23 @@ public class JasonProjectSideKickParser extends sidekick.SideKickParser {
                 	pd.root.add(new ProjectAsset("Environment: ",project.getEnvClass(), buf, ENV_TYPE).createTreeNode());
             	}
             	//Object[] aap = new Object[project.getAgents().size()];
-            	JasonID.listModel.clear();
-            	Iterator i = project.getAgents().iterator();
-            	int c = 0;
+            	Iterator i = jasonPluginInstance.iterator();
             	while (i.hasNext()) {
-            		AgentParameters ap = (AgentParameters)i.next();
+            		((JasonID)i.next()).listModel.clear();
+            	}
+            	Iterator ia = project.getAgents().iterator();
+            	int c = 0;
+            	while (ia.hasNext()) {
+            		AgentParameters ap = (AgentParameters)ia.next();
             		ap.asSource = new File(buf.getDirectory() + ap.asSource); // add project directory in the AP
             	    pd.root.add(new ProjectAsset("", ap.name, buf, AG_TYPE).createTreeNode());
             	    //aap[c++] = ap;
-            	    JasonID.listModel.addElement(ap);
+                	
+            	    i = jasonPluginInstance.iterator();
+                	while (i.hasNext()) {
+                		((JasonID)i.next()).listModel.addElement(ap);
+                	}
             	}
-        	    //JasonID.lstAgs.ensureIndexIsVisible(project.getAgents().size()-1);
-        	    //JasonID.lstAgs.setSelectedIndex(project.getAgents().size()-1);
-            	//JasonID.lstAgs.setListData(aap);
         		return pd;
         		
         } catch (jason.mas2j.parser.ParseException ex) {

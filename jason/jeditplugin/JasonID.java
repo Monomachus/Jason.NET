@@ -97,8 +97,8 @@ public class JasonID extends JPanel implements EBComponent, RunningMASListener {
 	JButton btRun;
 	JButton btDebug;
 
-	static DefaultListModel listModel = new DefaultListModel();
-	static JList  lstAgs = new JList(listModel);
+	DefaultListModel listModel = new DefaultListModel();
+	JList  lstAgs = new JList(listModel);
 	
 	DefaultErrorSource errorSource = null;
 
@@ -140,6 +140,9 @@ public class JasonID extends JPanel implements EBComponent, RunningMASListener {
 		
         myOut = new OutputStreamAdapter(null, textArea);
         myOut.setAsDefaultOut();
+        
+        // add myself in project parser
+        JasonIDPlugin.jpskp.addPluginInstance(this);
 	}
 	
 	public synchronized void start() {
