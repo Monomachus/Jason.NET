@@ -1,6 +1,7 @@
 package jason.mas2j;
 
 import jason.architecture.AgArch;
+import jason.runtime.Settings;
 
 import java.io.File;
 import java.util.Iterator;
@@ -51,7 +52,7 @@ public class AgentParameters {
 		return s.toString().trim() + ";";
 	}
 
-	public String getAsXMLScript(String proDir, String soc, String architecture, boolean debug, boolean forceSync) {
+	public String getAsSaciXMLScript(String proDir, String soc, String architecture, boolean debug, boolean forceSync) {
 		StringBuffer s = new StringBuffer("\t<startAgent "); 
         s.append("\n\t\tname=\""+name+"\" "); 
         s.append("\n\t\tsociety.name=\""+soc+"\" ");
@@ -72,7 +73,7 @@ public class AgentParameters {
         }
         
         File tmpAsSrc = new File(proDir + File.separator + asSource);
-        s.append("\n\t\targs=\""+tmpAgArchClass+" "+tmpAgClass+" '"+tmpAsSrc.getAbsolutePath()+"'"+getOptsStr(debug, forceSync)+"\"");
+        s.append("\n\t\targs=\""+tmpAgArchClass+" "+tmpAgClass+" '"+tmpAsSrc.getAbsolutePath()+"'"+getSaciOptsStr(debug, forceSync)+"\"");
         if (qty > 1) {
         	s.append("\n\t\tqty=\""+qty+"\" ");
         }
@@ -83,7 +84,7 @@ public class AgentParameters {
 		return s.toString().trim();
 	}
 	
-	String getOptsStr(boolean debug, boolean forceSync) {
+	String getSaciOptsStr(boolean debug, boolean forceSync) {
 		String s = "";
 		String v = "";
 	    if (debug) {
@@ -110,6 +111,29 @@ public class AgentParameters {
 		return s;
 	}
 	
+	public Settings getAsSetts(boolean debug, boolean forceSync) {
+		Settings stts = new Settings();
+		
+		Iterator i = options.keySet().iterator();
+		String s = ""; String v = "";
+		while (i.hasNext()) {
+			String key = (String) i.next();
+			s += v + key + "=" + options.get(key);
+			v = ",";
+		}
+		if (s.length() > 0) {
+			stts.setOptions("["+s+"]");
+		}
+	    if (debug) {
+	    	stts.setVerbose(2);
+	    }
+		
+	    if (forceSync || debug) {
+	    	stts.setSync(true);
+	    }
+		return stts;
+	}
+	
 	String removeQuotes(String s) {
 		if (s.startsWith("\"") && s.endsWith("\"")) {
 			return s.substring(1,s.length()-1);
@@ -117,12 +141,12 @@ public class AgentParameters {
 			return s;
 		}
 	}
+	
 	String changeQuotes(String s) {
 		if (s.startsWith("\"") && s.endsWith("\"")) {
 			return "'"+s.substring(1,s.length()-1)+"'";
 		} else {
 			return s;
 		}
-	}
-	
+	}	
 }

@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.20  2006/01/14 18:22:45  jomifred
+//   centralised infra does not use xml script file anymore
+//
 //   Revision 1.19  2006/01/04 02:54:41  jomifred
 //   using java log API instead of apache log
 //
@@ -59,6 +62,7 @@ import jason.asSemantics.Message;
 import jason.asSyntax.Term;
 import jason.control.CentralisedExecutionControl;
 import jason.environment.CentralisedEnvironment;
+import jason.runtime.Settings;
 
 import java.util.Iterator;
 import java.util.List;
@@ -88,19 +92,14 @@ public class CentralisedAgArch extends Thread implements AgArchInterface {
 	
 	protected Logger logger;
     
-    public void initAg(String[] args) throws JasonException {
+	/** creates the user agent architecture, default architecture is jason.architecture.AgArch. 
+	 *  The arch will create the agent that creates the TS. */
+    public void initAg(String agArchClass, String agClass, String asSrc, Settings stts) throws JasonException {
     	logger = Logger.getLogger(CentralisedAgArch.class.getName()+"."+getAgName());
-        // set the agent
         try {
-            String archClassName = null;
-            if (args.length < 1) { // error
-                throw new JasonException("The agent architecture class name was not informed for the CentralisedAgArch creation!");
-            } else {
-            	archClassName = args[0].trim();
-            }
-            fUserAgArh = (AgArch)Class.forName(archClassName).newInstance();
+            fUserAgArh = (AgArch)Class.forName(agArchClass).newInstance();
             fUserAgArh.setInfraArch(this);
-            fUserAgArh.initAg(args);
+            fUserAgArh.initAg(agClass, asSrc, stts);
     		logger.setLevel(fUserAgArh.getTS().getSettings().logLevel());
         } catch (Exception e) {
         	running = false;
@@ -120,13 +119,6 @@ public class CentralisedAgArch extends Thread implements AgArchInterface {
     public AgArch getUserAgArch() {
     	return fUserAgArh;
     }
-
-    /*
-    public void setTS(TransitionSystem ts) {
-        this.fTS = ts;
-    }
-    */
-    
 
 	public void setEnv(CentralisedEnvironment env) {
 		fEnv = env;

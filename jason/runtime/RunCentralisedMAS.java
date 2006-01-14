@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.3  2006/01/14 18:23:40  jomifred
+//   centralised infra does not use xml script file anymore
+//
 //   Revision 1.2  2006/01/04 03:00:46  jomifred
 //   using java log API instead of apache log
 //
@@ -31,9 +34,6 @@
 //
 //   Revision 1.19  2005/11/16 18:35:25  jomifred
 //   fixed the print(int) on console bug
-//
-//   Revision 1.18  2005/11/07 12:41:31  jomifred
-//   no message
 //
 //   Revision 1.17  2005/10/30 18:39:48  jomifred
 //   change in the AgArch customisation  support (the same customisation is used both to Cent and Saci infrastructures0
@@ -52,14 +52,22 @@
 
 package jason.runtime;
 
+import jason.JasonException;
+import jason.architecture.AgArch;
 import jason.architecture.CentralisedAgArch;
 import jason.control.CentralisedExecutionControl;
+import jason.control.ExecutionControlGUI;
 import jason.environment.CentralisedEnvironment;
+import jason.mas2j.AgentParameters;
+import jason.mas2j.MAS2JProject;
+import jason.mas2j.parser.ParseException;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -68,12 +76,6 @@ import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 import javax.swing.JButton;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
 /**
  * Runs a SACI script without SACI.
@@ -84,81 +86,87 @@ public class RunCentralisedMAS {
     CentralisedEnvironment env = null;
     CentralisedExecutionControl control = null;
     List ags = new ArrayList();
-    boolean insideJIDE = false;
     
     private static Logger logger = Logger.getLogger(RunCentralisedMAS.class.getName());
     private static RunCentralisedMAS runner = null;
     
     public final static String logPropFile = "logging.properties";
     
-    //static MASConsoleGUI console;
-    
     public static void main(String[] args) {
         if (args.length < 1) {
-            System.err.println("You should inform the MAS XML script only.");
+            System.err.println("You should inform the MAS project file.");
             System.exit(1);
         }
-
-        runner = new RunCentralisedMAS();
+        boolean debug = false;
 
         setupLogger();
         
-        Document docDOM = parse(args[0]);
-        if (docDOM != null) {
-			try {
-				runner.createAg(docDOM);
-				runner.startAgs();
-				runner.startSyncMode();
-			} catch (Exception e) {
-				logger.log(Level.SEVERE,"Error!?: ",e);
-			}
-
-	        if (args.length == 2) { // from inside jIDE
-	        	if (args[1].equals("insideJIDE")) {
-	        		runner.insideJIDE = true;
-	        	}
-	        }
-			
-	        if (MASConsoleGUI.hasConsole()) {
-				// add Button
-		        JButton btStop = new JButton("Stop MAS");
-		        btStop.addActionListener(new ActionListener() {
-		            public void actionPerformed(ActionEvent evt) {
-		            	MASConsoleGUI.get().setPause(false);
-		            	runner.finish();
-		            }
-		        });
-		        MASConsoleGUI.get().addButton(btStop);
-	
-		        // add Button
-		        final JButton btPause = new JButton("Pause MAS");
-		        btPause.addActionListener(new ActionListener() {
-		            public void actionPerformed(ActionEvent evt) {
-		            	if (MASConsoleGUI.get().isPause()) {
-		            		btPause.setText("Pause MAS");
-		            		MASConsoleGUI.get().setPause(false);
-		            	} else {
-		            		btPause.setText("Continue");
-		            		MASConsoleGUI.get().setPause(true);
-		            	}
-		            	
-		            }
-		        });
-		        MASConsoleGUI.get().addButton(btPause);
-		        MASConsoleGUI.get().setAsDefaultOut();
-	        }
-	        
-	        if (! runner.insideJIDE) {
-	        	runner.waitEnd();
-	        }
+        if (args.length > 1) {
+        	if (args[1].equals("-debug")) {
+        		debug = true;
+        		logger.getLogger("").setLevel(Level.FINE);
+        	}
         }
+        
+        runner = new RunCentralisedMAS();
+
+        
+    	MAS2JProject project = null;
+		try {
+			jason.mas2j.parser.mas2j parser = new jason.mas2j.parser.mas2j(new FileReader(args[0]));
+	    	project = parser.mas();
+
+			runner.createAg(project, debug);
+			runner.startAgs();
+			runner.startSyncMode();
+			
+		} catch (FileNotFoundException e1) {
+			logger.log(Level.SEVERE, "File "+args[0]+" not found!");
+			System.exit(2);
+		} catch (ParseException e) {
+			logger.log(Level.SEVERE, "Error parsing file "+args[0]+"!",e);
+			System.exit(3);
+		} catch (Exception e) {
+			logger.log(Level.SEVERE,"Error!?: ",e);
+			System.exit(4);
+		}
+
+        if (MASConsoleGUI.hasConsole()) {
+			// add Button
+	        JButton btStop = new JButton("Stop MAS");
+	        btStop.addActionListener(new ActionListener() {
+	            public void actionPerformed(ActionEvent evt) {
+	            	MASConsoleGUI.get().setPause(false);
+	            	runner.finish();
+	            }
+	        });
+	        MASConsoleGUI.get().addButton(btStop);
+
+	        // add Button
+	        final JButton btPause = new JButton("Pause MAS");
+	        btPause.addActionListener(new ActionListener() {
+	            public void actionPerformed(ActionEvent evt) {
+	            	if (MASConsoleGUI.get().isPause()) {
+	            		btPause.setText("Pause MAS");
+	            		MASConsoleGUI.get().setPause(false);
+	            	} else {
+	            		btPause.setText("Continue");
+	            		MASConsoleGUI.get().setPause(true);
+	            	}
+	            	
+	            }
+	        });
+	        MASConsoleGUI.get().addButton(btPause);
+	        MASConsoleGUI.get().setAsDefaultOut();
+        }
+    
+        runner.waitEnd();
     }
     
     
     public static void setupLogger() {
-        // see for a local log4j configuration
+        // see for a local log configuration
         if (new File(logPropFile).exists()) {
-        	// PropertyConfigurator.configure(logPropFile);
         	try {
         		LogManager.getLogManager().readConfiguration(new FileInputStream(logPropFile));
         	} catch (Exception e) {
@@ -182,86 +190,75 @@ public class RunCentralisedMAS {
             Logger.getLogger("").addHandler(h);
             Logger.getLogger("").setLevel(Level.INFO);
             */
-            // PropertyConfigurator.configure(RunCentralisedMAS.class.getResource("/"+logPropFile));
-        	//Logger.getRootLogger().addAppender(new ConsoleAppender(new PatternLayout("[%c{1}] %m%n")));
-        	//Logger.getRootLogger().setLevel(Level.INFO);
         }
     }
     
-    public static Document parse(String file) {
-        try {
-            if (file.startsWith("\"")) {
-        			file = file.substring(1, file.length()-1);
-            }
-        	
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            factory.setNamespaceAware(true); // se o parser considera o name space
-			
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            return builder.parse( new File( file ) );
-        } catch (Exception e) {
-            logger.log(Level.SEVERE,"Error parsing the script file",e);
-            return null;
-        }
-    }
-
     public static RunCentralisedMAS getRunner() {
     	return runner;
     }
     
-	void createAg(Document docDOM) {
-        
-		// get soc nome
-		try {
-			Element app = (Element)docDOM.getElementsByTagName("application").item(0);
-	        if (MASConsoleGUI.hasConsole()) {
-	        	MASConsoleGUI.get().setTitle("MAS Console - " + app.getAttribute("id"));
-	        }
-		} catch (Exception e) {
-			logger.log(Level.SEVERE,"Error getting the society name",e);
-		}
-		
-        // create the agentes
-        NodeList listAg = docDOM.getElementsByTagName("startAgent");
-        for (int i=0; i<listAg.getLength(); i++) {
-            Element sAg = (Element)listAg.item(i);
 
-            String agName = sAg.getAttribute("name");
-            try {
-                if (agName.equals("environment")) {
-                    logger.info("Creating environment "+sAg.getAttribute("class"));
-                    env = new CentralisedEnvironment(sAg.getAttribute("class"));
-                } else if (agName.equals("controller")) {
-                	logger.info("Creating controller "+sAg.getAttribute("class"));
-                	control = new CentralisedExecutionControl(env, sAg.getAttribute("class"));
-                } else {
-                    // it is an agent
-                    int qty = 1;
-                    try {
-                        qty = Integer.parseInt(sAg.getAttribute("qty"));
-                    } catch (Exception e) {}
-                    String className = sAg.getAttribute("class");
-                    String[] agArgs = getArrayFromString(sAg.getAttribute("args"));
-                    for (int cAg=0; cAg<qty; cAg++) {
-                        String numberedAg = agName;
-                        if (qty > 1) {
-                            numberedAg += (cAg+1);
-                        }
-                        logger.info("Creating agent "+numberedAg+" ("+(cAg+1)+"/"+qty+") from "+className);
-                        CentralisedAgArch agArch = (CentralisedAgArch)Class.forName(className).newInstance();
-                        agArch.setAgName(numberedAg);
-                        agArch.setEnv(env);
-                        agArch.initAg(agArgs);
-                        env.addAgent(agArch.getUserAgArch());
-                        ags.add(agArch);
-                    }
+
+    void createAg(MAS2JProject project, boolean debug) throws JasonException {
+        
+    	if (MASConsoleGUI.hasConsole()) {
+    		MASConsoleGUI.get().setTitle("MAS Console - " + project.getSocName());
+	    }
+		
+    	// create environment
+        String envClass = project.getEnvClass();
+        if (envClass == null) {
+            envClass = jason.environment.Environment.class.getName();;
+        }
+        logger.info("Creating environment "+envClass);
+        env = new CentralisedEnvironment(envClass);
+    	
+        // create the agents
+    	Iterator ia = project.getAgents().iterator();
+    	while (ia.hasNext()) {
+    		AgentParameters ap = (AgentParameters)ia.next();
+    		try {
+                String agName = ap.name;
+
+                String tmpAgClass = ap.agClass;
+                if (tmpAgClass == null) {
+                	tmpAgClass = jason.asSemantics.Agent.class.getName();
                 }
-                
-            } catch (Exception e) {
-            	logger.log(Level.SEVERE,"Error creating agent "+agName,e);
-            }
-        } // for
+                String tmpAgArchClass = ap.archClass;
+                if (tmpAgArchClass == null) {
+                	tmpAgArchClass = AgArch.class.getName();
+                }
+                String tmpAsSrc = project.getDirectory() + ap.asSource;
+
+                for (int cAg=0; cAg < ap.qty; cAg++) {
+                    String numberedAg = agName;
+                    if (ap.qty > 1) {
+                        numberedAg += (cAg+1);
+                    }
+                    logger.info("Creating agent "+numberedAg+" ("+(cAg+1)+"/"+ap.qty+")");
+                    CentralisedAgArch agArch = new CentralisedAgArch();
+                    agArch.setAgName(numberedAg);
+                    agArch.setEnv(env);
+                    agArch.initAg(tmpAgArchClass, tmpAgClass, tmpAsSrc, ap.getAsSetts(debug, project.getControlClass() != null));
+                    env.addAgent(agArch.getUserAgArch());
+                    ags.add(agArch);
+                }
+    		} catch (Exception e) {
+    			logger.log(Level.SEVERE,"Error creating agent "+ap.name,e);
+    		}
+    	}
+    	
+    	// create controller
+        String controlClass = project.getControlClass();
+		if (debug && controlClass == null) {
+			controlClass = ExecutionControlGUI.class.getName();
+		}
+		if (controlClass != null) {
+			logger.info("Creating controller "+controlClass);
+	    	control = new CentralisedExecutionControl(env, controlClass);
+		}
 	}
+    
 
 	void startAgs() {
         // run the agents
@@ -297,7 +294,7 @@ public class RunCentralisedMAS {
 	void waitEnd() {
 		try {
 			int c = System.in.read();
-			while (c != 1) {
+			while (c != 1) { // RunProject prints "1" out to signal finishing
 				c = System.in.read();
 			}
 			finish();
@@ -328,58 +325,7 @@ public class RunCentralisedMAS {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		if (!insideJIDE) {
-			System.exit(0);
-		}
+		
+		System.exit(0);
 	}
-	
-	
-    public static String[] getArrayFromString(String s) {
-        if (s == null) {
-            return new String[0];
-        }
-
-        List v = new ArrayList();
-        
-        s = s.trim();
-        String token = "";
-        char lookingFor = ' ';
-        for (int i = 0; i < s.length(); i++) {
-        		if (s.charAt(i) == lookingFor) {
-        			if (token.length() > 0 && lookingFor == ' ') {
-        				token = token.trim();
-        				if (token.startsWith("\"") && token.endsWith("\"")) {
-        					token = token.substring(1,token.length()-1);
-        				}
-        				v.add(token);
-            			token = "";
-        			}
-        			if (lookingFor == '\'') {
-            			token += "\"";
-        				lookingFor = ' ';
-        			}
-        		} else if (s.charAt(i) == '\'') {
-        			lookingFor = '\'';
-        			token += "\"";
-        		} else {
-        			token += s.charAt(i);
-        		}
-        }
-        if (token.length() > 0) {
-			token = token.trim();
-			if (token.startsWith("\"") && token.endsWith("\"")) {
-				token = token.substring(1,token.length()-1);
-			}
-			v.add(token);
-        }
-        
-        String[] a = new String[v.size()];
-
-        for (int i = 0; i < v.size(); i++) {
-            a[i] = (String) v.get(i);
-        }
-
-        return a;
-    }
-
 }

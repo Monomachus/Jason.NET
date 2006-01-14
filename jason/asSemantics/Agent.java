@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.26  2006/01/14 18:22:45  jomifred
+//   centralised infra does not use xml script file anymore
+//
 //   Revision 1.25  2006/01/06 12:05:37  jomifred
 //   operator - removes bel from BB and changes the current unifier.
 //
@@ -40,9 +43,6 @@
 //
 //   Revision 1.20  2005/12/23 00:48:22  jomifred
 //   StringTerm is now an interface implemented by StringTermImpl
-//
-//   Revision 1.19  2005/12/17 19:51:57  jomifred
-//   no message
 //
 //   Revision 1.18  2005/10/30 18:38:34  jomifred
 //   change in the AgArch customisation  support (the same customisation is used both to Cent and Saci infrastructures0
@@ -110,34 +110,15 @@ public class Agent {
 
 	private Logger logger;
 	
-	/**
-	 * args[0] is the agent architecture class (ignored here)
-	 * args[1] is the user Agent class (ignored here)
-	 * args[2] is the AgentSpeak source file
-	 * args[3] "options"
-	 * args[4] options
-	 */
-    public TransitionSystem initAg(String[] args, AgArchInterface arch) throws JasonException {
+    /** creates the TS of this agent, parse its AS source, and set its Settings */
+    public TransitionSystem initAg(AgArchInterface arch, String asSrc, Settings stts) throws JasonException {
         // set the agent
         try {
 			setLogger(arch);
-			String asSource = null;
-			if (args.length < 3) { // error
-				throw new JasonException("The AgentSpeak source file was not informed, cannot create the Agent!");
-			} else {
-				asSource = args[2].trim();
-			}
-			Circumstance C = new Circumstance();
-			Settings setts = new Settings();
-			if (args.length > 3) {
-				if (args[3].equals("options")) {
-					setts.setOptions("[" + args[4] + "]");
-				}
-			}
-			logger.setLevel(setts.logLevel());
-			setTS(new TransitionSystem(this, C, setts, arch));
+			logger.setLevel(stts.logLevel());
+			setTS(new TransitionSystem(this, new Circumstance(), stts, arch));
 
-			parseAS(asSource);
+			parseAS(asSrc);
 			// kqml Plans at the end of the ag PS
 			parseAS(JasonID.class.getResource("/asl/kqmlPlans.asl"));
 			
@@ -148,7 +129,7 @@ public class Agent {
 		}
     }
 
-	public void setLogger(AgArchInterface arch) {
+    public void setLogger(AgArchInterface arch) {
 		if (arch != null) {
 			logger = Logger.getLogger(Agent.class.getName()+"."+arch.getAgName());
 		} else {

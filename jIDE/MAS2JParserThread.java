@@ -23,11 +23,11 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.14  2006/01/14 18:24:20  jomifred
+//   centralised infra does not use xml script file anymore
+//
 //   Revision 1.13  2005/12/08 20:05:01  jomifred
 //   changes for JasonIDE plugin
-//
-//   Revision 1.12  2005/11/22 00:05:32  jomifred
-//   no message
 //
 //   Revision 1.11  2005/10/29 21:46:22  jomifred
 //   add a new class (MAS2JProject) to store information parsed by the mas2j parser. This new class also create the project scripts
@@ -39,9 +39,12 @@
 
 package jIDE;
 
-import jason.mas2j.parser.*;
 import jason.mas2j.MAS2JProject;
+import jason.mas2j.parser.ParseException;
+import jason.mas2j.parser.TokenMgrError;
+import jason.mas2j.parser.mas2j;
 
+import java.io.File;
 import java.io.StringReader;
 
 import javax.swing.text.Document;
@@ -90,6 +93,7 @@ public class MAS2JParserThread extends ASParserThread { //Thread {
             fParserMAS2J.ReInit(new StringReader(text));
             fCurrentProject = fParserMAS2J.mas();
             fCurrentProject.setDirectory( fJasonID.projectDirectory );
+            fCurrentProject.setProjectFile( new File(fJasonID.mas2jPane.getFileName()) ); // TODO: not work. Fix it 
             
             fOk = true;
             
@@ -99,7 +103,6 @@ public class MAS2JParserThread extends ASParserThread { //Thread {
                 } else {
             		fCurrentProject.debugOff();            		
                 }
-            	fCurrentProject.writeXMLScript();
             	fCurrentProject.writeScripts();
                 System.out.println(" parsed successfully!");
                 //System.out.println("scripts was written on "+editorPanel.mainGUI.projectDirectory+".");

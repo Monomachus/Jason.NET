@@ -23,12 +23,14 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.6  2006/01/14 18:23:22  jomifred
+//   centralised infra does not use xml script file anymore
+//
 //   Revision 1.5  2006/01/14 15:25:15  jomifred
 //   Config and some code of RunMAS was moved to package plugin
 //
 //   Revision 1.4  2005/12/30 20:40:59  jomifred
 //   new features: unnamed var, var with annots, TE as var
-//
 //
 //   Revision 1.1  2005/12/08 20:13:53  jomifred
 //   changes for JasonIDE plugin
@@ -94,8 +96,8 @@ public class mas2j {
 		project = parser.mas();
 		Config.get().fix();
         project.setDirectory(new File(".").getAbsolutePath());
+        project.setProjectFile(new File(name));
 		System.out.println("mas2j: "+name+" parsed successfully!\n");
-		project.writeXMLScript();
         project.writeScripts();
 
         int step = 1;

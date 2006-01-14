@@ -23,8 +23,8 @@
 //   $Date$
 //   $Revision$
 //   $Log$
-//   Revision 1.16  2006/01/04 03:00:47  jomifred
-//   using java log API instead of apache log
+//   Revision 1.17  2006/01/14 18:23:40  jomifred
+//   centralised infra does not use xml script file anymore
 //
 //----------------------------------------------------------------------------
 
@@ -43,6 +43,7 @@ import jason.asSyntax.StringTerm;
 import jason.asSyntax.Term;
 import jason.control.CentralisedExecutionControl;
 import jason.environment.CentralisedEnvironment;
+import jason.runtime.Settings;
 
 import java.io.File;
 import java.util.logging.Logger;
@@ -130,11 +131,9 @@ public class createAgent implements InternalAction {
 			logger.fine("Creating centralised agent from source "+source);
             // parameters for ini
 			
-            String[] agArgs = { AgArch.class.getName(), Agent.class.getName(), source};
-
             CentralisedAgArch agArch = new CentralisedAgArch();//(CentralisedAgArch)Class.forName(Agent.class.getName()).newInstance();
             agArch.setAgName(name.toString());
-            agArch.initAg(agArgs);
+            agArch.initAg(AgArch.class.getName(), Agent.class.getName(), source, new Settings());
             agArch.setEnv(env);
             agArch.setControl(control);
             if (isSync) {

@@ -22,6 +22,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.3  2006/01/14 18:22:45  jomifred
+//   centralised infra does not use xml script file anymore
+//
 //   Revision 1.2  2005/11/20 16:53:17  jomifred
 //   the canSleep method in TS asks the agent arch if it can sleep.
 //
@@ -37,6 +40,7 @@ import jason.JasonException;
 import jason.asSemantics.Agent;
 import jason.asSemantics.Message;
 import jason.asSemantics.TransitionSystem;
+import jason.runtime.Settings;
 
 import java.util.List;
 
@@ -57,29 +61,20 @@ public class AgArch implements AgArchInterface {
 
 	protected TransitionSystem fTS = null;
 	
-	/** the class that implements the architecture  tier for the MAS infrastructure */
+	/** the class that implements the architecture tier for the MAS infrastructure */
 	AgArchInterface archTier;
 
-	/**
-	 * args[0] Arch class
-	 * args[1] Agent class
-	 */
-    public void initAg(String[] args) throws JasonException {
+    /** creates the agent class defined by <i>agClass</i>, default is jason.semantics.Agent. */
+    public void initAg(String agClass, String asSrc, Settings stts) throws JasonException {
         // set the agent
         try {
-            String agClassName = null;
-            if (args.length < 2) { // error
-                throw new JasonException("The Agent class name was not informed for the CentralisedAgArch creation!");
-            } else {
-                agClassName = args[1].trim();
-            }
-            Agent ag = (Agent)Class.forName(agClassName).newInstance();
-            fTS = ag.initAg(args, this);
+            Agent ag = (Agent)Class.forName(agClass).newInstance();
+            fTS = ag.initAg(this, asSrc, stts);
         } catch (Exception e) {
             throw new JasonException("as2j: error creating the agent class! - "+e);
         }
     }
-	
+
     /** stop the agent */
     public void stopAg() {
     }

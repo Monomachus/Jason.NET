@@ -2,7 +2,6 @@ package test;
 
 import jason.mas2j.MAS2JProject;
 import jason.mas2j.parser.mas2j;
-import jason.runtime.RunCentralisedMAS;
 
 import java.io.StringReader;
 import java.util.Map;
@@ -16,8 +15,6 @@ public class MAS2JParserTest extends TestCase {
 	 
 	protected void setUp() throws Exception {
 		super.setUp();
-		//Logger.getRootLogger().addAppender(new ConsoleAppender(new PatternLayout("[%c{1}] %m%n")));
-    	//Logger.getRootLogger().setLevel(Level.DEBUG);
     	parser = new mas2j(new StringReader("MAS auctionCent {  infrastructure: Centralised environment: myEnv at \"x.edu\" executionControl: myController agents: ag1 [events=discard,intBels=newFocus,osfile=\"a/x.xml\"]; ag2 /home/agTest.asl agentClass mypkg.MyAgent #2; ag3 at \"x.edu\"; auctionner agentArchClass AuctionnerGUI;}"));
 	}
 
@@ -37,12 +34,5 @@ public class MAS2JParserTest extends TestCase {
 			e.printStackTrace();
 		}
 	}
-
-	public void testParseArrayFromString() {
-		String[] args = RunCentralisedMAS.getArrayFromString("jason.asSemantics.Agent '/Users/jomi/programming/cvs/Jason/examples/Simple/./agCount.asl' options y='a a a',verbose=1,x=1,bla='blas/x1 y/t.txt'");
-		//System.out.println("*"+args[1]);		
-		//System.out.println("*"+args[2]+" "+args[3]);
-		assertEquals(args.length, 4);
-	}	
 
 }

@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.2  2006/01/14 18:23:40  jomifred
+//   centralised infra does not use xml script file anymore
+//
 //   Revision 1.1  2006/01/04 02:55:57  jomifred
 //   using java log API instead of apache log
 //
@@ -141,6 +144,10 @@ public class Settings {
         		//userParameters.put(key, options.get(key));
 	        }
         }
+    }
+    
+    public void addOption(String key, Object value) {
+    	userParameters.put(key, value);
     }
 
 	public void setEvents(byte opt) {

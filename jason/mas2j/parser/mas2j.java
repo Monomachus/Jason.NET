@@ -39,8 +39,8 @@ public class mas2j implements mas2jConstants {
                 project = parser.mas();
                 Config.get().fix();
         project.setDirectory(new File(".").getAbsolutePath());
+        project.setProjectFile(new File(name));
                 System.out.println("mas2j: "+name+" parsed successfully!\n");
-                project.writeXMLScript();
         project.writeScripts();
 
         int step = 1;

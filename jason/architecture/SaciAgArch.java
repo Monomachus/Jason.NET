@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.23  2006/01/14 18:22:45  jomifred
+//   centralised infra does not use xml script file anymore
+//
 //   Revision 1.22  2006/01/04 02:54:41  jomifred
 //   using java log API instead of apache log
 //
@@ -76,6 +79,7 @@ import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Term;
 import jason.runtime.MASConsoleGUI;
 import jason.runtime.RunCentralisedMAS;
+import jason.runtime.Settings;
 
 import java.util.List;
 import java.util.logging.Level;
@@ -109,10 +113,15 @@ public class SaciAgArch extends saci.Agent implements AgArchInterface {
 
 	private Logger logger;
     
-    // this is used by SACI to initialize the agent
+	/**
+	 * Method used by SACI to initialize the agent
+	 * args[0] is the agent architecture class (ignored here)
+	 * args[1] is the user Agent class (ignored here)
+	 * args[2] is the AgentSpeak source file
+	 * args[3] "options"
+	 * args[4] options
+	 */
     public void initAg(String[] args) throws JasonException {
-
-        
     	// create a logger
     	RunCentralisedMAS.setupLogger();
     	logger = Logger.getLogger(SaciAgArch.class.getName()+"."+getAgName());
@@ -131,9 +140,28 @@ public class SaciAgArch extends saci.Agent implements AgArchInterface {
             } else {
             	archClassName = args[0].trim();
             }
+
+            String agClassName = null;
+            if (args.length < 2) { // error
+                throw new JasonException("The Agent class name was not informed for the CentralisedAgArch creation!");
+            } else {
+                agClassName = args[1].trim();
+            }
+			String asSource = null;
+			if (args.length < 3) { // error
+				throw new JasonException("The AgentSpeak source file was not informed, cannot create the Agent!");
+			} else {
+				asSource = args[2].trim();
+			}
+			Settings stts = new Settings();
+			if (args.length > 3) {
+				if (args[3].equals("options")) {
+					stts.setOptions("[" + args[4] + "]");
+				}
+			}
             fUserAgArh = (AgArch)Class.forName(archClassName).newInstance();
             fUserAgArh.setInfraArch(this);
-            fUserAgArh.initAg(args);
+            fUserAgArh.initAg(agClassName, asSource, stts);
     		logger.setLevel(fUserAgArh.getTS().getSettings().logLevel());
         } catch (Exception e) {
         	running = false;
