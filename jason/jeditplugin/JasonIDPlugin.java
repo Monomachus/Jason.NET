@@ -22,44 +22,11 @@
 // CVS information:
 //   $Date$
 //   $Revision$
-//   $Log$
-//   Revision 1.11  2006/01/13 19:54:47  jomifred
-//   handle multiple instances of the plugin
-//
-//   Revision 1.10  2006/01/11 18:31:52  jomifred
-//   no message
-//
-//   Revision 1.9  2006/01/04 03:00:46  jomifred
-//   using java log API instead of apache log
-//
-//   Revision 1.8  2005/12/19 22:53:31  jomifred
-//   no message
-//
-//   Revision 1.7  2005/12/18 15:31:02  jomifred
-//   no message
-//
-//   Revision 1.6  2005/12/17 19:51:58  jomifred
-//   no message
-//
-//   Revision 1.5  2005/12/17 19:28:47  jomifred
-//   no message
-//
-//   Revision 1.4  2005/12/16 22:09:20  jomifred
-//   no message
-//
-//   Revision 1.3  2005/12/09 14:47:40  jomifred
-//   no message
-//
-//   Revision 1.2  2005/12/08 20:06:59  jomifred
-//   changes for JasonIDE plugin
-//
-//
 //----------------------------------------------------------------------------
 
 package jason.jeditplugin;
 
 
-import jIDE.Config;
 import jason.mas2j.MAS2JProject;
 
 import javax.swing.SwingUtilities;

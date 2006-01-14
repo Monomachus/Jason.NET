@@ -27,8 +27,6 @@
 
 package jason.jeditplugin;
 
-import jIDE.RunMAS;
-import jIDE.RunningMASListener;
 import jason.mas2j.AgentParameters;
 import jason.mas2j.MAS2JProject;
 import jason.mas2j.parser.ParseException;
@@ -84,12 +82,12 @@ import org.gjt.sp.jedit.gui.RolloverButton;
 import errorlist.DefaultErrorSource;
 import errorlist.ErrorSource;
 
-public class JasonID extends JPanel implements EBComponent, RunningMASListener {
+public class JasonID extends JPanel implements EBComponent, RunProjectListener {
 
 	View view;
 
 	OutputStreamAdapter myOut;
-	RunMAS runner = null;
+	RunProject runner = null;
 	
 	JTextArea textArea;
 	AnimatedIcon animation;
@@ -176,7 +174,7 @@ public class JasonID extends JPanel implements EBComponent, RunningMASListener {
 		
 		btRun = createToolBarButton("Run MAS", new ImageIcon(JasonID.class.getResource("/images/run.gif")), new ActionListener() { //GUIUtilities.loadIcon("Play.png")
 			public void actionPerformed(ActionEvent arg0) {
-				runMAS();
+				runProject();
 			}
 		});
 		toolBar.add(btRun);
@@ -184,7 +182,7 @@ public class JasonID extends JPanel implements EBComponent, RunningMASListener {
 		btDebug = createToolBarButton("Debug MAS", new ImageIcon(JasonID.class.getResource("/images/debug.gif")), //GUIUtilities.loadIcon("RunAgain.png"), 
 				new ActionListener() {
 					public void actionPerformed(ActionEvent arg0) {
-						debugMAS();
+						debugProject();
 					}
 				});
 		toolBar.add(btDebug);
@@ -213,7 +211,7 @@ public class JasonID extends JPanel implements EBComponent, RunningMASListener {
 		toolBar.add(createToolBarButton("New Project", new ImageIcon(JasonID.class.getResource("/images/newProject.gif")), //GUIUtilities.loadIcon("NewDir.png"), 
 				new ActionListener() {
 					public void actionPerformed(ActionEvent evt) {
-						newMAS();
+						newProject();
 					}
 				}));
 
@@ -421,7 +419,7 @@ public class JasonID extends JPanel implements EBComponent, RunningMASListener {
 	// Menu actions
 	//
 	
-	public void runMAS(boolean debug) {
+	public void runProject(boolean debug) {
 		Buffer b = getProjectBuffer();
 		if (b == null) {
 			textArea.setText("There is no Jason project opened!");
@@ -444,7 +442,7 @@ public class JasonID extends JPanel implements EBComponent, RunningMASListener {
 					btRun.setEnabled(false);
 					btDebug.setEnabled(false);
 					if (runner == null) {
-						runner = new RunMAS(this);
+						runner = new RunProject(this);
 					}
 					runner.run(project);
 				}
@@ -452,11 +450,11 @@ public class JasonID extends JPanel implements EBComponent, RunningMASListener {
 		}
 	}
 	
-	public void runMAS() {
-		runMAS(false);
+	public void runProject() {
+		runProject(false);
 	}
-	public void debugMAS() {
-		runMAS(true);
+	public void debugProject() {
+		runProject(true);
 	}
 
 	public void stopMAS() {
@@ -470,7 +468,7 @@ public class JasonID extends JPanel implements EBComponent, RunningMASListener {
 		}
 	}
 
-	public void newMAS() {
+	public void newProject() {
 		new NewProjectGUI("New Jason Project", view, this);
 	}
 
