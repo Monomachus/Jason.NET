@@ -14,18 +14,18 @@ plugin.jason.jeditplugin.JasonIDPlugin.depend.1=plugin sidekick.SideKickPlugin 0
 
 # application menu items
 plugin.jason.jeditplugin.JasonIDPlugin.menu=jason - \
-  jason.run-mas jason.debug-mas jason.stop-mas \
+  jason.run-project jason.debug-project jason.stop-mas \
   - \
-  jason.new-mas \
+  jason.new-project \
   jason.new-ag \
   - \
   jason.edit-log
 
 # action labels
-jason.run-mas.label=Run MAS
-jason.debug-mas.label=Debug MAS
-jason.stop-mas.label=Stop current running MAS
-jason.new-mas.label=New Project
+jason.run-project.label=Run Project
+jason.debug-project.label=Debug Project
+jason.stop-mas.label=Stop running MAS
+jason.new-project.label=New Project
 jason.new-ag.label=New Agent
 jason.edit-log.label=Edit log parameters
 

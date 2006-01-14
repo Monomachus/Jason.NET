@@ -3,16 +3,16 @@
 <!DOCTYPE ACTIONS SYSTEM "actions.dtd">
 
 <ACTIONS>
-	<ACTION NAME="jason.run-mas">
+	<ACTION NAME="jason.run-project">
 		<CODE>
 			wm.addDockableWindow(jason.jeditplugin.JasonIDPlugin.NAME);
-			wm.getDockable(jason.jeditplugin.JasonIDPlugin.NAME).runMAS();
+			wm.getDockable(jason.jeditplugin.JasonIDPlugin.NAME).runProject();
 		</CODE>
 	</ACTION>
-	<ACTION NAME="jason.debug-mas">
+	<ACTION NAME="jason.debug-project">
 		<CODE>
 			wm.addDockableWindow(jason.jeditplugin.JasonIDPlugin.NAME);
-			wm.getDockable(jason.jeditplugin.JasonIDPlugin.NAME).debugMAS();
+			wm.getDockable(jason.jeditplugin.JasonIDPlugin.NAME).debugProject();
 		</CODE>
 	</ACTION>
 	<ACTION NAME="jason.stop-mas">
@@ -21,10 +21,10 @@
 			wm.getDockable(jason.jeditplugin.JasonIDPlugin.NAME).stopMAS();
 		</CODE>
 	</ACTION>
-	<ACTION NAME="jason.new-mas">
+	<ACTION NAME="jason.new-project">
 		<CODE>
 			wm.addDockableWindow(jason.jeditplugin.JasonIDPlugin.NAME);
-			wm.getDockable(jason.jeditplugin.JasonIDPlugin.NAME).newMAS();
+			wm.getDockable(jason.jeditplugin.JasonIDPlugin.NAME).newProject();
 		</CODE>
 	</ACTION>
 	<ACTION NAME="jason.new-ag">
