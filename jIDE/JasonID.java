@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.30  2006/01/14 15:20:45  jomifred
+//   Config and some code of RunMAS was moved to package plugin
+//
 //   Revision 1.29  2006/01/04 02:54:41  jomifred
 //   using java log API instead of apache log
 //
@@ -57,6 +60,8 @@ package jIDE;
 
 
 import jason.jeditplugin.AboutGUI;
+import jason.jeditplugin.Config;
+import jason.jeditplugin.RunProjectListener;
 import jason.runtime.OutputStreamAdapter;
 import jason.runtime.RunCentralisedMAS;
 
@@ -111,7 +116,7 @@ import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
 /** The main class of the Jason IDE */
-public class JasonID implements RunningMASListener {
+public class JasonID implements RunProjectListener {
     
     JFrame frame = null;
 	JMenuBar  menuBar;
@@ -822,7 +827,7 @@ public class JasonID implements RunningMASListener {
         }
         
         public void actionPerformed(ActionEvent e) {
-            runMASAct.stopMAS();
+            runMASAct.runProject.stopMAS();
         }
     }
     
@@ -833,7 +838,7 @@ public class JasonID implements RunningMASListener {
         
         public void actionPerformed(ActionEvent e) {
             if (checkNeedsSave()) {
-                runMASAct.stopMAS();
+                runMASAct.runProject.stopMAS();
                 System.exit(0);
             }
         }

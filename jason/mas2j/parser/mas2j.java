@@ -4,7 +4,7 @@ package jason.mas2j.parser;
 import java.util.*;
 import java.io.*;
 import jason.mas2j.*;
-import jIDE.*;
+import jason.jeditplugin.*;
 
 public class mas2j implements mas2jConstants {
 

@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.1  2006/01/14 15:18:58  jomifred
+//   Config and some code of RunMAS was moved to package plugin
+//
 //   Revision 1.6  2006/01/11 15:14:39  jomifred
 //   add close all befere opening a mas2j project
 //
@@ -35,16 +38,14 @@
 //   Revision 1.3  2005/12/30 20:40:16  jomifred
 //   new features: unnamed var, var with annots, TE as var
 //
-//   Revision 1.2  2005/12/16 22:09:20  jomifred
-//   no message
-//
 //   Revision 1.1  2005/12/08 20:06:02  jomifred
 //   changes for JasonIDE plugin
 //
-//
 //----------------------------------------------------------------------------
 
-package jIDE;
+package jason.jeditplugin;
+
+import jIDE.JasonID;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -159,7 +160,9 @@ public class Config extends Properties {
         
         // shell command
         if (get(SHELL_CMD) == null) {
-    		if (System.getProperty("os.name").indexOf("indows") > 0) {
+    		if (System.getProperty("os.name").startsWith("Windows 9")) {
+    			put(SHELL_CMD, "command.com /c ");
+    		} else if (System.getProperty("os.name").indexOf("indows") > 0) {
     			put(SHELL_CMD, "cmd /c ");
     		} else {
     			put(SHELL_CMD, "/bin/sh ");

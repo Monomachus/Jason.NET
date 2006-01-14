@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.5  2006/01/14 15:25:15  jomifred
+//   Config and some code of RunMAS was moved to package plugin
+//
 //   Revision 1.4  2005/12/30 20:40:59  jomifred
 //   new features: unnamed var, var with annots, TE as var
 //
@@ -56,7 +59,7 @@ package jason.mas2j.parser;
 import java.util.*;
 import java.io.*;
 import jason.mas2j.*;
-import jIDE.*;
+import jason.jeditplugin.*;
 
 public class mas2j {
 

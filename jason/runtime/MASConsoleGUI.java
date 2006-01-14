@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.2  2006/01/14 15:22:47  jomifred
+//   Config and some code of RunMAS was moved to package plugin
+//
 //   Revision 1.1  2005/12/08 20:14:28  jomifred
 //   changes for JasonIDE plugin
 //
@@ -45,8 +48,6 @@
 
 package jason.runtime;
 
-import jIDE.RunMAS;
-
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -66,17 +67,9 @@ public class MASConsoleGUI  {
     private static MASConsoleGUI masConsole = null;
     
     /** for sigleton pattern */
-    public static MASConsoleGUI get(String title, RunMAS runMAS) {
-        if (masConsole == null) {
-            masConsole = new MASConsoleGUI(title, runMAS);
-        }
-        return masConsole;
-    }
-
-    /** for sigleton pattern */
     public static MASConsoleGUI get() {
         if (masConsole == null) {
-            masConsole = new MASConsoleGUI("MAS Console", null);
+            masConsole = new MASConsoleGUI("MAS Console");
         }
         return masConsole;
     }
@@ -92,13 +85,10 @@ public class MASConsoleGUI  {
     
     private boolean inPause = false; 
     
-    private MASConsoleGUI(String title, final RunMAS runMAS) {
+    private MASConsoleGUI(String title) {
     	frame = new JFrame(title);
     	frame.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
-                if (runMAS != null) {
-                    runMAS.stopMAS();
-                }
                 close();
             }
         });

@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.7  2006/01/14 15:25:52  jomifred
+//   Config and some code of RunMAS was moved to package plugin
+//
 //   Revision 1.6  2006/01/04 03:00:46  jomifred
 //   using java log API instead of apache log
 //
@@ -52,8 +55,8 @@
 
 package jason.mas2j;
 
-import jIDE.Config;
 import jason.control.ExecutionControlGUI;
+import jason.jeditplugin.Config;
 
 import java.io.File;
 import java.io.FileOutputStream;

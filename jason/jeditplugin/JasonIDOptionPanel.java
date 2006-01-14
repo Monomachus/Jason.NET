@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.8  2006/01/14 15:26:28  jomifred
+//   Config and some code of RunMAS was moved to package plugin
+//
 //   Revision 1.7  2006/01/11 15:14:39  jomifred
 //   add close all befere opening a mas2j project
 //
@@ -49,7 +52,6 @@
 
 package jason.jeditplugin;
 
-import jIDE.Config;
 
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
