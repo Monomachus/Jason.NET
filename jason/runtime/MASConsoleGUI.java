@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.3  2006/01/16 16:47:35  jomifred
+//   added a new kind of console with one tab for agent
+//
 //   Revision 1.2  2006/01/14 15:22:47  jomifred
 //   Config and some code of RunMAS was moved to package plugin
 //
@@ -54,17 +57,26 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.LogManager;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 
 /** the GUI console to output log messages  */
 public class MASConsoleGUI  {
     
     private static MASConsoleGUI masConsole = null;
+
+    public static String isTabbedPropField = MASConsoleLogHandler.class.getName()+".tabbed";
+    private boolean isTabbed = false;
+    JTabbedPane tabPane;
+    Map agsTextArea = new HashMap();
     
     /** for sigleton pattern */
     public static MASConsoleGUI get() {
@@ -86,21 +98,35 @@ public class MASConsoleGUI  {
     private boolean inPause = false; 
     
     private MASConsoleGUI(String title) {
+		String tabbed = LogManager.getLogManager().getProperty(isTabbedPropField);
+		if (tabbed != null && tabbed.equals("true")) {
+			isTabbed = true;
+		}
+    	
     	frame = new JFrame(title);
     	frame.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
                 close();
             }
         });
-        
+
         output = new JTextArea();
         output.setEditable(false);
 
+        JPanel pcenter = new JPanel(new BorderLayout());
+    	if (isTabbed) {
+    		tabPane = new JTabbedPane(JTabbedPane.LEFT);
+    		tabPane.add("common", new JScrollPane(output));
+    		pcenter.add(BorderLayout.CENTER, tabPane);
+    	} else {
+    		pcenter.add(BorderLayout.CENTER, new JScrollPane(output));
+    	}
+        
 		pBt = new JPanel();
 		pBt.setLayout(new FlowLayout(FlowLayout.CENTER));
 
         frame.getContentPane().setLayout(new BorderLayout());
-        frame.getContentPane().add(BorderLayout.CENTER, new JScrollPane(output));
+        frame.getContentPane().add(BorderLayout.CENTER, pcenter);
         frame.getContentPane().add(BorderLayout.SOUTH, pBt);
 
         JButton btClean = new JButton("Clean");
@@ -143,21 +169,37 @@ public class MASConsoleGUI  {
     }
   
 	public void append(String s) {
+		append(null,s);
+    }
+    
+	public void append(String agName, String s) {
 		if (!frame.isVisible()) {
 			frame.setVisible(true);
 		}
 		if (inPause) {
 			waitNotPause();
 		}
-		int l = output.getDocument().getLength();
+		JTextArea ta = (JTextArea)agsTextArea.get(agName);
+		if (ta == null && agName != null) {
+			ta = new JTextArea();
+	        ta.setEditable(false);
+			agsTextArea.put(agName, ta);
+			tabPane.add(agName, new JScrollPane(ta));
+		} 
+		if (ta == null) { // no new TA was created
+			ta = output;
+		}
+
+		// print out 
+		int l = ta.getDocument().getLength();
 		if (l > 30000) {
-			output.setText("");
+			ta.setText("");
 			//l = output.getDocument().getLength();
 		}
-		output.append(s);
+		ta.append(s);
 		//output.setCaretPosition(l);
-    }
-    
+	}
+
     public void close() {
     	if (masConsole == null) return;
         masConsole.frame.dispose();

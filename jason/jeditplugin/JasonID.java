@@ -354,12 +354,7 @@ public class JasonID extends JPanel implements EBComponent, RunProjectListener {
         	MAS2JProject project = parser.mas();
         	project.setDirectory( projectBufffer.getDirectory());
         	project.setProjectFile(new File(projectBufffer.getPath()));
-            if (debug) {
-            	project.debugOn();
-            } else {
-            	project.debugOff();            		
-            }
-            project.writeScripts();
+            project.writeScripts(debug);
             textArea.append(" parsed successfully!\n");
             return project;
             

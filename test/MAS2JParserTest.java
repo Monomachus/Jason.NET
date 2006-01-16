@@ -24,9 +24,8 @@ public class MAS2JParserTest extends TestCase {
 	    	project.setDirectory("/tmp");
 			//System.out.println(project);
 			
-			project.debugOn();
 			//project.writeXMLScript(System.out);
-			//project.writeScripts();
+			//project.writeScripts(true);
 			Map ag1Opt = project.getAg("ag1").options;
 			assertEquals(ag1Opt.size(),3);
 		} catch (Exception e) {

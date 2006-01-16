@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.2  2006/01/16 16:47:35  jomifred
+//   added a new kind of console with one tab for agent
+//
 //   Revision 1.1  2006/01/04 02:55:57  jomifred
 //   using java log API instead of apache log
 //
@@ -62,12 +65,7 @@ import java.util.logging.LogRecord;
 public class MASConsoleLogFormatter extends java.util.logging.Formatter {
 	public String format(LogRecord l) {
 		StringBuffer s = new StringBuffer("[");
-		String lname = l.getLoggerName();
-		int posd = lname.lastIndexOf(".");
-		if (posd > 0) {
-			lname = lname.substring(posd+1);
-		}
-		s.append(lname);
+		s.append(getAgName(l));
 		s.append("] ");
 		s.append(l.getMessage());
 		if (l.getThrown() != null) {
@@ -78,5 +76,14 @@ public class MASConsoleLogFormatter extends java.util.logging.Formatter {
 		}
 		s.append("\n");
 		return s.toString();
+	}
+	
+	public static String getAgName(LogRecord l) {
+		String lname = l.getLoggerName();
+		int posd = lname.lastIndexOf(".");
+		if (posd > 0) {
+			return lname.substring(posd+1);
+		}
+		return null;
 	}
 }

@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.15  2006/01/16 16:47:35  jomifred
+//   added a new kind of console with one tab for agent
+//
 //   Revision 1.14  2006/01/14 18:24:20  jomifred
 //   centralised infra does not use xml script file anymore
 //
@@ -98,12 +101,7 @@ public class MAS2JParserThread extends ASParserThread { //Thread {
             fOk = true;
             
             if (fForegroundCompilation) {
-                if (fDebug) {
-                	fCurrentProject.debugOn();
-                } else {
-            		fCurrentProject.debugOff();            		
-                }
-            	fCurrentProject.writeScripts();
+            	fCurrentProject.writeScripts(fDebug);
                 System.out.println(" parsed successfully!");
                 //System.out.println("scripts was written on "+editorPanel.mainGUI.projectDirectory+".");
             }
