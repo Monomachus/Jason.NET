@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.4  2006/01/17 00:19:11  jomifred
+//   fix bug tabbed
+//
 //   Revision 1.3  2006/01/16 16:47:35  jomifred
 //   added a new kind of console with one tab for agent
 //
@@ -173,19 +176,23 @@ public class MASConsoleGUI  {
     }
     
 	public void append(String agName, String s) {
+		try {
 		if (!frame.isVisible()) {
 			frame.setVisible(true);
 		}
 		if (inPause) {
 			waitNotPause();
 		}
-		JTextArea ta = (JTextArea)agsTextArea.get(agName);
-		if (ta == null && agName != null) {
-			ta = new JTextArea();
-	        ta.setEditable(false);
-			agsTextArea.put(agName, ta);
-			tabPane.add(agName, new JScrollPane(ta));
-		} 
+		JTextArea ta = null;
+		if (isTabbed) {
+			ta = (JTextArea)agsTextArea.get(agName);
+			if (ta == null && agName != null) {
+				ta = new JTextArea();
+		        ta.setEditable(false);
+				agsTextArea.put(agName, ta);
+				tabPane.add(agName, new JScrollPane(ta));
+			} 
+		}
 		if (ta == null) { // no new TA was created
 			ta = output;
 		}
@@ -198,6 +205,9 @@ public class MASConsoleGUI  {
 		}
 		ta.append(s);
 		//output.setCaretPosition(l);
+		} catch (Exception e) {
+			
+		}
 	}
 
     public void close() {
