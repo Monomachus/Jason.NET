@@ -504,6 +504,10 @@ public class JasonID extends JPanel implements EBComponent, RunProjectListener {
 	
 	public void editLog() {
 		Buffer curBuf = getProjectBuffer();
+		if (curBuf == null) {
+			textArea.setText("You can not edit log properties since there is no Jason project opned.");
+			return;
+		}
         try {
         	File f = new File(curBuf.getDirectory() + File.separator + RunCentralisedMAS.logPropFile);
         	if (f.exists()) {

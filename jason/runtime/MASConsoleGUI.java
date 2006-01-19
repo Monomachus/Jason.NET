@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.5  2006/01/19 18:30:22  jomifred
+//   no message
+//
 //   Revision 1.4  2006/01/17 00:19:11  jomifred
 //   fix bug tabbed
 //
@@ -183,28 +186,35 @@ public class MASConsoleGUI  {
 		if (inPause) {
 			waitNotPause();
 		}
-		JTextArea ta = null;
 		if (isTabbed) {
-			ta = (JTextArea)agsTextArea.get(agName);
+			JTextArea ta = (JTextArea)agsTextArea.get(agName);
 			if (ta == null && agName != null) {
 				ta = new JTextArea();
 		        ta.setEditable(false);
 				agsTextArea.put(agName, ta);
 				tabPane.add(agName, new JScrollPane(ta));
-			} 
-		}
-		if (ta == null) { // no new TA was created
-			ta = output;
-		}
 
-		// print out 
-		int l = ta.getDocument().getLength();
+			
+			} 
+			if (ta != null) { // no new TA was created
+				// print out 
+				int l = ta.getDocument().getLength();
+				if (l > 30000) {
+					ta.setText("");
+					//l = output.getDocument().getLength();
+				}
+				ta.append(s);
+				//output.setCaretPosition(l);
+			}
+		}
+		
+		// print in output
+		int l = output.getDocument().getLength();
 		if (l > 30000) {
-			ta.setText("");
+			output.setText("");
 			//l = output.getDocument().getLength();
 		}
-		ta.append(s);
-		//output.setCaretPosition(l);
+		output.append(s);
 		} catch (Exception e) {
 			
 		}
