@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.27  2006/02/14 22:34:40  jomifred
+//   fix a bug in brf (it does not deal correctly with open world)
+//
 //   Revision 1.26  2006/01/14 18:22:45  jomifred
 //   centralised infra does not use xml script file anymore
 //
@@ -247,19 +250,20 @@ public class Agent {
             return;
         }
 		
-        // deleting percepts in the BB that is not percepted anymore
+        // deleting percepts in the BB that is not perceived anymore
         List perceptsInBB = getBS().getPercepts();
         for (int i=0; i<perceptsInBB.size(); i++) { 
             Literal l = (Literal)perceptsInBB.get(i);
-            // could not use percepts.contains(l), since equalsAsTerm must be used
-            boolean wasPercepted = false;
+            // could not use percepts.contains(l), since equalsAsTerm must be used (to ignore annotations)
+            boolean wasPerceived = false;
             for (int j=0; j< percepts.size(); j++) {
-            	Term t = (Term)percepts.get(j); // it probably is a Pred
-            	if (l.equalsAsTerm(t)) { // if percept t already is in BB
-            		wasPercepted = true;
+            	Literal t = (Literal)percepts.get(j);
+            	if (l.equalsAsTerm(t) && l.negated() == t.negated()) { // if percept t is already in BB
+            		wasPerceived = true;
+            		break;
             	}
             }
-            if (!wasPercepted) {
+            if (!wasPerceived) {
                 if (delBel(l,BeliefBase.TPercept,fTS.getC(), Intention.EmptyInt)) {
                 	i--;
                 }
