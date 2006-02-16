@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.4  2006/02/16 13:33:22  jomifred
+//   no message
+//
 //   Revision 1.3  2006/01/14 18:23:40  jomifred
 //   centralised infra does not use xml script file anymore
 //
@@ -197,6 +200,13 @@ public class RunCentralisedMAS {
     	return runner;
     }
     
+    public CentralisedExecutionControl getControllerInfraTier() {
+    	return control;
+    }
+    
+    public CentralisedEnvironment getEnvironmentInfraTier() {
+    	return env;
+    }
 
 
     void createAg(MAS2JProject project, boolean debug) throws JasonException {
