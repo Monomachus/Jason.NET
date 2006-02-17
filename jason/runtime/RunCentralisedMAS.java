@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.5  2006/02/17 13:13:16  jomifred
+//   change a lot of method/classes names and improve some comments
+//
 //   Revision 1.4  2006/02/16 13:33:22  jomifred
 //   no message
 //
@@ -248,7 +251,7 @@ public class RunCentralisedMAS {
                     logger.info("Creating agent "+numberedAg+" ("+(cAg+1)+"/"+ap.qty+")");
                     CentralisedAgArch agArch = new CentralisedAgArch();
                     agArch.setAgName(numberedAg);
-                    agArch.setEnv(env);
+                    agArch.setEnvInfraTier(env);
                     agArch.initAg(tmpAgArchClass, tmpAgClass, tmpAsSrc, ap.getAsSetts(debug, project.getControlClass() != null));
                     env.addAgent(agArch.getUserAgArch());
                     ags.add(agArch);
@@ -275,7 +278,7 @@ public class RunCentralisedMAS {
         Iterator i = ags.iterator();
         while (i.hasNext()) {
             CentralisedAgArch ag = (CentralisedAgArch)i.next();
-            ag.setControl(control);
+            ag.setControlInfraTier(control);
             ag.start();
         }
 	}

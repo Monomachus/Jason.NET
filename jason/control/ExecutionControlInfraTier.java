@@ -23,45 +23,49 @@
 //   $Date$
 //   $Revision$
 //   $Log$
-//   Revision 1.5  2005/10/30 16:07:33  jomifred
-//   add comments
+//   Revision 1.1  2006/02/17 13:16:16  jomifred
+//   change a lot of method/classes names and improve some comments
 //
-//   Revision 1.4  2005/08/12 22:26:08  jomifred
-//   add cvs keywords
+//   Revision 1.6  2005/08/12 20:52:18  jomifred
+//   change in the informAgs method name
 //
+//   Revision 1.5  2005/08/12 20:43:54  jomifred
+//   add cvs keywords and change informAgs method name
 //
 //----------------------------------------------------------------------------
 
 
-package jason.environment;
+package jason.control;
 
 import java.util.Collection;
 
-/** The infrastructure tier interface for Environment.
- * 
- *  <p>It is implemented by jason to ecapsulate the communication side 
- *  of the distributed/centralised environment, so the user environment can call 
- *  "informAgsEnvironmentChanged" either in centralised or distributed
- *  executions.  
- * 
- * <p>An example of interaction:
- * <img src="../../../uml/environmentInteraction.gif" />
- *
- * <p>The related classes:
- * <img src="../../../uml/jason.environment.gif" />
- */
-public interface EnvironmentInterface {
+import org.w3c.dom.Document;
 
-    /** 
-     * sends a message to all agents notifying them that the environment has changed 
-     * (called by the user environment). 
-     */
-    public void informAgsEnvironmentChanged();
+
+/** 
+ *  This interface is implemented in the infrastructure tier (distributed/centralised)
+ *  to provide methods that the <b>user</b> controller may call.
+ */
+public interface ExecutionControlInfraTier {
 
     /**
-     * Sends a message to a set of agents notifying them that the environment has changed. 
-     * The collection has the agents' names. 
-     * (called by the user environment). 
+     * informs an agent to continue to its next reasoning cycle.
      */
-    public void informAgsEnvironmentChanged(Collection agents);
+    public void informAgToPerformCycle(String agName);
+
+    /**
+     * informs all agents to continue to its next reasoning cycle.
+     */
+    public void informAllAgsToPerformCycle();
+
+    /** gets a string list with all the agents names */
+    public Collection getAgentsName();
+    
+    public int getAgentsQty();
+
+    /**
+     * get the agent state (beliefs, intentions, plans, ...)
+     * as an XML document
+     */
+	public Document getAgState(String agName);
 }

@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.34  2006/02/17 13:13:16  jomifred
+//   change a lot of method/classes names and improve some comments
+//
 //   Revision 1.33  2006/01/06 12:05:37  jomifred
 //   operator - removes bel from BB and changes the current unifier.
 //
@@ -81,7 +84,7 @@
 package jason.asSemantics;
 
 import jason.JasonException;
-import jason.architecture.AgArchInterface;
+import jason.architecture.AgArch;
 import jason.asSyntax.BeliefBase;
 import jason.asSyntax.BodyLiteral;
 import jason.asSyntax.DefaultLiteral;
@@ -125,12 +128,11 @@ public class TransitionSystem {
 	private Logger logger = null;	
 	
 	Agent ag = null;
+	AgArch agArch = null;
 
 	Circumstance C = null;
 
 	Settings setts = null;
-
-	AgArchInterface agArch = null;
 
 	private byte step = SStartRC; // First step of the SOS
 	private int nrcslbr; // number of reasoning cycles since last belief revision
@@ -143,7 +145,7 @@ public class TransitionSystem {
 	// object, this is just to make it look more like the SOS
 	TransitionSystem conf;
 
-	public TransitionSystem(Agent a, Circumstance c, Settings s, AgArchInterface ar) {
+	public TransitionSystem(Agent a, Circumstance c, Settings s, AgArch ar) {
 		ag = a;
 		C = c;
 		agArch = ar;
@@ -165,7 +167,7 @@ public class TransitionSystem {
 		}
 	}
 	
-	public void setLogger(AgArchInterface arch) {
+	public void setLogger(AgArch arch) {
 		if (arch != null) {
 			logger = Logger.getLogger(TransitionSystem.class.getName()+"."+arch.getAgName());
 		} else {
@@ -991,7 +993,7 @@ public class TransitionSystem {
 		return setts;
 	}
 
-	public AgArchInterface getAgArch() {
+	public AgArch getUserAgArch() {
 		return agArch;
 	}
 	

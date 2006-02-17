@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.4  2006/02/17 13:13:16  jomifred
+//   change a lot of method/classes names and improve some comments
+//
 //   Revision 1.3  2005/08/12 22:20:10  jomifred
 //   add cvs keywords
 //
@@ -40,7 +43,7 @@ import jason.asSyntax.Term;
 
 public class perceive implements InternalAction {
     public boolean execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
-    	List P = ts.getAgArch().perceive();
+    	List P = ts.getUserAgArch().perceive();
     	ts.getAg().brf(P);
     	return true;
     }

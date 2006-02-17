@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.10  2006/02/17 13:13:16  jomifred
+//   change a lot of method/classes names and improve some comments
+//
 //   Revision 1.9  2006/01/04 03:00:46  jomifred
 //   using java log API instead of apache log
 //
@@ -105,7 +108,7 @@ public class ExecutionControlGUI extends ExecutionControl {
 		jBtStep.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				jBtStep.setEnabled(false);
-				fJasonControl.informAllAgsToPerformCycle();
+				infraControl.informAllAgsToPerformCycle();
 			}
 		});
 
@@ -116,7 +119,7 @@ public class ExecutionControlGUI extends ExecutionControl {
 			public void actionPerformed(ActionEvent e) {
 				jBtRun.setEnabled(false);
 				inRunMode = true;
-				fJasonControl.informAllAgsToPerformCycle();
+				infraControl.informAllAgsToPerformCycle();
 			}
 		});
 
@@ -219,7 +222,7 @@ public class ExecutionControlGUI extends ExecutionControl {
 
 		Document agState = null;
 		try {
-			agState = fJasonControl.getAgState(agName);
+			agState = infraControl.getAgState(agName);
 		} catch (Exception e) {
 			jTA.setText("can not get the state of agent "+agName);
 		}
@@ -260,7 +263,7 @@ public class ExecutionControlGUI extends ExecutionControl {
 	/** called when all agents have finished the current cycle */
 	protected void allAgsFinished() {
 		if (inRunMode) {
-			fJasonControl.informAllAgsToPerformCycle();
+			infraControl.informAllAgsToPerformCycle();
 		} else {
 			inspectAgent(currentAg);
 			jBtStep.setEnabled(true);

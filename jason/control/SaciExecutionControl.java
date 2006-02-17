@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.6  2006/02/17 13:13:16  jomifred
+//   change a lot of method/classes names and improve some comments
+//
 //   Revision 1.5  2005/08/12 20:41:35  jomifred
 //   add cvs keywords
 //
@@ -45,9 +48,9 @@ import saci.Message;
 import saci.MessageHandler;
 
 /**
- * Concrete execution control implementation based on saci distributed architecture.
+ * Concrete execution control implementation based on saci distributed infrastructure.
  */
-public class SaciExecutionControl extends saci.Agent implements ExecutionControlInterface {
+public class SaciExecutionControl extends saci.Agent implements ExecutionControlInfraTier {
 
 	private ExecutionControl fUserControl;
 
@@ -56,7 +59,7 @@ public class SaciExecutionControl extends saci.Agent implements ExecutionControl
         try {
         	System.out.println("Creating controller from "+args[0]);//+" Jason Home is "+args[0]);
         	fUserControl = (ExecutionControl)Class.forName(args[0]).newInstance();
-        	fUserControl.setJasonExecutionControl(this);
+        	fUserControl.setExecutionControlInfraTier(this);
         	//fUserControl.setJasonDir(args[0]);
         	fUserControl.init();
         } catch (Exception e) {
@@ -103,7 +106,7 @@ public class SaciExecutionControl extends saci.Agent implements ExecutionControl
     
 
 	/**
-	 * @see jason.control.ExecutionControlInterface#informAgToPerformCycle(java.lang.String)
+	 * @see jason.control.ExecutionControlInfraTier#informAgToPerformCycle(java.lang.String)
 	 */
 	public void informAgToPerformCycle(String agName) {
 	    Message m = new Message("(tell)");
@@ -118,7 +121,7 @@ public class SaciExecutionControl extends saci.Agent implements ExecutionControl
 	}
 
 	/**
-	 * @see jason.control.ExecutionControlInterface#informAllAgsToPerformCycle()
+	 * @see jason.control.ExecutionControlInfraTier#informAllAgsToPerformCycle()
 	 */
 	public void informAllAgsToPerformCycle() {
 	    Message m = new Message("(tell)");
@@ -132,7 +135,7 @@ public class SaciExecutionControl extends saci.Agent implements ExecutionControl
 	}
 
 	/**
-	 * @see jason.control.ExecutionControlInterface#getAgentsName()
+	 * @see jason.control.ExecutionControlInfraTier#getAgentsName()
 	 */
 	public Collection getAgentsName() {
 		try {
@@ -166,7 +169,7 @@ public class SaciExecutionControl extends saci.Agent implements ExecutionControl
 	
 	
 	/**
-	 *  @see jason.control.ExecutionControlInterface#getAgState(java.lang.String)
+	 *  @see jason.control.ExecutionControlInfraTier#getAgState(java.lang.String)
 	 */
 	public Document getAgState(String agName) {
 	    Message m = new Message("(ask)");

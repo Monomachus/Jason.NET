@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.21  2006/02/17 13:13:15  jomifred
+//   change a lot of method/classes names and improve some comments
+//
 //   Revision 1.20  2006/01/14 18:22:45  jomifred
 //   centralised infra does not use xml script file anymore
 //
@@ -74,13 +77,15 @@ import java.util.logging.Logger;
  * This class provides an agent architecture when using Centralised
  * infrastructure to run the MAS inside Jason.
  * 
- * <p>Execution sequence: initAg, setEnv, setControl, run (perceive, checkMail, act), stopAg.
+ * <p>Execution sequence: initAg, setEnvInfraTier, setControlInfraTier, 
+ *                        run (perceive, checkMail, act), 
+ *                        stopAg.
  */
-public class CentralisedAgArch extends Thread implements AgArchInterface {
+public class CentralisedAgArch extends Thread implements AgArchInfraTier {
     
-	protected CentralisedEnvironment fEnv = null;
+	protected CentralisedEnvironment infraEnv = null;
 	
-	private CentralisedExecutionControl fControl = null;
+	private CentralisedExecutionControl infraControl = null;
 
 	//protected TransitionSystem fTS = null;
 	
@@ -92,13 +97,15 @@ public class CentralisedAgArch extends Thread implements AgArchInterface {
 	
 	protected Logger logger;
     
-	/** creates the user agent architecture, default architecture is jason.architecture.AgArch. 
-	 *  The arch will create the agent that creates the TS. */
+	/** creates the user agent architecture, default architecture is 
+	 *  jason.architecture.AgArch. 
+	 *  The arch will create the agent that creates the TS. 
+	 **/
     public void initAg(String agArchClass, String agClass, String asSrc, Settings stts) throws JasonException {
     	logger = Logger.getLogger(CentralisedAgArch.class.getName()+"."+getAgName());
         try {
             fUserAgArh = (AgArch)Class.forName(agArchClass).newInstance();
-            fUserAgArh.setInfraArch(this);
+            fUserAgArh.setArchInfraTier(this);
             fUserAgArh.initAg(agClass, asSrc, stts);
     		logger.setLevel(fUserAgArh.getTS().getSettings().logLevel());
         } catch (Exception e) {
@@ -120,18 +127,18 @@ public class CentralisedAgArch extends Thread implements AgArchInterface {
     	return fUserAgArh;
     }
 
-	public void setEnv(CentralisedEnvironment env) {
-		fEnv = env;
+	public void setEnvInfraTier(CentralisedEnvironment env) {
+		infraEnv = env;
 	}
-	public CentralisedEnvironment getEnv() {
-		return fEnv;
+	public CentralisedEnvironment getEnvInfraTier() {
+		return infraEnv;
 	}
 	
-	public void setControl(CentralisedExecutionControl pControl) {
-		fControl = pControl;
+	public void setControlInfraTier(CentralisedExecutionControl pControl) {
+		infraControl = pControl;
 	}
-	public CentralisedExecutionControl getControl() {
-		return fControl;
+	public CentralisedExecutionControl getControlInfraTier() {
+		return infraControl;
 	}
     
     
@@ -143,7 +150,7 @@ public class CentralisedAgArch extends Thread implements AgArchInterface {
     	fUserAgArh.getTS().receiveSyncSignal(); // in case the agent is wainting .....
     	fUserAgArh.getTS().newMessageHasArrived(); // in case the agent is wainting .....
     	synchronized(syncStopRun) {
-    		fEnv.delAgent(fUserAgArh);
+    		infraEnv.delAgent(fUserAgArh);
     	}
     	fUserAgArh.stopAg();
     }
@@ -162,7 +169,7 @@ public class CentralisedAgArch extends Thread implements AgArchInterface {
     
     // Default perception assumes Complete and Accurate sensing.
     public List perceive() {
-    	List percepts = fEnv.getUserEnvironment().getPercepts(getName());
+    	List percepts = infraEnv.getUserEnvironment().getPercepts(getName());
     	if (logger.isLoggable(Level.FINE)) { // to salve CPU time building the string
     		logger.fine("percepts: "+percepts);
     	}
@@ -178,18 +185,18 @@ public class CentralisedAgArch extends Thread implements AgArchInterface {
 
     	// actually send the message
         m.setSender(getName());
-        List mbox = fEnv.getAgMbox(m.getReceiver());
+        List mbox = infraEnv.getAgMbox(m.getReceiver());
 		if (mbox == null) {
             throw new JasonException("Receiver '"+m.getReceiver()+"' does not exists! Could not send "+m);
 		}
         synchronized (mbox) {
             mbox.add(new Message(m));
         }
-        fEnv.getAgent(m.getReceiver()).getTS().newMessageHasArrived();
+        infraEnv.getAgent(m.getReceiver()).getTS().newMessageHasArrived();
     }
 
     public void broadcast(jason.asSemantics.Message m) throws Exception {
-    	Iterator i = fEnv.getAgents().values().iterator();
+    	Iterator i = infraEnv.getAgents().values().iterator();
     	while (i.hasNext()) {
     		AgArch ag = (AgArch)i.next();
     		if (! ag.getAgName().equals(this.getAgName())) {
@@ -202,7 +209,7 @@ public class CentralisedAgArch extends Thread implements AgArchInterface {
     
     // Deafult procedure for checking messages
     public void checkMail() {
-        List mbox = (List)fEnv.getAgMbox(getName());
+        List mbox = (List)infraEnv.getAgMbox(getName());
         synchronized (mbox) {
             Iterator i = mbox.iterator();
             while (i.hasNext()) {
@@ -226,7 +233,7 @@ public class CentralisedAgArch extends Thread implements AgArchInterface {
         Term acTerm = acExec.getActionTerm();
         logger.info("doing: "+acTerm);
 
-        if (fEnv.getUserEnvironment().executeAction(getName(), acTerm)) {
+        if (infraEnv.getUserEnvironment().executeAction(getName(), acTerm)) {
             acExec.setResult(true);
         } else {
             acExec.setResult(false);
@@ -235,7 +242,7 @@ public class CentralisedAgArch extends Thread implements AgArchInterface {
     }
     
     public boolean canSleep() {
-        List mbox = (List)fEnv.getAgMbox(getName());
+        List mbox = (List)infraEnv.getAgMbox(getName());
         return mbox.size() == 0;
     }
     
@@ -244,6 +251,6 @@ public class CentralisedAgArch extends Thread implements AgArchInterface {
 
 	/** inform the controller that this agent's cycle was finished (used in sync mode) */ 
 	public void informCycleFinished(boolean breakpoint) {
-		fControl.receiveFinishedCycle(getName(), breakpoint);
+		infraControl.receiveFinishedCycle(getName(), breakpoint);
 	}
 }

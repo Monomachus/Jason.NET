@@ -22,6 +22,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.4  2006/02/17 13:13:15  jomifred
+//   change a lot of method/classes names and improve some comments
+//
 //   Revision 1.3  2006/01/14 18:22:45  jomifred
 //   centralised infra does not use xml script file anymore
 //
@@ -52,17 +55,17 @@ import java.util.List;
  * <p>The agent reasoning cycle (implemented in TransitionSystem class)
  * calls these methods to get perception, action, and communication.
  * 
- * <p>This class just calls the AgArchInterface methods
+ * <p>This class just calls the AgArchInfraTier methods
  * implemented by the infrastructure tier (Centralised, Saci, ...). 
  * However, the user can customise
  * this methods overridding some of them in his/her arch. class.
  */
-public class AgArch implements AgArchInterface {
+public class AgArch {
 
 	protected TransitionSystem fTS = null;
 	
 	/** the class that implements the architecture tier for the MAS infrastructure */
-	AgArchInterface archTier;
+	AgArchInfraTier archTier;
 
     /** creates the agent class defined by <i>agClass</i>, default is jason.semantics.Agent. */
     public void initAg(String agClass, String asSrc, Settings stts) throws JasonException {
@@ -79,10 +82,10 @@ public class AgArch implements AgArchInterface {
     public void stopAg() {
     }
 
-    public void setInfraArch(AgArchInterface ai) {
+    public void setArchInfraTier(AgArchInfraTier ai) {
 		archTier = ai;
 	}
-    public AgArchInterface getInfraArch() {
+    public AgArchInfraTier getArchInfraTier() {
     	return archTier;
     }
 	

@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.9  2006/02/17 13:13:16  jomifred
+//   change a lot of method/classes names and improve some comments
+//
 //   Revision 1.8  2006/01/04 03:00:46  jomifred
 //   using java log API instead of apache log
 //
@@ -41,24 +44,21 @@ import java.util.logging.Logger;
 /**
  * Base class for the user implementation of execution control.
  * 
- * This default implementation synchronize the agents execution, i.e.,
- * each agent will perform its next reasoning cycle only when all agents have finished its 
- * reasoning cycle.
+ * This default implementation synchronise the agents execution, i.e.,
+ * each agent will perform its next reasoning cycle only when all agents have 
+ * finished its reasoning cycle.
  * 
- * Execution sequence: 	setJasonExecutionControl, init, (receivedFinishedCycle)*, stop.
+ * Execution sequence: 	setExecutionControlInfraTier, init, (receivedFinishedCycle)*, stop.
  * 
  */
 public class ExecutionControl {
 
-	protected ExecutionControlInterface fJasonControl = null;
+	protected ExecutionControlInfraTier infraControl = null;
 	
 	private int nbFinished = 0; // the number of agents that have finished its reasoning cycle
 	private int cycleNumber = 0;
 
 	private Object syncAgFinished = new Object();
-	//private Object syncAllAgFinished = new Object();
-
-	//private String jasonDir = "..";
 
 	static Logger logger = Logger.getLogger(ExecutionControl.class.getName());
 
@@ -72,8 +72,8 @@ public class ExecutionControl {
 					while (true) {
 						try {
 							syncAgFinished.wait(); // waits notify
-							if (fJasonControl != null) { 
-								if (nbFinished >= fJasonControl.getAgentsQty()) {
+							if (infraControl != null) { 
+								if (nbFinished >= infraControl.getAgentsQty()) {
 									nbFinished = 0;
 									allAgsFinished();
 									//setAllAgFinished();
@@ -118,7 +118,7 @@ public class ExecutionControl {
 	  */
 	public void receiveFinishedCycle(String agName, boolean breakpoint) {
 		if (logger.isLoggable(Level.FINE)) {
-			logger.fine("Agent "+agName+" has finished a cycle, # of finished agents is "+(nbFinished+1)+"/"+fJasonControl.getAgentsQty());
+			logger.fine("Agent "+agName+" has finished a cycle, # of finished agents is "+(nbFinished+1)+"/"+infraControl.getAgentsQty());
 			if (breakpoint) {
 				logger.fine("Agent "+agName+" reached a breakpoint");				
 			}
@@ -129,12 +129,12 @@ public class ExecutionControl {
 		}
 	}
 
-	public void setJasonExecutionControl(ExecutionControlInterface jasonControl) {
-		fJasonControl = jasonControl;
+	public void setExecutionControlInfraTier(ExecutionControlInfraTier jasonControl) {
+		infraControl = jasonControl;
 	}
 	
-	public ExecutionControlInterface getJasonExecutionControl() {
-		return fJasonControl;
+	public ExecutionControlInfraTier getExecutionControlInfraTier() {
+		return infraControl;
 	}
 
 	/**
@@ -195,8 +195,8 @@ public class ExecutionControl {
 	
 	/** called when all agents have finished the current cycle */
 	protected void allAgsFinished() {
-		fJasonControl.informAllAgsToPerformCycle();
-		logger.info("starting cycle "+cycleNumber);
+		infraControl.informAllAgsToPerformCycle();
+		logger.fine("starting cycle "+cycleNumber);
 	}
 
 	public int getCycleNumber() {

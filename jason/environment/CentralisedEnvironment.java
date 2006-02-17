@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.12  2006/02/17 13:13:16  jomifred
+//   change a lot of method/classes names and improve some comments
+//
 //   Revision 1.11  2006/01/04 03:00:46  jomifred
 //   using java log API instead of apache log
 //
@@ -59,11 +62,10 @@ import java.util.logging.Logger;
 
 
 /**
- * This class implements the centralised version of the environment tier.
- * It manages the current agents inside the MAS, their mailboxes, etc.
+ * This class implements the centralised version of the environment infrastructure tier.
+ * It also manages the current agents inside the MAS, their mailboxes, etc.
  */
-
-public class CentralisedEnvironment implements EnvironmentInterface {
+public class CentralisedEnvironment implements EnvironmentInfraTier {
 
 	// TODO: try ConcurrentHashMap when moving to jdk 1.5
     private Map mboxes;
@@ -98,7 +100,7 @@ public class CentralisedEnvironment implements EnvironmentInterface {
     }
     
 	/**
-	 * @see jason.environment.EnvironmentInterface#informAgsEnvironmentChanged()
+	 * @see jason.environment.EnvironmentInfraTier#informAgsEnvironmentChanged()
 	 */
     public void informAgsEnvironmentChanged() {
         Iterator i = agents.values().iterator();
@@ -109,7 +111,7 @@ public class CentralisedEnvironment implements EnvironmentInterface {
     }
 
 	/**
-	 * @see jason.environment.EnvironmentInterface#informAgsEnvironmentChanged(java.util.Collection)
+	 * @see jason.environment.EnvironmentInfraTier#informAgsEnvironmentChanged(java.util.Collection)
 	 */
     public void informAgsEnvironmentChanged(Collection agentsToNotify) {
         if (agentsToNotify == null) {

@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.28  2006/02/17 13:13:16  jomifred
+//   change a lot of method/classes names and improve some comments
+//
 //   Revision 1.27  2006/02/14 22:34:40  jomifred
 //   fix a bug in brf (it does not deal correctly with open world)
 //
@@ -69,7 +72,7 @@ package jason.asSemantics;
 
 import jIDE.JasonID;
 import jason.JasonException;
-import jason.architecture.AgArchInterface;
+import jason.architecture.AgArch;
 import jason.asSyntax.BeliefBase;
 import jason.asSyntax.Literal;
 import jason.asSyntax.Plan;
@@ -114,7 +117,7 @@ public class Agent {
 	private Logger logger;
 	
     /** creates the TS of this agent, parse its AS source, and set its Settings */
-    public TransitionSystem initAg(AgArchInterface arch, String asSrc, Settings stts) throws JasonException {
+    public TransitionSystem initAg(AgArch arch, String asSrc, Settings stts) throws JasonException {
         // set the agent
         try {
 			setLogger(arch);
@@ -132,7 +135,7 @@ public class Agent {
 		}
     }
 
-    public void setLogger(AgArchInterface arch) {
+    public void setLogger(AgArch arch) {
 		if (arch != null) {
 			logger = Logger.getLogger(Agent.class.getName()+"."+arch.getAgName());
 		} else {
@@ -439,7 +442,7 @@ public class Agent {
 	/** get the agent "mind" as XML */
 	public Element getAsDOM(Document document) {
 		Element ag = (Element) document.createElement("agent");
-		ag.setAttribute("name", fTS.getAgArch().getAgName());
+		ag.setAttribute("name", fTS.getUserAgArch().getAgName());
 		ag.appendChild(fBS.getAsDOM(document));
 		//ag.appendChild(ps.getAsDOM(document));
 		return ag;

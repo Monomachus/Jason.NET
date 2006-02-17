@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.24  2006/02/17 13:13:15  jomifred
+//   change a lot of method/classes names and improve some comments
+//
 //   Revision 1.23  2006/01/14 18:22:45  jomifred
 //   centralised infra does not use xml script file anymore
 //
@@ -97,26 +100,26 @@ import saci.Message;
 import saci.MessageHandler;
 
 /**
- * This class provides an agent architecture when using SACI Infra Structure
+ * This class provides an agent architecture when using SACI Infrastructure
  * to run the MAS.
  * 
  * <p>Execution sequence: initAg, run (perceive, checkMail, act), stopAg.
  */
 
-public class SaciAgArch extends saci.Agent implements AgArchInterface {
+public class SaciAgArch extends saci.Agent implements AgArchInfraTier {
     
     // to get the percepts via SACI (the normal mbox is used for inter-agent com.)
     private MBoxSAg mboxPercept = null;
 
 	/** the user implementation of the architecture */
-	protected AgArch fUserAgArh;
+	protected AgArch userAgArh;
 
 	private Logger logger;
     
 	/**
 	 * Method used by SACI to initialize the agent
-	 * args[0] is the agent architecture class (ignored here)
-	 * args[1] is the user Agent class (ignored here)
+	 * args[0] is the agent architecture class 
+	 * args[1] is the user Agent class 
 	 * args[2] is the AgentSpeak source file
 	 * args[3] "options"
 	 * args[4] options
@@ -159,10 +162,10 @@ public class SaciAgArch extends saci.Agent implements AgArchInterface {
 					stts.setOptions("[" + args[4] + "]");
 				}
 			}
-            fUserAgArh = (AgArch)Class.forName(archClassName).newInstance();
-            fUserAgArh.setInfraArch(this);
-            fUserAgArh.initAg(agClassName, asSource, stts);
-    		logger.setLevel(fUserAgArh.getTS().getSettings().logLevel());
+            userAgArh = (AgArch)Class.forName(archClassName).newInstance();
+            userAgArh.setArchInfraTier(this);
+            userAgArh.initAg(agClassName, asSource, stts);
+    		logger.setLevel(userAgArh.getTS().getSettings().logLevel());
         } catch (Exception e) {
         	running = false;
             throw new JasonException("as2j: error creating the agent class! - "+e.getMessage());
@@ -176,15 +179,15 @@ public class SaciAgArch extends saci.Agent implements AgArchInterface {
             mboxPercept.init();
             mboxPercept.setMboxChangedListener(new MBoxChangedListener() {
                 public void mboxChanged() {
-                    if (fUserAgArh.getTS() != null) {
-                    	fUserAgArh.getTS().newMessageHasArrived();
+                    if (userAgArh.getTS() != null) {
+                    	userAgArh.getTS().newMessageHasArrived();
                     }
                 }
             });
             
             mboxPercept.addMessageHandler("performCycle", "tell", null, "AS-ExecControl", new MessageHandler() {
                 public boolean processMessage(saci.Message m) {
-                	fUserAgArh.getTS().receiveSyncSignal();
+                	userAgArh.getTS().receiveSyncSignal();
                 	return true; // no other message handler gives this message
                 }
             });
@@ -198,7 +201,7 @@ public class SaciAgArch extends saci.Agent implements AgArchInterface {
                         r.put("ontology", m.get("ontology"));
                         
                         try {
-                            Document agStateDoc = fUserAgArh.getTS().getAg().getAgState();
+                            Document agStateDoc = userAgArh.getTS().getAg().getAgState();
                             
                             // serialize
                             //StringWriter so = new StringWriter();
@@ -217,8 +220,8 @@ public class SaciAgArch extends saci.Agent implements AgArchInterface {
                 
             getMBox().setMboxChangedListener(new MBoxChangedListener() {
                 public void mboxChanged() {
-                    if (fUserAgArh.getTS() != null) {
-                    	fUserAgArh.getTS().newMessageHasArrived();
+                    if (userAgArh.getTS() != null) {
+                    	userAgArh.getTS().newMessageHasArrived();
                     }
                 }
             });
@@ -243,7 +246,7 @@ public class SaciAgArch extends saci.Agent implements AgArchInterface {
     
     public void run() {
         while (running) {
-        	fUserAgArh.getTS().reasoningCycle();
+        	userAgArh.getTS().reasoningCycle();
         }
         logger.fine("finished running.\n");
     }
@@ -293,7 +296,7 @@ public class SaciAgArch extends saci.Agent implements AgArchInterface {
                         if ( ((String)m.get("ontology")).equals("AS-Action")) {
                             String irt = (String)m.get("in-reply-to");
                             if (irt != null) {
-                                ActionExec a = (ActionExec)fUserAgArh.getTS().getC().getPendingActions().remove(irt);
+                                ActionExec a = (ActionExec)userAgArh.getTS().getC().getPendingActions().remove(irt);
                                 // was it a pending action?
                                 if (a != null) {
                                     if (((String)m.get("content")).equals("ok")) {
@@ -302,7 +305,7 @@ public class SaciAgArch extends saci.Agent implements AgArchInterface {
                                     else {
                                         a.setResult(false);
                                     }
-                                    fUserAgArh.getTS().getC().getFeedbackActions().add(a);
+                                    userAgArh.getTS().getC().getFeedbackActions().add(a);
                                 }
                                 else {
                                 	logger.log(Level.SEVERE, "Error: received feedback for an Action that is not pending.");
@@ -326,7 +329,7 @@ public class SaciAgArch extends saci.Agent implements AgArchInterface {
     public void sendMsg(jason.asSemantics.Message m) throws Exception {
     	// suspend intention if it is an ask
     	if (m.isAsk()) {
-    		fUserAgArh.getTS().getC().getPendingActions().put(m.getMsgId(), fUserAgArh.getTS().getC().getSelectedIntention());    		
+    		userAgArh.getTS().getC().getPendingActions().put(m.getMsgId(), userAgArh.getTS().getC().getSelectedIntention());    		
     	}
         saci.Message msaci = new saci.Message("("+m.getIlForce()+")");
         msaci.put("receiver", m.getReceiver());
@@ -388,7 +391,7 @@ public class SaciAgArch extends saci.Agent implements AgArchInterface {
                     if (irt != null) {
                     	im.setInReplyTo(irt);
                     }
-                    fUserAgArh.getTS().getC().getMB().add(im);
+                    userAgArh.getTS().getC().getMB().add(im);
 
                     /*
                     if (Term.parse(sPropCont) != null) { // the contents are well formed
@@ -410,7 +413,7 @@ public class SaciAgArch extends saci.Agent implements AgArchInterface {
         if (! running) {
             return;
         }
-        TransitionSystem ts = fUserAgArh.getTS();
+        TransitionSystem ts = userAgArh.getTS();
         if (ts.getC().getAction() == null)
             return;
         try {

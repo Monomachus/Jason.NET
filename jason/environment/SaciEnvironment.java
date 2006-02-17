@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.11  2006/02/17 13:13:16  jomifred
+//   change a lot of method/classes names and improve some comments
+//
 //   Revision 1.10  2006/01/04 03:00:46  jomifred
 //   using java log API instead of apache log
 //
@@ -49,7 +52,7 @@ import java.util.logging.Logger;
 
 import saci.MessageHandler;
 
-public class SaciEnvironment extends saci.Agent implements EnvironmentInterface {
+public class SaciEnvironment extends saci.Agent implements EnvironmentInfraTier {
 
 	private Environment fUserEnv;
 
@@ -59,7 +62,7 @@ public class SaciEnvironment extends saci.Agent implements EnvironmentInterface 
     }
     
 	/**
-	 * @see jason.environment.EnvironmentInterface#informAgsEnvironmentChanged()
+	 * @see jason.environment.EnvironmentInfraTier#informAgsEnvironmentChanged()
 	 */
     public void informAgsEnvironmentChanged() {
         try {
@@ -71,7 +74,7 @@ public class SaciEnvironment extends saci.Agent implements EnvironmentInterface 
     }
 
 	/**
-	 * @see jason.environment.EnvironmentInterface#informAgsEnvironmentChanged(java.util.Collection)
+	 * @see jason.environment.EnvironmentInfraTier#informAgsEnvironmentChanged(java.util.Collection)
 	 */
     public void informAgsEnvironmentChanged(Collection agentsToNotify) {
         try {

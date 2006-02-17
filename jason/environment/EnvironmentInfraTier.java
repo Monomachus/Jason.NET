@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------------
 // Copyright (C) 2003  Rafael H. Bordini, Jomi F. Hubner, et al.
-// 
+//
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
@@ -23,41 +23,49 @@
 //   $Date$
 //   $Revision$
 //   $Log$
-//   Revision 1.7  2006/02/17 13:13:16  jomifred
+//   Revision 1.1  2006/02/17 13:16:16  jomifred
 //   change a lot of method/classes names and improve some comments
 //
-//   Revision 1.6  2005/08/12 22:20:10  jomifred
+//   Revision 1.5  2005/10/30 16:07:33  jomifred
+//   add comments
+//
+//   Revision 1.4  2005/08/12 22:26:08  jomifred
 //   add cvs keywords
 //
 //
 //----------------------------------------------------------------------------
 
-package jason.stdlib;
 
-import jason.JasonException;
-import jason.asSemantics.InternalAction;
-import jason.asSemantics.TransitionSystem;
-import jason.asSemantics.Unifier;
-import jason.asSyntax.Term;
+package jason.environment;
 
-public class myName implements InternalAction {
+import java.util.Collection;
 
-	public boolean execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
-		
-		Term name = null;
-		try {
-			name = args[0];
-			if (name == null) {
-				throw new JasonException("The parameter Name of internal action 'myName' is not a term!");
-			}
-			// do not need to be VAR
-			//if (!name.isVar()) {
-			//	throw new JasonException("The parameter Name of internal action 'myName' is not a variable!");
-			//}
+/** 
+ * The infrastructure tier interface for Environment.
+ * 
+ *  <p>It is implemented by jason to ecapsulate the communication side 
+ *  of the distributed/centralised environment, so the user environment can call 
+ *  "informAgsEnvironmentChanged" either in centralised or distributed
+ *  executions.  
+ * 
+ * <p>An example of interaction:
+ * <img src="../../../uml/environmentInteraction.gif" />
+ *
+ * <p>The related classes:
+ * <img src="../../../uml/jason.environment.gif" />
+ */
+public interface EnvironmentInfraTier {
 
-		} catch (ArrayIndexOutOfBoundsException e) {
-			throw new JasonException("The internal action 'myName' has not received one argument");
-		}
-		return un.unifies(name, new Term(ts.getUserAgArch().getAgName()));
-	}
+    /** 
+     * sends a message to all agents notifying them that the environment has changed 
+     * (called by the user environment). 
+     */
+    public void informAgsEnvironmentChanged();
+
+    /**
+     * Sends a message to a set of agents notifying them that the environment has changed. 
+     * The collection has the agents' names. 
+     * (called by the user environment). 
+     */
+    public void informAgsEnvironmentChanged(Collection agents);
 }

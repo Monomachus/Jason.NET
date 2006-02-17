@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.7  2006/02/17 13:13:16  jomifred
+//   change a lot of method/classes names and improve some comments
+//
 //   Revision 1.6  2006/01/04 03:00:46  jomifred
 //   using java log API instead of apache log
 //
@@ -49,22 +52,23 @@ import java.util.logging.Logger;
 import org.w3c.dom.Document;
 
 /**
- * Concrete execution control implementation based on centralised architecture.
+ * Concrete implementation of the controller for
+ * centralised infrastructure tier.
  */
-public class CentralisedExecutionControl implements ExecutionControlInterface {
+public class CentralisedExecutionControl implements ExecutionControlInfraTier {
 
-	private CentralisedEnvironment    fEnv;
-	private ExecutionControl          fUserControl;
+	private CentralisedEnvironment    infraEnv;
+	private ExecutionControl          userController;
 	
 	static Logger logger = Logger.getLogger(CentralisedExecutionControl.class.getName());
 	
-	public CentralisedExecutionControl(CentralisedEnvironment env, String userControlClass) throws JasonException {
-		fEnv = env;
+	public CentralisedExecutionControl(CentralisedEnvironment envInfraTier, String userControlClass) throws JasonException {
+		infraEnv = envInfraTier;
         try {
-        	fUserControl = (ExecutionControl)Class.forName(userControlClass).newInstance();
-        	fUserControl.setJasonExecutionControl(this);
+        	userController = (ExecutionControl)Class.forName(userControlClass).newInstance();
+        	userController.setExecutionControlInfraTier(this);
         	//fUserControl.setJasonDir(jasonDir);
-        	fUserControl.init();
+        	userController.init();
         } catch (Exception e) {
             logger.log(Level.SEVERE,"Error ",e);
             throw new JasonException("The user execution control class instantiation '"+userControlClass+"' has failed!"+e.getMessage());
@@ -75,17 +79,15 @@ public class CentralisedExecutionControl implements ExecutionControlInterface {
 	 * This method is called when MAS execution is being finished
 	 */
 	public void stop() {
-		fUserControl.stop();
+		userController.stop();
 	}
-
-
 	
 	public ExecutionControl getUserControl() {
-		return fUserControl;
+		return userController;
 	}
 	
-	public CentralisedEnvironment getJasonEnvironment() {
-		return fEnv;
+	public CentralisedEnvironment getEnvInfraTier() {
+		return infraEnv;
 	}
 	
 	/** 
@@ -95,23 +97,23 @@ public class CentralisedExecutionControl implements ExecutionControlInterface {
      */
 	public void receiveFinishedCycle(String agName, boolean breakpoint) {
 		// pass to user controller
-		fUserControl.receiveFinishedCycle(agName, breakpoint);
+		userController.receiveFinishedCycle(agName, breakpoint);
 	}
 
 	/**
-	 * @see jason.control.ExecutionControlInterface#informAgToPerformCycle(java.lang.String)
+	 * @see jason.control.ExecutionControlInfraTier#informAgToPerformCycle(java.lang.String)
 	 */
 	public void informAgToPerformCycle(String agName) {
 		// call the agent method to "go on"
-		fEnv.getAgent(agName).getTS().receiveSyncSignal();
+		infraEnv.getAgent(agName).getTS().receiveSyncSignal();
 	}
 
 	/**
-	 * @see jason.control.ExecutionControlInterface#informAllAgsToPerformCycle()
+	 * @see jason.control.ExecutionControlInfraTier#informAllAgsToPerformCycle()
 	 */
 	public void informAllAgsToPerformCycle() {
-		synchronized(fEnv.getAgents()) { 
-			Iterator i = fEnv.getAgents().values().iterator();
+		synchronized(infraEnv.getAgents()) { 
+			Iterator i = infraEnv.getAgents().values().iterator();
 			while (i.hasNext()) {
 				AgArch ag = (AgArch)i.next();
 				ag.getTS().receiveSyncSignal();
@@ -121,20 +123,20 @@ public class CentralisedExecutionControl implements ExecutionControlInterface {
 	
 	
 	/**
-	 * @see jason.control.ExecutionControlInterface#getAgentsName()
+	 * @see jason.control.ExecutionControlInfraTier#getAgentsName()
 	 */
 	public Collection getAgentsName() {
-		return fEnv.getAgents().keySet();
+		return infraEnv.getAgents().keySet();
 	}
 	
     public int getAgentsQty() {
-    	return fEnv.getAgents().size();
+    	return infraEnv.getAgents().size();
     }
 	
 	/**
-	 *  @see jason.control.ExecutionControlInterface#getAgState(java.lang.String)
+	 *  @see jason.control.ExecutionControlInfraTier#getAgState(java.lang.String)
 	 */
 	public Document getAgState(String agName) {
-		return fEnv.getAgent(agName).getTS().getAg().getAgState();
+		return infraEnv.getAgent(agName).getTS().getAg().getAgState();
 	}
 }

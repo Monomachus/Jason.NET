@@ -23,8 +23,8 @@
 //   $Date$
 //   $Revision$
 //   $Log$
-//   Revision 1.17  2006/01/14 18:23:40  jomifred
-//   centralised infra does not use xml script file anymore
+//   Revision 1.18  2006/02/17 13:13:16  jomifred
+//   change a lot of method/classes names and improve some comments
 //
 //----------------------------------------------------------------------------
 
@@ -84,11 +84,11 @@ public class createAgent implements InternalAction {
             	}
             }
             
-            if ( ((AgArch)ts.getAgArch()).getInfraArch() instanceof CentralisedAgArch) {
-            	CentralisedAgArch ag = (CentralisedAgArch)((AgArch)ts.getAgArch()).getInfraArch();
-            	return createCentralisedAg(name.toString(), fSource.getAbsolutePath(), ag.getEnv(), ag.getControl(), ts.getSettings().isSync());
-            } else if (((AgArch)ts.getAgArch()).getInfraArch() instanceof SaciAgArch) {
-            	SaciAgArch ag = (SaciAgArch)((AgArch)ts.getAgArch()).getInfraArch();
+            if (ts.getUserAgArch().getArchInfraTier() instanceof CentralisedAgArch) {
+            	CentralisedAgArch ag = (CentralisedAgArch)((AgArch)ts.getUserAgArch()).getArchInfraTier();
+            	return createCentralisedAg(name.toString(), fSource.getAbsolutePath(), ag.getEnvInfraTier(), ag.getControlInfraTier(), ts.getSettings().isSync());
+            } else if (ts.getUserAgArch().getArchInfraTier() instanceof SaciAgArch) {
+            	SaciAgArch ag = (SaciAgArch)((AgArch)ts.getUserAgArch()).getArchInfraTier();
             	return createSaciAg(name.toString(), ag.getSociety(), fSource.getAbsolutePath(), ts.getSettings().isSync());
             } else {
 				throw new JasonException("Create agent is currently implemented only for the Centralised/Saci infrastructure!");				
@@ -134,12 +134,12 @@ public class createAgent implements InternalAction {
             CentralisedAgArch agArch = new CentralisedAgArch();//(CentralisedAgArch)Class.forName(Agent.class.getName()).newInstance();
             agArch.setAgName(name.toString());
             agArch.initAg(AgArch.class.getName(), Agent.class.getName(), source, new Settings());
-            agArch.setEnv(env);
-            agArch.setControl(control);
+            agArch.setEnvInfraTier(env);
+            agArch.setControlInfraTier(control);
             if (isSync) {
             	agArch.getUserAgArch().getTS().getSettings().setSync(true);
             }
-            agArch.getEnv().addAgent(agArch.getUserAgArch());
+            agArch.getEnvInfraTier().addAgent(agArch.getUserAgArch());
             agArch.start();
             logger.fine("Agent "+name+" created!");
             return true;

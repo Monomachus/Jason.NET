@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.1  2006/02/17 13:16:15  jomifred
+//   change a lot of method/classes names and improve some comments
+//
 //   Revision 1.3  2005/11/20 16:53:17  jomifred
 //   the canSleep method in TS asks the agent arch if it can sleep.
 //
@@ -51,18 +54,12 @@ import java.util.List;
 
 
 /**
- * This interface should be used to define the overall agent
- * architecture; the AS interpreter is only the reasoner (a kind of mind) within such
- * architecture (a kind of body).
+ * This is interface implemented by the infrastructure tier (Saci/Centralised)
+ * regarding the agent architecture methods (perception, action, and communication).
  * 
- * <p>The agent reasoning cycle (implemented in TransitionSystem class)
- * calls these methods to get perception, action, and communication.
  **/
 
-public interface AgArchInterface {
-
-    // Default functions for the overall agent architecture
-    // The user can always override them
+public interface AgArchInfraTier {
 
     /** gets the agent's perception as a list of Literals */
     public List perceive();

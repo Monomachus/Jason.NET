@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.3  2006/02/17 13:13:16  jomifred
+//   change a lot of method/classes names and improve some comments
+//
 //   Revision 1.2  2006/01/04 03:00:47  jomifred
 //   using java log API instead of apache log
 //
@@ -60,12 +63,12 @@ public class killAgent implements InternalAction {
             Term name = (Term)args[0].clone();
             un.apply(name);
             
-            if (ts.getAgArch() instanceof CentralisedAgArch) {
-    			CentralisedAgArch ag = (CentralisedAgArch)ts.getAgArch();
-            	return killCentralisedAg(name.toString(), ag.getEnv());
+            if (ts.getUserAgArch().getArchInfraTier() instanceof CentralisedAgArch) {
+    			CentralisedAgArch ag = (CentralisedAgArch)ts.getUserAgArch().getArchInfraTier();
+            	return killCentralisedAg(name.toString(), ag.getEnvInfraTier());
 
-            } else if (ts.getAgArch() instanceof SaciAgArch) {
-    			SaciAgArch ag = (SaciAgArch)ts.getAgArch();
+            } else if (ts.getUserAgArch().getArchInfraTier() instanceof SaciAgArch) {
+    			SaciAgArch ag = (SaciAgArch)ts.getUserAgArch().getArchInfraTier();
             	return killSaciAg(name.toString(), ag.getSociety());
             
             } else {
