@@ -23,30 +23,20 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.9  2006/02/17 11:45:52  jomifred
+//   no message
+//
 //   Revision 1.8  2006/01/14 15:26:28  jomifred
 //   Config and some code of RunMAS was moved to package plugin
 //
 //   Revision 1.7  2006/01/11 15:14:39  jomifred
 //   add close all befere opening a mas2j project
 //
-//   Revision 1.6  2006/01/02 14:25:34  jomifred
-//   no message
-//
 //   Revision 1.5  2005/12/30 20:40:17  jomifred
 //   new features: unnamed var, var with annots, TE as var
 //
-//   Revision 1.4  2005/12/19 22:53:31  jomifred
-//   no message
-//
-//   Revision 1.3  2005/12/17 19:28:47  jomifred
-//   no message
-//
-//   Revision 1.2  2005/12/16 22:09:20  jomifred
-//   no message
-//
 //   Revision 1.1  2005/12/08 20:15:00  jomifred
 //   changes for JasonIDE plugin
-//
 //
 //----------------------------------------------------------------------------
 
@@ -183,7 +173,7 @@ public class JasonIDOptionPanel extends AbstractOptionPane  {
 			public void actionPerformed(ActionEvent arg0) {
 	            try {
 	                JFileChooser chooser = new JFileChooser(System.getProperty("user.dir"));
-					 chooser.setDialogTitle("Select the Java Home directory");
+					 chooser.setDialogTitle("Select the Java JDK Home directory");
 	                chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 	                if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
 	                	String javaHome = (new File(chooser.getSelectedFile().getPath())).getCanonicalPath();
