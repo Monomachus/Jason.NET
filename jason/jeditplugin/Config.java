@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.2  2006/02/18 15:24:50  jomifred
+//   changes in many files to detach jason kernel from any infrastructure implementation
+//
 //   Revision 1.1  2006/01/14 15:18:58  jomifred
 //   Config and some code of RunMAS was moved to package plugin
 //
@@ -46,6 +49,8 @@
 package jason.jeditplugin;
 
 import jIDE.JasonID;
+import jason.infra.centralised.CentralisedFactory;
+import jason.infra.saci.SaciFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -173,6 +178,10 @@ public class Config extends Properties {
         if (get(CLOSEALL) == null) {
         	put(CLOSEALL, "true");
         }
+        
+        // Default infrastructures
+        put("infrastructure.Centralised", CentralisedFactory.class.getName());
+        put("infrastructure.Saci", SaciFactory.class.getName());
 	}
 	
     public void store() {
@@ -189,6 +198,10 @@ public class Config extends Properties {
     	}
     }
 
+    public String getInfrastructureFactoryClass(String infraId) {
+    	return get("infrastructure."+infraId).toString();
+    }
+    
     public String getJasonRunningVersion() {
         try {
             Properties p = new Properties();

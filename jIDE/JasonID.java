@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.31  2006/02/18 15:20:07  jomifred
+//   changes in many files to detach jason kernel from any infrastructure implementation
+//
 //   Revision 1.30  2006/01/14 15:20:45  jomifred
 //   Config and some code of RunMAS was moved to package plugin
 //
@@ -59,11 +62,11 @@
 package jIDE;
 
 
+import jason.infra.centralised.RunCentralisedMAS;
 import jason.jeditplugin.AboutGUI;
 import jason.jeditplugin.Config;
 import jason.jeditplugin.RunProjectListener;
 import jason.runtime.OutputStreamAdapter;
-import jason.runtime.RunCentralisedMAS;
 
 import java.awt.BorderLayout;
 import java.awt.Component;

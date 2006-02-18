@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.7  2006/02/18 15:25:16  jomifred
+//   changes in many files to detach jason kernel from any infrastructure implementation
+//
 //   Revision 1.6  2006/01/14 18:23:22  jomifred
 //   centralised infra does not use xml script file anymore
 //
@@ -98,7 +101,7 @@ public class mas2j {
         project.setDirectory(new File(".").getAbsolutePath());
         project.setProjectFile(new File(name));
 		System.out.println("mas2j: "+name+" parsed successfully!\n");
-        project.writeScripts();
+        project.writeScripts(false);
 
         int step = 1;
         System.out.println("To run your MAS:");
@@ -110,8 +113,7 @@ public class mas2j {
              step++;
         }
         System.out.println("  "+step+". run your agents (script ./"+project.getSocName()+".sh)");
-      }
-      catch(ParseException e){
+      } catch(Exception e){
 		System.err.println("mas2j: parsing errors found... \n" + e);
       }
     }
@@ -139,7 +141,6 @@ TOKEN : {
 |  <AT:          "at">
 |  <ARCH:        "architecture" >
 |  <INFRA:       "infrastructure" >
-|  <INFRAV:       ("Centralised" | "Saci") >
 
 |  <ASOEE:       "events" >
 |  <ASOEEV:      ("discard"|"requeue"|"retrieve") >
@@ -207,7 +208,7 @@ void infra() :              { Token t; }
 {                           { project.setInfrastructure("Centralised"); }
   [ (<ARCH>                 { System.err.println("The id <architecture> was replaced by <infrastructure> in .mas2j syntax, please use the new id."); }
      | <INFRA>) 
-    ":" t = <INFRAV>        { project.setInfrastructure(t.image); } 
+    ":" t = <CLASSID>       { project.setInfrastructure(t.image); } 
   ]
 }
 

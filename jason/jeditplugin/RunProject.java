@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.2  2006/02/18 15:24:50  jomifred
+//   changes in many files to detach jason kernel from any infrastructure implementation
+//
 //   Revision 1.1  2006/01/14 15:18:58  jomifred
 //   Config and some code of RunMAS was moved to package plugin
 //
@@ -61,28 +64,13 @@
 package jason.jeditplugin;
 
 import jason.mas2j.MAS2JProject;
-import jason.runtime.MASConsoleGUI;
-import jason.runtime.RunCentralisedMAS;
+import jason.runtime.MASLauncher;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
-
-import javax.swing.JOptionPane;
-
-import saci.launcher.Launcher;
-import saci.launcher.LauncherD;
 
 // TODO: when using jdk 1.5, change RunProcess to ProcessBuilder as
 // explained at http://java.sun.com/developer/JDCTechTips/2005/tt0727.html#1
@@ -90,14 +78,9 @@ import saci.launcher.LauncherD;
 /** runs an MAS */
 public class RunProject {
 
-	RunProjectListener listener;
-	MASRunner masRunner;
+	MASLauncher masLauncher;
 
-	public RunProject(RunProjectListener l) {
-		listener = l;
-	}
-
-	public void run(MAS2JProject project) {
+	public void run(MAS2JProject project, RunProjectListener listener) {
 		try {
 			String jasonJar = Config.get().getJasonJar();
 			if (!Config.checkJar(jasonJar)) {
@@ -111,26 +94,17 @@ public class RunProject {
 			// compile some files
 			CompileThread compT = new CompileThread(project.getAllUserJavaFiles(), project);
 			compT.start();
-			if (masRunner != null) {
-				masRunner.stopRunner();
+			if (masLauncher != null) {
+				masLauncher.stopMAS();
+			}
+			if (!compT.waitCompilation()) {
+				return;
 			}
 
-			if (project.isCentArch()) {
-				if (Config.get().runAsInternalTread()) {
-					masRunner = new MASRunnerInsideJIDE(compT, project);
-				} else {
-					masRunner = new MASRunnerCentralised(compT, project);
-				}
-			} else if (project.isSaciArch()) {
-				String saciJar = Config.get().getSaciJar();
-				if (Config.checkJar(saciJar)) {
-					masRunner = new MASRunnerSaci(compT, project);
-				} else {
-					System.err.println("The path to the saci.jar file ("+saciJar+") was not correctly set. Go to menu Edit->Preferences to configure the path.");
-					return;
-				}
-			}
-			masRunner.start();
+			masLauncher = project.getInfrastructureFactory().createMASLauncher();
+			masLauncher.setProject(project);
+			masLauncher.setListener(listener);
+			masLauncher.start();
 			
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -138,113 +112,12 @@ public class RunProject {
 	}
 
 	public void stopMAS() {
-		if (masRunner != null) {
-			masRunner.stopRunner();
+		if (masLauncher != null) {
+			masLauncher.stopMAS();
 		}
-		masRunner = null;
+		masLauncher = null;
 	}
 
-
-	class StartSaci extends Thread {
-
-		//BufferedReader saciIn;
-		//BufferedReader saciErr;
-
-		boolean saciOk = false;
-		Process saciProcess;
-		MAS2JProject project;
-		
-		StartSaci(MAS2JProject project) {
-			super("StartSaci");
-			this.project = project;
-		}
-
-		Launcher getLauncher() {
-			//PrintStream err = System.err;
-			Launcher l = null;
-			try {
-				//if (jasonID != null) {
-				//	System.setErr(jasonID.myOut.originalErr);
-				//}
-				l = LauncherD.getLauncher();
-				return l;
-			} catch (Exception e) {
-				return null;
-			} finally {
-				//System.setErr(err);
-			}
-		}
-		
-		void stopSaci() {
-			try {
-				getLauncher().stop();
-			} catch (Exception e) {
-				try {
-					saciProcess.destroy();
-				} catch (Exception e2) {
-				}
-			}
-			saciProcess = null;
-		}
-
-		public void run() {
-			//stopSaci();
-			try {
-				//String command = getAsScriptCommand(jasonID.projectDirectory + File.separator + "saci-" + jasonID.getFileName());
-				String command = getAsScriptCommand("saci-" + project.getSocName(), true);
-				saciProcess = Runtime.getRuntime().exec(command, null,
-						//new File(JasonID.saciHome + File.separator + "bin"));
-						new File(project.getDirectory()));
-				//saciIn = new BufferedReader(new InputStreamReader(saciProcess.getInputStream()));
-				//saciErr = new BufferedReader(new InputStreamReader(saciProcess.getErrorStream()));
-				System.out.println("running saci with " + command);
-
-				int tryCont = 0;
-				while (tryCont < 30) {
-					tryCont++;
-					sleep(1000);
-					Launcher l = getLauncher();
-					if (l != null) {
-						saciOk = true;
-						stopWaitSaciOk();
-						break;
-					}
-				}
-			} catch (Exception ex) {
-				System.err.println("error running saci:" + ex);
-			} finally {
-				stopWaitSaciOk();
-			}
-		}
-
-		synchronized void stopWaitSaciOk() {
-			notifyAll();
-		}
-
-		synchronized boolean waitSaciOk() {
-			try {
-				wait(20000); // waits 20 seconds
-				if (!saciOk) {
-					JOptionPane
-							.showMessageDialog(
-									null,
-									"Fail to automatically start saci! \nGo to \""
-											+ project.getDirectory()
-											+ "\" directory and run the saci-"
-											+ project.getSocName()
-											+ " script.\n\nClick 'ok' when saci is running.");
-					wait(1000);
-					if (!saciOk) {
-						JOptionPane
-								.showMessageDialog(null,
-										"Saci might not be properly installed or configure. Use the centralised architecture to run your MAS");
-					}
-				}
-			} catch (Exception e) {
-			}
-			return saciOk;
-		}
-	}
 
 	class CompileThread extends Thread {
 		private boolean ok = true;
@@ -318,213 +191,12 @@ public class RunProject {
 		}
 	}
 
-	class MASRunner extends Thread {
-		CompileThread compT;
-		MAS2JProject project;
-		protected boolean stop = false;
-		boolean stopOnProcessExit = true;
-		
-		Process masProcess = null;
-		OutputStream processOut;
 
-		MASRunner(CompileThread t, MAS2JProject project) {
-			super("MASRunner");
-			compT = t;
-			this.project = project;
-		}
-
-		void stopRunner() {
-			if (masProcess != null) {
-				masProcess.destroy();
-			}
-			stop = true;
-		}
-
-		public void run() {
-			try {
-				if (compT != null) {
-					if (!compT.waitCompilation()) {
-						return;
-					}
-				}
-				String command = getAsScriptCommand(project.getSocName());
-				System.out.println("Executing MAS with " + command);
-				masProcess = Runtime.getRuntime().exec(command, null,
-						new File(project.getDirectory()));
-
-				BufferedReader in = new BufferedReader(new InputStreamReader(masProcess.getInputStream()));
-				BufferedReader err = new BufferedReader(new InputStreamReader(	masProcess.getErrorStream()));
-				processOut = masProcess.getOutputStream();
-
-				sleep(500);
-				stop = false;
-				while (!stop) {// || saciProcess!=null) {
-					while (!stop && in.ready()) {
-						System.out.println(in.readLine());
-					}
-					while (!stop && err.ready()) {
-						System.out.println(err.readLine());
-					}
-					sleep(250); // to not consume cpu
-					
-					if (stopOnProcessExit) {
-						try {
-							masProcess.exitValue();
-							// no exception when the process has finished
-							stop = true;
-						} catch (Exception e) {}
-					}
-				}
-				
-			} catch (Exception e) {
-				System.err.println("Execution error: " + e);
-				e.printStackTrace();
-			} finally {
-				if (listener != null) {
-					listener.masFinished();
-				}
-			}
-		}
-	}
-	
-	class MASRunnerCentralised extends MASRunner {
-
-		MASRunnerCentralised(CompileThread t, MAS2JProject project) {
-			super(t, project);
-		}
-
-		void stopRunner() {
-			try {
-				if (processOut != null) {
-					processOut.write(1);//"quit"+System.getProperty("line.separator"));
-				}
-			} catch (Exception e) {
-				System.err.println("Execution error: " + e);
-				e.printStackTrace();
-			}
-
-			super.stopRunner();
-		}
-	}
-
-	
-	class MASRunnerInsideJIDE extends MASRunner {
-		Method getRunnerMethod = null;
-		Method finishMethod = null;
-		
-		MASRunnerInsideJIDE(CompileThread t, MAS2JProject project) {
-			super(t, project);
-		}
-
-		void stopRunner() {
-			try {
-				//RunCentralisedMAS.getRunner().finish();
-				if (getRunnerMethod != null && finishMethod != null) {
-					finishMethod.invoke(getRunnerMethod.invoke(null,null),null);
-				}
-			} catch (Exception e) {
-				System.err.println("Execution error: " + e);
-				e.printStackTrace();
-			}
-
-			super.stopRunner();
-		}
-
-		public void run() {
-			try {
-				if (compT != null) {
-					if (!compT.waitCompilation()) {
-						return;
-					}
-				}
-				
-				File fXML = new File(project.getDirectory() + File.separator + project.getSocName()+".xml");
-				System.out.println("Running MAS with "+fXML.getAbsolutePath());
-				// create a new RunCentralisedMAS (using my class loader to not cache user classes and to find user project directory)
-				Class rmas = new MASClassLoader(project.getDirectory()).loadClass(RunCentralisedMAS.class.getName());
-				Class[] classParameters = { (new String[2]).getClass() };
-				Method executeMethod = rmas.getDeclaredMethod("main", classParameters);
-				classParameters = new Class[0];
-				getRunnerMethod = rmas.getDeclaredMethod("getRunner", classParameters);
-				finishMethod = rmas.getDeclaredMethod("finish", classParameters);
-				
-				Object objectParameters[] = { new String[] {fXML.getAbsolutePath(), "insideJIDE"} };
-				// Static method, no instance needed
-				executeMethod.invoke(null, objectParameters);
-				//((RunCentralisedMAS)rmas.newInstance()).main(new String[] {fXML.getAbsolutePath(), "insideJIDE"});
-
-				stop = false;
-				while (!stop) {
-					sleep(250); // to not consume cpu
-					//if (RunCentralisedMAS.getRunner() == null) {
-					if (getRunnerMethod.invoke(null, null) == null) {
-						stop = true;
-					}
-				}
-			} catch (Exception e) {
-				System.err.println("Execution error: " + e);
-				e.printStackTrace();
-			} finally {
-				if (listener != null) {
-					listener.masFinished();
-				}
-				getRunnerMethod = null;
-				finishMethod = null;
-			}
-		}
-	}
-	
-	class MASRunnerSaci extends MASRunner {
-		StartSaci saciThread;
-		Launcher l;
-
-		boolean iHaveStartedSaci = false;
-		
-		MASRunnerSaci(CompileThread t, MAS2JProject project) {
-			super(t, project);
-			stopOnProcessExit = false;
-		}
-
-		void stopRunner() {
-			try {
-				String socName = project.getSocName();
-				if (l != null) {
-					l.killFacilitatorAgs(socName);
-					l.killFacilitator(socName);
-					l.killFacilitatorAgs(socName + "-env");
-					l.killFacilitator(socName + "-env");
-				}
-			} catch (Exception e) {
-				System.err.println("Execution error: " + e);
-				e.printStackTrace();
-			}
-			if (iHaveStartedSaci) {
-				saciThread.stopSaci();
-			}
-			super.stopRunner();
-		}
-
-		public void run() {
-			saciThread = new StartSaci(project);
-			l = saciThread.getLauncher();
-			if (l == null) { // no saci running, start one
-				saciThread.start();
-				if (!saciThread.waitSaciOk()) {
-					return;
-				}
-				iHaveStartedSaci = true;
-			}
-			l = saciThread.getLauncher();
-
-			super.run();
-		}
-	}
-
-	
-	String getAsScriptCommand(String scriptName) {
+	public static String getAsScriptCommand(String scriptName) {
 		return getAsScriptCommand(scriptName, false); 
 	}
-	String getAsScriptCommand(String scriptName, boolean start) {
+	
+	public static String getAsScriptCommand(String scriptName, boolean start) {
 		if (System.getProperty("os.name").indexOf("indows") > 0) {
 			//command = "command.com /e:2048 /c "+command+".bat";
 			String sStart = " ";
@@ -534,111 +206,6 @@ public class RunProject {
 			return Config.get().getShellCommand() + sStart + scriptName + ".bat";
 		} else {
 			return Config.get().getShellCommand() + " " + scriptName + ".sh";
-		}
-	}
-	
-	
-	class MASClassLoader extends ClassLoader {
-		
-		String MASDirectory;
-		JarFile jf;
-		List libDirJars = new ArrayList();
-		
-		MASClassLoader(String masDir) {
-			MASDirectory = masDir;
-			try {
-				jf = new JarFile(Config.get().getJasonJar());
-				
-				// create the jars from application lib directory
-				if (MASDirectory != null) {
-					File lib = new File(MASDirectory + File.separator + "lib");
-					// add all jar files in lib dir
-					if (lib.exists()) {
-						File[] fs = lib.listFiles();
-						for (int i=0; i<fs.length; i++) {
-							if (fs[i].getName().endsWith(".jar")) {
-								libDirJars.add(new JarFile(fs[i].getAbsolutePath()));
-							}
-						}
-					}
-					
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-
-		public Class loadClass(String name) throws ClassNotFoundException {
-			//System.out.println("loadClass " + name);
-			if (! name.equals(MASConsoleGUI.class.getName())) { // let super loader to get MASConsoleGUI, since it must be shared between RunCentMAS and jIDE
-				if (! name.equals(JasonID.class.getName())) { // let super loader to get MASConsoleGUI, since it must be shared between RunCentMAS and jIDE
-					if (name.startsWith("jason.") || name.startsWith("jIDE.")) {
-						//System.out.println("loading new ");
-						Class c = findClassInJar(jf, name);
-						if (c == null) {
-							System.out.println("does not find class "+name+" in jason.jar");
-						} else {
-							return c;
-						}
-					}
-				}
-			}
-			return super.loadClass(name);
-		}
-
-		public Class findClass(String name) {
-			byte[] b = findClassBytes(MASDirectory, name);
-			if (b != null) {
-				//System.out.println(name + " found ");
-				return defineClass(name, b, 0, b.length);
-			} else {
-				// try in lib dir
-				Iterator i = libDirJars.iterator();
-				while (i.hasNext()) {
-					JarFile j = (JarFile)i.next();
-					Class c = findClassInJar(j, name);
-					if (c != null) {
-						return c;
-					}
-				}
-				System.err.println("Error loading class "+name);
-				return null;
-			}
-		}
-
-		public byte[] findClassBytes(String dir, String className) {
-			try {
-				String pathName = dir + File.separatorChar	+ className.replace('.', File.separatorChar) + ".class";
-				FileInputStream inFile = new FileInputStream(pathName);
-				byte[] classBytes = new byte[inFile.available()];
-				inFile.read(classBytes);
-				return classBytes;
-			} catch (java.io.IOException ioEx) {
-				//ioEx.printStackTrace();
-				return null;
-			}
-		}
-
-		public Class findClassInJar(JarFile jf, String className) {
-			try {
-				if (jf == null) 
-					return null;
-				JarEntry je = jf.getJarEntry(className.replace('.', '/') + ".class"); // must be '/' since inside jar / is used not \
-				if (je == null) {
-					return null;
-				}
-				InputStream in = new BufferedInputStream(jf.getInputStream(je));
-				//System.out.println(c.getResource("/"+className.replace('.', File.separatorChar) + ".class"));
-				//InputStream in = new BufferedInputStream(c.getResource("/"+className.replace('.', File.separatorChar) + ".class").openStream());
-				byte[] classBytes = new byte[in.available()];
-				in.read(classBytes);
-				//System.out.println(" found "+className+ " size="+classBytes.length);
-				return defineClass(className, classBytes, 0, classBytes.length);
-			} catch (Exception e) {
-				System.err.println("Error loading class "+className);
-				e.printStackTrace();
-				return null;
-			}
 		}
 	}	
 }

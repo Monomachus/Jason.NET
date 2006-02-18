@@ -1,6 +1,5 @@
 package jason.mas2j;
 
-import jason.architecture.AgArch;
 import jason.runtime.Settings;
 
 import java.io.File;
@@ -52,65 +51,6 @@ public class AgentParameters {
 		return s.toString().trim() + ";";
 	}
 
-	public String getAsSaciXMLScript(String proDir, String soc, String architecture, boolean debug, boolean forceSync) {
-		StringBuffer s = new StringBuffer("\t<startAgent "); 
-        s.append("\n\t\tname=\""+name+"\" "); 
-        s.append("\n\t\tsociety.name=\""+soc+"\" ");
-        
-        String tmpInfraClass = jason.architecture.CentralisedAgArch.class.getName();
-    	if (architecture.equals("Saci")) {
-    		tmpInfraClass = jason.architecture.SaciAgArch.class.getName();
-    	}
-        s.append("\n\t\tclass=\""+tmpInfraClass+"\"");
-
-        String tmpAgClass = agClass;
-        if (tmpAgClass == null) {
-        	tmpAgClass = jason.asSemantics.Agent.class.getName();
-        }
-        String tmpAgArchClass = archClass;
-        if (tmpAgArchClass == null) {
-        	tmpAgArchClass = AgArch.class.getName();
-        }
-        
-        File tmpAsSrc = new File(proDir + File.separator + asSource);
-        s.append("\n\t\targs=\""+tmpAgArchClass+" "+tmpAgClass+" '"+tmpAsSrc.getAbsolutePath()+"'"+getSaciOptsStr(debug, forceSync)+"\"");
-        if (qty > 1) {
-        	s.append("\n\t\tqty=\""+qty+"\" ");
-        }
-        if (host != null) {
-        	s.append("\n\t\thost="+host);
-        }
-        s.append(" />");
-		return s.toString().trim();
-	}
-	
-	String getSaciOptsStr(boolean debug, boolean forceSync) {
-		String s = "";
-		String v = "";
-	    if (debug) {
-	    	s += "verbose=2";
-	    	v = ",";
-	    }
-	    if (forceSync || debug) {
-	    	s += v+"synchronised=true";
-	    	v = ",";
-	    }
-		Iterator i = options.keySet().iterator();
-		while (i.hasNext()) {
-			String key = (String) i.next();
-			if (!(debug && key.equals("verbose"))) {
-				if (!( (forceSync || debug) && key.equals("synchronised"))) {
-					s += v + key + "=" + changeQuotes((String)options.get(key));
-					v = ",";
-				}
-			}
-		}
-		if (s.length() > 0) {
-			s = " options " + s;
-		}
-		return s;
-	}
-	
 	public Settings getAsSetts(boolean debug, boolean forceSync) {
 		Settings stts = new Settings();
 		
@@ -134,19 +74,4 @@ public class AgentParameters {
 		return stts;
 	}
 	
-	String removeQuotes(String s) {
-		if (s.startsWith("\"") && s.endsWith("\"")) {
-			return s.substring(1,s.length()-1);
-		} else {
-			return s;
-		}
-	}
-	
-	String changeQuotes(String s) {
-		if (s.startsWith("\"") && s.endsWith("\"")) {
-			return "'"+s.substring(1,s.length()-1)+"'";
-		} else {
-			return s;
-		}
-	}	
 }

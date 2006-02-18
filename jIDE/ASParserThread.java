@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.16  2006/02/18 15:20:07  jomifred
+//   changes in many files to detach jason kernel from any infrastructure implementation
+//
 //   Revision 1.15  2005/12/08 20:05:01  jomifred
 //   changes for JasonIDE plugin
 //
@@ -44,7 +47,7 @@ import jason.asSyntax.parser.SimpleCharStream;
 import jason.asSyntax.parser.TokenMgrError;
 import jason.asSyntax.parser.as2j;
 import jason.asSyntax.parser.as2jTokenManager;
-import jason.runtime.RunCentralisedMAS;
+import jason.infra.centralised.RunCentralisedMAS;
 
 import java.io.StringReader;
 

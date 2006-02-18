@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.3  2006/02/18 15:26:24  jomifred
+//   changes in many files to detach jason kernel from any infrastructure implementation
+//
 //   Revision 1.2  2006/01/14 18:23:40  jomifred
 //   centralised infra does not use xml script file anymore
 //
@@ -58,7 +61,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
-/** MAS Runtime Settings (from mas2j file) */
+/** MAS Runtime Settings for an Agent (from mas2j file) */
 public class Settings {
 	
     public static final byte      ODiscard        = 1;

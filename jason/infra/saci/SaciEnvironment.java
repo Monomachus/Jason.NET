@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.1  2006/02/18 15:24:30  jomifred
+//   changes in many files to detach jason kernel from any infrastructure implementation
+//
 //   Revision 1.11  2006/02/17 13:13:16  jomifred
 //   change a lot of method/classes names and improve some comments
 //
@@ -39,10 +42,12 @@
 //----------------------------------------------------------------------------
 
 
-package jason.environment;
+package jason.infra.saci;
 
 import jason.JasonException;
 import jason.asSyntax.Term;
+import jason.environment.Environment;
+import jason.environment.EnvironmentInfraTier;
 
 import java.util.Collection;
 import java.util.Iterator;

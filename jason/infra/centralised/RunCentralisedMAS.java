@@ -23,11 +23,11 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.1  2006/02/18 15:24:30  jomifred
+//   changes in many files to detach jason kernel from any infrastructure implementation
+//
 //   Revision 1.5  2006/02/17 13:13:16  jomifred
 //   change a lot of method/classes names and improve some comments
-//
-//   Revision 1.4  2006/02/16 13:33:22  jomifred
-//   no message
 //
 //   Revision 1.3  2006/01/14 18:23:40  jomifred
 //   centralised infra does not use xml script file anymore
@@ -56,17 +56,15 @@
 //----------------------------------------------------------------------------
 
 
-package jason.runtime;
+package jason.infra.centralised;
 
 import jason.JasonException;
 import jason.architecture.AgArch;
-import jason.architecture.CentralisedAgArch;
-import jason.control.CentralisedExecutionControl;
 import jason.control.ExecutionControlGUI;
-import jason.environment.CentralisedEnvironment;
 import jason.mas2j.AgentParameters;
 import jason.mas2j.MAS2JProject;
 import jason.mas2j.parser.ParseException;
+import jason.runtime.MASConsoleGUI;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -84,8 +82,7 @@ import java.util.logging.Logger;
 import javax.swing.JButton;
 
 /**
- * Runs a SACI script without SACI.
- * It is used to run the MAS without saci.
+ * Runs MASProject using centralised infrastructure.
  */
 public class RunCentralisedMAS {
     

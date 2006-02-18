@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.30  2006/02/18 15:20:07  jomifred
+//   changes in many files to detach jason kernel from any infrastructure implementation
+//
 //   Revision 1.29  2006/01/14 15:20:22  jomifred
 //   Config and some code of RunMAS was moved to package plugin
 //
@@ -76,7 +79,7 @@ public class RunMAS extends AbstractAction {
 	public RunMAS(JasonID jID) {
 		super("Run MAS...", new ImageIcon(JasonID.class.getResource("/images/execute.gif")));
 		jasonID = jID;
-		runProject = new RunProject(jID);
+		runProject = new RunProject();
 	}
 
 	public void actionPerformed(ActionEvent e) {
@@ -88,7 +91,7 @@ public class RunMAS extends AbstractAction {
 				jasonID.runMASButton.setEnabled(false);
 				jasonID.debugMASButton.setEnabled(false);
 				jasonID.stopMASButton.setEnabled(true);
-				runProject.run(jasonID.fMAS2jThread.fCurrentProject);
+				runProject.run(jasonID.fMAS2jThread.fCurrentProject, jasonID);
 			}
 		} catch (Exception ex) {
 			ex.printStackTrace();

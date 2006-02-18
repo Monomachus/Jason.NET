@@ -27,12 +27,12 @@
 
 package jason.jeditplugin;
 
+import jason.infra.centralised.RunCentralisedMAS;
 import jason.mas2j.AgentParameters;
 import jason.mas2j.MAS2JProject;
 import jason.mas2j.parser.ParseException;
 import jason.mas2j.parser.TokenMgrError;
 import jason.runtime.OutputStreamAdapter;
-import jason.runtime.RunCentralisedMAS;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -437,9 +437,9 @@ public class JasonID extends JPanel implements EBComponent, RunProjectListener {
 					btRun.setEnabled(false);
 					btDebug.setEnabled(false);
 					if (runner == null) {
-						runner = new RunProject(this);
+						runner = new RunProject();
 					}
-					runner.run(project);
+					runner.run(project, this);
 				}
 			}
 		}

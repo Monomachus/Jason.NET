@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.4  2006/02/18 15:27:04  jomifred
+//   changes in many files to detach jason kernel from any infrastructure implementation
+//
 //   Revision 1.3  2006/02/17 13:13:16  jomifred
 //   change a lot of method/classes names and improve some comments
 //
@@ -37,13 +40,13 @@
 package jason.stdlib;
 
 import jason.JasonException;
-import jason.architecture.CentralisedAgArch;
-import jason.architecture.SaciAgArch;
 import jason.asSemantics.InternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.Term;
-import jason.environment.CentralisedEnvironment;
+import jason.infra.centralised.CentralisedAgArch;
+import jason.infra.centralised.CentralisedEnvironment;
+import jason.infra.saci.SaciAgArch;
 
 import java.util.Iterator;
 import java.util.logging.Logger;

@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.15  2006/02/18 15:23:32  jomifred
+//   changes in many files to detach jason kernel from any infrastructure implementation
+//
 //   Revision 1.14  2006/02/17 13:13:16  jomifred
 //   change a lot of method/classes names and improve some comments
 //
@@ -93,10 +96,10 @@ public class Environment {
 	/**
 	 * sets the infrastructure tier of the environment (saci, centralised, ...)
 	 */
-	protected void setEnvironmentInfraTier(EnvironmentInfraTier je) {
+	public void setEnvironmentInfraTier(EnvironmentInfraTier je) {
 		environmentInfraTier = je;
 	}
-	protected EnvironmentInfraTier getEnvironmentInfraTier() {
+	public EnvironmentInfraTier getEnvironmentInfraTier() {
 		return environmentInfraTier;
 	}
 

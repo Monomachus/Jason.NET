@@ -11,27 +11,26 @@ public interface mas2jConstants {
   int AT = 11;
   int ARCH = 12;
   int INFRA = 13;
-  int INFRAV = 14;
-  int ASOEE = 15;
-  int ASOEEV = 16;
-  int ASOIB = 17;
-  int ASOIBV = 18;
-  int ASONRC = 19;
-  int ASOV = 20;
-  int ASOSYNC = 21;
-  int ASOBOOL = 22;
-  int ASAGCLASS = 23;
-  int ASAGARCHCLASS = 24;
-  int NUMBER = 25;
-  int STRING = 26;
-  int ASID = 27;
-  int CLASSID = 28;
-  int PATH = 29;
-  int DRIVER = 30;
-  int LETTER = 31;
-  int LC_LETTER = 32;
-  int UP_LETTER = 33;
-  int DIGIT = 34;
+  int ASOEE = 14;
+  int ASOEEV = 15;
+  int ASOIB = 16;
+  int ASOIBV = 17;
+  int ASONRC = 18;
+  int ASOV = 19;
+  int ASOSYNC = 20;
+  int ASOBOOL = 21;
+  int ASAGCLASS = 22;
+  int ASAGARCHCLASS = 23;
+  int NUMBER = 24;
+  int STRING = 25;
+  int ASID = 26;
+  int CLASSID = 27;
+  int PATH = 28;
+  int DRIVER = 29;
+  int LETTER = 30;
+  int LC_LETTER = 31;
+  int UP_LETTER = 32;
+  int DIGIT = 33;
 
   int DEFAULT = 0;
 
@@ -50,7 +49,6 @@ public interface mas2jConstants {
     "\"at\"",
     "\"architecture\"",
     "\"infrastructure\"",
-    "<INFRAV>",
     "\"events\"",
     "<ASOEEV>",
     "\"intBels\"",
