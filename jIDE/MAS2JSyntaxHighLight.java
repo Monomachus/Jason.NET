@@ -23,8 +23,8 @@
 //   $Date$
 //   $Revision$
 //   $Log$
-//   Revision 1.11  2005/12/08 20:05:01  jomifred
-//   changes for JasonIDE plugin
+//   Revision 1.12  2006/02/18 15:37:53  jomifred
+//   changes in many files to detach jason kernel from any infrastructure implementation
 //
 //----------------------------------------------------------------------------
 
@@ -178,12 +178,14 @@ public class MAS2JSyntaxHighLight extends ASSyntaxHighLight {
 			tokenStyles[mas2jConstants.ASAGARCHCLASS].addAttributes(style);
 			
 			// Values
+			/*
 			style = new SimpleAttributeSet();
 			float chsb[] = Color.RGBtoHSB(120,20,120,null);
 			StyleConstants.setForeground(style, Color.getHSBColor(chsb[0],chsb[1],chsb[2]));
 			StyleConstants.setBold(style, true);
 			tokenStyles[mas2jConstants.INFRAV].addAttributes(style);
-
+			*/
+			
 			// ag options
 			style = new SimpleAttributeSet();
 			StyleConstants.setForeground(style, Color.blue);
