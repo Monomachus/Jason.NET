@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.3  2006/02/18 16:04:56  jomifred
+//   no message
+//
 //   Revision 1.2  2006/02/18 15:24:50  jomifred
 //   changes in many files to detach jason kernel from any infrastructure implementation
 //
@@ -166,7 +169,7 @@ public class Config extends Properties {
         // shell command
         if (get(SHELL_CMD) == null) {
     		if (System.getProperty("os.name").startsWith("Windows 9")) {
-    			put(SHELL_CMD, "command.com /c ");
+    			put(SHELL_CMD, "command.com /e:1024 /c ");
     		} else if (System.getProperty("os.name").indexOf("indows") > 0) {
     			put(SHELL_CMD, "cmd /c ");
     		} else {
