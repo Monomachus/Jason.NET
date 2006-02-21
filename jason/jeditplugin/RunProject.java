@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.3  2006/02/21 14:24:37  jomifred
+//   add TODO
+//
 //   Revision 1.2  2006/02/18 15:24:50  jomifred
 //   changes in many files to detach jason kernel from any infrastructure implementation
 //
@@ -74,6 +77,8 @@ import java.util.Set;
 
 // TODO: when using jdk 1.5, change RunProcess to ProcessBuilder as
 // explained at http://java.sun.com/developer/JDCTechTips/2005/tt0727.html#1
+
+// TODO: when using jdk 1.6 use API suport to compile.
 
 /** runs an MAS */
 public class RunProject {
