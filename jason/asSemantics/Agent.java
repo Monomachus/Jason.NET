@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.30  2006/02/22 21:28:16  jomifred
+//   no message
+//
 //   Revision 1.29  2006/02/22 21:19:05  jomifred
 //   The internalAction removePlan use plan's label as argument instead of plan's strings
 //
@@ -317,10 +320,10 @@ public class Agent {
 		return null;
 	}
 	
-	// TODO: move this methos to BB
-	
-	/** Adds a new Literal <i>l</i> in BB with "source(<i>source</i>)" annotation.
-	 *  <i>l</i> will be cloned before being added in the BB */
+	/** 
+	 * Adds a new Literal <i>l</i> in BB with "source(<i>source</i>)" annotation.
+	 *  <i>l</i> will be cloned before being added in the BB 
+	 */
 	public boolean addBel(Literal l, Term source, Circumstance c, Intention focus) {
 		if (source != null && !source.isGround()) {
 			logger.log(Level.SEVERE,"Error: Annotations must be ground!\n Cannot use "+source+" as annotation.");
