@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.29  2006/02/22 21:19:05  jomifred
+//   The internalAction removePlan use plan's label as argument instead of plan's strings
+//
 //   Revision 1.28  2006/02/17 13:13:16  jomifred
 //   change a lot of method/classes names and improve some comments
 //
@@ -75,9 +78,7 @@ import jason.JasonException;
 import jason.architecture.AgArch;
 import jason.asSyntax.BeliefBase;
 import jason.asSyntax.Literal;
-import jason.asSyntax.Plan;
 import jason.asSyntax.PlanLibrary;
-import jason.asSyntax.StringTerm;
 import jason.asSyntax.Term;
 import jason.asSyntax.Trigger;
 import jason.asSyntax.parser.ParseException;
@@ -224,11 +225,6 @@ public class Agent {
 	}
 	*/
 
-	/** Agent's Source Plans Initialisation (called by the parser) */
-	public void addPS(PlanLibrary pp) throws JasonException {
-		fPS.addAll(pp);
-	}
-
 	/** TS Initialisation (called by the AgArch) */
 	public void setTS(TransitionSystem ts) {
 		this.fTS = ts;
@@ -247,6 +243,8 @@ public class Agent {
 	}
 
 
+	// TODO: call it BUF (belief update function)
+	
 	/** Belief Revision Function: add/remove perceptions into belief base */
     public void brf(List percepts) {
         if (percepts == null) {
@@ -319,7 +317,8 @@ public class Agent {
 		return null;
 	}
 	
-
+	// TODO: move this methos to BB
+	
 	/** Adds a new Literal <i>l</i> in BB with "source(<i>source</i>)" annotation.
 	 *  <i>l</i> will be cloned before being added in the BB */
 	public boolean addBel(Literal l, Term source, Circumstance c, Intention focus) {
@@ -366,55 +365,6 @@ public class Agent {
 				c.E.add(e);
 				logger.fine("Added event "+e);
 			}
-		}
-	}
-
-	public void addPlan(StringTerm stPlan, Term tSource) {
-		String sPlan = stPlan.getString();
-		try {
-			// remove quotes \" -> "
-			StringBuffer sTemp = new StringBuffer();
-			for (int c=0; c <sPlan.length(); c++) {
-				if (sPlan.charAt(c) != '\\') {
-					sTemp.append(sPlan.charAt(c));
-				}
-			}
-			sPlan = sTemp.toString();
-			Plan p = Plan.parse(sPlan);
-			int i = fPS.indexOf(p);
-			if (i < 0) {
-				fPS.add(p);
-			} else {
-				p = (Plan) fPS.get(i);
-			}
-			if (tSource != null) {
-				p.getLabel().addSource(tSource);
-			}
-			
-			//System.out.println("**** adding plan "+p+" from "+sSource);		
-
-		} catch (Exception e) {
-			logger.log(Level.SEVERE,"Error adding plan "+sPlan,e);
-		}
-	}
-
-	/** 
-	 * remove a plan represented by the string sPlan 
-	 * that comes from source (normally the agent name)
-	 */
-	public void removePlan(StringTerm sPlan, Term source) {
-		Plan p = Plan.parse(sPlan.getString());
-		int i = fPS.indexOf(p);
-		if (i >= 0) {
-			p = (Plan)fPS.get(i);
-			boolean hasSource = p.getLabel().delSource(source);
-
-			// if no source anymore, remove the plan
-			if (hasSource && ! p.getLabel().hasSource()) {
-				fPS.remove(i);
-			}
-		} else {
-			logger.log(Level.SEVERE,"Plan '"+p+"' was not found for deletion!");
 		}
 	}
 

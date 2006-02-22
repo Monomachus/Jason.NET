@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.7  2006/02/22 21:19:05  jomifred
+//   The internalAction removePlan use plan's label as argument instead of plan's strings
+//
 //   Revision 1.6  2005/12/22 00:04:19  jomifred
 //   ListTerm is now an interface implemented by ListTermImpl
 //
@@ -40,7 +43,6 @@ import jason.asSemantics.InternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.ListTerm;
-import jason.asSyntax.StringTerm;
 import jason.asSyntax.Term;
 
 import java.util.Iterator;
@@ -48,25 +50,42 @@ import java.util.Iterator;
 public class removePlan implements InternalAction {
 
 	/**
-	 * args[0] = list of plans (a ListTerm), each element is a StringTerm 
-	 *           that represent a plan to be removed
-	 *           or only one plan (as StringTerm)
-	 * args[1] = source (the name of the agent, for instance)
+	 * args[0] = list of plans (a ListTerm) where each element is a plan label 
+	 *                 that represent a plan to be removed
+	 *           or only one plan's label
+	 * args[1] = source (the name of the agent, for instance),
+	 *           if not informed, source is "self"
+	 *           
+	 * Example: .removePlan(l1);
+	 *          .removePlan(X); // X is unified with a plan's label 
+	 *          .removePlan([l1,l2,l3]);
+	 *          .removePlan(l1,ag1); // remove the plan l1 sent (tellHow) by agent ag1 
 	 */
     public boolean execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         try {
-        	if (args[0].isList()) { // if arg[0] is a list
+        	Term label = (Term)args[0].clone();
+        	un.apply(label);
+
+        	Term source = new Term("self");
+        	if (args.length > 1) {
+        		source = (Term)args[1].clone();
+        		un.apply(source);
+        	}
+        	
+        	if (label.isList()) { // if arg[0] is a list
+        		boolean r = true;
         		ListTerm lt = (ListTerm)args[0];
         		Iterator i = lt.iterator();
         		while (i.hasNext()) {
-            		ts.getAg().removePlan( (StringTerm)i.next(), args[1]);
+        			label = (Term)i.next();
+        			r = r && ts.getAg().getPS().removePlan(label, source);
         		}
-        	} else { // args[0] is a plan
-        		ts.getAg().removePlan((StringTerm)args[0], args[1]);
+        		return r;
+        	} else { // args[0] is a plan's label
+        		return ts.getAg().getPS().removePlan(label, source);
         	}
-            return true;
         } catch (ArrayIndexOutOfBoundsException e) {
-            throw new JasonException("The internal action 'removePlan' has not received two arguments (plan's string and source)");
+            throw new JasonException("The internal action 'removePlan' has not received the plan's label as argument.");
         } 
     }
 }

@@ -22,6 +22,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.27  2006/02/22 21:19:05  jomifred
+//   The internalAction removePlan use plan's label as argument instead of plan's strings
+//
 //   Revision 1.26  2006/01/02 13:49:01  jomifred
 //   add plan unique id, fix some bugs
 //
@@ -132,7 +135,7 @@ void ag(Agent a) : { List bbl = new LinkedList(); PlanLibrary pp;  }
   <EOF>
               { if (a != null) {
                   try {
-                    a.addPS(pp); 
+                    a.getPS().addAll(pp); 
   
                     // add beliefs (when the plans are loaded, so the events are relevant
                     Iterator i = bbl.iterator();

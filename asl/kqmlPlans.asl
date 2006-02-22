@@ -12,6 +12,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.3  2006/02/22 21:19:01  jomifred
+//   The internalAction removePlan use plan's label as argument instead of plan's strings
+//
 //   Revision 1.2  2005/09/04 23:25:24  jomifred
 //   add labels in plans
 //
@@ -43,15 +46,16 @@
     <- .findall(Var, KQMLcontentVar, List); 
        .send(S, tell, List, M).
 
-	// In tellHow, KQMLcontentVar must be a string representation of the plan (or a list of strings)
+// In tellHow, KQMLcontentVar must be a string representation of the plan 
+// (or a list of strings)
 @kqmlReceiveTellHow
 +received(S, tellHow  , KQMLcontentVar, M) : true <- .addPlan(KQMLcontentVar, S).
 
-	// In untellHow, KQMLcontentVar must be a string representation of the plan (or a list of strings)
+// In untellHow, KQMLcontentVar must be a plan's label (or a list of labels)
 @kqmlReceiveUnTellHow
 +received(S, untellHow, KQMLcontentVar, M) : true <- .removePlan(KQMLcontentVar, S).
 
-    // In askHow, KQMLcontentVar must be a string representation of the trigger event
+// In askHow, KQMLcontentVar must be a string representation of the trigger event
 @kqmlReceiveAskHow
 +received(S, askHow, KQMLcontentVar, M) : true    <- .getRelevantPlans(KQMLcontentVar, ListAsString); 
                                                      .send(S, tellHow, ListAsString, M).

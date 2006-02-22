@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.7  2006/02/22 21:19:05  jomifred
+//   The internalAction removePlan use plan's label as argument instead of plan's strings
+//
 //   Revision 1.6  2006/01/02 13:49:00  jomifred
 //   add plan unique id, fix some bugs
 //
@@ -43,41 +46,81 @@ import jason.JasonException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 public class PlanLibrary {
 
-    // the order of insertion is relevant
-    // need various plans for the same hashCode
-	// List codes = new ArrayList();
-	
-	// a MAP from TE to a list of relevant plans
+	/** a MAP from TE to a list of relevant plans */
     Map relPlans = new HashMap();
 
 	/**
-	 * All plans as defined in the AS code
+	 * All plans as defined in the AS code (maintains the order of the plans)
 	 */
 	List plans = new ArrayList();
 	
 	/** list of plans that have var as TE */
 	List varPlans = new ArrayList();
 	
-	/** Set of plans labels */
-	Set planLabels = new HashSet();
+	/** A map from labels to plans */
+	Map planLabels = new HashMap();
 	
 	private static int lastPlanLabel = 0;
 
+	private Logger logger = Logger.getLogger(PlanLibrary.class.getName());	
+	
+	/** 
+	 *  Add a new plan based on a String. The source
+	 *  normally is "self" or the agent that sent this plan. 
+	 */
+	public void add(StringTerm stPlan, Term tSource) {
+		String sPlan = stPlan.getString();
+		try {
+			// remove quotes \" -> "
+			StringBuffer sTemp = new StringBuffer();
+			for (int c=0; c <sPlan.length(); c++) {
+				if (sPlan.charAt(c) != '\\') {
+					sTemp.append(sPlan.charAt(c));
+				}
+			}
+			sPlan = sTemp.toString();
+			Plan p = Plan.parse(sPlan);
+			int i = plans.indexOf(p);
+			if (i < 0) {
+				add(p);
+			} else {
+				p = (Plan) plans.get(i);
+			}
+			if (tSource != null) {
+				p.getLabel().addSource(tSource);
+			}
+			
+			//System.out.println("**** adding plan "+p+" from "+sSource);		
+
+		} catch (Exception e) {
+			logger.log(Level.SEVERE,"Error adding plan "+sPlan,e);
+		}
+	}
+
+
+	
     public void add(Plan p) throws JasonException {
     	// test p.label
-    	if (p.getLabel() != null && planLabels.contains(p.getLabel())) {
-    		throw new JasonException("There already is a plan with label "+p.getLabel());
+    	if (p.getLabel() != null && planLabels.keySet().contains(p.getLabel().getFunctor())) {
+    		// test if the new plan is equal, in this case, just add a source
+    		Plan planInPL = get(p.getLabel().getFunctor());
+    		if (p.equals( planInPL )) {
+    			planInPL.getLabel().addSource((Pred)p.getLabel().getSources().get(0));
+    			return;
+    		} else {
+    			throw new JasonException("There already is a plan with label "+p.getLabel());
+    		}
     	}
     	
     	// add label, if necessary
@@ -85,10 +128,10 @@ public class PlanLibrary {
     		String l;
     		do {
     			l = "l"+(lastPlanLabel++);
-    		} while (planLabels.contains(l));
+    		} while (planLabels.keySet().contains(l));
     		p.setLabel(l);
     	}
-    	planLabels.add(p.getLabel());
+    	planLabels.put(p.getLabel().getFunctor(), p);
     	
     	// trim the plan
     	if (p.body != null) {
@@ -115,7 +158,6 @@ public class PlanLibrary {
 	    	codesList.add(p);
         }
     	
-        //codes.add(new Integer(p.tevent.hashCode()));
         plans.add(p);
     }
 
@@ -127,21 +169,49 @@ public class PlanLibrary {
 		}
 	}
     
-    public Plan get(int i) {
-        return (Plan)plans.get(i);
+	/** return a plan for a label */
+    public Plan get(String label) {
+        return (Plan)planLabels.get(label);
     }
     
     public List getPlans() {
     	return plans;
     }
 
+    /*
     public int indexOf(Plan p) {
         return plans.indexOf(p);
     }
+    */
 
-    public Plan remove(int i) {
+    /** 
+	 * Remove a plan represented by the label <i>pLabel</i>.
+	 * In case the plan has many sources, only the plan's source is removed. 
+	 */
+	public boolean removePlan(Term pLabel, Term source) {
+		// find the plan
+		Plan p = get(pLabel.getFunctor());
+		if (p != null) {
+			boolean hasSource = p.getLabel().delSource(source);
+
+			// if no source anymore, remove the plan
+			if (hasSource && !p.getLabel().hasSource()) {
+    			remove(pLabel.getFunctor());
+			}
+
+			return true;
+		}
+		return false;
+	}
+
+	/** remove the plan with label <i>pLabel</i> */
+    public Plan remove(String pLabel) {
         //codes.remove(i);
-        Plan p = (Plan)plans.remove(i);
+    	Plan p = (Plan)planLabels.remove(pLabel);
+    	
+    	// remove it from plans' list
+    	plans.remove(p);
+    	
         if (p.getTriggerEvent().getLiteral().isVar()) {
         	varPlans.remove(p);
         	// remove p from all entries
@@ -158,12 +228,10 @@ public class PlanLibrary {
             	relPlans.remove(p.tevent.getFunctorArity());
             }
         }
-        planLabels.remove(p.getLabel());
         return p;
     }
 
     public boolean isRelevant(Trigger t) {
-        //return codes.contains(new Integer(t.hashCode()));
     	List l = getAllRelevant(t);
     	return l != null && l.size() > 0;
     }
@@ -174,18 +242,6 @@ public class PlanLibrary {
     		l = varPlans;
     	}
     	return l;
-    	/*
-        if (!isRelevant(t))
-            return null;
-        // IMPORTANT: avoid creating a new list here???
-        List lr = new ArrayList();
-        for (int i=0; i<codes.size(); i++) {
-            if (t.hashCode()==((Integer)codes.get(i)).intValue()) {
-                lr.add(plans.get(i));
-            }
-        }
-        return lr;
-        */
     }
 
     public String toString() {

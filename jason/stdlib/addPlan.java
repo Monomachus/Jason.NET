@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.8  2006/02/22 21:19:05  jomifred
+//   The internalAction removePlan use plan's label as argument instead of plan's strings
+//
 //   Revision 1.7  2005/12/22 00:04:19  jomifred
 //   ListTerm is now an interface implemented by ListTermImpl
 //
@@ -47,21 +50,27 @@ import java.util.Iterator;
 public class addPlan implements InternalAction {
     
 	/**
-	 * args[0] = plan or list of plans
-	 * args[1] = source
+	 * args[0] = plan or list of plans (as StringTerm)
+	 * args[1] = source (if not informed, is "self")
 	 */
     public boolean execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         try {
 			Term plans = Term.parse(args[0].toString());
-			Term source = args[1];
+
+			Term source = new Term("self");
+        	if (args.length > 1) {
+        		source = (Term)args[1].clone();
+        		un.apply(source);
+        	}
+			
         	if (plans.isList()) { // if arg[0] is a list
 				ListTerm lt = (ListTerm)plans;
         		Iterator i = lt.iterator();
         		while (i.hasNext()) {
-					ts.getAg().addPlan( (StringTerm)i.next(), source);
+					ts.getAg().getPS().add( (StringTerm)i.next(), source);
         		}
         	} else { // args[0] is a plan
-        		ts.getAg().addPlan((StringTerm)plans, source);
+        		ts.getAg().getPS().add((StringTerm)plans, source);
         	}
             return true;
         } catch (ArrayIndexOutOfBoundsException e) {

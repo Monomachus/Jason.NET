@@ -32,7 +32,7 @@
     jj_consume_token(0);
                 if (a != null) {
                   try {
-                    a.addPS(pp);
+                    a.getPS().addAll(pp);
 
                     // add beliefs (when the plans are loaded, so the events are relevant
                     Iterator i = bbl.iterator();
