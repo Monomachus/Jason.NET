@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.8  2006/02/24 20:08:31  jomifred
+//   no message
+//
 //   Revision 1.7  2006/02/22 21:19:05  jomifred
 //   The internalAction removePlan use plan's label as argument instead of plan's strings
 //
@@ -77,7 +80,9 @@ public class PlanLibrary {
 	
 	/** 
 	 *  Add a new plan based on a String. The source
-	 *  normally is "self" or the agent that sent this plan. 
+	 *  normally is "self" or the agent that sent this plan.
+	 *  If the already has a plan equals to "stPlan", only a
+	 *  new source is added. 
 	 */
 	public void add(StringTerm stPlan, Term tSource) {
 		String sPlan = stPlan.getString();
@@ -91,13 +96,13 @@ public class PlanLibrary {
 			}
 			sPlan = sTemp.toString();
 			Plan p = Plan.parse(sPlan);
+
 			int i = plans.indexOf(p);
 			if (i < 0) {
+				p.getLabel().addSource(tSource);
 				add(p);
 			} else {
 				p = (Plan) plans.get(i);
-			}
-			if (tSource != null) {
 				p.getLabel().addSource(tSource);
 			}
 			
@@ -130,6 +135,11 @@ public class PlanLibrary {
     			l = "l"+(lastPlanLabel++);
     		} while (planLabels.keySet().contains(l));
     		p.setLabel(l);
+    	}
+    	
+    	// add self source
+    	if (!p.getLabel().hasSource()) {
+    		p.getLabel().addSource(new Term("self"));
     	}
     	planLabels.put(p.getLabel().getFunctor(), p);
     	

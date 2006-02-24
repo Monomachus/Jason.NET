@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.15  2006/02/24 20:08:31  jomifred
+//   no message
+//
 //   Revision 1.14  2006/01/04 02:54:41  jomifred
 //   using java log API instead of apache log
 //
@@ -48,7 +51,6 @@
 //----------------------------------------------------------------------------
 
 package jason.asSyntax;
-
 
 import jason.asSemantics.Unifier;
 import jason.asSyntax.parser.as2j;
@@ -160,19 +162,21 @@ public class Pred extends Term implements Cloneable, Comparable, Serializable {
 	}
 	
 	/**
-	 * Add a source annotation like "source(<t>)". 
+	 * Add a source annotation like "source(<i>agName</i>)". 
 	 */
-	public void addSource(Term t) {
-		Term ts = new Term("source");
-		ts.addTerm(t);
-		addAnnot(ts);
+	public void addSource(Term agName) {
+		if (agName != null) {
+			Term ts = new Term("source");
+			ts.addTerm(agName);
+			addAnnot(ts);
+		}
 	}
 
-	/** del source(<s>) */
-	public boolean delSource(Term s) {
+	/** del "source(<i>agName</i>)" */
+	public boolean delSource(Term agName) {
 		if (annots != null) {
 			Term ts = new Term("source");
-			ts.addTerm(s);
+			ts.addTerm(agName);
 			return annots.remove(ts);
 			/*
 			Iterator i = annots.iterator();
@@ -190,7 +194,7 @@ public class Pred extends Term implements Cloneable, Comparable, Serializable {
 	
 	/** 
 	 * return the sources of this Pred as a new list.
-	 * e.g.: from annots [souce(a), source(b)],
+	 * e.g.: from annots [source(a), source(b)],
 	 * it returns [a,b] 
 	 */
 	public ListTerm getSources() {
@@ -235,11 +239,11 @@ public class Pred extends Term implements Cloneable, Comparable, Serializable {
 	}
 
 	
-	/** returns true if this pred has a source(<s>) */
-	public boolean hasSource(Term s) {
+	/** returns true if this pred has a "source(<i>agName</i>)" */
+	public boolean hasSource(Term agName) {
 		if (annots != null) {
 			Term ts = new Term("source");
-			ts.addTerm(s);
+			ts.addTerm(agName);
 			return annots.contains(ts);
 			/*
 			Iterator i = annots.iterator();

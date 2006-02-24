@@ -818,21 +818,6 @@
     finally { jj_save(0, xla); }
   }
 
-  final private boolean jj_3R_17() {
-    if (jj_scan_token(UNNAMEDVAR)) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_25() {
-    if (jj_3R_26()) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_16() {
-    if (jj_scan_token(VAR)) return true;
-    return false;
-  }
-
   final private boolean jj_3R_12() {
     Token xsp;
     xsp = jj_scanpos;
@@ -1056,6 +1041,21 @@
 
   final private boolean jj_3R_18() {
     if (jj_3R_21()) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_17() {
+    if (jj_scan_token(UNNAMEDVAR)) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_25() {
+    if (jj_3R_26()) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_16() {
+    if (jj_scan_token(VAR)) return true;
     return false;
   }
 

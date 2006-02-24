@@ -95,10 +95,10 @@ public class StdLibTest extends TestCase {
 		Agent ag = new Agent();
 		ag.setLogger(null);
 		StringTerm pt1 = new StringTermImpl("@t1 +a : g(10) <- .print(\"ok 10\").");
-		ag.getPS().add(pt1, new Term("self"));
+		ag.getPS().add(pt1, null);
 		ag.getPS().add(new StringTermImpl("@t2 +a : g(20) <- .print(\"ok 20\")."), new Term("nosource"));
 		((Plan)ag.getPS().getPlans().get(1)).getLabel().addSource(new Term("ag1"));
-		ag.getPS().add(new StringTermImpl("@t3 +b : true <- true."), new Term("nosource"));
+		ag.getPS().add(new StringTermImpl("@t3 +b : true <- true."), null);
 		//System.out.println(ag.getPS());
 		TransitionSystem ts = new TransitionSystem(ag, null, null, null);
 
@@ -149,7 +149,7 @@ public class StdLibTest extends TestCase {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+
 		// the plan t2 (first plan now) must have 4 sources
 		assertEquals(ag.getPS().get("t2").getLabel().getSources().size(), 4);
 
@@ -163,12 +163,20 @@ public class StdLibTest extends TestCase {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		assertEquals(ag.getPS().getPlans().size(), 2);
+		assertEquals(ag.getPS().getPlans().size(), 3);
 
+		// remove plan t2,t3 (source = self) from PS
+		llt = ListTermImpl.parseList("[t2,t3]");
+		try {
+			assertTrue(new removePlan().execute(ts, new Unifier(), new Term[] { (Term)llt}));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		assertEquals(ag.getPS().getPlans().size(), 2);
+		
 		// the plan t2 (first plan now) must have 3 sources
 		assertEquals(ag.getPS().get("t2").getLabel().getSources().size(), 3);
 		
-		//System.out.println("PS="+ag.getPS());
 	}
 	
 	
