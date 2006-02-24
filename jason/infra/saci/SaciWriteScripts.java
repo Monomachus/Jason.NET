@@ -50,7 +50,7 @@ public class SaciWriteScripts implements WriteScriptsInfraTier {
 					out.println("set PATH=\"" + javaHome + "bin\";%PATH%\n");
 				}
 				out.println("java -classpath " + classPath + " "
-							+ saci.tools.runApplicationScript.class.getName()
+							+ "saci.tools.runApplicationScript"
 							+ " \"" + project.getSocName() + ".xml\"");
 				out.close();
 

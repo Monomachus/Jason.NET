@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.4  2006/02/24 14:53:26  jomifred
+//   no message
+//
 //   Revision 1.3  2006/02/18 16:04:56  jomifred
 //   no message
 //
@@ -238,6 +241,20 @@ public class Config extends Properties {
 
         	// try current dir + lib
     		jarFile = ".."+File.separator+"lib"+File.separator+jarName;
+    		if (checkJar(jarFile)) {
+        		put(jarEntry, new File(jarFile).getAbsolutePath());
+    			System.out.println("found at "+jarFile);
+    			return;
+    		}
+    		jarFile = "."+File.separator+"lib"+File.separator+jarName;
+    		if (checkJar(jarFile)) {
+        		put(jarEntry, new File(jarFile).getAbsolutePath());
+    			System.out.println("found at "+jarFile);
+    			return;
+    		}
+
+        	// try current dir + bin
+    		jarFile = "."+File.separator+"bin"+File.separator+jarName;
     		if (checkJar(jarFile)) {
         		put(jarEntry, new File(jarFile).getAbsolutePath());
     			System.out.println("found at "+jarFile);
