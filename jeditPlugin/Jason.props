@@ -19,6 +19,7 @@ plugin.jason.jeditplugin.JasonIDPlugin.menu=jason - \
   jason.new-project \
   jason.new-ag \
   jason.create-env \
+  jason.new-ia \
   - \
   jason.edit-log
 
@@ -29,6 +30,7 @@ jason.stop-mas.label=Stop running MAS
 jason.new-project.label=New Project
 jason.new-ag.label=New Agent
 jason.create-env.label=Create project environment
+jason.new-ia.label=New internal action
 jason.edit-log.label=Edit log parameters
 
 # Dockables
