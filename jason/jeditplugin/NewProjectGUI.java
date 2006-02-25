@@ -28,7 +28,7 @@ public class NewProjectGUI extends NewAgentGUI {
 	JTextField projName;
 	JTextField projDir;
 	JLabel     projFinalDir;
-	JTextField projEnv;
+	//JTextField projEnv;
 	JComboBox  projInfra;
 	
 	JasonID jasonID;
@@ -46,8 +46,8 @@ public class NewProjectGUI extends NewAgentGUI {
 		projName = new JTextField(10);
 		createField("Project name", projName, "The project name");
 		
-		projEnv = new JTextField(20);
-		createField("Environment class", projEnv, "The java class that implements the environment (<package.classname>). If not filled, the default class will be used.");
+		//projEnv = new JTextField(20);
+		//createField("Environment class", projEnv, "The java class that implements the environment (<package.classname>). If not filled, the default class will be used.");
 		
 		projInfra = new JComboBox(new String[] { "Centralised", "Saci" });
 		projInfra.setSelectedIndex(0);
@@ -171,9 +171,9 @@ public class NewProjectGUI extends NewAgentGUI {
 		
 		projDecl += "\tinfrastructure: "+projInfra.getSelectedItem()+"\n";
 		
-		if (projEnv.getText().trim().length() > 0) {
-			projDecl += "\tenvironment: "+projEnv.getText().trim()+"\n";
-		}
+		//if (projEnv.getText().trim().length() > 0) {
+		//	projDecl += "\tenvironment: "+projEnv.getText().trim()+"\n";
+		//}
 
 		projDecl += "\tagents:\n";
 

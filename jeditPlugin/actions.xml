@@ -33,6 +33,12 @@
 			wm.getDockable(jason.jeditplugin.JasonIDPlugin.NAME).newAg();
 		</CODE>
 	</ACTION>
+	<ACTION NAME="jason.create-env">
+		<CODE>
+			wm.addDockableWindow(jason.jeditplugin.JasonIDPlugin.NAME);
+			wm.getDockable(jason.jeditplugin.JasonIDPlugin.NAME).createEnv();
+		</CODE>
+	</ACTION>
 	<ACTION NAME="jason.edit-log">
 		<CODE>
 			wm.addDockableWindow(jason.jeditplugin.JasonIDPlugin.NAME);

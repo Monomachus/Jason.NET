@@ -222,6 +222,12 @@ public class JasonID extends JPanel implements EBComponent, RunProjectListener {
 				}
 			}));
 		
+		toolBar.add(createToolBarButton("Create Environment", new ImageIcon(JasonID.class.getResource("/images/createEnv.gif")), //GUIUtilities.loadIcon("NextFile.png"), 
+				new ActionListener() {
+				public void actionPerformed(ActionEvent evt) {
+					createEnv();
+				}
+			}));
 		
 		toolBar.add(new JLabel(" | "));
 		toolBar.add(createToolBarButton("Clear panel", new ImageIcon(JasonID.class.getResource("/images/clear.gif")),//GUIUtilities.loadIcon("Clear.png"), 
@@ -473,6 +479,15 @@ public class JasonID extends JPanel implements EBComponent, RunProjectListener {
 			textArea.setText("There is no Jason project opened to add an agent, create a project first.");
 		} else {
 			new NewAgentGUI("New agent for project "+b.getName(), b, view);
+		}
+	}
+
+	public void createEnv() {
+		Buffer b = getProjectBuffer();
+		if (b == null) {
+			textArea.setText("There is no Jason project opened, create a project first.");
+		} else {
+			new NewEnvironmentGUI("Create environment for project "+b.getName(), b, view);
 		}
 	}
 
