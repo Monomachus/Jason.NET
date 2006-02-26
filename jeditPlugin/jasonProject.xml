@@ -8,16 +8,18 @@
 -->
 
 <MODE>
+
 	<PROPS>
 		<PROPERTY NAME="lineComment" VALUE="//" />
 		<PROPERTY NAME="commentStart" VALUE="/*" />
 		<PROPERTY NAME="commentEnd" VALUE="*/" />
+		<PROPERTY NAME="wordBreakChars" VALUE=":;#={}" />
 	</PROPS>
 
 	<RULES ESCAPE="\" IGNORE_CASE="FALSE" HIGHLIGHT_DIGITS="TRUE">
 	
 		<!-- Comments -->
-		<EOL_SPAN TYPE="COMMENT1">//</EOL_SPAN>
+		<EOL_SPAN TYPE="COMMENT2">//</EOL_SPAN>
 		<!--- ISO compliant C-style comments -->
 		<SPAN TYPE="COMMENT1">
 			<BEGIN>/*</BEGIN>
@@ -25,45 +27,48 @@
 		</SPAN>
 		
 		<!-- String literals -->
-		<SPAN TYPE="COMMENT2" NO_LINE_BREAK="TRUE">
+		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
 			<BEGIN>"</BEGIN>
 			<END>"</END>
 		</SPAN>
 
-		<!-- keywords -->
- 		<SEQ TYPE="MARKUP">MAS</SEQ>
- 		<SEQ TYPE="MARKUP">agents</SEQ>
- 		<SEQ TYPE="MARKUP">environment</SEQ>
- 		<SEQ TYPE="MARKUP">executionControl</SEQ>
- 		<SEQ TYPE="MARKUP">infrastructure</SEQ>
+		<!-- Parentheses -->
+		<SEQ TYPE="MARKUP">{</SEQ>
+		<SEQ TYPE="MARKUP">}</SEQ>
+		<SEQ TYPE="MARKUP">:</SEQ>
+		<SEQ TYPE="MARKUP">#</SEQ>
+		<SEQ TYPE="MARKUP">;</SEQ>
+		<SEQ TYPE="MARKUP">=</SEQ>
 
- 		<SEQ TYPE="COMMENT3">at</SEQ>
- 		<SEQ TYPE="COMMENT3">events</SEQ>
- 		<SEQ TYPE="COMMENT3">intBels</SEQ>
- 		<SEQ TYPE="COMMENT3">nrcbp</SEQ>
- 		<SEQ TYPE="COMMENT3">verbose</SEQ>
- 		<SEQ TYPE="COMMENT3">synchronised</SEQ>
- 		<SEQ TYPE="COMMENT3">agentClass</SEQ>
- 		<SEQ TYPE="COMMENT3">agentArchClass</SEQ>
+		<!-- keywords -->
+		<KEYWORDS>
+ 		<MARKUP>MAS</MARKUP>
+ 		<MARKUP>agents</MARKUP>
+ 		<MARKUP>environment</MARKUP>
+ 		<MARKUP>executionControl</MARKUP>
+ 		<MARKUP>infrastructure</MARKUP>
+
+ 		<LITERAL4>at</LITERAL4>
+ 		<LITERAL4>events</LITERAL4>
+ 		<LITERAL4>intBels</LITERAL4>
+ 		<LITERAL4>nrcbp</LITERAL4>
+ 		<LITERAL4>verbose</LITERAL4>
+ 		<LITERAL4>synchronised</LITERAL4>
+ 		<LITERAL4>agentClass</LITERAL4>
+ 		<LITERAL4>agentArchClass</LITERAL4>
 
 
 		<!-- values -->
- 		<SEQ TYPE="COMMENT2">Centralised</SEQ>
- 		<SEQ TYPE="COMMENT2">Saci</SEQ>
+ 		<LITERAL2>Centralised</LITERAL2>
+ 		<LITERAL2>Saci</LITERAL2>
 
- 		<SEQ TYPE="FUNCTION">discard</SEQ>
- 		<SEQ TYPE="FUNCTION">requeue</SEQ>
- 		<SEQ TYPE="FUNCTION">retrieve</SEQ>
- 		<SEQ TYPE="FUNCTION">sameFocus</SEQ>
- 		<SEQ TYPE="FUNCTION">newFocus</SEQ>
- 		<SEQ TYPE="FUNCTION">true</SEQ>
- 		<SEQ TYPE="FUNCTION">false</SEQ>
-
-		<!-- Parentheses -->
-		<SEQ TYPE="MARKUP">{</SEQ>
-		<SEQ TYPE="MARKUP">}</SEQ>		
-
-		<KEYWORDS>
+ 		<FUNCTION>discard</FUNCTION>
+ 		<FUNCTION>requeue</FUNCTION>
+ 		<FUNCTION>retrieve</FUNCTION>
+ 		<FUNCTION>sameFocus</FUNCTION>
+ 		<FUNCTION>newFocus</FUNCTION>
+ 		<FUNCTION>true</FUNCTION>
+ 		<FUNCTION>false</FUNCTION>
 		</KEYWORDS>
 		
 	</RULES>
