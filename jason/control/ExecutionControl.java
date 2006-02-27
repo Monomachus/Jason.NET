@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.10  2006/02/27 18:46:26  jomifred
+//   creation of the RuntimeServices interface
+//
 //   Revision 1.9  2006/02/17 13:13:16  jomifred
 //   change a lot of method/classes names and improve some comments
 //
@@ -36,6 +39,8 @@
 //----------------------------------------------------------------------------
 
 package jason.control;
+
+import jason.runtime.RuntimeServicesInfraTier;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -61,23 +66,27 @@ public class ExecutionControl {
 	private Object syncAgFinished = new Object();
 
 	static Logger logger = Logger.getLogger(ExecutionControl.class.getName());
-
+	RuntimeServicesInfraTier runtime;
 
 	public ExecutionControl() {
 
 		// create a thread to wait ag Finished signals
 		new Thread("ExecControlWaitAgFinish") {
 			public void run() {
+				int tries = 0;
 				synchronized(syncAgFinished) {
 					while (true) {
 						try {
-							syncAgFinished.wait(); // waits notify
-							if (infraControl != null) { 
-								if (nbFinished >= infraControl.getAgentsQty()) {
+							syncAgFinished.wait(1000); // waits notify
+							if (runtime != null) { 
+								if (nbFinished >= runtime.getAgentsQty() || tries > 3) {
 									nbFinished = 0;
 									allAgsFinished();
 									//setAllAgFinished();
 									cycleNumber++;
+									tries = 0;
+								} else {
+									tries++;
 								}
 							}
 						} catch (Exception e) {
@@ -118,7 +127,7 @@ public class ExecutionControl {
 	  */
 	public void receiveFinishedCycle(String agName, boolean breakpoint) {
 		if (logger.isLoggable(Level.FINE)) {
-			logger.fine("Agent "+agName+" has finished a cycle, # of finished agents is "+(nbFinished+1)+"/"+infraControl.getAgentsQty());
+			logger.fine("Agent "+agName+" has finished a cycle, # of finished agents is "+(nbFinished+1)+"/"+runtime.getAgentsQty());
 			if (breakpoint) {
 				logger.fine("Agent "+agName+" reached a breakpoint");				
 			}
@@ -131,6 +140,7 @@ public class ExecutionControl {
 
 	public void setExecutionControlInfraTier(ExecutionControlInfraTier jasonControl) {
 		infraControl = jasonControl;
+		runtime = infraControl.getRuntimeServices();
 	}
 	
 	public ExecutionControlInfraTier getExecutionControlInfraTier() {

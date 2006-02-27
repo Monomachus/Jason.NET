@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.4  2006/02/27 18:46:26  jomifred
+//   creation of the RuntimeServices interface
+//
 //   Revision 1.3  2006/02/18 15:26:24  jomifred
 //   changes in many files to detach jason kernel from any infrastructure implementation
 //
@@ -211,17 +214,6 @@ public class Settings {
     public int verbose() {
         return verbose;
     }
-    
-    /*
-    public Level log4JLevel() {
-    	 switch(verbose) {
-    	 case 0 : return Level.WARN;
-    	 case 1 : return Level.INFO;
-    	 case 2 : return Level.DEBUG;
-    	 }
-    	 return Level.INFO;
-    }
-    */
     
     public java.util.logging.Level logLevel() {
 	   	 switch(verbose) {

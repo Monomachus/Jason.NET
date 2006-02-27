@@ -1,5 +1,8 @@
 package jason.infra.saci;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import jason.runtime.MASLauncher;
 import saci.launcher.Launcher;
 
@@ -9,22 +12,18 @@ public class SaciMASLauncher extends MASLauncher {
 
 	boolean iHaveStartedSaci = false;
 	
+	private static Logger logger = Logger.getLogger(SaciMASLauncher.class.getName());
+
+	
 	public SaciMASLauncher() {
 		stopOnProcessExit = false;
 	}
 
 	public void stopMAS() {
 		try {
-			String socName = project.getSocName();
-			if (l != null) {
-				l.killFacilitatorAgs(socName);
-				l.killFacilitator(socName);
-				l.killFacilitatorAgs(socName + "-env");
-				l.killFacilitator(socName + "-env");
-			}
+			new SaciRuntimeServices(project.getSocName()).stopMAS();
 		} catch (Exception e) {
-			System.err.println("Execution error: " + e);
-			e.printStackTrace();
+			logger.log(Level.SEVERE, "Error stoping saci MAS", e);
 		}
 		if (iHaveStartedSaci) {
 			saciThread.stopSaci();

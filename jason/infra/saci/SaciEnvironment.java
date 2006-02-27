@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.2  2006/02/27 18:46:26  jomifred
+//   creation of the RuntimeServices interface
+//
 //   Revision 1.1  2006/02/18 15:24:30  jomifred
 //   changes in many files to detach jason kernel from any infrastructure implementation
 //
@@ -48,6 +51,7 @@ import jason.JasonException;
 import jason.asSyntax.Term;
 import jason.environment.Environment;
 import jason.environment.EnvironmentInfraTier;
+import jason.runtime.RuntimeServicesInfraTier;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -167,7 +171,9 @@ public class SaciEnvironment extends saci.Agent implements EnvironmentInfraTier 
                             r.put("content", "error");
                         }
                         
-                        mbox.sendMsg(r);
+                        if (mbox != null) { // the agent could be out meanwhile
+                        	mbox.sendMsg(r);
+                        }
                     } catch (Exception e) {
                     	logger.log(Level.SEVERE,"Error sending message "+e,e);
                     }
@@ -182,8 +188,11 @@ public class SaciEnvironment extends saci.Agent implements EnvironmentInfraTier 
     }
 
 	public void stopAg() {
-		super.stopAg();
 		fUserEnv.stop();
+		super.stopAg();
 	}
 
+    public RuntimeServicesInfraTier getRuntimeServices() {
+    	return new SaciRuntimeServices(getSociety());
+    }
 }

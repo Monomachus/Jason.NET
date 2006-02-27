@@ -23,8 +23,8 @@
 //   $Date$
 //   $Revision$
 //   $Log$
-//   Revision 1.19  2006/02/18 15:27:04  jomifred
-//   changes in many files to detach jason kernel from any infrastructure implementation
+//   Revision 1.20  2006/02/27 18:46:26  jomifred
+//   creation of the RuntimeServices interface
 //
 //----------------------------------------------------------------------------
 
@@ -32,25 +32,15 @@ package jason.stdlib;
 
 import jIDE.JasonID;
 import jason.JasonException;
-import jason.architecture.AgArch;
-import jason.asSemantics.Agent;
 import jason.asSemantics.InternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.StringTerm;
 import jason.asSyntax.Term;
-import jason.infra.centralised.CentralisedAgArch;
-import jason.infra.centralised.CentralisedEnvironment;
-import jason.infra.centralised.CentralisedExecutionControl;
-import jason.infra.saci.SaciAgArch;
-import jason.runtime.Settings;
+import jason.runtime.RuntimeServicesInfraTier;
 
 import java.io.File;
 import java.util.logging.Logger;
-
-import saci.launcher.Command;
-import saci.launcher.Launcher;
-import saci.launcher.LauncherD;
 
 public class createAgent implements InternalAction {
 
@@ -83,16 +73,10 @@ public class createAgent implements InternalAction {
             		throw new JasonException("The file source "+source+" was not found!");
             	}
             }
+
+            RuntimeServicesInfraTier rs = ts.getUserAgArch().getArchInfraTier().getRuntimeServices();
+            return rs.createAgent(name.toString(), fSource.getAbsolutePath(), null, null, ts.getSettings());
             
-            if (ts.getUserAgArch().getArchInfraTier() instanceof CentralisedAgArch) {
-            	CentralisedAgArch ag = (CentralisedAgArch)((AgArch)ts.getUserAgArch()).getArchInfraTier();
-            	return createCentralisedAg(name.toString(), fSource.getAbsolutePath(), ag.getEnvInfraTier(), ag.getControlInfraTier(), ts.getSettings().isSync());
-            } else if (ts.getUserAgArch().getArchInfraTier() instanceof SaciAgArch) {
-            	SaciAgArch ag = (SaciAgArch)((AgArch)ts.getUserAgArch()).getArchInfraTier();
-            	return createSaciAg(name.toString(), ag.getSociety(), fSource.getAbsolutePath(), ts.getSettings().isSync());
-            } else {
-				throw new JasonException("Create agent is currently implemented only for the Centralised/Saci infrastructure!");				
-			}
 		} catch (IndexOutOfBoundsException e) {
 			throw new JasonException("The internal action 'createAgent' received a wrong number of arguments");
 		} catch (Exception e) {
@@ -100,52 +84,5 @@ public class createAgent implements InternalAction {
 		}
 		return false;
 	}
-	
-	public boolean createSaciAg(String name, String socName, String source, boolean isSync) {
-		try {
-			logger.fine("Creating saci agent from source "+source);
 
-			String extraOp = "";
-			if (isSync) {
-				extraOp = " options verbose=2,synchronised=true";
-			}
-			// gets the saci launcher
-			Launcher l = LauncherD.getLauncher();
-			Command c1 = new Command(Command.START_AGENT);
-			c1.addArg("class", SaciAgArch.class.getName());
-			c1.addArg("name", name);
-			c1.addArg("society.name", socName);
-			c1.addArg("args", AgArch.class.getName()+" "+Agent.class.getName() + " " + source + extraOp);
-			//c1.addArg("host", "?");
-			l.execCommand(c1);
-            logger.fine("Agent "+name+" created!");
-            return true;
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return false;
-	}
-
-	public boolean createCentralisedAg(String name, String source, CentralisedEnvironment env, CentralisedExecutionControl control, boolean isSync) {
-		try {
-			logger.fine("Creating centralised agent from source "+source);
-            // parameters for ini
-			
-            CentralisedAgArch agArch = new CentralisedAgArch();//(CentralisedAgArch)Class.forName(Agent.class.getName()).newInstance();
-            agArch.setAgName(name.toString());
-            agArch.initAg(AgArch.class.getName(), Agent.class.getName(), source, new Settings());
-            agArch.setEnvInfraTier(env);
-            agArch.setControlInfraTier(control);
-            if (isSync) {
-            	agArch.getUserAgArch().getTS().getSettings().setSync(true);
-            }
-            agArch.getEnvInfraTier().addAgent(agArch.getUserAgArch());
-            agArch.start();
-            logger.fine("Agent "+name+" created!");
-            return true;
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return false;	
-	}
 }

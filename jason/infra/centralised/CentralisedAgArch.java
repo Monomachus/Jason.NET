@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.2  2006/02/27 18:46:26  jomifred
+//   creation of the RuntimeServices interface
+//
 //   Revision 1.1  2006/02/18 15:24:30  jomifred
 //   changes in many files to detach jason kernel from any infrastructure implementation
 //
@@ -68,6 +71,7 @@ import jason.architecture.AgArchInfraTier;
 import jason.asSemantics.ActionExec;
 import jason.asSemantics.Message;
 import jason.asSyntax.Term;
+import jason.runtime.RuntimeServicesInfraTier;
 import jason.runtime.Settings;
 
 import java.util.Iterator;
@@ -256,4 +260,9 @@ public class CentralisedAgArch extends Thread implements AgArchInfraTier {
 	public void informCycleFinished(boolean breakpoint) {
 		infraControl.receiveFinishedCycle(getName(), breakpoint);
 	}
+	
+    public RuntimeServicesInfraTier getRuntimeServices() {
+    	return new CentralisedRuntimeServices();
+    }
+	
 }

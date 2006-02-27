@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.2  2006/02/27 18:46:26  jomifred
+//   creation of the RuntimeServices interface
+//
 //   Revision 1.1  2006/02/18 15:24:30  jomifred
 //   changes in many files to detach jason kernel from any infrastructure implementation
 //
@@ -47,8 +50,8 @@ import jason.JasonException;
 import jason.architecture.AgArch;
 import jason.control.ExecutionControl;
 import jason.control.ExecutionControlInfraTier;
+import jason.runtime.RuntimeServicesInfraTier;
 
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -125,22 +128,15 @@ public class CentralisedExecutionControl implements ExecutionControlInfraTier {
 		}
 	}
 	
-	
-	/**
-	 * @see jason.control.ExecutionControlInfraTier#getAgentsName()
-	 */
-	public Collection getAgentsName() {
-		return infraEnv.getAgents().keySet();
-	}
-	
-    public int getAgentsQty() {
-    	return infraEnv.getAgents().size();
-    }
-	
+		
 	/**
 	 *  @see jason.control.ExecutionControlInfraTier#getAgState(java.lang.String)
 	 */
 	public Document getAgState(String agName) {
 		return infraEnv.getAgent(agName).getTS().getAg().getAgState();
+	}
+
+	public RuntimeServicesInfraTier getRuntimeServices() {
+		return new CentralisedRuntimeServices();
 	}
 }

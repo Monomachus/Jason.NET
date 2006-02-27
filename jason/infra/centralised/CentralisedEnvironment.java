@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.2  2006/02/27 18:46:26  jomifred
+//   creation of the RuntimeServices interface
+//
 //   Revision 1.1  2006/02/18 15:24:30  jomifred
 //   changes in many files to detach jason kernel from any infrastructure implementation
 //
@@ -54,6 +57,7 @@ import jason.JasonException;
 import jason.architecture.AgArch;
 import jason.environment.Environment;
 import jason.environment.EnvironmentInfraTier;
+import jason.runtime.RuntimeServicesInfraTier;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -165,4 +169,7 @@ public class CentralisedEnvironment implements EnvironmentInfraTier {
         return (AgArch)agents.get(name);
     }
 
+    public RuntimeServicesInfraTier getRuntimeServices() {
+    	return new CentralisedRuntimeServices();
+    }
 }

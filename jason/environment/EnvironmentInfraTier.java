@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.2  2006/02/27 18:46:26  jomifred
+//   creation of the RuntimeServices interface
+//
 //   Revision 1.1  2006/02/17 13:16:16  jomifred
 //   change a lot of method/classes names and improve some comments
 //
@@ -37,6 +40,8 @@
 
 
 package jason.environment;
+
+import jason.runtime.RuntimeServicesInfraTier;
 
 import java.util.Collection;
 
@@ -68,4 +73,7 @@ public interface EnvironmentInfraTier {
      * (called by the user environment). 
      */
     public void informAgsEnvironmentChanged(Collection agents);
+
+    /** gets an object with infrastructure runtime services */
+    public RuntimeServicesInfraTier getRuntimeServices();
 }

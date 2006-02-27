@@ -9,7 +9,10 @@ import java.io.File;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 
-public class MASLauncher extends Thread {
+/** Used by the Jason IDE to launch an MAS. 
+ *  Each infrastructure extends this class.
+ */
+public abstract class MASLauncher extends Thread {
 	protected MAS2JProject project;
 	protected boolean stop = false;
 	protected boolean stopOnProcessExit = true;

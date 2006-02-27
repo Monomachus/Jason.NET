@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.2  2006/02/27 18:46:26  jomifred
+//   creation of the RuntimeServices interface
+//
 //   Revision 1.1  2006/02/17 13:16:16  jomifred
 //   change a lot of method/classes names and improve some comments
 //
@@ -37,7 +40,7 @@
 
 package jason.control;
 
-import java.util.Collection;
+import jason.runtime.RuntimeServicesInfraTier;
 
 import org.w3c.dom.Document;
 
@@ -58,14 +61,12 @@ public interface ExecutionControlInfraTier {
      */
     public void informAllAgsToPerformCycle();
 
-    /** gets a string list with all the agents names */
-    public Collection getAgentsName();
-    
-    public int getAgentsQty();
-
     /**
      * get the agent state (beliefs, intentions, plans, ...)
      * as an XML document
      */
 	public Document getAgState(String agName);
+
+    /** gets an object with infrastructure runtime services */
+    public RuntimeServicesInfraTier getRuntimeServices();
 }

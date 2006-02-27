@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.2  2006/02/27 18:46:25  jomifred
+//   creation of the RuntimeServices interface
+//
 //   Revision 1.1  2006/02/17 13:16:15  jomifred
 //   change a lot of method/classes names and improve some comments
 //
@@ -48,6 +51,7 @@
 package jason.architecture;
 
 import jason.asSemantics.Message;
+import jason.runtime.RuntimeServicesInfraTier;
 
 import java.util.List;
 
@@ -84,6 +88,12 @@ public interface AgArchInfraTier {
     
     /** checks whether the agent is running */
     public boolean isRunning();
+    
+    /** stops the agent */
+    public void stopAg();
+    
+    /** gets an object with infrastructure runtime services */
+    public RuntimeServicesInfraTier getRuntimeServices();
     
     // methods for execution control
 

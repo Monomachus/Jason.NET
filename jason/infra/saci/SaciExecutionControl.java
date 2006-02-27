@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.2  2006/02/27 18:46:26  jomifred
+//   creation of the RuntimeServices interface
+//
 //   Revision 1.1  2006/02/18 15:24:30  jomifred
 //   changes in many files to detach jason kernel from any infrastructure implementation
 //
@@ -39,6 +42,7 @@ package jason.infra.saci;
 import jason.JasonException;
 import jason.control.ExecutionControl;
 import jason.control.ExecutionControlInfraTier;
+import jason.runtime.RuntimeServicesInfraTier;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -139,39 +143,6 @@ public class SaciExecutionControl extends saci.Agent implements ExecutionControl
 	    }
 	}
 
-	/**
-	 * @see jason.control.ExecutionControlInfraTier#getAgentsName()
-	 */
-	public Collection getAgentsName() {
-		try {
-			Map ags = ((MBoxSAg)mbox).getFacilitator().getAllWP();
-			
-			List l = new ArrayList(ags.size());
-			Iterator ia = ags.keySet().iterator();
-            while (ia.hasNext()) {
-            	l.add(ia.next());
-            }
-            return l;
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-
-		
-	
-	/* 
-	 * @see jason.control.ExecutionControlInterface#getAgentsQty()
-	 */
-	public int getAgentsQty() {
-		try {
-			return ((MBoxSAg)mbox).getFacilitator().getAgQty() - 3; // do not include controller, environment, and facilitator 
-		} catch (Exception e) {
-			e.printStackTrace();
-			return 0;
-		}
-	}
-	
 	
 	/**
 	 *  @see jason.control.ExecutionControlInfraTier#getAgState(java.lang.String)
@@ -194,4 +165,8 @@ public class SaciExecutionControl extends saci.Agent implements ExecutionControl
 	    }
 		return null;
 	}
+
+    public RuntimeServicesInfraTier getRuntimeServices() {
+    	return new SaciRuntimeServices(getSociety());
+    }
 }
