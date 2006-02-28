@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.3  2006/02/28 15:11:28  jomifred
+//   improve javadoc
+//
 //   Revision 1.2  2006/02/27 18:46:25  jomifred
 //   creation of the RuntimeServices interface
 //
@@ -58,51 +61,48 @@ import java.util.List;
 
 
 /**
- * This is interface implemented by the infrastructure tier (Saci/Centralised)
- * regarding the agent architecture methods (perception, action, and communication).
- * 
+ * This interface is implemented by the infrastructure tier (Saci/Centralised/...)
+ * to provide concrete perception, action, and communication to the agent architecture.
  **/
 
 public interface AgArchInfraTier {
 
-    /** gets the agent's perception as a list of Literals */
+    /** Gets the agent's perception as a list of Literals */
     public List perceive();
 
-    /** reads the agent's mailbox and adds messages into the agent's circumstance */
+    /** Reads the agent's mailbox and adds messages into the agent's circumstance */
     public void checkMail();
 
-    /** executes the action in agent's circumstance (C.A) */
+    /** Executes the action in agent's circumstance (C.A) */
     public void act();
 
-    /** returns true whether the agent can sleep according to the arch */
+    /** Returns true whether the agent can sleep according to the arch */
     public boolean canSleep();
     
-    /** gets the agent's name */
+    /** Gets the agent's name */
     public String getAgName();
 
-    /** sends a Jason message in a specific infrastructure */
+    /** Sends a Jason message in a specific infrastructure */
     public void   sendMsg(Message m) throws Exception;
 
-    /** broadcasts a Jason message in a specific infrastructure */
+    /** Broadcasts a Jason message in a specific infrastructure */
     public void   broadcast(Message m) throws Exception;
     
-    /** checks whether the agent is running */
+    /** Checks whether the agent is running */
     public boolean isRunning();
     
-    /** stops the agent */
+    /** Stops the agent */
     public void stopAg();
     
-    /** gets an object with infrastructure runtime services */
+    /** Gets an object with infrastructure runtime services */
     public RuntimeServicesInfraTier getRuntimeServices();
     
-    // methods for execution control
-
 	/** 
-	 *  Inform the (centralised/saci) controller that this agent's cycle 
+	 *  Informs the infrastructure tier controller that the agent 
 	 *  has finished its reasoning cycle (used in sync mode).
 	 *  
 	 *  <p><i>breakpoint</i> is true in case the agent selected one plan 
 	 *  with the "breakpoint"  annotation.  
 	 */ 
-	public void informCycleFinished(boolean breakpoint);
+    public void informCycleFinished(boolean breakpoint);
 }

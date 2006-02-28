@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.3  2006/02/28 15:11:29  jomifred
+//   improve javadoc
+//
 //   Revision 1.2  2006/02/27 18:46:26  jomifred
 //   creation of the RuntimeServices interface
 //
@@ -52,21 +55,21 @@ import org.w3c.dom.Document;
 public interface ExecutionControlInfraTier {
 
     /**
-     * informs an agent to continue to its next reasoning cycle.
+     * Informs an agent to continue to its next reasoning cycle.
      */
     public void informAgToPerformCycle(String agName);
 
     /**
-     * informs all agents to continue to its next reasoning cycle.
+     * Informs all agents to continue to its next reasoning cycle.
      */
     public void informAllAgsToPerformCycle();
 
     /**
-     * get the agent state (beliefs, intentions, plans, ...)
+     * Gets the agent state (beliefs, intentions, plans, ...)
      * as an XML document
      */
 	public Document getAgState(String agName);
 
-    /** gets an object with infrastructure runtime services */
+    /** Gets an object with infrastructure runtime services */
     public RuntimeServicesInfraTier getRuntimeServices();
 }

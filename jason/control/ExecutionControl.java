@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.11  2006/02/28 15:11:29  jomifred
+//   improve javadoc
+//
 //   Revision 1.10  2006/02/27 18:46:26  jomifred
 //   creation of the RuntimeServices interface
 //
@@ -49,12 +52,16 @@ import java.util.logging.Logger;
 /**
  * Base class for the user implementation of execution control.
  * 
- * This default implementation synchronise the agents execution, i.e.,
+ * <p>This default implementation synchronise the agents execution, i.e.,
  * each agent will perform its next reasoning cycle only when all agents have 
  * finished its reasoning cycle.
  * 
- * Execution sequence: 	setExecutionControlInfraTier, init, (receivedFinishedCycle)*, stop.
- * 
+ * <p>Execution sequence:
+ *    <ul><li>setExecutionControlInfraTier, 
+ *        <li>init, 
+ *        <li>(receivedFinishedCycle)*, 
+ *        <li>stop.
+ *    </ul>
  */
 public class ExecutionControl {
 
@@ -96,27 +103,6 @@ public class ExecutionControl {
 				}
 			}
 		}.start();
-		
-		// create a thread to control AllAgFinished
-		// this thread is necessary since the user allAgsFinished method could take
-		// many time to run and the allAgFinished control could lose the notification
-		// that an agent has finished
-		/*
-		new Thread("ExecControlWaitAllAgFinish") {
-			public void run() {
-				synchronized(syncAllAgFinished) {
-					while (true) {
-						try {
-							syncAllAgFinished.wait();
-							allAgsFinished();
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-					}
-				}
-			}
-		}.start(); 
-		*/
 	}
 	
 	
@@ -160,50 +146,8 @@ public class ExecutionControl {
 	public void stop() {
 		
 	}
-
-	/*
-	private void waitAgFinish() {
-		try {
-			synchronized(syncAgFinished) {
-				syncAgFinished.wait(1000); // waits notify
-			
-				int nbAgs = fJasonControl.getAgentsQty();
-				if (nbFinished == nbAgs) {
-						setAllAgFinished();
-						nbFinished = 0;
-						cycleNumber++;
-				}
-			}
-		} catch (Exception e) {
-			if (fJasonControl != null) {
-				e.printStackTrace();
-			}
-		}
-	}
-	*/
-
-	/*
-	private void setAllAgFinished() {
-		synchronized(syncAllAgFinished) {
-			syncAllAgFinished.notifyAll();
-		}
-	}
-	*/
 	
-	/*
-	private void waitAllAgFinised() {
-		try {
-			synchronized(syncAllAgFinished) {
-				syncAllAgFinished.wait();
-				allAgsFinished();
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-	*/
-	
-	/** called when all agents have finished the current cycle */
+	/** Called when all agents have finished the current cycle */
 	protected void allAgsFinished() {
 		infraControl.informAllAgsToPerformCycle();
 		logger.fine("starting cycle "+cycleNumber);

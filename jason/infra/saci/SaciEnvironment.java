@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.3  2006/02/28 15:11:29  jomifred
+//   improve javadoc
+//
 //   Revision 1.2  2006/02/27 18:46:26  jomifred
 //   creation of the RuntimeServices interface
 //
@@ -61,6 +64,9 @@ import java.util.logging.Logger;
 
 import saci.MessageHandler;
 
+/**
+ * This class implements the saci version of the environment infrastructure tier.
+ */
 public class SaciEnvironment extends saci.Agent implements EnvironmentInfraTier {
 
 	private Environment fUserEnv;
@@ -70,9 +76,6 @@ public class SaciEnvironment extends saci.Agent implements EnvironmentInfraTier 
     public SaciEnvironment() {
     }
     
-	/**
-	 * @see jason.environment.EnvironmentInfraTier#informAgsEnvironmentChanged()
-	 */
     public void informAgsEnvironmentChanged() {
         try {
             saci.Message m = new saci.Message("(tell :content environmentChanged)");
@@ -82,9 +85,6 @@ public class SaciEnvironment extends saci.Agent implements EnvironmentInfraTier 
         }
     }
 
-	/**
-	 * @see jason.environment.EnvironmentInfraTier#informAgsEnvironmentChanged(java.util.Collection)
-	 */
     public void informAgsEnvironmentChanged(Collection agentsToNotify) {
         try {
             if (agentsToNotify == null) {

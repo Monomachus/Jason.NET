@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.35  2006/02/28 15:11:29  jomifred
+//   improve javadoc
+//
 //   Revision 1.34  2006/02/17 13:13:16  jomifred
 //   change a lot of method/classes names and improve some comments
 //
@@ -967,7 +970,7 @@ public class TransitionSystem {
 				if (logger.isLoggable(Level.FINE)) {
 					logger.fine("Informing controller that I finished a reasoning cycle. Breakpoint is "+isBreakPoint);
 				}
-				agArch.informCycleFinished(isBreakPoint);
+				agArch.getArchInfraTier().informCycleFinished(isBreakPoint);
 			}
 			
 		} catch (Exception e) {

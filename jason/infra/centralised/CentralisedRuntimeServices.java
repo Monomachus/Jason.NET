@@ -9,16 +9,11 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/** This class implements the centralised version of the runtime services. */
 public class CentralisedRuntimeServices implements RuntimeServicesInfraTier {
 
 	private static Logger logger = Logger.getLogger(CentralisedRuntimeServices.class.getName());
 
-	/**
-	 * Creates a new agent with <i>agName</i> from source <i>agSource</i>.
-	 * If <i>agClass</i> is null, a default value is used (jason.asSemantics.Agent).
-	 * If <i>archClass</i> is null, a default value is used (jason.architecture.AgArch).
-	 * If <i>stts</i> is null, a default value is used (new Settings()).
-	 */
 	public boolean createAgent(String agName, String agSource, String agClass, String archClass, Settings stts) throws Exception {
 		if (logger.isLoggable(Level.FINE)) {
 			logger.fine("Creating centralised agent "+agName+"from source "+agSource+"(agClass="+agClass+", archClass="+archClass+", settings="+stts);

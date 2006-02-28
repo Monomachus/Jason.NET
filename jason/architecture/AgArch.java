@@ -22,6 +22,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.5  2006/02/28 15:11:28  jomifred
+//   improve javadoc
+//
 //   Revision 1.4  2006/02/17 13:13:15  jomifred
 //   change a lot of method/classes names and improve some comments
 //
@@ -64,10 +67,10 @@ public class AgArch {
 
 	protected TransitionSystem fTS = null;
 	
-	/** the class that implements the architecture tier for the MAS infrastructure */
+	/** The class that implements the architecture tier for the MAS infrastructure */
 	AgArchInfraTier archTier;
 
-    /** creates the agent class defined by <i>agClass</i>, default is jason.semantics.Agent. */
+    /** Creates the agent class defined by <i>agClass</i>, default is jason.semantics.Agent. */
     public void initAg(String agClass, String asSrc, Settings stts) throws JasonException {
         // set the agent
         try {
@@ -78,7 +81,7 @@ public class AgArch {
         }
     }
 
-    /** stop the agent */
+    /** Stops the agent, the user should override this method to do something before the agent is killed. The default implementation does nothing. */
     public void stopAg() {
     }
 
@@ -95,53 +98,43 @@ public class AgArch {
 
 
 	
-    /** gets the agent's perception as a list of Literals */
+    /** Gets the agent's perception as a list of Literals */
 	public List perceive() {
 		return archTier.perceive();
 	}
 
-    /** reads the agent's mailbox and adds messages into the agent's circumstance */
+    /** Reads the agent's mailbox and adds messages into the agent's circumstance */
 	public void checkMail() {
 		archTier.checkMail();
 	}
 
-    /** executes the action in agent's circumstance (C.A) */
+    /** Executes the action in agent's circumstance (C.A) */
 	public void act() {
 		archTier.act();
 	}
 
+	/** Returns true if the agent can enter in sleep mode. */
 	public boolean canSleep() {
 		return archTier.canSleep();
     }
 
-    /** gets the agent's name */
+    /** Gets the agent's name */
 	public String getAgName() {
 		return archTier.getAgName();
 	}
 
-    /** sends a Jason message in a specific infrastructure */
+    /** Sends a Jason message */
 	public void sendMsg(Message m) throws Exception {
 		archTier.sendMsg(m);
 	}
 
-    /** broadcasts a Jason message in a specific infrastructure */
+    /** Broadcasts a Jason message */
 	public void broadcast(Message m) throws Exception {
 		archTier.broadcast(m);
 	}
 
-    /** checks whether the agent is running */
+    /** Checks whether the agent is running */
 	public boolean isRunning() {
 		return archTier.isRunning();
-	}
-
-	/** 
-	 *  Inform the (centralised/saci) controller that this agent's cycle 
-	 *  has finished its reasoning cycle (used in sync mode).
-	 *  
-	 *  <p><i>breakpoint</i> is true in case the agent selected one plan 
-	 *  with the "breakpoint"  annotation.  
-	 */ 
-	public void informCycleFinished(boolean breakpoint) {
-		archTier.informCycleFinished(breakpoint);
 	}
 }

@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.3  2006/02/28 15:11:29  jomifred
+//   improve javadoc
+//
 //   Revision 1.2  2006/02/27 18:46:26  jomifred
 //   creation of the RuntimeServices interface
 //
@@ -40,13 +43,8 @@
 //
 //   Revision 1.9  2005/10/30 16:07:33  jomifred
 //   add comments
-//
-//   Revision 1.8  2005/08/18 20:37:55  jomifred
-//   no message
-//
 //   Revision 1.7  2005/08/12 22:26:08  jomifred
 //   add cvs keywords
-//
 //
 //----------------------------------------------------------------------------
 
@@ -108,9 +106,6 @@ public class CentralisedEnvironment implements EnvironmentInfraTier {
     	return fUserEnv;
     }
     
-	/**
-	 * @see jason.environment.EnvironmentInfraTier#informAgsEnvironmentChanged()
-	 */
     public void informAgsEnvironmentChanged() {
         Iterator i = agents.values().iterator();
         while (i.hasNext()) {
@@ -119,9 +114,6 @@ public class CentralisedEnvironment implements EnvironmentInfraTier {
         }
     }
 
-	/**
-	 * @see jason.environment.EnvironmentInfraTier#informAgsEnvironmentChanged(java.util.Collection)
-	 */
     public void informAgsEnvironmentChanged(Collection agentsToNotify) {
         if (agentsToNotify == null) {
         	informAgsEnvironmentChanged();
@@ -158,7 +150,7 @@ public class CentralisedEnvironment implements EnvironmentInfraTier {
     }
     
     /** 
-     * returns the agents map, key is the agent name (String) and value 
+     * Returns the agents map, key is the agent name (String) and value 
      * is the AgArch agent object.
      */
     public Map getAgents() {

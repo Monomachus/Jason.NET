@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.3  2006/02/28 15:11:29  jomifred
+//   improve javadoc
+//
 //   Revision 1.2  2006/02/27 18:46:26  jomifred
 //   creation of the RuntimeServices interface
 //
@@ -82,9 +85,6 @@ public class CentralisedExecutionControl implements ExecutionControlInfraTier {
         }
 	}
 	
-	/**
-	 * This method is called when MAS execution is being finished
-	 */
 	public void stop() {
 		userController.stop();
 	}
@@ -97,27 +97,16 @@ public class CentralisedExecutionControl implements ExecutionControlInfraTier {
 		return infraEnv;
 	}
 	
-	/** 
-	 * Called (by the ag arch) when the agent <i>agName</i> has finished its reasoning cycle.
-	 * <i>breakpoint</i> is true in case the agent selected one plan with "breakpoint" 
-	 * annotation.
-     */
 	public void receiveFinishedCycle(String agName, boolean breakpoint) {
 		// pass to user controller
 		userController.receiveFinishedCycle(agName, breakpoint);
 	}
 
-	/**
-	 * @see jason.control.ExecutionControlInfraTier#informAgToPerformCycle(java.lang.String)
-	 */
 	public void informAgToPerformCycle(String agName) {
 		// call the agent method to "go on"
 		infraEnv.getAgent(agName).getTS().receiveSyncSignal();
 	}
 
-	/**
-	 * @see jason.control.ExecutionControlInfraTier#informAllAgsToPerformCycle()
-	 */
 	public void informAllAgsToPerformCycle() {
 		synchronized(infraEnv.getAgents()) { 
 			Iterator i = infraEnv.getAgents().values().iterator();
@@ -129,9 +118,6 @@ public class CentralisedExecutionControl implements ExecutionControlInfraTier {
 	}
 	
 		
-	/**
-	 *  @see jason.control.ExecutionControlInfraTier#getAgState(java.lang.String)
-	 */
 	public Document getAgState(String agName) {
 		return infraEnv.getAgent(agName).getTS().getAg().getAgState();
 	}

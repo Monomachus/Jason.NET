@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.3  2006/02/28 15:11:29  jomifred
+//   improve javadoc
+//
 //   Revision 1.2  2006/02/27 18:46:26  jomifred
 //   creation of the RuntimeServices interface
 //
@@ -46,23 +49,12 @@ import jason.runtime.RuntimeServicesInfraTier;
 import java.util.Collection;
 
 /** 
- * The infrastructure tier interface for Environment.
- * 
- *  <p>It is implemented by jason to ecapsulate the communication side 
- *  of the distributed/centralised environment, so the user environment can call 
- *  "informAgsEnvironmentChanged" either in centralised or distributed
- *  executions.  
- * 
- * <p>An example of interaction:
- * <img src="../../../uml/environmentInteraction.gif" />
- *
- * <p>The related classes:
- * <img src="../../../uml/jason.environment.gif" />
+ * This interface is implemented by the infrastructure tier (Saci/Centralised/...) to provide concrete implementation of the environment.
  */
 public interface EnvironmentInfraTier {
 
     /** 
-     * sends a message to all agents notifying them that the environment has changed 
+     * Sends a message to all agents notifying them that the environment has changed 
      * (called by the user environment). 
      */
     public void informAgsEnvironmentChanged();
@@ -74,6 +66,6 @@ public interface EnvironmentInfraTier {
      */
     public void informAgsEnvironmentChanged(Collection agents);
 
-    /** gets an object with infrastructure runtime services */
+    /** Gets an object with infrastructure runtime services */
     public RuntimeServicesInfraTier getRuntimeServices();
 }
