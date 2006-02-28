@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.3  2006/02/28 15:17:24  jomifred
+//   improve javadoc
+//
 //   Revision 1.2  2006/02/27 18:46:26  jomifred
 //   creation of the RuntimeServices interface
 //
@@ -84,9 +87,13 @@ import java.util.logging.Logger;
  * This class provides an agent architecture when using Centralised
  * infrastructure to run the MAS inside Jason.
  * 
- * <p>Execution sequence: initAg, setEnvInfraTier, setControlInfraTier, 
- *                        run (perceive, checkMail, act), 
- *                        stopAg.
+ * <p>Execution sequence: 
+ *    <ul><li>initAg, 
+ *        <li>setEnvInfraTier, 
+ *        <li>setControlInfraTier, 
+ *        <li>run (perceive, checkMail, act), 
+ *        <li>stopAg.
+ *    </ul>
  */
 public class CentralisedAgArch extends Thread implements AgArchInfraTier {
     
@@ -94,9 +101,7 @@ public class CentralisedAgArch extends Thread implements AgArchInfraTier {
 	
 	private CentralisedExecutionControl infraControl = null;
 
-	//protected TransitionSystem fTS = null;
-	
-	/** the user implementation of the architecture */
+	/** The user implementation of the architecture */
 	protected AgArch fUserAgArh;
 	
 	private String agName = "";
@@ -104,7 +109,7 @@ public class CentralisedAgArch extends Thread implements AgArchInfraTier {
 	
 	protected Logger logger;
     
-	/** creates the user agent architecture, default architecture is 
+	/** Creates the user agent architecture, default architecture is 
 	 *  jason.architecture.AgArch. 
 	 *  The arch will create the agent that creates the TS. 
 	 **/
@@ -151,7 +156,7 @@ public class CentralisedAgArch extends Thread implements AgArchInfraTier {
     
     private Object syncStopRun = new Object();
     
-    /** stops the agent */
+    /** Stops the agent */
     public void stopAg() {
     	running = false;
     	fUserAgArh.getTS().receiveSyncSignal(); // in case the agent is wainting .....
@@ -253,11 +258,7 @@ public class CentralisedAgArch extends Thread implements AgArchInfraTier {
         return mbox.size() == 0;
     }
     
-    
-    // methods for execution control
-
-	/** inform the controller that this agent's cycle was finished (used in sync mode) */ 
-	public void informCycleFinished(boolean breakpoint) {
+    	public void informCycleFinished(boolean breakpoint) {
 		infraControl.receiveFinishedCycle(getName(), breakpoint);
 	}
 	

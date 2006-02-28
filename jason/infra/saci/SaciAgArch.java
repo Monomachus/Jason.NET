@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.3  2006/02/28 15:17:24  jomifred
+//   improve javadoc
+//
 //   Revision 1.2  2006/02/27 18:46:26  jomifred
 //   creation of the RuntimeServices interface
 //
@@ -454,7 +457,6 @@ public class SaciAgArch extends saci.Agent implements AgArchInfraTier {
 
     private static Message cycleFinished = new Message("(tell :receiver controller :ontology AS-ExecControl :content cycleFinished)");
     
-	/** inform the remote controller that this agent's cycle was finished (used in sync mode) */ 
 	public void informCycleFinished(boolean breakpoint) {
 		// send a message to the executionControl agent
 	    Message m = (Message)cycleFinished.clone();
