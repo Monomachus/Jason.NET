@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.2  2006/03/01 17:25:44  jomifred
+//   fix bug in using masconsole
+//
 //   Revision 1.1  2006/02/18 15:24:30  jomifred
 //   changes in many files to detach jason kernel from any infrastructure implementation
 //
@@ -123,47 +126,53 @@ public class RunCentralisedMAS {
 			runner.startAgs();
 			runner.startSyncMode();
 			
+	        if (MASConsoleGUI.hasConsole()) {
+				// add Button
+		        JButton btStop = new JButton("Stop MAS");
+		        btStop.addActionListener(new ActionListener() {
+		            public void actionPerformed(ActionEvent evt) {
+		            	MASConsoleGUI.get().setPause(false);
+		            	runner.finish();
+		            }
+		        });
+		        MASConsoleGUI.get().addButton(btStop);
+
+		        // add Button
+		        final JButton btPause = new JButton("Pause MAS");
+		        btPause.addActionListener(new ActionListener() {
+		            public void actionPerformed(ActionEvent evt) {
+		            	if (MASConsoleGUI.get().isPause()) {
+		            		btPause.setText("Pause MAS");
+		            		MASConsoleGUI.get().setPause(false);
+		            	} else {
+		            		btPause.setText("Continue");
+		            		MASConsoleGUI.get().setPause(true);
+		            	}
+		            	
+		            }
+		        });
+		        MASConsoleGUI.get().addButton(btPause);
+		        MASConsoleGUI.get().setAsDefaultOut();
+	        }
+	    
+	        runner.waitEnd();
+
 		} catch (FileNotFoundException e1) {
 			logger.log(Level.SEVERE, "File "+args[0]+" not found!");
-			System.exit(2);
+	        if (!MASConsoleGUI.hasConsole()) {
+	        	System.exit(2);
+	        }
 		} catch (ParseException e) {
 			logger.log(Level.SEVERE, "Error parsing file "+args[0]+"!",e);
-			System.exit(3);
+	        if (!MASConsoleGUI.hasConsole()) {
+	        	System.exit(3);
+	        }
 		} catch (Exception e) {
 			logger.log(Level.SEVERE,"Error!?: ",e);
-			System.exit(4);
+	        if (!MASConsoleGUI.hasConsole()) {
+	        	System.exit(4);
+	        }
 		}
-
-        if (MASConsoleGUI.hasConsole()) {
-			// add Button
-	        JButton btStop = new JButton("Stop MAS");
-	        btStop.addActionListener(new ActionListener() {
-	            public void actionPerformed(ActionEvent evt) {
-	            	MASConsoleGUI.get().setPause(false);
-	            	runner.finish();
-	            }
-	        });
-	        MASConsoleGUI.get().addButton(btStop);
-
-	        // add Button
-	        final JButton btPause = new JButton("Pause MAS");
-	        btPause.addActionListener(new ActionListener() {
-	            public void actionPerformed(ActionEvent evt) {
-	            	if (MASConsoleGUI.get().isPause()) {
-	            		btPause.setText("Pause MAS");
-	            		MASConsoleGUI.get().setPause(false);
-	            	} else {
-	            		btPause.setText("Continue");
-	            		MASConsoleGUI.get().setPause(true);
-	            	}
-	            	
-	            }
-	        });
-	        MASConsoleGUI.get().addButton(btPause);
-	        MASConsoleGUI.get().setAsDefaultOut();
-        }
-    
-        runner.waitEnd();
     }
     
     
