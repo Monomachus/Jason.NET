@@ -3,7 +3,7 @@ package jason.infra.saci;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import jason.runtime.MASLauncher;
+import jason.jeditplugin.MASLauncher;
 import saci.launcher.Launcher;
 
 public class SaciMASLauncher extends MASLauncher {

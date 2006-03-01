@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.4  2006/03/01 19:22:05  jomifred
+//   no message
+//
 //   Revision 1.3  2006/02/21 14:24:37  jomifred
 //   add TODO
 //
@@ -67,7 +70,6 @@
 package jason.jeditplugin;
 
 import jason.mas2j.MAS2JProject;
-import jason.runtime.MASLauncher;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -153,7 +155,7 @@ public class RunProject {
 		public void run() {
 			try {
 				if (needsComp()) {
-					String command = getAsScriptCommand("compile-" + project.getSocName());
+					String command = MASLauncher.getAsScriptCommand("compile-" + project.getSocName());
 					System.out.println("Compiling user class with " + command);
 					Process p = Runtime.getRuntime().exec(command, null, new File(project.getDirectory()));
 					p.waitFor();
@@ -196,21 +198,4 @@ public class RunProject {
 		}
 	}
 
-
-	public static String getAsScriptCommand(String scriptName) {
-		return getAsScriptCommand(scriptName, false); 
-	}
-	
-	public static String getAsScriptCommand(String scriptName, boolean start) {
-		if (System.getProperty("os.name").indexOf("indows") > 0) {
-			//command = "command.com /e:2048 /c "+command+".bat";
-			String sStart = " ";
-			if (start) {
-				sStart = " start "; 
-			}
-			return Config.get().getShellCommand() + sStart + scriptName + ".bat";
-		} else {
-			return Config.get().getShellCommand() + " " + scriptName + ".sh";
-		}
-	}	
 }

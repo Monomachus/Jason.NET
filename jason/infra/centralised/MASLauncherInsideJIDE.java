@@ -2,8 +2,8 @@ package jason.infra.centralised;
 
 import jason.jeditplugin.Config;
 import jason.jeditplugin.JasonID;
+import jason.jeditplugin.MASLauncher;
 import jason.runtime.MASConsoleGUI;
-import jason.runtime.MASLauncher;
 
 import java.io.BufferedInputStream;
 import java.io.File;

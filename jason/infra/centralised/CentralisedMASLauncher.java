@@ -1,6 +1,6 @@
 package jason.infra.centralised;
 
-import jason.runtime.MASLauncher;
+import jason.jeditplugin.MASLauncher;
 
 public class CentralisedMASLauncher extends MASLauncher {
 

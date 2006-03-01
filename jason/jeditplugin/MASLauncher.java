@@ -1,7 +1,5 @@
-package jason.runtime;
+package jason.jeditplugin;
 
-import jason.jeditplugin.RunProject;
-import jason.jeditplugin.RunProjectListener;
 import jason.mas2j.MAS2JProject;
 
 import java.io.BufferedReader;
@@ -42,7 +40,7 @@ public abstract class MASLauncher extends Thread {
 
 	public void run() {
 		try {
-			String command = RunProject.getAsScriptCommand(project.getSocName());
+			String command = getAsScriptCommand(project.getSocName());
 			System.out.println("Executing MAS with " + command);
 			masProcess = Runtime.getRuntime().exec(command, null,
 					new File(project.getDirectory()));
@@ -80,5 +78,21 @@ public abstract class MASLauncher extends Thread {
 			}
 		}
 	}
+
+	public static String getAsScriptCommand(String scriptName) {
+		return getAsScriptCommand(scriptName, false); 
+	}
+	
+	public static String getAsScriptCommand(String scriptName, boolean start) {
+		if (System.getProperty("os.name").indexOf("indows") > 0) {
+			String sStart = " ";
+			if (start) {
+				sStart = " start "; 
+			}
+			return Config.get().getShellCommand() + sStart + scriptName + ".bat";
+		} else {
+			return Config.get().getShellCommand() + " " + scriptName + ".sh";
+		}
+	}	
 	
 }

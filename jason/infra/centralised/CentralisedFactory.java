@@ -1,8 +1,8 @@
 package jason.infra.centralised;
 
 import jason.infra.InfrastructureFactory;
+import jason.jeditplugin.MASLauncher;
 import jason.mas2j.WriteScriptsInfraTier;
-import jason.runtime.MASLauncher;
 import jason.runtime.RuntimeServicesInfraTier;
 
 public class CentralisedFactory implements InfrastructureFactory {
