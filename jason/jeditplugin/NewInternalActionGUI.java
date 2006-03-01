@@ -1,5 +1,7 @@
 package jason.jeditplugin;
 
+import jason.asSemantics.InternalAction;
+
 import java.awt.BorderLayout;
 import java.io.File;
 
@@ -12,12 +14,12 @@ import javax.swing.border.TitledBorder;
 import org.gjt.sp.jedit.Buffer;
 import org.gjt.sp.jedit.View;
 
-public class NewInternalActioinGUI extends NewAgentGUI {
+public class NewInternalActionGUI extends NewAgentGUI {
 
 	private JTextField iaClass;
 	private JTextField iaPkg;
 	
-	public NewInternalActioinGUI(String title, Buffer b, View view) {
+	public NewInternalActionGUI(String title, Buffer b, View view) {
 		super(title, b, view);
 	}
 	
@@ -84,7 +86,7 @@ public class NewInternalActioinGUI extends NewAgentGUI {
 		s.append("import jason.asSyntax.*;\n");
 		s.append("import java.util.logging.*;\n\n");
 		
-		s.append("public class "+className+" implements InternalAction {\n\n");
+		s.append("public class "+className+" implements "+InternalAction.class.getName()+" {\n\n");
 
 		s.append("\tprivate Logger logger = Logger.getLogger(\""+buffer.getName()+".\"+"+className+".class.getName());\n\n");
 		

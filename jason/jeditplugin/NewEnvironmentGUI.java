@@ -11,6 +11,8 @@ import javax.swing.border.TitledBorder;
 import org.gjt.sp.jedit.Buffer;
 import org.gjt.sp.jedit.View;
 
+import jason.environment.Environment;
+
 public class NewEnvironmentGUI extends NewAgentGUI {
 
 	private JTextField envClass;
@@ -89,9 +91,10 @@ public class NewEnvironmentGUI extends NewAgentGUI {
 		s.append("import jason.asSyntax.*;\n");
 		s.append("import jason.environment.*;\n");
 		s.append("import java.util.logging.*;\n\n");
-		s.append("public class "+className+" extends Environment {\n\n");
+		s.append("public class "+className+" extends "+Environment.class.getName()+" {\n\n");
 		s.append("\tprivate Logger logger = Logger.getLogger(\""+buffer.getName()+".\"+"+className+".class.getName());\n\n");
 		s.append("\tpublic "+className+"() {\n");
+		s.append("\t\taddPercept(Literal.parseLiteral(\"percept(demo)\"));\n");
 		s.append("\t}\n\n");
 		s.append("\tpublic boolean executeAction(String ag, Term action) {\n");
 		s.append("\t\tlogger.info(\"executing: \"+action+\", but not implemented!\");\n");

@@ -494,7 +494,11 @@ public class JasonID extends JPanel implements EBComponent, RunProjectListener {
 		if (b == null) {
 			textArea.setText("There is no Jason project opened, create a project first.");
 		} else {
-			new NewEnvironmentGUI("Create environment for project "+b.getName(), b, view);
+			if (b.getText(0, b.getLength()).indexOf("environment") > 0) {
+				textArea.setText("Your project already has an environment definition!");				
+			} else {
+				new NewEnvironmentGUI("Create environment for project "+b.getName(), b, view);
+			}
 		}
 	}
 
@@ -503,36 +507,10 @@ public class JasonID extends JPanel implements EBComponent, RunProjectListener {
 		if (b == null) {
 			textArea.setText("There is no Jason project opened, create a project first.");
 		} else {
-			new NewInternalActioinGUI("Create new internal action for project "+b.getName(), b, view);
+			new NewInternalActionGUI("Create new internal action for project "+b.getName(), b, view);
 		}
 	}
 
-	/*
-	void checkProjectView(String projName, File projDirectory) {
-		// add in project viewer
-		EditPlugin pv = org.gjt.sp.jedit.jEdit.getPlugin(projectviewer.ProjectPlugin.class.getName(),false);
-		if (pv == null) {
-			return;
-		}
-
-		// we can use the projectviewer plugin
-		ProjectManager pm = ProjectManager.getInstance();
-		ProjectViewer projView = ProjectViewer.getViewer(view);
-		if (! pm.hasProject(projName)) {
-			VPTProject proj = new VPTProject(projName);
-			proj.setRootPath(projDirectory.getAbsolutePath());
-
-			pm.addProject(proj, VPTRoot.getInstance());
-			projView.setActiveNode(view, proj);
-			
-			JasonProjectImporter fi = new JasonProjectImporter(proj, projView);
-			fi.doImport();
-							
-			// add special actions (new agent, run, ....)
-		}
-	}
-	*/
-	
 	public void editLog() {
 		Buffer curBuf = getProjectBuffer();
 		if (curBuf == null) {
