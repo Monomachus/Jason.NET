@@ -150,10 +150,7 @@ public class SaciMASLauncher extends Thread implements MASLauncherInfraTier {
 				if (javaHome != null) {
 						out.println("set PATH=\"" + javaHome + "bin\";%PATH%\n");
 				}
-				out.println("set CLASSPATH=" + classPath + "\n");
-				// out.println("cd \""+saciHome+"\"");
-				// out.println("saci &");
-				out.println("java -Djava.security.policy=\"jar:file:"
+				out.println("java -classpath "+classPath+" -Djava.security.policy=\"jar:file:"
 							+ Config.get().getSaciJar() + "!/policy\" saci.tools.SaciMenu");
 				out.close();
 				
@@ -179,15 +176,7 @@ public class SaciMASLauncher extends Thread implements MASLauncherInfraTier {
 				if (javaHome != null) {
 					out.println("export PATH=\"" + javaHome + "bin\":$PATH\n");
 				}
-					// out.println("CURDIR=`pwd`");
-					// out.println("cd "+destDir);
-					// out.println("APPDIR=`pwd`");
-					// out.println("export
-					// CLASSPATH=$APPDIR:$CURDIR:"+classPath);
-				out.println("export CLASSPATH=" + classPath + "\n");
-					// out.println("cd \""+saciHome+"\"");
-					// out.println("./saci &");
-				out.println("java -Djava.security.policy=\"jar:file:"
+				out.println("java -classpath "+classPath+"-Djava.security.policy=\"jar:file:"
 							+ Config.get().getSaciJar() + "!/policy\" saci.tools.SaciMenu");
 				out.close();
 			}
@@ -235,8 +224,7 @@ public class SaciMASLauncher extends Thread implements MASLauncherInfraTier {
             tmpEnvClass = project.getEnvClass();
         }        
         out.println("\t\targs=\""+tmpEnvClass+"\" ");
-        tmpEnvClass = jason.infra.saci.SaciEnvironment.class.getName();
-        out.println("\t\tclass=\""+tmpEnvClass+"\" ");
+        out.println("\t\tclass=\"jason.infra.saci.SaciEnvironment\" "); // do not use class.getName, it does not work with jason.exe
         if (project.getEnvHost() != null) {
         	out.println("\t\thost="+project.getEnvHost()); 
         }
@@ -260,7 +248,7 @@ public class SaciMASLauncher extends Thread implements MASLauncherInfraTier {
 			out.println("\t\tsociety.name=\""+project.getSocName()+"-env\" "); 
 
            	out.println("\t\targs=\""+fControlClass+"\"");
-           	fControlClass = jason.infra.saci.SaciExecutionControl.class.getName();
+           	fControlClass = "jason.infra.saci.SaciExecutionControl";
             out.println("\t\tclass=\""+fControlClass+"\" ");
             if (project.getControlHost() != null) {
             	out.println("\t\thost="+project.getControlHost());
@@ -278,7 +266,7 @@ public class SaciMASLauncher extends Thread implements MASLauncherInfraTier {
         s.append("\n\t\tname=\""+agp.name+"\" "); 
         s.append("\n\t\tsociety.name=\""+project.getSocName()+"\" ");
         
-        s.append("\n\t\tclass=\""+jason.infra.saci.SaciAgArch.class.getName()+"\"");
+        s.append("\n\t\tclass=\"jason.infra.saci.SaciAgArch\"");
 
         String tmpAgClass = agp.agClass;
         if (tmpAgClass == null) {
