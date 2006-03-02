@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.8  2006/03/02 01:42:14  jomifred
+//   the jIDE package was remove, the writeScriptInterface's methods was moved to MASLauncher
+//
 //   Revision 1.7  2006/02/18 15:25:16  jomifred
 //   changes in many files to detach jason kernel from any infrastructure implementation
 //
@@ -101,7 +104,7 @@ public class mas2j {
         project.setDirectory(new File(".").getAbsolutePath());
         project.setProjectFile(new File(name));
 		System.out.println("mas2j: "+name+" parsed successfully!\n");
-        project.writeScripts(false);
+		project.getInfrastructureFactory().createMASLauncher(project).writeScripts(false);
 
         int step = 1;
         System.out.println("To run your MAS:");
@@ -213,7 +216,7 @@ void infra() :              { Token t; }
 }
 
 
-void agents() :             { project.initAgMaps(); }
+void agents() :             { project.initAgMap(); }
 {
   <AGS> ":"
   ( agent() )+

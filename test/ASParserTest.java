@@ -1,6 +1,6 @@
 package test;
 
-import jIDE.JasonID;
+import jason.JasonException;
 import jason.asSemantics.Agent;
 import junit.framework.TestCase;
 
@@ -18,7 +18,7 @@ public class ASParserTest extends TestCase {
 		Agent ag = new Agent();
 		ag.setLogger(null);
 		
-		assertTrue(ag.parseAS(JasonID.class.getResource("/asl/kqmlPlans.asl")));
+		assertTrue(ag.parseAS(JasonException.class.getResource("/asl/kqmlPlans.asl")));
 		assertTrue(ag.parseAS("examples/Auction/ag1.asl"));
 		assertTrue(ag.parseAS("examples/Auction/ag2.asl"));
 		assertTrue(ag.parseAS("examples/Auction/ag3.asl"));

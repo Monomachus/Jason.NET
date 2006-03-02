@@ -19,11 +19,8 @@ public abstract class MASLauncher extends Thread {
 	protected Process masProcess = null;
 	protected OutputStream processOut;
 
-	public MASLauncher() {
+	public MASLauncher(MAS2JProject project) {
 		super("MAS-Launcher");
-	}
-
-	public void setProject(MAS2JProject project) {
 		this.project = project;
 	}
 
@@ -79,6 +76,41 @@ public abstract class MASLauncher extends Thread {
 		}
 	}
 
+	public abstract void writeScripts(boolean debug);
+
+	public String getProjectClassPath() {
+		String clPath = "\"$CLASSPATH\"";
+		String indelim = "\"";
+		String outdelim = "";
+		if (System.getProperty("os.name").indexOf("indows") > 0) {
+			clPath = "%CLASSPATH%";
+			indelim = "";
+			outdelim = "\"";
+		}
+
+		String dDir = project.getDirectory();
+		if (dDir.endsWith(File.separator)) {
+			dDir = dDir.substring(0, dDir.length() - 1);
+		}
+
+		String sLib = "";
+		File lib = new File(dDir + File.separator + "lib");
+		// add all jar files in lib dir
+		if (lib.exists()) {
+			File[] fs = lib.listFiles();
+			for (int i = 0; i < fs.length; i++) {
+				if (fs[i].getName().endsWith(".jar")) {
+					sLib += indelim + fs[i].getAbsolutePath() + indelim + File.pathSeparator;
+				}
+			}
+		}
+
+		return outdelim + "." + File.pathSeparator + indelim + Config.get().getJasonJar() + indelim
+				+ File.pathSeparator + indelim + dDir + indelim
+				+ File.pathSeparator + sLib + clPath + outdelim;
+	}
+
+	
 	public static String getAsScriptCommand(String scriptName) {
 		return getAsScriptCommand(scriptName, false); 
 	}

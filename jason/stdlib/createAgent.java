@@ -23,14 +23,13 @@
 //   $Date$
 //   $Revision$
 //   $Log$
-//   Revision 1.20  2006/02/27 18:46:26  jomifred
-//   creation of the RuntimeServices interface
+//   Revision 1.21  2006/03/02 01:42:14  jomifred
+//   the jIDE package was remove, the writeScriptInterface's methods was moved to MASLauncher
 //
 //----------------------------------------------------------------------------
 
 package jason.stdlib;
 
-import jIDE.JasonID;
 import jason.JasonException;
 import jason.asSemantics.InternalAction;
 import jason.asSemantics.TransitionSystem;
@@ -60,18 +59,7 @@ public class createAgent implements InternalAction {
             
             File fSource = new File(source.getString());
             if (! fSource.exists()) {
-            	
-            	// try to get the project directory (only when running inside JasonID)
-            	if (JasonID.currentJasonID != null) {
-            		logger.fine("trying to find the source at "+JasonID.currentJasonID.getProjectDirectory());
-            		fSource = new File(JasonID.currentJasonID.getProjectDirectory()+File.separator+source.getString());
-                    if (! fSource.exists()) {
-                		throw new JasonException("The file source "+source+" was not found!");
-                    }
-                    logger.fine("Ok, found "+fSource.getAbsolutePath());
-            	} else {
-            		throw new JasonException("The file source "+source+" was not found!");
-            	}
+            	throw new JasonException("The file source "+source+" was not found!");
             }
 
             RuntimeServicesInfraTier rs = ts.getUserAgArch().getArchInfraTier().getRuntimeServices();

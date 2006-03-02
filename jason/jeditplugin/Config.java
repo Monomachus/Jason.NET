@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.5  2006/03/02 01:41:14  jomifred
+//   the jIDE package was remove, the writeScriptInterface's methods was moved to MASLauncher
+//
 //   Revision 1.4  2006/02/24 14:53:26  jomifred
 //   no message
 //
@@ -54,7 +57,6 @@
 
 package jason.jeditplugin;
 
-import jIDE.JasonID;
 import jason.infra.centralised.CentralisedFactory;
 import jason.infra.saci.SaciFactory;
 

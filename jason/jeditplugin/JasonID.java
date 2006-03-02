@@ -87,7 +87,7 @@ public class JasonID extends JPanel implements EBComponent, RunProjectListener {
 	View view;
 
 	OutputStreamAdapter myOut;
-	RunProject runner = null;
+	//RunProject runner = null;
 	
 	JTextArea textArea;
 	AnimatedIcon animation;
@@ -100,6 +100,7 @@ public class JasonID extends JPanel implements EBComponent, RunProjectListener {
 	
 	DefaultErrorSource errorSource = null;
 
+	MASLauncher masLauncher;
 	
 	public JasonID(View view, String position) {
 		super(new BorderLayout());
@@ -350,7 +351,7 @@ public class JasonID extends JPanel implements EBComponent, RunProjectListener {
         }
 	}
 
-    private MAS2JProject parseProject(Buffer projectBufffer, boolean debug) {
+    private MAS2JProject parseProject(Buffer projectBufffer) {
         // compile
         try {
         	textArea.append("Parsing project file... ");
@@ -367,7 +368,6 @@ public class JasonID extends JPanel implements EBComponent, RunProjectListener {
         	MAS2JProject project = parser.mas();
         	project.setDirectory( projectBufffer.getDirectory());
         	project.setProjectFile(new File(projectBufffer.getPath()));
-            project.writeScripts(debug);
             textArea.append(" parsed successfully!\n");
             return project;
             
@@ -431,30 +431,58 @@ public class JasonID extends JPanel implements EBComponent, RunProjectListener {
 		Buffer b = getProjectBuffer();
 		if (b == null) {
 			textArea.setText("There is no Jason project opened!");
-		} else {
-			textArea.setText("Running project "+b.getName()+"\n");
-			if (errorSource == null) {
-				errorSource = new DefaultErrorSource("JasonIDE");
-				ErrorSource.registerErrorSource(errorSource);
+			return;
+		} 
+		textArea.setText("Running project "+b.getName()+"\n");
+		if (errorSource == null) {
+			errorSource = new DefaultErrorSource("JasonIDE");
+			ErrorSource.registerErrorSource(errorSource);
+		}
+		
+		errorSource.clear();
+		saveAll();
+
+		MAS2JProject project = parseProject(b);
+		if (project == null || !parseProjectAS(project)) {
+			return;
+		}
+		
+		// launch the MAs
+		animation.start();
+		btStop.setEnabled(true);
+		btRun.setEnabled(false);
+		btDebug.setEnabled(false);
+		try {
+			if (masLauncher != null) {
+				// stops old running mas
+				masLauncher.stopMAS();
+			}
+
+			String jasonJar = Config.get().getJasonJar();
+			if (!Config.checkJar(jasonJar)) {
+				System.err.println("The path to the jason.jar file ("+jasonJar+") was not correctly set, the MAS may not run. Go to menu Plugins->Plugins Options->Jason to configure the path.");
+			}
+			String javaHome = Config.get().getJavaHome();
+			if (!Config.checkJavaHomePath(javaHome)) {
+				System.err.println("The Java home directory ("+javaHome+") was not correctly set, the MAS may not run. Go to the Plugins->Options->Jason menu to configure the path.");
 			}
 			
-			errorSource.clear();
-			MAS2JProject project = parseProject(b, debug);
-			if (project != null) {
+			masLauncher = project.getInfrastructureFactory().createMASLauncher(project);
+			masLauncher.writeScripts(debug);
+			masLauncher.setListener(this);
 
-				saveAll();
-				
-				if (parseProjectAS(project)) {
-					animation.start();
-					btStop.setEnabled(true);
-					btRun.setEnabled(false);
-					btDebug.setEnabled(false);
-					if (runner == null) {
-						runner = new RunProject();
-					}
-					runner.run(project, this);
-				}
+			// compile some files
+			CompileUserJavaSources compT = new CompileUserJavaSources(project.getAllUserJavaFiles(), project);
+			compT.start();
+			if (!compT.waitCompilation()) {
+				masFinished();
+				return;
 			}
+
+			masLauncher.start();
+			
+		} catch (Exception ex) {
+			ex.printStackTrace();
 		}
 	}
 	
@@ -470,9 +498,9 @@ public class JasonID extends JPanel implements EBComponent, RunProjectListener {
 		btStop.setEnabled(false);
 		btRun.setEnabled(true);
 		btDebug.setEnabled(true);
-		if (runner != null) {
-			runner.stopMAS();
-			runner = null;
+		if (masLauncher != null) {
+			masLauncher.stopMAS();
+			masLauncher = null;
 		}
 	}
 

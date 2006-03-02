@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.31  2006/03/02 01:42:14  jomifred
+//   the jIDE package was remove, the writeScriptInterface's methods was moved to MASLauncher
+//
 //   Revision 1.30  2006/02/22 21:28:16  jomifred
 //   no message
 //
@@ -76,7 +79,6 @@
 
 package jason.asSemantics;
 
-import jIDE.JasonID;
 import jason.JasonException;
 import jason.architecture.AgArch;
 import jason.asSyntax.BeliefBase;
@@ -86,6 +88,7 @@ import jason.asSyntax.Term;
 import jason.asSyntax.Trigger;
 import jason.asSyntax.parser.ParseException;
 import jason.asSyntax.parser.as2j;
+import jason.jeditplugin.JasonID;
 import jason.runtime.Settings;
 
 import java.io.FileInputStream;

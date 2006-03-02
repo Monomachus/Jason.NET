@@ -3,6 +3,7 @@ package jason.infra.centralised;
 import jason.jeditplugin.Config;
 import jason.jeditplugin.JasonID;
 import jason.jeditplugin.MASLauncher;
+import jason.mas2j.MAS2JProject;
 import jason.runtime.MASConsoleGUI;
 
 import java.io.BufferedInputStream;
@@ -20,7 +21,10 @@ public class MASLauncherInsideJIDE extends MASLauncher {
 	Method getLauncherMethod = null;
 	Method finishMethod = null;
 	
-
+	MASLauncherInsideJIDE(MAS2JProject project) {
+		super(project);
+	}
+	
 	public void stopMAS() {
 		try {
 			if (getLauncherMethod != null && finishMethod != null) {
@@ -70,6 +74,11 @@ public class MASLauncherInsideJIDE extends MASLauncher {
 		}
 	}
 
+	public void writeScripts(boolean debug) {
+	}	
+
+
+	
 	class MASClassLoader extends ClassLoader {
 		
 		String MASDirectory;
@@ -172,6 +181,7 @@ public class MASLauncherInsideJIDE extends MASLauncher {
 				return null;
 			}
 		}
-	}	
+	}
+
 
 }

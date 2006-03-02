@@ -1,6 +1,6 @@
 package jason.infra.saci;
 
-import jason.jeditplugin.RunProject;
+import jason.jeditplugin.MASLauncher;
 import jason.mas2j.MAS2JProject;
 
 import java.io.File;
@@ -53,7 +53,7 @@ class StartSaci extends Thread {
 		//stopSaci();
 		try {
 			//String command = getAsScriptCommand(jasonID.projectDirectory + File.separator + "saci-" + jasonID.getFileName());
-			String command = RunProject.getAsScriptCommand("saci-" + project.getSocName(), true);
+			String command = MASLauncher.getAsScriptCommand("saci-" + project.getSocName(), true);
 			saciProcess = Runtime.getRuntime().exec(command, null,
 					//new File(JasonID.saciHome + File.separator + "bin"));
 					new File(project.getDirectory()));

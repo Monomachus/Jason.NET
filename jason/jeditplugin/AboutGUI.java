@@ -1,7 +1,5 @@
 package jason.jeditplugin;
 
-import jIDE.JasonID;
-
 import java.util.Properties;
 
 import javax.swing.ImageIcon;

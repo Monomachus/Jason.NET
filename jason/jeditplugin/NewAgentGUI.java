@@ -1,6 +1,5 @@
 package jason.jeditplugin;
 
-import jIDE.ASEditorPane;
 import jason.mas2j.AgentParameters;
 import jason.mas2j.MAS2JProject;
 
@@ -156,7 +155,9 @@ public class NewAgentGUI extends JDialog {
 		Buffer nb = org.gjt.sp.jedit.jEdit.openFile(view, agFile);
 		try {
 			nb.writeLock();
-			nb.insert(0, ASEditorPane.getDefaultText(agName.getText().trim() + " in project "+buffer.getName()));
+			String agcode = "// "+agName.getText().trim() + " in project "+buffer.getName()+
+							"\ndemo.\n+demo : true <- .print(\"hello world.\").";
+			nb.insert(0, agcode);
 			nb.save(view, agFile);
 		} finally {
 			nb.writeUnlock();

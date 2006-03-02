@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.11  2006/03/02 01:42:14  jomifred
+//   the jIDE package was remove, the writeScriptInterface's methods was moved to MASLauncher
+//
 //   Revision 1.10  2006/02/18 15:25:16  jomifred
 //   changes in many files to detach jason kernel from any infrastructure implementation
 //
@@ -111,10 +114,6 @@ public class MAS2JProject {
 		return projectFile;
 	}
 	
-	public String getXmlScriptFile() {
-		return projectDir + soc + ".xml";
-	}
-
 	public void setInfrastructure(String a) {
 		infrastructure = a;
 	}
@@ -158,7 +157,7 @@ public class MAS2JProject {
 		return controlHost;
 	}
 
-	public void initAgMaps() {
+	public void initAgMap() {
 		agents = new ArrayList();
 	}
 	public void addAgent(AgentParameters a) {
@@ -185,7 +184,11 @@ public class MAS2JProject {
 		while (iag.hasNext()) {
 			AgentParameters agp = (AgentParameters)iag.next();
 			if (agp.asSource != null) {
-				files.add(new File(projectDir + File.separator + agp.asSource));
+				String dir = projectDir + File.separator;
+				if (agp.asSource.getName().startsWith(File.separator)) {
+					dir = "";
+				}
+				files.add(new File(dir + agp.asSource));
 			}
 		}
 		return files;
@@ -216,41 +219,6 @@ public class MAS2JProject {
 			directories.add(dir);
 		}
 		return directories;
-	}
-
-	public String getFullClassPath() {
-		String clPath = "\"$CLASSPATH\"";
-		String indelim = "\"";
-		String outdelim = "";
-		if (System.getProperty("os.name").indexOf("indows") > 0) {
-			clPath = "%CLASSPATH%";
-			indelim = "";
-			outdelim = "\"";
-		}
-
-		String dDir = projectDir;
-		if (dDir.endsWith(File.separator)) {
-			dDir = dDir.substring(0, dDir.length() - 1);
-		}
-
-		String sLib = "";
-		File lib = new File(dDir + File.separator + "lib");
-		// add all jar files in lib dir
-		if (lib.exists()) {
-			File[] fs = lib.listFiles();
-			for (int i = 0; i < fs.length; i++) {
-				if (fs[i].getName().endsWith(".jar")) {
-					sLib += indelim + fs[i].getAbsolutePath() + indelim
-							+ File.pathSeparator;
-				}
-			}
-		}
-
-		return outdelim + "." + File.pathSeparator + indelim + Config.get().getJasonJar() + indelim
-				//+ saciJar
-				//+ File.pathSeparator + indelim + Config.get().getProperty(Config.LOG4J_JAR) + indelim
-				+ File.pathSeparator + indelim + dDir + indelim
-				+ File.pathSeparator + sLib + clPath + outdelim;
 	}
 
 
@@ -295,8 +263,4 @@ public class MAS2JProject {
 		return infraFac;
 	}
 	
-	/** write the scrits that run the MAS in the chosen infrastructure */
-	public void writeScripts(boolean debug)  throws JasonException {
-		getInfrastructureFactory().createWriteScripts().writeScripts(this, debug);
-	}
 }
