@@ -41,16 +41,15 @@ public class CompileUserJavaSources  extends Thread {
 			if (needsComp()) {
 				writeCompileScript();
 				String command = MASLauncher.getRunScriptCommand("compile-" + project.getSocName());
-				System.out.println("Compiling user class with " + command);
+				System.out.println("Compiling user classes with " + command);
 				Process p = Runtime.getRuntime().exec(command, null, new File(project.getDirectory()));
 				p.waitFor();
 				ok = !needsComp();
 				if (!ok) {
-						BufferedReader in = new BufferedReader(new InputStreamReader(p.getErrorStream()));
-						while (in.ready()) {
-							System.out.println(in.readLine());
-							//jasonID.output.append(in.readLine() + "\n");
-						}
+					BufferedReader err = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+					while (err.ready()) {
+						System.out.println(err.readLine());
+					}
 				}
 			}
 		} catch (Exception e) {
@@ -66,10 +65,8 @@ public class CompileUserJavaSources  extends Thread {
 		while (ifiles.hasNext()) {
 			String file = (String) ifiles.next();
 
-			File javaF = new File(project.getDirectory()
-					+ File.separatorChar + file + ".java");
-			File classF = new File(project.getDirectory()
-					+ File.separatorChar + file + ".class");
+			File javaF = new File(file); //project.getDirectory()+File.separatorChar + file + ".java");
+			File classF = new File(file.substring(0, file.length()-5)+".class");//project.getDirectory() + File.separatorChar + file + ".class");
 			//System.out.println(classF.lastModified()+" > "+javaF.lastModified());
 			if (javaF.exists() && !classF.exists()) {
 				return true;

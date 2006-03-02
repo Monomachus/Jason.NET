@@ -467,10 +467,6 @@ public class JasonID extends JPanel implements EBComponent, RunProjectListener {
 				System.err.println("The Java home directory ("+javaHome+") was not correctly set, the MAS may not run. Go to the Plugins->Options->Jason menu to configure the path.");
 			}
 			
-			masLauncher = project.getInfrastructureFactory().createMASLauncher(project);
-			masLauncher.writeScripts(debug);
-			masLauncher.setListener(this);
-
 			// compile some files
 			CompileUserJavaSources compT = new CompileUserJavaSources(project.getAllUserJavaFiles(), project);
 			compT.start();
@@ -479,6 +475,9 @@ public class JasonID extends JPanel implements EBComponent, RunProjectListener {
 				return;
 			}
 
+			masLauncher = project.getInfrastructureFactory().createMASLauncher(project);
+			masLauncher.writeScripts(debug);
+			masLauncher.setListener(this);
 			masLauncher.start();
 			
 		} catch (Exception ex) {

@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.13  2006/03/02 03:30:36  jomifred
+//   no message
+//
 //   Revision 1.12  2006/03/02 02:52:15  jomifred
 //   some changes in MASLauncher
 //
@@ -197,20 +200,42 @@ public class MAS2JProject {
 		return files;
 	}
 	
+	private Set userJavaFilesCache = null;
 	public Set getAllUserJavaFiles() {
-		Set files = new HashSet();
-		Iterator iag = agents.iterator();
-		while (iag.hasNext()) { 
-			AgentParameters agp = (AgentParameters)iag.next();
-			if (agp.agClass != null) files.add(agp.agClass.replace('.', '/'));
-			if (agp.archClass != null) files.add(agp.archClass.replace('.', '/'));
+		if (userJavaFilesCache == null) {
+			userJavaFilesCache = new HashSet();
+			/*
+			Iterator iag = agents.iterator();
+			while (iag.hasNext()) { 
+				AgentParameters agp = (AgentParameters)iag.next();
+				if (agp.agClass != null) files.add(agp.agClass.replace('.', '/'));
+				if (agp.archClass != null) files.add(agp.archClass.replace('.', '/'));
+			}
+			if (getEnvClass() != null) {
+				files.add(getEnvClass().replace('.', '/'));
+			}
+			*/
+			findJava(new File(getDirectory()), userJavaFilesCache);
 		}
-		if (getEnvClass() != null) {
-			files.add(getEnvClass().replace('.', '/'));
-		}
-		return files;
+		return userJavaFilesCache;
 	}
 
+    void findJava(File p, Set allFiles) {
+    	if (p.isDirectory()) {
+    		File[] files = p.listFiles();
+    		for (int i=0; i<files.length; i++) {
+    			if (files[i].isDirectory()) {
+    				findJava(files[i], allFiles);
+    			} else {
+    				if (files[i].getName().endsWith(".java")) {
+    					allFiles.add(files[i].getAbsolutePath());
+    				}
+    			}
+    		}
+    	}
+    }
+	
+	
 	public Set getAllUserJavaDirectories() {
 		Set directories = new HashSet();
 		Iterator ifiles = getAllUserJavaFiles().iterator();
