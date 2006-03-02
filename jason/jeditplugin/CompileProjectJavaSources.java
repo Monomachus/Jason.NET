@@ -10,13 +10,13 @@ import java.io.PrintWriter;
 import java.util.Iterator;
 import java.util.Set;
 
-public class CompileUserJavaSources  extends Thread {
+public class CompileProjectJavaSources  extends Thread {
 	private boolean ok = true;
 	private boolean finished = false;
 	private Set files;
 	MAS2JProject project;
 
-	CompileUserJavaSources(Set files, MAS2JProject project) {
+	CompileProjectJavaSources(Set files, MAS2JProject project) {
 		super("CompileThread");
 		this.files = files;
 		this.project = project;
@@ -40,7 +40,7 @@ public class CompileUserJavaSources  extends Thread {
 		try {
 			if (needsComp()) {
 				writeCompileScript();
-				String command = MASLauncher.getRunScriptCommand("compile-" + project.getSocName());
+				String command = getRunScriptCommand("compile-" + project.getSocName());
 				System.out.println("Compiling user classes with " + command);
 				Process p = Runtime.getRuntime().exec(command, null, new File(project.getDirectory()));
 				p.waitFor();
@@ -85,7 +85,7 @@ public class CompileUserJavaSources  extends Thread {
 			String javaHome = Config.get().getJavaHome();
 			
 			String dirsToCompile = "";
-			Iterator i = project.getAllUserJavaDirectories().iterator();
+			Iterator i = project.getProjectJavaFilesDirectories().iterator();
 			while (i.hasNext()) {
 				dirsToCompile += " " + i.next() + File.separator + "*.java";
 			}
@@ -117,8 +117,8 @@ public class CompileUserJavaSources  extends Thread {
 					out.println("export PATH=\"" + javaHome + "bin\":$PATH\n");
 				}
 				out.println("echo -n \"        compiling user classes...\"");
-				out.println("# compile files " + project.getAllUserJavaFiles());
-				out.println("# on " + project.getAllUserJavaDirectories());
+				out.println("# compile files " + project.getProjectJavaFiles());
+				out.println("# on " + project.getProjectJavaFilesDirectories());
 				out.println("javac -classpath " + classPath + " " + dirsToCompile + "\n");
 				out.println("chmod u+x *.sh");
 				out.println("echo ok");
@@ -129,5 +129,21 @@ public class CompileUserJavaSources  extends Thread {
 			e.printStackTrace();
 		}
 	}
+
+	public static String getRunScriptCommand(String scriptName) {
+		return getRunScriptCommand(scriptName, false); 
+	}
+	
+	public static String getRunScriptCommand(String scriptName, boolean start) {
+		if (System.getProperty("os.name").indexOf("indows") > 0) {
+			String sStart = " ";
+			if (start) {
+				sStart = " start "; 
+			}
+			return Config.get().getShellCommand() + sStart + scriptName + ".bat";
+		} else {
+			return Config.get().getShellCommand() + " " + scriptName + ".sh";
+		}
+	}	
 
 }

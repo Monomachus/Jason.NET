@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.4  2006/03/02 13:33:40  jomifred
+//   changes in MASLauncher interface
+//
 //   Revision 1.3  2006/02/28 15:17:24  jomifred
 //   improve javadoc
 //
@@ -158,13 +161,13 @@ public class CentralisedAgArch extends Thread implements AgArchInfraTier {
     
     /** Stops the agent */
     public void stopAg() {
+    	fUserAgArh.stopAg();
     	running = false;
     	fUserAgArh.getTS().receiveSyncSignal(); // in case the agent is wainting .....
     	fUserAgArh.getTS().newMessageHasArrived(); // in case the agent is wainting .....
     	synchronized(syncStopRun) {
     		infraEnv.delAgent(fUserAgArh);
     	}
-    	fUserAgArh.stopAg();
     }
 
     public boolean isRunning() {

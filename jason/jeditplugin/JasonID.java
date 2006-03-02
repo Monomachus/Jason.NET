@@ -100,7 +100,7 @@ public class JasonID extends JPanel implements EBComponent, RunProjectListener {
 	
 	DefaultErrorSource errorSource = null;
 
-	MASLauncher masLauncher;
+	MASLauncherInfraTier masLauncher;
 	
 	public JasonID(View view, String position) {
 		super(new BorderLayout());
@@ -468,17 +468,18 @@ public class JasonID extends JPanel implements EBComponent, RunProjectListener {
 			}
 			
 			// compile some files
-			CompileUserJavaSources compT = new CompileUserJavaSources(project.getAllUserJavaFiles(), project);
+			CompileProjectJavaSources compT = new CompileProjectJavaSources(project.getProjectJavaFiles(), project);
 			compT.start();
 			if (!compT.waitCompilation()) {
 				masFinished();
 				return;
 			}
 
-			masLauncher = project.getInfrastructureFactory().createMASLauncher(project);
-			masLauncher.writeScripts(debug);
+			masLauncher = project.getInfrastructureFactory().createMASLauncher();
+			masLauncher.setProject(project);
 			masLauncher.setListener(this);
-			masLauncher.start();
+			masLauncher.writeScripts(debug);
+			new Thread(masLauncher, "MAS-Launcher").start();
 			
 		} catch (Exception ex) {
 			ex.printStackTrace();

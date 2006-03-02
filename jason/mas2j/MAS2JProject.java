@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.14  2006/03/02 13:33:41  jomifred
+//   changes in MASLauncher interface
+//
 //   Revision 1.13  2006/03/02 03:30:36  jomifred
 //   no message
 //
@@ -200,10 +203,10 @@ public class MAS2JProject {
 		return files;
 	}
 	
-	private Set userJavaFilesCache = null;
-	public Set getAllUserJavaFiles() {
-		if (userJavaFilesCache == null) {
-			userJavaFilesCache = new HashSet();
+	private Set javaFilesCache = null;
+	public Set getProjectJavaFiles() {
+		if (javaFilesCache == null) {
+			javaFilesCache = new HashSet();
 			/*
 			Iterator iag = agents.iterator();
 			while (iag.hasNext()) { 
@@ -215,9 +218,9 @@ public class MAS2JProject {
 				files.add(getEnvClass().replace('.', '/'));
 			}
 			*/
-			findJava(new File(getDirectory()), userJavaFilesCache);
+			findJava(new File(getDirectory()), javaFilesCache);
 		}
-		return userJavaFilesCache;
+		return javaFilesCache;
 	}
 
     void findJava(File p, Set allFiles) {
@@ -236,11 +239,11 @@ public class MAS2JProject {
     }
 	
 	
-	public Set getAllUserJavaDirectories() {
+	public Set getProjectJavaFilesDirectories() {
 		Set directories = new HashSet();
-		Iterator ifiles = getAllUserJavaFiles().iterator();
+		Iterator ifiles = getProjectJavaFiles().iterator();
 		while (ifiles.hasNext()) {
-			String dir = new File(ifiles.next() + ".java").getParent();
+			String dir = new File(ifiles.next().toString()).getParent();
 			if (dir == null) { // no parent
 				dir = ".";
 			}

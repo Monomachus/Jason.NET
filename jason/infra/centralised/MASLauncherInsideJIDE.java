@@ -2,7 +2,8 @@ package jason.infra.centralised;
 
 import jason.jeditplugin.Config;
 import jason.jeditplugin.JasonID;
-import jason.jeditplugin.MASLauncher;
+import jason.jeditplugin.MASLauncherInfraTier;
+import jason.jeditplugin.RunProjectListener;
 import jason.mas2j.MAS2JProject;
 import jason.runtime.MASConsoleGUI;
 
@@ -17,26 +18,24 @@ import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-public class MASLauncherInsideJIDE extends MASLauncher {
+public class MASLauncherInsideJIDE implements MASLauncherInfraTier {
+
+	protected MAS2JProject project;
+	protected RunProjectListener listener;
+
+	protected boolean stop = false;
+
 	Method getLauncherMethod = null;
 	Method finishMethod = null;
 	
-	MASLauncherInsideJIDE(MAS2JProject project) {
-		super(project);
+	public void setProject(MAS2JProject project) {
+		this.project = project;
 	}
 	
-	public void stopMAS() {
-		try {
-			if (getLauncherMethod != null && finishMethod != null) {
-				finishMethod.invoke(getLauncherMethod.invoke(null,null),null);
-			}
-		} catch (Exception e) {
-			System.err.println("Execution error: " + e);
-			e.printStackTrace();
-		}
-
-		super.stopMAS();
+	public void setListener(RunProjectListener listener) {
+		this.listener = listener;		
 	}
+	
 
 	public void run() {
 		try {
@@ -57,7 +56,7 @@ public class MASLauncherInsideJIDE extends MASLauncher {
 
 			stop = false;
 			while (!stop) {
-				sleep(250); // to not consume cpu
+				Thread.sleep(250); // to not consume cpu
 				if (getLauncherMethod.invoke(null, null) == null) {
 					stop = true;
 				}
@@ -74,15 +73,21 @@ public class MASLauncherInsideJIDE extends MASLauncher {
 		}
 	}
 
+	public void stopMAS() {
+		try {
+			if (getLauncherMethod != null && finishMethod != null) {
+				finishMethod.invoke(getLauncherMethod.invoke(null,null),null);
+			}
+		} catch (Exception e) {
+			System.err.println("Execution error: " + e);
+			e.printStackTrace();
+		}
+	}
+
 	public void writeScripts(boolean debug) {
 		// not used.
 	}	
 
-	public String getStartCommand() {
-		return ""; // not used in this case
-	}
-
-	
 	class MASClassLoader extends ClassLoader {
 		
 		String MASDirectory;
@@ -186,6 +191,4 @@ public class MASLauncherInsideJIDE extends MASLauncher {
 			}
 		}
 	}
-
-
 }

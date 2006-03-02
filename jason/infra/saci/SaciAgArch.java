@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.4  2006/03/02 13:33:41  jomifred
+//   changes in MASLauncher interface
+//
 //   Revision 1.3  2006/02/28 15:17:24  jomifred
 //   improve javadoc
 //
@@ -249,6 +252,8 @@ public class SaciAgArch extends saci.Agent implements AgArchInfraTier {
     }
     
     public void stopAg() {
+    	userAgArh.stopAg();
+    	
         super.stopAg();
         mboxPercept.disconnect();
         if (MASConsoleGUI.hasConsole()) { // the logger created the MASConsole

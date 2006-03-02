@@ -1,36 +1,94 @@
 package jason.infra.centralised;
 
+import jason.jeditplugin.CompileProjectJavaSources;
 import jason.jeditplugin.Config;
-import jason.jeditplugin.MASLauncher;
+import jason.jeditplugin.MASLauncherInfraTier;
+import jason.jeditplugin.RunProjectListener;
 import jason.mas2j.MAS2JProject;
 
+import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileWriter;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 
-public class CentralisedMASLauncher extends MASLauncher {
+public class CentralisedMASLauncher implements MASLauncherInfraTier {
 
-	private boolean debug = false;
+	protected MAS2JProject project;
+	protected RunProjectListener listener;
+
+	protected boolean stop = false;
+
+	protected Process masProcess = null;
+	protected OutputStream processOut;
 	
-	public CentralisedMASLauncher(MAS2JProject project) {
-		super(project);
+	public void setProject(MAS2JProject project) {
+		this.project = project;
 	}
 	
+	public void setListener(RunProjectListener listener) {
+		this.listener = listener;		
+	}
+
+	public void run() {
+		try {
+			String command = getStartCommand();
+			System.out.println("Executing MAS with " + command);
+			masProcess = Runtime.getRuntime().exec(command, null,	new File(project.getDirectory()));
+
+			BufferedReader in = new BufferedReader(new InputStreamReader(masProcess.getInputStream()));
+			BufferedReader err = new BufferedReader(new InputStreamReader(	masProcess.getErrorStream()));
+			processOut = masProcess.getOutputStream();
+
+			Thread.sleep(300);
+			stop = false;
+			while (!stop) {// || saciProcess!=null) {
+				while (!stop && in.ready()) {
+					System.out.println(in.readLine());
+				}
+				while (!stop && err.ready()) {
+					System.out.println(err.readLine());
+				}
+				Thread.sleep(250); // to not consume cpu
+				
+				try {
+					masProcess.exitValue();
+					// no exception when the process has finished
+					stop = true;
+				} catch (Exception e) {}
+			}
+			
+		} catch (Exception e) {
+			System.err.println("Execution error: " + e);
+			e.printStackTrace();
+		} finally {
+			if (listener != null) {
+				listener.masFinished();
+			}
+		}
+	}
+
 	public void stopMAS() {
 		try {
 			if (processOut != null) {
 				processOut.write(1);//"quit"+System.getProperty("line.separator"));
 			}
+
+			if (masProcess != null) {
+				masProcess.destroy();
+			}
 		} catch (Exception e) {
 			System.err.println("Execution error: " + e);
 			e.printStackTrace();
+		} finally {
+			stop = true;			
 		}
-
-		super.stopMAS();
 	}
 
 	/** return the operating system command that runs the MAS */
 	public String getStartCommand() {
-		return getRunScriptCommand(project.getSocName());
+		return CompileProjectJavaSources.getRunScriptCommand(project.getSocName());
 		/* the code below does not work! I didn't find a reason
 		String sDebug = "";
 		if (debug) {
@@ -49,7 +107,6 @@ public class CentralisedMASLauncher extends MASLauncher {
 
 	/** write the scripts necessary to run the project */	
 	public void writeScripts(boolean debug) {
-		this.debug = debug;
 		try {
 			String classPath = project.getProjectClassPath();
 			String javaHome = Config.get().getJavaHome();

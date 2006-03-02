@@ -2,14 +2,19 @@ package jason.infra.saci;
 
 import jason.architecture.AgArch;
 import jason.control.ExecutionControlGUI;
+import jason.jeditplugin.CompileProjectJavaSources;
 import jason.jeditplugin.Config;
-import jason.jeditplugin.MASLauncher;
+import jason.jeditplugin.MASLauncherInfraTier;
+import jason.jeditplugin.RunProjectListener;
 import jason.mas2j.AgentParameters;
 import jason.mas2j.MAS2JProject;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.util.Iterator;
@@ -18,7 +23,17 @@ import java.util.logging.Logger;
 
 import saci.launcher.Launcher;
 
-public class SaciMASLauncher extends MASLauncher {
+public class SaciMASLauncher extends Thread implements MASLauncherInfraTier {
+
+	protected MAS2JProject project;
+	protected RunProjectListener listener;
+
+	protected boolean stop = false;
+
+	protected Process masProcess = null;
+	protected OutputStream processOut;
+	
+	
 	StartSaci saciThread;
 	Launcher l;
 
@@ -26,14 +41,59 @@ public class SaciMASLauncher extends MASLauncher {
 	
 	private static Logger logger = Logger.getLogger(SaciMASLauncher.class.getName());
 
+	public void setProject(MAS2JProject project) {
+		this.project = project;
+	}
 	
-	public SaciMASLauncher(MAS2JProject project) {
-		super(project);
-		stopOnProcessExit = false;
+	public void setListener(RunProjectListener listener) {
+		this.listener = listener;		
+	}
+
+
+	public void run() {
+		saciThread = new StartSaci(project);
+		l = saciThread.getLauncher();
+		if (l == null) { // no saci running, start one
+			saciThread.start();
+			if (!saciThread.waitSaciOk()) {
+				return;
+			}
+			iHaveStartedSaci = true;
+		}
+		l = saciThread.getLauncher();
+
+		try {
+			String command = getStartCommand();
+			System.out.println("Executing MAS with " + command);
+			masProcess = Runtime.getRuntime().exec(command, null,	new File(project.getDirectory()));
+
+			BufferedReader in = new BufferedReader(new InputStreamReader(masProcess.getInputStream()));
+			BufferedReader err = new BufferedReader(new InputStreamReader(	masProcess.getErrorStream()));
+			processOut = masProcess.getOutputStream();
+
+			sleep(500);
+			stop = false;
+			while (!stop) {// || saciProcess!=null) {
+				while (!stop && in.ready()) {
+					System.out.println(in.readLine());
+				}
+				while (!stop && err.ready()) {
+					System.out.println(err.readLine());
+				}
+				sleep(250); // to not consume cpu
+			}
+			
+		} catch (Exception e) {
+			System.err.println("Execution error: " + e);
+			e.printStackTrace();
+		} finally {
+			if (listener != null) {
+				listener.masFinished();
+			}
+		}
 	}
 
 	public void stopMAS() {
-		super.stopMAS();
 		new Thread() {
 			public void run() {
 				try {
@@ -48,24 +108,9 @@ public class SaciMASLauncher extends MASLauncher {
 		}.start();
 	}
 
-	public void run() {
-		saciThread = new StartSaci(project);
-		l = saciThread.getLauncher();
-		if (l == null) { // no saci running, start one
-			saciThread.start();
-			if (!saciThread.waitSaciOk()) {
-				return;
-			}
-			iHaveStartedSaci = true;
-		}
-		l = saciThread.getLauncher();
-
-		super.run();
-	}
-
 	/** return the operating system command that runs the MAS */
 	public String getStartCommand() {
-		return getRunScriptCommand(project.getSocName());
+		return CompileProjectJavaSources.getRunScriptCommand(project.getSocName());
 	}
 
 

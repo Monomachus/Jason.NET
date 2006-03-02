@@ -41,7 +41,9 @@ public class mas2j implements mas2jConstants {
         project.setDirectory(new File(".").getAbsolutePath());
         project.setProjectFile(new File(name));
                 System.out.println("mas2j: "+name+" parsed successfully!\n");
-                project.getInfrastructureFactory().createMASLauncher(project).writeScripts(false);
+                MASLauncherInfraTier launcher = project.getInfrastructureFactory().createMASLauncher();
+                launcher.setProject(project);
+                launcher.writeScripts(false);
 
         int step = 1;
         System.out.println("To run your MAS:");

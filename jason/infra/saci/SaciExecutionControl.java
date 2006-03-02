@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.3  2006/03/02 13:33:41  jomifred
+//   changes in MASLauncher interface
+//
 //   Revision 1.2  2006/02/27 18:46:26  jomifred
 //   creation of the RuntimeServices interface
 //
@@ -44,15 +47,8 @@ import jason.control.ExecutionControl;
 import jason.control.ExecutionControlInfraTier;
 import jason.runtime.RuntimeServicesInfraTier;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 import org.w3c.dom.Document;
 
-import saci.MBoxSAg;
 import saci.Message;
 import saci.MessageHandler;
 
@@ -98,8 +94,8 @@ public class SaciExecutionControl extends saci.Agent implements ExecutionControl
     }
     
     public void stopAg() {
-		super.stopAg();
 		fUserControl.stop();
+		super.stopAg();
 	}
 
 	public void run() {

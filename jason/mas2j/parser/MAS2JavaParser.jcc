@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.9  2006/03/02 13:33:41  jomifred
+//   changes in MASLauncher interface
+//
 //   Revision 1.8  2006/03/02 01:42:14  jomifred
 //   the jIDE package was remove, the writeScriptInterface's methods was moved to MASLauncher
 //
@@ -104,7 +107,9 @@ public class mas2j {
         project.setDirectory(new File(".").getAbsolutePath());
         project.setProjectFile(new File(name));
 		System.out.println("mas2j: "+name+" parsed successfully!\n");
-		project.getInfrastructureFactory().createMASLauncher(project).writeScripts(false);
+		MASLauncherInfraTier launcher = project.getInfrastructureFactory().createMASLauncher();
+		launcher.setProject(project);
+		launcher.writeScripts(false);
 
         int step = 1;
         System.out.println("To run your MAS:");

@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.3  2006/03/02 13:33:40  jomifred
+//   changes in MASLauncher interface
+//
 //   Revision 1.2  2006/03/01 17:25:44  jomifred
 //   fix bug in using masconsole
 //
@@ -116,6 +119,7 @@ public class RunCentralisedMAS {
         
         runner = new RunCentralisedMAS();
 
+        int errorCode = 0;
         
     	MAS2JProject project = null;
 		try {
@@ -156,23 +160,25 @@ public class RunCentralisedMAS {
 	        }
 	    
 	        runner.waitEnd();
-
+	        errorCode = 0;
+	        
 		} catch (FileNotFoundException e1) {
 			logger.log(Level.SEVERE, "File "+args[0]+" not found!");
-	        if (!MASConsoleGUI.hasConsole()) {
-	        	System.exit(2);
-	        }
+			errorCode = 2;
 		} catch (ParseException e) {
 			logger.log(Level.SEVERE, "Error parsing file "+args[0]+"!",e);
-	        if (!MASConsoleGUI.hasConsole()) {
-	        	System.exit(3);
-	        }
+			errorCode = 3;
 		} catch (Exception e) {
 			logger.log(Level.SEVERE,"Error!?: ",e);
-	        if (!MASConsoleGUI.hasConsole()) {
-	        	System.exit(4);
-	        }
+			errorCode = 4;
 		}
+        System.out.close();
+        System.err.close();
+
+        if (!MASConsoleGUI.hasConsole() && errorCode != 0) {
+        	System.exit(errorCode);
+        }
+
     }
     
     
