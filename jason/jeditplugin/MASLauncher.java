@@ -37,10 +37,9 @@ public abstract class MASLauncher extends Thread {
 
 	public void run() {
 		try {
-			String command = getAsScriptCommand(project.getSocName());
+			String command = getStartCommand();
 			System.out.println("Executing MAS with " + command);
-			masProcess = Runtime.getRuntime().exec(command, null,
-					new File(project.getDirectory()));
+			masProcess = Runtime.getRuntime().exec(command, null,	new File(project.getDirectory()));
 
 			BufferedReader in = new BufferedReader(new InputStreamReader(masProcess.getInputStream()));
 			BufferedReader err = new BufferedReader(new InputStreamReader(	masProcess.getErrorStream()));
@@ -78,44 +77,14 @@ public abstract class MASLauncher extends Thread {
 
 	public abstract void writeScripts(boolean debug);
 
-	public String getProjectClassPath() {
-		String clPath = "\"$CLASSPATH\"";
-		String indelim = "\"";
-		String outdelim = "";
-		if (System.getProperty("os.name").indexOf("indows") > 0) {
-			clPath = "%CLASSPATH%";
-			indelim = "";
-			outdelim = "\"";
-		}
-
-		String dDir = project.getDirectory();
-		if (dDir.endsWith(File.separator)) {
-			dDir = dDir.substring(0, dDir.length() - 1);
-		}
-
-		String sLib = "";
-		File lib = new File(dDir + File.separator + "lib");
-		// add all jar files in lib dir
-		if (lib.exists()) {
-			File[] fs = lib.listFiles();
-			for (int i = 0; i < fs.length; i++) {
-				if (fs[i].getName().endsWith(".jar")) {
-					sLib += indelim + fs[i].getAbsolutePath() + indelim + File.pathSeparator;
-				}
-			}
-		}
-
-		return outdelim + "." + File.pathSeparator + indelim + Config.get().getJasonJar() + indelim
-				+ File.pathSeparator + indelim + dDir + indelim
-				+ File.pathSeparator + sLib + clPath + outdelim;
-	}
-
+	/** return the operating system command that runs the MAS */
+	public abstract String getStartCommand();
 	
-	public static String getAsScriptCommand(String scriptName) {
-		return getAsScriptCommand(scriptName, false); 
+	public static String getRunScriptCommand(String scriptName) {
+		return getRunScriptCommand(scriptName, false); 
 	}
 	
-	public static String getAsScriptCommand(String scriptName, boolean start) {
+	public static String getRunScriptCommand(String scriptName, boolean start) {
 		if (System.getProperty("os.name").indexOf("indows") > 0) {
 			String sStart = " ";
 			if (start) {

@@ -75,8 +75,12 @@ public class MASLauncherInsideJIDE extends MASLauncher {
 	}
 
 	public void writeScripts(boolean debug) {
+		// not used.
 	}	
 
+	public String getStartCommand() {
+		return ""; // not used in this case
+	}
 
 	
 	class MASClassLoader extends ClassLoader {

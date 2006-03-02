@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.12  2006/03/02 02:52:15  jomifred
+//   some changes in MASLauncher
+//
 //   Revision 1.11  2006/03/02 01:42:14  jomifred
 //   the jIDE package was remove, the writeScriptInterface's methods was moved to MASLauncher
 //
@@ -221,6 +224,37 @@ public class MAS2JProject {
 		return directories;
 	}
 
+	public String getProjectClassPath() {
+		String clPath = "\"$CLASSPATH\"";
+		String indelim = "\"";
+		String outdelim = "";
+		if (System.getProperty("os.name").indexOf("indows") > 0) {
+			clPath = "%CLASSPATH%";
+			indelim = "";
+			outdelim = "\"";
+		}
+
+		String dDir = getDirectory();
+		if (dDir.endsWith(File.separator)) {
+			dDir = dDir.substring(0, dDir.length() - 1);
+		}
+
+		String sLib = "";
+		File lib = new File(dDir + File.separator + "lib");
+		// add all jar files in lib dir
+		if (lib.exists()) {
+			File[] fs = lib.listFiles();
+			for (int i = 0; i < fs.length; i++) {
+				if (fs[i].getName().endsWith(".jar")) {
+					sLib += indelim + fs[i].getAbsolutePath() + indelim + File.pathSeparator;
+				}
+			}
+		}
+
+		return outdelim + "." + File.pathSeparator + indelim + Config.get().getJasonJar() + indelim
+				+ File.pathSeparator + indelim + dDir + indelim
+				+ File.pathSeparator + sLib + clPath + outdelim;
+	}
 
 	public String toString() {
 		StringBuffer s = new StringBuffer("MAS " + getSocName() + " {\n");
