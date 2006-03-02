@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.32  2006/03/02 02:51:24  jomifred
+//   the jIDE package was remove, the writeScriptInterface's methods was moved to MASLauncher
+//
 //   Revision 1.31  2006/03/02 01:42:14  jomifred
 //   the jIDE package was remove, the writeScriptInterface's methods was moved to MASLauncher
 //
@@ -88,7 +91,6 @@ import jason.asSyntax.Term;
 import jason.asSyntax.Trigger;
 import jason.asSyntax.parser.ParseException;
 import jason.asSyntax.parser.as2j;
-import jason.jeditplugin.JasonID;
 import jason.runtime.Settings;
 
 import java.io.FileInputStream;
@@ -133,7 +135,7 @@ public class Agent {
 
 			parseAS(asSrc);
 			// kqml Plans at the end of the ag PS
-			parseAS(JasonID.class.getResource("/asl/kqmlPlans.asl"));
+			parseAS(JasonException.class.getResource("/asl/kqmlPlans.asl"));
 			
 			return fTS;
 		} catch (Exception e) {
