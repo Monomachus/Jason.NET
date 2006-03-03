@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.6  2006/03/03 23:12:38  jomifred
+//   no message
+//
 //   Revision 1.5  2006/03/02 01:41:14  jomifred
 //   the jIDE package was remove, the writeScriptInterface's methods was moved to MASLauncher
 //
@@ -213,7 +216,7 @@ public class Config extends Properties {
     public String getJasonRunningVersion() {
         try {
             Properties p = new Properties();
-            p.load(JasonID.class.getResource("/dist.properties").openStream());
+            p.load(Config.class.getResource("/dist.properties").openStream());
             return p.getProperty("version") + "." + p.getProperty("release");
         } catch (Exception ex) { 
         	return "?";
