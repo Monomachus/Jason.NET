@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.8  2006/03/06 17:21:16  jomifred
+//   "to"argument may be a list of names
+//
 //   Revision 1.7  2006/02/17 13:13:16  jomifred
 //   change a lot of method/classes names and improve some comments
 //
@@ -43,13 +46,16 @@ import jason.asSemantics.InternalAction;
 import jason.asSemantics.Message;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
+import jason.asSyntax.ListTerm;
 import jason.asSyntax.Pred;
 import jason.asSyntax.Term;
+
+import java.util.Iterator;
 
 public class send implements InternalAction {
     
 	/**
-	 * arg[0] is receiver 
+	 * arg[0] is receiver (an agent name or a list of names)
 	 * arg[1] is illocucionary force
 	 * arg[2] is content
 	 *  
@@ -73,10 +79,9 @@ public class send implements InternalAction {
             //if (to == null) {
             //    throw new JasonException("The TO parameter of the internal action 'send' is not a term!");            	
             //}
-            if (to.isVar()) {
-            	un.apply(to);
-            }
-            if (! to.isGround()) {
+	        un.apply(to);
+
+	        if (! to.isGround()) {
                 throw new JasonException("The TO parameter ('"+to+"') of the internal action 'send' is not a ground term!");            	
             }
 
@@ -84,9 +89,7 @@ public class send implements InternalAction {
             //if (ilf == null) {
             //    throw new JasonException("The Ilf Force parameter of the internal action 'send' is not a term!");            	
             //}
-            if (ilf.isVar()) {
-            	un.apply(ilf);
-            }
+	        un.apply(ilf);
             if (! ilf.isGround()) {
                 throw new JasonException("The Ilf Force parameter ('"+ilf+"') of the internal action 'send' is not a ground term!");            	            	
             }
@@ -121,7 +124,7 @@ public class send implements InternalAction {
         }
         */
         
-        Message m = new Message(ilf.toString(), null, to.toString(), pcnt.toString());
+        Message m = new Message(ilf.toString(), null, null, pcnt.toString());
 
         // ask must have a fourth argument
         if (m.isAsk()) {
@@ -156,7 +159,17 @@ public class send implements InternalAction {
         }
         
         try {
-            ts.getUserAgArch().sendMsg(m);
+        	if (to.isList()) {
+        		Iterator i = ((ListTerm)to).iterator();
+        		while (i.hasNext()) {
+        			Term t = (Term)i.next();
+            		m.setReceiver(t.toString());
+            		ts.getUserAgArch().sendMsg(m);        			
+        		}
+        	} else {
+        		m.setReceiver(to.toString());
+        		ts.getUserAgArch().sendMsg(m);
+        	}
             return true;
         } catch (Exception e) {
             throw new JasonException("Error sending message " + m + "\nError="+e);
