@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.36  2006/03/07 10:53:12  bordini
+//   added IF in transition system: bug with removing a formula from an empty body.
+//
 //   Revision 1.35  2006/02/28 15:11:29  jomifred
 //   improve javadoc
 //
@@ -654,9 +657,14 @@ public class TransitionSystem {
 						confP.C.SI.pop();
 					}
 					im = conf.C.SI.peek();
-					BodyLiteral g = (BodyLiteral) im.getPlan().getBody().remove(0);
-					// use unifier of finished plan accordingly
-					im.unif.compose(g.getLiteral(), oldim.unif);
+					// TODO: Not sure when body could be 0!!!
+					//       Check why this can happen; perhaps test goal is removed
+					//       from body when event is created, unlike achievement goal?
+					if (im.getPlan().getBody().size()>0) {
+						BodyLiteral g = (BodyLiteral) im.getPlan().getBody().remove(0);
+						// use unifier of finished plan accordingly
+						im.unif.compose(g.getLiteral(), oldim.unif);
+					}
 					confP.step = SClrInt; // the new top may have become
 					                      // empty! need to keep checking.
 					
