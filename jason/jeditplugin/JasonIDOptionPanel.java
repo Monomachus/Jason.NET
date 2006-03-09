@@ -23,6 +23,9 @@
 //   $Date$
 //   $Revision$
 //   $Log$
+//   Revision 1.10  2006/03/09 23:56:15  jomifred
+//   show message when jdk is not chosen correctly
+//
 //   Revision 1.9  2006/02/17 11:45:52  jomifred
 //   no message
 //
@@ -54,6 +57,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
@@ -123,6 +127,8 @@ public class JasonIDOptionPanel extends AbstractOptionPane  {
 	                	String jasonJar = (new File(chooser.getSelectedFile().getPath())).getCanonicalPath();
 	                	if (userProperties.checkJar(jasonJar)) {
 							jasonTF.setText(jasonJar);
+	                	} else {
+	                		JOptionPane.showMessageDialog(null, "The selected jason.jar file was not ok!");
 	                	}
 	                }
 	            } catch (Exception e) {}
@@ -152,6 +158,8 @@ public class JasonIDOptionPanel extends AbstractOptionPane  {
 	                	String saciJar = (new File(chooser.getSelectedFile().getPath())).getCanonicalPath();
 	                	if (userProperties.checkJar(saciJar)) {
 	                		saciTF.setText(saciJar);
+	                	} else {
+	                		JOptionPane.showMessageDialog(null, "The selected saci.jar file was not ok!");
 	                	}
 	                }
 	            } catch (Exception e) {}
@@ -179,6 +187,8 @@ public class JasonIDOptionPanel extends AbstractOptionPane  {
 	                	String javaHome = (new File(chooser.getSelectedFile().getPath())).getCanonicalPath();
 	                	if (userProperties.checkJavaHomePath(javaHome)) {
 	                		javaTF.setText(javaHome);
+	                	} else {
+	                		JOptionPane.showMessageDialog(null, "The selected JDK home directory has not the file bin/javac inside!");
 	                	}
 	                }
 	            } catch (Exception e) {}
