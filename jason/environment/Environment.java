@@ -75,14 +75,14 @@ import java.util.Set;
  */
 public class Environment { 
 
-	private List percepts = Collections.synchronizedList(new ArrayList());
-	private Map  agPercepts = Collections.synchronizedMap(new HashMap());
+	private List<Literal> percepts = Collections.synchronizedList(new ArrayList<Literal>());
+	private Map<String,List<Literal>>  agPercepts = Collections.synchronizedMap(new HashMap<String,List<Literal>>());
 	
         /** the infrastructure tier for environment (Centralised, Saci, ...) */
 	private EnvironmentInfraTier environmentInfraTier = null;
 
 	// set of agents that already received the last version of perception
-	private Set uptodateAgs = Collections.synchronizedSet(new HashSet());
+	private Set<String> uptodateAgs = Collections.synchronizedSet(new HashSet<String>());
 	
 	
 	/** Called before the start of MAS execution, the user environment could override it */
@@ -122,7 +122,7 @@ public class Environment {
 	 * Returns perceptions for an agent.
 	 * A full copy of both common and agent perceptions lists is returned.
 	 */
-    public List getPercepts(String agName) {
+    public List<Literal> getPercepts(String agName) {
 		
 		// check whether this agent needs the current version of perception
 		if (uptodateAgs.contains(agName)) {
@@ -132,11 +132,11 @@ public class Environment {
 		uptodateAgs.add(agName);
 		
 		int size = percepts.size();
-		List agl = (List)agPercepts.get(agName);
+		List<Literal> agl = agPercepts.get(agName);
 		if (agl != null) {
 			size += agl.size();
 		}
-		List p = new ArrayList(size);
+		List<Literal> p = new ArrayList<Literal>(size);
 		
         synchronized (percepts) {
             // make a local copy of the environment percepts
@@ -189,9 +189,9 @@ public class Environment {
 	/** Add a perception for a specific agent */
 	public void addPercept(String agName, Literal per) {
 		if (per != null && agName != null) {
-			List agl = (List)agPercepts.get(agName);
+			List<Literal> agl = agPercepts.get(agName);
 			if (agl == null) {
-				agl = Collections.synchronizedList(new ArrayList());
+				agl = Collections.synchronizedList(new ArrayList<Literal>());
 				uptodateAgs.remove(agName);
 				agl.add(per);
 				agPercepts.put( agName, agl);
@@ -207,7 +207,7 @@ public class Environment {
 	/** Remove a perception for one agent */
 	public boolean removePercept(String agName, Literal per) {
 		if (per != null && agName != null) {
-			List agl = (List)agPercepts.get(agName);
+			List<Literal> agl = agPercepts.get(agName);
 			if (agl != null) {
 				uptodateAgs.remove(agName);
 				return agl.remove(per);
@@ -218,7 +218,7 @@ public class Environment {
 
 	public boolean containsPercept(String agName, Literal per) {
 		if (per != null && agName != null) {
-			List agl = (List)agPercepts.get(agName);
+			List<Literal> agl = agPercepts.get(agName);
 			if (agl != null) {
 				return agl.contains(per);
 			}
@@ -229,7 +229,7 @@ public class Environment {
 	/** Clear list of percepts of a specific agent */
 	public void clearPercepts(String agName) {
 		if (agName != null) {
-			List agl = (List)agPercepts.get(agName);
+			List<Literal> agl = agPercepts.get(agName);
 			if (agl != null) {
 				uptodateAgs.remove(agName);
 				agl.clear();
