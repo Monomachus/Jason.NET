@@ -64,7 +64,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
-/** MAS Runtime Settings for an Agent (from mas2j file) */
+/** MAS Runtime Settings for an Agent (from mas2j file, agent declaration) */
 public class Settings {
 	
     public static final byte      ODiscard        = 1;
