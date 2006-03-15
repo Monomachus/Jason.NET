@@ -281,7 +281,10 @@ public class ListTermImpl extends Term implements ListTerm {
 	 * @return the last ListTerm of the new list
 	 */
 	public ListTerm concat(ListTerm lt) {
-		if ( ((ListTerm)next).isEmpty() ) {
+		if (isEmpty()) {
+			term = lt.getTerm();
+			next = (Term)lt.getNext();
+		} else if (((ListTerm)next).isEmpty() ) {
 			next = (Term)lt;
 		} else {
 			((ListTerm)next).concat(lt);
