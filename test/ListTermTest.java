@@ -128,4 +128,48 @@ public class ListTermTest extends TestCase {
 		assertFalse(l1.equals(ListTermImpl.parseList("[a,b,d]")));
 	}
 
+	public void testConcat() {
+		
+		ListTerm la = ListTermImpl.parseList("[a]");
+		ListTerm le = ListTermImpl.parseList("[]");
+		le.concat(la);
+		assertEquals(le.toString(), "[a]");
+
+		le = ListTermImpl.parseList("[]");
+		la.concat(le);
+		assertEquals(la.toString(), "[a]");
+		
+		Unifier u = new Unifier();
+
+		// L1 = [x,y]
+		VarTerm l1 = new VarTerm("L1");
+		u.unifies(l1, (Term)ListTermImpl.parseList("[x,y]"));
+		
+		// L2 = [a|L1]
+		VarTerm l2 = new VarTerm("L2");
+		u.unifies(l2, (Term)ListTermImpl.parseList("[a|L1]"));
+		
+		// L3 = [b|L2]
+		VarTerm l3 = new VarTerm("L3");
+		u.unifies(l3, (Term)ListTermImpl.parseList("[b|L2]"));
+
+		// L4 = L3
+		VarTerm l4 = new VarTerm("L4");
+		u.unifies(l4, l3);
+
+		// L5 = [b|L2]
+		VarTerm l5 = new VarTerm("L5");
+		u.unifies(l5, (Term)ListTermImpl.parseList("[c|L4]"));
+
+		// L6 = L5 concat [d]
+		VarTerm l6 = new VarTerm("L6");
+		u.unifies(l5, l6);
+		u.apply(l6);
+		l6.concat(ListTermImpl.parseList("[d]"));
+
+		ListTerm lf = ListTermImpl.parseList("[c,b,a,x,y,d]");
+		//l1.concat(l1);
+		//System.out.println(l1);
+		assertTrue(u.unifies((Term)l5,(Term)lf));
+	}
 }

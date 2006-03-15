@@ -1,5 +1,6 @@
 package test;
 
+import jason.asSemantics.Unifier;
 import jason.asSyntax.BeliefBase;
 import jason.asSyntax.Literal;
 import jason.asSyntax.Pred;
@@ -16,7 +17,6 @@ public class BeliefBaseTest extends TestCase {
     	//Logger.getRootLogger().setLevel(Level.INFO);
 	}
 
-	
 	public void testAdd() {
 		Literal l1, l2, l3, l4, l5;
 		BeliefBase bb = new BeliefBase();
@@ -133,5 +133,17 @@ public class BeliefBaseTest extends TestCase {
 		//System.out.println("BB="+bb);
 		assertEquals(bb.size(), 0);
 	}
-
+	
+	public void testRemWithList() {
+		BeliefBase bb = new BeliefBase();
+		System.out.println();
+		bb.add(Literal.parseLiteral("seen([a,b])"));
+		VarTerm b1 = new VarTerm("B1");
+		Unifier u = new Unifier();
+		
+		u.unifies(b1, Literal.parseLiteral("seen([a,b])"));
+		u.apply(b1);
+		assertTrue(b1.equalsAsTerm(Literal.parseLiteral("seen([a,b])")));
+		assertTrue(bb.remove(b1));
+	}
 }
