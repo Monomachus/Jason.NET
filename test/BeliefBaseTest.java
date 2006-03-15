@@ -2,6 +2,7 @@ package test;
 
 import jason.asSemantics.Unifier;
 import jason.asSyntax.BeliefBase;
+import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Literal;
 import jason.asSyntax.Pred;
 import jason.asSyntax.Term;
@@ -135,15 +136,21 @@ public class BeliefBaseTest extends TestCase {
 	}
 	
 	public void testRemWithList() {
-		BeliefBase bb = new BeliefBase();
-		System.out.println();
-		bb.add(Literal.parseLiteral("seen([a,b])"));
-		VarTerm b1 = new VarTerm("B1");
 		Unifier u = new Unifier();
-		
+		BeliefBase bb = new BeliefBase();
+		Literal s = Literal.parseLiteral("seen(L)");
+		assertTrue(u.unifies(new VarTerm("L"), (Term)ListTermImpl.parseList("[a,b]")));
+		//System.out.println("u="+u);
+		u.apply(s);
+		bb.add(s);
+
+		VarTerm b1 = new VarTerm("B1");
 		u.unifies(b1, Literal.parseLiteral("seen([a,b])"));
 		u.apply(b1);
+		//System.out.println("b1="+b1);
+		//System.out.println("test 1");
 		assertTrue(b1.equalsAsTerm(Literal.parseLiteral("seen([a,b])")));
+		assertTrue(b1.equalsAsTerm(s));
 		assertTrue(bb.remove(b1));
 	}
 }
