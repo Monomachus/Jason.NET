@@ -229,7 +229,9 @@ public class BeliefBase {
 				return false;
 			}
 		} else {
-			logger.fine("Does not contains "+l+" in "+getAllBeliefs());
+			if (logger.isLoggable(Level.FINE)) {
+				logger.fine("Does not contains "+l+" in "+getAllBeliefs());
+			}
 			return false;
 		}
 	}
