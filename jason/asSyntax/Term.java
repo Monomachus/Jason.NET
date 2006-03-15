@@ -245,27 +245,32 @@ public class Term implements TermInterface, Comparable, Serializable {
 		// it is a var, uses var's equals
 		try {
 			VarTerm vt = (VarTerm)t;
-			//System.out.println(this.funcSymb+" equals1 "+vt.funcSymb);
+			//System.out.println(this.functor+" equals1 "+vt.getFunctor());
 			return vt.equals(this);
 		} catch (Exception e) {}
 
 		try {
 			Term tAsTerm = (Term)t;
-			//System.out.println(this.funcSymb+" equals2 "+tAsTerm.funcSymb);
-			if (functor == null && tAsTerm.functor != null) {
+			//System.out.println(this+" equals2 "+tAsTerm);
+			if (getFunctor() == null && tAsTerm.getFunctor() != null) {
 				return false;
 			}
-			if (functor != null && !functor.equals(tAsTerm.functor))
+			if (getFunctor() != null && !getFunctor().equals(tAsTerm.getFunctor())) {
 				return false;
-			if (terms == null && tAsTerm.terms == null)
+			}
+			if (getTerms() == null && tAsTerm.getTerms() == null) {
 				return true;
-			if (terms == null || tAsTerm.terms == null)
+			}
+			if (getTerms() == null || tAsTerm.getTerms() == null) {
 				return false;
-			if (terms.size() != tAsTerm.terms.size())
+			}
+			if (getTermsSize() != tAsTerm.getTermsSize()) {
 				return false;
+			}
 
 			for (int i=0; i<getTermsSize(); i++) {
-//System.out.println("term* "+getTerm(i)+getTerm(i).getClass().getName()+"="+tAsTerm.getTerm(i)+getTerm(i).getClass().getName()+" deu "+getTerm(i).equals(tAsTerm.getTerm(i)));				
+				//System.out.println(" *term "+i+" "+getTerm(i)+getTerm(i).getClass().getName()
+				//		+"="+tAsTerm.getTerm(i)+tAsTerm.getTerm(i).getClass().getName()+" deu "+getTerm(i).equals(tAsTerm.getTerm(i)));				
 				if (!getTerm(i).equals(tAsTerm.getTerm(i))) {
 					return false;
 				}

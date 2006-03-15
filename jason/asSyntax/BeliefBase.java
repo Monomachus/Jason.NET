@@ -229,6 +229,7 @@ public class BeliefBase {
 				return false;
 			}
 		} else {
+			logger.fine("Does not contains "+l+" in "+getAllBeliefs());
 			return false;
 		}
 	}

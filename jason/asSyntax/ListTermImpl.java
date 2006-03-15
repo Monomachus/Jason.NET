@@ -102,15 +102,21 @@ public class ListTermImpl extends Term implements ListTerm {
 
 	public boolean equals(Object t) {
 		try {
-			ListTermImpl tAsTerm = (ListTermImpl)t;
-			if (term == null && tAsTerm.term != null) {
+			if ( ((Term)t).isVar() ) { // unground var is not equals a list
 				return false;
 			}
-			if (term != null && !term.equals(tAsTerm.term)) {
+			ListTerm tAsList = (ListTerm)t;
+			if (term == null && tAsList.getTerm() != null) {
+				return false;
+			}
+			if (term != null && !term.equals(tAsList.getTerm())) {
+				return false;
+			}
+			if (next == null && tAsList.getNext() != null) {
 				return false;
 			}
 			if (next != null) {
-				return next.equals(tAsTerm.next);
+				return next.equals(tAsList.getNext());
 			}
 			return true;
 		} catch (ClassCastException e) {

@@ -151,7 +151,7 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
 		try {
 			Term tAsTerm = (Term)t;
 			Term vl = getValue();
-			//System.out.println("cheking equals form "+tAsTerm.funcSymb+"="+this.funcSymb+" my value "+vl);
+			//System.out.println("cheking equals form "+tAsTerm.getFunctor()+" and this "+this.getFunctor()+" my value "+vl);
 			if (vl == null) {
 				// is t also a var? (its value must also be null)
 				try {
