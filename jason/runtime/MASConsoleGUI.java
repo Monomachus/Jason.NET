@@ -199,7 +199,7 @@ public class MASConsoleGUI  {
 			if (ta != null) { // no new TA was created
 				// print out 
 				int l = ta.getDocument().getLength();
-				if (l > 30000) {
+				if (l > 50000) {
 					ta.setText("");
 					//l = output.getDocument().getLength();
 				}
