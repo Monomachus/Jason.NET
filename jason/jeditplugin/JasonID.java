@@ -347,7 +347,9 @@ public class JasonID extends JPanel implements EBComponent, RunProjectListener {
 	private void saveAll() {
 		Buffer[] bufs = org.gjt.sp.jedit.jEdit.getBuffers();
         for (int i = 0; i < bufs.length; i++) {
-        	bufs[i].save(view, null);
+        	if (bufs[i].isDirty()) {
+        		bufs[i].save(view, null);
+        	}
         }
 	}
 
@@ -392,7 +394,7 @@ public class JasonID extends JPanel implements EBComponent, RunProjectListener {
             	textArea.append("Parsing AgentSpeak file '"+asFile.getName()+"'...");
             	jason.asSyntax.parser.as2j parser = new jason.asSyntax.parser.as2j(new FileReader(asFile));
             	parser.ag(null);
-                textArea.append(" parsed successfully!\n");
+            	textArea.append(" parsed successfully!\n");
         	}
             return true;
             
@@ -427,8 +429,8 @@ public class JasonID extends JPanel implements EBComponent, RunProjectListener {
 	// Menu actions
 	//
 	
-	public void runProject(boolean debug) {
-		Buffer b = getProjectBuffer();
+	public void runProject(final boolean debug) {
+		final Buffer b = getProjectBuffer();
 		if (b == null) {
 			textArea.setText("There is no Jason project opened!");
 			return;
@@ -442,48 +444,63 @@ public class JasonID extends JPanel implements EBComponent, RunProjectListener {
 		errorSource.clear();
 		saveAll();
 
-		MAS2JProject project = parseProject(b);
-		if (project == null || !parseProjectAS(project)) {
-			return;
-		}
+		new Thread() {
+			public void run() {
+
+				// wait buffers io
+				Buffer[] bufs = org.gjt.sp.jedit.jEdit.getBuffers();
+				int max = 1;
+		        for (int i = 0; i < bufs.length && max < 20; i++) {
+		        	if (bufs[i].isPerformingIO()) {
+		        		i--;
+		        		max++;
+		        		try { Thread.sleep(200); } catch (Exception e) {}
+		        	}
+		        }
+			
+				MAS2JProject project = parseProject(b);
+				if (project == null || !parseProjectAS(project)) {
+					return;
+				}
+				
+				// launch the MAs
+				animation.start();
+				btStop.setEnabled(true);
+				btRun.setEnabled(false);
+				btDebug.setEnabled(false);
+				try {
+					if (masLauncher != null) {
+						// stops old running mas
+						masLauncher.stopMAS();
+					}
 		
-		// launch the MAs
-		animation.start();
-		btStop.setEnabled(true);
-		btRun.setEnabled(false);
-		btDebug.setEnabled(false);
-		try {
-			if (masLauncher != null) {
-				// stops old running mas
-				masLauncher.stopMAS();
+					String jasonJar = Config.get().getJasonJar();
+					if (!Config.checkJar(jasonJar)) {
+						System.err.println("The path to the jason.jar file ("+jasonJar+") was not correctly set, the MAS may not run. Go to menu Plugins->Plugins Options->Jason to configure the path.");
+					}
+					String javaHome = Config.get().getJavaHome();
+					if (!Config.checkJavaHomePath(javaHome)) {
+						System.err.println("The Java home directory ("+javaHome+") was not correctly set, the MAS may not run. Go to the Plugins->Options->Jason menu to configure the path.");
+					}
+					
+					// compile some files
+					CompileProjectJavaSources compT = new CompileProjectJavaSources(project.getProjectJavaFiles(), project);
+					compT.start();
+					if (!compT.waitCompilation()) {
+						masFinished();
+						return;
+					}
+		
+					masLauncher = project.getInfrastructureFactory().createMASLauncher();
+					masLauncher.setProject(project);
+					masLauncher.setListener(JasonID.this);
+					masLauncher.writeScripts(debug);
+					new Thread(masLauncher, "MAS-Launcher").start();
+				} catch (Exception ex) {
+					ex.printStackTrace();
+				}
 			}
-
-			String jasonJar = Config.get().getJasonJar();
-			if (!Config.checkJar(jasonJar)) {
-				System.err.println("The path to the jason.jar file ("+jasonJar+") was not correctly set, the MAS may not run. Go to menu Plugins->Plugins Options->Jason to configure the path.");
-			}
-			String javaHome = Config.get().getJavaHome();
-			if (!Config.checkJavaHomePath(javaHome)) {
-				System.err.println("The Java home directory ("+javaHome+") was not correctly set, the MAS may not run. Go to the Plugins->Options->Jason menu to configure the path.");
-			}
-			
-			// compile some files
-			CompileProjectJavaSources compT = new CompileProjectJavaSources(project.getProjectJavaFiles(), project);
-			compT.start();
-			if (!compT.waitCompilation()) {
-				masFinished();
-				return;
-			}
-
-			masLauncher = project.getInfrastructureFactory().createMASLauncher();
-			masLauncher.setProject(project);
-			masLauncher.setListener(this);
-			masLauncher.writeScripts(debug);
-			new Thread(masLauncher, "MAS-Launcher").start();
-			
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
+		}.start();
 	}
 	
 	public void runProject() {
