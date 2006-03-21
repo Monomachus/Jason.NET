@@ -80,6 +80,7 @@ public class Config extends Properties {
 	public static final String SACI_JAR  = "saciJar";
 	//public static final String LOG4J_JAR = "log4jJar";
 	public static final String JAVA_HOME = "javaHome";
+	public static final String ANT_LIB  = "antLib";
 	public static final String RUN_AS_THREAD = "runCentralisedInsideJIDE";
 	public static final String SHELL_CMD = "shellCommand";
 	public static final String CLOSEALL = "closeAllBeforeOpenMAS2J";
@@ -126,6 +127,10 @@ public class Config extends Properties {
 	public String getJavaHome() {
 		return getProperty(JAVA_HOME);
 	}
+	public String getAntLib() {
+		return getProperty(ANT_LIB);
+	}
+	
 	public void setJavaHome(String jh) {
 		if (jh != null) {
 			jh = new File(jh).getAbsolutePath();
@@ -136,6 +141,16 @@ public class Config extends Properties {
 		}
 	}
 	
+	public void setAntLib(String al) {
+		if (al != null) {
+			al = new File(al).getAbsolutePath();
+			if (!al.endsWith(File.separator)) {
+				al += File.separator;
+			}
+			put(ANT_LIB, al);
+		}
+	}
+
 	public boolean runAsInternalTread() {
 		return false; // it not works with jedit
 		/*
@@ -163,6 +178,20 @@ public class Config extends Properties {
         	}
         }
 
+        // fix ant lib
+        if (get(ANT_LIB) == null || !checkAntLib(getAntLib())) {
+	        try {
+	        	String antlib = new File(getJasonJar()).getParentFile().getParentFile().getAbsolutePath() + File.separator + "lib" + File.separator;
+	        	if (checkAntLib(antlib)) {
+	        		put(ANT_LIB, antlib);
+	        	} else {
+	        		System.out.println("nao ok para "+antlib);
+	        	}
+	        } catch (Exception e) {
+	        	e.printStackTrace();
+	        }
+        }
+        
         // Jason version
         put("version", getJasonRunningVersion());
         
@@ -331,7 +360,17 @@ public class Config extends Properties {
         return false;
     }
     
-	static String getJavaHomePathFromClassPath(String file) {
+    public static boolean checkAntLib(String al) {
+        try {
+            File antjar = new File(al + "ant.jar");
+            if (antjar.exists()) {
+        		return true;
+            }
+        } catch (Exception e) {}
+        return false;
+    }
+
+    static String getJavaHomePathFromClassPath(String file) {
 		StringTokenizer st = new StringTokenizer(System.getProperty("java.class.path"), File.pathSeparator);
 		while (st.hasMoreTokens()) {
 			String token = st.nextToken();

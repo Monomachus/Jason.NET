@@ -482,14 +482,20 @@ public class JasonID extends JPanel implements EBComponent, RunProjectListener {
 					if (!Config.checkJavaHomePath(javaHome)) {
 						System.err.println("The Java home directory ("+javaHome+") was not correctly set, the MAS may not run. Go to the Plugins->Options->Jason menu to configure the path.");
 					}
+					String antLib = Config.get().getAntLib();
+					if (!Config.checkAntLib(antLib)) {
+						System.err.println("The ant lib directory ("+antLib+") was not correctly set, the MAS may not run. Go to the Plugins->Options->Jason menu to configure the path.");
+					}
 					
 					// compile some files
+					/*
 					CompileProjectJavaSources compT = new CompileProjectJavaSources(project.getProjectJavaFiles(), project);
 					compT.start();
 					if (!compT.waitCompilation()) {
 						masFinished();
 						return;
 					}
+					*/
 		
 					masLauncher = project.getInfrastructureFactory().createMASLauncher();
 					masLauncher.setProject(project);

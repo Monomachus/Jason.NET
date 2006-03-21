@@ -70,6 +70,7 @@ public class JasonIDOptionPanel extends AbstractOptionPane  {
 	JTextField saciTF;
 	JTextField jasonTF;
 	JTextField javaTF;
+	JTextField antTF;
 	JTextField shellTF;
 	//JCheckBox  insideJIDECBox;
 	JCheckBox  closeAllCBox;
@@ -197,6 +198,36 @@ public class JasonIDOptionPanel extends AbstractOptionPane  {
     	javaHomePanel.add(setJava);
     	pop.add(javaHomePanel);
     	
+    	// ant lib home
+    	JPanel antHomePanel = new JPanel();
+    	antHomePanel.setBorder(BorderFactory.createTitledBorder(BorderFactory
+				.createEtchedBorder(), "Ant libs", TitledBorder.LEFT, TitledBorder.TOP));
+    	antHomePanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+    	antHomePanel.add(new JLabel("Directory"));
+    	antTF = new JTextField(30);
+    	antHomePanel.add(antTF);
+    	JButton setAnt = new JButton("Browse");
+    	setAnt.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+	            try {
+	                JFileChooser chooser = new JFileChooser(System.getProperty("user.dir"));
+					 chooser.setDialogTitle("Select the directory with ant.jar and ant-launcher.jar files");
+	                chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+	                if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+	                	String antLib = (new File(chooser.getSelectedFile().getPath())).getCanonicalPath();
+	                	if (userProperties.checkAntLib(antLib)) {
+	                		antTF.setText(antLib);
+	                	} else {
+	                		JOptionPane.showMessageDialog(null, "The selected directory has not the files ant.jar and ant-launcher.jar!");
+	                	}
+	                }
+	            } catch (Exception e) {}
+			}
+    	});
+    	antHomePanel.add(setAnt);
+    	pop.add(antHomePanel);
+
+    	
     	// shell command
     	JPanel shellPanel = new JPanel();
     	shellPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory
@@ -230,6 +261,7 @@ public class JasonIDOptionPanel extends AbstractOptionPane  {
     	saciTF.setText(userProperties.getSaciJar());
     	jasonTF.setText(userProperties.getJasonJar());
     	javaTF.setText(userProperties.getJavaHome());
+    	antTF.setText(userProperties.getAntLib());
     	shellTF.setText(userProperties.getShellCommand());
     	//insideJIDECBox.setSelected(userProperties.runAsInternalTread());
     	closeAllCBox.setSelected(userProperties.getBoolean(Config.CLOSEALL));
@@ -244,6 +276,9 @@ public class JasonIDOptionPanel extends AbstractOptionPane  {
 		}
 		if (userProperties.checkJavaHomePath(javaTF.getText())) {
 			userProperties.setJavaHome(javaTF.getText().trim());
+		}
+		if (userProperties.checkAntLib(antTF.getText())) {
+			userProperties.setAntLib(antTF.getText().trim());
 		}
 		userProperties.put(Config.SHELL_CMD, shellTF.getText().trim());
 		//userProperties.put(Config.RUN_AS_THREAD, insideJIDECBox.isSelected()+"");

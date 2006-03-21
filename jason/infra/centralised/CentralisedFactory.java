@@ -7,7 +7,7 @@ import jason.runtime.RuntimeServicesInfraTier;
 public class CentralisedFactory implements InfrastructureFactory {
 
 	public MASLauncherInfraTier createMASLauncher() {
-		return new CentralisedMASLauncher();
+		return new CentralisedMASLauncherAnt();
 	}
 	
 	public RuntimeServicesInfraTier createRuntimeServices() {

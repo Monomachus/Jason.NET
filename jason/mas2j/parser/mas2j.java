@@ -46,8 +46,9 @@ public class mas2j implements mas2jConstants {
                 launcher.writeScripts(false);
 
         int step = 1;
-        System.out.println("To run your MAS:");
+        System.out.println("To run your MAS, just run \"ant\".");
         //System.out.println("  1. chmod u+x *.sh");
+        /*
         System.out.println("  "+step+". compile the java files (script ./compile-"+project.getSocName()+".sh)");
         step++;
         if (project.getInfrastructure().equals("Saci")) {
@@ -55,6 +56,7 @@ public class mas2j implements mas2jConstants {
              step++;
         }
         System.out.println("  "+step+". run your agents (script ./"+project.getSocName()+".sh)");
+        */
       } catch(Exception e){
                 System.err.println("mas2j: parsing errors found... \n" + e);
       }
