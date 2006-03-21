@@ -435,7 +435,7 @@ public class JasonID extends JPanel implements EBComponent, RunProjectListener {
 			textArea.setText("There is no Jason project opened!");
 			return;
 		} 
-		textArea.setText("Running project "+b.getName()+"\n");
+		textArea.setText("Launching "+b.getName()+"\n");
 		if (errorSource == null) {
 			errorSource = new DefaultErrorSource("JasonIDE");
 			ErrorSource.registerErrorSource(errorSource);
