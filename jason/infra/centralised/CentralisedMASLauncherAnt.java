@@ -92,18 +92,26 @@ public class CentralisedMASLauncherAnt implements MASLauncherInfraTier {
 
 	/** return the operating system command that runs the MAS */
 	public String[] getStartCommandArray() {
+		String build = "build.xml";
+		if (hasCBuild()) build = "c-build.xml";
 		return  new String[] {
 					Config.get().getJavaHome()+"bin"+File.separator+"java",
 					"-classpath", 
 					//Config.get().getAntLib()+ "ant.jar"  + File.pathSeparator + 
 					Config.get().getAntLib()+ "ant-launcher.jar",
 				    "org.apache.tools.ant.launch.Launcher",
-				    "-e"
-				};
+				    "-e",
+				    "-f", build 
+				 };
 	}
 
 	/** write the scripts necessary to run the project */	
 	public void writeScripts(boolean debug) {
+		if (hasCBuild()) {
+			System.out.println("The build.xml file is not being created, the user c-build.xml file is used instead.");
+			return; // if the user has a c-build.xml file, use his build
+		}
+		
 		try {
 			String nl = System.getProperty("line.separator");
 			// get template
@@ -128,7 +136,7 @@ public class CentralisedMASLauncherAnt implements MASLauncherInfraTier {
 			script = replace(script,"<PROJECT-FILE>", project.getProjectFile().getName());
 			
 			script = replace(script,"<JASON-JAR>", Config.get().getJasonJar());
-			script = replace(script,"<SACI-JAR>", Config.get().getSaciJar());
+			//script = replace(script,"<SACI-JAR>", Config.get().getSaciJar());
 
 			// add lib/*.jar
 			String lib = "";
@@ -162,4 +170,9 @@ public class CentralisedMASLauncherAnt implements MASLauncherInfraTier {
 		}
 		return s;
 	}
+	
+	private boolean hasCBuild() {
+		return new File(project.getDirectory()+ "c-build.xml").exists();
+	}
+	
 }

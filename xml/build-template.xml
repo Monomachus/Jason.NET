@@ -11,14 +11,13 @@
          default="run">
 
     <property name="mas2j.project.file" value="<PROJECT-FILE>"/>
+    <property name="debug" value="<DEBUG>"/> <!-- use "-debug" to run in debug mode -->
 
     <property name="jasonJar" value="<JASON-JAR>"/>
-    <property name="saciJar"  value="<SACI-JAR>"/>
 
     <path id="project.classpath">
         <pathelement location="."/>
         <pathelement location="${jasonJar}"/>
-        <pathelement location="${saciJar}"/>
         <PATH-LIB>
     </path>
 
@@ -33,7 +32,7 @@
         <java classname="<PROJECT-RUNNER-CLASS>"
                 failonerror="true" fork="yes" dir="${basedir}" >
         	<classpath refid="project.classpath"/>
-        	<arg line="${mas2j.project.file} <DEBUG>"/>
+        	<arg line="${mas2j.project.file} ${debug}"/>
         </java>
     </target>
 
