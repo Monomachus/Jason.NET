@@ -94,18 +94,30 @@ public class SaciMASLauncher extends Thread implements MASLauncherInfraTier {
 	}
 
 	public void stopMAS() {
-		new Thread() {
-			public void run() {
-				try {
-					new SaciRuntimeServices(project.getSocName()).stopMAS();
-					if (iHaveStartedSaci) {
-						saciThread.stopSaci();
-					}					
-				} catch (Exception e) {
-					logger.log(Level.SEVERE, "Error stoping saci MAS", e);
+		if (saciThread.saciOk) {
+			// saci is running
+			new Thread() {
+				public void run() {
+					try {
+						new SaciRuntimeServices(project.getSocName()).stopMAS();
+						if (iHaveStartedSaci) {
+							saciThread.stopSaci();
+						}					
+					} catch (Exception e) {
+						logger.log(Level.SEVERE, "Error stoping saci MAS", e);
+					}
 				}
+			}.start();
+		} else {
+			// saci is not running yet
+			// stop the start thread
+			try {
+				saciThread.stopWaitSaciOk();
+			} catch (Exception e) {
+				logger.log(Level.SEVERE, "Error stoping saci MAS", e);
 			}
-		}.start();
+
+		}
 	}
 
 	/** return the operating system command that runs the MAS */
@@ -176,7 +188,7 @@ public class SaciMASLauncher extends Thread implements MASLauncherInfraTier {
 				if (javaHome != null) {
 					out.println("export PATH=\"" + javaHome + "bin\":$PATH\n");
 				}
-				out.println("java -classpath "+classPath+"-Djava.security.policy=\"jar:file:"
+				out.println("java -classpath "+classPath+" -Djava.security.policy=\"jar:file:"
 							+ Config.get().getSaciJar() + "!/policy\" saci.tools.SaciMenu");
 				out.close();
 			}

@@ -15,6 +15,7 @@ class StartSaci extends Thread {
 	boolean saciOk = false;
 	Process saciProcess;
 	MAS2JProject project;
+	boolean stop = false;
 	
 	StartSaci(MAS2JProject project) {
 		super("StartSaci");
@@ -62,7 +63,7 @@ class StartSaci extends Thread {
 			System.out.println("running saci with " + command);
 
 			int tryCont = 0;
-			while (tryCont < 30) {
+			while (tryCont < 30 && !stop) {
 				tryCont++;
 				sleep(1000);
 				Launcher l = getLauncher();
@@ -80,17 +81,18 @@ class StartSaci extends Thread {
 	}
 
 	synchronized void stopWaitSaciOk() {
+		stop = true;
 		notifyAll();
 	}
 
 	synchronized boolean waitSaciOk() {
 		try {
 			wait(20000); // waits 20 seconds
-			if (!saciOk) {
+			if (!saciOk && !stop) {
 				JOptionPane
 						.showMessageDialog(
 								null,
-								"Fail to automatically start saci! \nGo to \""
+								"Failed to automatically start saci! \nGo to \""
 										+ project.getDirectory()
 										+ "\" directory and run the saci-"
 										+ project.getSocName()
