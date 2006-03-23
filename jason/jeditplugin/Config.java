@@ -181,11 +181,14 @@ public class Config extends Properties {
         // fix ant lib
         if (get(ANT_LIB) == null || !checkAntLib(getAntLib())) {
 	        try {
-	        	String antlib = new File(getJasonJar()).getParentFile().getParentFile().getAbsolutePath() + File.separator + "lib" + File.separator;
+	        	String antlib = new File(getJasonJar()).getParentFile().getParentFile().getAbsolutePath() + File.separator + "lib";
 	        	if (checkAntLib(antlib)) {
-	        		put(ANT_LIB, antlib);
+	        		setAntLib(antlib);
 	        	} else {
-	        		System.out.println("nao ok para "+antlib);
+	        		antlib = new File(".") + File.separator + "lib";
+		        	if (checkAntLib(antlib)) {
+		        		setAntLib(antlib);
+		        	}
 	        	}
 	        } catch (Exception e) {
 	        	e.printStackTrace();
@@ -362,6 +365,9 @@ public class Config extends Properties {
     
     public static boolean checkAntLib(String al) {
         try {
+        	if (!al.endsWith(File.separator)) {
+        		al = al + File.separator;
+        	}
             File antjar = new File(al + "ant.jar");
             if (antjar.exists()) {
         		return true;
