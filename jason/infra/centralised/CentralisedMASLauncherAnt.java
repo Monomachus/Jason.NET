@@ -8,6 +8,7 @@ import jason.mas2j.MAS2JProject;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -115,7 +116,21 @@ public class CentralisedMASLauncherAnt implements MASLauncherInfraTier {
 		try {
 			String nl = System.getProperty("line.separator");
 			// get template
-			BufferedReader in = new BufferedReader(new InputStreamReader(TransitionSystem.class.getResource("/xml/build-template.xml").openStream()));
+			BufferedReader in;
+			
+			// if there is jason/src/xml/build-template.xml, use it; otherwise use the file in jason.jar
+			File bt = new File("src/xml/build-template.xml");
+			if (bt.exists()) {
+				in = new BufferedReader(new FileReader(bt));				
+			} else {
+				bt = new File("../src/xml/build-template.xml");
+				if (bt.exists()) {
+					in = new BufferedReader(new FileReader(bt));
+				} else {
+					in = new BufferedReader(new InputStreamReader(TransitionSystem.class.getResource("/xml/build-template.xml").openStream()));
+				}
+			}
+			
 			StringBuffer scriptBuf = new StringBuffer();
 			String line = in.readLine();
 			while (line != null) {
