@@ -216,7 +216,7 @@ public class JasonID extends JPanel implements EBComponent, RunProjectListener {
 					}
 				}));
 
-		toolBar.add(createToolBarButton("New Agent", new ImageIcon(JasonID.class.getResource("/images/newAgent.gif")), //GUIUtilities.loadIcon("NextFile.png"), 
+		toolBar.add(createToolBarButton("Add agent in project", new ImageIcon(JasonID.class.getResource("/images/newAgent.gif")), //GUIUtilities.loadIcon("NextFile.png"), 
 				new ActionListener() {
 				public void actionPerformed(ActionEvent evt) {
 					newAg();
@@ -536,7 +536,7 @@ public class JasonID extends JPanel implements EBComponent, RunProjectListener {
 		if (b == null) {
 			textArea.setText("There is no Jason project opened to add an agent, create a project first.");
 		} else {
-			new NewAgentGUI("New agent for project "+b.getName(), b, view);
+			new NewAgentGUI("Add an agent in project "+b.getName(), b, view);
 		}
 	}
 
