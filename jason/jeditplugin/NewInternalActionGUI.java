@@ -23,7 +23,7 @@ public class NewInternalActionGUI extends NewAgentGUI {
 		super(title, b, view);
 	}
 	
-	void initComponents() {
+	protected void initComponents() {
 		getContentPane().setLayout(new BorderLayout());
 		
 		// Fields
@@ -43,7 +43,7 @@ public class NewInternalActionGUI extends NewAgentGUI {
 		getContentPane().add(createButtonsPanel(), BorderLayout.SOUTH);
 	}
 
-	boolean ok() {
+	protected boolean ok() {
 		if  (iaPkg.getText().trim().length() == 0) {
 			JOptionPane.showMessageDialog(this, "An package name must be informed.");
 			return false;

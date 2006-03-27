@@ -53,16 +53,17 @@ public class AgentParameters {
 
 	public Settings getAsSetts(boolean debug, boolean forceSync) {
 		Settings stts = new Settings();
-		
-		Iterator i = options.keySet().iterator();
-		String s = ""; String v = "";
-		while (i.hasNext()) {
-			String key = (String) i.next();
-			s += v + key + "=" + options.get(key);
-			v = ",";
-		}
-		if (s.length() > 0) {
-			stts.setOptions("["+s+"]");
+		if (options != null) {
+			Iterator i = options.keySet().iterator();
+			String s = ""; String v = "";
+			while (i.hasNext()) {
+				String key = (String) i.next();
+				s += v + key + "=" + options.get(key);
+				v = ",";
+			}
+			if (s.length() > 0) {
+				stts.setOptions("["+s+"]");
+			}
 		}
 	    if (debug) {
 	    	stts.setVerbose(2);

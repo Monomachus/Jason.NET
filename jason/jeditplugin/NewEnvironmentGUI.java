@@ -21,7 +21,7 @@ public class NewEnvironmentGUI extends NewAgentGUI {
 		super(title, b, view);
 	}
 	
-	void initComponents() {
+	protected void initComponents() {
 		getContentPane().setLayout(new BorderLayout());
 		
 		// Fields
@@ -39,7 +39,7 @@ public class NewEnvironmentGUI extends NewAgentGUI {
 		getContentPane().add(createButtonsPanel(), BorderLayout.SOUTH);
 	}
 
-	boolean ok() {
+	protected boolean ok() {
 		String env = getEnvName();
 		if  (env == null) {
 			JOptionPane.showMessageDialog(this, "An environment name must be informed.");

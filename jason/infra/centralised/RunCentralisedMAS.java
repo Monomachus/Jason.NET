@@ -85,6 +85,7 @@ import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 
 /**
@@ -94,6 +95,8 @@ public class RunCentralisedMAS {
     
     CentralisedEnvironment env = null;
     CentralisedExecutionControl control = null;
+    static boolean debug = false;
+    
     List ags = new ArrayList();
     
     private static Logger logger = Logger.getLogger(RunCentralisedMAS.class.getName());
@@ -106,7 +109,6 @@ public class RunCentralisedMAS {
             System.err.println("You should inform the MAS project file.");
             System.exit(1);
         }
-        boolean debug = false;
 
         setupLogger();
         
@@ -132,7 +134,7 @@ public class RunCentralisedMAS {
 			
 	        if (MASConsoleGUI.hasConsole()) {
 				// add Button
-		        JButton btStop = new JButton("Stop MAS");
+		        JButton btStop = new JButton("Stop", new ImageIcon(RunCentralisedMAS.class.getResource("/images/suspend.gif")));
 		        btStop.addActionListener(new ActionListener() {
 		            public void actionPerformed(ActionEvent evt) {
 		            	MASConsoleGUI.get().setPause(false);
@@ -141,8 +143,8 @@ public class RunCentralisedMAS {
 		        });
 		        MASConsoleGUI.get().addButton(btStop);
 
-		        // add Button
-		        final JButton btPause = new JButton("Pause MAS");
+		        // add Button pause
+		        final JButton btPause = new JButton("Pause", new ImageIcon(RunCentralisedMAS.class.getResource("/images/resume_co.gif")));
 		        btPause.addActionListener(new ActionListener() {
 		            public void actionPerformed(ActionEvent evt) {
 		            	if (MASConsoleGUI.get().isPause()) {
@@ -156,6 +158,16 @@ public class RunCentralisedMAS {
 		            }
 		        });
 		        MASConsoleGUI.get().addButton(btPause);
+
+		        // add Button pause
+		        final JButton btStartAg = new JButton("Start new agent", new ImageIcon(RunCentralisedMAS.class.getResource("/images/newAgent.gif")));
+		        btStartAg.addActionListener(new ActionListener() {
+		            public void actionPerformed(ActionEvent evt) {
+		            	new StartNewAgentGUI(MASConsoleGUI.get().getFrame(), "Start a new agent to run in current MAS");
+		            }
+		        });
+		        MASConsoleGUI.get().addButton(btStartAg);
+
 		        MASConsoleGUI.get().setAsDefaultOut();
 	        }
 	    
@@ -181,6 +193,10 @@ public class RunCentralisedMAS {
 
     }
     
+    
+    public static boolean isDebug() {
+    	return debug;
+    }
     
     public static void setupLogger() {
         // see for a local log configuration

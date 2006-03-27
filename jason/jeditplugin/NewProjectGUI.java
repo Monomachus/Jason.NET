@@ -38,7 +38,7 @@ public class NewProjectGUI extends NewAgentGUI {
 		this.jasonID = jasonID;
 	}
 	
-	void initComponents() {
+	protected void initComponents() {
 		getContentPane().setLayout(new BorderLayout());
 
 		
@@ -113,7 +113,7 @@ public class NewProjectGUI extends NewAgentGUI {
 	}
 
 	
-	boolean ok() {
+	protected boolean ok() {
 		String projDecl = getProjDecl();
 		if  (projDecl == null) {
 			return false;

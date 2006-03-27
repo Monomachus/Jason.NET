@@ -23,6 +23,10 @@ public class CentralisedRuntimeServices implements RuntimeServicesInfraTier {
 		if (agClass == null) agClass = Agent.class.getName();
 		if (archClass == null) archClass = AgArch.class.getName();
 		if (stts == null) stts = new Settings();
+
+		while (RunCentralisedMAS.getRunner().getEnvironmentInfraTier().getAgent(agName) != null) {
+			agName += "_a";
+		}
 		
         CentralisedAgArch agArch = new CentralisedAgArch();
         agArch.setAgName(agName);

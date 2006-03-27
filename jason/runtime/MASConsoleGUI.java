@@ -57,6 +57,8 @@
 
 package jason.runtime;
 
+import jason.infra.centralised.RunCentralisedMAS;
+
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -67,6 +69,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.LogManager;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -135,7 +138,7 @@ public class MASConsoleGUI  {
         frame.getContentPane().add(BorderLayout.CENTER, pcenter);
         frame.getContentPane().add(BorderLayout.SOUTH, pBt);
 
-        JButton btClean = new JButton("Clean");
+        JButton btClean = new JButton("Clean", new ImageIcon(RunCentralisedMAS.class.getResource("/images/clear.gif")));
         btClean.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 output.setText("");
@@ -149,6 +152,10 @@ public class MASConsoleGUI  {
     
     public void setTitle(String s) {
     	frame.setTitle(s);
+    }
+    
+    public JFrame getFrame() {
+    	return frame;
     }
     
     public void addButton(JButton jb) {
