@@ -4,22 +4,12 @@ import jason.mas2j.AgentParameters;
 import jason.runtime.RuntimeServicesInfraTier;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Frame;
-import java.awt.GridLayout;
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.HashMap;
 
 import javax.swing.BorderFactory;
-import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -27,7 +17,7 @@ import javax.swing.border.TitledBorder;
 
 // TODO ask for source, browse button
 
-public class StartNewAgentGUI extends JDialog {
+public class StartNewAgentGUI extends BaseDialogGUI {
 
 	protected JTextField agName;
 	protected JTextField agSource;
@@ -37,20 +27,8 @@ public class StartNewAgentGUI extends JDialog {
 	protected JTextField agHost;
 	protected JComboBox  verbose;
 
-	protected JPanel pFields = new JPanel(new GridLayout(0,1));
-	protected JPanel pLabels = new JPanel(new GridLayout(0,1));
-
-	protected JButton ok;
-	protected JButton cancel;
-	
 	public StartNewAgentGUI(Frame f, String title) {
-		super(f);
-		setTitle(title);
-		initComponents();
-		pack();
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        setLocation((int)( (screenSize.width - getWidth()) / 2),(int) ((screenSize.height - getHeight())/2));
-        setVisible(true);
+		super(f, title);
 	}
 	
 	protected void initComponents() {
@@ -90,41 +68,6 @@ public class StartNewAgentGUI extends JDialog {
 		
 		getContentPane().add(p, BorderLayout.CENTER);
 		getContentPane().add(createButtonsPanel(), BorderLayout.SOUTH);
-	}
-
-
-	protected JPanel createButtonsPanel() {
-		// Buttons
-		JPanel bts = new JPanel(new FlowLayout(FlowLayout.CENTER));
-		ok = new JButton("Ok");
-		ok.setDefaultCapable(true);
-		ok.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				if (ok()) {
-					setVisible(false);
-				}
-			}
-		});
-		bts.add(ok);
-		cancel = new JButton("Cancel");
-		cancel.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				setVisible(false);
-			}
-		});
-		bts.add(cancel);
-		getRootPane().setDefaultButton(ok);
-		return bts;
-	}
-
-	protected void createField(String label, JComponent tf, String tooltip) {
-		JLabel jl = new JLabel(label+": ");
-		jl.setToolTipText(tooltip);
-		tf.setToolTipText(tooltip);
-		pLabels.add(jl);
-		JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT));
-		p.add(tf);
-		pFields.add(p);
 	}
 
 	

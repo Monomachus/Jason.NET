@@ -45,6 +45,8 @@
 
 package jason.control;
 
+import jason.infra.centralised.RunCentralisedMAS;
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -57,6 +59,7 @@ import java.io.StringWriter;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JList;
@@ -102,7 +105,7 @@ public class ExecutionControlGUI extends ExecutionControl {
 	void initComponents() {
 		frame = new JFrame("MAS Execution Control");
 
-		jBtStep = new JButton("Step");
+		jBtStep = new JButton("Step", new ImageIcon(ExecutionControlGUI.class.getResource("/images/resume_co.gif")));
 		jBtStep.setToolTipText("ask all agents to perform one reasoning cycle");
 		jBtStep.setEnabled(false);
 		jBtStep.addActionListener(new ActionListener() {
@@ -112,7 +115,7 @@ public class ExecutionControlGUI extends ExecutionControl {
 			}
 		});
 
-		jBtRun = new JButton("Run");
+		jBtRun = new JButton("Run", new ImageIcon(ExecutionControlGUI.class.getResource("/images/run.gif")));
 		jBtRun.setToolTipText("Run the MAS until some agent achieve a breakpoint. Breakpoints are annotations in plans' label");
 		jBtRun.setEnabled(false);
 		jBtRun.addActionListener(new ActionListener() {
@@ -120,10 +123,12 @@ public class ExecutionControlGUI extends ExecutionControl {
 				jBtRun.setEnabled(false);
 				inRunMode = true;
 				infraControl.informAllAgsToPerformCycle();
+				if (RunCentralisedMAS.getRunner() != null && RunCentralisedMAS.getRunner().btDebug != null) {
+					RunCentralisedMAS.getRunner().btDebug.setEnabled(true);
+				}
 			}
 		});
 
-		
 		jTA = new JTextPane();
 		jTA.setEditable(false);
 		jTA.setContentType("text/html");
@@ -202,6 +207,10 @@ public class ExecutionControlGUI extends ExecutionControl {
 		frame = null;
 	}
 
+	public void setRunMode(boolean b) {
+		inRunMode = b;
+	}
+	
 	private void inspectAgent(String agName) {
 		if (agName == null) {
 			return;
@@ -252,10 +261,7 @@ public class ExecutionControlGUI extends ExecutionControl {
 		if (!listModel.contains(agName)) {
 			logger.fine("New agent "+agName);
 			listModel.addElement(agName);
-			//spList.removeAll();
-			//spList.add(new JScrollPane(jList));
 		}
-		//listModel.addAgent(agName);
 		super.receiveFinishedCycle(agName, breakpoint);
 	}
 
@@ -271,26 +277,4 @@ public class ExecutionControlGUI extends ExecutionControl {
 		}
 	}
 
-	/*
-	class MyListModel extends AbstractListModel {
-		List agents = new ArrayList();
-
-		public void addAgent(String agName) {
-			if (!agents.contains(agName)) {
-				agents.add(agName);
-				Collections.sort(agents);
-				fireContentsChanged(this, 0, agents.size()-1);
-				//fireIntervalAdded(this, agents.size() - 1, agents.size());
-			}
-		}
-
-		public Object getElementAt(int index) {
-			return agents.get(index);
-		}
-
-		public int getSize() {
-			return agents.size();
-		}
-	}
-	*/
 }

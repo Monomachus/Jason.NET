@@ -86,7 +86,7 @@ public class ExecutionControl {
 						try {
 							syncAgFinished.wait(1000); // waits notify
 							if (runtime != null) { 
-								if (nbFinished >= runtime.getAgentsQty() || tries > 3) {
+								if (nbFinished >= runtime.getAgentsQty() || tries > 6) {
 									nbFinished = 0;
 									allAgsFinished();
 									//setAllAgFinished();

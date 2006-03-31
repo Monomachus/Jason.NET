@@ -151,6 +151,10 @@ public class Agent {
 			logger = Logger.getLogger(Agent.class.getName());			
 		}
 	}
+    
+    public Logger getLogger() {
+    	return logger;
+    }
 
 	/** add beliefs and plan form a URL */
 	public boolean parseAS(URL asURL) {

@@ -71,6 +71,7 @@ import jason.mas2j.AgentParameters;
 import jason.mas2j.MAS2JProject;
 import jason.mas2j.parser.ParseException;
 import jason.runtime.MASConsoleGUI;
+import jason.runtime.Settings;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -96,6 +97,7 @@ public class RunCentralisedMAS {
     CentralisedEnvironment env = null;
     CentralisedExecutionControl control = null;
     static boolean debug = false;
+    public JButton btDebug;
     
     List ags = new ArrayList();
     
@@ -143,12 +145,32 @@ public class RunCentralisedMAS {
 		        });
 		        MASConsoleGUI.get().addButton(btStop);
 
+				// add Button
+		        runner.btDebug = new JButton("Debug", new ImageIcon(RunCentralisedMAS.class.getResource("/images/debug.gif")));
+		        runner.btDebug.addActionListener(new ActionListener() {
+		            public void actionPerformed(ActionEvent evt) {
+		            	runner.changeToDebugMode();
+		            	runner.btDebug.setEnabled(false);
+		            	if (runner.control != null) {
+		            		try {
+		            			ExecutionControlGUI ecg = (ExecutionControlGUI)runner.control.getUserControl();
+		            			ecg.setRunMode(false);
+		            		} catch (Exception e) {}
+		            	}
+		            }
+		        });
+		        if (debug) {
+	            	runner.btDebug.setEnabled(false);		        	
+		        }
+		        MASConsoleGUI.get().addButton(runner.btDebug);
+
+		        
 		        // add Button pause
 		        final JButton btPause = new JButton("Pause", new ImageIcon(RunCentralisedMAS.class.getResource("/images/resume_co.gif")));
 		        btPause.addActionListener(new ActionListener() {
 		            public void actionPerformed(ActionEvent evt) {
 		            	if (MASConsoleGUI.get().isPause()) {
-		            		btPause.setText("Pause MAS");
+		            		btPause.setText("Pause");
 		            		MASConsoleGUI.get().setPause(false);
 		            	} else {
 		            		btPause.setText("Continue");
@@ -159,7 +181,7 @@ public class RunCentralisedMAS {
 		        });
 		        MASConsoleGUI.get().addButton(btPause);
 
-		        // add Button pause
+		        // add Button start
 		        final JButton btStartAg = new JButton("Start new agent", new ImageIcon(RunCentralisedMAS.class.getResource("/images/newAgent.gif")));
 		        btStartAg.addActionListener(new ActionListener() {
 		            public void actionPerformed(ActionEvent evt) {
@@ -167,6 +189,15 @@ public class RunCentralisedMAS {
 		            }
 		        });
 		        MASConsoleGUI.get().addButton(btStartAg);
+
+		        // add Button kill
+		        final JButton btKillAg = new JButton("Kill agent", new ImageIcon(RunCentralisedMAS.class.getResource("/images/killAgent.gif")));
+		        btKillAg.addActionListener(new ActionListener() {
+		            public void actionPerformed(ActionEvent evt) {
+		            	new KillAgentGUI(MASConsoleGUI.get().getFrame(), "Kill an agent of the current MAS");
+		            }
+		        });
+		        MASConsoleGUI.get().addButton(btKillAg);
 
 		        MASConsoleGUI.get().setAsDefaultOut();
 	        }
@@ -330,6 +361,28 @@ public class RunCentralisedMAS {
     			e.printStackTrace();
             }	
         }		
+	}
+
+	/** change the current running MAS to debug mode */
+	void changeToDebugMode() {
+		try {
+			if (control == null) {
+				control = new CentralisedExecutionControl(env, ExecutionControlGUI.class.getName());
+		        Iterator i = ags.iterator();
+		        while (i.hasNext()) {
+		            CentralisedAgArch ag = (CentralisedAgArch)i.next();
+		            ag.setControlInfraTier(control);
+		            Settings stts = ag.getUserAgArch().getTS().getSettings();
+		            stts.setVerbose(2);
+			    	stts.setSync(true);
+			    	ag.getLogger().setLevel(Level.FINE);
+			    	ag.getUserAgArch().getTS().getLogger().setLevel(Level.FINE);
+			    	ag.getUserAgArch().getTS().getAg().getLogger().setLevel(Level.FINE);
+		        }
+			}
+		} catch (Exception e) {
+			logger.log(Level.SEVERE, "Error entering in debug mode",e);
+		}
 	}
 	
 	void waitEnd() {

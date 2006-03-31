@@ -129,6 +129,10 @@ public class CentralisedAgArch extends Thread implements AgArchInfraTier {
         }
     }
     
+    public Logger getLogger() {
+    	return logger;
+    }
+    
     public void setAgName(String name) {
     	super.setName(name);
     	agName = name;
