@@ -228,9 +228,8 @@ public class MASConsoleGUI  {
 	}
 
     public void close() {
-    	if (masConsole == null) return;
-        masConsole.frame.dispose();
-        out.restoreOriginalOut();
+    	if (masConsole != null && masConsole.frame != null) masConsole.frame.setVisible(false);
+        if (out != null) out.restoreOriginalOut();
         masConsole = null;
     }
     

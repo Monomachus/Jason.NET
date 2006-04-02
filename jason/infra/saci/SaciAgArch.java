@@ -254,17 +254,22 @@ public class SaciAgArch extends saci.Agent implements AgArchInfraTier {
     public void stopAg() {
     	userAgArh.stopAg();
     	
-        super.stopAg();
-        mboxPercept.disconnect();
-        if (MASConsoleGUI.hasConsole()) { // the logger created the MASConsole
-        	MASConsoleGUI.get().close();
-        }
+        running = false;
+        userAgArh.getTS().receiveSyncSignal(); // in case the agent is wainting .....
+        userAgArh.getTS().newMessageHasArrived(); // in case the agent is wainting .....
     }
     
     public void run() {
         while (running) {
         	userAgArh.getTS().reasoningCycle();
         }
+
+        super.stopAg();
+        mboxPercept.disconnect();
+        if (MASConsoleGUI.hasConsole()) { // the logger created the MASConsole
+            MASConsoleGUI.get().close();
+        }
+        
         logger.fine("finished running.\n");
     }
     
