@@ -1,6 +1,6 @@
 package jason.infra.saci;
 
-import jason.jeditplugin.CompileProjectJavaSources;
+import jason.jeditplugin.Config;
 import jason.mas2j.MAS2JProject;
 
 import java.io.File;
@@ -53,14 +53,15 @@ class StartSaci extends Thread {
 	public void run() {
 		//stopSaci();
 		try {
-			//String command = getAsScriptCommand(jasonID.projectDirectory + File.separator + "saci-" + jasonID.getFileName());
-			String command = CompileProjectJavaSources.getRunScriptCommand("saci-" + project.getSocName(), true);
-			saciProcess = Runtime.getRuntime().exec(command, null,
-					//new File(JasonID.saciHome + File.separator + "bin"));
-					new File(project.getDirectory()));
-			//saciIn = new BufferedReader(new InputStreamReader(saciProcess.getInputStream()));
-			//saciErr = new BufferedReader(new InputStreamReader(saciProcess.getErrorStream()));
-			System.out.println("running saci with " + command);
+            String[] command = getStartCommandArray();
+            
+            String cmdstr = command[0];
+            for (int i=1; i<command.length; i++) {
+                cmdstr += " "+command[i];
+            }
+            System.out.println("Running saci with " + cmdstr);
+            
+            saciProcess = Runtime.getRuntime().exec(command, null, new File(project.getDirectory()));
 
 			int tryCont = 0;
 			while (tryCont < 30 && !stop) {
@@ -79,6 +80,25 @@ class StartSaci extends Thread {
 			stopWaitSaciOk();
 		}
 	}
+
+    /** returns the operating system command that runs the MAS */
+    public String[] getStartCommandArray() {
+        String build = "build.xml";
+        if (hasCBuild()) build = "c-build.xml";
+        return  new String[] {
+                    Config.get().getJavaHome()+"bin"+File.separator+"java",
+                    "-classpath", 
+                    Config.get().getAntLib()+ "ant-launcher.jar",
+                    "org.apache.tools.ant.launch.Launcher",
+                    "-e",
+                    "-f", build,
+                    "saci"
+                 };
+    }
+
+    protected boolean hasCBuild() {
+        return new File(project.getDirectory()+ "c-build.xml").exists();
+    }
 
 	synchronized void stopWaitSaciOk() {
 		stop = true;

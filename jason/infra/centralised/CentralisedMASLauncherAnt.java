@@ -91,7 +91,7 @@ public class CentralisedMASLauncherAnt implements MASLauncherInfraTier {
 		}
 	}
 
-	/** return the operating system command that runs the MAS */
+	/** returns the operating system command that runs the MAS */
 	public String[] getStartCommandArray() {
 		String build = "build.xml";
 		if (hasCBuild()) build = "c-build.xml";
@@ -138,6 +138,22 @@ public class CentralisedMASLauncherAnt implements MASLauncherInfraTier {
 				line = in.readLine();
 			}
 			String script = scriptBuf.toString();
+			
+			// replace <....> 
+			script = replaceMarks(script, debug);
+
+			// write the script
+			FileWriter out = new FileWriter(project.getDirectory() + "build.xml");
+			out.write(script);
+			out.close();
+
+		} catch (Exception e) {
+			System.err.println("Could not write start script for project " + project.getSocName());
+			e.printStackTrace();
+		}
+	}
+
+	protected String replaceMarks(String script, boolean debug) {
 			script = replace(script, "<PROJECT-ID>", project.getSocName());
 			
 			String dDir = project.getDirectory();
@@ -151,7 +167,6 @@ public class CentralisedMASLauncherAnt implements MASLauncherInfraTier {
 			script = replace(script,"<PROJECT-FILE>", project.getProjectFile().getName());
 			
 			script = replace(script,"<JASON-JAR>", Config.get().getJasonJar());
-			//script = replace(script,"<SACI-JAR>", Config.get().getSaciJar());
 
 			// add lib/*.jar
 			String lib = "";
@@ -166,19 +181,11 @@ public class CentralisedMASLauncherAnt implements MASLauncherInfraTier {
 				sDebug = " -debug";
 			}
 			script = replace(script,"<DEBUG>", sDebug);
-
-			// write the script
-			FileWriter out = new FileWriter(project.getDirectory() + "build.xml");
-			out.write(script);
-			out.close();
-
-		} catch (Exception e) {
-			System.err.println("Could not write start script for project " + project.getSocName());
-			e.printStackTrace();
-		}
+			script = replace(script,"<OTHER-TASK>", "");
+			return script;
 	}
 
-	private String replace(String s, String p, String n) {
+	protected String replace(String s, String p, String n) {
 		int i = s.indexOf(p);
 		if (i >= 0) {
 			s = s.substring(0,i) + n + s.substring(i+p.length()); 
@@ -186,7 +193,7 @@ public class CentralisedMASLauncherAnt implements MASLauncherInfraTier {
 		return s;
 	}
 	
-	private boolean hasCBuild() {
+	protected boolean hasCBuild() {
 		return new File(project.getDirectory()+ "c-build.xml").exists();
 	}
 	

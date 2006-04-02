@@ -41,5 +41,8 @@
 			<fileset dir="${basedir}" includes="**/*.class"/>
 		</delete>
     </target>
+
+<OTHER-TASK>
+    
 </project>
 
