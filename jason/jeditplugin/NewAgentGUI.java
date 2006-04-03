@@ -16,8 +16,8 @@ public class NewAgentGUI extends StartNewAgentGUI {
 	Buffer buffer = null;
 	View view;
 	
-	public NewAgentGUI(String title, Buffer b, View view) {
-		super(view, title);
+	public NewAgentGUI(String title, Buffer b, View view, String openDir) {
+		super(view, title, openDir);
 		buffer = b;
 		this.view = view;
 	}
@@ -29,9 +29,8 @@ public class NewAgentGUI extends StartNewAgentGUI {
 			JOptionPane.showMessageDialog(this, "An agent name must be informed.");
 			return false;
 		}
-		if (agDecl.asSource != null && !agDecl.asSource.exists()) {
-			JOptionPane.showMessageDialog(this, "The source file does not exist");
-			return false;			
+		if (agDecl.asSource == null) {
+			agDecl.asSource = new File(buffer.getDirectory() + agDecl.name + "." + MAS2JProject.AS_EXT);
 		}
 		try {
 			buffer.writeLock();
@@ -47,21 +46,19 @@ public class NewAgentGUI extends StartNewAgentGUI {
 			buffer.writeUnlock();
 		}
 		
-		// create new agent buffer
-		String agFile = buffer.getDirectory() + agName.getText().trim() + "." + MAS2JProject.AS_EXT;
-		
-		Buffer nb = org.gjt.sp.jedit.jEdit.openFile(view, agFile);
-		try {
-			nb.writeLock();
-			String agcode = "// "+agName.getText().trim() + " in project "+buffer.getName()+
-							"\ndemo.\n+demo : true <- .print(\"hello world.\").";
-			nb.insert(0, agcode);
-			nb.save(view, agFile);
-		} finally {
-			nb.writeUnlock();
+		boolean newFile = !agDecl.asSource.exists();
+		Buffer nb = org.gjt.sp.jedit.jEdit.openFile(view, agDecl.asSource.getAbsolutePath());
+		if (newFile) {
+			try {
+				nb.writeLock();
+				String agcode = "// "+agName.getText().trim() + " in project "+buffer.getName()+
+								"\ndemo.\n+demo : true <- .print(\"hello world.\").";
+				nb.insert(0, agcode);
+				nb.save(view, agDecl.asSource.getAbsolutePath());
+			} finally {
+				nb.writeUnlock();
+			}
 		}
-		
-		agDecl.asSource = new File(agFile);
 		return true;
 	}
 	

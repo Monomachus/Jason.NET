@@ -64,7 +64,9 @@ public class JasonProjectSideKickParser extends sidekick.SideKickParser {
             	int c = 0;
             	while (ia.hasNext()) {
             		AgentParameters ap = (AgentParameters)ia.next();
-            		ap.asSource = new File(buf.getDirectory() + ap.asSource); // add project directory in the AP
+            		if (!ap.asSource.toString().startsWith(File.separator)) {
+            			ap.asSource = new File(buf.getDirectory() + ap.asSource); // add project directory in the AP
+            		}
             	    pd.root.add(new ProjectAsset("", ap.name, buf, AG_TYPE).createTreeNode());
             	    //aap[c++] = ap;
                 	

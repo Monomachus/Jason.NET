@@ -20,7 +20,7 @@ public class NewInternalActionGUI extends NewAgentGUI {
 	private JTextField iaPkg;
 	
 	public NewInternalActionGUI(String title, Buffer b, View view) {
-		super(title, b, view);
+		super(title, b, view, ".");
 	}
 	
 	protected void initComponents() {
@@ -67,14 +67,17 @@ public class NewInternalActionGUI extends NewAgentGUI {
 		
 		// create new agent buffer
 		String iaFile = buffer.getDirectory() + pckDir + File.separator + ia + ".java";
+		boolean newFile = !new File(iaFile).exists();
 		
 		Buffer nb = org.gjt.sp.jedit.jEdit.openFile(view, iaFile);
-		try {
-			nb.writeLock();
-			nb.insert(0, getIAText(pck, ia));
-			nb.save(view, iaFile);
-		} finally {
-			nb.writeUnlock();
+		if (newFile) {
+			try {
+				nb.writeLock();
+				nb.insert(0, getIAText(pck, ia));
+				nb.save(view, iaFile);
+			} finally {
+				nb.writeUnlock();
+			}
 		}
 		return true;
 	}

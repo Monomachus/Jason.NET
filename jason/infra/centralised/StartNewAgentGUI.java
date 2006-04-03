@@ -1,19 +1,25 @@
 package jason.infra.centralised;
 
 import jason.mas2j.AgentParameters;
+import jason.mas2j.MAS2JProject;
 import jason.runtime.RuntimeServicesInfraTier;
 
 import java.awt.BorderLayout;
 import java.awt.Frame;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.HashMap;
 
 import javax.swing.BorderFactory;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
+import javax.swing.filechooser.FileFilter;
 
 // TODO ask for source, browse button
 
@@ -27,8 +33,11 @@ public class StartNewAgentGUI extends BaseDialogGUI {
 	protected JTextField agHost;
 	protected JComboBox  verbose;
 
-	public StartNewAgentGUI(Frame f, String title) {
+	String openDir;
+	
+	public StartNewAgentGUI(Frame f, String title, String openDir) {
 		super(f, title);
+		this.openDir = openDir;
 	}
 	
 	protected void initComponents() {
@@ -39,8 +48,22 @@ public class StartNewAgentGUI extends BaseDialogGUI {
 		agName = new JTextField(10);
 		createField("Agent name", agName, "The agent name");
 		
-		agSource = new JTextField(10);
-		createField("Source", agSource, "The path for the agent's source file (e.g. ../asl/code.asl). If left empty, the file will be the agent's name + .asl.");
+		agSource = new JTextField(15);
+    	JButton sourceBrowseBt = new JButton("Browse");
+    	sourceBrowseBt.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+	            try {
+					JFileChooser chooser = new JFileChooser(openDir);
+					chooser.setDialogTitle("Select the AgentSpeak source file");
+					chooser.setFileFilter(new AslFileFilter());
+	                //chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+	                if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+	                	agSource.setText(chooser.getSelectedFile().toString());
+	                }
+	            } catch (Exception e) {}
+			}
+    	});
+		createField("Source", agSource, sourceBrowseBt, "The path for the agent's source file (e.g. ../asl/code.asl). If left empty, the file will be the agent's name + .asl.");
 
 		agClass = new JTextField(20);
 		createField("Agent class", agClass, "The customisation class for the agent (<package.classname>). If not filled, the default agent class will be used.");
@@ -78,7 +101,7 @@ public class StartNewAgentGUI extends BaseDialogGUI {
 			return false;
 		}
 		if (ap.asSource == null) {
-			ap.asSource = new File(ap.name + ".asl");
+			ap.asSource = new File(ap.name + "." + MAS2JProject.AS_EXT);
 		}
 		if (!ap.asSource.exists()) {
 			JOptionPane.showMessageDialog(this, "The source file '"+ap.asSource+"' does not exist!");
@@ -95,7 +118,7 @@ public class StartNewAgentGUI extends BaseDialogGUI {
 						if (ap.qty > 1) {
 							name = name + (i+1);
 						}
-						services.createAgent(name, ap.asSource.getName(), ap.agClass, ap.archClass, ap.getAsSetts(debug, fs));
+						services.createAgent(name, ap.asSource.getAbsolutePath(), ap.agClass, ap.archClass, ap.getAsSetts(debug, fs));
 					}
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -111,13 +134,21 @@ public class StartNewAgentGUI extends BaseDialogGUI {
 		}
 		AgentParameters ap = new AgentParameters();
 		ap.name = agName.getText().trim();
+		if (Character.isUpperCase(ap.name.charAt(0))) {
+			ap.name = Character.toLowerCase(ap.name.charAt(0)) + ap.name.substring(1);
+		}
+		
 		if (verbose.getSelectedIndex() != 1) {
 			ap.options = new HashMap();
 			ap.options.put("verbose", verbose.getSelectedIndex()+"");
 		}
 		
 		if (agSource.getText().trim().length() > 0) {
-			ap.asSource = new File(agSource.getText().trim());
+			if (agSource.getText().startsWith(File.separator)) {
+				ap.asSource = new File(agSource.getText().trim());
+			} else {
+				ap.asSource = new File(openDir + File.separator + agSource.getText().trim());
+			}
 		}
 
 		if (archClass.getText().trim().length() > 0) {
@@ -139,5 +170,19 @@ public class StartNewAgentGUI extends BaseDialogGUI {
 		}
 		return ap;
 	}
+	
+    class AslFileFilter extends FileFilter {
+        public boolean accept(File f) {
+            if (f.getName().endsWith(MAS2JProject.AS_EXT) || f.isDirectory()) {
+				return true;
+            } else {
+				return false;
+            }
+        }
+        
+        public String getDescription() {
+            return "AgentSpeak language source";
+        }
+    }
 	
 }

@@ -69,6 +69,16 @@ abstract public class BaseDialogGUI extends JDialog {
 		pFields.add(p);
 	}
 
+	protected void createField(String label, JComponent tf1, JComponent tf2, String tooltip) {
+		JLabel jl = new JLabel(label+": ");
+		jl.setToolTipText(tooltip);
+		tf1.setToolTipText(tooltip);
+		pLabels.add(jl);
+		JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		p.add(tf1);
+		p.add(tf2);
+		pFields.add(p);
+	}
 	
 	abstract protected boolean ok();
 	

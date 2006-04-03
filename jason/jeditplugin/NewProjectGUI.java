@@ -34,7 +34,7 @@ public class NewProjectGUI extends NewAgentGUI {
 	JasonID jasonID;
 	
 	public NewProjectGUI(String title, View view, JasonID jasonID) {
-		super(title, null, view);
+		super(title, null, view, ".");
 		this.jasonID = jasonID;
 	}
 	
@@ -130,13 +130,16 @@ public class NewProjectGUI extends NewAgentGUI {
 		}
 		
 		String pFile = finalDir + File.separator + projName.getText() + "." + MAS2JProject.EXT;
+		boolean newFile = !new File(pFile).exists();
 		Buffer b = org.gjt.sp.jedit.jEdit.openFile(view, pFile);
-		try {
-			b.writeLock();
-			b.insert(0, projDecl);
-			b.save(view,pFile);
-		} finally {
-			b.writeUnlock();
+		if (newFile) {
+			try {
+				b.writeLock();
+				b.insert(0, projDecl);
+				b.save(view,pFile);
+			} finally {
+				b.writeUnlock();
+			}
 		}
 		/*
 		jasonID.checkProjectView(projName.getText(), finalDir);

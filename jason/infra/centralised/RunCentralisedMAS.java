@@ -125,7 +125,7 @@ public class RunCentralisedMAS {
 
         int errorCode = 0;
         
-    	MAS2JProject project = null;
+    	final MAS2JProject project;
 		try {
 			jason.mas2j.parser.mas2j parser = new jason.mas2j.parser.mas2j(new FileReader(args[0]));
 	    	project = parser.mas();
@@ -185,7 +185,7 @@ public class RunCentralisedMAS {
 		        final JButton btStartAg = new JButton("Start new agent", new ImageIcon(RunCentralisedMAS.class.getResource("/images/newAgent.gif")));
 		        btStartAg.addActionListener(new ActionListener() {
 		            public void actionPerformed(ActionEvent evt) {
-		            	new StartNewAgentGUI(MASConsoleGUI.get().getFrame(), "Start a new agent to run in current MAS");
+		            	new StartNewAgentGUI(MASConsoleGUI.get().getFrame(), "Start a new agent to run in current MAS", System.getProperty("user.dir"));
 		            }
 		        });
 		        MASConsoleGUI.get().addButton(btStartAg);
@@ -300,7 +300,10 @@ public class RunCentralisedMAS {
                 if (tmpAgArchClass == null) {
                 	tmpAgArchClass = AgArch.class.getName();
                 }
-                String tmpAsSrc = project.getDirectory() + ap.asSource;
+                String tmpAsSrc = ap.asSource.toString();
+                if (!tmpAsSrc.startsWith(File.separator)) {
+                	tmpAsSrc = project.getDirectory() + tmpAsSrc;
+                }
 
                 for (int cAg=0; cAg < ap.qty; cAg++) {
                     String numberedAg = agName;

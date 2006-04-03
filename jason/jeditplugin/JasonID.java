@@ -536,7 +536,7 @@ public class JasonID extends JPanel implements EBComponent, RunProjectListener {
 		if (b == null) {
 			textArea.setText("There is no Jason project opened to add an agent, create a project first.");
 		} else {
-			new NewAgentGUI("Add an agent in project "+b.getName(), b, view);
+			new NewAgentGUI("Add an agent in project "+b.getName(), b, view, b.getDirectory());
 		}
 	}
 

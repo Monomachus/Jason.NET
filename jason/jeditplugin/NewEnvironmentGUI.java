@@ -1,6 +1,9 @@
 package jason.jeditplugin;
 
+import jason.environment.Environment;
+
 import java.awt.BorderLayout;
+import java.io.File;
 
 import javax.swing.BorderFactory;
 import javax.swing.JOptionPane;
@@ -11,14 +14,12 @@ import javax.swing.border.TitledBorder;
 import org.gjt.sp.jedit.Buffer;
 import org.gjt.sp.jedit.View;
 
-import jason.environment.Environment;
-
 public class NewEnvironmentGUI extends NewAgentGUI {
 
 	private JTextField envClass;
 	
 	public NewEnvironmentGUI(String title, Buffer b, View view) {
-		super(title, b, view);
+		super(title, b, view, ".");
 	}
 	
 	protected void initComponents() {
@@ -61,14 +62,17 @@ public class NewEnvironmentGUI extends NewAgentGUI {
 		
 		// create new agent buffer
 		String envFile = buffer.getDirectory() + env + ".java";
+		boolean newFile = !new File(envFile).exists();
 		
 		Buffer nb = org.gjt.sp.jedit.jEdit.openFile(view, envFile);
-		try {
-			nb.writeLock();
-			nb.insert(0, getEnvText(env));
-			nb.save(view, envFile);
-		} finally {
-			nb.writeUnlock();
+		if (newFile) {
+			try {
+				nb.writeLock();
+				nb.insert(0, getEnvText(env));
+				nb.save(view, envFile);
+			} finally {
+				nb.writeUnlock();
+			}
 		}
 		return true;
 	}

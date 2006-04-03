@@ -194,7 +194,7 @@ public class MAS2JProject {
 			AgentParameters agp = (AgentParameters)iag.next();
 			if (agp.asSource != null) {
 				String dir = projectDir + File.separator;
-				if (agp.asSource.getName().startsWith(File.separator)) {
+				if (agp.asSource.toString().startsWith(File.separator)) {
 					dir = "";
 				}
 				files.add(new File(dir + agp.asSource));
