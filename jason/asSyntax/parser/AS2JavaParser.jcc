@@ -99,6 +99,7 @@ TOKEN : {
 | <TK_FALSE: "false">
 | <TK_NOT:  "not">
 | <TK_NEG:  "~">
+| <TK_INTDIV: "div">
 
 // special chars
 | <TK_LABEL_AT: "@">
@@ -285,6 +286,7 @@ BodyLiteral f() :     { Literal A; Token k;
  ( LOOKAHEAD(4)
    // goals and belief updates
    (  "!"             { formType = BodyLiteral.HAchieve; }
+    | "!!"            { formType = BodyLiteral.HAchieveNF; }
     | "?"             { formType = BodyLiteral.HTest; }
     | "+"             { formType = BodyLiteral.HAddBel; }
     | "-"             { formType = BodyLiteral.HDelBel; }
@@ -434,6 +436,7 @@ NumberTerm trm() :  { NumberTerm t1, t2; int op;}
    t1 = factor()    { op = -1; }
 [  ( "*"            { op = ExprTerm.EOtimes; } 
    | "/"            { op = ExprTerm.EOdiv; }
+   | <TK_INTDIV>    { op = ExprTerm.EOintdiv; }
    )
    t2 = trm()       { return new ExprTerm(t1,op,t2); }
 ]                   { return t1; }

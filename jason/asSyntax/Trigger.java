@@ -58,6 +58,7 @@ public class Trigger implements Cloneable {
 	static private Logger logger = Logger.getLogger(Trigger.class.getName());
     
     
+
 	boolean trigType = TEAdd;
 	byte goal = TEBel;
 	Literal literal;

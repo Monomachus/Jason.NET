@@ -66,7 +66,8 @@ public class ExprTerm extends VarTerm implements NumberTerm {
 	public static final int EOtimes = 3; 
 	public static final int EOdiv   = 4; 
 	public static final int EOmod   = 5; 
-	public static final int EOpow   = 6; 
+	public static final int EOpow   = 6;
+	public static final int EOintdiv = 7;
 
 	private NumberTerm lhs;
 	private int op = 0;
@@ -252,6 +253,7 @@ public class ExprTerm extends VarTerm implements NumberTerm {
 			case EOminus: return l - r;
 			case EOtimes: return l * r;
 			case EOdiv:   return l / r;
+			case EOintdiv:   return (int)l / (int)r;
 			case EOmod:   return l % r;
 			case EOpow:   return Math.pow(l,r);
 			}

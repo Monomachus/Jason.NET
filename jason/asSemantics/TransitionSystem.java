@@ -588,6 +588,12 @@ public class TransitionSystem {
 			case BodyLiteral.HAchieve:
 				conf.C.addAchvGoal(l, conf.C.SI);
 				break;
+
+			// Rule Achieve as a New Focus
+			case BodyLiteral.HAchieveNF:
+				conf.C.addAchvGoal(l, Intention.EmptyInt);
+				updateIntention();
+				break;
 				
 			// Rule Test
 			case BodyLiteral.HTest:

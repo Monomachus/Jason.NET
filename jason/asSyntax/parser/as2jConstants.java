@@ -8,18 +8,19 @@ public interface as2jConstants {
   int TK_FALSE = 8;
   int TK_NOT = 9;
   int TK_NEG = 10;
-  int TK_LABEL_AT = 11;
-  int NUMBER = 12;
-  int EXPONENT = 13;
-  int STRING = 14;
-  int ATOM = 15;
-  int VAR = 16;
-  int UNNAMEDVAR = 17;
-  int CHAR = 18;
-  int LETTER = 19;
-  int LC_LETTER = 20;
-  int UP_LETTER = 21;
-  int DIGIT = 22;
+  int TK_INTDIV = 11;
+  int TK_LABEL_AT = 12;
+  int NUMBER = 13;
+  int EXPONENT = 14;
+  int STRING = 15;
+  int ATOM = 16;
+  int VAR = 17;
+  int UNNAMEDVAR = 18;
+  int CHAR = 19;
+  int LETTER = 20;
+  int LC_LETTER = 21;
+  int UP_LETTER = 22;
+  int DIGIT = 23;
 
   int DEFAULT = 0;
 
@@ -35,6 +36,7 @@ public interface as2jConstants {
     "\"false\"",
     "\"not\"",
     "\"~\"",
+    "\"div\"",
     "\"@\"",
     "<NUMBER>",
     "<EXPONENT>",
@@ -56,6 +58,7 @@ public interface as2jConstants {
     "\"?\"",
     "\"&\"",
     "\";\"",
+    "\"!!\"",
     "\"(\"",
     "\")\"",
     "\",\"",

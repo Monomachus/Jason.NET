@@ -43,6 +43,7 @@ public class BodyLiteral implements Cloneable {
     public static final byte      HTest      = 2;
     public static final byte      HAddBel    = 3;
     public static final byte      HDelBel    = 4;	
+    public static final byte      HAchieveNF = 5;
 	
 	Literal literal;
     byte    formType;
@@ -96,6 +97,8 @@ public class BodyLiteral implements Cloneable {
                 return literal.toString();
             case HAchieve :
                 return "!" + literal.toString();
+            case HAchieveNF :
+                return "!!" + literal.toString();
             case HTest :
                 return "?" + literal.toString();
             case HAddBel :
