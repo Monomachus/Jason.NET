@@ -47,7 +47,7 @@ import java.util.Iterator;
 public final class BDIlogic {
 
     public static final boolean Bel(TransitionSystem ts, Literal l) {
-        return ts.ag.believes(l,new Unifier());
+        return ts.ag.believes(l,new Unifier()) != null;
     }
 
     /** 

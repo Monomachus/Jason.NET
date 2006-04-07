@@ -1,5 +1,6 @@
 package test;
 
+import jason.asSemantics.Agent;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.BeliefBase;
 import jason.asSyntax.ListTermImpl;
@@ -14,8 +15,6 @@ public class BeliefBaseTest extends TestCase {
 
 	protected void setUp() throws Exception {
 		super.setUp();
-		//Logger.getRootLogger().addAppender(new ConsoleAppender(new PatternLayout("[%c{1}] %m%n")));
-    	//Logger.getRootLogger().setLevel(Level.INFO);
 	}
 
 	public void testAdd() {
@@ -153,4 +152,18 @@ public class BeliefBaseTest extends TestCase {
 		assertTrue(b1.equalsAsTerm(s));
 		assertTrue(bb.remove(b1));
 	}
+	
+	public void testRemWithUnnamedVar() {
+		BeliefBase bb = new BeliefBase();
+		
+		Agent ag = new Agent();
+		ag.getBS().add(Literal.parseLiteral("pos(2,3)"));
+		Unifier u = new Unifier();
+
+		Literal l = ag.believes(Literal.parseLiteral("pos(_,_)"), u);
+		assertTrue(l != null);
+		assertEquals(l, Literal.parseLiteral("pos(2,3)"));
+		
+		assertTrue(ag.getBS().remove(l));
+	}	
 }

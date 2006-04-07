@@ -296,22 +296,24 @@ public class Agent {
         }
     }
 	
-	// Other auxiliary methods
-	public boolean believes(Literal l, Unifier un) {
+	/** 
+	 * If BB contains l (using unification to test), returns the literal that is the BB; 
+	 * otherwise, returns null.
+	 * E.g.: if l is g(_,_) and BB is={...., g(10,20), ...}, this method returns g(10,20).
+	 * 
+	 */
+	public Literal believes(Literal l, Unifier un) {
 		List relB = fBS.getRelevant(l);
 		if (relB != null) {
 			for (int i=0; i < relB.size(); i++) {
 				Literal b = (Literal) relB.get(i);
-				// old version Unifier newUn = (un == null) ? new Unifier() : (Unifier) un.clone();
 				// recall that order is important because of annotations!
 				if (un.unifies(l,b)) {
-					// if literals are negated or not
-					//old version return newUn;
-					return true;
+					return b;
 				}
 			}
 		}
-		return false;
+		return null;
 	}
 
 	public Literal findBel(Literal l, Unifier un) {

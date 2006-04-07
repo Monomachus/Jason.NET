@@ -597,11 +597,7 @@ public class TransitionSystem {
 				
 			// Rule Test
 			case BodyLiteral.HTest:
-				//old version Unifier ubel = conf.ag.believes(l, u);
-				//old version if (ubel != null) {
-				if (conf.ag.believes(l, u)) {
-					//old version im = conf.C.SI.peek();
-					//old version im.unif = ubel;
+				if (conf.ag.believes(l, u) != null) {
 					updateIntention();
 				} else {
 					logger.warning("Test Goal '"+h+"' failed as simple query. Generating internal event for it...");
@@ -626,19 +622,20 @@ public class TransitionSystem {
 				
 			// Rule DelBel
 			case BodyLiteral.HDelBel:
-				//old version ubel = conf.ag.believes(l, u);
-				//old version if (ubel != null) {
-				if (conf.ag.believes(l, u)) {
-					//old version ubel.apply(l);
-					u.apply(l); // apply again, since believes may add some unification
+				Literal lInBB = conf.ag.believes(l, u);
+				if (lInBB != null) {
+					// lInBBClone is l unified in BB, without annots
+					// we can not use l for delBel in case l is g(_,_)
+					Literal lInBBClone = (Literal)lInBB.clone();
+					lInBBClone.clearAnnots();
 					source = BeliefBase.TSelf;
 					if (l.hasSource()) {
 						source = null; // do not add source(self) in case the programmer set the source
 					}
 					if (setts.sameFocus())
-						conf.ag.delBel(l, source, conf.C, conf.C.SI);
+						conf.ag.delBel(lInBBClone, source, conf.C, conf.C.SI);
 					else {
-						conf.ag.delBel(l, source, conf.C, Intention.EmptyInt);
+						conf.ag.delBel(lInBBClone, source, conf.C, Intention.EmptyInt);
 						updateIntention();
 					}
 				} else {
