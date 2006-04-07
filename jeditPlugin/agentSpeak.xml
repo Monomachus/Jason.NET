@@ -40,8 +40,10 @@
 		    <END>]</END>
 		</SPAN>
 
-		<!-- true in context or body is special -->
+		<!-- special reserved words and operators -->
  		<SEQ TYPE="LITERAL2">true</SEQ>
+		<SEQ TYPE="OPERATOR">not</SEQ>
+		<SEQ TYPE="OPERATOR">div</SEQ>
 
 		<SEQ_REGEXP TYPE="DIGIT" HASH_CHAR="@" AT_WORD_START="TRUE">[@]([[:alnum:]])+</SEQ_REGEXP>
 
@@ -51,35 +53,11 @@
 		<SEQ_REGEXP TYPE="MARKUP" HASH_CHAR="+" AT_WORD_START="TRUE">[+][?][a-z]([[:alnum:]])*</SEQ_REGEXP>
 		<SEQ_REGEXP TYPE="MARKUP" HASH_CHAR="-" AT_WORD_START="TRUE">[-][!][a-z]([[:alnum:]])*</SEQ_REGEXP>
 		<SEQ_REGEXP TYPE="MARKUP" HASH_CHAR="-" AT_WORD_START="TRUE">[-][?][a-z]([[:alnum:]])*</SEQ_REGEXP>
-		<SEQ_REGEXP TYPE="MARKUP" HASH_CHAR="!" AT_WORD_START="TRUE">[!][a-z]([[:alnum:]])*</SEQ_REGEXP>
+ 		<SEQ_REGEXP TYPE="MARKUP" HASH_CHAR="!" AT_WORD_START="TRUE">[!][a-z]([[:alnum:]])*</SEQ_REGEXP>
+ 		<SEQ_REGEXP TYPE="MARKUP" HASH_CHAR="!" AT_WORD_START="TRUE">[!][!][a-z]([[:alnum:]])*</SEQ_REGEXP>
 		<SEQ_REGEXP TYPE="MARKUP" HASH_CHAR="?" AT_WORD_START="TRUE">[?][a-z]([[:alnum:]])*</SEQ_REGEXP>		
 
-		<!-- plans delimiters -->
-		<SEQ TYPE="KEYWORD1">:</SEQ>
-		<SEQ TYPE="KEYWORD1" DELEGATE="BODY">&lt;-</SEQ>
-		<SEQ TYPE="KEYWORD1" AT_END_WORD="TRUE">.</SEQ>
-
-	<!-- Operators -->
-		<SEQ TYPE="OPERATOR">==</SEQ>
-		<SEQ TYPE="OPERATOR">\==</SEQ>
-		<SEQ TYPE="OPERATOR">=</SEQ>
-		<SEQ TYPE="OPERATOR">&gt;=</SEQ>
-		<SEQ TYPE="OPERATOR">&lt;=</SEQ>
-		<SEQ TYPE="OPERATOR">&gt;</SEQ>
-		<SEQ TYPE="OPERATOR">&lt;</SEQ>
-
-		<SEQ TYPE="OPERATOR">+</SEQ>
-		<SEQ TYPE="OPERATOR">-</SEQ>
-		<SEQ TYPE="OPERATOR">/</SEQ>
-		<SEQ TYPE="OPERATOR">*</SEQ>
-		<SEQ TYPE="OPERATOR">**</SEQ>
-		<SEQ TYPE="OPERATOR">%</SEQ>
-
-		<SEQ TYPE="OPERATOR">&amp;</SEQ>
-		<SEQ TYPE="OPERATOR">not</SEQ>
-		<SEQ TYPE="OPERATOR">~</SEQ>
-
-	<!-- Vars -->
+		<!-- Vars -->
 		<SEQ_REGEXP TYPE="LITERAL3" HASH_CHAR="A">A([[:alnum:]])*</SEQ_REGEXP>
 		<SEQ_REGEXP TYPE="LITERAL3" HASH_CHAR="B">B([[:alnum:]])*</SEQ_REGEXP>
 		<SEQ_REGEXP TYPE="LITERAL3" HASH_CHAR="C">C([[:alnum:]])*</SEQ_REGEXP>
@@ -107,7 +85,7 @@
 		<SEQ_REGEXP TYPE="LITERAL3" HASH_CHAR="W">W([[:alnum:]])*</SEQ_REGEXP>
 		<SEQ_REGEXP TYPE="LITERAL3" HASH_CHAR="Y">Y([[:alnum:]])*</SEQ_REGEXP>
 
-	<!-- Internal Actions -->
+		<!-- Internal Actions -->
 		<SEQ_REGEXP TYPE="COMMENT4" HASH_CHAR=".">[.]([[:alnum:]])+</SEQ_REGEXP>
 		<SEQ_REGEXP TYPE="COMMENT4" HASH_CHAR="a">a([[:alnum:]])*[.]([[:alnum:]])+</SEQ_REGEXP>
 		<SEQ_REGEXP TYPE="COMMENT4" HASH_CHAR="b">b([[:alnum:]])*[.]([[:alnum:]])+</SEQ_REGEXP>
@@ -136,7 +114,7 @@
 		<SEQ_REGEXP TYPE="COMMENT4" HASH_CHAR="w">w([[:alnum:]])*[.]([[:alnum:]])+</SEQ_REGEXP>
 		<SEQ_REGEXP TYPE="COMMENT4" HASH_CHAR="y">y([[:alnum:]])*[.]([[:alnum:]])+</SEQ_REGEXP>
 
-	<!-- Default for atoms is belief -->
+		<!-- Default for atoms is belief -->
 		<SEQ_REGEXP TYPE="LABEL" HASH_CHAR="a">a([[:alnum:]])*</SEQ_REGEXP>
 		<SEQ_REGEXP TYPE="LABEL" HASH_CHAR="b">b([[:alnum:]])*</SEQ_REGEXP>
 		<SEQ_REGEXP TYPE="LABEL" HASH_CHAR="c">c([[:alnum:]])*</SEQ_REGEXP>
@@ -164,7 +142,31 @@
 		<SEQ_REGEXP TYPE="LABEL" HASH_CHAR="w">w([[:alnum:]])*</SEQ_REGEXP>
 		<SEQ_REGEXP TYPE="LABEL" HASH_CHAR="y">y([[:alnum:]])*</SEQ_REGEXP>
 
-	<!-- Brackets and Punctuation -->
+		<!-- plans delimiters -->
+		<SEQ TYPE="KEYWORD1">:</SEQ>
+		<SEQ TYPE="KEYWORD1" DELEGATE="BODY">&lt;-</SEQ>
+		<SEQ TYPE="KEYWORD1" AT_END_WORD="TRUE">.</SEQ>
+		
+		<!-- Operators -->
+		<SEQ TYPE="OPERATOR">==</SEQ>
+		<SEQ TYPE="OPERATOR">\==</SEQ>
+		<SEQ TYPE="OPERATOR">=</SEQ>
+		<SEQ TYPE="OPERATOR">&gt;=</SEQ>
+		<SEQ TYPE="OPERATOR">&lt;=</SEQ>
+		<SEQ TYPE="OPERATOR">&gt;</SEQ>
+		<SEQ TYPE="OPERATOR">&lt;</SEQ>
+
+		<SEQ TYPE="OPERATOR">+</SEQ>
+		<SEQ TYPE="OPERATOR">-</SEQ>
+		<SEQ TYPE="OPERATOR">/</SEQ>
+		<SEQ TYPE="OPERATOR">*</SEQ>
+		<SEQ TYPE="OPERATOR">**</SEQ>
+		<SEQ TYPE="OPERATOR">%</SEQ>
+
+		<SEQ TYPE="OPERATOR">&amp;</SEQ>
+		<SEQ TYPE="OPERATOR">~</SEQ>
+
+		<!-- Brackets and Punctuation -->
 		<SEQ TYPE="NULL">(</SEQ>
 		<SEQ TYPE="NULL">)</SEQ>
 		<SEQ TYPE="NULL">[</SEQ>
@@ -203,35 +205,18 @@
 		    <END>]</END>
 		</SPAN>
 
-		<!-- literals -->
+		<!-- special reserved words and operators -->
  		<SEQ TYPE="LITERAL2">true</SEQ>
+		<SEQ TYPE="OPERATOR">not</SEQ>
+		<SEQ TYPE="OPERATOR">div</SEQ>
 
 		<SEQ_REGEXP TYPE="LABEL" HASH_CHAR="+" AT_WORD_START="TRUE">[+][a-z]([[:alnum:]])*</SEQ_REGEXP>
 		<SEQ_REGEXP TYPE="LABEL" HASH_CHAR="-" AT_WORD_START="TRUE">[-][a-z]([[:alnum:]])*</SEQ_REGEXP>
 		<SEQ_REGEXP TYPE="MARKUP" HASH_CHAR="!" AT_WORD_START="TRUE">[!][a-z]([[:alnum:]])*</SEQ_REGEXP>
+		<SEQ_REGEXP TYPE="MARKUP" HASH_CHAR="!" AT_WORD_START="TRUE">[!][!][a-z]([[:alnum:]])*</SEQ_REGEXP>
 		<SEQ_REGEXP TYPE="MARKUP" HASH_CHAR="?" AT_WORD_START="TRUE">[?][a-z]([[:alnum:]])*</SEQ_REGEXP>		
 
-	<!-- Operators -->
-		<SEQ TYPE="OPERATOR">==</SEQ>
-		<SEQ TYPE="OPERATOR">\==</SEQ>
-		<SEQ TYPE="OPERATOR">=</SEQ>
-		<SEQ TYPE="OPERATOR">&gt;=</SEQ>
-		<SEQ TYPE="OPERATOR">&lt;=</SEQ>
-		<SEQ TYPE="OPERATOR">&gt;</SEQ>
-		<SEQ TYPE="OPERATOR">&lt;</SEQ>
-
-		<SEQ TYPE="OPERATOR">+</SEQ>
-		<SEQ TYPE="OPERATOR">-</SEQ>
-		<SEQ TYPE="OPERATOR">/</SEQ>
-		<SEQ TYPE="OPERATOR">*</SEQ>
-		<SEQ TYPE="OPERATOR">**</SEQ>
-		<SEQ TYPE="OPERATOR">%</SEQ>
-
-		<SEQ TYPE="OPERATOR">&amp;</SEQ>
-		<SEQ TYPE="OPERATOR">not</SEQ>
-		<SEQ TYPE="OPERATOR">~</SEQ>
-
-	<!-- Vars -->
+		<!-- Vars -->
 		<SEQ_REGEXP TYPE="LITERAL3" HASH_CHAR="A">A([[:alnum:]])*</SEQ_REGEXP>
 		<SEQ_REGEXP TYPE="LITERAL3" HASH_CHAR="B">B([[:alnum:]])*</SEQ_REGEXP>
 		<SEQ_REGEXP TYPE="LITERAL3" HASH_CHAR="C">C([[:alnum:]])*</SEQ_REGEXP>
@@ -259,7 +244,7 @@
 		<SEQ_REGEXP TYPE="LITERAL3" HASH_CHAR="W">W([[:alnum:]])*</SEQ_REGEXP>
 		<SEQ_REGEXP TYPE="LITERAL3" HASH_CHAR="Y">Y([[:alnum:]])*</SEQ_REGEXP>
 
-	<!-- Internal Actions -->
+		<!-- Internal Actions -->
 		<SEQ_REGEXP TYPE="COMMENT4" HASH_CHAR=".">[.]([[:alnum:]])+</SEQ_REGEXP>
 		<SEQ_REGEXP TYPE="COMMENT4" HASH_CHAR="a">a([[:alnum:]])*[.]([[:alnum:]])+</SEQ_REGEXP>
 		<SEQ_REGEXP TYPE="COMMENT4" HASH_CHAR="b">b([[:alnum:]])*[.]([[:alnum:]])+</SEQ_REGEXP>
@@ -288,7 +273,7 @@
 		<SEQ_REGEXP TYPE="COMMENT4" HASH_CHAR="w">w([[:alnum:]])*[.]([[:alnum:]])+</SEQ_REGEXP>
 		<SEQ_REGEXP TYPE="COMMENT4" HASH_CHAR="y">y([[:alnum:]])*[.]([[:alnum:]])+</SEQ_REGEXP>
 
-	<!-- Default for atoms is action -->
+		<!-- Default for atoms is action -->
 		<SEQ_REGEXP TYPE="COMMENT4" HASH_CHAR="a">a([[:alnum:]])*</SEQ_REGEXP>
 		<SEQ_REGEXP TYPE="COMMENT4" HASH_CHAR="b">b([[:alnum:]])*</SEQ_REGEXP>
 		<SEQ_REGEXP TYPE="COMMENT4" HASH_CHAR="c">c([[:alnum:]])*</SEQ_REGEXP>
@@ -316,7 +301,29 @@
 		<SEQ_REGEXP TYPE="COMMENT4" HASH_CHAR="w">w([[:alnum:]])*</SEQ_REGEXP>
 		<SEQ_REGEXP TYPE="COMMENT4" HASH_CHAR="y">y([[:alnum:]])*</SEQ_REGEXP>
 
-	<!-- Brackets and Punctuation -->
+		<!-- plans delimiters -->
+		<SEQ TYPE="KEYWORD1" AT_END_WORD="TRUE" DELEGATE="MAIN">.</SEQ>
+
+		<!-- Operators -->
+		<SEQ TYPE="OPERATOR">==</SEQ>
+		<SEQ TYPE="OPERATOR">\==</SEQ>
+		<SEQ TYPE="OPERATOR">=</SEQ>
+		<SEQ TYPE="OPERATOR">&gt;=</SEQ>
+		<SEQ TYPE="OPERATOR">&lt;=</SEQ>
+		<SEQ TYPE="OPERATOR">&gt;</SEQ>
+		<SEQ TYPE="OPERATOR">&lt;</SEQ>
+
+		<SEQ TYPE="OPERATOR">+</SEQ>
+		<SEQ TYPE="OPERATOR">-</SEQ>
+		<SEQ TYPE="OPERATOR">/</SEQ>
+		<SEQ TYPE="OPERATOR">*</SEQ>
+		<SEQ TYPE="OPERATOR">**</SEQ>
+		<SEQ TYPE="OPERATOR">%</SEQ>
+
+		<SEQ TYPE="OPERATOR">&amp;</SEQ>
+		<SEQ TYPE="OPERATOR">~</SEQ>
+
+		<!-- Brackets and Punctuation -->
 		<SEQ TYPE="NULL">(</SEQ>
 		<SEQ TYPE="NULL">)</SEQ>
 		<SEQ TYPE="NULL">[</SEQ>
@@ -325,9 +332,6 @@
 		<SEQ TYPE="NULL">}</SEQ>
 		<SEQ TYPE="NULL">,</SEQ>
 		<SEQ TYPE="NULL">;</SEQ>
-
-		<!-- plans delimiters -->
-		<SEQ TYPE="KEYWORD1" AT_END_WORD="TRUE" DELEGATE="MAIN">.</SEQ>
 
 	</RULES>
 
@@ -366,6 +370,9 @@
  		<SEQ TYPE="LITERAL2">source</SEQ>
  		<SEQ TYPE="LITERAL2">atomic</SEQ>
  		<SEQ TYPE="LITERAL2">breakpoint</SEQ>
+
+	<!-- special reserved words and operators -->
+		<SEQ TYPE="OPERATOR">div</SEQ>
 
 	<!-- Atoms -->
 		<SEQ_REGEXP TYPE="LITERAL4" HASH_CHAR="a">a([[:alnum:]])*</SEQ_REGEXP>
