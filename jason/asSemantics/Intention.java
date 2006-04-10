@@ -36,6 +36,7 @@
 package jason.asSemantics;
 
 import jason.asSyntax.Trigger;
+import jason.stdlib.intend;
 
 import java.io.Serializable;
 import java.util.Iterator;
@@ -43,6 +44,8 @@ import java.util.Stack;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+//import java.util.logging.Level;
+//import java.util.logging.Logger;
 
 public class Intention implements Serializable {
 
@@ -52,7 +55,9 @@ public class Intention implements Serializable {
 	private int id;
 	
     Stack fIntendedMeans = new Stack();
-    
+
+//	static private Logger logger = Logger.getLogger(intend.class.getName());
+
     public Intention() {
     	id = idCount++;
     }
@@ -96,13 +101,14 @@ public class Intention implements Serializable {
 		return false;
 	}
 	
-    public boolean hasTrigger(Trigger g) {
+    public boolean hasTrigger(Trigger g, Unifier u) {
         Iterator j = iterator(); 
         while (j.hasNext()) {
             IntendedMeans im = (IntendedMeans)j.next();
             Trigger it = (Trigger) im.getPlan().getTriggerEvent().clone();
             im.unif.apply(it.getLiteral());
-            if (new Unifier().unifies(g,it)) {
+//logger.log(Level.SEVERE,"HasTrigger: "+g+it);
+            if (u.unifies(g,it)) {
                 return true;
             }
         }

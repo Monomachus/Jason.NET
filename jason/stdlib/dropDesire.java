@@ -44,7 +44,7 @@ public class dropDesire implements InternalAction {
     public boolean execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         Literal l = Literal.parseLiteral(args[0].toString());
         un.apply(l);
-        BDIlogic.dropDes(ts,l);
+        BDIlogic.dropDes(ts,l,un);
         return true;
     }
 }

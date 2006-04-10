@@ -660,13 +660,17 @@ public class TransitionSystem {
 						confP.C.SI.pop();
 					}
 					im = conf.C.SI.peek();
-					// TODO: Not sure when body could be 0!!!
+					// TODO: We needed this if() here but not sure when body could be 0!!!
 					//       Check why this can happen; perhaps test goal is removed
 					//       from body when event is created, unlike achievement goal?
 					if (im.getPlan().getBody().size()>0) {
 						BodyLiteral g = (BodyLiteral) im.getPlan().getBody().remove(0);
-						// use unifier of finished plan accordingly
-						im.unif.compose(g.getLiteral(), oldim.unif);
+						// Fixed bug here: note unifier.compose is no longer used
+						// this is now as in the formal semantics
+						// make the TE of finished plan ground and unify that with goal in the body
+						Literal tel = oldim.getPlan().getTriggerEvent().getLiteral();
+						oldim.unif.apply(tel);
+						im.unif.unifies(tel,g.getLiteral()); // TODO: Is the order here right?
 					}
 					confP.step = SClrInt; // the new top may have become
 					                      // empty! need to keep checking.

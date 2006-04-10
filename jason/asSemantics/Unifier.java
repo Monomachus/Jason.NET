@@ -151,6 +151,7 @@ public class Unifier implements Cloneable {
 		}
     }
     
+    // TODO: compose is no longer used in TS. Delete?
     public void compose(Term t, Unifier u) {
         if (t.isVar()) {
             if (u.function.containsKey(t.getFunctor())) {

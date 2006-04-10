@@ -38,12 +38,19 @@ import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.Literal;
 import jason.asSyntax.Term;
+//import java.util.logging.Level;
+//import java.util.logging.Logger;
+
 
 public class intend implements InternalAction {
     
-    public boolean execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
-        Literal l = Literal.parseLiteral(args[0].toString());
+//	static private Logger logger = Logger.getLogger(intend.class.getName());
+
+	public boolean execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
+    	
+    	Literal l = Literal.parseLiteral(args[0].toString());
         un.apply(l);
-        return BDIlogic.Int(ts,l);
+//logger.log(Level.SEVERE,"HERE in .intend: "+BDIlogic.Int(ts,l,un));
+        return BDIlogic.Int(ts,l,un);
     }
 }

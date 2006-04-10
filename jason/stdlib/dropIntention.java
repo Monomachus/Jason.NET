@@ -44,7 +44,7 @@ public class dropIntention implements InternalAction {
     public boolean execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         Literal l = Literal.parseLiteral(args[0].toString());
         un.apply(l);
-        BDIlogic.dropInt(ts,l);
+        BDIlogic.dropInt(ts,l,un);
         return true;
     }
 }
