@@ -376,7 +376,7 @@ public class Agent {
 	public void updateEvents(Event e, Circumstance c) {
 		if (c != null) {
 			if (e.isInternal() || fPS.isRelevant(e.trigger)) {
-				c.E.add(e);
+				c.addEvent(e);
 				logger.fine("Added event "+e);
 			}
 		}

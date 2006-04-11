@@ -66,7 +66,7 @@ public class Circumstance implements Serializable {
 
 	static Logger logger = Logger.getLogger(Circumstance.class.getName());
 	
-    protected List   E;
+    private List   E;
     protected List   I;
 
 	protected ActionExec A;
@@ -84,6 +84,8 @@ public class Circumstance implements Serializable {
     protected Map       PA;
     protected List      FA;
 
+    private List listeners = new ArrayList();
+    
     public Circumstance() {
         E  = new LinkedList();
         I  = new LinkedList();
@@ -103,32 +105,17 @@ public class Circumstance implements Serializable {
     }
 
     public void addAchvGoal(Literal l, Intention i) {
-        E.add(new Event(new Trigger(Trigger.TEAdd,Trigger.TEAchvG, l), i));
+        addEvent(new Event(new Trigger(Trigger.TEAdd,Trigger.TEAchvG, l), i));
     }
     public void addTestGoal(Literal l, Intention i) {
-        E.add(new Event(new Trigger(Trigger.TEAdd,Trigger.TETestG, l), i));
-    }
-
-    public void addGoal(byte g, Literal l, Intention i) throws JasonException {
-        if (g==Trigger.TEAchvG)
-            addAchvGoal(l, i);
-        else if (g==Trigger.TETestG)
-            addTestGoal(l, i);
-        else
-            throw new JasonException("Unknown type of goal.");
+    	addEvent(new Event(new Trigger(Trigger.TEAdd,Trigger.TETestG, l), i));
     }
 
     public void delAchvGoal(Literal l, Intention i) {
-        E.add(new Event(new Trigger(Trigger.TEDel,Trigger.TEAchvG,l), i));
-    }
-    public void delAchvGoal(String sl, Intention i) {
-        delAchvGoal(Literal.parseLiteral(sl), i);
+    	addEvent(new Event(new Trigger(Trigger.TEDel,Trigger.TEAchvG,l), i));
     }
     public void delTestGoal(Literal l, Intention i) {
-        E.add(new Event(new Trigger(Trigger.TEDel,Trigger.TETestG,l), i));
-    }
-    public void delTestGoal(String sl, Intention i) {
-        delTestGoal(Literal.parseLiteral(sl), i);
+    	addEvent(new Event(new Trigger(Trigger.TEDel,Trigger.TETestG,l), i));
     }
 
     public void delGoal(byte g, Literal l, Intention i) throws JasonException {
@@ -141,17 +128,64 @@ public class Circumstance implements Serializable {
     }
 
     public void addExternalEv(Trigger trig) {
-        E.add(new Event(trig, Intention.EmptyInt));
+    	addEvent(new Event(trig, Intention.EmptyInt));
     }
+
     public void addEvent(Event ev) {
         E.add(ev);
+        
+        // notify listeners
+        synchronized (listeners) {
+	        Iterator i = listeners.iterator();
+	        while (i.hasNext()) {
+	        	CircumstanceListener el = (CircumstanceListener)i.next();
+	        	el.eventAdded(ev);
+	        }
+		}
+    }
+    
+    public void clearEvents() {
+    	E.clear();
+    }
+
+    public List getEvents() {
+		return E;
+	}
+    
+    public void addEventListener(CircumstanceListener el) {
+        synchronized (listeners) {
+        	listeners.add(el);
+        }
+    }
+    
+    public void removeEventListener(CircumstanceListener el) {
+        synchronized (listeners) {
+        	listeners.remove(el);
+        }
     }
 
     public List getMB() {
 		return MB;
 	}
 
-	public ActionExec getAction() {
+
+	public List getIntentions() {
+		return I;
+	}
+	public void addIntention(Intention intention) {
+		I.add(intention);
+
+		// notify listeners
+        synchronized (listeners) {
+	        Iterator i = listeners.iterator();
+	        while (i.hasNext()) {
+	        	CircumstanceListener el = (CircumstanceListener)i.next();
+	        	el.intentionAdded(intention);
+	        }
+        }
+	}
+    
+    public ActionExec getAction() {
 		return A;
 	}
 	public void setA(ActionExec a) {
@@ -160,14 +194,8 @@ public class Circumstance implements Serializable {
 	public List getApplicablePlans() {
 		return AP;
 	}
-	public List getEvents() {
-		return E;
-	}
 	public List getFeedbackActions() {
 		return FA;
-	}
-	public List getIntentions() {
-		return I;
 	}
 	public Map getPendingActions() {
 		return PA;
@@ -208,8 +236,8 @@ public class Circumstance implements Serializable {
 		// events
 		Element events = (Element) document.createElement("events");
 		boolean add = false;
-		if (getEvents() != null && !getEvents().isEmpty()) {
-			i = getEvents().iterator();
+		if (E != null && !E.isEmpty()) {
+			i = E.iterator();
 			while (i.hasNext()) {
 				add = true;
 				Event evt = (Event)i.next();

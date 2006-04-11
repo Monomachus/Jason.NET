@@ -19,20 +19,6 @@
 // http://www.dur.ac.uk/r.bordini
 // http://www.inf.furb.br/~jomi
 //
-// CVS information:
-//   $Date$
-//   $Revision$
-//   $Log$
-//   Revision 1.8  2006/01/06 12:05:37  jomifred
-//   operator - removes bel from BB and changes the current unifier.
-//
-//   Revision 1.7  2005/12/30 20:40:16  jomifred
-//   new features: unnamed var, var with annots, TE as var
-//
-//   Revision 1.6  2005/08/12 22:18:37  jomifred
-//   add cvs keywords
-//
-//
 //----------------------------------------------------------------------------
 
 
@@ -43,12 +29,11 @@ import jason.asSyntax.Literal;
 import jason.asSyntax.Trigger;
 
 import java.util.Iterator;
-//import java.util.logging.Level;
-//import java.util.logging.Logger;
+import java.util.logging.Logger;
 
 public final class BDIlogic {
 
-//	static private Logger logger = Logger.getLogger(BDIlogic.class.getName());
+	static private Logger logger = Logger.getLogger(BDIlogic.class.getName());
 
     public static final boolean Bel(TransitionSystem ts, Literal l) {
         return ts.ag.believes(l,new Unifier()) != null;
@@ -60,7 +45,7 @@ public final class BDIlogic {
      */
     public static final boolean Des(TransitionSystem ts, Literal l, Unifier un) {
     	Trigger teFromL = new Trigger(Trigger.TEAdd,Trigger.TEAchvG,l);
-//logger.log(Level.SEVERE,"Des: "+l+un+ts.C.E+ts.C.I);
+    	//logger.log(Level.SEVERE,"Des: "+l+un+ts.C.E+ts.C.I);
 
 		// need to check the slected event in this cycle!!! (already removed from E)
 		if(ts.C.SE!=null) {
@@ -69,20 +54,20 @@ public final class BDIlogic {
 				t = (Trigger)t.clone();
 				((IntendedMeans)ts.C.SE.intention.peek()).unif.apply(t.getLiteral());
 			}
-//logger.log(Level.SEVERE,"Des: "+t+" unif "+teFromL);
+			//logger.log(Level.SEVERE,"Des: "+t+" unif "+teFromL);
         	if(un.unifies(t,teFromL)) {
         		return true;
         	}
 		}
 
-		for(Iterator i=ts.C.E.iterator(); i.hasNext(); ) {
+		for(Iterator i=ts.C.getEvents().iterator(); i.hasNext(); ) {
             Event ei = (Event)i.next();
             Trigger t = (Trigger)ei.trigger;
             if (ei.intention!=Intention.EmptyInt) {
                 t = (Trigger)t.clone();
                 ((IntendedMeans)ei.intention.peek()).unif.apply(t.getLiteral());
             }
-//logger.log(Level.SEVERE,"Des: "+t+" unif "+teFromL);
+            //logger.log(Level.SEVERE,"Des: "+t+" unif "+teFromL);
             if(un.unifies(t,teFromL)) {
                 return true;
             }
@@ -98,11 +83,11 @@ public final class BDIlogic {
      */
     public static final boolean Int(TransitionSystem ts, Literal l, Unifier un) {
         Trigger g = new Trigger(Trigger.TEAdd,Trigger.TEAchvG,l);
-//logger.log(Level.SEVERE,"Entering Int: "+ts.C.I);
+        //logger.log(Level.SEVERE,"Entering Int: "+ts.C.I);
 
         // need to check the intention in the slected event in this cycle!!! (already removed from E)
         if (ts.C.SE!=null) {
-//logger.log(Level.SEVERE,"Int: "+g+" unif "+ts.C.SE);
+        	//logger.log(Level.SEVERE,"Int: "+g+" unif "+ts.C.SE);
 			if (ts.C.SE.intention!=null)
 				if (ts.C.SE.intention.hasTrigger(g,un))
 					return true;
@@ -110,14 +95,14 @@ public final class BDIlogic {
 
         // need to check the slected intention in this cycle!!!
         if (ts.C.SI!=null) {
-//logger.log(Level.SEVERE,"Int: "+g+" unif "+ts.C.SI);
+        	//logger.log(Level.SEVERE,"Int: "+g+" unif "+ts.C.SI);
         	if (ts.C.SI.hasTrigger(g,un))
         		return true;
         }
 
         // intention may be suspended in E
-        for(Iterator i=ts.C.E.iterator(); i.hasNext(); ) {
-//logger.log(Level.SEVERE,"Int: "+g+" unif "+ts.C.SI);
+        for(Iterator i=ts.C.getEvents().iterator(); i.hasNext(); ) {
+        	//logger.log(Level.SEVERE,"Int: "+g+" unif "+ts.C.SI);
             if (((Event)i.next()).intention.hasTrigger(g,un))
                 return true;
         }
@@ -125,14 +110,14 @@ public final class BDIlogic {
         // intention may be suspended in PA! (in the new semantics)
         if (ts.C.PA!=null) {
             for(Iterator i=ts.C.PA.values().iterator(); i.hasNext(); ) {
-//logger.log(Level.SEVERE,"Int: "+g+" unif "+ts.C.SI);
+            	//logger.log(Level.SEVERE,"Int: "+g+" unif "+ts.C.SI);
                 if (((ActionExec)i.next()).getIntention().hasTrigger(g,un))
                     return true;
             }
         }
 
         for(Iterator i=ts.C.I.iterator(); i.hasNext(); ) {
-//logger.log(Level.SEVERE,"Int: "+g+" unif "+ts.C.SI);
+        	//logger.log(Level.SEVERE,"Int: "+g+" unif "+ts.C.SI);
     		if (((Intention)i.next()).hasTrigger(g,un))
     			return true;
         }
@@ -153,7 +138,7 @@ public final class BDIlogic {
      */
     public static final void dropDes(TransitionSystem ts, Literal l, Unifier un) {
         Event e = new Event(new Trigger(Trigger.TEAdd,Trigger.TEAchvG,l),Intention.EmptyInt);
-        for(Iterator i=ts.C.E.iterator(); i.hasNext(); ) {
+        for(Iterator i=ts.C.getEvents().iterator(); i.hasNext(); ) {
             Event ei = (Event)i.next();
             Trigger t = (Trigger)ei.trigger;
             if (ei.intention!=Intention.EmptyInt) {
@@ -180,17 +165,17 @@ public final class BDIlogic {
             if (i.hasTrigger(g,un)) {
                 Trigger ng = (Trigger) g.clone();
                 ng.setTrigType(Trigger.TEDel);
-                ts.C.E.add(new Event(ng,i));
+                ts.C.addEvent(new Event(ng,i));
                 j.remove();
             }
         }
         // intention may be suspended in E
-        for(Iterator j=ts.C.E.iterator(); j.hasNext(); ) {
+        for(Iterator j=ts.C.getEvents().iterator(); j.hasNext(); ) {
         	Intention i = ((Event)j.next()).intention;
             if (i.hasTrigger(g,un)) {
                 Trigger ng = (Trigger) g.clone();
                 ng.setTrigType(Trigger.TEDel);
-                ts.C.E.add(new Event(ng,i));
+                ts.C.addEvent(new Event(ng,i));
                 j.remove();
             }
         }
@@ -206,7 +191,7 @@ public final class BDIlogic {
                 if (i.hasTrigger(g,un)) {
                     Trigger ng = (Trigger) g.clone();
                     ng.setTrigType(Trigger.TEDel);
-                    ts.C.E.add(new Event(ng,i));
+                    ts.C.addEvent(new Event(ng,i));
                     j.remove();
                 }
             }
@@ -220,7 +205,7 @@ public final class BDIlogic {
      * goal deletion event is generated.
      */
     public static final void dropAllDes(TransitionSystem ts) {
-        ts.C.E.clear();
+        ts.C.clearEvents();
     }
 
     /**

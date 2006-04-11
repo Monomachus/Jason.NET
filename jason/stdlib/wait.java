@@ -46,23 +46,109 @@
 
 package jason.stdlib;
 
+import jason.asSemantics.Circumstance;
+import jason.asSemantics.CircumstanceListener;
+import jason.asSemantics.Event;
+import jason.asSemantics.Intention;
 import jason.asSemantics.InternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.NumberTerm;
+import jason.asSyntax.StringTerm;
 import jason.asSyntax.Term;
+import jason.asSyntax.Trigger;
+
+import java.util.logging.Level;
 
 public class wait implements InternalAction {
-
+	
 	/**
-	 * args[0] is the time (in ms)
+	 * args[0] is either a number or a string, if number it is the time (in ms), 
+	 * if string it is the trigger event to be waited.
+	 * 
+	 * E.g.: .wait(1000)       // waits 1 second
+	 *       .wait("+!t(50)")  // waits the event +!t(50)
+	 * 
 	 */
-	public boolean execute(TransitionSystem ts, Unifier un, Term[] args)	throws Exception {
-		NumberTerm time = (NumberTerm)args[0].clone();
-		un.apply((Term)time);
-		try {
-			Thread.sleep((long)time.solve());
-		} catch (Exception e) {		}
-		return true;
+	public boolean execute(final TransitionSystem ts, Unifier un, Term[] args)	throws Exception {
+		if (args[0].isNumber()) {
+			// time in mile seconds
+			NumberTerm time = (NumberTerm)args[0].clone();
+			un.apply((Term)time);
+			try {
+				Thread.sleep((long)time.solve());
+			} catch (Exception e) {		}
+			return true;
+		} else if (args[0].isString()) {
+			// wait event
+			try {
+				StringTerm st = (StringTerm)args[0];
+				un.apply((Term)st);
+				Trigger te = Trigger.parseTrigger(st.getString());
+				new WaitEvent(te, un, ts).start();
+				return true;
+			} catch (Exception e) {
+				ts.getLogger().log(Level.SEVERE, "Error at .wait.",e);
+			}
+		}
+		return false;
 	}
+
+	class WaitEvent extends Thread implements CircumstanceListener {
+		Trigger te;
+		Unifier un; 
+		Intention si;
+		TransitionSystem ts;
+		Circumstance c;
+		
+		WaitEvent(Trigger te, Unifier un, TransitionSystem ts) {
+			this.te = te;
+			this.un = un;
+			this.ts = ts;
+			c = ts.getC();
+			si = c.getSelectedIntention();
+		}
+
+		public void run() {
+			try {
+				// register listener
+				c.addEventListener(this);		
+		
+				waitEvent();
+
+				// unregister (to not receive intentionAdded again)
+				c.removeEventListener(this);
+
+				// add SI again in C.I
+				c.addIntention(si);
+				
+			} catch (Exception e) {
+				ts.getLogger().log(Level.SEVERE, "Error at .wait thread",e);
+			}
+		}
+		
+		synchronized public void waitEvent() {
+			try {
+				wait();
+			} catch (Exception e) {
+			}
+		}		
+
+		synchronized public void eventAdded(Event e) {
+			if (un.unifies(te,e.getTrigger())) {
+				notifyAll();
+			}
+		}
+		
+		public void intentionAdded(Intention i) {
+			// if the intention where .wait is is being added in C.I, remove it
+			if (i == si) {
+				if (!c.getIntentions().remove(si)) {
+					ts.getLogger().warning("The following intentions sould be removed, but wasn't!"+si);
+				}
+			}
+		}
+
+	}	
 }
+

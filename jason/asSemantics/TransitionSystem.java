@@ -308,8 +308,8 @@ public class TransitionSystem {
 
 	private void applySelEv() throws JasonException {
 		// Rule SelEv1
-		if (!conf.C.E.isEmpty()) {
-			confP.C.SE = conf.ag.selectEvent(confP.C.E);
+		if (!conf.C.getEvents().isEmpty()) {
+			confP.C.SE = conf.ag.selectEvent(confP.C.getEvents());
 			confP.step = SRelPl;
 		}
 		// Rule SelEv2
@@ -816,7 +816,7 @@ public class TransitionSystem {
 		IntendedMeans im = conf.C.SI.peek();
 		if (!im.getPlan().getBody().isEmpty()) // maybe it had an empty plan body
 			im.getPlan().getBody().remove(0);
-		confP.C.I.add(conf.C.SI);
+		confP.C.addIntention(conf.C.SI);
 	}
 
 	private void generateGoalDeletion() throws JasonException {
@@ -859,7 +859,7 @@ public class TransitionSystem {
 	/** ********************************************************************* */
 
 	boolean canSleep() {
-		return conf.C.E.isEmpty() && conf.C.I.isEmpty() && conf.C.MB.isEmpty() && conf.C.FA.isEmpty() && agArch.canSleep();
+		return conf.C.getEvents().isEmpty() && conf.C.I.isEmpty() && conf.C.MB.isEmpty() && conf.C.FA.isEmpty() && agArch.canSleep();
 	}
 
 	/** waits for a new message */
