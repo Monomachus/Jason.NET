@@ -123,6 +123,7 @@ public class Pred extends Term implements Cloneable, Comparable, Serializable {
 	}
 	
 	public void addAnnots(List l) {
+        if (l == null) return;
 		Iterator i = l.iterator();
 		while (i.hasNext()) {
 			addAnnot( (Term)i.next());

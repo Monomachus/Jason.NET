@@ -211,6 +211,7 @@ public class ExecutionControlGUI extends ExecutionControl {
 		inRunMode = b;
 	}
 	
+    private String previousMind = "--";
 	private void inspectAgent(String agName) {
 		if (agName == null) {
 			return;
@@ -241,7 +242,11 @@ public class ExecutionControlGUI extends ExecutionControl {
 			try {
 				agTransformer.transform(new DOMSource(agState),
 						                new StreamResult(so));
-				jTA.setText(so.toString());
+                String sMind = so.toString();
+                if (!sMind.equals(previousMind)) {
+                    jTA.setText(sMind);
+                }
+                previousMind = sMind;
 			} catch (Exception e) {
 				jTA.setText("Error in XML transformation!" + e + "\n");
 				e.printStackTrace();

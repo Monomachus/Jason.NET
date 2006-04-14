@@ -622,20 +622,21 @@ public class TransitionSystem {
 				
 			// Rule DelBel
 			case BodyLiteral.HDelBel:
+                if (logger.isLoggable(Level.FINE)) logger.fine("doing -"+l+" in BB="+conf.ag.believes(l, u));
 				Literal lInBB = conf.ag.believes(l, u);
 				if (lInBB != null) {
-					// lInBBClone is l unified in BB, without annots
+					// lInBBClone is l unified in BB, with annots from l
 					// we can not use l for delBel in case l is g(_,_)
 					Literal lInBBClone = (Literal)lInBB.clone();
 					lInBBClone.clearAnnots();
-					source = BeliefBase.TSelf;
-					if (l.hasSource()) {
-						source = null; // do not add source(self) in case the programmer set the source
+					lInBBClone.addAnnots(l.getAnnots());
+					if ( ! lInBBClone.hasSource()) {
+                        lInBBClone.addAnnot(BeliefBase.TSelf);
 					}
 					if (setts.sameFocus())
-						conf.ag.delBel(lInBBClone, source, conf.C, conf.C.SI);
+						conf.ag.delBel(lInBBClone, conf.C, conf.C.SI);
 					else {
-						conf.ag.delBel(lInBBClone, source, conf.C, Intention.EmptyInt);
+						conf.ag.delBel(lInBBClone, conf.C, Intention.EmptyInt);
 						updateIntention();
 					}
 				} else {

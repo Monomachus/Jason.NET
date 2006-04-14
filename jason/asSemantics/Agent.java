@@ -277,7 +277,8 @@ public class Agent {
             	}
             }
             if (!wasPerceived) {
-                if (delBel(l,BeliefBase.TPercept,fTS.getC(), Intention.EmptyInt)) {
+                l.addAnnot(BeliefBase.TPercept);
+                if (delBel(l,fTS.getC(), Intention.EmptyInt)) {
                 	i--;
                 }
             }
@@ -355,20 +356,14 @@ public class Agent {
 		return false;
 	}
 
-	public boolean delBel(Literal l, Term source, Circumstance c, Intention focus) {
-		if (source != null && !source.isGround()) {
-			logger.log(Level.SEVERE,"Error: Annotations must be ground!\n Cannot use "+source+" as annotation.");
+	public boolean delBel(Literal l, Circumstance c, Intention focus) {
+		if (fBS.remove(l)) {
+            if (logger.isLoggable(Level.FINE)) logger.fine("Removed:" +l);
+			updateEvents(new Event(new Trigger(Trigger.TEDel, Trigger.TEBel, l), focus), c);
+			return true;
 		} else {
-			if (source != null) {
-				//l.clearAnnot();
-				l.addAnnot(source);
-			}
-			if (fBS.remove(l)) {
-				logger.fine("Removed belief "+l);
-				updateEvents(new Event(new Trigger(Trigger.TEDel, Trigger.TEBel, l), focus), c);
-				return true;
-			}
-		}
+            if (logger.isLoggable(Level.FINE)) logger.fine("Not removed: "+l);                
+        }
 		return false;
 	}
 
