@@ -451,12 +451,48 @@ public class ListTermImpl extends Term implements ListTerm {
 	}
 
 	public ListIterator listIterator() {
-		logger.warning("listIterator() is not implemented!");
-		return null;
+		return listIterator(0);
 	}
-	public ListIterator listIterator(int arg0) {
-		logger.warning("listIterator() is not implemented!");
-		return null;
+	public ListIterator listIterator(final int startIndex) {
+        final ListTermImpl list = this;
+        return new ListIterator() {
+            int pos = startIndex;
+            int last = -1;
+            int size = size();
+
+            public void add(Object o) {
+                list.add(last,o);
+            }
+            public boolean hasNext() {
+                return pos < size;
+            }
+            public boolean hasPrevious() {
+                return pos > startIndex;
+            }
+            public Object next() {
+                last = pos;
+                pos++;
+                return get(last);
+            }
+            public int nextIndex() {
+                return pos+1;
+            }
+            public Object previous() {
+                last = pos;
+                pos--;
+                return get(last);
+            }
+            public int previousIndex() {
+                return pos-1;
+            }
+            public void remove() {
+                list.remove(last);
+            }
+            public void set(Object o) {
+                remove();
+                add(o);
+            }            
+        };
 	}
 
 	public Object remove(int index) {

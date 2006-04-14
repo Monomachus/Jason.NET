@@ -283,30 +283,29 @@ public class Term implements TermInterface, Comparable, Serializable {
 
 	public int compareTo(Object t) {
 		int c;
-		if (((Term) t).functor == null)
-			return 1;
-		if (functor == null)
-			return -1;
-		c = functor.compareTo(((Term) t).functor);
-		if (c != 0)
-			return c;
-		if (terms == null && ((Term) t).terms == null)
-			return 0;
-		if (terms == null)
-			return -1;
-		if (((Term) t).terms == null)
-			return 1;
-		if (terms.size() < ((Term) t).terms.size())
-			return -1;
-		else if (terms.size() > ((Term) t).terms.size())
-			return 1;
-		Iterator i = terms.iterator();
-		Iterator j = ((Term) t).terms.iterator();
-		while (i.hasNext() && j.hasNext()) {
-			c = ((Term) i.next()).compareTo((Term) j.next());
-			if (c != 0)
-				return c;
+        Term tAsTerm = (Term)t;
+		if (getFunctor() != null && tAsTerm.getFunctor() != null) {
+		    c = getFunctor().compareTo(tAsTerm.getFunctor());
+		    if (c != 0)
+		        return c;
 		}
+		if (getTerms() == null && tAsTerm.getTerms() == null)
+			return 0;
+		if (getTerms() == null)
+			return -1;
+		if (tAsTerm.getTerms() == null)
+			return 1;
+		if (getTerms().size() < tAsTerm.getTerms().size())
+			return -1;
+		else if (getTerms().size() > tAsTerm.getTerms().size())
+			return 1;
+
+        // same number of terms
+        for (int i=0; i<getTermsSize(); i++) {
+            c = getTerm(i).compareTo(tAsTerm.getTerm(i));
+            if (c != 0)
+                return c;
+        }
 		return 0;
 	}
 

@@ -22,7 +22,7 @@
     </path>
 
     <target name="compile" >
-    	<javac srcdir="${basedir}" destdir="${basedir}">
+    	<javac srcdir="${basedir}" destdir="${basedir}" debug="true" optimize="true" >
             <classpath refid="project.classpath"/>
         </javac>
     </target>

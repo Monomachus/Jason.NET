@@ -412,10 +412,26 @@ public class Pred extends Term implements Cloneable, Comparable, Serializable {
 		c = super.compareTo(p);
 		if (c != 0)
 			return c;
-		if (annots.size() < ((Pred) p).getAnnots().size())
+        if (getAnnots() == null && ((Pred) p).getAnnots() == null) {
+            return 0;
+        }
+        if (getAnnots() == null) {
+            return -1;
+        }
+        if (((Pred) p).getAnnots() == null) {
+            return 1;
+        }
+		if (getAnnots().size() < ((Pred) p).getAnnots().size())
 			return -1;
-		if (annots.size() > ((Pred) p).getAnnots().size())
+		if (getAnnots().size() > ((Pred) p).getAnnots().size())
 			return 1;
+        
+        // same size, compare annots
+        for (int i=0; i< getAnnots().size(); i++) {
+            if ( ((Comparable)getAnnots().get(i)).compareTo(((Pred) p).getAnnots().get(i)) == 0) {
+                return 0;
+            }
+        }
 		return 0;
 	}
 

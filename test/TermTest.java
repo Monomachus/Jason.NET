@@ -3,11 +3,16 @@ package test;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.BeliefBase;
 import jason.asSyntax.DefaultLiteral;
+import jason.asSyntax.ListTerm;
+import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Literal;
 import jason.asSyntax.Pred;
 import jason.asSyntax.Term;
 import jason.asSyntax.Trigger;
 import jason.asSyntax.VarTerm;
+
+import java.util.Collections;
+
 import junit.framework.TestCase;
 
 /** JUnit test case for syntax package */
@@ -320,4 +325,23 @@ public class TermTest extends TestCase {
 		u.apply(p2);
 		assertEquals(p2.toString(),"p(t1,t2)[a(1),z,a(2,3),a(3)]");
 	}
+    
+    public void testCompare() {
+        Pred p1 = Pred.parsePred("a");
+        Pred p2 = Pred.parsePred("b");
+        
+        assertEquals(p1.compareTo(p2), -1);
+        assertEquals(p2.compareTo(p1), 1);
+        assertEquals(p1.compareTo(p1), 0);
+        
+        p1 = Pred.parsePred("a(3)");
+        p2 = Pred.parsePred("a(100)");
+        
+        assertEquals(p1.compareTo(p2), -1);
+        assertEquals(p2.compareTo(p1), 1);
+        
+        ListTerm l = ListTermImpl.parseList("[b,c,g,casa,f(10),[3,4],[3,1],f(4)]");
+        Collections.sort(l);
+        assertEquals(l.toString(), "[b,c,casa,f(4),f(10),g,[3,1],[3,4]]");
+    }
 }

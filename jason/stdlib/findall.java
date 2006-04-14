@@ -51,9 +51,9 @@ public class findall implements InternalAction {
 	public boolean execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
 		try {
 			Term var = (Term) args[0].clone();
-			if (!var.isVar()) {
-				throw new JasonException("The first parameter ('"+args[0]+"') of the internal action 'findAll' is not a Variable!");
-			}
+			//if (!var.isVar()) {
+			//	throw new JasonException("The first parameter ('"+args[0]+"') of the internal action 'findAll' is not a Variable!");
+			//}
 			Literal bel = Literal.parseLiteral(args[1].toString());
 			if (bel == null) {
 				throw new JasonException("The second parameter ('"+args[1]+"') of the internal action 'findAll' is not a literal!");
@@ -66,27 +66,23 @@ public class findall implements InternalAction {
 			if (relB != null) {
 				for (int i = 0; i < relB.size(); i++) {
 					Literal b = (Literal) relB.get(i);
-					Unifier newUn = (un == null) ? new Unifier() : (Unifier) un.clone();
+					Unifier newUn = (Unifier) un.clone();
 					// recall that order is important because of annotations!
 					//System.out.println("b="+b+"="+bel);
 					if (newUn.unifies(bel, b)) {
-						// get the val value and add it in the list
-						Term vl = newUn.get(var.toString());
-						if (vl != null) {
-							all.add((Term) vl);
-						}
+						// apply to var the resulted unifier
+						Term vl = (Term)var.clone();
+                        newUn.apply(vl);
+                        all.add((Term) vl);
 					}
 				}
 			}
 			Term list = args[2];
-			//System.out.println("all="+all);
 			return un.unifies(list, (Term)all);
 		} catch (ArrayIndexOutOfBoundsException e) {
 			throw new JasonException("The internal action 'findall' has not received three arguments");
 		} catch (Exception e) {
 			throw new JasonException("Error in internal action 'findall': " + e);
-		//} finally {
-		//	System.out.println("u="+un);
 		}
 	}
 }

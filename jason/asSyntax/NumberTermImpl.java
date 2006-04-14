@@ -110,6 +110,16 @@ public class NumberTermImpl extends Term implements NumberTerm {
 		return false;
 	}
 
+    public int compareTo(Object o) {
+        try {
+            Term t = (Term)o;
+            NumberTerm st = (NumberTerm)t;
+            if (solve() > st.solve()) return 1;
+            if (solve() < st.solve()) return -1;
+        } catch (Exception e) {}
+        return 0;    
+    }
+
 	public String toString() {
 		long r = Math.round(fValue);
 		if (fValue == (double)r) {
