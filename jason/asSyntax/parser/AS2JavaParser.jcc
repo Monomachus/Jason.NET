@@ -18,34 +18,6 @@
 // http://www.dur.ac.uk/r.bordini
 // http://www.inf.furb.br/~jomi
 //
-// CVS information:
-//   $Date$
-//   $Revision$
-//   $Log$
-//   Revision 1.27  2006/02/22 21:19:05  jomifred
-//   The internalAction removePlan use plan's label as argument instead of plan's strings
-//
-//   Revision 1.26  2006/01/02 13:49:01  jomifred
-//   add plan unique id, fix some bugs
-//
-//   Revision 1.25  2005/12/31 16:29:58  jomifred
-//   add operator =..
-//
-//   Revision 1.24  2005/12/30 20:40:17  jomifred
-//   new features: unnamed var, var with annots, TE as var
-//
-//   Revision 1.23  2005/12/23 00:48:23  jomifred
-//   StringTerm is now an interface implemented by StringTermImpl
-//
-//   Revision 1.22  2005/12/22 00:04:18  jomifred
-//   ListTerm is now an interface implemented by ListTermImpl
-//
-//   Revision 1.20  2005/08/18 01:22:21  jomifred
-//   (AS grammar) arithmeticExpression renamed to ae
-//
-//   Revision 1.19  2005/08/17 18:19:21  jomifred
-//   change AS grammar (unify lt and la implementation)
-//
 //----------------------------------------------------------------------------
 
 
@@ -132,7 +104,7 @@ TOKEN : {
 void ag(Agent a) : { List bbl = new LinkedList(); PlanLibrary pp;  }
 {
   bs(bbl)
-  pp = ps()
+  pp = ps(bbl)
   <EOF>
               { if (a != null) {
                   try {
@@ -167,7 +139,7 @@ void bs(List bbl) : { Literal F; }
 }
 
 /* Plans */
-PlanLibrary ps() : { PlanLibrary pp = new PlanLibrary(); Plan pl;  }
+PlanLibrary ps(List bbl) : { PlanLibrary pp = new PlanLibrary(); Plan pl;  }
 {
   ( pl = p()       { try {
                        pp.add(pl); 
@@ -175,9 +147,19 @@ PlanLibrary ps() : { PlanLibrary pp = new PlanLibrary(); Plan pl;  }
                        System.err.println("Error adding plan:"+je);
                      }
                    } 
+    | directive(bbl,pp)
   )*
                    { return pp; }
 }
+
+/* Directive */
+void directive(List bbl, PlanLibrary pp) : { Pred d; }
+{
+  "{"
+   d = at()        { Directives.process(d, bbl, pp); }
+  "}"
+}
+
 
 /* Plan */
 Plan p() :         { Token k; Trigger T; ArrayList C; ArrayList H; Pred L = null; int start = -1, end;}
