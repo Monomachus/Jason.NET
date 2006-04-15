@@ -184,6 +184,13 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
 		}
 		return false;
 	}
+
+    public int compareTo(Object o) {
+        if (value != null)
+            return value.compareTo(o);
+        else 
+            return super.compareTo(o);
+    }
 	
 	
 	// ----------
