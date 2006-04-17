@@ -44,8 +44,6 @@ public class gte implements InternalAction {
         Term yp = (Term)args[1].clone();
         un.apply(xp);
         un.apply(yp);
-        int x = Integer.parseInt(xp.toString());
-        int y = Integer.parseInt(yp.toString());
-        return x >= y;
+        return xp.equals(yp) || xp.compareTo(yp) > 0;
     }
 }

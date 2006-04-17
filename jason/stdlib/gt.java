@@ -45,12 +45,6 @@ public class gt implements InternalAction {
         Term yp = (Term)args[1].clone();
         un.apply(xp);
         un.apply(yp);
-        if (xp.isNumber() && yp.isNumber()) {
-        	NumberTerm xt = (NumberTerm)xp;
-        	NumberTerm yt = (NumberTerm)yp;
-        	return xt.solve() > yt.solve();
-        } else {
-        	return xp.toString().compareTo(yp.toString()) > 0;
-        }
+       	return xp.compareTo(yp) > 0;
     }
 }
