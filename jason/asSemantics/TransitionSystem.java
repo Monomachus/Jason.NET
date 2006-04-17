@@ -718,7 +718,7 @@ public class TransitionSystem {
 	public List applicablePlans(List rp) throws JasonException {
 		for (Iterator i = rp.iterator(); i.hasNext();) {
 			Option opt = (Option) i.next();
-			opt.unif = logCons(opt.plan.getContext().iterator(), opt.unif);
+			opt.unif = logCons(opt.plan.getContext(), 0, opt.unif);
 			if (opt.unif == null) {
 				i.remove();
 			}
@@ -731,34 +731,23 @@ public class TransitionSystem {
 	 * is a log(ical)Cons(equence) of the belief base.
 	 * It is used in the method that checks whether the plan is applicable.
 	 */
-	private Unifier logCons(Iterator ctxt, Unifier un) throws JasonException {
+	private Unifier logCons(List ctxt, int pos, Unifier un) throws JasonException {
 
-		if (!ctxt.hasNext()) {
+		if (pos >= ctxt.size()) {
 			return un;
 		}
 
-		DefaultLiteral dfl = (DefaultLiteral) ctxt.next();
+		DefaultLiteral dfl = (DefaultLiteral) ctxt.get(pos);
 
-		/*
-		Term dflTerm = (Term)dfl.getLiteral().clone();
-		Literal l;
-		if (dflTerm.isVar()) {
-			un.apply(dflTerm);
-			l = (Literal) ((VarTerm)dflTerm).getValue();
-		} else {
-			l = (Literal) dflTerm;
-		}
-		*/
 		Literal l = (Literal)dfl.getLiteral().clone();
 		un.apply(l); // in case we have ... & X & ...
-		
 		if (l.isInternalAction()) {
 			boolean execOk = execInternalAction((Pred) l, un);
 			if ((!execOk && !dfl.isDefaultNegated()) 
 				|| (execOk && dfl.isDefaultNegated())) {
 				return null;
 			} else { 
-				return logCons(ctxt, un);
+				return logCons(ctxt, pos+1, un);
 			}
 		}
 
@@ -782,7 +771,7 @@ public class TransitionSystem {
 				}
 			}
 			// negated literals do not change the unification, OK to use un
-			return logCons(ctxt, un);
+			return logCons(ctxt, pos+1, un);
 		} else {
 			if (relB == null) {
 				return null;
@@ -794,7 +783,7 @@ public class TransitionSystem {
 				Unifier unC = (Unifier) un.clone();
 				// notice the importance of the order here again (see above)
 				if (unC.unifies(l,b)) {
-					Unifier res = logCons(ctxt, unC);
+					Unifier res = logCons(ctxt, pos+1, unC);
 					if (res != null)
 						// found unification res that makes the plan
 						// applicable
