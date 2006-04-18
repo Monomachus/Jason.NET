@@ -625,18 +625,18 @@ public class TransitionSystem {
                 if (logger.isLoggable(Level.FINE)) logger.fine("doing -"+l+" in BB="+conf.ag.believes(l, u));
 				Literal lInBB = conf.ag.believes(l, u);
 				if (lInBB != null) {
-					// lInBBClone is l unified in BB, with annots from l
+					// lInBB is l unified in BB
 					// we can not use l for delBel in case l is g(_,_)
-					Literal lInBBClone = (Literal)lInBB.clone();
-					lInBBClone.clearAnnots();
-					lInBBClone.addAnnots(l.getAnnots());
-					if ( ! lInBBClone.hasSource()) {
-                        lInBBClone.addAnnot(BeliefBase.TSelf);
-					}
+                    if (l.hasAnnot()) {
+                        // use annots from l
+                        lInBB = (Literal)lInBB.clone();
+                        lInBB.clearAnnots();
+                        lInBB.addAnnots(l.getAnnots());
+                    }
 					if (setts.sameFocus())
-						conf.ag.delBel(lInBBClone, conf.C, conf.C.SI);
+						conf.ag.delBel(lInBB, conf.C, conf.C.SI);
 					else {
-						conf.ag.delBel(lInBBClone, conf.C, Intention.EmptyInt);
+						conf.ag.delBel(lInBB, conf.C, Intention.EmptyInt);
 						updateIntention();
 					}
 				} else {
@@ -812,8 +812,22 @@ public class TransitionSystem {
 	private void generateGoalDeletion() throws JasonException {
 		IntendedMeans im = conf.C.SI.peek();
 		Trigger tevent = im.getTrigger();
-		if (tevent.isAddition() && tevent.isGoal())
+		if (tevent.isAddition() && tevent.isGoal()) {
+            // find a relevant failure plan
+            /*
+            Trigger failTrigger = new Trigger(Trigger.TEDel,tevent.getGoal(),tevent.getLiteral());
+            logger.info("** trying "+failTrigger);
+            while (! getAg().getPS().isRelevant(failTrigger) && conf.C.SI.size() > 0) {
+                conf.C.SI.pop();
+                im = conf.C.SI.peek();
+                tevent = im.getTrigger();
+                failTrigger = new Trigger(Trigger.TEDel,tevent.getGoal(),tevent.getLiteral());
+                logger.info("** trying "+failTrigger);
+            }
+            logger.info("** ficou "+tevent);
+            */
 			confP.C.delGoal(tevent.getGoal(), tevent.getLiteral(), conf.C.SI); // intention will be suspended
+        }
 		// if "discard" is set, we are deleting the whole intention!
 		// it is simply not going back to 'I' nor anywhere else!
 		else if (setts.requeue()) {
@@ -829,9 +843,22 @@ public class TransitionSystem {
 	// similar to the one above, but for an Event rather than intention
 	private void generateGoalDeletionFromEvent() throws JasonException {
 		Event ev = conf.C.SE;
+        Trigger tevent = ev.trigger;
 		// TODO: double check all cases here
-		if (ev.trigger.isAddition() && ev.trigger.isGoal() && ev.isInternal()) {
-			confP.C.delGoal(ev.getTrigger().getGoal(), ev.getTrigger().getLiteral(), ev.intention);
+		if (tevent.isAddition() && tevent.isGoal() && ev.isInternal()) {
+            // find a relevant failure plan
+            Trigger failTrigger = new Trigger(Trigger.TEDel,tevent.getGoal(),tevent.getLiteral());
+            boolean firsttime = true;
+            while (! getAg().getPS().isRelevant(failTrigger) && ev.intention.size() > 1) {
+                if (!firsttime) {
+                    ev.intention.pop();
+                }
+                firsttime = false;
+                tevent = ev.intention.peek().getTrigger();
+                failTrigger = new Trigger(Trigger.TEDel,tevent.getGoal(),tevent.getLiteral());
+            }
+ 
+            confP.C.delGoal(tevent.getGoal(), tevent.getLiteral(), ev.intention);
 			logger.warning("Generating goal deletion from event: " + ev);
 		}
 		else if (ev.isInternal()) {

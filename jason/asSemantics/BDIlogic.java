@@ -82,7 +82,7 @@ public final class BDIlogic {
      * just note that intentions can be suspended and appear in E or PA as well.
      */
     public static final boolean Int(TransitionSystem ts, Literal l, Unifier un) {
-        Trigger g = new Trigger(Trigger.TEAdd,Trigger.TEAchvG,l);
+        Trigger g = new Trigger(Trigger.TEAdd, Trigger.TEAchvG,l);
         //logger.log(Level.SEVERE,"Entering Int: "+ts.C.I);
 
         // need to check the intention in the slected event in this cycle!!! (already removed from E)
@@ -103,7 +103,8 @@ public final class BDIlogic {
         // intention may be suspended in E
         for(Iterator i=ts.C.getEvents().iterator(); i.hasNext(); ) {
         	//logger.log(Level.SEVERE,"Int: "+g+" unif "+ts.C.SI);
-            if (((Event)i.next()).intention.hasTrigger(g,un))
+            Event t = (Event)i.next(); 
+            if (t.intention != null && t.intention.hasTrigger(g,un))
                 return true;
         }
         
