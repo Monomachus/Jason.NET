@@ -71,9 +71,9 @@ public class Event implements Serializable {
 
     public String toString() {
         if (intention == Intention.EmptyInt)
-            return("<"+trigger+",TRUE>");
+            return ""+trigger;
         else
-            return("<"+trigger+","+intention+">");
+            return trigger+"\n"+intention;
     }
 
     /** get as XML */

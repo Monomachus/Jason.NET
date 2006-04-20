@@ -36,10 +36,10 @@
 package jason.asSemantics;
 
 import jason.asSyntax.Trigger;
-import jason.stdlib.intend;
 
 import java.io.Serializable;
 import java.util.Iterator;
+import java.util.ListIterator;
 import java.util.Stack;
 
 import org.w3c.dom.Document;
@@ -117,7 +117,12 @@ public class Intention implements Serializable {
     
     
     public String toString() {
-    	return fIntendedMeans.toString();
+    	StringBuffer s = new StringBuffer();
+    	ListIterator i = fIntendedMeans.listIterator(fIntendedMeans.size());
+    	while (i.hasPrevious()) {
+    		s.append("    "+i.previous() + "\n");
+    	}
+    	return s.toString();
     }
 
     /** get as XML */

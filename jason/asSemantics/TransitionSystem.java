@@ -310,17 +310,23 @@ public class TransitionSystem {
 		// Rule SelEv1
 		if (!conf.C.getEvents().isEmpty()) {
 			confP.C.SE = conf.ag.selectEvent(confP.C.getEvents());
-			confP.step = SRelPl;
+			if (confP.C.SE != null) {
+				confP.step = SRelPl;
+				return;
+			}
 		}
 		// Rule SelEv2
-		else {
-			// directly to ProcAct if no event to handle
-			confP.step = SProcAct;
-		}
+		// directly to ProcAct if no event to handle
+		confP.step = SProcAct;
 	}
 
 	private void applyRelPl() throws JasonException {
 		// get all relevant plans for the selected event
+		if (conf.C.SE.trigger == null) {
+			logger.log(Level.SEVERE, "Event "+C.SE+" has null as trigger! I should not get relevant plan!");
+			// TODO: Rafa, what to do in this case?
+			return;
+		}
 		confP.C.RP = relevantPlans(conf.C.SE.trigger);
 		
 		// Rule Rel1
@@ -331,7 +337,7 @@ public class TransitionSystem {
 		else {
 			if (conf.C.SE.trigger.isGoal()) {
 				generateGoalDeletionFromEvent();
-				logger.warning("Found a goal for which there is no relevant plan:\n"+ conf.C.SE);
+				logger.warning("Found a goal for which there is no relevant plan:"+ conf.C.SE);
 			}
 			// e.g. belief addition as internal event, just go ahead
 			else if (conf.C.SE.isInternal()) {
@@ -658,7 +664,11 @@ public class TransitionSystem {
 					IntendedMeans oldim = confP.C.SI.pop();
 					if (im.getTrigger().isGoal() && !im.getTrigger().isAddition()) {
 						// needs to get rid of the failed plan when finished handling failure
-						confP.C.SI.pop();
+						// only when it was a -!g for +!g (no applicable plan failure does not add an IM to be poped)
+						im = conf.C.SI.peek();
+						if (im.getTrigger().isAddition() && im.getTrigger().isGoal() && im.unif.unifies(oldim.getTrigger().getLiteral(), im.getTrigger().getLiteral())) {
+							confP.C.SI.pop();
+						}
 					}
 					im = conf.C.SI.peek();
 					// TODO: We needed this if() here but not sure when body could be 0!!!
@@ -813,19 +823,6 @@ public class TransitionSystem {
 		IntendedMeans im = conf.C.SI.peek();
 		Trigger tevent = im.getTrigger();
 		if (tevent.isAddition() && tevent.isGoal()) {
-            // find a relevant failure plan
-            /*
-            Trigger failTrigger = new Trigger(Trigger.TEDel,tevent.getGoal(),tevent.getLiteral());
-            logger.info("** trying "+failTrigger);
-            while (! getAg().getPS().isRelevant(failTrigger) && conf.C.SI.size() > 0) {
-                conf.C.SI.pop();
-                im = conf.C.SI.peek();
-                tevent = im.getTrigger();
-                failTrigger = new Trigger(Trigger.TEDel,tevent.getGoal(),tevent.getLiteral());
-                logger.info("** trying "+failTrigger);
-            }
-            logger.info("** ficou "+tevent);
-            */
 			confP.C.delGoal(tevent.getGoal(), tevent.getLiteral(), conf.C.SI); // intention will be suspended
         }
 		// if "discard" is set, we are deleting the whole intention!
@@ -846,8 +843,10 @@ public class TransitionSystem {
         Trigger tevent = ev.trigger;
 		// TODO: double check all cases here
 		if (tevent.isAddition() && tevent.isGoal() && ev.isInternal()) {
+			
             // find a relevant failure plan
             Trigger failTrigger = new Trigger(Trigger.TEDel,tevent.getGoal(),tevent.getLiteral());
+            //logger.info("Trying "+failTrigger+" relevant="+getAg().getPS().isRelevant(failTrigger));
             boolean firsttime = true;
             while (! getAg().getPS().isRelevant(failTrigger) && ev.intention.size() > 1) {
                 if (!firsttime) {
@@ -856,13 +855,15 @@ public class TransitionSystem {
                 firsttime = false;
                 tevent = ev.intention.peek().getTrigger();
                 failTrigger = new Trigger(Trigger.TEDel,tevent.getGoal(),tevent.getLiteral());
+                //logger.info("Trying "+failTrigger+" relevant="+getAg().getPS().isRelevant(failTrigger));
             }
- 
-            confP.C.delGoal(tevent.getGoal(), tevent.getLiteral(), ev.intention);
-			logger.warning("Generating goal deletion from event: " + ev);
+            if (tevent.isGoal()) {
+            	confP.C.addEvent(new Event(failTrigger, ev.intention));
+            	logger.warning("Generating goal deletion "+failTrigger+" from event: " + ev);
+            }
 		}
 		else if (ev.isInternal()) {
-			logger.warning("Could not finish intention: " + ev.intention);
+			logger.warning("Could not finish intention:\n" + ev.intention);
 		}
 		// if "discard" is set, we are deleting the whole intention!
 		// it is simply not going back to I nor anywhere else!
