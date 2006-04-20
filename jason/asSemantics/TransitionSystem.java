@@ -666,7 +666,9 @@ public class TransitionSystem {
 						// needs to get rid of the failed plan when finished handling failure
 						// only when it was a -!g for +!g (no applicable plan failure does not add an IM to be poped)
 						im = conf.C.SI.peek();
-						if (im.getTrigger().isAddition() && im.getTrigger().isGoal() && im.unif.unifies(oldim.getTrigger().getLiteral(), im.getTrigger().getLiteral())) {
+						if (im.getTrigger().isAddition() && im.getTrigger().isGoal() 
+                                && im.unif.unifies(oldim.getTrigger().getLiteral(), im.getTrigger().getLiteral())
+                                && conf.C.SI.size() > 1) {
 							confP.C.SI.pop();
 						}
 					}
