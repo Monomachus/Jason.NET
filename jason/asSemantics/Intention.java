@@ -107,7 +107,6 @@ public class Intention implements Serializable {
             IntendedMeans im = (IntendedMeans)j.next();
             Trigger it = (Trigger) im.getPlan().getTriggerEvent().clone();
             im.unif.apply(it.getLiteral());
-//logger.log(Level.SEVERE,"HasTrigger: "+g+it);
             if (u.unifies(g,it)) {
                 return true;
             }

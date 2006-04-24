@@ -189,7 +189,7 @@ public class CentralisedAgArch extends Thread implements AgArchInfraTier {
     // Default perception assumes Complete and Accurate sensing.
     public List perceive() {
     	List percepts = infraEnv.getUserEnvironment().getPercepts(getName());
-    	if (logger.isLoggable(Level.FINE)) { // to salve CPU time building the string
+    	if (logger.isLoggable(Level.FINE) && percepts != null) { // to salve CPU time building the string
     		logger.fine("percepts: "+percepts);
     	}
         return percepts;

@@ -241,7 +241,7 @@ public class TransitionSystem {
             	Term ans = Term.parse(m.getPropCont().toString());
             	BodyLiteral send = (BodyLiteral)intention.peek().getPlan().getBody().remove(0);
             	intention.peek().getUnif().unifies(send.getLiteral().getTerm(3),ans);
-				getC().getIntentions().add(intention);
+				getC().addIntention(intention);
                 
             // the message is not an ask answer
             } else if (conf.ag.socAcc(m)) {
@@ -308,7 +308,7 @@ public class TransitionSystem {
 
 	private void applySelEv() throws JasonException {
 		// Rule SelEv1
-		if (!conf.C.getEvents().isEmpty()) {
+		if (conf.C.hasEvent()) {
 			confP.C.SE = conf.ag.selectEvent(confP.C.getEvents());
 			if (confP.C.SE != null) {
 				confP.step = SRelPl;
@@ -406,12 +406,12 @@ public class TransitionSystem {
 		if (conf.C.SE.intention == Intention.EmptyInt) {
 			Intention intention = new Intention();
 			intention.push(im);
-			confP.C.I.add(intention);
+			confP.C.addIntention(intention);
 		}
 		// Rule IntEv
 		else {
 			confP.C.SE.intention.push(im);
-			confP.C.I.add(confP.C.SE.intention);
+			confP.C.addIntention(confP.C.SE.intention);
 		}
 		confP.step = SProcAct;
 	}
@@ -467,8 +467,8 @@ public class TransitionSystem {
 		}
 
 		// Rule SelInt1
-		if (!conf.C.I.isEmpty()) {
-			confP.C.SI = conf.ag.selectIntention(conf.C.I);
+		if (conf.C.hasIntention()) {
+			confP.C.SI = conf.ag.selectIntention(conf.C.getIntentions());
 			/* the following was not enough to remove selectAtomicIntention
 			if (confP.C.SI.isAtomic()) {
 				confP.C.AI = confP.C.SI;
@@ -706,7 +706,7 @@ System.out.println("Config: "+conf.C);
 					}
 					*/
 				} else {
-					confP.C.I.remove(conf.C.SI);
+					confP.C.removeIntention(conf.C.SI);
 					/* the following was not enought to remove selectAtomicIntention
 					if (conf.C.SI.isAtomic()) { // remove atomic intention
 						conf.C.AI = null;
@@ -891,7 +891,7 @@ System.out.println("Config: "+conf.C);
 	/** ********************************************************************* */
 
 	boolean canSleep() {
-		return conf.C.getEvents().isEmpty() && conf.C.I.isEmpty() && conf.C.MB.isEmpty() && conf.C.FA.isEmpty() && agArch.canSleep();
+		return !conf.C.hasEvent() && !conf.C.hasIntention() && conf.C.MB.isEmpty() && conf.C.FA.isEmpty() && agArch.canSleep();
 	}
 
 	/** waits for a new message */

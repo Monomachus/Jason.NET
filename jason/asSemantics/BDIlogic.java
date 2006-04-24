@@ -29,6 +29,8 @@ import jason.asSyntax.Literal;
 import jason.asSyntax.Trigger;
 
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.logging.Logger;
 
 public final class BDIlogic {
@@ -117,7 +119,7 @@ public final class BDIlogic {
             }
         }
 
-        for(Iterator i=ts.C.I.iterator(); i.hasNext(); ) {
+        for(Iterator i=ts.C.getIntentions().iterator(); i.hasNext(); ) {
         	//logger.log(Level.SEVERE,"Int: "+g+" unif "+ts.C.SI);
     		if (((Intention)i.next()).hasTrigger(g,un))
     			return true;
@@ -161,41 +163,49 @@ public final class BDIlogic {
      */
     public static final void dropInt(TransitionSystem ts, Literal l, Unifier un) {
         Trigger g = new Trigger(Trigger.TEAdd,Trigger.TEAchvG,l);
-        for(Iterator j=ts.C.I.iterator(); j.hasNext(); ) {
+        for(Iterator j=ts.C.getIntentions().iterator(); j.hasNext(); ) {
         	Intention i = (Intention) j.next();
             if (i.hasTrigger(g,un)) {
+                j.remove();            
                 Trigger ng = (Trigger) g.clone();
                 ng.setTrigType(Trigger.TEDel);
                 ts.C.addEvent(new Event(ng,i));
-                j.remove();
             }
         }
+        
         // intention may be suspended in E
+        List dropped = new LinkedList();
         for(Iterator j=ts.C.getEvents().iterator(); j.hasNext(); ) {
         	Intention i = ((Event)j.next()).intention;
             if (i.hasTrigger(g,un)) {
+                j.remove();
+                
                 Trigger ng = (Trigger) g.clone();
                 ng.setTrigType(Trigger.TEDel);
-                ts.C.addEvent(new Event(ng,i));
-// JOMI: E' na linha de baixo que deu erro de concurrent modification. Sabes como arrumar?
-// Imagino que o mesmo acontece no dropDes
-                j.remove();
+                dropped.add(new Event(ng,i));
             }
         }
+        // we must add the events only after removing (add events while removing cause a loop)
+        Iterator id = dropped.iterator();
+        while (id.hasNext()) {
+            ts.C.addEvent((Event)id.next());
+        }
+        
         // intention may be suspended in PA! (in the new semantics)
         if (ts.C.PA!=null) {
             for(Iterator j=ts.C.PA.values().iterator(); j.hasNext(); ) {
             	Intention i = ((ActionExec)j.next()).getIntention();
-		// TODO CAREFUL: The semantics for this isn't well defined yet.
-		// The goal deletion on top of the intention will not get to know
-		// the result of the action, as it is removed from the PA set!
-       	// If left in PA, the action won't be the the top of
-       	// the stack (that might cause problems?)
+        		// TODO CAREFUL: The semantics for this isn't well defined yet.
+        		// The goal deletion on top of the intention will not get to know
+        		// the result of the action, as it is removed from the PA set!
+               	// If left in PA, the action won't be the the top of
+               	// the stack (that might cause problems?)
                 if (i.hasTrigger(g,un)) {
+                    j.remove();
+
                     Trigger ng = (Trigger) g.clone();
                     ng.setTrigType(Trigger.TEDel);
                     ts.C.addEvent(new Event(ng,i));
-                    j.remove();
                 }
             }
         }
@@ -218,7 +228,7 @@ public final class BDIlogic {
      * goal deletion event is generated.
      */
     public static final void dropAllInt(TransitionSystem ts) {
-        ts.C.I.clear();
+        ts.C.clearIntentions();
     }
 
 }

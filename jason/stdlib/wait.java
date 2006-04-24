@@ -141,10 +141,10 @@ public class wait implements InternalAction {
 		}
 		
 		public void intentionAdded(Intention i) {
-			// if the intention where .wait is is being added in C.I, remove it
+			// if the .wait intention where is being added in C.I, remove it
 			if (i == si) {
-				if (!c.getIntentions().remove(si)) {
-					ts.getLogger().warning("The following intentions sould be removed, but wasn't!"+si);
+				if (!c.removeIntention(si)) {
+					ts.getLogger().warning("The following intentions sould be removed, but wasn't!"+si+"\nWait intention is"+i);
 				}
 			}
 		}

@@ -78,11 +78,7 @@ public class IntendedMeans implements Serializable {
     }
 
 	public boolean isAtomic() {
-		if (plan != null) {
-			return plan.isAtomic();
-		} else {
-			return false;
-		}
+		return plan != null && plan.isAtomic();
 	}
 	
     public String toString() {

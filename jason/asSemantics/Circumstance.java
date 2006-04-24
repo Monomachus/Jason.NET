@@ -67,7 +67,7 @@ public class Circumstance implements Serializable {
 	static Logger logger = Logger.getLogger(Circumstance.class.getName());
 	
     private List   E;
-    protected List   I;
+    private List   I;
 
 	protected ActionExec A;
 
@@ -152,6 +152,10 @@ public class Circumstance implements Serializable {
 		return E;
 	}
     
+    public boolean hasEvent() {
+        return ! E.isEmpty();
+    }
+    
     public void addEventListener(CircumstanceListener el) {
         synchronized (listeners) {
         	listeners.add(el);
@@ -172,6 +176,11 @@ public class Circumstance implements Serializable {
 	public List getIntentions() {
 		return I;
 	}
+    
+    public boolean hasIntention() {
+        return ! I.isEmpty();
+    }
+    
 	public void addIntention(Intention intention) {
 		I.add(intention);
 
@@ -184,6 +193,14 @@ public class Circumstance implements Serializable {
 	        }
         }
 	}
+    
+    public boolean removeIntention(Intention i) {
+        return I.remove(i);
+    }
+    
+    public void clearIntentions() {
+        I.clear();
+    }
     
     public ActionExec getAction() {
 		return A;
