@@ -469,7 +469,7 @@ public class TransitionSystem {
 		// Rule SelInt1
 		if (!conf.C.I.isEmpty()) {
 			confP.C.SI = conf.ag.selectIntention(conf.C.I);
-			/* the following was not enought to remove selectAtomicIntention
+			/* the following was not enough to remove selectAtomicIntention
 			if (confP.C.SI.isAtomic()) {
 				confP.C.AI = confP.C.SI;
 				System.out.println("new AI="+confP.C.AI);
@@ -563,7 +563,14 @@ public class TransitionSystem {
 	private void applyExecInt() throws JasonException {
 		// get next formula in the body of the intended means
 		// on the top of the selected intention
+/*		if (conf.C.SI==null) {
+System.out.println("Config: "+conf.C);
+			confP.step = SClrInt;
+			return;
+		}
+*/
 		IntendedMeans im = conf.C.SI.peek();
+		
 		if (im.getPlan().getBody().size() == 0) { // for empty plans! may need unnif, etc
 			updateIntention();
 		} else {
@@ -592,6 +599,8 @@ public class TransitionSystem {
 				
 			// Rule Achieve
 			case BodyLiteral.HAchieve:
+				// free variables in an event cannot conflict with those in the plan
+				l.makeVarsAnnon();
 				conf.C.addAchvGoal(l, conf.C.SI);
 				break;
 
@@ -683,7 +692,9 @@ public class TransitionSystem {
 						// make the TE of finished plan ground and unify that with goal in the body
 						Literal tel = oldim.getPlan().getTriggerEvent().getLiteral();
 						oldim.unif.apply(tel);
+//		System.out.println("Tel here: "+tel+"G: "+g.getLiteral()+" Unif: "+oldim.unif+" New unif: "+im.unif);
 						im.unif.unifies(tel,g.getLiteral()); // TODO: Is the order here right?
+//		System.out.println(" New unif: "+im.unif);
 					}
 					confP.step = SClrInt; // the new top may have become
 					                      // empty! need to keep checking.
@@ -712,7 +723,8 @@ public class TransitionSystem {
 	/* auxiliary functions for the semantic rules */
 	/** ******************************************* */
 
-	public List relevantPlans(Trigger te) throws JasonException {
+	public List relevantPlans(Trigger teP) throws JasonException {
+		Trigger te = (Trigger)teP.clone();
 		List rp = new ArrayList();
 		List candidateRPs = conf.ag.fPS.getAllRelevant(te);
 		if (candidateRPs == null)

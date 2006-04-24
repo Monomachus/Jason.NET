@@ -177,6 +177,8 @@ public final class BDIlogic {
                 Trigger ng = (Trigger) g.clone();
                 ng.setTrigType(Trigger.TEDel);
                 ts.C.addEvent(new Event(ng,i));
+// JOMI: E' na linha de baixo que deu erro de concurrent modification. Sabes como arrumar?
+// Imagino que o mesmo acontece no dropDes
                 j.remove();
             }
         }

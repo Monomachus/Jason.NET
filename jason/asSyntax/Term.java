@@ -160,6 +160,10 @@ public class Term implements TermInterface, Comparable, Serializable {
 	public void setTerms(List l) {
 		terms = l;
 	}
+
+	public void setTerm(int i, Term t) {
+		terms.set(i,t);
+	}
 		
 	public void addTerms(List l) {
 		Iterator i = l.iterator();
@@ -225,6 +229,19 @@ public class Term implements TermInterface, Comparable, Serializable {
 			}
 		}
 		return true;
+	}
+
+	public void makeVarsAnnon() {
+		if (terms==null)
+			return;
+		for (int i=0; i<getTermsSize(); i++) {
+			if (getTerm(i).isVar()) {
+				setTerm(i,new UnnamedVar());
+			}
+			else if (getTerm(i).getTermsSize()>0) {
+				getTerm(i).makeVarsAnnon();
+			}
+		}
 	}
 
 	public boolean hasVar(Term t) {

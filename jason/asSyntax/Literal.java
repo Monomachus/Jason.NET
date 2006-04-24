@@ -104,8 +104,7 @@ public class Literal extends Pred implements Cloneable {
 		type = l.type;
 	}
 	*/
-	
-	
+		
 	public boolean isInternalAction() {
 		return (getFunctor().indexOf('.') >= 0);
 	}
