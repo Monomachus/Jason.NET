@@ -891,7 +891,9 @@ System.out.println("Config: "+conf.C);
 	/** ********************************************************************* */
 
 	boolean canSleep() {
-		return !conf.C.hasEvent() && !conf.C.hasIntention() && conf.C.MB.isEmpty() && conf.C.FA.isEmpty() && agArch.canSleep();
+		return !conf.C.hasEvent() && !conf.C.hasIntention() && 
+               conf.C.MB.isEmpty() && conf.C.FA.isEmpty() && 
+               agArch.canSleep();
 	}
 
 	/** waits for a new message */
@@ -943,7 +945,8 @@ System.out.println("Config: "+conf.C);
 		}
 	}
 	
-	
+	private static final Trigger tidle = Trigger.parseTrigger("+!idle");
+
 	/** ******************************************************************* */
 	/* MAIN LOOP */
 	/** ******************************************************************* */
@@ -957,9 +960,15 @@ System.out.println("Config: "+conf.C);
 			if (setts.isSync()) {
 				waitSyncSignal();
 			} else if (canSleep()) {
-				// changed here: now conditinal on NRCSLBR
-				if (nrcslbr <= 1)
-					waitMessage();
+                if (getAg().fPS.isRelevant(tidle)) {
+                    logger.fine("generating idle event");
+                    C.addExternalEv(tidle);
+                } else {
+    				// changed here: now conditinal on NRCSLBR
+    				if (nrcslbr <= 1) {
+    					waitMessage();
+                    }
+                }
 			}
 			
 			C.reset();
