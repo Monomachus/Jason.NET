@@ -357,24 +357,25 @@ public class Circumstance implements Serializable {
 		
 		// pending actions
 		if (getPendingActions() != null && !getPendingActions().isEmpty()) {
-			i = getPendingActions().values().iterator();
+			i = getPendingActions().keySet().iterator();
 			while (i.hasNext()) {
-				Object o = i.next();
+                Object key = i.next();
+				Object o = getPendingActions().get(key);
 				if (!alreadyIn.contains(o)) {
 					try { // try ActionExec
 						e = ((ActionExec)o).getAsDOM(document);
-						e.setAttribute("pending","true");
+						e.setAttribute("pending",key.toString());
 						acts.appendChild(e);
 						alreadyIn.add(o);
 					} catch (Exception ex1) {
 						try { // try Intention
 							e = ((Intention)o).getAsDOM(document);
 							if (! o.equals(getSelectedIntention())) {
-								e.setAttribute("pending","true");
+								e.setAttribute("pending",key.toString());
 								// add in intentions
 								ints.appendChild(e);
 							} else {
-								selIntEle.setAttribute("pending","true");
+								selIntEle.setAttribute("pending",key.toString());
 							}
 						} catch (Exception ex2) {
 							logger.log(Level.SEVERE,"Trying to add an unknown pending action "+o.getClass().getName()+" - "+ex2,ex2);

@@ -65,10 +65,12 @@ public class wait implements InternalAction {
     
 	/**
 	 * args[0] is either a number or a string, if number it is the time (in ms), 
-	 * if string it is the trigger event to be waited.
+	 * if string it is the trigger event to be waited. this second use also receive
+     * the timeout (in ms) as parameter.
 	 * 
-	 * E.g.: .wait(1000)       // waits 1 second
-	 *       .wait("+!t(50)")  // waits the event +!t(50)
+	 * E.g.: .wait(1000)             // waits 1 second
+	 *       .wait("+!t(50)")        // waits the event +!t(50)
+     *       .wait("+!t(50)", 2000)  // waits the event +!t(50) for 2 seconds
 	 * 
 	 */
 	public boolean execute(final TransitionSystem ts, Unifier un, Term[] args)	throws Exception {
@@ -86,7 +88,15 @@ public class wait implements InternalAction {
 				StringTerm st = (StringTerm)args[0];
 				un.apply((Term)st);
 				Trigger te = Trigger.parseTrigger(st.getString());
-				new WaitEvent(te, un, ts).start();
+                
+                int timeout = -1;
+                if (args.length == 2) {
+                    NumberTerm tot = (NumberTerm)args[1].clone();
+                    un.apply((Term)tot);
+                    timeout = (int)tot.solve();
+                }
+                
+				new WaitEvent(te, un, ts, timeout).start();
 				return true;
 			} catch (Exception e) {
 				ts.getLogger().log(Level.SEVERE, "Error at .wait.",e);
@@ -102,13 +112,15 @@ public class wait implements InternalAction {
 		TransitionSystem ts;
 		Circumstance c;
         boolean ok = false;
+        int timeout = -1;
 		
-		WaitEvent(Trigger te, Unifier un, TransitionSystem ts) {
+		WaitEvent(Trigger te, Unifier un, TransitionSystem ts, int to) {
 			this.te = te;
 			this.un = un;
 			this.ts = ts;
 			c = ts.getC();
 			si = c.getSelectedIntention();
+            this.timeout = to;
 		}
 
 		public void run() {
@@ -123,20 +135,35 @@ public class wait implements InternalAction {
 
 				// add SI again in C.I
 				c.addIntention(si);
+				c.getPendingActions().remove(te.toString());
 				
 			} catch (Exception e) {
 				ts.getLogger().log(Level.SEVERE, "Error at .wait thread",e);
 			}
 		}
 		
-		synchronized public void waitEvent() {
+		synchronized public boolean waitEvent() {
+            long init = System.currentTimeMillis();
+            long pass = 0;
             while (!ok) {
+                //ts.getLogger().info("* waiting "+te+" timeout="+timeout+" pass="+pass);
                 try {
-                    wait();
+                    if (timeout == -1) {
+                        wait();
+                    } else {
+                        long to = timeout - pass;
+                        if (to <= 0) to = 100;
+                        wait(to);
+                        pass = System.currentTimeMillis()-init;
+                        if (pass >= timeout) {
+                            break;
+                        }
+                    }
     			} catch (Exception e) {
     			    e.printStackTrace();
                 }
             }
+            return ok;
 		}		
 
 		synchronized public void eventAdded(Event e) {
@@ -149,7 +176,10 @@ public class wait implements InternalAction {
 		public void intentionAdded(Intention i) {
 			// if the .wait intention where is being added in C.I, remove it
 			if (i == si) {
-				if (!c.removeIntention(si)) {
+				if (c.removeIntention(si)) {
+                    // TODO: add i in FA
+                    c.getPendingActions().put(te.toString(), si);          
+                } else {
 					ts.getLogger().warning("The following intentions sould be removed, but wasn't!"+si+"\nWait intention is"+i);
 				}
 			}

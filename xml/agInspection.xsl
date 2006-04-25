@@ -124,8 +124,8 @@
             </td>
 
             <td valign="top" style="{$td-style2}">
-	   	    <xsl:if test="@pending='true'">
-  	    	  <b>X</b>
+     	    <xsl:if test="string-length(@pending) > 0">
+  	    	  <b><xsl:value-of select="@pending" /></b>
    		    </xsl:if>
             </td>
 
