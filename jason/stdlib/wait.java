@@ -61,7 +61,8 @@ import jason.asSyntax.Trigger;
 import java.util.logging.Level;
 
 public class wait implements InternalAction {
-	
+	// TODO: implement timeout for wait event
+    
 	/**
 	 * args[0] is either a number or a string, if number it is the time (in ms), 
 	 * if string it is the trigger event to be waited.
@@ -100,6 +101,7 @@ public class wait implements InternalAction {
 		Intention si;
 		TransitionSystem ts;
 		Circumstance c;
+        boolean ok = false;
 		
 		WaitEvent(Trigger te, Unifier un, TransitionSystem ts) {
 			this.te = te;
@@ -128,14 +130,18 @@ public class wait implements InternalAction {
 		}
 		
 		synchronized public void waitEvent() {
-			try {
-				wait();
-			} catch (Exception e) {
-			}
+            while (!ok) {
+                try {
+                    wait();
+    			} catch (Exception e) {
+    			    e.printStackTrace();
+                }
+            }
 		}		
 
 		synchronized public void eventAdded(Event e) {
 			if (un.unifies(te,e.getTrigger())) {
+                ok = true;
 				notifyAll();
 			}
 		}
