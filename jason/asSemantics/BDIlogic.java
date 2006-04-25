@@ -111,18 +111,26 @@ public final class BDIlogic {
         }
         
         // intention may be suspended in PA! (in the new semantics)
-        if (ts.C.PA!=null) {
-            for(Iterator i=ts.C.PA.values().iterator(); i.hasNext(); ) {
+        if (ts.C.hasPendingAction()) {
+            for(Iterator i=ts.C.getPendingActions().values().iterator(); i.hasNext(); ) {
             	//logger.log(Level.SEVERE,"Int: "+g+" unif "+ts.C.SI);
-                if (((ActionExec)i.next()).getIntention().hasTrigger(g,un))
+                Object o = i.next();
+                Intention intention = null;
+                try {
+                    intention = ((ActionExec)o).getIntention();
+                } catch (Exception e) {
+                    intention = (Intention)o;
+                } 
+                if (intention.hasTrigger(g,un))
                     return true;
             }
         }
-
-        for(Iterator i=ts.C.getIntentions().iterator(); i.hasNext(); ) {
-        	//logger.log(Level.SEVERE,"Int: "+g+" unif "+ts.C.SI);
-    		if (((Intention)i.next()).hasTrigger(g,un))
-    			return true;
+        synchronized (ts.C.getIntentions()) {
+            for(Iterator i=ts.C.getIntentions().iterator(); i.hasNext(); ) {
+            	//logger.log(Level.SEVERE,"Int: "+g+" unif "+ts.C.SI);
+        		if (((Intention)i.next()).hasTrigger(g,un))
+        			return true;
+            }
         }
 
         return false;
@@ -163,13 +171,16 @@ public final class BDIlogic {
      */
     public static final void dropInt(TransitionSystem ts, Literal l, Unifier un) {
         Trigger g = new Trigger(Trigger.TEAdd,Trigger.TEAchvG,l);
-        for(Iterator j=ts.C.getIntentions().iterator(); j.hasNext(); ) {
-        	Intention i = (Intention) j.next();
-            if (i.hasTrigger(g,un)) {
-                j.remove();            
-                Trigger ng = (Trigger) g.clone();
-                ng.setTrigType(Trigger.TEDel);
-                ts.C.addEvent(new Event(ng,i));
+
+        synchronized (ts.C.getIntentions()) {
+            for(Iterator j=ts.C.getIntentions().iterator(); j.hasNext(); ) {
+            	Intention i = (Intention) j.next();
+                if (i.hasTrigger(g,un)) {
+                    j.remove();            
+                    Trigger ng = (Trigger) g.clone();
+                    ng.setTrigType(Trigger.TEDel);
+                    ts.C.addEvent(new Event(ng,i));
+                }
             }
         }
         
@@ -192,9 +203,16 @@ public final class BDIlogic {
         }
         
         // intention may be suspended in PA! (in the new semantics)
-        if (ts.C.PA!=null) {
-            for(Iterator j=ts.C.PA.values().iterator(); j.hasNext(); ) {
-            	Intention i = ((ActionExec)j.next()).getIntention();
+        if (ts.C.hasPendingAction()) {
+            for(Iterator j=ts.C.getPendingActions().values().iterator(); j.hasNext(); ) {
+                // PA may contain ActionExec or Intention
+                Object o = j.next();
+            	Intention i = null;
+                try {
+                    i = ((ActionExec)o).getIntention();
+                } catch (Exception e) {
+                    i = (Intention)o;
+                } 
         		// TODO CAREFUL: The semantics for this isn't well defined yet.
         		// The goal deletion on top of the intention will not get to know
         		// the result of the action, as it is removed from the PA set!

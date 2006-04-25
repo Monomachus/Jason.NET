@@ -468,7 +468,9 @@ public class TransitionSystem {
 
 		// Rule SelInt1
 		if (conf.C.hasIntention()) {
-			confP.C.SI = conf.ag.selectIntention(conf.C.getIntentions());
+            synchronized (conf.C.getIntentions()) {
+                confP.C.SI = conf.ag.selectIntention(conf.C.getIntentions());
+            }
 			/* the following was not enough to remove selectAtomicIntention
 			if (confP.C.SI.isAtomic()) {
 				confP.C.AI = confP.C.SI;
@@ -485,14 +487,17 @@ public class TransitionSystem {
 		if (conf.C.SI != null && conf.C.SI.isAtomic()) {
 			return conf.C.SI;
 		}
-		Iterator i = conf.C.getIntentions().iterator();
-		while (i.hasNext()) {
-			Intention inte = (Intention)i.next();
-			if (inte.isAtomic()) {
-				i.remove();
-				return inte;
-			}
-		}
+
+        synchronized (conf.C.getIntentions()) {
+    		Iterator i = conf.C.getIntentions().iterator();
+    		while (i.hasNext()) {
+    			Intention inte = (Intention)i.next();
+    			if (inte.isAtomic()) {
+    				conf.C.removeIntention(inte);
+    				return inte;
+    			}
+    		}
+        }
 		return null;
 	}
 	
@@ -516,43 +521,8 @@ public class TransitionSystem {
 		
 		// if it implements InternalAction
 		try {
-			// check if  the agent already has this InternalAction object
-			//InternalAction objIA = ;
-			/*
-			(InternalAction)agInternalAction.get(name);
-			if (objIA == null) {
-				objIA = (InternalAction)Class.forName(name).newInstance();
-				agInternalAction.put(name, objIA);
-			}
-			*/
 			// calls execute
 			return getIA(name).execute(this, un, action.getTermsArray());
-			
-		} catch (ClassNotFoundException e) {
-			logger.log(Level.SEVERE, "Error in IA ", e);
-			return false;
-		} catch (ClassCastException e) {
-			// tries it as old internal action (static + string pars)
-			String pars[] = null;
-			if (action.getTerms() == null) {
-				pars = new String[0];
-			} else {
-				pars = new String[action.getTerms().size()];
-				int i = 0;
-				Iterator j = action.getTerms().iterator();
-				while (j.hasNext()) {
-					pars[i++] = j.next().toString();
-				}
-			}
-			try {
-				Class classDef = Class.forName(name);
-				Method executeMethod = classDef.getDeclaredMethod("execute", classParameters);
-				Object objectParameters[] = { this, un, pars };
-				// Static method, no instance needed
-				return ((Boolean) executeMethod.invoke(null, objectParameters)).booleanValue();
-			} catch (Exception e2) {
-				throw new JasonException("Method execute does not exists in class " + name);
-			}
 	
 		} catch (Exception e) {
 			logger.log(Level.SEVERE,"Error in IA ",e);
@@ -857,23 +827,22 @@ System.out.println("Config: "+conf.C);
         Trigger tevent = ev.trigger;
 		// TODO: double check all cases here
 		if (tevent.isAddition() && tevent.isGoal() && ev.isInternal()) {
-			
-            // find a relevant failure plan
             Trigger failTrigger = new Trigger(Trigger.TEDel,tevent.getGoal(),tevent.getLiteral());
             //logger.info("Trying "+failTrigger+" relevant="+getAg().getPS().isRelevant(failTrigger));
-            boolean firsttime = true;
-            while (! getAg().getPS().isRelevant(failTrigger) && ev.intention.size() > 1) {
-                if (!firsttime) {
-                    ev.intention.pop();
-                }
-                firsttime = false;
+			
+            // find a relevant failure plan
+            while (! getAg().getPS().isRelevant(failTrigger) && ev.intention.size() > 0) {
                 tevent = ev.intention.peek().getTrigger();
                 failTrigger = new Trigger(Trigger.TEDel,tevent.getGoal(),tevent.getLiteral());
                 //logger.info("Trying "+failTrigger+" relevant="+getAg().getPS().isRelevant(failTrigger));
+
+                ev.intention.pop();
             }
-            if (tevent.isGoal()) {
+            if (tevent.isGoal() && getAg().getPS().isRelevant(failTrigger)) {
             	confP.C.addEvent(new Event(failTrigger, ev.intention));
-            	logger.warning("Generating goal deletion "+failTrigger+" from event: " + ev);
+            	logger.warning("Generating goal deletion "+failTrigger+" from event: " + ev.getTrigger());
+            } else {
+                logger.warning("No fail event was generated for "+ev.getTrigger());
             }
 		}
 		else if (ev.isInternal()) {

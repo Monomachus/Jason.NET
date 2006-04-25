@@ -81,7 +81,7 @@ public class Circumstance implements Serializable {
 
     protected Intention SI;
     //protected Intention AI; // atomic intention
-    protected Map       PA;
+    private   Map       PA;
     protected List      FA;
 
     private List listeners = new ArrayList();
@@ -182,7 +182,9 @@ public class Circumstance implements Serializable {
     }
     
 	public void addIntention(Intention intention) {
-		I.add(intention);
+        synchronized (I) {
+            I.add(intention);
+        }
 
 		// notify listeners
         synchronized (listeners) {
@@ -195,11 +197,15 @@ public class Circumstance implements Serializable {
 	}
     
     public boolean removeIntention(Intention i) {
-        return I.remove(i);
+        synchronized (I) {
+            return I.remove(i);
+        }  
     }
     
     public void clearIntentions() {
-        I.clear();
+        synchronized (I) {
+            I.clear();
+        }
     }
     
     public ActionExec getAction() {
@@ -214,9 +220,15 @@ public class Circumstance implements Serializable {
 	public List getFeedbackActions() {
 		return FA;
 	}
+    
 	public Map getPendingActions() {
 		return PA;
 	}
+    public boolean hasPendingAction() {
+        return PA != null && PA.size() > 0;
+    }
+    
+    
 	public List getRelevantPlans() {
 		return RP;
 	}
@@ -356,7 +368,7 @@ public class Circumstance implements Serializable {
 		}
 		
 		// pending actions
-		if (getPendingActions() != null && !getPendingActions().isEmpty()) {
+		if (hasPendingAction()) {
 			i = getPendingActions().keySet().iterator();
 			while (i.hasNext()) {
                 Object key = i.next();
