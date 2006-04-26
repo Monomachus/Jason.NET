@@ -246,12 +246,19 @@ public class PlanLibrary {
     	return l != null && l.size() > 0;
     }
 
+
     public List getAllRelevant(Trigger t) {
     	List l = (List)relPlans.get(t.getFunctorArity());
     	if ((l == null || l.size() == 0) && varPlans.size() > 0) { // no rel plan, try varPlan
     		l = varPlans;
     	}
     	return l;
+    }
+
+    public static final Trigger TE_IDLE = Trigger.parseTrigger("+!idle");
+
+    public List getIdlePlans() {
+        return (List)relPlans.get(TE_IDLE.getFunctorArity());
     }
 
     public String toString() {

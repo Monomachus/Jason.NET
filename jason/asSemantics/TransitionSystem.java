@@ -96,6 +96,7 @@ import jason.asSyntax.BodyLiteral;
 import jason.asSyntax.DefaultLiteral;
 import jason.asSyntax.Literal;
 import jason.asSyntax.Plan;
+import jason.asSyntax.PlanLibrary;
 import jason.asSyntax.Pred;
 import jason.asSyntax.Term;
 import jason.asSyntax.Trigger;
@@ -914,8 +915,6 @@ System.out.println("Config: "+conf.C);
 		}
 	}
 	
-	private static final Trigger tidle = Trigger.parseTrigger("+!idle");
-
 	/** ******************************************************************* */
 	/* MAIN LOOP */
 	/** ******************************************************************* */
@@ -929,9 +928,9 @@ System.out.println("Config: "+conf.C);
 			if (setts.isSync()) {
 				waitSyncSignal();
 			} else if (canSleep()) {
-                if (getAg().fPS.isRelevant(tidle)) {
+                if (getAg().fPS.getIdlePlans() != null) {
                     logger.fine("generating idle event");
-                    C.addExternalEv(tidle);
+                    C.addExternalEv(PlanLibrary.TE_IDLE);
                 } else {
     				// changed here: now conditinal on NRCSLBR
     				if (nrcslbr <= 1) {
