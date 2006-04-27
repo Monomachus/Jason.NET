@@ -179,7 +179,7 @@ public final class BDIlogic {
                     j.remove();            
                     Trigger ng = (Trigger) g.clone();
                     ng.setTrigType(Trigger.TEDel);
-                    ts.C.addEvent(new Event(ng,i));
+                    ts.C.addEvent(new Event(ng, Intention.EmptyInt));
                 }
             }
         }
@@ -188,12 +188,12 @@ public final class BDIlogic {
         List dropped = new LinkedList();
         for(Iterator j=ts.C.getEvents().iterator(); j.hasNext(); ) {
         	Intention i = ((Event)j.next()).intention;
-            if (i.hasTrigger(g,un)) {
+            if (i != null && i.hasTrigger(g,un)) {
                 j.remove();
                 
                 Trigger ng = (Trigger) g.clone();
                 ng.setTrigType(Trigger.TEDel);
-                dropped.add(new Event(ng,i));
+                dropped.add(new Event(ng,Intention.EmptyInt));
             }
         }
         // we must add the events only after removing (add events while removing cause a loop)
@@ -223,7 +223,7 @@ public final class BDIlogic {
 
                     Trigger ng = (Trigger) g.clone();
                     ng.setTrigType(Trigger.TEDel);
-                    ts.C.addEvent(new Event(ng,i));
+                    ts.C.addEvent(new Event(ng,Intention.EmptyInt));
                 }
             }
         }
