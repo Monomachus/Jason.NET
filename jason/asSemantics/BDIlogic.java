@@ -176,10 +176,12 @@ public final class BDIlogic {
             for(Iterator j=ts.C.getIntentions().iterator(); j.hasNext(); ) {
             	Intention i = (Intention) j.next();
                 if (i.hasTrigger(g,un)) {
-                    j.remove();            
-                    Trigger ng = (Trigger) g.clone();
-                    ng.setTrigType(Trigger.TEDel);
-                    ts.C.addEvent(new Event(ng, Intention.EmptyInt));
+                    j.remove();
+                    addDropEvent(g,ts);
+                    // TODO: what if we have 2 intentions?
+                    // 2 identical events are generated!
+                    // idem for E/PA
+                    // Maybe do not use g, but a copy of g with un.apply
                 }
             }
         }
@@ -190,16 +192,13 @@ public final class BDIlogic {
         	Intention i = ((Event)j.next()).intention;
             if (i != null && i.hasTrigger(g,un)) {
                 j.remove();
-                
-                Trigger ng = (Trigger) g.clone();
-                ng.setTrigType(Trigger.TEDel);
-                dropped.add(new Event(ng,Intention.EmptyInt));
+                dropped.add(g);
             }
         }
         // we must add the events only after removing (add events while removing cause a loop)
         Iterator id = dropped.iterator();
         while (id.hasNext()) {
-            ts.C.addEvent((Event)id.next());
+            addDropEvent((Trigger)id.next(), ts);
         }
         
         // intention may be suspended in PA! (in the new semantics)
@@ -220,15 +219,20 @@ public final class BDIlogic {
                	// the stack (that might cause problems?)
                 if (i.hasTrigger(g,un)) {
                     j.remove();
-
-                    Trigger ng = (Trigger) g.clone();
-                    ng.setTrigType(Trigger.TEDel);
-                    ts.C.addEvent(new Event(ng,Intention.EmptyInt));
+                    addDropEvent(g,ts);
                 }
             }
         }
     }
 
+    private static void addDropEvent(Trigger g, TransitionSystem ts) {
+        Trigger ng = (Trigger) g.clone();
+        ng.setTrigType(Trigger.TEDel);
+        if (ts.getAg().getPS().isRelevant(ng)) {
+            ts.C.addEvent(new Event(ng, Intention.EmptyInt));
+        }
+    }
+    
     /**
      * This changes the agent's circumstance by simply emptying
      * the whole set of events (E). IMPORTANT: note that this
