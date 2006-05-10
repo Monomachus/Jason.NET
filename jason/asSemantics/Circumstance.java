@@ -167,6 +167,10 @@ public class Circumstance implements Serializable {
         	listeners.remove(el);
         }
     }
+    
+    public boolean hasListener() {
+        return listeners.size() > 0;
+    }
 
     public List getMB() {
 		return MB;

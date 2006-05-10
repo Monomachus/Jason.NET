@@ -370,7 +370,7 @@ public class Agent {
 	// only add External Event if it is relevant in respect to the PlanLibrary
 	public void updateEvents(Event e, Circumstance c) {
 		if (c != null) {
-			if (e.isInternal() || fPS.isRelevant(e.trigger)) {
+			if (e.isInternal() || c.hasListener() || fPS.isRelevant(e.trigger)) {
 				c.addEvent(e);
 				logger.fine("Added event "+e);
 			}
