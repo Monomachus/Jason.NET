@@ -41,7 +41,8 @@ public class CentralisedMASLauncherAnt implements MASLauncherInfraTier {
 			}
 			System.out.println("Executing MAS with " + cmdstr);
 			
-			masProcess = Runtime.getRuntime().exec(command, null,	new File(project.getDirectory()));
+			File dir = new File(new File(project.getDirectory()).getAbsolutePath());
+			masProcess = Runtime.getRuntime().exec(command, null,	dir);
 
 			BufferedReader in = new BufferedReader(new InputStreamReader(masProcess.getInputStream()));
 			BufferedReader err = new BufferedReader(new InputStreamReader(	masProcess.getErrorStream()));
