@@ -10,6 +10,12 @@
     <xsl:param name="td-style2" select="'text-align: center; vertical-align: top;'" />
     <xsl:param name="trh-style" select="'background-color: #ece7e6; font-family: arial; vertical-align: top;'" />
     <xsl:param name="tr-style" select="'background-color: #ece7e6; font-family: arial;'" />
+
+    <xsl:param name="show-bels" select="'true'" />
+    <xsl:param name="show-evt"  select="'true'" />
+    <xsl:param name="show-mb"  select="'true'" />
+    <xsl:param name="show-int"  select="'true'" />
+    <xsl:param name="show-plan"  select="'true'" />
     
     <xsl:output method="html"/>
 
@@ -31,25 +37,61 @@
         </html>
     </xsl:template>
 
-    <xsl:template match="beliefs">
-        <tr style="{$trh-style}">
-        <th valign="top" style="{$th-style}">Beliefs</th>
-        <td style="{$td-style}">
-        <table cellspacing="0" cellpadding="2">
-        <xsl:apply-templates select="bel" />
-        </table>
-        </td>
-        </tr>
+	<!-- create de +/- buttom -->
+    <xsl:template name="hideshow">
+        <xsl:param name="show" select="'false'" />
+        <xsl:param name="item" select="'none'" />
+        <xsl:param name="ds"   select="'none'" />
+        <xsl:if test="$show='true'">
+	        <th valign="top" style="{$th-style}">
+	        	<a href="hide?{$item}" style="text-decoration: none">
+	        		-<xsl:text> </xsl:text>
+	        	</a>
+	        	<xsl:value-of select="$ds" />
+	       	</th>
+        </xsl:if>
+        <xsl:if test="$show='false'">
+	        <th valign="top" style="{$th-style}">
+	        	<a href="show?{$item}" style="text-decoration: none">+
+	        		<xsl:text> </xsl:text>
+	        	</a>
+	        	<xsl:value-of select="$ds" />
+	       	</th>
+	        <td style="{$td-style}"></td>
+        </xsl:if> 
     </xsl:template>
     
+    <xsl:template match="beliefs">
+        <tr style="{$trh-style}">
+        <xsl:call-template name="hideshow">
+        	<xsl:with-param name="show" select="$show-bels" />
+        	<xsl:with-param name="item" select="'bels'" />
+        	<xsl:with-param name="ds" select="'Beliefs'" />
+        </xsl:call-template>
+        <xsl:if test="$show-bels='true'">
+	        <td style="{$td-style}">
+		        <table cellspacing="0" cellpadding="2">
+			        <xsl:apply-templates select="bel" />
+		        </table>
+	        </td>
+        </xsl:if>
+        </tr>
+    </xsl:template>
+
     <xsl:template match="mailbox">
         <tr style="{$trh-style}">
-        <th valign="top" style="{$th-style}">MailBox</th>
-        <td style="{$td-style}">
-        <table cellspacing="0" cellpadding="3">
-        <xsl:apply-templates select="message" />
-        </table>
-        </td>
+        <xsl:call-template name="hideshow">
+        	<xsl:with-param name="show" select="$show-mb" />
+        	<xsl:with-param name="item" select="'mv'" />
+        	<xsl:with-param name="ds" select="'MailBox'" />
+        </xsl:call-template>
+        <xsl:if test="$show-mb='true'">
+	        <td style="{$td-style}">
+	        <table cellspacing="0" cellpadding="3">
+	        <xsl:apply-templates select="message" />
+	        </table>
+	        </td>
+        </xsl:if>
         </tr>
     </xsl:template>
 
@@ -63,17 +105,23 @@
 
     <xsl:template match="events">
         <tr style="{$trh-style}">
-        <th valign="top" style="{$th-style}">Events</th>
-        <td style="{$td-style}">
-        <table cellspacing="0" cellpadding="3">
-        <tr style="{$trh-style}">
-		<th valign="top" style="{$th-style2}">Sel</th>
-		<th valign="top" style="{$th-style2}">Trigger</th>
-		<th valign="top" style="{$th-style2}">Intention</th>
-        </tr>
-        <xsl:apply-templates />
-        </table>
-        </td>
+        <xsl:call-template name="hideshow">
+        	<xsl:with-param name="show" select="$show-evt" />
+        	<xsl:with-param name="item" select="'evt'" />
+        	<xsl:with-param name="ds" select="'Events'" />
+        </xsl:call-template>
+        <xsl:if test="$show-evt='true'">
+	        <td style="{$td-style}">
+	        <table cellspacing="0" cellpadding="3">
+	        <tr style="{$trh-style}">
+			<th valign="top" style="{$th-style2}">Sel</th>
+			<th valign="top" style="{$th-style2}">Trigger</th>
+			<th valign="top" style="{$th-style2}">Intention</th>
+	        </tr>
+	        <xsl:apply-templates />
+	        </table>
+	        </td>
+        </xsl:if>
         </tr>
     </xsl:template>
     
@@ -96,18 +144,24 @@
 
     <xsl:template match="intentions">
         <tr style="{$trh-style}">
-        <th valign="top" style="{$th-style}">Intentions</th>
-        <td valign="top" style="{$td-style}">
-        <table cellspacing="0" cellpadding="5">
-        <tr style="{$trh-style}">
-		<th valign="top" style="{$th-style2}">Sel</th>
-		<th valign="top" style="{$th-style2}">Id</th>
-		<th valign="top" style="{$th-style2}">Pen</th>
-		<th valign="top" style="{$th-style2}">Intended Means Stack and Unifier</th>
-        </tr>
-        <xsl:apply-templates />
-        </table>
-        </td>
+        <xsl:call-template name="hideshow">
+        	<xsl:with-param name="show" select="$show-int" />
+        	<xsl:with-param name="item" select="'int'" />
+        	<xsl:with-param name="ds" select="'Intentions'" />
+        </xsl:call-template>
+        <xsl:if test="$show-int='true'">
+	        <td valign="top" style="{$td-style}">
+	        <table cellspacing="0" cellpadding="5">
+	        <tr style="{$trh-style}">
+			<th valign="top" style="{$th-style2}">Sel</th>
+			<th valign="top" style="{$th-style2}">Id</th>
+			<th valign="top" style="{$th-style2}">Pen</th>
+			<th valign="top" style="{$th-style2}">Intended Means Stack and Unifier</th>
+	        </tr>
+	        <xsl:apply-templates />
+	        </table>
+	        </td>
+	    </xsl:if>
         </tr>
     </xsl:template>
 
@@ -205,19 +259,25 @@
 
     <xsl:template match="plans">
         <tr style="{$trh-style}">
-        <th valign="top" style="{$th-style}">Plans</th>
-        <td>
-        <table ellspacing="0" cellpadding="3">
-        <tr style="{$trh-style}">
-    	<!--th valign="top" style="{$th-style2}">Rel</th-->
-	    <th valign="top" style="{$th-style2}">App</th>
-	    <th valign="top" style="{$th-style2}">Sel</th>
-	    <th valign="top" style="{$th-style2}">Plan</th>
-	    <th valign="top" style="{$th-style2}">Unifier</th>
-        </tr>
-        <xsl:apply-templates />
-        </table>
-        </td>
+        <xsl:call-template name="hideshow">
+        	<xsl:with-param name="show" select="$show-plan" />
+        	<xsl:with-param name="item" select="'plan'" />
+        	<xsl:with-param name="ds" select="'Plans'" />
+        </xsl:call-template>
+        <xsl:if test="$show-plan='true'">
+	        <td>
+	        <table ellspacing="0" cellpadding="3">
+	        <tr style="{$trh-style}">
+	    	<!--th valign="top" style="{$th-style2}">Rel</th-->
+		    <th valign="top" style="{$th-style2}">App</th>
+		    <th valign="top" style="{$th-style2}">Sel</th>
+		    <th valign="top" style="{$th-style2}">Plan</th>
+		    <th valign="top" style="{$th-style2}">Unifier</th>
+	        </tr>
+	        <xsl:apply-templates />
+	        </table>
+	        </td>
+		</xsl:if>
         </tr>
     </xsl:template>
 

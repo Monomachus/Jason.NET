@@ -56,6 +56,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.StringWriter;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
@@ -68,6 +70,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextPane;
 import javax.swing.border.TitledBorder;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.xml.transform.Transformer;
@@ -101,6 +105,11 @@ public class ExecutionControlGUI extends ExecutionControl {
 	JPanel spList;
 	
 	DefaultListModel listModel;
+    
+    // what to show
+    Document agState = null;
+
+    Map<String,Boolean> show = new HashMap<String,Boolean>();
 
 	void initComponents() {
 		frame = new JFrame("MAS Execution Control");
@@ -133,6 +142,11 @@ public class ExecutionControlGUI extends ExecutionControl {
 		jTA.setEditable(false);
 		jTA.setContentType("text/html");
 		jTA.setAutoscrolls(false);
+        jTA.addHyperlinkListener(new HyperlinkListener() {
+            public void hyperlinkUpdate(HyperlinkEvent evt) {
+                hyperLink(evt);
+            }
+        });
 		
 		JPanel spTA = new JPanel(new BorderLayout());
 		spTA.add(BorderLayout.CENTER, new JScrollPane(jTA));
@@ -199,6 +213,12 @@ public class ExecutionControlGUI extends ExecutionControl {
 				//close();
 			}
 		});
+        
+        show.put("bels", true);
+        show.put("evt", true);
+        show.put("mb", false);
+        show.put("int", false);
+        show.put("plan", false);
 	}
 	
 	public void stop() {
@@ -211,7 +231,6 @@ public class ExecutionControlGUI extends ExecutionControl {
 		inRunMode = b;
 	}
 	
-    private String previousMind = "--";
 	private void inspectAgent(String agName) {
 		if (agName == null) {
 			return;
@@ -219,40 +238,49 @@ public class ExecutionControlGUI extends ExecutionControl {
 		if (agName.length() == 0) {
 			return;
 		}
-		if (agTransformer == null) {
-			try {
-				agTransformer = TransformerFactory.newInstance().newTransformer(
-						new StreamSource( ExecutionControlGUI.class.getResource("/xml/agInspection.xsl").openStream()));
-			} catch (Exception e) {
-				jTA.setText("Error initializing XML transformer");
-				e.printStackTrace();
-				return;
-			}
-		}
 
-		Document agState = null;
 		try {
 			agState = infraControl.getAgState(agName);
+            showAgState();
 		} catch (Exception e) {
 			jTA.setText("can not get the state of agent "+agName);
 		}
 		
-		if (agState != null) {
-			StringWriter so = new StringWriter();
-			try {
-				agTransformer.transform(new DOMSource(agState),
-						                new StreamResult(so));
+	}
+
+    private String previousMind = "--";
+    /** show current agent state */
+    void showAgState() {
+        if (agTransformer == null) {
+            try {
+                agTransformer = TransformerFactory.newInstance().newTransformer(
+                        new StreamSource( ExecutionControlGUI.class.getResource("/xml/agInspection.xsl").openStream()));
+            } catch (Exception e) {
+                jTA.setText("Error initializing XML transformer");
+                e.printStackTrace();
+                return;
+            }
+        }
+        if (agState != null) {
+            StringWriter so = new StringWriter();
+            try {
+                // set parameters
+                for (String p: show.keySet()) {
+                    agTransformer.setParameter("show-"+p, show.get(p)+"");
+                }
+                agTransformer.transform(new DOMSource(agState),
+                                        new StreamResult(so));
                 String sMind = so.toString();
                 if (!sMind.equals(previousMind)) {
                     jTA.setText(sMind);
                 }
                 previousMind = sMind;
-			} catch (Exception e) {
-				jTA.setText("Error in XML transformation!" + e + "\n");
-				e.printStackTrace();
-			}
-		}
-	}
+            } catch (Exception e) {
+                jTA.setText("Error in XML transformation!" + e + "\n");
+                e.printStackTrace();
+            }
+        }        
+    }
 
 	/** 
 	 * Called when the agent <i>agName</i> has finished its reasoning cycle.
@@ -281,5 +309,24 @@ public class ExecutionControlGUI extends ExecutionControl {
 			jBtRun.setEnabled(true);
 		}
 	}
-
+    
+    private void hyperLink(HyperlinkEvent evt) {
+        if (evt.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+            //System.out.println("*evt="+evt.getDescription());
+            String uri = "show?";
+            int pos = evt.getDescription().indexOf(uri);
+            if (pos >= 0) {
+                String par = evt.getDescription().substring(pos+uri.length());
+                show.put(par,true);
+            } else {
+                uri = "hide?";
+                pos = evt.getDescription().indexOf(uri);
+                if (pos >= 0) {
+                    String par = evt.getDescription().substring(pos+uri.length());
+                    show.put(par,false);
+                }
+            }
+            showAgState();
+        }
+    }
 }
