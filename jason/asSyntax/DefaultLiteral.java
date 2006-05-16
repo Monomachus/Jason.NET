@@ -35,6 +35,10 @@
 
 package jason.asSyntax;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
+// TODO: remove when having expr log
 
 public class DefaultLiteral implements Cloneable {
 
@@ -81,4 +85,11 @@ public class DefaultLiteral implements Cloneable {
         else
             return "not " + literal.toString();
     }
+
+    /** get as XML */
+    public Element getAsDOM(Document document) {
+        Element u = (Element) document.createElement("default-literal");
+        u.appendChild(literal.getAsDOM(document));
+        return u;
+    }    
 }

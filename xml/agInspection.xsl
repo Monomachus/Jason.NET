@@ -11,6 +11,13 @@
     <xsl:param name="trh-style" select="'background-color: #ece7e6; font-family: arial; vertical-align: top;'" />
     <xsl:param name="tr-style" select="'background-color: #ece7e6; font-family: arial;'" />
 
+    <xsl:param name="bc"  select="'rgb(0 ,170, 0)'" />
+    <xsl:param name="tec" select="'rgb(200, 0, 0)'" />
+    <xsl:param name="ac"  select="'rgb(80, 40, 20)'" />
+    <xsl:param name="tgc" select="'rgb(0, 0, 170)'" />
+    <xsl:param name="agc" select="'rgb(0, 0, 120)'" />
+    <xsl:param name="iac" select="'rgb(100, 70, 30)'" />
+
     <xsl:param name="show-bels" select="'true'" />
     <xsl:param name="show-evt"  select="'true'" />
     <xsl:param name="show-mb"  select="'true'" />
@@ -95,7 +102,17 @@
         </tr>
     </xsl:template>
 
-    <xsl:template match="bel|message">
+    <xsl:template match="bel">
+        <tr style="{$trh-style}">
+            <td style="text-align: left">
+	        	<span style="color: {$bc}">
+                <xsl:apply-templates />
+                </span>
+            </td>
+        </tr>
+    </xsl:template>
+
+    <xsl:template match="message">
         <tr style="{$trh-style}">
             <td style="text-align: left">
                 <xsl:apply-templates />
@@ -134,7 +151,9 @@
             </td>
 
             <td valign="top" style="{$td-style}">
-		        <xsl:value-of select="@trigger" />
+            	<span style="color: {$tec}">
+			        <xsl:value-of select="@trigger" />
+			    </span>
             </td>
             <td valign="top" style="{$td-style2}">
 		        <xsl:value-of select="@intention" />
@@ -321,24 +340,67 @@
            </span><br/>
         </xsl:if>
         
-        <xsl:value-of select="@trigger" /> 
+        <span style="color: {$tec};">
+        	<xsl:value-of select="@trigger" /> 
+        </span>
         
-        <table>
-        <tr>
-        <td width="20" />
-        <td width="20" style="vertical-align: top"><b>:</b></td>
-	    <td><xsl:value-of select="@context" /></td> 
-    	</tr>
-        </table>
+        <xsl:if test="count(context/default-literal) > 0">
+	        <table>
+	        <tr>
+	        <td width="20" />
+	        <td width="20" style="vertical-align: top"><b>:</b></td>
+		    <td><xsl:apply-templates select="context" /></td> 
+	    	</tr>
+	        </table>
+		</xsl:if>
+        
+        <xsl:if test="count(body/body-literal) > 0">
+	        <table>
+	        <tr>
+	        <td width="20" />
+	        <td width="20" style="vertical-align: top"><b>&lt;-</b></td>
+		    <td><xsl:apply-templates select="body" /></td>
+	    	</tr>
+	        </table>
+		</xsl:if>
+    </xsl:template>
 
-        
-        <table>
-        <tr>
-        <td width="20" />
-        <td width="20" style="vertical-align: top"><b>&lt;-</b></td>
-	    <td><xsl:value-of select="@body" /></td>
-    	</tr>
-        </table>
+
+    <xsl:template match="context">
+        <xsl:for-each select="default-literal">
+        	<span style="color: {$bc}">
+        		<xsl:apply-templates />
+       		</span>
+            <xsl:if test="not(position()=last())"> &amp; </xsl:if>
+        </xsl:for-each>
     </xsl:template>
     
+    <xsl:template match="body">
+        <xsl:for-each select="body-literal">
+        	<xsl:choose>
+        		<xsl:when test="literal/@ia = 'true'">
+		        	<span style="color: {$iac}"><xsl:apply-templates />	</span>
+        		</xsl:when>
+        		<xsl:when test="string-length(@type) = 0">
+		        	<span style="color: {$ac}"><xsl:apply-templates />	</span>
+        		</xsl:when>
+        		<xsl:when test="@type = '?'">
+		        	<span style="color: {$tgc}">?<xsl:apply-templates />	</span>
+        		</xsl:when>
+        		<xsl:when test="@type = '!'">
+		        	<span style="color: {$agc}">!<xsl:apply-templates />	</span>
+        		</xsl:when>
+        		<xsl:when test="@type = '+'">
+		        	<span style="color: {$bc}">+<xsl:apply-templates />	</span>
+        		</xsl:when>
+        		<xsl:when test="@type = '-'">
+		        	<span style="color: {$bc}">-<xsl:apply-templates />	</span>
+        		</xsl:when>
+        		<xsl:otherwise>
+	        		<xsl:value-of select="@type"/><xsl:apply-templates />
+        		</xsl:otherwise>        		
+        	</xsl:choose>
+            <xsl:if test="not(position()=last())">; </xsl:if>
+        </xsl:for-each>
+    </xsl:template>
 </xsl:stylesheet> 

@@ -53,6 +53,9 @@ import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
 
 /**
  * A Literal is a Pred with strong negation (~).
@@ -184,4 +187,14 @@ public class Literal extends Pred implements Cloneable {
 			return "~" + super.toString();
 	}
 
+    /** get as XML */
+    public Element getAsDOM(Document document) {
+        Element u = (Element) document.createElement("literal");
+        if (isInternalAction()) {
+            u.setAttribute("ia", isInternalAction()+"");
+        }
+        u.appendChild(document.createTextNode(this.toString()));
+        return u;
+    }    
+    
 }

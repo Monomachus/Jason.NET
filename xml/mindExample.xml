@@ -1,13 +1,131 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet href="agInspection.xsl" type="text/xsl" ?>
 
-<agent name="ag2"><beliefs><bel>ally(ag3)[source(self)]</bel><bel>defaultBidValue(4)[source(self)]</bel><bel>auction(1)[source(percept)]</bel></beliefs><circumstance><events><event selected="true" trigger="+auction(1)[source(percept)]"/></events>
+<agent name="vc">
+<beliefs>
+<bel>pos(2,0)[source(percept)]</bel>
+<bel>demo[source(self)]</bel>
+<bel>dirty(3,0)[source(percept)]</bel>
+<bel>dirty(0,1)[source(percept)]</bel>
+<bel>dirty(2,1)[source(percept)]</bel>
+<bel>dirty(4,2)[source(percept)]</bel>
+<bel>dirty(3,3)[source(percept)]</bel>
+<bel>dirty(0,4)[source(percept)]</bel>
+<bel>dirty(2,4)[source(percept)]</bel>
+<bel>dirty(4,4)[source(percept)]</bel>
+<bel>dirty(2,0)[source(percept)]</bel>
+<bel>dirty(1,3)[source(percept)]</bel>
+<bel>dirty(4,1)[source(percept)]</bel>
+<bel>dirty(1,2)[source(percept)]</bel>
+<bel>dirty(0,2)[source(percept)]</bel>
+<bel>dirty(2,2)[source(percept)]</bel>
+<bel>dirty(2,3)[source(percept)]</bel>
+<bel>dirty(4,3)[source(percept)]</bel>
+<bel>dirty(3,4)[source(percept)]</bel>
+<bel>dirty(1,4)[source(percept)]</bel>
+<bel>dirty[source(percept)]</bel>
+</beliefs>
+<circumstance>
+<events>
+<event selected="true" trigger="+dirty[source(percept)]"/>
+</events>
 <plans>
 <option applicable="true" relevant="true" selected="true">
-<plan body="?defaultBidValue(B); place_bid(N,B)" context="not alliance" label="p1" trigger="+auction(N)"/><unification>{N=1, B=4}</unification>
+<plan label="l3[source(self)]" trigger="+dirty">
+<context/>
+<body>
+<body-literal type="">
+<literal>suck</literal>
+</body-literal>
+</body>
+</plan>
+<unifier>{}</unifier>
 </option>
-<option relevant="true"><plan body="place_bid(N,0)" context="alliance" label="p2" trigger="+auction(N)"/></option>
 </plans>
-
-<intentions><intention id="1" selected="true"><intended-means><plan body="place_bid(N,B)" context="not alliance" label="p1" trigger="+auction(N)"/><unification>{N=1, B=4}
-</unification></intended-means></intention></intentions></circumstance></agent>
+<intentions>
+<intention id="1" selected="true">
+<intended-means>
+<plan label="l5[source(self)]" trigger="+!go(X,Y)">
+<context>
+<default-literal>
+<literal>pos(AtX,AtY)</literal>
+</default-literal>
+<default-literal>
+<literal ia="true">.gt(X,AtX)</literal>
+</default-literal>
+</context>
+<body>
+<body-literal type="!">
+<literal>go(X,Y)</literal>
+</body-literal>
+</body>
+</plan>
+<unifier>{Y=0, AtX=1, AtY=0, X=3}</unifier>
+</intended-means>
+<intended-means>
+<plan label="l5[source(self)]" trigger="+!go(X,Y)">
+<context>
+<default-literal>
+<literal>pos(AtX,AtY)</literal>
+</default-literal>
+<default-literal>
+<literal ia="true">.gt(X,AtX)</literal>
+</default-literal>
+</context>
+<body>
+<body-literal type="!">
+<literal>go(X,Y)</literal>
+</body-literal>
+</body>
+</plan>
+<unifier>{Y=0, AtX=0, AtY=0, X=3}</unifier>
+</intended-means>
+<intended-means>
+<plan label="l1[source(self)]" trigger="+!limpar">
+<context>
+<default-literal>
+<literal>dirty(X,Y)</literal>
+</default-literal>
+</context>
+<body>
+<body-literal type="!">
+<literal>go(X,Y)</literal>
+</body-literal>
+<body-literal type="">
+<literal>suck</literal>
+</body-literal>
+<body-literal type="!!">
+<literal>limpar</literal>
+</body-literal>
+</body>
+</plan>
+<unifier>{Y=0, X=3}</unifier>
+</intended-means>
+<intended-means>
+<plan label="l0[source(self)]" trigger="+demo">
+<context/>
+<body>
+<body-literal type="!">
+<literal>limpar</literal>
+</body-literal>
+</body>
+</plan>
+<unifier>{}</unifier>
+</intended-means>
+</intention>
+<intention id="2">
+<intended-means>
+<plan label="l3[source(self)]" trigger="+dirty">
+<context/>
+<body>
+<body-literal type="">
+<literal>suck</literal>
+</body-literal>
+</body>
+</plan>
+<unifier>{}</unifier>
+</intended-means>
+</intention>
+</intentions>
+</circumstance>
+</agent>

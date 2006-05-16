@@ -56,13 +56,13 @@ import org.w3c.dom.Element;
 
 public class Plan implements Cloneable, Serializable {
 
-	public static final Term TAtomic = Term.parse("atomic");	
+	public static final Term TAtomic     = Term.parse("atomic");	
 	public static final Term TBreakPoint = Term.parse("breakpoint");	
 	
 	Pred label = null;
 	protected Trigger tevent = null;
-	protected ArrayList context;
-	protected ArrayList body;
+	protected ArrayList<DefaultLiteral> context;
+	protected ArrayList<BodyLiteral>    body;
 
 	Boolean isAtomic = null; // if the label has atomic annotation, used to cache the value, so we do not need to seach all label annotations each isAtomic()
 	
@@ -75,13 +75,13 @@ public class Plan implements Cloneable, Serializable {
 	public Plan() {
 	}
 
-	public Plan(Trigger te, ArrayList ct, ArrayList bd) {
+	public Plan(Trigger te, ArrayList<DefaultLiteral> ct, ArrayList<BodyLiteral> bd) {
 		tevent = te;
 		context = ct;
 		body = bd;
 	}
 
-	public Plan(Pred lb, Trigger te, ArrayList ct, ArrayList bd) {
+	public Plan(Pred lb, Trigger te, ArrayList<DefaultLiteral> ct, ArrayList<BodyLiteral> bd) {
 		label = lb;
 		tevent = te;
 		context = ct;
@@ -121,11 +121,11 @@ public class Plan implements Cloneable, Serializable {
 		return tevent;
 	}
 
-	public List getContext() {
+	public List<DefaultLiteral> getContext() {
 		return context;
 	}
 
-	public List getBody() {
+	public List<BodyLiteral> getBody() {
 		return body;
 	}
 
@@ -168,22 +168,18 @@ public class Plan implements Cloneable, Serializable {
 		if (context == null)
 			p.context = null;
 		else {
-			p.context = new ArrayList(context.size());
-			Iterator i = context.iterator();
-			while (i.hasNext()) {
-				DefaultLiteral l = (DefaultLiteral) i.next();
-				p.context.add(l.clone());
+			p.context = new ArrayList<DefaultLiteral>(context.size());
+			for (DefaultLiteral l: context) {
+				p.context.add( (DefaultLiteral)l.clone());
 			}
 		}
 		
 		if (body == null)
 			p.body = null;
 		else {
-			p.body = new ArrayList(body.size());
-			Iterator i = body.iterator();
-			while (i.hasNext()) {
-				BodyLiteral l = (BodyLiteral) i.next();
-				p.body.add(l.clone());
+			p.body = new ArrayList<BodyLiteral>(body.size());
+		    for (BodyLiteral l: body) {
+				p.body.add((BodyLiteral)l.clone());
 			}
 		}
 		return p;
@@ -227,8 +223,21 @@ public class Plan implements Cloneable, Serializable {
 			u.setAttribute("label", label.toString());
 		}
 		u.setAttribute("trigger", tevent.toString());
-		u.setAttribute("context", listToString(context, " & "));
-		u.setAttribute("body", listToString(body, "; "));
+        
+		//u.setAttribute("context", listToString(context, " & "));
+		//u.setAttribute("body", listToString(body, "; "));
+        Element ec = (Element) document.createElement("context");
+        for (DefaultLiteral dl: context) {
+            ec.appendChild(dl.getAsDOM(document));
+        }
+        u.appendChild(ec);
+        
+        Element eb = (Element) document.createElement("body");
+        for (BodyLiteral bl: body) {
+            eb.appendChild(bl.getAsDOM(document));
+        }
+        u.appendChild(eb);
+        
 		return u;
 	}
 

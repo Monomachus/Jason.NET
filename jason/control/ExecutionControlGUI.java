@@ -19,28 +19,6 @@
 // http://www.dur.ac.uk/r.bordini
 // http://www.inf.furb.br/~jomi
 //
-// CVS information:
-//   $Date$
-//   $Revision$
-//   $Log$
-//   Revision 1.10  2006/02/17 13:13:16  jomifred
-//   change a lot of method/classes names and improve some comments
-//
-//   Revision 1.9  2006/01/04 03:00:46  jomifred
-//   using java log API instead of apache log
-//
-//   Revision 1.8  2005/09/04 17:03:23  jomifred
-//   using dispose instead of setVisible(false)
-//
-//   Revision 1.7  2005/08/15 13:03:48  jomifred
-//   close the window when  the MAS stops
-//
-//   Revision 1.6  2005/08/12 20:46:19  jomifred
-//   add cvs keywords
-//
-//   Revision 1.5  2005/08/12 20:45:36  jomifred
-//   change informAgs method name
-//
 //----------------------------------------------------------------------------
 
 package jason.control;
@@ -53,6 +31,8 @@ import java.awt.FlowLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.StringWriter;
@@ -63,7 +43,9 @@ import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -74,6 +56,7 @@ import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
@@ -88,7 +71,8 @@ public class ExecutionControlGUI extends ExecutionControl {
 	boolean inRunMode = false;
 	
 	// xml components
-	Transformer agTransformer = null;
+	Transformer agTransformerHTML = null;
+    Transformer agTransformerXML = null;
 
 	public ExecutionControlGUI() {
 		initComponents();
@@ -98,6 +82,7 @@ public class ExecutionControlGUI extends ExecutionControl {
 	JFrame  frame;
 	JButton jBtStep = null;
 	JButton jBtRun = null;
+    JComboBox jCbViewAs = null;
 
 	JTextPane jTA = null;
 
@@ -137,6 +122,16 @@ public class ExecutionControlGUI extends ExecutionControl {
 				}
 			}
 		});
+
+        jCbViewAs = new JComboBox();
+        jCbViewAs.addItem("html");
+        jCbViewAs.addItem("xml");
+        jCbViewAs.addItemListener(new ItemListener() {
+            public void itemStateChanged(ItemEvent ievt) {
+                jTA.setContentType("text/"+jCbViewAs.getSelectedItem());
+                showAgState();
+            }            
+        });
 
 		jTA = new JTextPane();
 		jTA.setEditable(false);
@@ -184,6 +179,8 @@ public class ExecutionControlGUI extends ExecutionControl {
 		JPanel pButtons = new JPanel(new FlowLayout(FlowLayout.CENTER));
 		pButtons.add(jBtStep);
 		pButtons.add(jBtRun);
+        pButtons.add(new JLabel("           View as:"));
+        pButtons.add(jCbViewAs);
 
 		JSplitPane splitPaneHor = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 		splitPaneHor.setTopComponent(spList);
@@ -251,25 +248,42 @@ public class ExecutionControlGUI extends ExecutionControl {
     private String previousMind = "--";
     /** show current agent state */
     void showAgState() {
-        if (agTransformer == null) {
-            try {
-                agTransformer = TransformerFactory.newInstance().newTransformer(
-                        new StreamSource( ExecutionControlGUI.class.getResource("/xml/agInspection.xsl").openStream()));
-            } catch (Exception e) {
-                jTA.setText("Error initializing XML transformer");
-                e.printStackTrace();
-                return;
-            }
-        }
         if (agState != null) {
             StringWriter so = new StringWriter();
             try {
                 // set parameters
-                for (String p: show.keySet()) {
-                    agTransformer.setParameter("show-"+p, show.get(p)+"");
+                if (jCbViewAs.getSelectedItem().toString().equals("html")) {
+                    // as HTML
+                    if (agTransformerHTML == null) {
+                        try {
+                            agTransformerHTML = TransformerFactory.newInstance().newTransformer(
+                                    new StreamSource( ExecutionControlGUI.class.getResource("/xml/agInspection.xsl").openStream()));
+                        } catch (Exception e) {
+                            jTA.setText("Error initializing XML transformer");
+                            e.printStackTrace();
+                            return;
+                        }
+                    }
+                    for (String p: show.keySet()) {
+                        agTransformerHTML.setParameter("show-"+p, show.get(p)+"");
+                    }
+                    agTransformerHTML.transform(new DOMSource(agState), new StreamResult(so));
+                    
+                } else {
+                    // as XML
+                    if (agTransformerXML == null) {
+                        try {
+                            agTransformerXML = TransformerFactory.newInstance().newTransformer();
+                            agTransformerXML.setOutputProperty(OutputKeys.INDENT, "yes");
+                        } catch (Exception e) {
+                            jTA.setText("Error initializing XML transformer");
+                            e.printStackTrace();
+                            return;
+                        }
+                    }
+                    agTransformerXML.transform(new DOMSource(agState),new StreamResult(so));
                 }
-                agTransformer.transform(new DOMSource(agState),
-                                        new StreamResult(so));
+
                 String sMind = so.toString();
                 if (!sMind.equals(previousMind)) {
                     jTA.setText(sMind);

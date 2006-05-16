@@ -35,6 +35,9 @@
 
 package jason.asSyntax;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
 
 public class BodyLiteral implements Cloneable {
     
@@ -90,24 +93,35 @@ public class BodyLiteral implements Cloneable {
     public Object clone() {
 		return new BodyLiteral(formType, literal);
     }
-    
-    public String toString() {
+
+    public String getTypeStr() {
         switch(formType) {
             case HAction :
-                return literal.toString();
+                return "";
             case HAchieve :
-                return "!" + literal.toString();
+                return "!";
             case HAchieveNF :
-                return "!!" + literal.toString();
+                return "!!";
             case HTest :
-                return "?" + literal.toString();
+                return "?";
             case HAddBel :
-                return "+" + literal.toString();
+                return "+";
             case HDelBel :
-                return "-" + literal.toString();
+                return "-";
         }
         // What to do here???
         return("ERROR in Literal to String");
     }
-    
+
+    public String toString() {
+        return getTypeStr() + literal.toString();
+    }
+
+    /** get as XML */
+    public Element getAsDOM(Document document) {
+        Element u = (Element) document.createElement("body-literal");
+        u.setAttribute("type", getTypeStr());
+        u.appendChild(literal.getAsDOM(document));
+        return u;
+    }    
 }
