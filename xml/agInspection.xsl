@@ -323,16 +323,20 @@
         
         <xsl:value-of select="@trigger" /> 
         
-        <xsl:text> </xsl:text>
-        <b>:</b>
-        <xsl:text> </xsl:text>
-        <xsl:value-of select="@context" /> 
+        <table>
+        <tr>
+        <td width="20" />
+        <td width="20" style="vertical-align: top"><b>:</b></td>
+	    <td><xsl:value-of select="@context" /></td> 
+    	</tr>
+        </table>
+
         
         <table>
         <tr>
         <td width="20" />
         <td width="20" style="vertical-align: top"><b>&lt;-</b></td>
-	    <td><xsl:value-of select="@body" />s</td>
+	    <td><xsl:value-of select="@body" /></td>
     	</tr>
         </table>
     </xsl:template>
