@@ -328,10 +328,13 @@
         <xsl:text> </xsl:text>
         <xsl:value-of select="@context" /> 
         
-        <blockquote>
-	        <b>&lt;-</b><xsl:text> </xsl:text>
-    	    <xsl:value-of select="@body" />
-        </blockquote>
+        <table>
+        <tr>
+        <td width="20" />
+        <td width="20" style="vertical-align: top"><b>&lt;-</b></td>
+	    <td><xsl:value-of select="@body" />s</td>
+    	</tr>
+        </table>
     </xsl:template>
     
 </xsl:stylesheet> 
