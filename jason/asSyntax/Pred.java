@@ -440,6 +440,10 @@ public class Pred extends Term implements Cloneable, Comparable, Serializable {
 	}
 
 
+    public String toStringAsTerm() {
+        return super.toString();
+    }
+    
 	public String toString() {
 		String s;
 		s = super.toString();

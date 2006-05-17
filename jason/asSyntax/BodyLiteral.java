@@ -120,7 +120,9 @@ public class BodyLiteral implements Cloneable {
     /** get as XML */
     public Element getAsDOM(Document document) {
         Element u = (Element) document.createElement("body-literal");
-        u.setAttribute("type", getTypeStr());
+        if (getTypeStr().length() > 0) {
+            u.setAttribute("type", getTypeStr());
+        }
         u.appendChild(literal.getAsDOM(document));
         return u;
     }    

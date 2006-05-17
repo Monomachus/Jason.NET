@@ -19,22 +19,6 @@
 // http://www.dur.ac.uk/r.bordini
 // http://www.inf.furb.br/~jomi
 //
-// CVS information:
-//   $Date$
-//   $Revision$
-//   $Log$
-//   Revision 1.10  2006/01/04 02:54:41  jomifred
-//   using java log API instead of apache log
-//
-//   Revision 1.9  2005/12/31 16:29:58  jomifred
-//   add operator =..
-//
-//   Revision 1.8  2005/12/30 20:40:16  jomifred
-//   new features: unnamed var, var with annots, TE as var
-//
-//   Revision 1.7  2005/08/12 22:26:08  jomifred
-//   add cvs keywords
-//
 //
 //----------------------------------------------------------------------------
 
@@ -45,6 +29,9 @@ import jason.asSyntax.parser.as2j;
 import java.io.StringReader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 public class Trigger implements Cloneable {
 
@@ -57,8 +44,7 @@ public class Trigger implements Cloneable {
 	
 	static private Logger logger = Logger.getLogger(Trigger.class.getName());
     
-    
-
+  
 	boolean trigType = TEAdd;
 	byte goal = TEBel;
 	Literal literal;
@@ -147,5 +133,29 @@ public class Trigger implements Cloneable {
 		s += literal.toString();
 		return s;
 	}
+    
+    
+    /** get as XML */
+    public Element getAsDOM(Document document) {
+        Element e = (Element) document.createElement("trigger");
+        String s;
+        if (trigType == TEAdd)
+            s = "+";
+        else
+            s = "-";
+        e.setAttribute("add", s);
+        
+        s = null;
+        if (goal == TEAchvG)
+            s = "!";
+        else if (goal == TETestG)
+            s = "?";
+        if (s != null) {
+            e.setAttribute("type", s);
+        }
+        
+        e.appendChild(literal.getAsDOM(document));
+        return e;
+    }
 
 }

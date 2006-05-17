@@ -410,6 +410,10 @@ public class Unifier implements Cloneable {
         return function.toString();
     }
     
+    public int size() {
+        return function.size();
+    }
+    
     public Object clone() {
         try {
         	Unifier newUn = new Unifier();

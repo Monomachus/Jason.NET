@@ -38,6 +38,7 @@ import java.awt.event.WindowEvent;
 import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
@@ -129,6 +130,7 @@ public class ExecutionControlGUI extends ExecutionControl {
         jCbViewAs.addItemListener(new ItemListener() {
             public void itemStateChanged(ItemEvent ievt) {
                 jTA.setContentType("text/"+jCbViewAs.getSelectedItem());
+                previousMind = "--";
                 showAgState();
             }            
         });
@@ -142,6 +144,7 @@ public class ExecutionControlGUI extends ExecutionControl {
                 hyperLink(evt);
             }
         });
+        jTA.setText("<html><body>Select the agent to inspect.</body></html>");
 		
 		JPanel spTA = new JPanel(new BorderLayout());
 		spTA.add(BorderLayout.CENTER, new JScrollPane(jTA));
@@ -169,8 +172,8 @@ public class ExecutionControlGUI extends ExecutionControl {
 			public void valueChanged(ListSelectionEvent e) {
 				String ag = jList.getSelectedValue().toString();
 				if (!ag.equals(currentAg)) {
+                    currentAg = ag;
 					inspectAgent(ag);
-					currentAg = ag;
 				}
 			}
 
@@ -241,6 +244,7 @@ public class ExecutionControlGUI extends ExecutionControl {
             showAgState();
 		} catch (Exception e) {
 			jTA.setText("can not get the state of agent "+agName);
+            logger.log(Level.SEVERE,"Error:",e);
 		}
 		
 	}

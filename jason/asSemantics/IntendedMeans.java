@@ -91,7 +91,7 @@ public class IntendedMeans implements Serializable {
 		if (plan != null) {
 			eim.appendChild(plan.getAsDOM(document));
 		}
-		if (unif != null) {
+		if (unif != null && unif.size() > 0) {
 			eim.appendChild(unif.getAsDOM(document));
 		}
 		return eim;

@@ -193,7 +193,10 @@ public class Literal extends Pred implements Cloneable {
         if (isInternalAction()) {
             u.setAttribute("ia", isInternalAction()+"");
         }
-        u.appendChild(document.createTextNode(this.toString()));
+        u.setAttribute("term",super.toStringAsTerm());
+        if (getAnnots() != null && !getAnnots().isEmpty()) {
+            u.setAttribute("annots", getAnnots().toString());
+        }
         return u;
     }    
     

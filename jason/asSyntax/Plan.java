@@ -220,23 +220,29 @@ public class Plan implements Cloneable, Serializable {
 	public Element getAsDOM(Document document) {
 		Element u = (Element) document.createElement("plan");
 		if (label != null) {
-			u.setAttribute("label", label.toString());
+            Element l = (Element) document.createElement("label");
+            l.appendChild(new Literal(Literal.LPos, label).getAsDOM(document));
+            u.appendChild(l);
 		}
-		u.setAttribute("trigger", tevent.toString());
+        u.appendChild(tevent.getAsDOM(document));
         
 		//u.setAttribute("context", listToString(context, " & "));
 		//u.setAttribute("body", listToString(body, "; "));
-        Element ec = (Element) document.createElement("context");
-        for (DefaultLiteral dl: context) {
-            ec.appendChild(dl.getAsDOM(document));
+        if (context.size() > 0) {
+            Element ec = (Element) document.createElement("context");
+            for (DefaultLiteral dl: context) {
+                ec.appendChild(dl.getAsDOM(document));
+            }
+            u.appendChild(ec);
         }
-        u.appendChild(ec);
-        
-        Element eb = (Element) document.createElement("body");
-        for (BodyLiteral bl: body) {
-            eb.appendChild(bl.getAsDOM(document));
+
+        if (body.size() > 0) {
+            Element eb = (Element) document.createElement("body");
+            for (BodyLiteral bl: body) {
+                eb.appendChild(bl.getAsDOM(document));
+            }
+            u.appendChild(eb);
         }
-        u.appendChild(eb);
         
 		return u;
 	}

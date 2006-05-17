@@ -299,9 +299,7 @@ public class BeliefBase {
 			Iterator j = ((List)i.next()).iterator();
 			while (j.hasNext()) {
 				Literal l = (Literal)j.next();
-				Element bel = (Element) document.createElement("bel");
-				bel.appendChild(document.createTextNode(l.toString()));
-				ebels.appendChild(bel);
+				ebels.appendChild(l.getAsDOM(document));
 			}
 		}
 		return ebels;

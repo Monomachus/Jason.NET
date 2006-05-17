@@ -132,7 +132,7 @@ public class PlanLibrary {
     	if (p.getLabel() == null) {
     		String l;
     		do {
-    			l = "l"+(lastPlanLabel++);
+    			l = "l__"+(lastPlanLabel++);
     		} while (planLabels.keySet().contains(l));
     		p.setLabel(l);
     	}

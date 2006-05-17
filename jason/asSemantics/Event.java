@@ -79,7 +79,7 @@ public class Event implements Serializable {
     /** get as XML */
 	public Element getAsDOM(Document document) {
 		Element eevt = (Element) document.createElement("event");
-		eevt.setAttribute("trigger", trigger.toString());
+        eevt.appendChild(trigger.getAsDOM(document));
 		if (intention != Intention.EmptyInt) {
 			eevt.setAttribute("intention", intention.getId()+"");
 		}

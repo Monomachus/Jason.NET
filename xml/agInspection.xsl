@@ -8,9 +8,10 @@
     <xsl:param name="th-style2" select="'text-align: left; color: blue;'" />
     <xsl:param name="td-style" select="'text-align: left; vertical-align: top;'" />
     <xsl:param name="td-style2" select="'text-align: center; vertical-align: top;'" />
-    <xsl:param name="trh-style" select="'background-color: #ece7e6; font-family: arial; vertical-align: top;'" />
+    <xsl:param name="trh-style" select="'font-family: arial; vertical-align: top;'" />
     <xsl:param name="tr-style" select="'background-color: #ece7e6; font-family: arial;'" />
-
+	<!-- border-top: 2px solid black;  -->
+	
     <xsl:param name="bc"  select="'rgb(0 ,170, 0)'" />
     <xsl:param name="tec" select="'rgb(200, 0, 0)'" />
     <xsl:param name="ac"  select="'rgb(80, 40, 20)'" />
@@ -18,7 +19,7 @@
     <xsl:param name="agc" select="'rgb(0, 0, 120)'" />
     <xsl:param name="iac" select="'rgb(100, 70, 30)'" />
 
-    <xsl:param name="show-bels" select="'true'" />
+    <xsl:param name="show-bels" select="'false'" />
     <xsl:param name="show-evt"  select="'true'" />
     <xsl:param name="show-mb"  select="'true'" />
     <xsl:param name="show-int"  select="'true'" />
@@ -28,7 +29,9 @@
 
     <xsl:template match="agent">
         <html>
-        <h2 style="{$h-style}"><b><xsl:value-of select="@name"/></b> inspection</h2>
+        <span style="{$h-style}"><font size="+2">
+        Inspection of agent <b><xsl:value-of select="@name"/></b>
+        </font></span>
         
         <table border="0" cellspacing="3" cellpadding="6" >
         
@@ -50,16 +53,21 @@
         <xsl:param name="item" select="'none'" />
         <xsl:param name="ds"   select="'none'" />
         <xsl:if test="$show='true'">
+        	
 	        <th valign="top" style="{$th-style}">
+	        	<hr/>
 	        	<a href="hide?{$item}" style="text-decoration: none">
-	        		-<xsl:text> </xsl:text>
+	        		<font size="+1">-</font>
+	        		<xsl:text> </xsl:text>
 	        	</a>
 	        	<xsl:value-of select="$ds" />
 	       	</th>
         </xsl:if>
         <xsl:if test="$show='false'">
 	        <th valign="top" style="{$th-style}">
-	        	<a href="show?{$item}" style="text-decoration: none">+
+	        	<hr/>
+	        	<a href="show?{$item}" style="text-decoration: none">
+	        		<font size="+1">+</font>
 	        		<xsl:text> </xsl:text>
 	        	</a>
 	        	<xsl:value-of select="$ds" />
@@ -77,8 +85,17 @@
         </xsl:call-template>
         <xsl:if test="$show-bels='true'">
 	        <td style="{$td-style}">
+		        <hr/>
 		        <table cellspacing="0" cellpadding="2">
-			        <xsl:apply-templates select="bel" />
+		        <xsl:for-each select="literal">
+			        <tr style="{$trh-style}">
+			            <td style="text-align: left">
+				        	<span style="color: {$bc}">
+			                <xsl:apply-templates select="." />
+			                </span>
+			            </td>
+			        </tr>
+			    </xsl:for-each>
 		        </table>
 	        </td>
         </xsl:if>
@@ -93,7 +110,7 @@
         	<xsl:with-param name="ds" select="'MailBox'" />
         </xsl:call-template>
         <xsl:if test="$show-mb='true'">
-	        <td style="{$td-style}">
+	        <td style="{$td-style}"><hr/>
 	        <table cellspacing="0" cellpadding="3">
 	        <xsl:apply-templates select="message" />
 	        </table>
@@ -102,15 +119,6 @@
         </tr>
     </xsl:template>
 
-    <xsl:template match="bel">
-        <tr style="{$trh-style}">
-            <td style="text-align: left">
-	        	<span style="color: {$bc}">
-                <xsl:apply-templates />
-                </span>
-            </td>
-        </tr>
-    </xsl:template>
 
     <xsl:template match="message">
         <tr style="{$trh-style}">
@@ -128,7 +136,7 @@
         	<xsl:with-param name="ds" select="'Events'" />
         </xsl:call-template>
         <xsl:if test="$show-evt='true'">
-	        <td style="{$td-style}">
+	        <td style="{$td-style}"><hr/>
 	        <table cellspacing="0" cellpadding="3">
 	        <tr style="{$trh-style}">
 			<th valign="top" style="{$th-style2}">Sel</th>
@@ -152,7 +160,7 @@
 
             <td valign="top" style="{$td-style}">
             	<span style="color: {$tec}">
-			        <xsl:value-of select="@trigger" />
+			        <xsl:apply-templates />
 			    </span>
             </td>
             <td valign="top" style="{$td-style2}">
@@ -169,7 +177,7 @@
         	<xsl:with-param name="ds" select="'Intentions'" />
         </xsl:call-template>
         <xsl:if test="$show-int='true'">
-	        <td valign="top" style="{$td-style}">
+	        <td valign="top" style="{$td-style}"><hr/>
 	        <table cellspacing="0" cellpadding="5">
 	        <tr style="{$trh-style}">
 			<th valign="top" style="{$th-style2}">Sel</th>
@@ -226,8 +234,9 @@
 
     <xsl:template match="actions">
         <tr style="{$trh-style}">
-        <th valign="top" style="{$th-style}">Actions</th>
-        <td valign="top" style="{$td-style}">
+        <th valign="top" style="{$th-style}"><hr/>
+        Actions</th>
+        <td valign="top" style="{$td-style}"><hr/>
         <table ellspacing="0" cellpadding="3">
         <tr style="{$trh-style}">
 		<th valign="top" style="{$th-style2}">Pend</th>
@@ -284,7 +293,7 @@
         	<xsl:with-param name="ds" select="'Plans'" />
         </xsl:call-template>
         <xsl:if test="$show-plan='true'">
-	        <td>
+	        <td><hr/>
 	        <table ellspacing="0" cellpadding="3">
 	        <tr style="{$trh-style}">
 	    	<!--th valign="top" style="{$th-style2}">Rel</th-->
@@ -334,14 +343,14 @@
 
 
     <xsl:template match="plan">
-	    <xsl:if test="string-length(@label) > 0">
+	    <xsl:if test="count(label) > 0 and not(starts-with(label/literal/@term,'l__'))">
            <span style="color: rgb(51, 51, 51);">
-           @<xsl:value-of select="@label" /> 
+           @<xsl:apply-templates select="label" />
            </span><br/>
         </xsl:if>
         
         <span style="color: {$tec};">
-        	<xsl:value-of select="@trigger" /> 
+        	<b><xsl:apply-templates select="trigger" /></b>
         </span>
         
         <xsl:if test="count(context/default-literal) > 0">
@@ -387,20 +396,35 @@
         		<xsl:when test="@type = '?'">
 		        	<span style="color: {$tgc}">?<xsl:apply-templates />	</span>
         		</xsl:when>
-        		<xsl:when test="@type = '!'">
-		        	<span style="color: {$agc}">!<xsl:apply-templates />	</span>
+        		<xsl:when test="@type = '!' or @type = '!!'">
+		        	<span style="color: {$agc}"><xsl:value-of select="@type"/><xsl:apply-templates />	</span>
         		</xsl:when>
-        		<xsl:when test="@type = '+'">
-		        	<span style="color: {$bc}">+<xsl:apply-templates />	</span>
-        		</xsl:when>
-        		<xsl:when test="@type = '-'">
-		        	<span style="color: {$bc}">-<xsl:apply-templates />	</span>
+        		<xsl:when test="@type = '+' or @type = '-'">
+		        	<span style="color: {$bc}"><xsl:value-of select="@type"/><xsl:apply-templates />	</span>
         		</xsl:when>
         		<xsl:otherwise>
 	        		<xsl:value-of select="@type"/><xsl:apply-templates />
         		</xsl:otherwise>        		
         	</xsl:choose>
             <xsl:if test="not(position()=last())">; </xsl:if>
+            <xsl:if test="position()=last()">.</xsl:if>
         </xsl:for-each>
+    </xsl:template>
+
+    
+    <xsl:template match="trigger">
+    	<xsl:value-of select="@add"/>
+    	<xsl:value-of select="@type"/>
+    	<xsl:apply-templates />
+    </xsl:template>
+
+    
+    <xsl:template match="literal">
+    	<xsl:value-of select="@term"/>
+    	<xsl:if test="string-length(@annots) > 0">
+	    	<span style="color: rgb(0 ,190, 0)">
+	    		<sub><xsl:value-of select="@annots"/></sub>
+	   		</span>
+	    </xsl:if>
     </xsl:template>
 </xsl:stylesheet> 
