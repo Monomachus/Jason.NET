@@ -44,6 +44,7 @@
  		<SEQ TYPE="LITERAL2">true</SEQ>
 		<SEQ TYPE="OPERATOR">not</SEQ>
 		<SEQ TYPE="OPERATOR">div</SEQ>
+		<SEQ TYPE="OPERATOR">mod</SEQ>
 
 		<SEQ_REGEXP TYPE="DIGIT" HASH_CHAR="@" AT_WORD_START="TRUE">[@]([[:alnum:]])+</SEQ_REGEXP>
 
@@ -209,6 +210,7 @@
  		<SEQ TYPE="LITERAL2">true</SEQ>
 		<SEQ TYPE="OPERATOR">not</SEQ>
 		<SEQ TYPE="OPERATOR">div</SEQ>
+		<SEQ TYPE="OPERATOR">mod</SEQ>
 
 		<SEQ_REGEXP TYPE="LABEL" HASH_CHAR="+" AT_WORD_START="TRUE">[+][a-z]([[:alnum:]])*</SEQ_REGEXP>
 		<SEQ_REGEXP TYPE="LABEL" HASH_CHAR="-" AT_WORD_START="TRUE">[-][a-z]([[:alnum:]])*</SEQ_REGEXP>
@@ -373,6 +375,7 @@
 
 	<!-- special reserved words and operators -->
 		<SEQ TYPE="OPERATOR">div</SEQ>
+		<SEQ TYPE="OPERATOR">mod</SEQ>
 
 	<!-- Atoms -->
 		<SEQ_REGEXP TYPE="LITERAL4" HASH_CHAR="a">a([[:alnum:]])*</SEQ_REGEXP>

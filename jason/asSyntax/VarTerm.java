@@ -31,6 +31,8 @@
 
 package jason.asSyntax;
 
+import jason.asSemantics.Agent;
+import jason.asSemantics.Unifier;
 import jason.asSyntax.parser.as2j;
 
 import java.io.StringReader;
@@ -40,6 +42,9 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 
 /**
@@ -215,6 +220,15 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
 			return null;
 	}
 
+    @Override
+    public Iterator<Unifier> logCons(Agent ag, Unifier un) {
+        if (value != null)
+            return value.logCons(ag,un);
+        else 
+            return null;
+    
+    }
+
 	public int hashCode() {
 		if (value != null)
 			return value.hashCode();
@@ -244,7 +258,7 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
 		}
 	}
 
-	public List getTerms() {
+	public List<Term> getTerms() {
 		if (value == null) {
 			return null;
 		} else {
@@ -252,13 +266,13 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
 		}
 	}
 	
-	public void setTerms(List l) {
+	public void setTerms(List<Term> l) {
 		if (value != null) {
 			value.setTerms(l);
 		}
 	}
 	
-	public void addTerms(List l) {
+	public void addTerms(List<Term> l) {
 		if (value != null) {
 			value.addTerms(l);
 		}
@@ -703,4 +717,14 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
 			return -1;
 	}
 
+    /** get as XML */
+    public Element getAsDOM(Document document) {
+        if (hasValue()) {
+            return value.getAsDOM(document);
+        } else {
+            Element u = (Element) document.createElement("var-term");
+            u.appendChild(document.createTextNode(toString()));
+            return u;
+        }
+    }
 }

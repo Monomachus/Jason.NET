@@ -62,6 +62,9 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
 
 /** 
  * A Pred is a Term with annotations, eg a(1)[an1,an2].
@@ -452,4 +455,20 @@ public class Pred extends Term implements Cloneable, Comparable, Serializable {
 		}
 		return s;
 	}
+
+    /** get as XML */
+    public Element getAsDOM(Document document) {
+        Element u = super.getAsDOM(document);
+        if (getAnnots() != null && !getAnnots().isEmpty()) {
+            Element ea = document.createElement("annotations");
+            Iterator i = getAnnots().iterator();
+            while (i.hasNext()) {
+                Term a = (Term)i.next();
+                ea.appendChild(a.getAsDOM(document));
+            }
+            u.appendChild(ea);
+        }
+        return u;
+    }    
+
 }

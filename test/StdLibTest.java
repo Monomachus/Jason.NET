@@ -8,8 +8,6 @@ import jason.asSyntax.BeliefBase;
 import jason.asSyntax.ListTerm;
 import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Literal;
-import jason.asSyntax.NumberTerm;
-import jason.asSyntax.NumberTermImpl;
 import jason.asSyntax.Plan;
 import jason.asSyntax.Pred;
 import jason.asSyntax.StringTerm;
@@ -19,7 +17,6 @@ import jason.asSyntax.VarTerm;
 import jason.stdlib.addAnnot;
 import jason.stdlib.addPlan;
 import jason.stdlib.getRelevantPlans;
-import jason.stdlib.literalBuilder;
 import jason.stdlib.removePlan;
 
 import java.util.Iterator;
@@ -31,8 +28,6 @@ public class StdLibTest extends TestCase {
 
 	protected void setUp() throws Exception {
 		super.setUp();
-		//Logger.getRootLogger().addAppender(new ConsoleAppender(new PatternLayout("[%c{1}] %m%n")));
-    	//Logger.getRootLogger().setLevel(Level.INFO);
 	}
 	
 	public void testAddAnnot() {
@@ -202,68 +197,6 @@ public class StdLibTest extends TestCase {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}	
-	}
-
-	public void testGT() {
-		NumberTerm x = new NumberTermImpl(20);
-		NumberTerm y = new NumberTermImpl(100);
-		VarTerm vy = new VarTerm("Y");
-		Unifier u = new Unifier();
-		u.unifies(vy,(Term)y);
-		try {
-			assertTrue(new jason.stdlib.gt().execute(null, u, new Term[] { vy, (Term)x }));
-			assertFalse(new jason.stdlib.gt().execute(null, u, new Term[] { (Term)x, vy }));
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
-		StringTerm sx = new StringTermImpl("a");
-		StringTerm sy = new StringTermImpl("b");
-		VarTerm vsy = new VarTerm("SY");
-		u.unifies(vsy,(Term)sy);
-		try {
-			assertTrue(new jason.stdlib.gt().execute(null, u, new Term[] { vsy, (Term)sx }));
-			assertFalse(new jason.stdlib.gt().execute(null, u, new Term[] { (Term)sx, vsy }));
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-	
-	public void testLiteralBuilder() {
-		try {
-		Literal l = Literal.parseLiteral("~p(t1,t2)[a1,a2]");
-		assertEquals(l.getAsListOfTerms().size(), 3);
-
-		ListTerm lt1 = ListTermImpl.parseList("[~p,[t1,t2],[a1,a2]]");
-		assertTrue(l.equals(Literal.newFromListOfTerms(lt1)));
-		ListTerm lt2 = ListTermImpl.parseList("[p,[t1,t2],[a1,a2]]");
-		assertFalse(l.equals(Literal.newFromListOfTerms(lt2)));
-		ListTerm lt3 = ListTermImpl.parseList("[~p,[t1,t2],[a1,a2,a3]]");
-		assertFalse(l.equals(Literal.newFromListOfTerms(lt3)));
-		
-		Unifier u = new Unifier();
-		assertFalse(u.unifies((Term)lt1,(Term)lt2));
-		
-		assertTrue(new literalBuilder().execute(null, u, new Term[] { l, (Term)lt1 }));
-		assertFalse(new literalBuilder().execute(null, u, new Term[] { l, (Term)lt2 }));
-		assertFalse(new literalBuilder().execute(null, u, new Term[] { l, (Term)lt3 }));
-
-		VarTerm v = new VarTerm("X");
-		u.clear();
-		assertTrue(new literalBuilder().execute(null, u, new Term[] { v, (Term)lt1 }));
-		assertEquals(u.get("X").toString(), l.toString());
-		assertEquals(u.get("X"), l);
-		assertEquals(l, u.get("X"));
-		
-		u.clear();
-		assertTrue(new literalBuilder().execute(null, u, new Term[] { l, v }));
-		assertEquals(u.get("X").toString(), lt1.toString());
-		assertEquals(u.get("X"), lt1);
-		assertEquals(lt1, u.get("X"));
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 	}
 	
 }

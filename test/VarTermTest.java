@@ -1,14 +1,16 @@
 package test;
 
 import jason.asSemantics.Unifier;
-import jason.asSyntax.ExprTerm;
+import jason.asSyntax.ArithExprTerm;
 import jason.asSyntax.ListTerm;
 import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Literal;
+import jason.asSyntax.NumberTerm;
 import jason.asSyntax.NumberTermImpl;
 import jason.asSyntax.Pred;
 import jason.asSyntax.Term;
 import jason.asSyntax.VarTerm;
+import jason.asSyntax.ArithExprTerm.ArithmeticOp;
 
 import java.util.Iterator;
 
@@ -19,8 +21,6 @@ public class VarTermTest extends TestCase {
 
 	protected void setUp() throws Exception {
 		super.setUp();
-		//Logger.getRootLogger().addAppender(new ConsoleAppender(new PatternLayout("[%c{1}] %m%n")));
-    	//Logger.getRootLogger().setLevel(Level.DEBUG);
 	}
 
 	/** test when a var is ground with a Term or another var*/
@@ -146,8 +146,12 @@ public class VarTermTest extends TestCase {
 		assertTrue(k.isNumber());
 		assertFalse(k.isLiteral());
 		
-		ExprTerm exp = new ExprTerm(k, ExprTerm.EOplus, new NumberTermImpl(20));
+		ArithExprTerm exp = new ArithExprTerm(k, ArithmeticOp.plus, new NumberTermImpl(20));
 		assertTrue(exp.solve() == 30d);
+		NumberTerm nt = ArithExprTerm.parseExpr("5 div 2");
+        assertTrue(nt.solve() == 2d);
+        nt = ArithExprTerm.parseExpr("5 mod 2");
+        assertTrue(nt.solve() == 1d);
 	}
 	
 	public void testUnify() {

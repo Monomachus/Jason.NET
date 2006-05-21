@@ -20,8 +20,6 @@ public class TSTest extends TestCase {
 	
 	protected void setUp() throws Exception {
 		super.setUp();
-		//Logger.getRootLogger().addAppender(new ConsoleAppender(new PatternLayout("[%c{1}] %m%n")));
-    	//Logger.getRootLogger().setLevel(Level.DEBUG);
 	}
 	
 	public void testRelevant() {
@@ -35,7 +33,7 @@ public class TSTest extends TestCase {
 		Literal content = Literal.parseLiteral("~alliance");
 		content.addSource(new Term("ag1"));
 
-		Trigger te1 = Trigger.parseTrigger("+a(10)");
+        Trigger te1 = Trigger.parseTrigger("+a(10)");
 		
 		try {
 			List rp = ts.relevantPlans(te1);

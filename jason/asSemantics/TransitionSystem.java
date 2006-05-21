@@ -93,21 +93,18 @@ import jason.JasonException;
 import jason.architecture.AgArch;
 import jason.asSyntax.BeliefBase;
 import jason.asSyntax.BodyLiteral;
-import jason.asSyntax.DefaultLiteral;
 import jason.asSyntax.Literal;
 import jason.asSyntax.Plan;
 import jason.asSyntax.PlanLibrary;
 import jason.asSyntax.Pred;
+import jason.asSyntax.RelExprTerm;
 import jason.asSyntax.Term;
 import jason.asSyntax.Trigger;
 import jason.runtime.Settings;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -235,13 +232,13 @@ public class TransitionSystem {
             Intention intention = (Intention)getC().getPendingActions().remove(m.getInReplyTo());
             // is it a pending intention?
             if (intention != null) {
-            	// unify the message answer with the .send fourth parameter
+                 // unify the message answer with the .send fourth parameter
 				// the send that put the intention in Pending state was something like
 				//  .send(ask, ag1, value, X)
 				// if the answer was 3, unifies X=3
-            	Term ans = Term.parse(m.getPropCont().toString());
-            	BodyLiteral send = (BodyLiteral)intention.peek().getPlan().getBody().remove(0);
-            	intention.peek().getUnif().unifies(send.getLiteral().getTerm(3),ans);
+                	Term ans = Term.parse(m.getPropCont().toString());
+                	BodyLiteral send = (BodyLiteral)intention.peek().getPlan().getBody().remove(0);
+                	intention.peek().getUnif().unifies(send.getTerm().getTerm(3),ans);
 				getC().addIntention(intention);
                 
             // the message is not an ask answer
@@ -503,43 +500,10 @@ public class TransitionSystem {
 	}
 	
 
-	static Class classParameters[] = { jason.asSemantics.TransitionSystem.class, jason.asSemantics.Unifier.class, (new String[3]).getClass() };
-	private Map agInternalAction = new HashMap(); // this agent internal actions (key->IA'name, value->InternalAction object)
-	
-	public InternalAction getIA(String iaName) throws Exception {
-		InternalAction objIA = (InternalAction)agInternalAction.get(iaName);
-		if (objIA == null) {
-			objIA = (InternalAction)Class.forName(iaName).newInstance();
-			agInternalAction.put(iaName, objIA);
-		}
-		return objIA;
-	}
-	
-	public boolean execInternalAction(Term action, Unifier un) throws JasonException {
-		String name = action.getFunctor();
-		if (name.indexOf('.') == 0)
-			name = "jason.stdlib" + name;
-		
-		// if it implements InternalAction
-		try {
-			// calls execute
-			return getIA(name).execute(this, un, action.getTermsArray());
-	
-		} catch (Exception e) {
-			logger.log(Level.SEVERE,"Error in IA ",e);
-			return false;
-		}
-	}
-
 	private void applyExecInt() throws JasonException {
 		// get next formula in the body of the intended means
 		// on the top of the selected intention
-/*		if (conf.C.SI==null) {
-System.out.println("Config: "+conf.C);
-			confP.step = SClrInt;
-			return;
-		}
-*/
+
 		IntendedMeans im = conf.C.SI.peek();
 		
 		if (im.getPlan().getBody().size() == 0) { // for empty plans! may need unnif, etc
@@ -548,87 +512,107 @@ System.out.println("Config: "+conf.C);
 			Unifier     u = im.unif;
 			BodyLiteral h = (BodyLiteral) im.getPlan().getBody().get(0);
 		
-			Literal l = (Literal)h.getLiteral().clone();			
-			u.apply(l);
+			Term body = (Term)h.getTerm().clone();			
+			u.apply(body);
 			
 			switch (h.getType()) {
 			
 			// Rule Action
-			case BodyLiteral.HAction:
-				if (l.isInternalAction()) {
-					if (execInternalAction(l, u)) {
-						if (!h.isAsk()) {
-							updateIntention();
-						}
-					} else {
-						generateGoalDeletion();
-					}
-				} else {
-					confP.C.A = new ActionExec((Pred) l, conf.C.SI);
-				}
+			case action:
+				confP.C.A = new ActionExec((Pred) body, conf.C.SI);
 				break;
 				
-			// Rule Achieve
-			case BodyLiteral.HAchieve:
+			case internalAction:
+                boolean ok = true;
+                try {
+                    ok = ag.getIA(body).execute(this, u, body.getTermsArray());
+                    if (ok && !h.isAsk()) {
+                        updateIntention();
+                    }
+		       } catch (Exception e) {
+                    logger.log(Level.SEVERE, "Error in IA ", e);
+                    ok = false;
+		       }
+		       if (!ok) {
+                    generateGoalDeletion();
+		       }
+		       break;
+				
+            case constraint:
+                if (((RelExprTerm)body).logCons(ag, u).hasNext()) {
+                    updateIntention();
+                } else {
+                    generateGoalDeletion();
+                }
+                break;
+
+               
+             // Rule Achieve
+			case achieve:
 				// free variables in an event cannot conflict with those in the plan
-				l.makeVarsAnnon();
-				conf.C.addAchvGoal(l, conf.C.SI);
+				body.makeVarsAnnon();
+				conf.C.addAchvGoal((Literal)body, conf.C.SI);
 				break;
 
 			// Rule Achieve as a New Focus
-			case BodyLiteral.HAchieveNF:
-				conf.C.addAchvGoal(l, Intention.EmptyInt);
+			case achieveNF:
+				conf.C.addAchvGoal((Literal)body, Intention.EmptyInt);
 				updateIntention();
 				break;
 				
 			// Rule Test
-			case BodyLiteral.HTest:
-				if (conf.ag.believes(l, u) != null) {
+			case test:
+			    Literal bodyl = (Literal)body;
+			    if (conf.ag.believes(bodyl, u) != null) {
 					updateIntention();
 				} else {
 					logger.warning("Test Goal '"+h+"' failed as simple query. Generating internal event for it...");
 					//old version  see above u.apply(l);
-					conf.C.addTestGoal(l, conf.C.SI);
+					conf.C.addTestGoal(bodyl, conf.C.SI);
 				}
 				break;
 				
 			// Rule AddBel
-			case BodyLiteral.HAddBel:
-				Term source = BeliefBase.TSelf;
-				if (l.hasSource()) {
-					source = null; // do not add source(self) in case the programmer set the source
-				}
-				if (setts.sameFocus())
-					conf.ag.addBel(l, source, conf.C, conf.C.SI);
-				else {
-					conf.ag.addBel(l, source, conf.C, Intention.EmptyInt);
-					updateIntention();
-				}
-				break;
+			case addBel:
+			   Term source = BeliefBase.TSelf;
+                bodyl = (Literal) body;
+                if (bodyl.hasSource()) {
+                    source = null; // do not add source(self) in case the
+                                   // programmer set the source
+                }
+                if (setts.sameFocus())
+                    conf.ag.addBel(bodyl, source, conf.C, conf.C.SI);
+                else {
+                    conf.ag.addBel(bodyl, source, conf.C, Intention.EmptyInt);
+                    updateIntention();
+                }
+                break;
 				
 			// Rule DelBel
-			case BodyLiteral.HDelBel:
-                if (logger.isLoggable(Level.FINE)) logger.fine("doing -"+l+" in BB="+conf.ag.believes(l, u));
-				Literal lInBB = conf.ag.believes(l, u);
-				if (lInBB != null) {
-					// lInBB is l unified in BB
-					// we can not use l for delBel in case l is g(_,_)
-                    if (l.hasAnnot()) {
+			case delBel:
+                bodyl = (Literal) body;
+                if (logger.isLoggable(Level.FINE))
+                    logger.fine("doing -" + body + " in BB=" + conf.ag.believes(bodyl, u));
+                Literal lInBB = conf.ag.believes(bodyl, u);
+                if (lInBB != null) {
+                    // lInBB is l unified in BB
+                    // we can not use l for delBel in case l is g(_,_)
+                    if (bodyl.hasAnnot()) {
                         // use annots from l
-                        lInBB = (Literal)lInBB.clone();
+                        lInBB = (Literal) lInBB.clone();
                         lInBB.clearAnnots();
-                        lInBB.addAnnots(l.getAnnots());
+                        lInBB.addAnnots(bodyl.getAnnots());
                     }
-					if (setts.sameFocus())
-						conf.ag.delBel(lInBB, conf.C, conf.C.SI);
-					else {
-						conf.ag.delBel(lInBB, conf.C, Intention.EmptyInt);
-						updateIntention();
-					}
-				} else {
-					generateGoalDeletion();
-				}
-				break;
+                    if (setts.sameFocus())
+                        conf.ag.delBel(lInBB, conf.C, conf.C.SI);
+                    else {
+                        conf.ag.delBel(lInBB, conf.C, Intention.EmptyInt);
+                        updateIntention();
+                    }
+                } else {
+                    generateGoalDeletion();
+                }
+                break;
 			}
 		}
 		confP.step = SClrInt;
@@ -663,9 +647,9 @@ System.out.println("Config: "+conf.C);
 						// make the TE of finished plan ground and unify that with goal in the body
 						Literal tel = oldim.getPlan().getTriggerEvent().getLiteral();
 						oldim.unif.apply(tel);
-//		System.out.println("Tel here: "+tel+"G: "+g.getLiteral()+" Unif: "+oldim.unif+" New unif: "+im.unif);
-						im.unif.unifies(tel,g.getLiteral()); // TODO: Is the order here right?
-//		System.out.println(" New unif: "+im.unif);
+						//		System.out.println("Tel here: "+tel+"G: "+g.getLiteral()+" Unif: "+oldim.unif+" New unif: "+im.unif);
+						im.unif.unifies(tel,g.getTerm()); // TODO: Is the order here right?
+						//		System.out.println(" New unif: "+im.unif);
 					}
 					confP.step = SClrInt; // the new top may have become
 					                      // empty! need to keep checking.
@@ -712,10 +696,15 @@ System.out.println("Config: "+conf.C);
 
 	public List applicablePlans(List rp) throws JasonException {
 		for (Iterator i = rp.iterator(); i.hasNext();) {
-			Option opt = (Option) i.next();
-			opt.unif = logCons(opt.plan.getContext(), 0, opt.unif);
-			if (opt.unif == null) {
-				i.remove();
+		    Option opt = (Option) i.next();
+		    Term context = opt.plan.getContext();
+			if (context != null) {
+                Iterator<Unifier> r = context.logCons(ag, opt.unif);
+                if (r.hasNext()) {
+                    opt.unif = r.next();
+                } else {
+                    i.remove();
+                }
 			}
 		}
 		return rp;
@@ -726,6 +715,7 @@ System.out.println("Config: "+conf.C);
 	 * is a log(ical)Cons(equence) of the belief base.
 	 * It is used in the method that checks whether the plan is applicable.
 	 */
+    /*
 	private Unifier logCons(List ctxt, int pos, Unifier un) throws JasonException {
 
 		if (pos >= ctxt.size()) {
@@ -795,6 +785,7 @@ System.out.println("Config: "+conf.C);
 			return null;
 		}
 	}
+    */
 
 	/** remove the top action and requeue the current intention */
 	private void updateIntention() {

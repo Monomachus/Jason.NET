@@ -19,10 +19,6 @@ public class ListTermTest extends TestCase {
 	
 	protected void setUp() throws Exception {
 		super.setUp();
-
-		//Logger.getRootLogger().addAppender(new ConsoleAppender(new PatternLayout("[%c{1}] %m%n")));
-    	//Logger.getRootLogger().setLevel(Level.DEBUG);
-
 		l1 = ListTermImpl.parseList("[a,b,c]");
 		l2 = ListTermImpl.parseList("[a(1,2),b(r,t)|T]");
 		l3 = ListTermImpl.parseList("[A|T]");

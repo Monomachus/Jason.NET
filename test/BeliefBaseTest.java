@@ -5,9 +5,13 @@ import jason.asSemantics.Unifier;
 import jason.asSyntax.BeliefBase;
 import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Literal;
+import jason.asSyntax.LogExprTerm;
 import jason.asSyntax.Pred;
 import jason.asSyntax.Term;
 import jason.asSyntax.VarTerm;
+
+import java.util.Iterator;
+
 import junit.framework.TestCase;
 
 /** JUnit test case for syntax package */
@@ -72,7 +76,7 @@ public class BeliefBaseTest extends TestCase {
 		//System.out.println("Percepts="+bb.getPercepts());
 		assertEquals(bb.getPercepts().size(), 3);
 		
-		Literal lRel1 = new Literal(true, new Pred("pos"));
+		//Literal lRel1 = new Literal(true, new Pred("pos"));
 		//System.out.println("Rel "+lRel1.getFunctorArity()+"="+bb.getRelevant(lRel1));
 
 		Literal lRel2 = new Literal(true, new Pred("pos"));
@@ -154,8 +158,6 @@ public class BeliefBaseTest extends TestCase {
 	}
 	
 	public void testRemWithUnnamedVar() {
-		BeliefBase bb = new BeliefBase();
-		
 		Agent ag = new Agent();
 		ag.getBS().add(Literal.parseLiteral("pos(2,3)"));
 		Unifier u = new Unifier();
@@ -165,5 +167,78 @@ public class BeliefBaseTest extends TestCase {
 		assertEquals(l, Literal.parseLiteral("pos(2,3)"));
 		
 		assertTrue(ag.getBS().remove(l));
-	}	
+	}
+    
+    public void testLogCons() {
+        Agent ag = new Agent();
+        ag.getBS().add(Literal.parseLiteral("a(10)"));
+        ag.getBS().add(Literal.parseLiteral("a(20)"));
+        ag.getBS().add(Literal.parseLiteral("b(20,10)"));
+        ag.getBS().add(Literal.parseLiteral("c(x)"));
+        ag.getBS().add(Literal.parseLiteral("c(y)"));
+        Term texpr;
+        
+        Iterator<Unifier> iun = Literal.parseLiteral("a(X)").logCons(ag, new Unifier());
+        int c = 0;
+        while (iun.hasNext()) {
+            iun.next();
+            c++;
+        }
+        assertEquals(c,2);
+
+        iun = Literal.parseLiteral("b(X,_)").logCons(ag, new Unifier());
+        assertTrue(iun.hasNext());
+        Unifier un = iun.next();
+        assertTrue(un.get("X").toString().equals("20"));
+        
+        
+        // test not
+        texpr = LogExprTerm.parseExpr("not a(5)");
+        assertTrue(texpr.logCons(ag, new Unifier()).hasNext());
+        texpr = LogExprTerm.parseExpr("not a(10)");
+        assertFalse(texpr.logCons(ag, new Unifier()).hasNext());
+        
+        
+        // test and
+        texpr = LogExprTerm.parseExpr("a(X) & c(Y) & a(Z)");
+        iun = texpr.logCons(ag, new Unifier());
+        c = 0;
+        while (iun.hasNext()) {
+            Unifier u = iun.next();
+            //System.out.println(u);
+            c++;
+        }
+        assertEquals(c,8);
+        
+        // test or
+        texpr = LogExprTerm.parseExpr("a(X) | c(Y)");
+        iun = texpr.logCons(ag, new Unifier());
+        c = 0;
+        while (iun.hasNext()) {
+            Unifier u = iun.next();
+            //System.out.println(u);
+            c++;
+        }
+        assertEquals(c,4);
+        
+        // test rel
+        texpr = LogExprTerm.parseExpr("a(X) & a(Y) & Y > X");
+        iun = texpr.logCons(ag, new Unifier());
+        c = 0;
+        while (iun.hasNext()) {
+            Unifier u = iun.next();
+            c++;
+        }
+        assertEquals(c,1);
+
+        texpr = LogExprTerm.parseExpr("a(X) & a(Y) & X <= Y");
+        iun = texpr.logCons(ag, new Unifier());
+        c = 0;
+        while (iun.hasNext()) {
+            Unifier u = iun.next();
+            c++;
+        }
+        assertEquals(c,3);
+        
+    }
 }

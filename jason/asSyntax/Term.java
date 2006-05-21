@@ -55,6 +55,8 @@
 
 package jason.asSyntax;
 
+import jason.asSemantics.Agent;
+import jason.asSemantics.Unifier;
 import jason.asSyntax.parser.as2j;
 
 import java.io.Serializable;
@@ -65,6 +67,9 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
 /**
  * Represents a Term (a predicate parameter), e.g.: val(10,x(3)).
  */
@@ -73,7 +78,7 @@ public class Term implements TermInterface, Comparable, Serializable {
 // Many casts from stringTerm/listTerm/numberTerm to (Term) can be avoided
 	
 	private String functor = null;
-	private List   terms;
+	private List<Term> terms;
 
 	static private Logger logger = Logger.getLogger(Term.class.getName());
 	
@@ -102,17 +107,6 @@ public class Term implements TermInterface, Comparable, Serializable {
 		}
 	}
 
-	/** copy all attributes of <i>t</i> */
-	/*
-	public void set(Term t) {
-		try {
-			setFunctor(t.getFunctor());
-			setTerms(t.getDeepCopyOfTerms());
-		} catch (Exception e) {
-			logger.error("Error setting value for term ",e);
-		}
-	}
-	*/
 	
 	public void setFunctor(String fs) {
 		functor = fs;
@@ -140,11 +134,34 @@ public class Term implements TermInterface, Comparable, Serializable {
 	public int hashCode() {
 		return getFunctorArity().hashCode();
 	}
+    
+    /** 
+     * logCons checks whether one particular predicate
+     * is a log(ical)Cons(equence) of the belief base.
+     * 
+     * Returns an iterator for all unifiers that are logCons.
+     */
+    public Iterator<Unifier> logCons(Agent ag, Unifier un) {
+        return null;
+    }	
 
+    protected static final List<Unifier> EMPTY_UNIF_LIST = new ArrayList<Unifier>(0);
+    
+
+    /** create an iterator for a list of unifiers */
+    protected Iterator<Unifier> createUnifIterator(Unifier... unifs) {
+        List<Unifier> r = new ArrayList<Unifier>(unifs.length);
+        for (int i=0; i<unifs.length; i++) {
+            r.add(unifs[i]);
+        }
+        return r.iterator();
+    }
+    
+    
 	/** returns the i-th term (first term is 0) */
 	public Term getTerm(int i) {
 		if (terms != null && terms.size() > i) {
-			return (Term)terms.get(i);
+			return terms.get(i);
 		} else {
 			return null;
 		}
@@ -152,12 +169,12 @@ public class Term implements TermInterface, Comparable, Serializable {
 
 	public void addTerm(Term t) {
 		if (terms == null)
-			terms = new ArrayList();
+			terms = new ArrayList<Term>();
 		terms.add(t);
 		functorArityBak = null;
 	}
 	
-	public void setTerms(List l) {
+	public void setTerms(List<Term> l) {
 		terms = l;
 	}
 
@@ -165,10 +182,9 @@ public class Term implements TermInterface, Comparable, Serializable {
 		terms.set(i,t);
 	}
 		
-	public void addTerms(List l) {
-		Iterator i = l.iterator();
-		while (i.hasNext()) {
-			addTerm( (Term)i.next());
+	public void addTerms(List<Term> l) {
+		for (Term t: l) {
+			addTerm( t);
 		}
 	}
 
@@ -179,7 +195,7 @@ public class Term implements TermInterface, Comparable, Serializable {
 			return 0;
 		}
 	}
-	public List getTerms() {
+	public List<Term> getTerms() {
 		return terms;
 	}
 	
@@ -331,29 +347,16 @@ public class Term implements TermInterface, Comparable, Serializable {
 		return new Term(this);
 	}
 
-	protected List getDeepCopyOfTerms() {
+	protected List<Term> getDeepCopyOfTerms() {
 		if (terms == null) {
 			return null;
 		}
-		List l = new ArrayList(getTerms().size());
-		Iterator i = getTerms().iterator();
-		while (i.hasNext()) {
-			Term ti = (Term)i.next();
-			l.add(ti.clone());
+		List<Term> l = new ArrayList<Term>(getTerms().size());
+		for (Term ti: getTerms()) {
+			l.add((Term)ti.clone());
 		}
 		return l;
 	}
-
-	/*
-	public double toDouble() {
-		try {
-			return Double.parseDouble(getFunctor());
-		} catch (Exception e) {
-			logger.error("Error converting to double " + functor,e);
-			return 0;
-		}
-	}
-	*/
 	
 	public String toString() {
 		StringBuffer s = new StringBuffer();
@@ -372,4 +375,19 @@ public class Term implements TermInterface, Comparable, Serializable {
 		}
 		return s.toString();
 	}
+   
+    /** get as XML */
+    public Element getAsDOM(Document document) {
+        Element u = (Element) document.createElement("term");
+        u.setAttribute("functor",getFunctor());
+        //u.appendChild(document.createTextNode(toString()));
+        if (getTerms() != null && !getTerms().isEmpty()) {
+            Element ea = document.createElement("arguments");
+            for (Term t: getTerms()) {
+                ea.appendChild(t.getAsDOM(document));
+            }
+            u.appendChild(ea);
+        }
+        return u;
+    }    
 }

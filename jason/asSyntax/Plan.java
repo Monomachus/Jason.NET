@@ -59,9 +59,9 @@ public class Plan implements Cloneable, Serializable {
 	public static final Term TAtomic     = Term.parse("atomic");	
 	public static final Term TBreakPoint = Term.parse("breakpoint");	
 	
-	Pred label = null;
+	protected Pred label = null;
 	protected Trigger tevent = null;
-	protected ArrayList<DefaultLiteral> context;
+	protected Term context;
 	protected ArrayList<BodyLiteral>    body;
 
 	Boolean isAtomic = null; // if the label has atomic annotation, used to cache the value, so we do not need to seach all label annotations each isAtomic()
@@ -75,19 +75,31 @@ public class Plan implements Cloneable, Serializable {
 	public Plan() {
 	}
 
-	public Plan(Trigger te, ArrayList<DefaultLiteral> ct, ArrayList<BodyLiteral> bd) {
-		tevent = te;
-		context = ct;
-		body = bd;
+	public Plan(Trigger te, Term ct, ArrayList<BodyLiteral> bd) {
+	    tevent = te;
+        setContext(ct);
+        setBody(bd);
 	}
 
-	public Plan(Pred lb, Trigger te, ArrayList<DefaultLiteral> ct, ArrayList<BodyLiteral> bd) {
+	public Plan(Pred lb, Trigger te, Term ct, ArrayList<BodyLiteral> bd) {
 		label = lb;
 		tevent = te;
-		context = ct;
-		body = bd;
+		setContext(ct);
+		setBody(bd);
 	}
 
+    public void setContext(Term le) {
+        context = le;
+        if (le != null && le.isLiteral() && ((Literal)le).equals(Literal.LTrue)) {
+            context = null;
+        }
+    }
+    
+    public void setBody(ArrayList<BodyLiteral> bd) {
+        if (bd == null) bd = new ArrayList<BodyLiteral>(0);
+        body = bd;
+    }
+    
 	public static Plan parse(String sPlan) {
 		as2j parser = new as2j(new StringReader(sPlan));
 		try {
@@ -121,7 +133,7 @@ public class Plan implements Cloneable, Serializable {
 		return tevent;
 	}
 
-	public List<DefaultLiteral> getContext() {
+	public Term getContext() {
 		return context;
 	}
 
@@ -150,10 +162,11 @@ public class Plan implements Cloneable, Serializable {
 			return null;
 	}
 
-
 	public boolean equals(Object o) {
-		Plan p = (Plan) o;
-		return tevent.equals(p.tevent) && context.equals(p.context) && body.equals(p.body);
+	    Plan p = (Plan) o;
+        if (context == null && p.context != null) return false;
+        if (context != null && p.context != null && !context.equals(p.context)) return false;
+		return tevent.equals(p.tevent) && body.equals(p.body);
 	}
 
 	public Object clone() {
@@ -168,10 +181,11 @@ public class Plan implements Cloneable, Serializable {
 		if (context == null)
 			p.context = null;
 		else {
-			p.context = new ArrayList<DefaultLiteral>(context.size());
+			p.context = (Term)context.clone();
+            /*new ArrayList<DefaultLiteral>(context.size());
 			for (DefaultLiteral l: context) {
 				p.context.add( (DefaultLiteral)l.clone());
-			}
+			}*/
 		}
 		
 		if (body == null)
@@ -209,13 +223,15 @@ public class Plan implements Cloneable, Serializable {
 	/** returns this plan in a string compliant with AS syntax */
 	public String toASString() {
 		return  ((label == null) ? "" : "@" + label.toString() + " ")
-				+ tevent + " : " + 
-				((context.size() == 0) ? "true" : listToString(context, " & "))
+				+ tevent  
+				//((context.size() == 0) ? "true" : listToString(context, " & "))
+				+ ((context == null) ? "" : " : " + context)
 				+ " <- " +
 				((body.size() == 0) ? "true" : listToString(body, "; ")) 
 				+ ".";
 	}
-	
+
+    
     /** get as XML */
 	public Element getAsDOM(Document document) {
 		Element u = (Element) document.createElement("plan");
@@ -228,14 +244,12 @@ public class Plan implements Cloneable, Serializable {
         
 		//u.setAttribute("context", listToString(context, " & "));
 		//u.setAttribute("body", listToString(body, "; "));
-        if (context.size() > 0) {
+        if (context != null) {
             Element ec = (Element) document.createElement("context");
-            for (DefaultLiteral dl: context) {
-                ec.appendChild(dl.getAsDOM(document));
-            }
+            ec.appendChild(context.getAsDOM(document));
             u.appendChild(ec);
         }
-
+        
         if (body.size() > 0) {
             Element eb = (Element) document.createElement("body");
             for (BodyLiteral bl: body) {

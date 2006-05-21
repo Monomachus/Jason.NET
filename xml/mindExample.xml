@@ -1,35 +1,96 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet href="agInspection.xsl" type="text/xsl" ?>
-<agent name="vc">
+<agent name="aa">
 <beliefs>
-<literal annots="[source(percept)]" term="pos(0,0)"/>
-<literal annots="[source(self)]" term="demo"/>
-<literal annots="[source(percept)]" term="dirty(3,0)"/>
-<literal annots="[source(percept)]" term="dirty(0,1)"/>
-<literal annots="[source(percept)]" term="dirty(2,1)"/>
-<literal annots="[source(percept)]" term="dirty(4,2)"/>
-<literal annots="[source(percept)]" term="dirty(3,3)"/>
-<literal annots="[source(percept)]" term="dirty(0,4)"/>
-<literal annots="[source(percept)]" term="dirty(2,4)"/>
-<literal annots="[source(percept)]" term="dirty(4,4)"/>
-<literal annots="[source(percept)]" term="dirty(0,2)"/>
-<literal annots="[source(percept)]" term="dirty(1,2)"/>
-<literal annots="[source(percept)]" term="dirty(2,2)"/>
-<literal annots="[source(percept)]" term="dirty(2,0)"/>
-<literal annots="[source(percept)]" term="dirty(1,1)"/>
-<literal annots="[source(percept)]" term="dirty(4,1)"/>
-<literal annots="[source(percept)]" term="dirty(0,3)"/>
-<literal annots="[source(percept)]" term="dirty(2,3)"/>
-<literal annots="[source(percept)]" term="dirty(4,3)"/>
-<literal annots="[source(percept)]" term="dirty(1,4)"/>
-<literal annots="[source(percept)]" term="dirty(3,4)"/>
-<literal annots="[source(percept)]" term="clean"/>
+	<literal>
+		<term functor="b">
+			<arguments>
+				<number-term>30</number-term>
+			</arguments>
+			<annotations>
+				<literal>
+					<term functor="source">
+						<arguments>
+							<literal>
+								<term functor="self"/>
+							</literal>
+						</arguments>
+					</term>
+				</literal>
+			</annotations>
+		</term>
+	</literal>
+<literal>
+<term functor="demo">
+<annotations>
+<literal>
+<term functor="source">
+<arguments>
+<literal>
+<term functor="self"/>
+</literal>
+</arguments>
+</term>
+</literal>
+</annotations>
+</term>
+</literal>
+<literal>
+<term functor="a">
+<arguments>
+<number-term>10</number-term>
+</arguments>
+<annotations>
+<literal>
+<term functor="source">
+<arguments>
+<literal>
+<term functor="self"/>
+</literal>
+</arguments>
+</term>
+</literal>
+</annotations>
+</term>
+</literal>
+<literal>
+<term functor="a">
+<arguments>
+<number-term>20</number-term>
+</arguments>
+<annotations>
+<literal>
+<term functor="source">
+<arguments>
+<literal>
+<term functor="self"/>
+</literal>
+</arguments>
+</term>
+</literal>
+</annotations>
+</term>
+</literal>
 </beliefs>
 <circumstance>
 <events>
-<event intention="1" selected="true">
-<trigger add="+" type="!">
-<literal term="go(3,0)"/>
+<event selected="true">
+<trigger add="+">
+<literal>
+<term functor="demo">
+<annotations>
+<literal>
+<term functor="source">
+<arguments>
+<literal>
+<term functor="self"/>
+</literal>
+</arguments>
+</term>
+</literal>
+</annotations>
+</term>
+</literal>
 </trigger>
 </event>
 </events>
@@ -37,122 +98,102 @@
 <option applicable="true" relevant="true" selected="true">
 <plan>
 <label>
-<literal annots="[source(self)]" term="l__5"/>
+	<literal>
+		<term functor="l__0">
+			<annotations>
+				<term functor="source">
+					<arguments>
+						<term functor="self"/>
+					</arguments>
+				</term>
+			</annotations>
+		</term>
+	</literal>
 </label>
-<trigger add="+" type="!">
-<literal term="go(X,Y)"/>
+<trigger add="+">
+<literal>
+<term functor="demo"/>
+</literal>
 </trigger>
 <context>
-<default-literal>
-<literal term="pos(AtX,AtY)"/>
-</default-literal>
-<default-literal>
-<literal ia="true" term=".gt(X,AtX)"/>
-</default-literal>
+<expression operator=" &amp; " type="logical">
+<left>
+<expression operator=" | " type="logical">
+<left>
+<literal>
+<term functor="a">
+<arguments>
+<var-term>X</var-term>
+</arguments>
+</term>
+</literal>
+</left>
+<right>
+<literal>
+<term functor="b">
+<arguments>
+<var-term>X</var-term>
+</arguments>
+</term>
+</literal>
+</right>
+</expression>
+</left>
+<right>
+<expression operator=" &gt; " type="relational">
+<left>
+<var-term>X</var-term>
+</left>
+<right>
+<number-term>25</number-term>
+</right>
+</expression>
+</right>
+</expression>
 </context>
 <body>
-<body-literal type="">
-<literal term="right"/>
+<body-literal>
+<expression operator=" = " type="relational">
+<left>
+<var-term>W</var-term>
+</left>
+<right>
+<expression operator=" div " type="arithmetic">
+<left>
+<number-term>5</number-term>
+</left>
+<right>
+<number-term>2</number-term>
+</right>
+</expression>
+</right>
+</expression>
 </body-literal>
-<body-literal type="!">
-<literal term="go(X,Y)"/>
+<body-literal>
+<expression operator=" &gt; " type="relational">
+<left>
+<var-term>W</var-term>
+</left>
+<right>
+<number-term>1</number-term>
+</right>
+</expression>
+</body-literal>
+<body-literal>
+<literal ia="true">
+<term functor=".print">
+<arguments>
+<string-term>"hello world "</string-term>
+<var-term>X</var-term>
+<string-term>" - "</string-term>
+<var-term>W</var-term>
+</arguments>
+</term>
+</literal>
 </body-literal>
 </body>
 </plan>
-<unifier>{Y=0, AtX=0, AtY=0, X=3}</unifier>
-</option>
-<option relevant="true">
-<plan>
-<label>
-<literal annots="[source(self)]" term="l__4"/>
-</label>
-<trigger add="+" type="!">
-<literal term="go(X,Y)"/>
-</trigger>
-<context>
-<default-literal>
-<literal term="pos(X,Y)"/>
-</default-literal>
-</context>
-</plan>
-</option>
-<option relevant="true">
-<plan>
-<label>
-<literal annots="[source(self)]" term="l__6"/>
-</label>
-<trigger add="+" type="!">
-<literal term="go(X,Y)"/>
-</trigger>
-<context>
-<default-literal>
-<literal term="pos(AtX,AtY)"/>
-</default-literal>
-<default-literal>
-<literal ia="true" term=".gt(AtX,X)"/>
-</default-literal>
-</context>
-<body>
-<body-literal type="">
-<literal term="left"/>
-</body-literal>
-<body-literal type="!">
-<literal term="go(X,Y)"/>
-</body-literal>
-</body>
-</plan>
-</option>
-<option relevant="true">
-<plan>
-<label>
-<literal annots="[source(self)]" term="l__7"/>
-</label>
-<trigger add="+" type="!">
-<literal term="go(X,Y)"/>
-</trigger>
-<context>
-<default-literal>
-<literal term="pos(AtX,AtY)"/>
-</default-literal>
-<default-literal>
-<literal ia="true" term=".gt(AtY,Y)"/>
-</default-literal>
-</context>
-<body>
-<body-literal type="">
-<literal term="up"/>
-</body-literal>
-<body-literal type="!">
-<literal term="go(X,Y)"/>
-</body-literal>
-</body>
-</plan>
-</option>
-<option relevant="true">
-<plan>
-<label>
-<literal annots="[source(self)]" term="l__8"/>
-</label>
-<trigger add="+" type="!">
-<literal term="go(X,Y)"/>
-</trigger>
-<context>
-<default-literal>
-<literal term="pos(AtX,AtY)"/>
-</default-literal>
-<default-literal>
-<literal ia="true" term=".gt(Y,AtY)"/>
-</default-literal>
-</context>
-<body>
-<body-literal type="">
-<literal term="down"/>
-</body-literal>
-<body-literal type="!">
-<literal term="go(X,Y)"/>
-</body-literal>
-</body>
-</plan>
+<unifier>{X=30}</unifier>
 </option>
 </plans>
 <intentions>
@@ -160,77 +201,87 @@
 <intended-means>
 <plan>
 <label>
-<literal annots="[source(self)]" term="l__5"/>
-</label>
-<trigger add="+" type="!">
-<literal term="go(X,Y)"/>
-</trigger>
-<context>
-<default-literal>
-<literal term="pos(AtX,AtY)"/>
-</default-literal>
-<default-literal>
-<literal ia="true" term=".gt(X,AtX)"/>
-</default-literal>
-</context>
-<body>
-<body-literal type="">
-<literal term="right"/>
-</body-literal>
-<body-literal type="!">
-<literal term="go(X,Y)"/>
-</body-literal>
-</body>
-</plan>
-<unifier>{Y=0, AtX=0, AtY=0, X=3}</unifier>
-</intended-means>
-<intended-means>
-<plan>
-<label>
-<literal annots="[source(self)]" term="l__1"/>
-</label>
-<trigger add="+" type="!">
-<literal term="limpar"/>
-</trigger>
-<context>
-<default-literal>
-<literal term="dirty(X,Y)"/>
-</default-literal>
-</context>
-<body>
-<body-literal type="!">
-<literal term="go(X,Y)"/>
-</body-literal>
-<body-literal type="">
-<literal term="suck"/>
-</body-literal>
-<body-literal type="!!">
-<literal term="limpar"/>
-</body-literal>
-</body>
-</plan>
-<unifier>{Y=0, X=3}</unifier>
-</intended-means>
-<intended-means>
-<plan>
-<label>
-<literal annots="[source(self)]" term="l__0"/>
+<literal>
+<term functor="l__0">
+<annotations>
+<term functor="source">
+<arguments>
+<term functor="self"/>
+</arguments>
+</term>
+</annotations>
+</term>
+</literal>
 </label>
 <trigger add="+">
-<literal term="demo"/>
+<literal>
+<term functor="demo"/>
+</literal>
 </trigger>
+<context>
+<expression operator=" &amp; " type="logical">
+<left>
+<expression operator=" | " type="logical">
+<left>
+<literal>
+<term functor="a">
+<arguments>
+<var-term>X</var-term>
+</arguments>
+</term>
+</literal>
+</left>
+<right>
+<literal>
+<term functor="b">
+<arguments>
+<var-term>X</var-term>
+</arguments>
+</term>
+</literal>
+</right>
+</expression>
+</left>
+<right>
+<expression operator=" &gt; " type="relational">
+<left>
+<var-term>X</var-term>
+</left>
+<right>
+<number-term>25</number-term>
+</right>
+</expression>
+</right>
+</expression>
+</context>
 <body>
-<body-literal type="!">
-<literal term="limpar"/>
+<body-literal>
+<expression operator=" &gt; " type="relational">
+<left>
+<var-term>W</var-term>
+</left>
+<right>
+<number-term>1</number-term>
+</right>
+</expression>
+</body-literal>
+<body-literal>
+<literal ia="true">
+<term functor=".print">
+<arguments>
+<string-term>"hello world "</string-term>
+<var-term>X</var-term>
+<string-term>" - "</string-term>
+<var-term>W</var-term>
+</arguments>
+</term>
+</literal>
 </body-literal>
 </body>
 </plan>
-<unifier>{}</unifier>
+<unifier>{W=2, X=30}</unifier>
 </intended-means>
 </intention>
 </intentions>
-<actions>
-<action feedback="true" intention="1" result="true" selected="true" term="right"/>
-</actions>
 </circumstance>
 </agent>

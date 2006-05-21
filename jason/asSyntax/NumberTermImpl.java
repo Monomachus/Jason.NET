@@ -40,6 +40,9 @@ package jason.asSyntax;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
 /** implements a term that represents a number */
 public class NumberTermImpl extends Term implements NumberTerm {
 
@@ -128,4 +131,12 @@ public class NumberTermImpl extends Term implements NumberTerm {
 			return ""+fValue;
 		}
 	}
+    
+    
+    /** get as XML */
+    public Element getAsDOM(Document document) {
+        Element u = (Element) document.createElement("number-term");
+        u.appendChild(document.createTextNode(toString()));
+        return u;
+    }    
 }

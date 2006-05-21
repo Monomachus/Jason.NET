@@ -43,6 +43,9 @@ import java.io.StringReader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
 public class StringTermImpl extends Term implements StringTerm {
 
 	static private Logger logger = Logger.getLogger(StringTermImpl.class.getName());
@@ -113,4 +116,11 @@ public class StringTermImpl extends Term implements StringTerm {
 	public String toString() {
 		return "\""+getString()+"\"";
 	}
+
+    /** get as XML */
+    public Element getAsDOM(Document document) {
+        Element u = (Element) document.createElement("string-term");
+        u.appendChild(document.createTextNode(toString()));
+        return u;
+    }    
 }

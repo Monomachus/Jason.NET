@@ -35,6 +35,10 @@ PARSER_BEGIN(as2j)
   import jason.asSyntax.*;
   import jason.asSemantics.*;
   import jason.*;
+  import jason.asSyntax.ArithExprTerm.ArithmeticOp;
+  import jason.asSyntax.LogExprTerm.LogicalOp;
+  import jason.asSyntax.RelExprTerm.RelationalOp;
+  import jason.asSyntax.BodyLiteral.BodyType;
 
   public class as2j {
 
@@ -72,6 +76,7 @@ TOKEN : {
 | <TK_NOT:  "not">
 | <TK_NEG:  "~">
 | <TK_INTDIV: "div">
+| <TK_INTMOD: "mod">
 
 // special chars
 | <TK_LABEL_AT: "@">
@@ -162,18 +167,15 @@ void directive(List bbl, PlanLibrary pp) : { Pred d; }
 
 
 /* Plan */
-Plan p() :         { Token k; Trigger T; ArrayList C; ArrayList H; Pred L = null; int start = -1, end;}
+Plan p() :         { Token k; Trigger T; Term C = null; ArrayList H = null; Pred L = null; int start = -1, end;}
 {
-    [ k = <TK_LABEL_AT> L=at()  
-                   { start = k.beginLine; } 
-    ]
+    [ k = <TK_LABEL_AT> L=at()  { start = k.beginLine; }   ]
     T=te()         
-    k = ":"        { if (start == -1) start = k.beginLine; }
-    C=ct() 
-    "<-" H=bd() 
-    k = "." 
+    [ k = ":"  C=le()           { if (start == -1) start = k.beginLine; } ] 
+    [ k = "<-" H=bd()           { if (start == -1) start = k.beginLine; } ]  
+    k = "."                     { if (start == -1) start = k.beginLine; } 
                    { end = k.beginLine;
-                     Plan p = new Plan(L,T,C,H);  
+                     Plan p = new Plan(L,T,C,H);
                      p.setSourceLines(start,end);
                      return p;}
 }
@@ -206,40 +208,9 @@ Literal l() :  { Pred F; Token k; boolean type = Literal.LPos; }
       ]
       F=at()                  { return new Literal(type,F); }
     )
-  | k=<TK_TRUE>               { return Literal.LTrue;}  // used when dl/body is true
+  | k=<TK_TRUE>               { return Literal.LTrue; } 
   | k=<TK_FALSE>              { return Literal.LFalse; } 
   )
-}
-
-
-/* Plan context */
-ArrayList ct() :    { DefaultLiteral P; ArrayList C = new ArrayList(); List CT;}
-{
-     P = dl()       { if (!P.getLiteral().equals(Literal.LTrue)) {
-                        C.add(P); 
-                      }
-                    }
-     [ "&" CT=ct()  { C.addAll(CT); } 
-     ]
-                    { return C; }
-}
-
-
-DefaultLiteral dl() : { boolean isPos = DefaultLiteral.LDefPos; 
-                        Term rel = null;
-                      }
-{
-  [ <TK_NOT>          { isPos = DefaultLiteral.LDefNeg; }
-  ]
-
-  rel = re() 
-                      { if (rel.isVar() || rel.isLiteral()) {
-                          return new DefaultLiteral(isPos, (Literal)rel);
-                        } else {
-                          return new DefaultLiteral(isPos, new Literal(rel)); 
-                        }
-                      }
-                     
 }
 
 
@@ -248,7 +219,7 @@ ArrayList bd() : { BodyLiteral F;
                    ArrayList BD = new ArrayList(); 
                    List BD2;}
 {
-  F=f()          { if (! F.getLiteral().equals(Literal.LTrue)) {
+  F=f()          { if (! F.getTerm().equals(Literal.LTrue)) {
                       BD.add(F); 
                    } 
                  }
@@ -259,7 +230,7 @@ ArrayList bd() : { BodyLiteral F;
 
 
 BodyLiteral f() :     { Literal A; Token k;
-                        byte formType = BodyLiteral.HAction;
+                        BodyType formType = BodyType.action;
                         Term rel;
                         VarTerm v;
                       }
@@ -267,11 +238,11 @@ BodyLiteral f() :     { Literal A; Token k;
  
  ( LOOKAHEAD(4)
    // goals and belief updates
-   (  "!"             { formType = BodyLiteral.HAchieve; }
-    | "!!"            { formType = BodyLiteral.HAchieveNF; }
-    | "?"             { formType = BodyLiteral.HTest; }
-    | "+"             { formType = BodyLiteral.HAddBel; }
-    | "-"             { formType = BodyLiteral.HDelBel; }
+   (  "!"             { formType = BodyType.achieve; }
+    | "!!"            { formType = BodyType.achieveNF; }
+    | "?"             { formType = BodyType.test; }
+    | "+"             { formType = BodyType.addBel; }
+    | "-"             { formType = BodyType.delBel; }
    )
    ( A=l()            { return new BodyLiteral(formType,A); }
    | v = var()        { return new BodyLiteral(formType,v); } // used in communication "+C"
@@ -280,9 +251,9 @@ BodyLiteral f() :     { Literal A; Token k;
   // actions or expressions
   rel = re() 
                       { if (rel.isVar() || rel.isLiteral()) {
-                          return new BodyLiteral(formType, (Literal)rel);
+                          return new BodyLiteral(formType, rel);
                         } else {
-                          return new BodyLiteral(formType, new Literal(rel)); 
+                          return new BodyLiteral((RelExprTerm)rel); 
                         }
                       }
  )
@@ -342,19 +313,44 @@ ListTermImpl list() : { ListTermImpl lt = new ListTermImpl(); ListTerm last;
 }
 
 
+/* logical expression */
+Term le() :    { Term t1, t2; }
+{					
+   t1 = le_trm()         
+[  "|" t2 = le()         { return new LogExprTerm(t1,LogicalOp.or,t2); } ]
+                         { return t1; }
+}
+
+Term le_trm() :  { Term t1, t2; }
+{
+   t1 = le_factor()    
+[  "&" t2 = le_trm() { return new LogExprTerm(t1,LogicalOp.and,t2); } ]
+                     { return t1; }
+}
+
+Term le_factor():{ Term t; }
+{
+( LOOKAHEAD(4)
+   <TK_NOT> t = le_factor()    { return new LogExprTerm(LogicalOp.not,t); } 
+ | "(" t = le() ")"            { return t; } 
+ | t = re()                    { return t; } 
+)
+}
+
+
 /* relational expression 
    used in context, body and term
    
      <VAR>      [ <OPREL> <EXP> ]  --> this method returns the VarTerm
    | <LITERAL>  [ <OPREL> <EXP> ]  --> returns the Literal
-   | <EXP> <OPREL> <EXP>           --> returns a Term like .gt(<Term>,<Term>)
+   | <EXP> <OPREL> <EXP>           --> returns a RelExprTerm
 */
 Term re() :                               {  Token k;
                                              Term op1 = null;
                                              Term op2 = null;
                                              NumberTerm nb; 
-                                             String operator = "";
-                                             boolean change = false;
+                                             RelationalOp operator = RelationalOp.none;
+                                             //boolean change = false;
                                              Term rel = null;
                                            }
 {
@@ -364,14 +360,14 @@ Term re() :                               {  Token k;
     )
                      
     [
-       ( "<"                               { operator = ".gt"; change = true; } 
-       | "<="                              { operator = ".gte"; change = true; } 
-       | ">"                               { operator = ".gt"; } 
-       | ">="                              { operator = ".gte"; } 
-       | "=="                              { operator = ".equals"; } 
-       | "\\=="                            { operator = ".notequals"; } 
-       | "="                               { operator = ".unifies"; } 
-       | "=.."                             { operator = ".literalBuilder"; } 
+       ( "<"                               { operator = RelationalOp.lt; } 
+       | "<="                              { operator = RelationalOp.lte; } 
+       | ">"                               { operator = RelationalOp.gt; } 
+       | ">="                              { operator = RelationalOp.gte; } 
+       | "=="                              { operator = RelationalOp.eq; } 
+       | "\\=="                            { operator = RelationalOp.dif; } 
+       | "="                               { operator = RelationalOp.unify; } 
+       | "=.."                             { operator = RelationalOp.literalBuilder; } 
        )
 
        (   nb = ae()                       { op2 = (Term)nb; }
@@ -380,15 +376,7 @@ Term re() :                               {  Token k;
          | op2 = list()
        )
 
-                                           { rel = new Term(operator);
-                                             if (!change) {
-                                                 rel.addTerm(op1); 
-                                                 rel.addTerm(op2); 
-                                 			  } else {
-                                                 rel.addTerm(op2); 
-                                                 rel.addTerm(op1); 
-                                             }
-                                           }
+                                           { rel = new RelExprTerm(op1, operator, op2); }
     ]
                                            { if (rel == null && !op1.isVar() && !op1.isLiteral()) {
                                                 throw new ParseException("RelExp: second operand expected");
@@ -403,34 +391,34 @@ Term re() :                               {  Token k;
 
 
 /* arithmetic expression */
-NumberTerm ae() :    { NumberTerm t1, t2; int op;}
+NumberTerm ae() :    { NumberTerm t1, t2; ArithmeticOp op;}
 {
-   t1 = trm()        { op = -1; }
-[  ( "+"             { op = ExprTerm.EOplus;} 
-   | "-"             { op = ExprTerm.EOminus;}
+   t1 = trm()        { op = ArithmeticOp.none; }
+[  ( "+"             { op = ArithmeticOp.plus;} 
+   | "-"             { op = ArithmeticOp.minus;}
    )
-   t2 = ae()         { return new ExprTerm(t1,op,t2); }
+   t2 = ae()         { return new ArithExprTerm(t1,op,t2); }
 ]                    { return t1; }
 }
 
-NumberTerm trm() :  { NumberTerm t1, t2; int op;}
+NumberTerm trm() :  { NumberTerm t1, t2; ArithmeticOp op;}
 {
-   t1 = factor()    { op = -1; }
-[  ( "*"            { op = ExprTerm.EOtimes; } 
-   | "/"            { op = ExprTerm.EOdiv; }
-   | <TK_INTDIV>    { op = ExprTerm.EOintdiv; }
+   t1 = factor()    { op = ArithmeticOp.none; }
+[  ( "*"            { op = ArithmeticOp.times; } 
+   | "/"            { op = ArithmeticOp.div; }
+   | <TK_INTDIV>    { op = ArithmeticOp.intdiv; }
+   | <TK_INTMOD>    { op = ArithmeticOp.mod; }
    )
-   t2 = trm()       { return new ExprTerm(t1,op,t2); }
+   t2 = trm()       { return new ArithExprTerm(t1,op,t2); }
 ]                   { return t1; }
 }
 
-NumberTerm factor():{ NumberTerm t1, t2; int op;}
+NumberTerm factor():{ NumberTerm t1, t2; ArithmeticOp op;}
 {
-   t1 = simple()    { op = -1; }
-[  ( "%"            { op = ExprTerm.EOmod; } 
-   | "**"           { op = ExprTerm.EOpow; }
+   t1 = simple()    { op = ArithmeticOp.none; }
+[  ( "**"           { op = ArithmeticOp.pow; }
    )
-   t2 = factor()    { return new ExprTerm(t1,op,t2); }
+   t2 = factor()    { return new ArithExprTerm(t1,op,t2); }
 ]                   { return t1; }
 }
 
@@ -438,9 +426,7 @@ NumberTerm factor():{ NumberTerm t1, t2; int op;}
 NumberTerm simple():{ Token K; NumberTerm t; VarTerm v; }
 {
  ( K = <NUMBER>     { return new NumberTermImpl(K.image); }
- //| K = <VAR>        { return new VarTerm(K.image); }
- //| K = <UNNAMEDVAR> { return new UnnamedVar(); }
- | "-" t = simple() { return new ExprTerm(ExprTerm.EOminus, t); }
+ | "-" t = simple() { return new ArithExprTerm(ArithmeticOp.minus, t); }
  | "(" t = ae() ")" { return t; }
  | v = var()        { return v; }
  )

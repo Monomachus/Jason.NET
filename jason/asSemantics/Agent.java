@@ -98,8 +98,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -120,6 +122,7 @@ public class Agent {
 	// Members
 	protected BeliefBase fBS = new BeliefBase();
 	protected PlanLibrary fPS = new PlanLibrary();
+    private Map<String,InternalAction> internalActions = new HashMap<String,InternalAction>(); // this agent internal actions (key->IA'name, value->InternalAction object)
 
 	protected TransitionSystem fTS = null;
 
@@ -188,6 +191,18 @@ public class Agent {
 		parser.ag(this);
 	}
 
+    public InternalAction getIA(Term action) throws Exception {
+        String iaName = action.getFunctor();
+        if (iaName.indexOf('.') == 0)
+            iaName = "jason.stdlib" + iaName;
+        InternalAction objIA = internalActions.get(iaName);
+        if (objIA == null) {
+            objIA = (InternalAction)Class.forName(iaName).newInstance();
+            internalActions.put(iaName, objIA);
+        }
+        return objIA;
+    }
+    
 	
 	/** Follows the default implementation for the agent's
 	 *  message acceptance relation and selection functions

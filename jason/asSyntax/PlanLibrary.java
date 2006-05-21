@@ -116,58 +116,61 @@ public class PlanLibrary {
 
 	
     public void add(Plan p) throws JasonException {
-    	// test p.label
-    	if (p.getLabel() != null && planLabels.keySet().contains(p.getLabel().getFunctor())) {
-    		// test if the new plan is equal, in this case, just add a source
-    		Plan planInPL = get(p.getLabel().getFunctor());
-    		if (p.equals( planInPL )) {
-    			planInPL.getLabel().addSource((Pred)p.getLabel().getSources().get(0));
-    			return;
-    		} else {
-    			throw new JasonException("There already is a plan with label "+p.getLabel());
-    		}
-    	}
-    	
-    	// add label, if necessary
-    	if (p.getLabel() == null) {
-    		String l;
-    		do {
-    			l = "l__"+(lastPlanLabel++);
-    		} while (planLabels.keySet().contains(l));
-    		p.setLabel(l);
-    	}
-    	
-    	// add self source
-    	if (!p.getLabel().hasSource()) {
-    		p.getLabel().addSource(new Term("self"));
-    	}
-    	planLabels.put(p.getLabel().getFunctor(), p);
-    	
-    	// trim the plan
-    	if (p.body != null) {
-    		p.body.trimToSize();
-    	}
-    	if (p.context != null) {
-    		p.context.trimToSize();
-    	}
-        if (p.getTriggerEvent().getLiteral().isVar()) {
-        	varPlans.add(p);
-        	// add plan p in all entries
-        	Iterator i = relPlans.values().iterator();
-        	while (i.hasNext()) {
-        		List li = (List)i.next();
-        		li.add(p);
-        	}
-        } else {
-	    	List codesList = (List)relPlans.get(p.tevent.getFunctorArity());
-	    	if (codesList == null) {
-	    		codesList = new ArrayList();
-		    	codesList.addAll(varPlans);
-	        	relPlans.put(p.tevent.getFunctorArity(), codesList);
-	    	}
-	    	codesList.add(p);
+        // test p.label
+        if (p.getLabel() != null
+                && planLabels.keySet().contains(p.getLabel().getFunctor())) {
+            // test if the new plan is equal, in this case, just add a source
+            Plan planInPL = get(p.getLabel().getFunctor());
+            if (p.equals(planInPL)) {
+                planInPL.getLabel().addSource(
+                        (Pred) p.getLabel().getSources().get(0));
+                return;
+            } else {
+                throw new JasonException("There already is a plan with label "
+                        + p.getLabel());
+            }
         }
-    	
+
+        // add label, if necessary
+        if (p.getLabel() == null) {
+            String l;
+            do {
+                l = "l__" + (lastPlanLabel++);
+            } while (planLabels.keySet().contains(l));
+            p.setLabel(l);
+        }
+
+        // add self source
+        if (!p.getLabel().hasSource()) {
+            p.getLabel().addSource(new Term("self"));
+        }
+        planLabels.put(p.getLabel().getFunctor(), p);
+
+        // trim the plan
+        if (p.body != null) {
+            p.body.trimToSize();
+        }
+        //if (p.context != null) {
+        //    p.context.trimToSize();
+        //}
+        if (p.getTriggerEvent().getLiteral().isVar()) {
+            varPlans.add(p);
+            // add plan p in all entries
+            Iterator i = relPlans.values().iterator();
+            while (i.hasNext()) {
+                List li = (List) i.next();
+                li.add(p);
+            }
+        } else {
+            List codesList = (List) relPlans.get(p.tevent.getFunctorArity());
+            if (codesList == null) {
+                codesList = new ArrayList();
+                codesList.addAll(varPlans);
+                relPlans.put(p.tevent.getFunctorArity(), codesList);
+            }
+            codesList.add(p);
+        }
+
         plans.add(p);
     }
 
@@ -216,26 +219,26 @@ public class PlanLibrary {
 
 	/** remove the plan with label <i>pLabel</i> */
     public Plan remove(String pLabel) {
-        //codes.remove(i);
-    	Plan p = (Plan)planLabels.remove(pLabel);
-    	
-    	// remove it from plans' list
-    	plans.remove(p);
-    	
+        // codes.remove(i);
+        Plan p = (Plan) planLabels.remove(pLabel);
+
+        // remove it from plans' list
+        plans.remove(p);
+
         if (p.getTriggerEvent().getLiteral().isVar()) {
-        	varPlans.remove(p);
-        	// remove p from all entries
-        	Iterator ip = relPlans.values().iterator();
-        	while (ip.hasNext()) {
-        		List li = (List)ip.next();
-        		li.remove(p);
-        	}
+            varPlans.remove(p);
+            // remove p from all entries
+            Iterator ip = relPlans.values().iterator();
+            while (ip.hasNext()) {
+                List li = (List) ip.next();
+                li.remove(p);
+            }
         } else {
-        	List codesList = (List)relPlans.get(p.tevent.getFunctorArity());
+            List codesList = (List) relPlans.get(p.tevent.getFunctorArity());
             codesList.remove(p);
             if (codesList.isEmpty()) {
-            	// no more plans for this TE
-            	relPlans.remove(p.tevent.getFunctorArity());
+                // no more plans for this TE
+                relPlans.remove(p.tevent.getFunctorArity());
             }
         }
         return p;

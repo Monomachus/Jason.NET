@@ -2,7 +2,6 @@ package test;
 
 import jason.asSemantics.Unifier;
 import jason.asSyntax.BeliefBase;
-import jason.asSyntax.DefaultLiteral;
 import jason.asSyntax.ListTerm;
 import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Literal;
@@ -228,10 +227,6 @@ public class TermTest extends TestCase {
 
 		p1.addTerm(new VarTerm("X"));
 		p1.addTerm(new VarTerm("Y"));
-
-		Trigger g = new Trigger(Trigger.TEAdd,Trigger.TEAchvG,new Literal(DefaultLiteral.LDefPos, p1));
-		//System.out.println("g="+g);
-		
 	}
 	
 	public void testTriggetAnnot() {

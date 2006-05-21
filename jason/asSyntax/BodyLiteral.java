@@ -41,89 +41,81 @@ import org.w3c.dom.Element;
 
 public class BodyLiteral implements Cloneable {
     
-    public static final byte      HAction    = 0;
-    public static final byte      HAchieve   = 1;
-    public static final byte      HTest      = 2;
-    public static final byte      HAddBel    = 3;
-    public static final byte      HDelBel    = 4;	
-    public static final byte      HAchieveNF = 5;
-	
-	Literal literal;
-    byte    formType;
+	public enum BodyType { 
+		action         { public String toString() { return ""; } },  
+		internalAction { public String toString() { return ""; } },  
+		achieve        { public String toString() { return "!"; } }, 
+		test           { public String toString() { return "?"; } }, 
+		addBel         { public String toString() { return "+"; } }, 
+		delBel         { public String toString() { return "-"; } },
+		achieveNF      { public String toString() { return "!!"; } }, 
+		constraint     { public String toString() { return ""; } }
+	}
 
-    public BodyLiteral(byte t, Literal l) {
-        literal = (Literal)l.clone();
+	Term    term;
+	BodyType    formType;
+
+    public BodyLiteral(BodyType t, Term l) {
+        term = (Term)l.clone();
         formType = t;
+        if (l.isInternalAction()) {
+        		formType = BodyType.internalAction;
+        }
+    }
+    public BodyLiteral(RelExprTerm re) {
+        term = (Term)re.clone();
+        formType = BodyType.constraint;
     }
 
-    public byte getType() {
+    public BodyType getType() {
         return formType;
     }
 	
-	public Term getLiteral() {
-		return literal;
+	public Term getTerm() {
+		return term;
 	}
     
 	// used with arithmetic expressions
 	public void addTerm(Term t) {
-		literal.addTerm(t);
+		term.addTerm(t);
 	}
 	
     public boolean equals(Object o) {
-    	try {
-    		BodyLiteral b = (BodyLiteral) o;
-    		return formType==b.formType && literal.equals(b.literal);
-    	} catch (Exception e) {
-    		return false;
-    	}
+	    	try {
+	    		BodyLiteral b = (BodyLiteral) o;
+	    		return formType==b.formType && term.equals(b.term);
+	    	} catch (Exception e) {
+	    		return false;
+	    	}
     }
 
     
     public boolean isAsk() {
-    	if (! literal.getFunctorArity().equals(".send/4")) {
-    		return false;
-    	}
-    	if (literal.getTerm(1).toString().startsWith("ask")) {
-    		return true;
-    	} else {
-    		return false;
-    	}
+	    	if (! term.getFunctorArity().equals(".send/4")) {
+	    		return false;
+	    	}
+	    	if (term.getTerm(1).toString().startsWith("ask")) {
+	    		return true;
+	    	} else {
+	    		return false;
+	    	}
     }
     
     public Object clone() {
-		return new BodyLiteral(formType, literal);
-    }
-
-    public String getTypeStr() {
-        switch(formType) {
-            case HAction :
-                return "";
-            case HAchieve :
-                return "!";
-            case HAchieveNF :
-                return "!!";
-            case HTest :
-                return "?";
-            case HAddBel :
-                return "+";
-            case HDelBel :
-                return "-";
-        }
-        // What to do here???
-        return("ERROR in Literal to String");
+		return new BodyLiteral(formType, term);
     }
 
     public String toString() {
-        return getTypeStr() + literal.toString();
+        return formType + term.toString();
     }
 
     /** get as XML */
     public Element getAsDOM(Document document) {
         Element u = (Element) document.createElement("body-literal");
-        if (getTypeStr().length() > 0) {
-            u.setAttribute("type", getTypeStr());
+        if (formType.toString().length() > 0) {
+            u.setAttribute("type", formType.toString());
         }
-        u.appendChild(literal.getAsDOM(document));
+        u.appendChild(term.getAsDOM(document));
         return u;
     }    
 }

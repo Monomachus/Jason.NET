@@ -46,10 +46,14 @@
 package jason.asSyntax;
 
 import jason.JasonException;
+import jason.asSemantics.Agent;
+import jason.asSemantics.Unifier;
 import jason.asSyntax.parser.as2j;
 
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -100,16 +104,8 @@ public class Literal extends Pred implements Cloneable {
 		}
 	}
 
-	/** copy all attributes from literal <i>l</i> */
-	/*
-	public void set(Literal l) {
-		super.set((Pred)l);
-		type = l.type;
-	}
-	*/
-		
 	public boolean isInternalAction() {
-		return (getFunctor().indexOf('.') >= 0);
+		return getFunctor() != null && getFunctor().indexOf('.') >= 0;
 	}
 	
 	public boolean isLiteral() {
@@ -120,7 +116,63 @@ public class Literal extends Pred implements Cloneable {
 		return (type == LNeg);
 	}
 
-	public boolean equals(Object o) {
+    /** 
+     * logCons checks whether one particular predicate
+     * is a log(ical)Cons(equence) of the belief base.
+     * 
+     * Returns an iterator for all unifiers that are logCons.
+     */
+    @Override
+    public Iterator<Unifier> logCons(final Agent ag, final Unifier un) {
+        if (isInternalAction()) {
+            try {
+                // calls execute
+                if (ag.getIA(this).execute(ag.getTS(), un, getTermsArray())) {
+                     return createUnifIterator(un);
+                }
+            } catch (Exception e) {
+                logger.log(Level.SEVERE,"Error in IA ",e);
+            }
+        } else if (this == LTrue) {
+            return createUnifIterator(un);            
+        } else if (this == LFalse) {
+            return EMPTY_UNIF_LIST.iterator();            
+        } else {
+            List<Literal> relList = ag.getBS().getRelevant(this);
+            if (relList != null) {
+                final Iterator<Literal> il = relList.iterator();
+                return new Iterator<Unifier>() {
+                    Unifier current = null;
+                    public boolean hasNext() {
+                        if (current == null) get();
+                        return current != null;
+                    }
+                    public Unifier next() {
+                        if (current == null) get();
+                        Unifier a = current;
+                        get();
+                        return a;
+                    }
+                    private void get() {
+                        current = null;
+                        while (il.hasNext()) {
+                            Literal b = il.next();
+                            Unifier unC = (Unifier) un.clone();
+                            if (unC.unifies(Literal.this,b)) {
+                                current = unC;
+                                return;
+                            }
+                        }
+                    }
+                    public void remove() {}
+                };
+            }
+        }
+        
+        return EMPTY_UNIF_LIST.iterator();  // empty iterator for unifier
+    }   
+
+    public boolean equals(Object o) {
 		try {
 			Literal l = (Literal) o;
 			return (type == l.type && super.equals(l));
@@ -193,10 +245,12 @@ public class Literal extends Pred implements Cloneable {
         if (isInternalAction()) {
             u.setAttribute("ia", isInternalAction()+"");
         }
-        u.setAttribute("term",super.toStringAsTerm());
+        u.appendChild(super.getAsDOM(document));
+        /*u.setAttribute("term",super.toStringAsTerm());
         if (getAnnots() != null && !getAnnots().isEmpty()) {
             u.setAttribute("annots", getAnnots().toString());
         }
+        */
         return u;
     }    
     

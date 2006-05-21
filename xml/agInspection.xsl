@@ -12,21 +12,24 @@
     <xsl:param name="tr-style" select="'background-color: #ece7e6; font-family: arial;'" />
 	<!-- border-top: 2px solid black;  -->
 	
-    <xsl:param name="bc"  select="'rgb(0 ,170, 0)'" />
-    <xsl:param name="tec" select="'rgb(200, 0, 0)'" />
-    <xsl:param name="ac"  select="'rgb(80, 40, 20)'" />
-    <xsl:param name="tgc" select="'rgb(0, 0, 170)'" />
-    <xsl:param name="agc" select="'rgb(0, 0, 120)'" />
-    <xsl:param name="iac" select="'rgb(100, 70, 30)'" />
+    <xsl:param name="bc"     select="'rgb(0 ,170, 0)'" />
+    <xsl:param name="tec"    select="'rgb(200, 0, 0)'" />
+    <xsl:param name="ac"     select="'rgb(80, 40, 20)'" />
+    <xsl:param name="tgc"    select="'rgb(0, 0, 170)'" />
+    <xsl:param name="agc"    select="'rgb(0, 0, 120)'" />
+    <xsl:param name="iac"    select="'rgb(100, 70, 30)'" />
+    <xsl:param name="var"    select="'rgb(0, 0, 200)'" />
+    <xsl:param name="string" select="'rgb(0, 0, 250)'" />
 
-    <xsl:param name="show-bels" select="'false'" />
+    <xsl:param name="show-bels" select="'true'" />
     <xsl:param name="show-evt"  select="'true'" />
     <xsl:param name="show-mb"  select="'true'" />
     <xsl:param name="show-int"  select="'true'" />
     <xsl:param name="show-plan"  select="'true'" />
     
-    <xsl:output method="html"/>
-
+    <xsl:output method="html" />
+	<xsl:strip-space elements="*" />
+	
     <xsl:template match="agent">
         <html>
         <span style="{$h-style}"><font size="+2">
@@ -343,7 +346,7 @@
 
 
     <xsl:template match="plan">
-	    <xsl:if test="count(label) > 0 and not(starts-with(label/literal/@term,'l__'))">
+	    <xsl:if test="count(label) > 0 and not(starts-with(label/literal/term/@functor,'l__'))">
            <span style="color: rgb(51, 51, 51);">
            @<xsl:apply-templates select="label" />
            </span><br/>
@@ -353,7 +356,7 @@
         	<b><xsl:apply-templates select="trigger" /></b>
         </span>
         
-        <xsl:if test="count(context/default-literal) > 0">
+        <xsl:if test="count(context) > 0">
 	        <table>
 	        <tr>
 	        <td width="20" />
@@ -370,18 +373,24 @@
 	        <td width="20" style="vertical-align: top"><b>&lt;-</b></td>
 		    <td><xsl:apply-templates select="body" /></td>
 	    	</tr>
-	        </table>
+	    </table>
 		</xsl:if>
     </xsl:template>
 
 
     <xsl:template match="context">
-        <xsl:for-each select="default-literal">
         	<span style="color: {$bc}">
-        		<xsl:apply-templates />
-       		</span>
-            <xsl:if test="not(position()=last())"> &amp; </xsl:if>
-        </xsl:for-each>
+			<xsl:apply-templates />
+		</span>
+    </xsl:template>
+    <xsl:template match="expression">
+		<span style="color: black">(</span>
+		<xsl:apply-templates select="left" />
+		<span style="color: black">
+			<xsl:value-of select="@operator" />
+		</span>
+		<xsl:apply-templates select="right" />
+		<span style="color: black">)</span>
     </xsl:template>
     
     <xsl:template match="body">
@@ -413,18 +422,36 @@
 
     
     <xsl:template match="trigger">
-    	<xsl:value-of select="@add"/>
-    	<xsl:value-of select="@type"/>
-    	<xsl:apply-templates />
+	    	<xsl:value-of select="@add"/>
+	    	<xsl:value-of select="@type"/>
+	    	<xsl:apply-templates />
     </xsl:template>
 
-    
-    <xsl:template match="literal">
-    	<xsl:value-of select="@term"/>
-    	<xsl:if test="string-length(@annots) > 0">
-	    	<span style="color: rgb(0 ,190, 0)">
-	    		<sub><xsl:value-of select="@annots"/></sub>
-	   		</span>
+    <xsl:template match="term">
+	    	<xsl:value-of select="@functor"/>
+	    	<xsl:if test="count(arguments) > 0">(<xsl:for-each select="arguments/*">
+		    		<xsl:apply-templates select="." />
+          		<xsl:if test="not(position()=last())">, </xsl:if>
+        		</xsl:for-each>)
 	    </xsl:if>
+	    	<xsl:if test="count(annotations) > 0">
+	    		<span style="color: rgb(0 ,190, 0)">
+	    			<sub>[<xsl:apply-templates select="annotations"/>]</sub>
+			</span>
+	    </xsl:if>
+    </xsl:template>
+    
+    <xsl:template match="var-term">
+	    	<span style="color: {$var}">
+	    		<xsl:value-of select="text()"/>
+		</span>
+    </xsl:template>
+    <xsl:template match="number-term">
+		<i><xsl:value-of select="text()"/></i>
+    </xsl:template>
+    <xsl:template match="string-term">
+	    	<span style="color: {$string}">
+	    		<xsl:value-of select="text()"/>
+		</span>
     </xsl:template>
 </xsl:stylesheet> 

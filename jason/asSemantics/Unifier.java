@@ -53,8 +53,7 @@
 
 package jason.asSemantics;
 
-import jason.asSyntax.DefaultLiteral;
-import jason.asSyntax.ExprTerm;
+import jason.asSyntax.ArithExprTerm;
 import jason.asSyntax.ListTerm;
 import jason.asSyntax.Literal;
 import jason.asSyntax.NumberTermImpl;
@@ -79,7 +78,7 @@ public class Unifier implements Cloneable {
     
     public void apply(Term t) {
     	if (t.isExpr()) {
-    		ExprTerm et = (ExprTerm)t;
+    		ArithExprTerm et = (ArithExprTerm)t;
     		// apply values to expression variables
     		apply( (Term)et.getLHS());
     		if (!et.isUnary()) {
@@ -394,9 +393,9 @@ public class Unifier implements Cloneable {
         return unifiesNoClone((Pred)l1,(Pred)l2);
     }
     
-    public boolean unifies(DefaultLiteral d1, DefaultLiteral d2) {
-        return d1.isDefaultNegated()==d2.isDefaultNegated() && unifies((Literal)d1.getLiteral(),(Literal)d2.getLiteral());
-    }
+//    public boolean unifies(DefaultLiteral d1, DefaultLiteral d2) {
+//        return d1.isDefaultNegated()==d2.isDefaultNegated() && unifies((Literal)d1.getLiteral(),(Literal)d2.getLiteral());
+//    }
     
     public boolean unifies(Trigger te1, Trigger te2) {
         return te1.sameType(te2) && unifies(te1.getLiteral(),te2.getLiteral());
