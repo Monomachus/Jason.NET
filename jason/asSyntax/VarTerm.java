@@ -224,8 +224,15 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
     public Iterator<Unifier> logCons(Agent ag, Unifier un) {
         if (value != null)
             return value.logCons(ag,un);
-        else 
+        else {
+        	// try to apply 
+        	VarTerm c = (VarTerm)this.clone();
+        	un.apply(c);
+        	if (c.hasValue()) {
+        		return c.getValue().logCons(ag,un);
+        	}
             return null;
+        }
     
     }
 

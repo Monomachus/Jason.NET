@@ -65,7 +65,7 @@ public class LogExprTerm extends Term {
 
 	public LogExprTerm(LogicalOp oper, Term t1) {
 		op = oper;
-		lhs = t1;
+		rhs = t1;
 	}
     
     /** 
@@ -76,69 +76,97 @@ public class LogExprTerm extends Term {
      */
     @Override
     public Iterator<Unifier> logCons(final Agent ag, Unifier un) {
-        final Iterator<Unifier> ileft;
-        switch (op) {
-        
-        case not:
-            if (!lhs.logCons(ag,un).hasNext()) {
-                return createUnifIterator(un);
-            }
-            break;
-        
-        case and:
-            ileft = lhs.logCons(ag,un);
-            return new Iterator<Unifier>() {
-                Unifier current = null;
-                Iterator<Unifier> iright = null;
-                public boolean hasNext() {
-                    if (current == null) get();
-                    return current != null;
-                }
-                public Unifier next() {
-                    if (current == null) get();
-                    Unifier a = current;
-                    get();
-                    return a;
-                }
-                private void get() {
-                    current = null;
-                    while ((iright == null || !iright.hasNext()) && ileft.hasNext()) {
-                        iright = rhs.logCons(ag, ileft.next());
-                    }
-                    if (iright != null && iright.hasNext()) {
-                        current = iright.next();
-                    }
-                }
-                public void remove() {}
-            };
-            
-        case or:
-            ileft = lhs.logCons(ag,un);
-            final Iterator<Unifier> iright = rhs.logCons(ag,un);
-            return new Iterator<Unifier>() {
-                Unifier current = null;
-                public boolean hasNext() {
-                    if (current == null) get();
-                    return current != null;
-                }
-                public Unifier next() {
-                    if (current == null) get();
-                    Unifier a = current;
-                    get();
-                    return a;
-                }
-                private void get() {
-                    current = null;
-                    if (ileft.hasNext()) {
-                        current = ileft.next();
-                    } else if (iright.hasNext()) {
-                        current = iright.next();
-                    }
-                }
-                public void remove() {}
-            };
-        }
-
+    	try {
+	        final Iterator<Unifier> ileft;
+	        switch (op) {
+	        
+	        case not:
+	            if (!rhs.logCons(ag,un).hasNext()) {
+	                return createUnifIterator(un);
+	            }
+	            break;
+	        
+	        case and:
+	            ileft = lhs.logCons(ag,un);
+	            return new Iterator<Unifier>() {
+	                Unifier current = null;
+	                Iterator<Unifier> iright = null;
+	                public boolean hasNext() {
+	                    if (current == null) get();
+	                    return current != null;
+	                }
+	                public Unifier next() {
+	                    if (current == null) get();
+	                    Unifier a = current;
+	                    get();
+	                    return a;
+	                }
+	                private void get() {
+	                    current = null;
+	                    while ((iright == null || !iright.hasNext()) && ileft.hasNext()) {
+	                        iright = rhs.logCons(ag, ileft.next());
+	                    }
+	                    if (iright != null && iright.hasNext()) {
+	                        current = iright.next();
+	                    }
+	                }
+	                public void remove() {}
+	            };
+	            
+	        case or:
+	            ileft = lhs.logCons(ag,un);
+	            final Iterator<Unifier> iright = rhs.logCons(ag,un);
+	            return new Iterator<Unifier>() {
+	                Unifier current = null;
+	                public boolean hasNext() {
+	                    if (current == null) get();
+	                    return current != null;
+	                }
+	                public Unifier next() {
+	                    if (current == null) get();
+	                    Unifier a = current;
+	                    get();
+	                    return a;
+	                }
+	                private void get() {
+	                    current = null;
+	                    if (ileft.hasNext()) {
+	                        current = ileft.next();
+	                    } else if (iright.hasNext()) {
+	                        current = iright.next();
+	                    }
+	                }
+	                public void remove() {}
+	            };
+	        }
+    	} catch (Exception e) {
+    		String slhs = "is null";
+    		if (lhs != null) {
+    			Iterator<Unifier> i = lhs.logCons(ag,un);
+    			if (i != null) {
+    				slhs = "";
+    				while (i.hasNext()) {
+    					slhs += i.next().toString()+", ";
+    				}
+    			} else {
+    				slhs = "iterator is null";
+    			}
+    		} 
+    		String srhs = "is null";
+    		if (lhs != null) {
+    			Iterator<Unifier> i = rhs.logCons(ag,un);
+    			if (i != null) {
+    				srhs = "";
+    				while (i.hasNext()) {
+    					srhs += i.next().toString()+", ";
+    				}
+    			} else {
+    				srhs = "iterator is null";
+    			}
+    		} 
+    		
+    		logger.log(Level.SEVERE, "Error evaluating expression "+this+". \nlhs elements="+slhs+". \nrhs elements="+srhs,e);
+    	}
         return EMPTY_UNIF_LIST.iterator();  // empty iterator for unifier
     }   
 
@@ -217,7 +245,7 @@ public class LogExprTerm extends Term {
 	}
 
 	public boolean isUnary() {
-		return rhs == null;
+		return lhs == null;
 	}
 
 	public boolean isGround() {
@@ -225,8 +253,8 @@ public class LogExprTerm extends Term {
 	}
 	
 	public String toString() {
-		if (rhs==null) {
-			return op+"("+lhs+")";
+		if (lhs == null) {
+			return op+"("+rhs+")";
 		} else {
 			return "("+lhs+op+rhs+")";
 		}
@@ -237,14 +265,16 @@ public class LogExprTerm extends Term {
         Element u = (Element) document.createElement("expression");
         u.setAttribute("type","logical");
         u.setAttribute("operator", op.toString());
-        if (rhs!=null) {
+        if (lhs != null) {
             Element l = (Element) document.createElement("left");
             l.appendChild(lhs.getAsDOM(document));
             u.appendChild(l);
         }
-        Element r = (Element) document.createElement("right");
-        r.appendChild(rhs.getAsDOM(document));
-        u.appendChild(r);
+        if (rhs != null) {
+            Element r = (Element) document.createElement("right");
+            r.appendChild(rhs.getAsDOM(document));
+            u.appendChild(r);
+	}
         return u;
     }
 }

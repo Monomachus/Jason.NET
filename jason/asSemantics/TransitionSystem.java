@@ -19,72 +19,6 @@
 // http://www.dur.ac.uk/r.bordini
 // http://www.inf.furb.br/~jomi
 //
-// CVS information:
-//   $Date$
-//   $Revision$
-//   $Log$
-//   Revision 1.36  2006/03/07 10:53:12  bordini
-//   added IF in transition system: bug with removing a formula from an empty body.
-//
-//   Revision 1.35  2006/02/28 15:11:29  jomifred
-//   improve javadoc
-//
-//   Revision 1.34  2006/02/17 13:13:16  jomifred
-//   change a lot of method/classes names and improve some comments
-//
-//   Revision 1.33  2006/01/06 12:05:37  jomifred
-//   operator - removes bel from BB and changes the current unifier.
-//
-//   Revision 1.32  2006/01/05 17:10:26  jomifred
-//   no message
-//
-//   Revision 1.31  2006/01/04 02:54:41  jomifred
-//   using java log API instead of apache log
-//
-//   Revision 1.30  2006/01/02 13:49:00  jomifred
-//   add plan unique id, fix some bugs
-//
-//   Revision 1.29  2005/12/30 20:40:16  jomifred
-//   new features: unnamed var, var with annots, TE as var
-//
-//   Revision 1.28  2005/12/23 00:48:22  jomifred
-//   StringTerm is now an interface implemented by StringTermImpl
-//
-//   Revision 1.27  2005/11/20 16:53:16  jomifred
-//   the canSleep method in TS asks the agent arch if it can sleep.
-//
-//   Revision 1.26  2005/11/07 12:43:00  jomifred
-//   Message content can be an object (not string)
-//
-//   Revision 1.25  2005/10/19 15:57:49  bordini
-//   as last log, just had forgotten to add .clone() in saving the Trigger.
-//
-//   Revision 1.24  2005/10/19 15:09:49  bordini
-//   Fixed 2 bugs related to the plan failure mechanism:
-//     - generated event, in case a plan failed by an action, was
-//       not post as originally (lacked unification), see generateGoalDeletion,
-//       rather than generateGoalDeletionFromEvent
-//     - old (faild) plan which is kept in the intention wasn't removed
-//       when the goal deletion plan finished (ClrInt)
-//   To solve the first problem, the IntendedMeans class now has an extra
-//   member variable called "Trigger" which record the original event.
-//
-//   Revision 1.23  2005/09/26 11:46:25  jomifred
-//   fix bug with source add/remove
-//
-//   Revision 1.22  2005/08/16 21:03:42  jomifred
-//   add some comments on TODOs
-//
-//   Revision 1.21  2005/08/15 17:41:36  jomifred
-//   AgentArchitecture renamed to AgArchInterface
-//
-//   Revision 1.20  2005/08/12 23:29:11  jomifred
-//   support for saci arch in IA createAgent
-//
-//   Revision 1.19  2005/08/12 22:18:37  jomifred
-//   add cvs keywords
-//
-//
 //----------------------------------------------------------------------------
 
 package jason.asSemantics;
@@ -352,7 +286,7 @@ public class TransitionSystem {
 
 	private void applyApplPl() throws JasonException {
 		if (confP.C.RP == null) {
-			logger.warning("applyPl was called even RP is null!");
+			logger.warning("applyPl was called even when RP is null!");
 			confP.step = SProcAct;
 			return;
 		}
@@ -699,93 +633,17 @@ public class TransitionSystem {
 		    Option opt = (Option) i.next();
 		    Term context = opt.plan.getContext();
 			if (context != null) {
-                Iterator<Unifier> r = context.logCons(ag, opt.unif);
-                if (r.hasNext()) {
-                    opt.unif = r.next();
-                } else {
-                    i.remove();
-                }
+		                Iterator<Unifier> r = context.logCons(ag, opt.unif);
+                		if (r != null && r.hasNext()) {
+		                    opt.unif = r.next();
+                		} else {
+		                    i.remove();
+                		}
 			}
 		}
 		return rp;
 	}
 
-	/** 
-	 * logCons checks whether one particular predicate
-	 * is a log(ical)Cons(equence) of the belief base.
-	 * It is used in the method that checks whether the plan is applicable.
-	 */
-    /*
-	private Unifier logCons(List ctxt, int pos, Unifier un) throws JasonException {
-
-		if (pos >= ctxt.size()) {
-			return un;
-		}
-
-		DefaultLiteral dfl = (DefaultLiteral) ctxt.get(pos);
-
-		Literal l = (Literal)dfl.getLiteral().clone();
-		un.apply(l); // in case we have ... & X & ...
-		if (l.isInternalAction()) {
-			boolean execOk = execInternalAction((Pred) l, un);
-			if ((!execOk && !dfl.isDefaultNegated()) 
-				|| (execOk && dfl.isDefaultNegated())) {
-				return null;
-			} else { 
-				return logCons(ctxt, pos+1, un);
-			}
-		}
-
-		// is not an internal action
-		
-		List relB = ag.getBS().getRelevant(l);
-
-
-		if (dfl.isDefaultNegated()) {
-			if (relB != null) {
-				// only goes ahead (recursively) if can't unify with any
-				// predicate
-				for (int i=0; i < relB.size(); i++) {
-					Literal b = (Literal) relB.get(i);
-					// check if literal unifies with belief: order is
-					// important as normally literals have no annotations,
-					// meaning any belief (from any source) will do
-					if (un.unifies(l, b)) // getRelevant already
-						// takes care of type of  literal
-						return null;
-				}
-			}
-			// negated literals do not change the unification, OK to use un
-			return logCons(ctxt, pos+1, un);
-		} else {
-			if (relB == null) {
-				return null;
-			}
-			for (int i=0; i < relB.size(); i++) {
-				Literal b = (Literal) relB.get(i);
-				// here we need a copy of the present unification
-				// so that we can "backtrack"
-				Unifier unC = (Unifier) un.clone();
-				// notice the importance of the order here again (see above)
-				if (unC.unifies(l,b)) {
-					Unifier res = logCons(ctxt, pos+1, unC);
-					if (res != null)
-						// found unification res that makes the plan
-						// applicable
-						return res;
-					else
-						// this unification didn't work, try next
-						continue;
-				} else
-					// this predicate doesn't unify with "l", try next
-					continue;
-			}
-			// attempted all (relevant) predicates and the plan is not
-			// applicable
-			return null;
-		}
-	}
-    */
 
 	/** remove the top action and requeue the current intention */
 	private void updateIntention() {
