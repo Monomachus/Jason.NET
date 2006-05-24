@@ -20,8 +20,8 @@
 // http://www.inf.furb.br/~jomi
 //
 // CVS information:
-//   $Date$
-//   $Revision$
+//   $Date: 2006-01-04 01:00:47 -0200 (Wed, 04 Jan 2006) $
+//   $Revision: 244 $
 //   $Log$
 //   Revision 1.10  2006/01/04 03:00:47  jomifred
 //   using java log API instead of apache log
@@ -38,9 +38,52 @@
 package jason.stdlib;
 
 import jason.asSemantics.InternalAction;
+import jason.asSemantics.TransitionSystem;
+import jason.asSemantics.Unifier;
+import jason.asSyntax.StringTerm;
+import jason.asSyntax.Term;
 
-public class print extends println implements InternalAction {
+import java.util.logging.Level;
+
+public class println implements InternalAction {
+
 	protected String getNewLine() {
-		return "";
+		return "\n";
+	}
+	
+	public boolean execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
+		if (args.length == 0) {
+			return true;
+			//throw new JasonException(".print without parameters!");
+		}
+
+		StringBuffer sout = null;
+		if (ts.getSettings().logLevel() == Level.WARNING) {
+			sout = new StringBuffer("");
+		} else {
+			sout = new StringBuffer("saying: ");
+		}
+		
+		for (int i = 0; i < args.length; i++) {
+			if (args[i].isString()) {
+				StringTerm st = (StringTerm)args[i];
+				sout.append(st.getString());
+			} else {
+				Term t = (Term)args[i].clone();
+				un.apply(t);
+				if (! t.isVar()) {
+					sout.append(t);
+				} else {
+					sout.append(t+"<no-value>");
+				}
+			}
+		}
+		if (ts.getSettings().logLevel() == Level.WARNING) {
+			System.out.print(sout.toString()+getNewLine());
+		} else {
+			ts.getLogger().info(sout.toString());
+		}
+
+		return true;
 	}
 }
