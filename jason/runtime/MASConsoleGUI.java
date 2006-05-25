@@ -19,40 +19,6 @@
 // http://www.dur.ac.uk/r.bordini
 // http://www.inf.furb.br/~jomi
 //
-// CVS information:
-//   $Date$
-//   $Revision$
-//   $Log$
-//   Revision 1.5  2006/01/19 18:30:22  jomifred
-//   no message
-//
-//   Revision 1.4  2006/01/17 00:19:11  jomifred
-//   fix bug tabbed
-//
-//   Revision 1.3  2006/01/16 16:47:35  jomifred
-//   added a new kind of console with one tab for agent
-//
-//   Revision 1.2  2006/01/14 15:22:47  jomifred
-//   Config and some code of RunMAS was moved to package plugin
-//
-//   Revision 1.1  2005/12/08 20:14:28  jomifred
-//   changes for JasonIDE plugin
-//
-//   Revision 1.12  2005/11/22 00:05:32  jomifred
-//   no message
-//
-//   Revision 1.11  2005/11/16 18:35:25  jomifred
-//   fixed the print(int) on console bug
-//
-//   Revision 1.10  2005/09/20 16:59:14  jomifred
-//   do not use MASConsole when the logger in Console (and so, do not need an X11)
-//
-//   Revision 1.9  2005/09/04 17:03:23  jomifred
-//   using dispose instead of setVisible(false)
-//
-//   Revision 1.8  2005/08/12 21:08:23  jomifred
-//   add cvs keywords
-//
 //----------------------------------------------------------------------------
 
 package jason.runtime;
@@ -85,7 +51,7 @@ public class MASConsoleGUI  {
     public static String isTabbedPropField = MASConsoleLogHandler.class.getName()+".tabbed";
     private boolean isTabbed = false;
     JTabbedPane tabPane;
-    Map agsTextArea = new HashMap();
+    Map<String,JTextArea> agsTextArea = new HashMap<String,JTextArea>();
     
     /** for sigleton pattern */
     public static MASConsoleGUI get() {
@@ -194,7 +160,7 @@ public class MASConsoleGUI  {
 			waitNotPause();
 		}
 		if (isTabbed) {
-			JTextArea ta = (JTextArea)agsTextArea.get(agName);
+			JTextArea ta = agsTextArea.get(agName);
 			if (ta == null && agName != null) {
 				ta = new JTextArea();
 		        ta.setEditable(false);

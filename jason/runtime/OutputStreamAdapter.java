@@ -19,17 +19,6 @@
 // http://www.dur.ac.uk/r.bordini
 // http://www.inf.furb.br/~jomi
 //
-// CVS information:
-//   $Date$
-//   $Revision$
-//   $Log$
-//   Revision 1.1  2005/12/08 20:14:28  jomifred
-//   changes for JasonIDE plugin
-//
-//   Revision 1.1  2005/12/05 16:04:17  jomifred
-//   no message
-//
-//
 //----------------------------------------------------------------------------
 
 package jason.runtime;

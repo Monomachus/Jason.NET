@@ -19,38 +19,6 @@
 // http://www.dur.ac.uk/r.bordini
 // http://www.inf.furb.br/~jomi
 //
-// CVS information:
-//   $Date$
-//   $Revision$
-//   $Log$
-//   Revision 1.20  2006/01/04 02:54:41  jomifred
-//   using java log API instead of apache log
-//
-//   Revision 1.19  2006/01/02 13:49:00  jomifred
-//   add plan unique id, fix some bugs
-//
-//   Revision 1.18  2005/12/30 20:40:16  jomifred
-//   new features: unnamed var, var with annots, TE as var
-//
-//   Revision 1.17  2005/12/23 00:48:23  jomifred
-//   StringTerm is now an interface implemented by StringTermImpl
-//
-//   Revision 1.16  2005/12/22 00:03:30  jomifred
-//   ListTerm is now an interface implemented by ListTermImpl
-//
-//   Revision 1.15  2005/12/20 19:52:05  jomifred
-//   no message
-//
-//   Revision 1.14  2005/11/07 12:43:26  jomifred
-//   add comments
-//
-//   Revision 1.13  2005/08/17 18:19:18  jomifred
-//   change AS grammar (unify lt and la implementation)
-//
-//   Revision 1.12  2005/08/12 22:26:08  jomifred
-//   add cvs keywords
-//
-//
 //----------------------------------------------------------------------------
 
 package jason.asSyntax;

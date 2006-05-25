@@ -19,28 +19,6 @@
 // http://www.dur.ac.uk/r.bordini
 // http://www.inf.furb.br/~jomi
 //
-// CVS information:
-//   $Date$
-//   $Revision$
-//   $Log$
-//   Revision 1.13  2006/01/04 02:54:41  jomifred
-//   using java log API instead of apache log
-//
-//   Revision 1.12  2006/01/03 00:17:05  jomifred
-//   change in =.. (using two lists, list of terms and list of annots)
-//
-//   Revision 1.11  2006/01/02 14:50:40  jomifred
-//   change in =.. (annots is the last arg)
-//
-//   Revision 1.10  2005/12/31 16:29:58  jomifred
-//   add operator =..
-//
-//   Revision 1.9  2005/12/30 20:40:16  jomifred
-//   new features: unnamed var, var with annots, TE as var
-//
-//   Revision 1.7  2005/08/12 22:26:08  jomifred
-//   add cvs keywords
-//
 //----------------------------------------------------------------------------
 
 package jason.asSyntax;
@@ -51,7 +29,6 @@ import jason.asSemantics.Unifier;
 import jason.asSyntax.parser.as2j;
 
 import java.io.StringReader;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;

@@ -19,25 +19,6 @@
 // http://www.dur.ac.uk/r.bordini
 // http://www.inf.furb.br/~jomi
 //
-// CVS information:
-//   $Date$
-//   $Revision$
-//   $Log$
-//   Revision 1.4  2006/02/22 12:57:56  jomifred
-//   no message
-//
-//   Revision 1.3  2006/01/16 16:47:35  jomifred
-//   added a new kind of console with one tab for agent
-//
-//   Revision 1.1  2006/01/04 02:55:57  jomifred
-//   using java log API instead of apache log
-//
-//   Revision 1.1  2005/12/08 20:14:28  jomifred
-//   changes for JasonIDE plugin
-//
-//   Revision 1.3  2005/08/12 21:08:23  jomifred
-//   add cvs keywords
-//
 //----------------------------------------------------------------------------
 
 package jason.runtime;

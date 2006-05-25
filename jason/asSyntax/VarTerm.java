@@ -19,13 +19,6 @@
 // http://www.dur.ac.uk/r.bordini
 // http://www.inf.furb.br/~jomi
 //
-// CVS information:
-//   $Date$
-//   $Revision$
-//   $Log$
-//   Revision 1.19  2006/01/04 02:54:41  jomifred
-//   using java log API instead of apache log
-//
 //
 //----------------------------------------------------------------------------
 

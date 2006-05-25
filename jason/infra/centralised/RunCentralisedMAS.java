@@ -19,46 +19,6 @@
 // http://www.dur.ac.uk/r.bordini
 // http://www.inf.furb.br/~jomi
 //
-// CVS information:
-//   $Date$
-//   $Revision$
-//   $Log$
-//   Revision 1.3  2006/03/02 13:33:40  jomifred
-//   changes in MASLauncher interface
-//
-//   Revision 1.2  2006/03/01 17:25:44  jomifred
-//   fix bug in using masconsole
-//
-//   Revision 1.1  2006/02/18 15:24:30  jomifred
-//   changes in many files to detach jason kernel from any infrastructure implementation
-//
-//   Revision 1.5  2006/02/17 13:13:16  jomifred
-//   change a lot of method/classes names and improve some comments
-//
-//   Revision 1.3  2006/01/14 18:23:40  jomifred
-//   centralised infra does not use xml script file anymore
-//
-//   Revision 1.2  2006/01/04 03:00:46  jomifred
-//   using java log API instead of apache log
-//
-//   Revision 1.1  2005/12/08 20:14:28  jomifred
-//   changes for JasonIDE plugin
-//
-//   Revision 1.19  2005/11/16 18:35:25  jomifred
-//   fixed the print(int) on console bug
-//
-//   Revision 1.17  2005/10/30 18:39:48  jomifred
-//   change in the AgArch customisation  support (the same customisation is used both to Cent and Saci infrastructures0
-//
-//   Revision 1.16  2005/10/19 21:41:51  jomifred
-//   fixed the bug  continue/stop when running the MAS
-//
-//   Revision 1.15  2005/09/20 16:59:14  jomifred
-//   do not use MASConsole when the logger in Console (and so, do not need an X11)
-//
-//   Revision 1.14  2005/08/12 21:08:23  jomifred
-//   add cvs keywords
-//
 //----------------------------------------------------------------------------
 
 
@@ -71,6 +31,7 @@ import jason.mas2j.AgentParameters;
 import jason.mas2j.MAS2JProject;
 import jason.mas2j.parser.ParseException;
 import jason.runtime.MASConsoleGUI;
+import jason.runtime.MASConsoleLogHandler;
 import jason.runtime.Settings;
 
 import java.awt.event.ActionEvent;
@@ -82,6 +43,7 @@ import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
@@ -99,7 +61,7 @@ public class RunCentralisedMAS {
     static boolean debug = false;
     public JButton btDebug;
     
-    List ags = new ArrayList();
+    List<CentralisedAgArch> ags = new ArrayList<CentralisedAgArch>();
     
     private static Logger logger = Logger.getLogger(RunCentralisedMAS.class.getName());
     private static RunCentralisedMAS runner = null;
@@ -118,6 +80,15 @@ public class RunCentralisedMAS {
         	if (args[1].equals("-debug")) {
         		debug = true;
         		logger.getLogger("").setLevel(Level.FINE);
+        	}
+        }
+        
+        // discover the handler
+        for (Handler h: Logger.getLogger("").getHandlers()) {
+        	// if there is a MASConsoleLogHandler, show it
+        	if (h.getClass().toString().equals(MASConsoleLogHandler.class.toString())) {
+        		MASConsoleGUI.get().getFrame().setVisible(true);
+		        MASConsoleGUI.get().setAsDefaultOut();
         	}
         }
         
@@ -198,8 +169,6 @@ public class RunCentralisedMAS {
 		            }
 		        });
 		        MASConsoleGUI.get().addButton(btKillAg);
-
-		        MASConsoleGUI.get().setAsDefaultOut();
 	        }
 	    
 	        runner.waitEnd();
@@ -282,7 +251,7 @@ public class RunCentralisedMAS {
         if (envClass == null) {
             envClass = jason.environment.Environment.class.getName();;
         }
-        logger.info("Creating environment "+envClass);
+        logger.fine("Creating environment "+envClass);
         env = new CentralisedEnvironment(envClass);
     	
         // create the agents
@@ -310,7 +279,7 @@ public class RunCentralisedMAS {
                     if (ap.qty > 1) {
                         numberedAg += (cAg+1);
                     }
-                    logger.info("Creating agent "+numberedAg+" ("+(cAg+1)+"/"+ap.qty+")");
+                    logger.fine("Creating agent "+numberedAg+" ("+(cAg+1)+"/"+ap.qty+")");
                     CentralisedAgArch agArch = new CentralisedAgArch();
                     agArch.setAgName(numberedAg);
                     agArch.setEnvInfraTier(env);
@@ -329,7 +298,7 @@ public class RunCentralisedMAS {
 			controlClass = ExecutionControlGUI.class.getName();
 		}
 		if (controlClass != null) {
-			logger.info("Creating controller "+controlClass);
+			logger.fine("Creating controller "+controlClass);
 	    	control = new CentralisedExecutionControl(env, controlClass);
 		}
 	}
@@ -337,9 +306,7 @@ public class RunCentralisedMAS {
 
 	void startAgs() {
         // run the agents
-        Iterator i = ags.iterator();
-        while (i.hasNext()) {
-            CentralisedAgArch ag = (CentralisedAgArch)i.next();
+		for (CentralisedAgArch ag: ags) {
             ag.setControlInfraTier(control);
             ag.start();
         }
@@ -347,9 +314,7 @@ public class RunCentralisedMAS {
 	
 	void stopAgs() {
         // run the agents
-        Iterator i = ags.iterator();
-        while (i.hasNext()) {
-            CentralisedAgArch ag = (CentralisedAgArch)i.next();
+		for (CentralisedAgArch ag: ags) {
             ag.stopAg();
         }
 	}
@@ -371,9 +336,7 @@ public class RunCentralisedMAS {
 		try {
 			if (control == null) {
 				control = new CentralisedExecutionControl(env, ExecutionControlGUI.class.getName());
-		        Iterator i = ags.iterator();
-		        while (i.hasNext()) {
-		            CentralisedAgArch ag = (CentralisedAgArch)i.next();
+				for (CentralisedAgArch ag: ags) {
 		            ag.setControlInfraTier(control);
 		            Settings stts = ag.getUserAgArch().getTS().getSettings();
 		            stts.setVerbose(2);
