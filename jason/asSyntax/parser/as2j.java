@@ -471,7 +471,7 @@
     case 36:
     case 39:
       f = t();
-                            last = lt.add(f);
+                            last = lt.append(f);
       label_4:
       while (true) {
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -484,7 +484,7 @@
         }
         jj_consume_token(38);
         f = t();
-                            last = last.add(f);
+                            last = last.append(f);
       }
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case 40:

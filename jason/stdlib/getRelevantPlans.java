@@ -19,20 +19,6 @@
 // http://www.dur.ac.uk/r.bordini
 // http://www.inf.furb.br/~jomi
 //
-// CVS information:
-//   $Date$
-//   $Revision$
-//   $Log$
-//   Revision 1.8  2005/12/23 00:51:00  jomifred
-//   StringTerm is now an interface implemented by StringTermImpl
-//
-//   Revision 1.7  2005/12/22 00:04:19  jomifred
-//   ListTerm is now an interface implemented by ListTermImpl
-//
-//   Revision 1.6  2005/08/12 22:20:10  jomifred
-//   add cvs keywords
-//
-//
 //----------------------------------------------------------------------------
 
 package jason.stdlib;
@@ -89,7 +75,7 @@ public class getRelevantPlans implements InternalAction {
 			//}
 
 			// un.unifies(new Term(sPlanList.toString()), listVar);
-			return un.unifies((Term)lt, listVar);
+			return un.unifies(lt, listVar);
 			// System.out.println("*** un = "+un);
 		} catch (ArrayIndexOutOfBoundsException e) {
 			throw new JasonException("The internal action 'getRelevantPlans' has not received two arguments (TE and a VAR)");

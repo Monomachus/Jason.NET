@@ -19,26 +19,6 @@
 // http://www.dur.ac.uk/r.bordini
 // http://www.inf.furb.br/~jomi
 //
-// CVS information:
-//   $Date$
-//   $Revision$
-//   $Log$
-//   Revision 1.11  2006/02/28 15:11:29  jomifred
-//   improve javadoc
-//
-//   Revision 1.10  2006/02/27 18:46:26  jomifred
-//   creation of the RuntimeServices interface
-//
-//   Revision 1.9  2006/02/17 13:13:16  jomifred
-//   change a lot of method/classes names and improve some comments
-//
-//   Revision 1.8  2006/01/04 03:00:46  jomifred
-//   using java log API instead of apache log
-//
-//   Revision 1.7  2005/08/12 20:52:18  jomifred
-//   change in the informAgs method name
-//
-//
 //----------------------------------------------------------------------------
 
 package jason.control;

@@ -19,19 +19,6 @@
 // http://www.dur.ac.uk/r.bordini
 // http://www.inf.furb.br/~jomi
 //
-// CVS information:
-//   $Date: 2006-02-22 18:21:12 -0300 (Wed, 22 Feb 2006) $
-//   $Revision: 294 $
-//   $Log$
-//   Revision 1.8  2006/02/22 21:19:05  jomifred
-//   The internalAction removePlan use plan's label as argument instead of plan's strings
-//
-//   Revision 1.7  2005/12/22 00:04:19  jomifred
-//   ListTerm is now an interface implemented by ListTermImpl
-//
-//   Revision 1.6  2005/08/12 21:12:50  jomifred
-//   add cvs keywords
-//
 //----------------------------------------------------------------------------
 
 
@@ -57,7 +44,7 @@ public class sort implements InternalAction {
             ListTerm l1 = (ListTerm) args[0].clone();
             ListTerm l2 = (ListTerm) args[1].clone();
             Collections.sort(l1);
-            return un.unifies((Term)l1, (Term)l2);
+            return un.unifies(l1, l2);
         } catch (ArrayIndexOutOfBoundsException e) {
             throw new JasonException("The internal action 'sort' has not received two arguments");
         } catch (Exception e) {

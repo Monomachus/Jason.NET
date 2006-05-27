@@ -19,29 +19,6 @@
 // http://www.dur.ac.uk/r.bordini
 // http://www.inf.furb.br/~jomi
 //
-// CVS information:
-//   $Date$
-//   $Revision$
-//   $Log$
-//   Revision 1.5  2006/01/04 02:54:41  jomifred
-//   using java log API instead of apache log
-//
-//   Revision 1.4  2006/01/03 00:17:05  jomifred
-//   change in =.. (using two lists, list of terms and list of annots)
-//
-//   Revision 1.3  2005/12/30 20:40:16  jomifred
-//   new features: unnamed var, var with annots, TE as var
-//
-//   Revision 1.2  2005/12/23 12:44:04  jomifred
-//   fix a bug in VarTerm (isTail)
-//
-//   Revision 1.1  2005/12/22 00:04:34  jomifred
-//   ListTerm is now an interface implemented by ListTermImpl
-//
-//   Revision 1.6  2005/08/12 22:26:08  jomifred
-//   add cvs keywords
-//
-//
 //----------------------------------------------------------------------------
 
 package jason.asSyntax;
@@ -65,7 +42,7 @@ import java.util.logging.Logger;
  *
  * @author jomi
  */
-public class ListTermImpl extends Term implements ListTerm {
+public class ListTermImpl extends TermImpl implements ListTerm {
 	
 	private Term term;
 	private Term next;
@@ -165,8 +142,8 @@ public class ListTermImpl extends Term implements ListTerm {
 	}
 	
 	/** return the this ListTerm elements (0=Term, 1=ListTerm) */
-	public List getTerms() {
-		List l = new ArrayList(2);
+	public List<Term> getTerms() {
+		List<Term> l = new ArrayList<Term>(2);
 		if (term != null) {
 			l.add(term);
 		}
@@ -201,7 +178,7 @@ public class ListTermImpl extends Term implements ListTerm {
 	}
 
 	public boolean isGround() {
-		Iterator i = iterator();
+	    Iterator i = iterator();
 		while (i.hasNext()) {
 			Term t = (Term)i.next();
 			if (!t.isGround()) {
@@ -250,7 +227,7 @@ public class ListTermImpl extends Term implements ListTerm {
 	 * add a term in the end of the list
 	 * @return the ListTerm where the term was added
 	 */
-	public ListTerm add(Term t) {
+	public ListTerm append(Term t) {
 		if (isEmpty()) {
 			term = t;
 			next = new ListTermImpl();
@@ -259,30 +236,13 @@ public class ListTermImpl extends Term implements ListTerm {
 			// What to do?
 			return null;
 		} else {
-			return getNext().add(t);
+			return getNext().append(t);
 		}
 	}
 
-	/** add a term in the end of the list
-	 * @return the ListTerm where the term was added
-	 */
-	public ListTerm add(int index, Term t) {
-		if (index == 0) {
-			ListTermImpl n = new ListTermImpl();
-			n.term = this.term;
-			n.next = this.next;
-			this.term = t;
-			this.next = n;
-			return n;
-		} else if (index > 0 && getNext() != null) {
-			return getNext().add(index-1,t);
-		} else {
-			return null;
-		}
-		
-	}
 	
-	/** Add a list in the end of this list.
+	/** 
+     * Add a list in the end of this list.
 	 * This method do not clone <i>lt</i>.
 	 * @return the last ListTerm of the new list
 	 */
@@ -300,15 +260,15 @@ public class ListTermImpl extends Term implements ListTerm {
 
 	
 	/** returns an iterator where each element is a ListTerm */
-	public Iterator listTermIterator() {
+	public Iterator<ListTerm> listTermIterator() {
 		final ListTermImpl lt = this;
-		return new Iterator() {
+		return new Iterator<ListTerm>() {
 			ListTerm nextLT  = lt;
 			ListTerm current = null;
 			public boolean hasNext() {
 				return nextLT != null && !nextLT.isEmpty() && nextLT.isList(); 
 			}
-			public Object next() {
+			public ListTerm next() {
 				current = nextLT;
 				nextLT = nextLT.getNext();
 				return current;
@@ -326,14 +286,14 @@ public class ListTermImpl extends Term implements ListTerm {
 	}
 
 	/** returns an iterator where each element is a Term of this list */
-	public Iterator iterator() {
-		final Iterator i = this.listTermIterator();
-		return new Iterator() {
+	public Iterator<Term> iterator() {
+		final Iterator<ListTerm> i = this.listTermIterator();
+		return new Iterator<Term>() {
 			public boolean hasNext() {
 				return i.hasNext();
 			}
-			public Object next() {
-				return ((ListTerm)i.next()).getTerm();
+			public Term next() {
+				return i.next().getTerm();
 			}
 			public void remove() {
 				i.remove();
@@ -346,13 +306,13 @@ public class ListTermImpl extends Term implements ListTerm {
 	 * Returns this ListTerm as a Java List. 
 	 * Note: the list Tail is considered just as the last element of the list!
 	 */
-    public List getAsList() {
-        List l = new ArrayList();
-		Iterator i = iterator();
-		while (i.hasNext()) {
-			l.add( i.next() );
-		}
-		return l;
+    public List<Term> getAsList() {
+        List<Term> l = new ArrayList<Term>();
+        Iterator<Term> i = iterator();
+        while (i.hasNext()) {
+            l.add( i.next() );
+        }
+        return l;
     }
 
 	
@@ -378,17 +338,25 @@ public class ListTermImpl extends Term implements ListTerm {
 	// Java List interface methods
 	//
 	
-	public void add(int index, Object o) {
-		add(index, (Term)o);
+	public void add(int index, Term o) {
+        if (index == 0) {
+            ListTermImpl n = new ListTermImpl();
+            n.term = this.term;
+            n.next = this.next;
+            this.term = o;
+            this.next = n;
+        } else if (index > 0 && getNext() != null) {
+            getNext().add(index-1,o);
+        }
 	}
-	public boolean add(Object o) {
-		return add((Term)o) != null;
+	public boolean add(Term o) {
+		return append((Term)o) != null;
 	}
 	public boolean addAll(Collection c) {
 		ListTerm lt = this; // where to add
 		Iterator i = c.iterator();
 		while (i.hasNext()) {
-			lt = lt.add((Term)i.next());
+			lt = lt.append((Term)i.next());
 		}
 		return true;
 	}
@@ -396,7 +364,7 @@ public class ListTermImpl extends Term implements ListTerm {
 		Iterator i = c.iterator();
 		int p = index;
 		while (i.hasNext()) {
-			add(p, i.next()); 
+			add(p, (Term)i.next()); 
 			p++;
 		}
 		return true;
@@ -407,8 +375,7 @@ public class ListTermImpl extends Term implements ListTerm {
 	}
 
 	public boolean contains(Object o) {
-		Term t = (Term)o;
-		if (term != null && term.equals(t)) {
+		if (term != null && term.equals(o)) {
 			return true;
 		} else if (getNext() != null) {
 			return getNext().contains(o);
@@ -420,12 +387,12 @@ public class ListTermImpl extends Term implements ListTerm {
 		boolean r = true;
 		Iterator i = c.iterator();
 		while (i.hasNext() && r) {
-			r = r && contains(i.next()); 
+			r = r && contains((Term)i.next()); 
 		}
 		return r;
 	}
 
-	public Object get(int index) {
+	public Term get(int index) {
 		if (index == 0) {
 			return this.term;
 		} else if (getNext() != null) {
@@ -435,8 +402,7 @@ public class ListTermImpl extends Term implements ListTerm {
 	}
 
 	public int indexOf(Object o) {
-		Term t = (Term)o;
-		if (this.term.equals(t)) {
+		if (this.term.equals(o)) {
 			return 0;
 		} else if (getNext() != null) {
 			int n = getNext().indexOf(o);
@@ -450,17 +416,17 @@ public class ListTermImpl extends Term implements ListTerm {
 		return getAsList().lastIndexOf(arg0);
 	}
 
-	public ListIterator listIterator() {
+	public ListIterator<Term> listIterator() {
 		return listIterator(0);
 	}
-	public ListIterator listIterator(final int startIndex) {
+	public ListIterator<Term> listIterator(final int startIndex) {
         final ListTermImpl list = this;
-        return new ListIterator() {
+        return new ListIterator<Term>() {
             int pos = startIndex;
             int last = -1;
             int size = size();
 
-            public void add(Object o) {
+            public void add(Term o) {
                 list.add(last,o);
             }
             public boolean hasNext() {
@@ -469,7 +435,7 @@ public class ListTermImpl extends Term implements ListTerm {
             public boolean hasPrevious() {
                 return pos > startIndex;
             }
-            public Object next() {
+            public Term next() {
                 last = pos;
                 pos++;
                 return get(last);
@@ -477,7 +443,7 @@ public class ListTermImpl extends Term implements ListTerm {
             public int nextIndex() {
                 return pos+1;
             }
-            public Object previous() {
+            public Term previous() {
                 last = pos;
                 pos--;
                 return get(last);
@@ -488,14 +454,14 @@ public class ListTermImpl extends Term implements ListTerm {
             public void remove() {
                 list.remove(last);
             }
-            public void set(Object o) {
+            public void set(Term o) {
                 remove();
                 add(o);
             }            
         };
 	}
 
-	public Object remove(int index) {
+	public Term remove(int index) {
 		if (index == 0) {
 			Term bt = this.term;
 			if (getNext() != null) {
@@ -512,8 +478,7 @@ public class ListTermImpl extends Term implements ListTerm {
 	}
 
 	public boolean remove(Object o) {
-		Term t = (Term)o;
-		if (term != null && term.equals(t)) {
+		if (term != null && term.equals(o)) {
 			if (getNext() != null) {
 				this.term = getNext().getTerm();
 				this.next = (Term)getNext().getNext();
@@ -548,17 +513,17 @@ public class ListTermImpl extends Term implements ListTerm {
 		return r;
 	}
 
-	public Object set(int index, Object o) {
+	public Term set(int index, Term t) {
 		if (index == 0) {
-			this.term = (Term)o;
-			return o;
+			this.term = (Term)t;
+			return t;
 		} else if (getNext() != null) {
-			return getNext().set(index-1, o);
+			return getNext().set(index-1, t);
 		}
 		return null;
 	}
 
-	public List subList(int arg0, int arg1) {
+	public List<Term> subList(int arg0, int arg1) {
 		return getAsList().subList(arg0, arg1);
 	}
 
@@ -566,6 +531,7 @@ public class ListTermImpl extends Term implements ListTerm {
 		return getAsList().toArray();
 	}
 
+    @SuppressWarnings("unchecked")
 	public Object[] toArray(Object[] arg0) {
 		return getAsList().toArray(arg0);
 	}

@@ -19,25 +19,6 @@
 // http://www.dur.ac.uk/r.bordini
 // http://www.inf.furb.br/~jomi
 //
-// CVS information:
-//   $Date$
-//   $Revision$
-//   $Log$
-//   Revision 1.3  2006/03/02 13:33:41  jomifred
-//   changes in MASLauncher interface
-//
-//   Revision 1.2  2006/02/27 18:46:26  jomifred
-//   creation of the RuntimeServices interface
-//
-//   Revision 1.1  2006/02/18 15:24:30  jomifred
-//   changes in many files to detach jason kernel from any infrastructure implementation
-//
-//   Revision 1.6  2006/02/17 13:13:16  jomifred
-//   change a lot of method/classes names and improve some comments
-//
-//   Revision 1.5  2005/08/12 20:41:35  jomifred
-//   add cvs keywords
-//
 //----------------------------------------------------------------------------
 
 package jason.infra.saci;

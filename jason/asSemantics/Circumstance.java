@@ -19,26 +19,6 @@
 // http://www.dur.ac.uk/r.bordini
 // http://www.inf.furb.br/~jomi
 //
-// CVS information:
-//   $Date$
-//   $Revision$
-//   $Log$
-//   Revision 1.12  2006/01/04 02:54:41  jomifred
-//   using java log API instead of apache log
-//
-//   Revision 1.11  2006/01/02 13:49:00  jomifred
-//   add plan unique id, fix some bugs
-//
-//   Revision 1.10  2005/12/30 20:40:16  jomifred
-//   new features: unnamed var, var with annots, TE as var
-//
-//   Revision 1.9  2005/08/16 21:03:42  jomifred
-//   add some comments on TODOs
-//
-//   Revision 1.8  2005/08/12 22:18:37  jomifred
-//   add cvs keywords
-//
-//
 //----------------------------------------------------------------------------
 
 
@@ -66,14 +46,14 @@ public class Circumstance implements Serializable {
 
 	static Logger logger = Logger.getLogger(Circumstance.class.getName());
 	
-    private List   E;
-    private List   I;
+    private List<Event>   E;
+    private List<Intention>   I;
 
 	protected ActionExec A;
 
     protected List   MB;
     protected List   RP;
-    protected List   AP;
+    protected List<Option>   AP;
 
 	protected Event SE;
 
@@ -84,11 +64,11 @@ public class Circumstance implements Serializable {
     private   Map       PA;
     protected List      FA;
 
-    private List listeners = new ArrayList();
+    private List<CircumstanceListener> listeners = new ArrayList<CircumstanceListener>();
     
     public Circumstance() {
-        E  = new LinkedList();
-        I  = new LinkedList();
+        E  = new LinkedList<Event>();
+        I  = new LinkedList<Intention>();
         MB = new LinkedList();
         PA = new HashMap();
         FA = new LinkedList();
@@ -108,14 +88,14 @@ public class Circumstance implements Serializable {
         addEvent(new Event(new Trigger(Trigger.TEAdd,Trigger.TEAchvG, l), i));
     }
     public void addTestGoal(Literal l, Intention i) {
-    	addEvent(new Event(new Trigger(Trigger.TEAdd,Trigger.TETestG, l), i));
+        addEvent(new Event(new Trigger(Trigger.TEAdd,Trigger.TETestG, l), i));
     }
 
     public void delAchvGoal(Literal l, Intention i) {
-    	addEvent(new Event(new Trigger(Trigger.TEDel,Trigger.TEAchvG,l), i));
+        addEvent(new Event(new Trigger(Trigger.TEDel,Trigger.TEAchvG,l), i));
     }
     public void delTestGoal(Literal l, Intention i) {
-    	addEvent(new Event(new Trigger(Trigger.TEDel,Trigger.TETestG,l), i));
+        addEvent(new Event(new Trigger(Trigger.TEDel,Trigger.TETestG,l), i));
     }
 
     public void delGoal(byte g, Literal l, Intention i) throws JasonException {
@@ -128,7 +108,7 @@ public class Circumstance implements Serializable {
     }
 
     public void addExternalEv(Trigger trig) {
-    	addEvent(new Event(trig, Intention.EmptyInt));
+    	    addEvent(new Event(trig, Intention.EmptyInt));
     }
 
     public void addEvent(Event ev) {
@@ -136,19 +116,17 @@ public class Circumstance implements Serializable {
         
         // notify listeners
         synchronized (listeners) {
-	        Iterator i = listeners.iterator();
-	        while (i.hasNext()) {
-	        	CircumstanceListener el = (CircumstanceListener)i.next();
-	        	el.eventAdded(ev);
+            for (CircumstanceListener el: listeners) {
+	            el.eventAdded(ev);
 	        }
 		}
     }
     
     public void clearEvents() {
-    	E.clear();
+        E.clear();
     }
 
-    public List getEvents() {
+    public List<Event> getEvents() {
 		return E;
 	}
     
@@ -158,13 +136,13 @@ public class Circumstance implements Serializable {
     
     public void addEventListener(CircumstanceListener el) {
         synchronized (listeners) {
-        	listeners.add(el);
+            listeners.add(el);
         }
     }
     
     public void removeEventListener(CircumstanceListener el) {
         synchronized (listeners) {
-        	listeners.remove(el);
+            listeners.remove(el);
         }
     }
     
@@ -177,7 +155,7 @@ public class Circumstance implements Serializable {
 	}
 
 
-	public List getIntentions() {
+	public List<Intention> getIntentions() {
 		return I;
 	}
     
@@ -192,10 +170,8 @@ public class Circumstance implements Serializable {
 
 		// notify listeners
         synchronized (listeners) {
-	        Iterator i = listeners.iterator();
-	        while (i.hasNext()) {
-	        	CircumstanceListener el = (CircumstanceListener)i.next();
-	        	el.intentionAdded(intention);
+	        for (CircumstanceListener el: listeners) {
+	            el.intentionAdded(intention);
 	        }
         }
 	}
@@ -218,7 +194,7 @@ public class Circumstance implements Serializable {
 	public void setA(ActionExec a) {
 		this.A = a;
 	}
-	public List getApplicablePlans() {
+	public List<Option> getApplicablePlans() {
 		return AP;
 	}
 	public List getFeedbackActions() {
@@ -290,7 +266,7 @@ public class Circumstance implements Serializable {
 		
 		// relPlans
 		Element plans = (Element) document.createElement("plans");
-		List alreadyIn = new ArrayList();
+		List<Object> alreadyIn = new ArrayList<Object>();
 		
 		// option
 		if (getSelectedOption() != null) {
@@ -304,9 +280,7 @@ public class Circumstance implements Serializable {
 
 		// appPlans
 		if (getApplicablePlans() != null && !getApplicablePlans().isEmpty()) {
-			i = getApplicablePlans().iterator();
-			while (i.hasNext()) {
-				Option o = (Option)i.next();
+			for (Option o: getApplicablePlans()) {
 				if (!alreadyIn.contains(o)) {
 					alreadyIn.add(o);
 					e = o.getAsDOM(document);

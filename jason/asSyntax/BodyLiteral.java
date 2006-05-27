@@ -19,17 +19,6 @@
 // http://www.dur.ac.uk/r.bordini
 // http://www.inf.furb.br/~jomi
 //
-// CVS information:
-//   $Date$
-//   $Revision$
-//   $Log$
-//   Revision 1.10  2005/12/30 20:40:16  jomifred
-//   new features: unnamed var, var with annots, TE as var
-//
-//   Revision 1.9  2005/08/12 22:26:08  jomifred
-//   add cvs keywords
-//
-//
 //----------------------------------------------------------------------------
 
 

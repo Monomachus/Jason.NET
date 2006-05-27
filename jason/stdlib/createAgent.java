@@ -19,13 +19,6 @@
 // http://www.dur.ac.uk/r.bordini
 // http://www.inf.furb.br/~jomi
 //
-// CVS information:
-//   $Date$
-//   $Revision$
-//   $Log$
-//   Revision 1.21  2006/03/02 01:42:14  jomifred
-//   the jIDE package was remove, the writeScriptInterface's methods was moved to MASLauncher
-//
 //----------------------------------------------------------------------------
 
 package jason.stdlib;
@@ -39,11 +32,10 @@ import jason.asSyntax.Term;
 import jason.runtime.RuntimeServicesInfraTier;
 
 import java.io.File;
-import java.util.logging.Logger;
 
 public class createAgent implements InternalAction {
 
-    private static Logger logger = Logger.getLogger(createAgent.class.getName());
+    //private static Logger logger = Logger.getLogger(createAgent.class.getName());
 
 	/** args[0] is the agent name
 	 *  args[1] is the agent code (as StringTerm)

@@ -19,9 +19,6 @@
 // http://www.dur.ac.uk/r.bordini
 // http://www.inf.furb.br/~jomi
 //
-// CVS information:
-//   $Date$
-//   $Revision$
 //----------------------------------------------------------------------------
 
 package jason.jeditplugin;

@@ -19,28 +19,6 @@
 // http://www.dur.ac.uk/r.bordini
 // http://www.inf.furb.br/~jomi
 //
-// CVS information:
-//   $Date$
-//   $Revision$
-//   $Log$
-//   Revision 1.10  2006/03/09 23:56:15  jomifred
-//   show message when jdk is not chosen correctly
-//
-//   Revision 1.9  2006/02/17 11:45:52  jomifred
-//   no message
-//
-//   Revision 1.8  2006/01/14 15:26:28  jomifred
-//   Config and some code of RunMAS was moved to package plugin
-//
-//   Revision 1.7  2006/01/11 15:14:39  jomifred
-//   add close all befere opening a mas2j project
-//
-//   Revision 1.5  2005/12/30 20:40:17  jomifred
-//   new features: unnamed var, var with annots, TE as var
-//
-//   Revision 1.1  2005/12/08 20:15:00  jomifred
-//   changes for JasonIDE plugin
-//
 //----------------------------------------------------------------------------
 
 package jason.jeditplugin;

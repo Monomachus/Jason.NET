@@ -66,7 +66,7 @@ public class Literal extends Pred implements Cloneable {
 		type = l.type;
 	}
 	
-	public Literal(Term t) {
+	public Literal(TermImpl t) {
 		super(t);
 		type = LPos;
 	}
@@ -185,7 +185,7 @@ public class Literal extends Pred implements Cloneable {
 		}
 		l.add(lt);
 		if (getAnnots() != null && !getAnnots().isEmpty()) {
-			l.add(getAnnots().clone());
+			l.add((ListTerm)getAnnots().clone());
 		} else {
 			l.add(new ListTermImpl());
 		}

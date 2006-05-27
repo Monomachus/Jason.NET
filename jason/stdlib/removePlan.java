@@ -19,20 +19,6 @@
 // http://www.dur.ac.uk/r.bordini
 // http://www.inf.furb.br/~jomi
 //
-// CVS information:
-//   $Date$
-//   $Revision$
-//   $Log$
-//   Revision 1.7  2006/02/22 21:19:05  jomifred
-//   The internalAction removePlan use plan's label as argument instead of plan's strings
-//
-//   Revision 1.6  2005/12/22 00:04:19  jomifred
-//   ListTerm is now an interface implemented by ListTermImpl
-//
-//   Revision 1.5  2005/08/12 22:20:10  jomifred
-//   add cvs keywords
-//
-//
 //----------------------------------------------------------------------------
 
 
@@ -44,6 +30,7 @@ import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.ListTerm;
 import jason.asSyntax.Term;
+import jason.asSyntax.TermImpl;
 
 import java.util.Iterator;
 
@@ -66,7 +53,7 @@ public class removePlan implements InternalAction {
         	Term label = (Term)args[0].clone();
         	un.apply(label);
 
-        	Term source = new Term("self");
+        	Term source = new TermImpl("self");
         	if (args.length > 1) {
         		source = (Term)args[1].clone();
         		un.apply(source);

@@ -7,6 +7,7 @@ import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Literal;
 import jason.asSyntax.Pred;
 import jason.asSyntax.Term;
+import jason.asSyntax.TermImpl;
 import jason.asSyntax.Trigger;
 import jason.asSyntax.VarTerm;
 
@@ -19,40 +20,38 @@ public class TermTest extends TestCase {
 
 	protected void setUp() throws Exception {
 		super.setUp();
-		//Logger.getRootLogger().addAppender(new ConsoleAppender(new PatternLayout("[%c{1}] %m%n")));
-    	//Logger.getRootLogger().setLevel(Level.DEBUG);
 	}
 
 	public void testEquals() {
-		Term t1, t2, t3;
-		t1 = new Term("pos");
-		t2 = new Term(t1);
-		t3 = new Term(); t3.setFunctor("pos");
+		TermImpl t1, t2, t3;
+		t1 = new TermImpl("pos");
+		t2 = new TermImpl((TermImpl)t1);
+		t3 = new TermImpl(); t3.setFunctor("pos");
 		assertTrue(t1.equals(t2));
 		assertTrue(t1.equals(t3));
 		
-		t1.addTerm(new Term("a"));
+		t1.addTerm(new TermImpl("a"));
 		assertFalse(t1.equals(t2));
 		
-		t2.addTerm(new Term("a"));
+		t2.addTerm(new TermImpl("a"));
 		assertTrue(t1.equals(t2));
 
-		Term targ1 = new Term("b");
-		targ1.addTerm(new Term("1"));
-		Term targ2 = new Term("b");
-		targ2.addTerm(new Term("2"));
+		Term targ1 = new TermImpl("b");
+		targ1.addTerm(new TermImpl("1"));
+		Term targ2 = new TermImpl("b");
+		targ2.addTerm(new TermImpl("2"));
 
 		t1.addTerm(targ1);
 		assertFalse(t1.equals(t2));
 		
-		Term targ1a = new Term("b");
-		targ1a.addTerm(new Term("1"));
-		t3.addTerm(new Term("a"));
+		Term targ1a = new TermImpl("b");
+		targ1a.addTerm(new TermImpl("1"));
+		t3.addTerm(new TermImpl("a"));
 		t3.addTerm(targ1a);
 		assertTrue(t1.equals(t3));
 		
 		// tests with variables
-		t1.addTerm(new Term("c"));
+		t1.addTerm(new TermImpl("c"));
 		t3.addTerm(new VarTerm("X"));
 		assertFalse(t1.equals(t3));
 		
@@ -62,39 +61,39 @@ public class TermTest extends TestCase {
 		l4.addAnnot(BeliefBase.TPercept);
 		assertEquals(l3, l4);
 		
-		assertTrue(l3.equals(new Term("pos")));
-		assertTrue(new Term("pos").equals(l3));
+		assertTrue(l3.equals(new TermImpl("pos")));
+		assertTrue(new TermImpl("pos").equals(l3));
 		//System.out.println(new Term("pos")+"="+l3+" --> "+new Term("pos").equals(l3));
 
 		assertFalse(new Pred("pos").equals(l3));
 		assertTrue(new Pred("pos").equalsAsTerm(l3));
 		Pred panot = new Pred("pos");
-		panot.addAnnot(new Term("bla"));
+		panot.addAnnot(new TermImpl("bla"));
 		assertTrue(l3.equalsAsTerm(panot));
 		
 		// basic VarTerm test
 		assertTrue(new VarTerm("X").equals(new VarTerm("X")));
 		assertFalse(new VarTerm("X").equals(new VarTerm("Y")));
-		assertFalse(new VarTerm("X").equals(new Term("X")));
+		assertFalse(new VarTerm("X").equals(new TermImpl("X")));
 		
 		VarTerm x1 = new VarTerm("X1");
-		x1.setValue(new Term("a"));
+		x1.setValue(new TermImpl("a"));
 		assertFalse(x1.equals(new VarTerm("X1")));
 		
 		VarTerm x2 = new VarTerm("X2");
-		x2.setValue(new Term("a"));
+		x2.setValue(new TermImpl("a"));
 		assertTrue(x1.equals(x2));
 	}
 
 	public void testUnifies() {
-		assertTrue(new Unifier().unifies(new Term("a"), new Term("a")));
-		assertTrue(new Unifier().unifies(new Term("a"), new VarTerm("X")));
+		assertTrue(new Unifier().unifies(new TermImpl("a"), new TermImpl("a")));
+		assertTrue(new Unifier().unifies(new TermImpl("a"), new VarTerm("X")));
 		
 		Unifier u = new Unifier();
 		VarTerm b = new VarTerm("B");
 		VarTerm x = new VarTerm("X");
 		assertTrue(u.unifies(b, x));
-		assertTrue(u.unifies(new Term("a"), x));
+		assertTrue(u.unifies(new TermImpl("a"), x));
 		//System.out.println("u="+u);
 		assertEquals(u.get("B").toString(), "a");
 		assertEquals(u.get("X").toString(), "a");
@@ -105,14 +104,14 @@ public class TermTest extends TestCase {
 		assertEquals(x.toString(), "X");
 		
 		u = new Unifier();
-		Term t1, t2, t3;
+		TermImpl t1, t2, t3;
 		
-		t1 = new Term("pos");
-		t2 = new Term(t1);
-		t3 = new Term(t1);
+		t1 = new TermImpl("pos");
+		t2 = new TermImpl(t1);
+		t3 = new TermImpl(t1);
 
-		t1.addTerm(new Term("1"));
-		t1.addTerm(new Term("2"));
+		t1.addTerm(new TermImpl("1"));
+		t1.addTerm(new TermImpl("2"));
 
 		t2.addTerm(new VarTerm("X"));
 		t2.addTerm(new VarTerm("X"));
@@ -143,7 +142,7 @@ public class TermTest extends TestCase {
 		assertTrue(z1.isVar()); // z1 is still a var
 		assertTrue(z2.isVar()); // z2 is still a var
 		
-		assertTrue(u.unifies(z2,new Term("a")));
+		assertTrue(u.unifies(z2,new TermImpl("a")));
 		//System.out.println("u="+u);
 		assertEquals(u.get("Z1").toString(), "a");
 		assertEquals(u.get("Z2").toString(), "a");
@@ -159,10 +158,10 @@ public class TermTest extends TestCase {
 		p1 = new Pred("pos");
 		p2 = new Pred("pos");
 
-		p1.addTerm(new Term("1"));
-		p2.addTerm(new Term("1"));
+		p1.addTerm(new TermImpl("1"));
+		p2.addTerm(new TermImpl("1"));
 		
-		p2.addAnnot(new Term("percept"));
+		p2.addAnnot(new TermImpl("percept"));
 		//System.out.println("p1="+p1+"; p2="+p2);
 		assertTrue(u.unifies(p1, p2));
 	}
@@ -178,16 +177,16 @@ public class TermTest extends TestCase {
 		p1 = new Pred("pos");
 		p2 = new Pred("pos");
 
-		p1.addTerm(new Term("1"));
-		p2.addTerm(new Term("1"));
+		p1.addTerm(new TermImpl("1"));
+		p2.addTerm(new TermImpl("1"));
 		
 		p1.addAnnot(new VarTerm("X"));
-		p2.addAnnot(new Term("ag1"));
+		p2.addAnnot(new TermImpl("ag1"));
 		//System.out.println("p1="+p1+"; p2="+p2);
 		assertTrue(u.unifies(p1, p2));
 		//System.out.println("u="+u);
 		
-		p1.addAnnot(new Term("ag2"));
+		p1.addAnnot(new TermImpl("ag2"));
 		p2.addAnnot(new VarTerm("Y"));
 		//System.out.println("p1="+p1+"; p2="+p2);
 		u = new Unifier();
@@ -195,8 +194,8 @@ public class TermTest extends TestCase {
 		//System.out.println("u="+u);
 		
 		p1.addAnnot(new VarTerm("Z"));
-		p2.addAnnot(new Term("ag3"));
-		p2.addAnnot(new Term("ag4"));
+		p2.addAnnot(new TermImpl("ag3"));
+		p2.addAnnot(new TermImpl("ag4"));
 		//System.out.println("p1="+p1+"; p2="+p2);
 		u = new Unifier();
 		assertTrue(u.unifies(p1, p2));
@@ -211,11 +210,11 @@ public class TermTest extends TestCase {
 		//System.out.println("u="+u);
 
 		p1.clearAnnots();
-		p1.addAnnot(new Term("ag2"));
+		p1.addAnnot(new TermImpl("ag2"));
 		p2.clearAnnots();
-		p2.addAnnot(new Term("ag1"));
-		p2.addAnnot(new Term("ag2"));
-		p2.addAnnot(new Term("ag3"));
+		p2.addAnnot(new TermImpl("ag1"));
+		p2.addAnnot(new TermImpl("ag2"));
+		p2.addAnnot(new TermImpl("ag3"));
 		//System.out.println("p1="+p1+"; p2="+p2);
 		u = new Unifier();
 		assertTrue(u.unifies(p1, p2));
@@ -231,18 +230,18 @@ public class TermTest extends TestCase {
 	
 	public void testTriggetAnnot() {
 		Literal content = Literal.parseLiteral("~alliance");
-		content.addSource(new Term("ag1"));
+		content.addSource(new TermImpl("ag1"));
 		Literal received = new Literal(Literal.LPos, new Pred("received"));
-		received.addTerm(new Term("ag1"));
-		received.addTerm(new Term("tell"));
+		received.addTerm(new TermImpl("ag1"));
+		received.addTerm(new TermImpl("tell"));
 		received.addTerm(content);
-		received.addTerm(new Term("id1"));
+		received.addTerm(new TermImpl("id1"));
 		
 		Trigger t1 = new Trigger(Trigger.TEAdd, Trigger.TEBel, received);
 
 		Literal received2 = new Literal(Literal.LPos, new Pred("received"));
 		received2.addTerm(new VarTerm("S"));
-		received2.addTerm(new Term("tell"));
+		received2.addTerm(new TermImpl("tell"));
 		received2.addTerm(new VarTerm("C"));
 		received2.addTerm(new VarTerm("M"));
 		
@@ -269,12 +268,12 @@ public class TermTest extends TestCase {
 	
 	public void testLiteralUnify() {
 		Literal content = Literal.parseLiteral("~alliance");
-		content.addSource(new Term("ag1"));
+		content.addSource(new TermImpl("ag1"));
 		Literal l1 = new Literal(Literal.LPos, new Pred("received"));
-		l1.addTerm(new Term("ag1"));
-		l1.addTerm(new Term("tell"));
+		l1.addTerm(new TermImpl("ag1"));
+		l1.addTerm(new TermImpl("tell"));
 		l1.addTerm(content);
-		l1.addTerm(new Term("id1"));
+		l1.addTerm(new TermImpl("id1"));
 
 		
 		Literal l2 = Literal.parseLiteral("received(S,tell,C,M)");

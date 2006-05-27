@@ -19,17 +19,6 @@
 // http://www.dur.ac.uk/r.bordini
 // http://www.inf.furb.br/~jomi
 //
-// CVS information:
-//   $Date$
-//   $Revision$
-//   $Log$
-//   Revision 1.6  2005/12/30 20:40:16  jomifred
-//   new features: unnamed var, var with annots, TE as var
-//
-//   Revision 1.5  2005/08/12 22:18:37  jomifred
-//   add cvs keywords
-//
-//
 //----------------------------------------------------------------------------
 
 
@@ -44,8 +33,6 @@ import java.util.Stack;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-//import java.util.logging.Level;
-//import java.util.logging.Logger;
 
 public class Intention implements Serializable {
 
@@ -54,46 +41,44 @@ public class Intention implements Serializable {
 	private static int idCount = 1;
 	private int id;
 	
-    Stack fIntendedMeans = new Stack();
+    Stack<IntendedMeans> fIntendedMeans = new Stack<IntendedMeans>();
 
 //	static private Logger logger = Logger.getLogger(intend.class.getName());
 
     public Intention() {
-    	id = idCount++;
+        id = idCount++;
     }
     
     public int getId() {
-    	return id;
+        return id;
     }
     
     public void push(IntendedMeans im) {
-    	fIntendedMeans.push(im);
+        fIntendedMeans.push(im);
     }
     
     public IntendedMeans peek() {
-    	return (IntendedMeans)fIntendedMeans.peek();
+        return fIntendedMeans.peek();
     }
     
-    public  IntendedMeans get(int index) {
-    	return (IntendedMeans)fIntendedMeans.get(index);    	
+    public IntendedMeans get(int index) {
+        return fIntendedMeans.get(index);    	
     }
 
     public IntendedMeans pop() {
-    	return (IntendedMeans)fIntendedMeans.pop();
+        return fIntendedMeans.pop();
     }
     
     public Iterator iterator() {
-    	return fIntendedMeans.iterator();
+        return fIntendedMeans.iterator();
     }
     
     public int size() {
-    	return fIntendedMeans.size();
+        return fIntendedMeans.size();
     }
     
 	boolean isAtomic() {
-		Iterator i = fIntendedMeans.iterator();
-		while (i.hasNext()) {
-			IntendedMeans im = (IntendedMeans)i.next();
+		for (IntendedMeans im: fIntendedMeans) {
 			if (im.isAtomic()) {
 				return true;
 			}
@@ -102,9 +87,7 @@ public class Intention implements Serializable {
 	}
 	
     public boolean hasTrigger(Trigger g, Unifier u) {
-        Iterator j = iterator(); 
-        while (j.hasNext()) {
-            IntendedMeans im = (IntendedMeans)j.next();
+        for (IntendedMeans im: fIntendedMeans) {
             Trigger it = (Trigger) im.getPlan().getTriggerEvent().clone();
             im.unif.apply(it.getLiteral());
             if (u.unifies(g,it)) {
@@ -116,19 +99,19 @@ public class Intention implements Serializable {
     
     
     public String toString() {
-    	StringBuffer s = new StringBuffer();
-    	ListIterator i = fIntendedMeans.listIterator(fIntendedMeans.size());
-    	while (i.hasPrevious()) {
-    		s.append("    "+i.previous() + "\n");
-    	}
-    	return s.toString();
+        	StringBuffer s = new StringBuffer();
+        	ListIterator i = fIntendedMeans.listIterator(fIntendedMeans.size());
+        	while (i.hasPrevious()) {
+        		s.append("    "+i.previous() + "\n");
+        	}
+        	return s.toString();
     }
 
     /** get as XML */
 	public Element getAsDOM(Document document) {
 		Element eint = (Element) document.createElement("intention");
 		eint.setAttribute("id", id+"");
-        for (int i=fIntendedMeans.size()-1; i>=0; i--) {
+		for (int i=fIntendedMeans.size()-1; i>=0; i--) {
             IntendedMeans im = (IntendedMeans) fIntendedMeans.get(i);
             eint.appendChild(im.getAsDOM(document));
         }

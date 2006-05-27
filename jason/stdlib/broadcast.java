@@ -19,16 +19,6 @@
 // http://www.dur.ac.uk/r.bordini
 // http://www.inf.furb.br/~jomi
 //
-// CVS information:
-//   $Date$
-//   $Revision$
-//   $Log$
-//   Revision 1.5  2006/02/17 13:13:16  jomifred
-//   change a lot of method/classes names and improve some comments
-//
-//   Revision 1.4  2005/08/12 21:12:50  jomifred
-//   add cvs keywords
-//
 //----------------------------------------------------------------------------
 
 package jason.stdlib;

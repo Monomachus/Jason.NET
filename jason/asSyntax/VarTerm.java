@@ -19,7 +19,6 @@
 // http://www.dur.ac.uk/r.bordini
 // http://www.inf.furb.br/~jomi
 //
-//
 //----------------------------------------------------------------------------
 
 package jason.asSyntax;
@@ -85,16 +84,16 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
 		}
 		return t;
 	}
-	
-	public boolean isVar() {
+    
+	@Override public boolean isVar() {
 		return !isGround();
 	}
 	
-	public boolean isUnnamedVar() {
+    public boolean isUnnamedVar() {
 		return false;
 	}
 
-	public boolean isGround() {
+    @Override public boolean isGround() {
 		return getValue() != null;
 	}
 	
@@ -183,11 +182,11 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
 		return false;
 	}
 
-    public int compareTo(Object o) {
+    public int compareTo(Term t) {
         if (value != null)
-            return value.compareTo(o);
+            return value.compareTo(t);
         else 
-            return super.compareTo(o);
+            return super.compareTo(t);
     }
 	
 	
@@ -197,7 +196,7 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
 	// in case this VarTerm has a value, use value's methods
 	// ----------
 	
-	public String getFunctor() {
+    @Override public String getFunctor() {
 		if (value == null) {
 			return super.getFunctor();
 		} else {
@@ -206,15 +205,14 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
 	}
 
 	
-	public String getFunctorArity() {
+    @Override public String getFunctorArity() {
 		if (value != null)
 			return value.getFunctorArity();
 		else 
 			return null;
 	}
 
-    @Override
-    public Iterator<Unifier> logCons(Agent ag, Unifier un) {
+    @Override public Iterator<Unifier> logCons(Agent ag, Unifier un) {
         if (value != null)
             return value.logCons(ag,un);
         else {
@@ -229,14 +227,14 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
     
     }
 
-	public int hashCode() {
+    @Override public int hashCode() {
 		if (value != null)
 			return value.hashCode();
 		else 
 			return super.hashCode();
 	}
 
-	public Term getTerm(int i) {
+    @Override public Term getTerm(int i) {
 		if (value == null) {
 			return null;
 		} else {
@@ -244,13 +242,13 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
 		}
 	}
 
-	public void addTerm(Term t) {
+    @Override public void addTerm(Term t) {
 		if (value != null) {
 			getValue().addTerm(t);
 		}
 	}
 
-	public int getTermsSize() {
+    @Override public int getTermsSize() {
 		if (value == null) {
 			return 0;
 		} else {
@@ -258,7 +256,7 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
 		}
 	}
 
-	public List<Term> getTerms() {
+    @Override public List<Term> getTerms() {
 		if (value == null) {
 			return null;
 		} else {
@@ -266,19 +264,19 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
 		}
 	}
 	
-	public void setTerms(List<Term> l) {
+    @Override public void setTerms(List<Term> l) {
 		if (value != null) {
 			value.setTerms(l);
 		}
 	}
 	
-	public void addTerms(List<Term> l) {
+    @Override public void addTerms(List<Term> l) {
 		if (value != null) {
 			value.addTerms(l);
 		}
 	}
 
-	public Term[] getTermsArray() {
+    @Override public Term[] getTermsArray() {
 		if (value == null) {
 			return null;
 		} else {
@@ -286,30 +284,30 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
 		}
 	}
 
-	public boolean isInternalAction() {
+    @Override public boolean isInternalAction() {
 		return value != null && getValue().isInternalAction();
 	}
 	
-	public boolean isList() {
+    @Override public boolean isList() {
 		return value != null && getValue().isList();
 	}
-	public boolean isString() {
+    @Override public boolean isString() {
 		return value != null && getValue().isString();
 	}
-	public boolean isNumber() {
+    @Override public boolean isNumber() {
 		return value != null && getValue().isNumber();
 	}
-	public boolean isPred() {
+    @Override public boolean isPred() {
 		return value != null && getValue().isPred();
 	}
-	public boolean isLiteral() {
+    @Override public boolean isLiteral() {
 		return value != null && getValue().isLiteral();
 	}
-	public boolean isExpr() {
+    @Override public boolean isExpr() {
 		return value != null && getValue().isExpr();
 	}
 	
-	public boolean hasVar(Term t) {
+    @Override public boolean hasVar(Term t) {
 		if (value == null) {
 			return super.hasVar(t);
 		} else {
@@ -317,7 +315,7 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
 		}
 	}
 	
-	public String toString() {
+    @Override public String toString() {
 		if (value == null) {
 			// no value, the var name must be equal
 			String s = getFunctor();
@@ -338,84 +336,84 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
 	// in case this VarTerm has a value, use value's methods
 	// ----------
 
-	public void setAnnots(ListTerm l) {
+    @Override public void setAnnots(ListTerm l) {
 		if (value != null && getValue().isPred())
 			((Pred)getValue()).setAnnots(l);
 		else
 			super.setAnnots(l);
 	}
 
-	public void addAnnot(int index, Term t) {
+    @Override public void addAnnot(int index, Term t) {
 		if (value != null && getValue().isPred())
 			((Pred)getValue()).addAnnot(index, t);
 		else
 			super.addAnnot(index,t);
 	}
 
-	public void importAnnots(Pred p) {
+    @Override public void importAnnots(Pred p) {
 		if (value != null && getValue().isPred())
 			((Pred)getValue()).importAnnots(p);
 		else
 			super.importAnnots(p);
 	}
 
-	public void addAnnot(Term t) {
+    @Override public void addAnnot(Term t) {
 		if (value != null && getValue().isPred())
 			((Pred)getValue()).addAnnot(t);
 		else
 			super.addAnnot(t);
 	}
 
-	public void addAnnots(List l) {
+    @Override public void addAnnots(List<Term> l) {
 		if (value != null && getValue().isPred())
 			((Pred)getValue()).addAnnots(l);
 		else
 			super.addAnnots(l);
 	}
 
-	public void clearAnnots() {
+    @Override public void clearAnnots() {
 		if (value != null && getValue().isPred())
 			((Pred)getValue()).clearAnnots();
 		else
 			super.clearAnnots();
 	}
 
-	public void delAnnot(Pred p) {
+    @Override public void delAnnot(Pred p) {
 		if (value != null && getValue().isPred())
 			((Pred)getValue()).delAnnot(p);
 		else
 			super.delAnnot(p);
 	}
 
-	public void delAnnot(Term t) {
+    @Override public void delAnnot(Term t) {
 		if (value != null && getValue().isPred())
 			((Pred)getValue()).delAnnot(t);
 		else
 			super.delAnnot(t);
 	}
 
-	public boolean hasAnnot(Term t) {
+    @Override public boolean hasAnnot(Term t) {
 		if (value != null && getValue().isPred())
 			return ((Pred)getValue()).hasAnnot(t);
 		else
 			return super.hasAnnot(t);
 	}
 
-	public boolean hasAnnot() {
+    @Override public boolean hasAnnot() {
 		if (value != null && getValue().isPred())
 			return ((Pred)getValue()).hasAnnot();
 		else
 			return super.hasAnnot();
 	}
 
-	public ListTerm getAnnots() {
+    @Override public ListTerm getAnnots() {
 		if (value != null && getValue().isPred())
 			return ((Pred)getValue()).getAnnots();
 		else 
 			return super.getAnnots();
 	}
 
-	public void addSource(Term t) {
+    @Override public void addSource(Term t) {
 		if (value != null && getValue().isPred())
 			((Pred)getValue()).addSource(t);
 		else
@@ -423,35 +421,35 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
 		
 	}
 
-	public boolean delSource(Term s) {
+    @Override public boolean delSource(Term s) {
 		if (value != null && getValue().isPred())
 			return ((Pred)getValue()).delSource(s);
 		else
 			return super.delSource(s);
 	}
 
-	public void delSources() {
+    @Override public void delSources() {
 		if (value != null && getValue().isPred())
 			((Pred)getValue()).delSources();
 		else
 			super.delSources();
 	}
 
-	public ListTerm getSources() {
+    @Override public ListTerm getSources() {
 		if (value != null && getValue().isPred())
 			return ((Pred)getValue()).getSources();
 		else 
 			return super.getSources();
 	}
 
-	public boolean hasSource() {
+    @Override public boolean hasSource() {
 		if (value != null && getValue().isPred())
 			return ((Pred)getValue()).hasSource();
 		else
 			return super.hasSource();
 	}
 
-	public boolean hasSource(Term s) {
+    @Override public boolean hasSource(Term s) {
 		if (value != null && getValue().isPred())
 			return ((Pred)getValue()).hasSource(s);
 		else
@@ -465,7 +463,7 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
 	// in case this VarTerm has a value, use value's methods
 	// ----------
 	
-	public boolean negated() {
+    @Override public boolean negated() {
 		return value != null && getValue().isLiteral() && ((Literal)getValue()).negated();
 	}
 	
@@ -492,16 +490,18 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
 	// ----------
 
 
-	public void add(int index, Object o) {
+    public void add(int index, Term o) {
 		if (value != null && getValue().isList())
 			((ListTerm)getValue()).add(index, o);
 	}
-	public boolean add(Object o) {
+    public boolean add(Term o) {
 		return value != null && getValue().isList() && ((ListTerm)getValue()).add(o);
 	}
+    @SuppressWarnings("unchecked")
 	public boolean addAll(Collection c) {
 		return value != null && getValue().isList() && ((ListTerm)getValue()).addAll(c);
 	}
+    @SuppressWarnings("unchecked")
 	public boolean addAll(int index, Collection c) {
 		return value != null && getValue().isList() && ((ListTerm)getValue()).addAll(index, c);
 	}
@@ -515,7 +515,7 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
 	public boolean containsAll(Collection c) {
 		return value != null && getValue().isList() && ((ListTerm)getValue()).containsAll(c);
 	}
-	public Object get(int index) {
+	public Term get(int index) {
 		if (value != null && getValue().isList())
 			return ((ListTerm)getValue()).get(index);
 		else 
@@ -533,25 +533,25 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
 		else 
 			return -1;
 	}
-	public Iterator iterator() {
+	public Iterator<Term> iterator() {
 		if (value != null && getValue().isList())
 			return ((ListTerm)getValue()).iterator();
 		else 
 			return null;
 	}
-	public ListIterator listIterator() {
+	public ListIterator<Term> listIterator() {
 		if (value != null && getValue().isList())
 			return ((ListTerm)getValue()).listIterator();
 		else 
 			return null;
 	}
-	public ListIterator listIterator(int index) {
+	public ListIterator<Term> listIterator(int index) {
 		if (value != null && getValue().isList())
 			return ((ListTerm)getValue()).listIterator(index);
 		else 
 			return null;
 	}
-	public Object remove(int index) {
+	public Term remove(int index) {
 		if (value != null && getValue().isList())
 			return ((ListTerm)getValue()).remove(index);
 		else 
@@ -575,25 +575,28 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
 		else 
 			return false;
 	}
-	public Object set(int index, Object o) {
+	public Term set(int index, Term o) {
 		if (value != null && getValue().isList())
 			return ((ListTerm)getValue()).set(index, o);
 		else 
 			return null;
 	}
-	public List subList(int arg0, int arg1) {
+	public List<Term> subList(int arg0, int arg1) {
 		if (value != null && getValue().isList())
 			return ((ListTerm)getValue()).subList(arg0, arg1);
 		else 
 			return null;
 	}
+    
 	public Object[] toArray() {
 		if (value != null && getValue().isList())
 			return ((ListTerm)getValue()).toArray();
 		else 
 			return null;
 	}
-	public Object[] toArray(Object[] arg0) {
+    
+	@SuppressWarnings("unchecked")
+    public Object[] toArray(Object[] arg0) {
 		if (value != null && getValue().isList())
 			return ((ListTerm)getValue()).toArray(arg0);
 		else 
@@ -612,15 +615,9 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
 			((ListTerm)getValue()).setNext(t);
 	}
 
-	public ListTerm add(int index, Term t) {
+	public ListTerm append(Term t) {
 		if (value != null && getValue().isList())
-			return ((ListTerm)getValue()).add(index, t);
-		else 
-			return null;
-	}
-	public ListTerm add(Term t) {
-		if (value != null && getValue().isList())
-			return ((ListTerm)getValue()).add(t);
+			return ((ListTerm)getValue()).append(t);
 		else 
 			return null;
 	}
@@ -630,7 +627,7 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
 		else 
 			return null;
 	}
-	public List getAsList() {
+	public List<Term> getAsList() {
 		if (value != null && getValue().isList())
 			return ((ListTerm)getValue()).getAsList();
 		else 
@@ -681,7 +678,7 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
 	}
 
 
-	public Iterator listTermIterator() {
+	public Iterator<ListTerm> listTermIterator() {
 		if (value != null && getValue().isList())
 			return ((ListTerm)getValue()).listTermIterator();
 		else 

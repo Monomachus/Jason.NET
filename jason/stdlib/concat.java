@@ -19,26 +19,6 @@
 // http://www.dur.ac.uk/r.bordini
 // http://www.inf.furb.br/~jomi
 //
-// CVS information:
-//   $Date$
-//   $Revision$
-//   $Log$
-//   Revision 1.7  2005/12/31 16:29:58  jomifred
-//   add operator =..
-//
-//   Revision 1.6  2005/12/23 00:51:00  jomifred
-//   StringTerm is now an interface implemented by StringTermImpl
-//
-//   Revision 1.5  2005/12/22 00:04:19  jomifred
-//   ListTerm is now an interface implemented by ListTermImpl
-//
-//   Revision 1.4  2005/11/09 23:39:01  jomifred
-//   works for strings, numbers, ...
-//
-//   Revision 1.3  2005/08/12 22:20:10  jomifred
-//   add cvs keywords
-//
-//
 //----------------------------------------------------------------------------
 
 package jason.stdlib;

@@ -18,21 +18,6 @@
 // To contact the authors:
 // http://www.dur.ac.uk/r.bordini
 // http://www.inf.furb.br/~jomi
-//
-// CVS information:
-//   $Date: 2006-01-04 01:00:47 -0200 (Wed, 04 Jan 2006) $
-//   $Revision: 244 $
-//   $Log$
-//   Revision 1.10  2006/01/04 03:00:47  jomifred
-//   using java log API instead of apache log
-//
-//   Revision 1.9  2005/12/23 00:51:00  jomifred
-//   StringTerm is now an interface implemented by StringTermImpl
-//
-//   Revision 1.8  2005/08/12 22:20:10  jomifred
-//   add cvs keywords
-//
-//
 //----------------------------------------------------------------------------
 
 package jason.stdlib;

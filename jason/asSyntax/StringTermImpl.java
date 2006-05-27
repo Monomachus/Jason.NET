@@ -19,20 +19,6 @@
 // http://www.dur.ac.uk/r.bordini
 // http://www.inf.furb.br/~jomi
 //
-// CVS information:
-//   $Date$
-//   $Revision$
-//   $Log$
-//   Revision 1.2  2006/01/04 02:54:41  jomifred
-//   using java log API instead of apache log
-//
-//   Revision 1.1  2005/12/23 00:49:57  jomifred
-//   StringTerm is now an interface implemented by StringTermImpl
-//
-//   Revision 1.6  2005/08/12 22:26:08  jomifred
-//   add cvs keywords
-//
-//
 //----------------------------------------------------------------------------
 
 package jason.asSyntax;
@@ -46,7 +32,7 @@ import java.util.logging.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-public class StringTermImpl extends Term implements StringTerm {
+public class StringTermImpl extends TermImpl implements StringTerm {
 
 	static private Logger logger = Logger.getLogger(StringTermImpl.class.getName());
 

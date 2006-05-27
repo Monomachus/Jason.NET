@@ -19,25 +19,13 @@
 // http://www.dur.ac.uk/r.bordini
 // http://www.inf.furb.br/~jomi
 //
-// CVS information:
-//   $Date$
-//   $Revision$
-//   $Log$
-//   Revision 1.7  2005/12/23 00:48:23  jomifred
-//   StringTerm is now an interface implemented by StringTermImpl
-//
-//   Revision 1.6  2005/08/12 22:26:08  jomifred
-//   add cvs keywords
-//
-//
 //----------------------------------------------------------------------------
 
 package jason.asSyntax;
 
 
-public interface StringTerm extends TermInterface {
+public interface StringTerm extends Term {
 	public void setString(String s);
 	public String getString();
-	public boolean isString();
 	public int length();
 }

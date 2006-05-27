@@ -19,19 +19,6 @@
 // http://www.dur.ac.uk/r.bordini
 // http://www.inf.furb.br/~jomi
 //
-// CVS information:
-//   $Date$
-//   $Revision$
-//   $Log$
-//   Revision 1.8  2006/02/22 21:19:05  jomifred
-//   The internalAction removePlan use plan's label as argument instead of plan's strings
-//
-//   Revision 1.7  2005/12/22 00:04:19  jomifred
-//   ListTerm is now an interface implemented by ListTermImpl
-//
-//   Revision 1.6  2005/08/12 21:12:50  jomifred
-//   add cvs keywords
-//
 //----------------------------------------------------------------------------
 
 
@@ -44,6 +31,7 @@ import jason.asSemantics.Unifier;
 import jason.asSyntax.ListTerm;
 import jason.asSyntax.StringTerm;
 import jason.asSyntax.Term;
+import jason.asSyntax.TermImpl;
 
 import java.util.Iterator;
 
@@ -55,29 +43,28 @@ public class addPlan implements InternalAction {
 	 */
     public boolean execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         try {
-			Term plans = Term.parse(args[0].toString());
+			Term plans = TermImpl.parse(args[0].toString());
 
-			Term source = new Term("self");
-        	if (args.length > 1) {
-        		source = (Term)args[1].clone();
-        		un.apply(source);
-        	}
+			Term source = new TermImpl("self");
+            	if (args.length > 1) {
+            		source = (Term)args[1].clone();
+            		un.apply(source);
+            	}
 			
-        	if (plans.isList()) { // if arg[0] is a list
-				ListTerm lt = (ListTerm)plans;
-        		Iterator i = lt.iterator();
-        		while (i.hasNext()) {
-					ts.getAg().getPS().add( (StringTerm)i.next(), source);
-        		}
-        	} else { // args[0] is a plan
-        		ts.getAg().getPS().add((StringTerm)plans, source);
-        	}
+            	if (plans.isList()) { // if arg[0] is a list
+    				ListTerm lt = (ListTerm)plans;
+            		Iterator i = lt.iterator();
+            		while (i.hasNext()) {
+    					ts.getAg().getPS().add( (StringTerm)i.next(), source);
+            		}
+            	} else { // args[0] is a plan
+            		ts.getAg().getPS().add((StringTerm)plans, source);
+            	}
             return true;
         } catch (ArrayIndexOutOfBoundsException e) {
             throw new JasonException("The internal action 'addPlan' has not received two arguments (plan's string and source)");
         } catch (Exception e) {
             throw new JasonException("Error in internal action 'addPlan': "+e);
         }
-    }
-    
+    }  
 }

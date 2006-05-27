@@ -19,17 +19,6 @@
 // http://www.dur.ac.uk/r.bordini
 // http://www.inf.furb.br/~jomi
 //
-// CVS information:
-//   $Date$
-//   $Revision$
-//   $Log$
-//   Revision 1.7  2006/02/17 13:13:16  jomifred
-//   change a lot of method/classes names and improve some comments
-//
-//   Revision 1.6  2005/08/12 22:20:10  jomifred
-//   add cvs keywords
-//
-//
 //----------------------------------------------------------------------------
 
 package jason.stdlib;
@@ -39,25 +28,15 @@ import jason.asSemantics.InternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.Term;
+import jason.asSyntax.TermImpl;
 
 public class myName implements InternalAction {
 
 	public boolean execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
-		
-		Term name = null;
 		try {
-			name = args[0];
-			if (name == null) {
-				throw new JasonException("The parameter Name of internal action 'myName' is not a term!");
-			}
-			// do not need to be VAR
-			//if (!name.isVar()) {
-			//	throw new JasonException("The parameter Name of internal action 'myName' is not a variable!");
-			//}
-
+            return un.unifies(args[0], new TermImpl(ts.getUserAgArch().getAgName()));
 		} catch (ArrayIndexOutOfBoundsException e) {
 			throw new JasonException("The internal action 'myName' has not received one argument");
 		}
-		return un.unifies(name, new Term(ts.getUserAgArch().getAgName()));
 	}
 }

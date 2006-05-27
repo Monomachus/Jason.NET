@@ -18,26 +18,6 @@
 // http://www.dur.ac.uk/r.bordini
 // http://www.inf.furb.br/~jomi
 //
-// CVS information:
-//   $Date$
-//   $Revision$
-//   $Log$
-//   Revision 1.5  2006/02/28 15:11:28  jomifred
-//   improve javadoc
-//
-//   Revision 1.4  2006/02/17 13:13:15  jomifred
-//   change a lot of method/classes names and improve some comments
-//
-//   Revision 1.3  2006/01/14 18:22:45  jomifred
-//   centralised infra does not use xml script file anymore
-//
-//   Revision 1.2  2005/11/20 16:53:17  jomifred
-//   the canSleep method in TS asks the agent arch if it can sleep.
-//
-//   Revision 1.1  2005/10/30 18:37:27  jomifred
-//   change in the AgArch customisation  support (the same customisation is used both to Cent and Saci infrastructures0
-//
-//
 //----------------------------------------------------------------------------
 
 package jason.architecture;
@@ -46,6 +26,7 @@ import jason.JasonException;
 import jason.asSemantics.Agent;
 import jason.asSemantics.Message;
 import jason.asSemantics.TransitionSystem;
+import jason.asSyntax.Literal;
 import jason.runtime.Settings;
 
 import java.util.List;
@@ -89,17 +70,17 @@ public class AgArch {
 		archTier = ai;
 	}
     public AgArchInfraTier getArchInfraTier() {
-    	return archTier;
+    	    return archTier;
     }
 	
     public TransitionSystem getTS() {
-    	return fTS;
+    	    return fTS;
     }
 
 
 	
     /** Gets the agent's perception as a list of Literals */
-	public List perceive() {
+	public List<Literal> perceive() {
 		return archTier.perceive();
 	}
 

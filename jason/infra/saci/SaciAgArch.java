@@ -19,68 +19,6 @@
 // http://www.dur.ac.uk/r.bordini
 // http://www.inf.furb.br/~jomi
 //
-// CVS information:
-//   $Date$
-//   $Revision$
-//   $Log$
-//   Revision 1.4  2006/03/02 13:33:41  jomifred
-//   changes in MASLauncher interface
-//
-//   Revision 1.3  2006/02/28 15:17:24  jomifred
-//   improve javadoc
-//
-//   Revision 1.2  2006/02/27 18:46:26  jomifred
-//   creation of the RuntimeServices interface
-//
-//   Revision 1.1  2006/02/18 15:24:30  jomifred
-//   changes in many files to detach jason kernel from any infrastructure implementation
-//
-//   Revision 1.24  2006/02/17 13:13:15  jomifred
-//   change a lot of method/classes names and improve some comments
-//
-//   Revision 1.23  2006/01/14 18:22:45  jomifred
-//   centralised infra does not use xml script file anymore
-//
-//   Revision 1.22  2006/01/04 02:54:41  jomifred
-//   using java log API instead of apache log
-//
-//   Revision 1.21  2005/12/22 00:03:26  jomifred
-//   ListTerm is now an interface implemented by ListTermImpl
-//
-//   Revision 1.20  2005/12/08 20:06:59  jomifred
-//   changes for JasonIDE plugin
-//
-//   Revision 1.19  2005/12/05 16:04:47  jomifred
-//   Message content can be object
-//
-//   Revision 1.18  2005/11/20 16:53:17  jomifred
-//   the canSleep method in TS asks the agent arch if it can sleep.
-//
-//   Revision 1.17  2005/11/16 18:35:25  jomifred
-//   fixed the print(int) on console bug
-//
-//   Revision 1.16  2005/11/07 12:42:23  jomifred
-//   receive message is shown only in debug mode
-//
-//   Revision 1.15  2005/10/30 18:37:27  jomifred
-//   change in the AgArch customisation  support (the same customisation is used both to Cent and Saci infrastructures0
-//
-//   Revision 1.14  2005/10/07 18:53:35  jomifred
-//   fix a bug in console (it tried to use X11 event with Console logger)
-//
-//   Revision 1.13  2005/08/16 21:03:42  jomifred
-//   add some comments on TODOs
-//
-//   Revision 1.12  2005/08/15 17:41:36  jomifred
-//   AgentArchitecture renamed to AgArchInterface
-//
-//   Revision 1.11  2005/08/13 13:55:35  jomifred
-//   java doc updated
-//
-//   Revision 1.10  2005/08/12 22:19:26  jomifred
-//   add cvs keywords
-//
-//
 //----------------------------------------------------------------------------
 
 
@@ -94,6 +32,7 @@ import jason.asSemantics.ActionExec;
 import jason.asSemantics.TransitionSystem;
 import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Term;
+import jason.asSyntax.TermImpl;
 import jason.infra.centralised.RunCentralisedMAS;
 import jason.runtime.MASConsoleGUI;
 import jason.runtime.RuntimeServicesInfraTier;
@@ -403,7 +342,7 @@ public class SaciAgArch extends saci.Agent implements AgArchInfraTier {
                     String sPropCont = propCont.toString();
                     if (sPropCont.startsWith("\"")) { // deal with a term closed by "
                     	sPropCont = sPropCont.substring(1,sPropCont.length()-1);
-                    	if (Term.parse(sPropCont) != null) {
+                    	if (TermImpl.parse(sPropCont) != null) {
                     		// it was a term with "
                     		propCont = sPropCont.trim();
                     	}

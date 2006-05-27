@@ -13,6 +13,7 @@ import jason.asSyntax.Pred;
 import jason.asSyntax.StringTerm;
 import jason.asSyntax.StringTermImpl;
 import jason.asSyntax.Term;
+import jason.asSyntax.TermImpl;
 import jason.asSyntax.VarTerm;
 import jason.stdlib.addAnnot;
 import jason.stdlib.addPlan;
@@ -36,7 +37,7 @@ public class StdLibTest extends TestCase {
 
 		Literal msg = Literal.parseLiteral("ok(10)");
 		VarTerm X = new VarTerm("X");
-		Term annot = Term.parse("source(jomi)");
+		Term annot = TermImpl.parse("source(jomi)");
 		try {
 			aa.execute(null, u, new Term[] { msg, annot, X });
 		} catch (Exception e) {
@@ -47,9 +48,9 @@ public class StdLibTest extends TestCase {
 		assertTrue( ((Pred)u.get("X")).hasAnnot(annot) );
 
 		// testing addAnnot with list
-		ListTerm msgL = (ListTerm)Term.parse("[ok(10),[ok(20),ok(30),[ok(40)|[ok(50),ok(60)]]]]");
+		ListTerm msgL = (ListTerm)TermImpl.parse("[ok(10),[ok(20),ok(30),[ok(40)|[ok(50),ok(60)]]]]");
 		VarTerm Y = new VarTerm("Y");
-		Term annotL = Term.parse("source(rafa)");
+		Term annotL = TermImpl.parse("source(rafa)");
 		assertEquals(msgL.toString(), "[ok(10),[ok(20),ok(30),[ok(40),ok(50),ok(60)]]]");
 		try {
 			aa.execute(null, u, new Term[] { (Term)msgL, annotL, Y });
@@ -91,8 +92,8 @@ public class StdLibTest extends TestCase {
 		ag.setLogger(null);
 		StringTerm pt1 = new StringTermImpl("@t1 +a : g(10) <- .print(\"ok 10\").");
 		ag.getPS().add(pt1, null);
-		ag.getPS().add(new StringTermImpl("@t2 +a : g(20) <- .print(\"ok 20\")."), new Term("nosource"));
-		((Plan)ag.getPS().getPlans().get(1)).getLabel().addSource(new Term("ag1"));
+		ag.getPS().add(new StringTermImpl("@t2 +a : g(20) <- .print(\"ok 20\")."), new TermImpl("nosource"));
+		((Plan)ag.getPS().getPlans().get(1)).getLabel().addSource(new TermImpl("ag1"));
 		ag.getPS().add(new StringTermImpl("@t3 +b : true <- true."), null);
 		//System.out.println(ag.getPS());
 		TransitionSystem ts = new TransitionSystem(ag, null, null, null);
@@ -116,7 +117,7 @@ public class StdLibTest extends TestCase {
 		assertEquals(ag.getPS().getPlans().size(), 3);
 		// remove plan t1 from PS
 		try {
-			new removePlan().execute(ts, new Unifier(), new Term[] { new Term("t1") });
+			new removePlan().execute(ts, new Unifier(), new Term[] { new TermImpl("t1") });
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -130,7 +131,7 @@ public class StdLibTest extends TestCase {
 		try {
 			while (i.hasNext()) {
 				StringTerm t = (StringTerm)i.next();
-				new addPlan().execute(ts, new Unifier(), new Term[] { (Term)t, new Term("fromGR") });
+				new addPlan().execute(ts, new Unifier(), new Term[] { (Term)t, new TermImpl("fromGR") });
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -140,7 +141,7 @@ public class StdLibTest extends TestCase {
 		// add again plans returned from getRelevantPlans
 		// using IA addPlan receiving a list of plans
 		try {
-			new addPlan().execute(ts, new Unifier(), new Term[] { (Term)plans, new Term("fromLT") });
+			new addPlan().execute(ts, new Unifier(), new Term[] { (Term)plans, new TermImpl("fromLT") });
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -154,7 +155,7 @@ public class StdLibTest extends TestCase {
 		// remove plan t2,t3 (source = nosource) from PS
 		ListTerm llt = ListTermImpl.parseList("[t2,t3]");
 		try {
-			assertTrue(new removePlan().execute(ts, new Unifier(), new Term[] { (Term)llt, new Term("nosource") }));
+			assertTrue(new removePlan().execute(ts, new Unifier(), new Term[] { (Term)llt, new TermImpl("nosource") }));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

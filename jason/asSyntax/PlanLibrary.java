@@ -19,26 +19,6 @@
 // http://www.dur.ac.uk/r.bordini
 // http://www.inf.furb.br/~jomi
 //
-// CVS information:
-//   $Date$
-//   $Revision$
-//   $Log$
-//   Revision 1.8  2006/02/24 20:08:31  jomifred
-//   no message
-//
-//   Revision 1.7  2006/02/22 21:19:05  jomifred
-//   The internalAction removePlan use plan's label as argument instead of plan's strings
-//
-//   Revision 1.6  2006/01/02 13:49:00  jomifred
-//   add plan unique id, fix some bugs
-//
-//   Revision 1.5  2005/12/30 20:40:16  jomifred
-//   new features: unnamed var, var with annots, TE as var
-//
-//   Revision 1.4  2005/08/12 22:26:08  jomifred
-//   add cvs keywords
-//
-//
 //----------------------------------------------------------------------------
 
 
@@ -49,7 +29,6 @@ import jason.JasonException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -61,18 +40,18 @@ import org.w3c.dom.Element;
 public class PlanLibrary {
 
 	/** a MAP from TE to a list of relevant plans */
-    Map relPlans = new HashMap();
+    Map<String,List<Plan>> relPlans = new HashMap<String,List<Plan>>();
 
 	/**
 	 * All plans as defined in the AS code (maintains the order of the plans)
 	 */
-	List plans = new ArrayList();
+	List<Plan> plans = new ArrayList<Plan>();
 	
 	/** list of plans that have var as TE */
-	List varPlans = new ArrayList();
+	List<Plan> varPlans = new ArrayList<Plan>();
 	
 	/** A map from labels to plans */
-	Map planLabels = new HashMap();
+	Map<String,Plan> planLabels = new HashMap<String,Plan>();
 	
 	private static int lastPlanLabel = 0;
 
@@ -117,17 +96,14 @@ public class PlanLibrary {
 	
     public void add(Plan p) throws JasonException {
         // test p.label
-        if (p.getLabel() != null
-                && planLabels.keySet().contains(p.getLabel().getFunctor())) {
+        if (p.getLabel() != null && planLabels.keySet().contains(p.getLabel().getFunctor())) {
             // test if the new plan is equal, in this case, just add a source
             Plan planInPL = get(p.getLabel().getFunctor());
             if (p.equals(planInPL)) {
-                planInPL.getLabel().addSource(
-                        (Pred) p.getLabel().getSources().get(0));
+                planInPL.getLabel().addSource((Pred) p.getLabel().getSources().get(0));
                 return;
             } else {
-                throw new JasonException("There already is a plan with label "
-                        + p.getLabel());
+                throw new JasonException("There already is a plan with label " + p.getLabel());
             }
         }
 
@@ -142,7 +118,7 @@ public class PlanLibrary {
 
         // add self source
         if (!p.getLabel().hasSource()) {
-            p.getLabel().addSource(new Term("self"));
+            p.getLabel().addAnnot(BeliefBase.TSelf);
         }
         planLabels.put(p.getLabel().getFunctor(), p);
 
@@ -156,15 +132,13 @@ public class PlanLibrary {
         if (p.getTriggerEvent().getLiteral().isVar()) {
             varPlans.add(p);
             // add plan p in all entries
-            Iterator i = relPlans.values().iterator();
-            while (i.hasNext()) {
-                List li = (List) i.next();
-                li.add(p);
+            for (List<Plan> lp: relPlans.values()) {
+                lp.add(p);
             }
         } else {
-            List codesList = (List) relPlans.get(p.tevent.getFunctorArity());
+            List<Plan> codesList = relPlans.get(p.tevent.getFunctorArity());
             if (codesList == null) {
-                codesList = new ArrayList();
+                codesList = new ArrayList<Plan>();
                 codesList.addAll(varPlans);
                 relPlans.put(p.tevent.getFunctorArity(), codesList);
             }
@@ -175,20 +149,18 @@ public class PlanLibrary {
     }
 
 	public void addAll(PlanLibrary pl) throws JasonException {
-		Iterator i = pl.getPlans().iterator();
-		while (i.hasNext()) {
-			Plan p = (Plan)i.next(); 
+		for (Plan p: pl.getPlans()) { 
 			add(p);
 		}
 	}
     
 	/** return a plan for a label */
     public Plan get(String label) {
-        return (Plan)planLabels.get(label);
+        return planLabels.get(label);
     }
     
-    public List getPlans() {
-    	return plans;
+    public List<Plan> getPlans() {
+    	    return plans;
     }
 
     /*
@@ -209,9 +181,8 @@ public class PlanLibrary {
 
 			// if no source anymore, remove the plan
 			if (hasSource && !p.getLabel().hasSource()) {
-    			remove(pLabel.getFunctor());
+			    remove(pLabel.getFunctor());
 			}
-
 			return true;
 		}
 		return false;
@@ -228,13 +199,11 @@ public class PlanLibrary {
         if (p.getTriggerEvent().getLiteral().isVar()) {
             varPlans.remove(p);
             // remove p from all entries
-            Iterator ip = relPlans.values().iterator();
-            while (ip.hasNext()) {
-                List li = (List) ip.next();
-                li.remove(p);
+            for (List<Plan> lp: relPlans.values()) {
+                lp.remove(p);
             }
         } else {
-            List codesList = (List) relPlans.get(p.tevent.getFunctorArity());
+            List<Plan> codesList = relPlans.get(p.tevent.getFunctorArity());
             codesList.remove(p);
             if (codesList.isEmpty()) {
                 // no more plans for this TE
@@ -245,23 +214,23 @@ public class PlanLibrary {
     }
 
     public boolean isRelevant(Trigger t) {
-    	List l = getAllRelevant(t);
-    	return l != null && l.size() > 0;
+        	List l = getAllRelevant(t);
+        	return l != null && l.size() > 0;
     }
 
 
-    public List getAllRelevant(Trigger t) {
-    	List l = (List)relPlans.get(t.getFunctorArity());
-    	if ((l == null || l.size() == 0) && varPlans.size() > 0) { // no rel plan, try varPlan
-    		l = varPlans;
-    	}
-    	return l;
+    public List<Plan> getAllRelevant(Trigger t) {
+        	List<Plan> l = relPlans.get(t.getFunctorArity());
+        	if ((l == null || l.size() == 0) && varPlans.size() > 0) { // no rel plan, try varPlan
+        		l = varPlans;
+        	}
+        	return l;
     }
 
     public static final Trigger TE_IDLE = Trigger.parseTrigger("+!idle");
 
-    public List getIdlePlans() {
-        return (List)relPlans.get(TE_IDLE.getFunctorArity());
+    public List<Plan> getIdlePlans() {
+        return relPlans.get(TE_IDLE.getFunctorArity());
     }
 
     public String toString() {
@@ -271,12 +240,9 @@ public class PlanLibrary {
 	/** get as XML */
 	public Element getAsDOM(Document document) {
 		Element eplans = (Element) document.createElement("plans");
-		Iterator i = plans.iterator();
-		while (i.hasNext()) {
-			Plan p = (Plan)i.next(); 
+		for (Plan p: plans) { 
 			eplans.appendChild(p.getAsDOM(document));
 		}
 		return eplans;
 	}
-
 }

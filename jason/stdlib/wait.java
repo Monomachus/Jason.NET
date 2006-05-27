@@ -19,29 +19,6 @@
 // http://www.dur.ac.uk/r.bordini
 // http://www.inf.furb.br/~jomi
 //
-// CVS information:
-//   $Date$
-//   $Revision$
-//   $Log$
-//   Revision 1.1  2006/02/27 18:43:52  jomifred
-//   creation of the RuntimeServices interface
-//
-//   Revision 1.7  2005/12/31 16:29:58  jomifred
-//   add operator =..
-//
-//   Revision 1.6  2005/12/23 00:51:00  jomifred
-//   StringTerm is now an interface implemented by StringTermImpl
-//
-//   Revision 1.5  2005/12/22 00:04:19  jomifred
-//   ListTerm is now an interface implemented by ListTermImpl
-//
-//   Revision 1.4  2005/11/09 23:39:01  jomifred
-//   works for strings, numbers, ...
-//
-//   Revision 1.3  2005/08/12 22:20:10  jomifred
-//   add cvs keywords
-//
-//
 //----------------------------------------------------------------------------
 
 package jason.stdlib;
@@ -61,9 +38,8 @@ import jason.asSyntax.Trigger;
 import java.util.logging.Level;
 
 public class wait implements InternalAction {
-	// TODO: implement timeout for wait event
-    
-	/**
+
+    /**
 	 * args[0] is either a number or a string, if number it is the time (in ms), 
 	 * if string it is the trigger event to be waited. this second use also receive
      * the timeout (in ms) as parameter.
@@ -176,12 +152,11 @@ public class wait implements InternalAction {
 		public void intentionAdded(Intention i) {
 			// if the .wait intention where is being added in C.I, remove it
 			if (i == si) {
-				if (c.removeIntention(si)) {
-                    // TODO: add i in FA
+			    if (c.removeIntention(si)) {
                     c.getPendingActions().put(te.toString(), si);          
                 } else {
-					ts.getLogger().warning("The following intentions sould be removed, but wasn't!"+si+"\nWait intention is"+i);
-				}
+                    ts.getLogger().warning("The following intentions sould be removed, but wasn't!"+si+"\nWait intention is"+i);
+                }
 			}
 		}
 

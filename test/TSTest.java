@@ -8,7 +8,7 @@ import jason.asSemantics.TransitionSystem;
 import jason.asSyntax.Literal;
 import jason.asSyntax.StringTerm;
 import jason.asSyntax.StringTermImpl;
-import jason.asSyntax.Term;
+import jason.asSyntax.TermImpl;
 import jason.asSyntax.Trigger;
 
 import java.util.List;
@@ -26,12 +26,12 @@ public class TSTest extends TestCase {
 		Agent ag = new Agent();
 		Circumstance c = new Circumstance();
 		StringTerm pt1 = new StringTermImpl("@t1 +a(X) : g(10) <- .print(\"ok 10\").");
-		ag.getPS().add(pt1, new Term("nosource"));
-		ag.getPS().add(new StringTermImpl("@t2 +a(X) : true <- .print(\"ok 20\")."), new Term("nosource"));
-		ag.getPS().add(new StringTermImpl("@t3 +b : true <- true."), new Term("nosource"));
+		ag.getPS().add(pt1, new TermImpl("nosource"));
+		ag.getPS().add(new StringTermImpl("@t2 +a(X) : true <- .print(\"ok 20\")."), new TermImpl("nosource"));
+		ag.getPS().add(new StringTermImpl("@t3 +b : true <- true."), new TermImpl("nosource"));
 		TransitionSystem ts = new TransitionSystem(ag, c, null, null);
 		Literal content = Literal.parseLiteral("~alliance");
-		content.addSource(new Term("ag1"));
+		content.addSource(new TermImpl("ag1"));
 
         Trigger te1 = Trigger.parseTrigger("+a(10)");
 		

@@ -19,22 +19,10 @@
 // http://www.dur.ac.uk/r.bordini
 // http://www.inf.furb.br/~jomi
 //
-// CVS information:
-//   $Date$
-//   $Revision$
-//   $Log$
-//   Revision 1.2  2006/01/04 02:54:41  jomifred
-//   using java log API instead of apache log
-//
-//   Revision 1.1  2005/12/30 20:40:16  jomifred
-//   new features: unnamed var, var with annots, TE as var
-//
-//
 //----------------------------------------------------------------------------
 
 package jason.asSyntax;
 
-import java.util.logging.Logger;
 
 
 /**
@@ -43,7 +31,7 @@ import java.util.logging.Logger;
  * @author jomi
  */
 public class UnnamedVar extends VarTerm {
-	static private Logger logger = Logger.getLogger(UnnamedVar.class.getName());
+	//static private Logger logger = Logger.getLogger(UnnamedVar.class.getName());
 	
 	public UnnamedVar() {
 		super();
@@ -54,11 +42,11 @@ public class UnnamedVar extends VarTerm {
 	}
 	
 	/** overridden VarTerm setValue, this method does nothing, so the Var never has value */
-	public boolean setValue(Term vl) {
+    @Override public boolean setValue(Term vl) {
 		return true;
 	}
 	
-	public boolean isUnnamedVar() {
+    @Override public boolean isUnnamedVar() {
 		return true;
 	}
 	

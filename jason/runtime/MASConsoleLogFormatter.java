@@ -19,37 +19,6 @@
 // http://www.dur.ac.uk/r.bordini
 // http://www.inf.furb.br/~jomi
 //
-// CVS information:
-//   $Date$
-//   $Revision$
-//   $Log$
-//   Revision 1.2  2006/01/16 16:47:35  jomifred
-//   added a new kind of console with one tab for agent
-//
-//   Revision 1.1  2006/01/04 02:55:57  jomifred
-//   using java log API instead of apache log
-//
-//   Revision 1.1  2005/12/08 20:14:28  jomifred
-//   changes for JasonIDE plugin
-//
-//   Revision 1.19  2005/11/16 18:35:25  jomifred
-//   fixed the print(int) on console bug
-//
-//   Revision 1.18  2005/11/07 12:41:31  jomifred
-//   no message
-//
-//   Revision 1.17  2005/10/30 18:39:48  jomifred
-//   change in the AgArch customisation  support (the same customisation is used both to Cent and Saci infrastructures0
-//
-//   Revision 1.16  2005/10/19 21:41:51  jomifred
-//   fixed the bug  continue/stop when running the MAS
-//
-//   Revision 1.15  2005/09/20 16:59:14  jomifred
-//   do not use MASConsole when the logger in Console (and so, do not need an X11)
-//
-//   Revision 1.14  2005/08/12 21:08:23  jomifred
-//   add cvs keywords
-//
 //----------------------------------------------------------------------------
 
 

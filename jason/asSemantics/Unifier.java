@@ -19,35 +19,6 @@
 // http://www.dur.ac.uk/r.bordini
 // http://www.inf.furb.br/~jomi
 //
-// CVS information:
-//   $Date$
-//   $Revision$
-//   $Log$
-//   Revision 1.19  2006/01/04 02:54:41  jomifred
-//   using java log API instead of apache log
-//
-//   Revision 1.18  2006/01/02 13:49:00  jomifred
-//   add plan unique id, fix some bugs
-//
-//   Revision 1.17  2005/12/31 16:29:58  jomifred
-//   add operator =..
-//
-//   Revision 1.16  2005/12/30 20:40:16  jomifred
-//   new features: unnamed var, var with annots, TE as var
-//
-//   Revision 1.15  2005/12/22 00:03:30  jomifred
-//   ListTerm is now an interface implemented by ListTermImpl
-//
-//   Revision 1.14  2005/12/20 19:52:05  jomifred
-//   no message
-//
-//   Revision 1.13  2005/08/16 21:03:42  jomifred
-//   add some comments on TODOs
-//
-//   Revision 1.12  2005/08/12 22:18:37  jomifred
-//   add cvs keywords
-//
-//
 //----------------------------------------------------------------------------
 
 
@@ -74,37 +45,37 @@ public class Unifier implements Cloneable {
     
 	static Logger logger = Logger.getLogger(Unifier.class.getName());
 
-	private HashMap function = new HashMap();
+	private HashMap<String,Term> function = new HashMap<String,Term>();
     
     public void apply(Term t) {
-    	if (t.isExpr()) {
-    		ArithExprTerm et = (ArithExprTerm)t;
-    		// apply values to expression variables
-    		apply( (Term)et.getLHS());
-    		if (!et.isUnary()) {
-    			apply( (Term)et.getRHS());
+        	if (t.isExpr()) {
+        		ArithExprTerm et = (ArithExprTerm)t;
+        		// apply values to expression variables
+        		apply(et.getLHS());
+        		if (!et.isUnary()) {
+        			apply(et.getRHS());
+        		}
+        		et.setValue(new NumberTermImpl(et.solve()));
+        	} else if (t.isVar()) {
+    			VarTerm vt = (VarTerm) t;
+    			if (! vt.hasValue()) { 
+    				Term vl = get(vt.getFunctor());
+    				//System.out.println("appling="+t+"="+vl+" un="+this);
+    				if (vl != null) {
+    					vt.setValue(vl);
+    					apply(vt); // in case t has var args
+    				}
+    			}
+    			return;
     		}
-    		et.setValue(new NumberTermImpl(et.solve()));
-    	} else if (t.isVar()) {
-			VarTerm vt = (VarTerm) t;
-			if (! vt.hasValue()) { 
-				Term vl = get(vt.getFunctor());
-				//System.out.println("appling="+t+"="+vl+" un="+this);
-				if (vl != null) {
-					vt.setValue(vl);
-					apply(vt); // in case t has var args
-				}
-			}
-			return;
-		}
-		for (int i = 0; i < t.getTermsSize(); i++) { // do not use iterator! (see ListTermImpl class)
-			apply(t.getTerm(i));
-		}
+    		for (int i = 0; i < t.getTermsSize(); i++) { // do not use iterator! (see ListTermImpl class)
+    			apply(t.getTerm(i));
+    		}
     }
 
     public void apply(Pred p) {
-    	apply((Term) p);
-		if (p.getAnnots() != null) {
+    	    apply((Term) p);
+    	    if (p.getAnnots() != null) {
 			Iterator i = p.getAnnots().listTermIterator();
 			while (i.hasNext()) {
 				ListTerm lt = (ListTerm)i.next();
@@ -124,7 +95,7 @@ public class Unifier implements Cloneable {
     public Term get(String var) {
 		if (var == null) return null;
 		
-		Term vl = (Term)function.get(var);
+		Term vl = function.get(var);
 		if (vl == null) return null;
 		
 		// if vl is also a var, get this var value
@@ -150,35 +121,11 @@ public class Unifier implements Cloneable {
 		}
     }
     
-    // TODO: compose is no longer used in TS. Delete?
-    public void compose(Term t, Unifier u) {
-        if (t.isVar()) {
-            if (u.function.containsKey(t.getFunctor())) {
-            	// Note we are losing any previous maping of that variable,
-            	// presumably this was either left unchanged or updated
-            	// by the plan execution
-                function.put(t.getFunctor(),u.function.get(t.getFunctor()));
-            } // else {
-                // Uninstantiated variables remain when the plan for a
-            	// goal has finished. Normally this shouldn't happend, but
-                // nothing necessarily wrong with it. If it was a programming
-                // mistake, an error will eventually occur (e.g., in an action
-            	// with an uninstantiated variable).
-            // }
-            return;
-        }
-        if (t.getTerms()==null)
-            return;
-        for (int i=0; i < t.getTermsSize(); i++) {
-            compose(t.getTerm(i), u);
-        }
-    }
-    
     // ----- Unify for Terms
     
     public boolean unifiesNoClone(Term t1g, Term t2g) {
-    	List t1gts = t1g.getTerms();
-		List t2gts = t2g.getTerms();
+    	    List t1gts = t1g.getTerms();
+    	    List t2gts = t2g.getTerms();
 
 		/*
 		// check if an expression needs solving, before anything else
@@ -224,12 +171,12 @@ public class Unifier implements Cloneable {
         // if two atoms or structures
 		if (!t1g.isVar() && !t2g.isVar()) {
 			// different funcSymb in atoms or structures
-        	if (t1g.getFunctor() != null && !t1g.getFunctor().equals(t2g.getFunctor())) {
+		    if (t1g.getFunctor() != null && !t1g.getFunctor().equals(t2g.getFunctor())) {
 				return false;
-        	}
+        	    }
             
 			// different arities
-        	if ( (t1gts==null && t2gts!=null) || (t1gts!=null && t2gts==null) ) {
+        	    if ( (t1gts==null && t2gts!=null) || (t1gts!=null && t2gts==null) ) {
 				return false;
 			}
 			if (t1g.getTermsSize() != t2g.getTermsSize()) {
@@ -271,17 +218,17 @@ public class Unifier implements Cloneable {
 		
         // both are structures, same funcSymb, same arity
         if (t1gts == null && t2gts == null && !t1g.isList() && !t2g.isList()) { // lists have always terms == null
-        	return true;
+        	    return true;
 		} 
 					    
 		for (int i=0; i < t1g.getTermsSize(); i++) { // do not use iterator! (see ListTermImpl class)
-			Term t1 = t1g.getTerm(i);
+		    Term t1 = t1g.getTerm(i);
 			Term t2 = t2g.getTerm(i);
 			apply(t1);
 			apply(t2);
-            if (!unifies2NoClone(t1,t2)) {
-                return false;
-            }
+			if (!unifies2NoClone(t1,t2)) {
+			    return false;
+			}
 		}
 		return true;
     }
@@ -305,20 +252,18 @@ public class Unifier implements Cloneable {
     }
 
     public boolean unifies2NoClone(Term t1g, Term t2g) {
-    	// try to cast both to Literal
-    	try {
-            return unifiesNoClone((Literal)t1g, (Literal)t2g);    		
-    	} catch (Exception e1) {
-    		// try to cast both to Pred
-    		try {
-    			return unifiesNoClone((Pred)t1g, (Pred)t2g);
-    		} catch (Exception e2) {
-    			// use args as Terms
-    			return unifiesNoClone(t1g, t2g);
-    		}
-    	}
-        //System.out.println("TermUn: "+t1+"="+t2+" : "+t1g+"="+t2g);
-        //return unifiesNoClone(t1g, t2g);
+        // try to cast both to Literal
+        	try {
+        	    return unifiesNoClone((Literal)t1g, (Literal)t2g);    		
+        	} catch (Exception e1) {
+        		// try to cast both to Pred
+        		try {
+        			return unifiesNoClone((Pred)t1g, (Pred)t2g);
+        		} catch (Exception e2) {
+        			// use args as Terms
+        			return unifiesNoClone(t1g, t2g);
+        		}
+        	}
     }
 
    	// ----- Pred
@@ -336,18 +281,19 @@ public class Unifier implements Cloneable {
         // terms unify and annotations are subset
    		
         if (!np1.isVar() && !np2.isVar() && !np1.hasSubsetAnnot(np2, this)) {
-        	return false;
+        	    return false;
         }
         
         // tests when np1 or np2 are Vars with annots
         if (np1.isVar() && np1.hasAnnot() && !np1.hasSubsetAnnot(np2, this)) {
-        	return false;
+        	    return false;
         }
         if (np2.isVar() && np2.hasAnnot() && !np1.hasSubsetAnnot(np2, this)) {
-        	return false;
+        	    return false;
         }
-    	/* (code used when remains in X some annots)
-    	 ListTerm newAnnots1 = null; // new annots for np1 (e.g. np1 is X[a,b,c] and np2 is p[a,b,c,d], newAnnots1 will be [d])
+
+        /* (code used when remains in X some annots)
+    	    ListTerm newAnnots1 = null; // new annots for np1 (e.g. np1 is X[a,b,c] and np2 is p[a,b,c,d], newAnnots1 will be [d])
         if (np1.isVar() && np1.hasAnnot()) {
         	VarTerm tail = np1.getAnnots().getTail(); 
         	if (tail == null) {
@@ -367,12 +313,12 @@ public class Unifier implements Cloneable {
 
         // clear annots of vars
         if (ok && np1.isVar() && np1.hasAnnot()) { //newAnnots1 != null) {
-        	((Pred)function.get(np1.getFunctor())).setAnnots(null);
-        	//((Pred)function.get(np1.getFunctor())).setAnnots(newAnnots1);
-        	//System.out.println("np1="+np1.getFunctor()+"/"+this+":"+newAnnots1);
+            	((Pred)function.get(np1.getFunctor())).setAnnots(null);
+            	//((Pred)function.get(np1.getFunctor())).setAnnots(newAnnots1);
+            	//System.out.println("np1="+np1.getFunctor()+"/"+this+":"+newAnnots1);
         }
         if (ok && np2.isVar() && np2.hasAnnot()) {
-        	((Pred)function.get(np2.getFunctor())).setAnnots(null);
+            ((Pred)function.get(np2.getFunctor())).setAnnots(null);
         }
         return ok;
     }
@@ -380,22 +326,19 @@ public class Unifier implements Cloneable {
    	// ----- Literal
    	
     public boolean unifies(Literal l1, Literal l2) {
-    	Literal nl1 = (Literal)l1.clone();
-   		Literal nl2 = (Literal)l2.clone();
-   		apply(nl1);
-   		apply(nl2);
-        return unifiesNoClone(nl1,nl2);
+        Literal nl1 = (Literal) l1.clone();
+        Literal nl2 = (Literal) l2.clone();
+        apply(nl1);
+        apply(nl2);
+        return unifiesNoClone(nl1, nl2);
     }
+
     private boolean unifiesNoClone(Literal l1, Literal l2) {
         if (!l1.isVar() && !l2.isVar() && l1.negated() != l2.negated()) {
-        	return false;
+            return false;
         }
-        return unifiesNoClone((Pred)l1,(Pred)l2);
+        return unifiesNoClone((Pred) l1, (Pred) l2);
     }
-    
-//    public boolean unifies(DefaultLiteral d1, DefaultLiteral d2) {
-//        return d1.isDefaultNegated()==d2.isDefaultNegated() && unifies((Literal)d1.getLiteral(),(Literal)d2.getLiteral());
-//    }
     
     public boolean unifies(Trigger te1, Trigger te2) {
         return te1.sameType(te2) && unifies(te1.getLiteral(),te2.getLiteral());
@@ -415,11 +358,11 @@ public class Unifier implements Cloneable {
     
     public Object clone() {
         try {
-        	Unifier newUn = new Unifier();
-        	newUn.function = (HashMap)this.function.clone();
+            Unifier newUn = new Unifier();
+            newUn.function = (HashMap)this.function.clone();
             return newUn;
         } catch (Exception e) {
-        	e.printStackTrace();
+            e.printStackTrace();
             return null;
         }
     }

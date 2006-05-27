@@ -19,25 +19,6 @@
 // http://www.dur.ac.uk/r.bordini
 // http://www.inf.furb.br/~jomi
 //
-// CVS information:
-//   $Date$
-//   $Revision$
-//   $Log$
-//   Revision 1.3  2006/02/28 15:11:29  jomifred
-//   improve javadoc
-//
-//   Revision 1.2  2006/02/27 18:46:26  jomifred
-//   creation of the RuntimeServices interface
-//
-//   Revision 1.1  2006/02/17 13:16:16  jomifred
-//   change a lot of method/classes names and improve some comments
-//
-//   Revision 1.6  2005/08/12 20:52:18  jomifred
-//   change in the informAgs method name
-//
-//   Revision 1.5  2005/08/12 20:43:54  jomifred
-//   add cvs keywords and change informAgs method name
-//
 //----------------------------------------------------------------------------
 
 

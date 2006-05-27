@@ -19,14 +19,6 @@
 // http://www.dur.ac.uk/r.bordini
 // http://www.inf.furb.br/~jomi
 //
-// CVS information:
-//   $Date$
-//   $Revision$
-//   $Log$
-//   Revision 1.4  2005/08/12 22:20:10  jomifred
-//   add cvs keywords
-//
-//
 //----------------------------------------------------------------------------
 
 
@@ -38,19 +30,17 @@ import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.Literal;
 import jason.asSyntax.Term;
-//import java.util.logging.Level;
-//import java.util.logging.Logger;
 
 
 public class intend implements InternalAction {
     
-//	static private Logger logger = Logger.getLogger(intend.class.getName());
+    //	static private Logger logger = Logger.getLogger(intend.class.getName());
 
 	public boolean execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
     	
-    	Literal l = Literal.parseLiteral(args[0].toString());
+    	    Literal l = Literal.parseLiteral(args[0].toString());
         un.apply(l);
-//logger.log(Level.SEVERE,"HERE in .intend: "+BDIlogic.Int(ts,l,un));
+        //logger.log(Level.SEVERE,"HERE in .intend: "+BDIlogic.Int(ts,l,un));
         return BDIlogic.Int(ts,l,un);
     }
 }

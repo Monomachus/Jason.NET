@@ -38,11 +38,10 @@ import org.w3c.dom.Element;
 public class BeliefBase {
 
 	
-	public static final Term TPercept = Term.parse("source(percept)");
-	public static final Term TSelf = Term.parse("source(self)");
+	public static final Term TPercept = TermImpl.parse("source(percept)");
+	public static final Term TSelf = TermImpl.parse("source(self)");
 
 	static private Logger logger = Logger.getLogger(BeliefBase.class.getName());
-	
 	
 	
 	/** 

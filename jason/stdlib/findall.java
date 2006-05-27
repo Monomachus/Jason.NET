@@ -19,17 +19,6 @@
 // http://www.dur.ac.uk/r.bordini
 // http://www.inf.furb.br/~jomi
 //
-// CVS information:
-//   $Date$
-//   $Revision$
-//   $Log$
-//   Revision 1.6  2005/12/22 00:04:19  jomifred
-//   ListTerm is now an interface implemented by ListTermImpl
-//
-//   Revision 1.5  2005/08/12 22:20:10  jomifred
-//   add cvs keywords
-//
-//
 //----------------------------------------------------------------------------
 
 package jason.stdlib;
@@ -78,7 +67,7 @@ public class findall implements InternalAction {
 				}
 			}
 			Term list = args[2];
-			return un.unifies(list, (Term)all);
+			return un.unifies(list, all);
 		} catch (ArrayIndexOutOfBoundsException e) {
 			throw new JasonException("The internal action 'findall' has not received three arguments");
 		} catch (Exception e) {

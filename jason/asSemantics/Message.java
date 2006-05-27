@@ -19,20 +19,6 @@
 // http://www.dur.ac.uk/r.bordini
 // http://www.inf.furb.br/~jomi
 //
-// CVS information:
-//   $Date$
-//   $Revision$
-//   $Log$
-//   Revision 1.6  2005/12/05 16:04:47  jomifred
-//   Message content can be object
-//
-//   Revision 1.5  2005/11/07 12:43:00  jomifred
-//   Message content can be an object (not string)
-//
-//   Revision 1.4  2005/08/12 22:18:37  jomifred
-//   add cvs keywords
-//
-//
 //----------------------------------------------------------------------------
 
 

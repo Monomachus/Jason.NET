@@ -8,6 +8,7 @@ import jason.asSyntax.Literal;
 import jason.asSyntax.LogExprTerm;
 import jason.asSyntax.Pred;
 import jason.asSyntax.Term;
+import jason.asSyntax.TermImpl;
 import jason.asSyntax.VarTerm;
 
 import java.util.Iterator;
@@ -31,45 +32,45 @@ public class BeliefBaseTest extends TestCase {
 		assertFalse(bb.add(new Literal(true, new Pred("pos"))));
 
 		l2 = new Literal(true, new Pred("pos"));
-		l2.addAnnot(new Term("a"));
+		l2.addAnnot(new TermImpl("a"));
 		assertTrue(bb.add(l2));
 		assertFalse(bb.add(l2));
 
 		l3 = new Literal(true, new Pred("pos"));
-		l3.addAnnot(new Term("b"));
+		l3.addAnnot(new TermImpl("b"));
 		l3.addAnnot(BeliefBase.TPercept);
 		assertTrue(bb.add(l3));
 		assertFalse(bb.add(l3));
 
 		l3 = new Literal(true, new Pred("pos"));
-		l3.addSource(new Term("ag1"));
+		l3.addSource(new TermImpl("ag1"));
 		assertTrue(bb.add(l3));
 
 		// same as above, must not insert
 		l3 = new Literal(true, new Pred("pos"));
-		l3.addSource(new Term("ag1"));
+		l3.addSource(new TermImpl("ag1"));
 		assertFalse(bb.add(l3));
 		
 		l4 = new Literal(true, new Pred("pos"));
-		l4.addTerm(new Term("1"));
-		l4.addTerm(new Term("2"));
+		l4.addTerm(new TermImpl("1"));
+		l4.addTerm(new TermImpl("2"));
 		l4.addAnnot(BeliefBase.TPercept);
 		assertTrue(bb.add(l4));
 
 		l4 = new Literal(true, new Pred("pos"));
-		l4.addTerm(new Term("1"));
-		l4.addTerm(new Term("2"));
+		l4.addTerm(new TermImpl("1"));
+		l4.addTerm(new TermImpl("2"));
 		l4.addAnnot(BeliefBase.TPercept);
 		assertFalse(bb.add(l4));
 
 		l4 = new Literal(true, new Pred("pos"));
-		l4.addTerm(new Term("5"));
-		l4.addTerm(new Term("6"));
+		l4.addTerm(new TermImpl("5"));
+		l4.addTerm(new TermImpl("6"));
 		l4.addAnnot(BeliefBase.TPercept);
 		assertTrue(bb.add(l4));
 
 		l5 = new Literal(true, new Pred("garb"));
-		l5.addTerm(new Term("r1"));
+		l5.addTerm(new TermImpl("r1"));
 		assertTrue(bb.add(l5));
 		
 		//System.out.println("BB="+bb);
@@ -87,13 +88,13 @@ public class BeliefBaseTest extends TestCase {
 		
 		// remove
 		l5 = new Literal(true, new Pred("garb"));
-		l5.addTerm(new Term("r1"));
+		l5.addTerm(new TermImpl("r1"));
 		assertTrue(bb.remove(l5));
 		assertEquals(bb.getRelevant(l5), null);
 
 		l4 = new Literal(true, new Pred("pos"));
-		l4.addTerm(new Term("5"));
-		l4.addTerm(new Term("6"));
+		l4.addTerm(new TermImpl("5"));
+		l4.addTerm(new TermImpl("6"));
 		l4.addAnnot(BeliefBase.TPercept);
 		assertTrue(bb.remove(l4));
 		assertEquals(bb.getRelevant(l4).size(), 1);
@@ -104,8 +105,8 @@ public class BeliefBaseTest extends TestCase {
 		assertEquals(bb.getPercepts().size(), 2);
 	
 		l4 = new Literal(true, new Pred("pos"));
-		l4.addTerm(new Term("1"));
-		l4.addTerm(new Term("2"));
+		l4.addTerm(new TermImpl("1"));
+		l4.addTerm(new TermImpl("2"));
 		l4.addAnnot(BeliefBase.TPercept);
 		assertTrue(bb.remove(l4));
 		assertEquals(bb.getRelevant(l4), null);
@@ -115,14 +116,14 @@ public class BeliefBaseTest extends TestCase {
 		//System.out.println("Percepts="+bb.getPercepts());
 		
 		l2 = new Literal(true, new Pred("pos"));
-		l2.addAnnot(new Term("a"));
+		l2.addAnnot(new TermImpl("a"));
 		assertTrue(bb.contains(l2) != null);
 		assertFalse(bb.contains(l2).hasSubsetAnnot(l2)); //
 		assertTrue(bb.remove(l2));
 
-		l2.addAnnot(new Term("b"));
+		l2.addAnnot(new TermImpl("b"));
 		l2.addAnnot(BeliefBase.TPercept);
-		l2.delAnnot(new Term("a"));
+		l2.delAnnot(new TermImpl("a"));
 		assertTrue(bb.remove(l2));
 		//System.out.println("removed "+l2);
 		//System.out.println("BB="+bb);

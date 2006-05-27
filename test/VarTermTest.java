@@ -9,6 +9,7 @@ import jason.asSyntax.NumberTerm;
 import jason.asSyntax.NumberTermImpl;
 import jason.asSyntax.Pred;
 import jason.asSyntax.Term;
+import jason.asSyntax.TermImpl;
 import jason.asSyntax.VarTerm;
 import jason.asSyntax.ArithExprTerm.ArithmeticOp;
 
@@ -27,12 +28,12 @@ public class VarTermTest extends TestCase {
 	public void testVarTermAsTerm() {
 		VarTerm k = new VarTerm("K");
 		Unifier u = new Unifier();
-		u.unifies(k, new Term("a1"));
+		u.unifies(k, new TermImpl("a1"));
 		assertTrue("K".equals(k.toString()));
 		u.apply(k);
 		assertTrue("a1".equals(k.toString()));
-		k.addTerm(new Term("p1"));
-		k.addTerm(new Term("p2"));
+		k.addTerm(new TermImpl("p1"));
+		k.addTerm(new TermImpl("p2"));
 		assertEquals(k.getTermsSize(), 2);
 		
 		
@@ -43,7 +44,7 @@ public class VarTermTest extends TestCase {
 		x1.setValue(x2);
 		x2.setValue(x3);
 		
-		x3.setValue(new Term("a"));
+		x3.setValue(new TermImpl("a"));
 		// x1's value is x3's value (a)
 		assertEquals(x1.getValue().toString(), "a");
 		
@@ -54,14 +55,14 @@ public class VarTermTest extends TestCase {
 		VarTerm v1 = new VarTerm("L");
 		ListTerm lt = ListTermImpl.parseList("[a,B,a(B)]");
 		u = new Unifier();
-		u.unifies(new VarTerm("B"), new Term("oi"));
+		u.unifies(new VarTerm("B"), new TermImpl("oi"));
 		u.unifies(v1, (Term)lt);
 		u.apply(v1);
 		lt = (ListTerm)v1.getValue();
 		Iterator i = lt.iterator();
 		i.next();i.next();
 		Term third = (Term)i.next();
-		assertTrue(third.equals(Term.parse("a(oi)")));
+		assertTrue(third.equals(TermImpl.parse("a(oi)")));
 	}
 
 	/** test when a var is ground with a Pred */
@@ -73,10 +74,10 @@ public class VarTermTest extends TestCase {
 		u.apply(k);
 		assertTrue(k.isPred());
 		assertFalse(k.hasAnnot());
-		k.addAnnot(new Term("annot1"));
+		k.addAnnot(new TermImpl("annot1"));
 		assertTrue(k.hasAnnot());
 
-		k.addSource(new Term("marcos"));
+		k.addSource(new TermImpl("marcos"));
 		assertEquals(k.getAnnots().size(), 2);
 		k.delSources();
 		assertEquals(k.getAnnots().size(), 1);
@@ -85,8 +86,8 @@ public class VarTermTest extends TestCase {
 		k = new VarTerm("K");
 		u = new Unifier();
 		u.unifies(k, Pred.parsePred("p[a]"));
-		k.addAnnot(new Term("annot1"));
-		k.addAnnot(new Term("annot2"));
+		k.addAnnot(new TermImpl("annot1"));
+		k.addAnnot(new TermImpl("annot2"));
 		assertEquals(k.getAnnots().size(), 2);		
 	}
 
@@ -188,7 +189,7 @@ public class VarTermTest extends TestCase {
 		VarTerm v1 = VarTerm.parseVar("X[a,b,c]");
 		VarTerm v2 = VarTerm.parseVar("X[a,b]");
 		assertFalse(v1.equals(v2));
-		v2.addAnnot(new Term("c"));
+		v2.addAnnot(new TermImpl("c"));
 		assertTrue(v1.equals(v2));
 		assertTrue(v2.equals(v1));
 		
@@ -201,8 +202,8 @@ public class VarTermTest extends TestCase {
 		assertTrue(u.unifies(p1,v1));
 		assertEquals(u.get("X").toString(), "p(t1,t2)");
 
-		p1.addAnnot(new Term("b"));
-		p1.addAnnot(new Term("d"));
+		p1.addAnnot(new TermImpl("b"));
+		p1.addAnnot(new TermImpl("d"));
 		u.clear();
 		// p[a,c,b,d] = X[a,b,c] nok
 		assertFalse(u.unifies(p1,v1));

@@ -19,38 +19,6 @@
 // http://www.dur.ac.uk/r.bordini
 // http://www.inf.furb.br/~jomi
 //
-// CVS information:
-//   $Date$
-//   $Revision$
-//   $Log$
-//   Revision 1.4  2006/02/27 18:46:26  jomifred
-//   creation of the RuntimeServices interface
-//
-//   Revision 1.3  2006/02/18 15:26:24  jomifred
-//   changes in many files to detach jason kernel from any infrastructure implementation
-//
-//   Revision 1.2  2006/01/14 18:23:40  jomifred
-//   centralised infra does not use xml script file anymore
-//
-//   Revision 1.1  2006/01/04 02:55:57  jomifred
-//   using java log API instead of apache log
-//
-//   Revision 1.11  2005/12/08 20:06:59  jomifred
-//   changes for JasonIDE plugin
-//
-//   Revision 1.10  2005/10/30 18:39:48  jomifred
-//   change in the AgArch customisation  support (the same customisation is used both to Cent and Saci infrastructures0
-//
-//   Revision 1.9  2005/10/20 21:40:09  jomifred
-//   add some comments
-//
-//   Revision 1.8  2005/08/15 13:05:25  jomifred
-//   using infrastructure instead of architecture in mas2j
-//
-//   Revision 1.7  2005/08/12 22:26:08  jomifred
-//   add cvs keywords
-//
-//
 //----------------------------------------------------------------------------
 
 

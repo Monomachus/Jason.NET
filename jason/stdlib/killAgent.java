@@ -19,25 +19,6 @@
 // http://www.dur.ac.uk/r.bordini
 // http://www.inf.furb.br/~jomi
 //
-// CVS information:
-//   $Date$
-//   $Revision$
-//   $Log$
-//   Revision 1.5  2006/02/27 18:46:26  jomifred
-//   creation of the RuntimeServices interface
-//
-//   Revision 1.4  2006/02/18 15:27:04  jomifred
-//   changes in many files to detach jason kernel from any infrastructure implementation
-//
-//   Revision 1.3  2006/02/17 13:13:16  jomifred
-//   change a lot of method/classes names and improve some comments
-//
-//   Revision 1.2  2006/01/04 03:00:47  jomifred
-//   using java log API instead of apache log
-//
-//   Revision 1.1  2005/08/18 13:32:45  jomifred
-//   initial implementation (based on createAg)
-//
 //----------------------------------------------------------------------------
 
 package jason.stdlib;
@@ -48,11 +29,9 @@ import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.Term;
 
-import java.util.logging.Logger;
-
 public class killAgent implements InternalAction {
 
-    private static Logger logger = Logger.getLogger(killAgent.class.getName());
+    //private static Logger logger = Logger.getLogger(killAgent.class.getName());
 
 	/* args[0] the agent name */
 	public boolean execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
@@ -60,7 +39,6 @@ public class killAgent implements InternalAction {
 		try {
             Term name = (Term)args[0].clone();
             un.apply(name);
-            
             return ts.getUserAgArch().getArchInfraTier().getRuntimeServices().killAgent(name.toString());
 		} catch (IndexOutOfBoundsException e) {
 			throw new JasonException("The internal action 'killAgent' received a wrong number of arguments");

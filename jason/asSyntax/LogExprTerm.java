@@ -39,7 +39,7 @@ import org.w3c.dom.Element;
 /** 
  *  represents a logical expression like [ <le> ] < & | "|" | not > <le>.
  */
-public class LogExprTerm extends Term {
+public class LogExprTerm extends TermImpl {
 
     public enum LogicalOp { 
 		none   { public String toString() { return ""; } }, 

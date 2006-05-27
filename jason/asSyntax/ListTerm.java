@@ -19,20 +19,6 @@
 // http://www.dur.ac.uk/r.bordini
 // http://www.inf.furb.br/~jomi
 //
-// CVS information:
-//   $Date$
-//   $Revision$
-//   $Log$
-//   Revision 1.8  2005/12/30 20:40:16  jomifred
-//   new features: unnamed var, var with annots, TE as var
-//
-//   Revision 1.7  2005/12/22 00:03:30  jomifred
-//   ListTerm is now an interface implemented by ListTermImpl
-//
-//   Revision 1.6  2005/08/12 22:26:08  jomifred
-//   add cvs keywords
-//
-//
 //----------------------------------------------------------------------------
 
 package jason.asSyntax;
@@ -45,27 +31,23 @@ import java.util.List;
  * 
  * @author jomi
  */
-public interface ListTerm extends java.util.List, TermInterface {
+public interface ListTerm extends java.util.List<Term>, Term {
 	
 	public void setTerm(Term t);
 	public Term getTerm();
 	public void setNext(Term l);
 	public ListTerm getNext();
-	public boolean isList();
 	
-	public void addTerm(Term t);
 	public int size();
 	public boolean isEmpty();
 	public boolean isEnd();
-	public boolean isGround();
 	
 	public boolean isTail();
 	public VarTerm getTail();
 	public void setTail(VarTerm v);
 	public ListTerm getLast();
-	public ListTerm add(Term t);
-	public ListTerm add(int index, Term t);
+	public ListTerm append(Term t);
 	public ListTerm concat(ListTerm lt);
-	public Iterator listTermIterator();
-    public List getAsList();
+	public Iterator<ListTerm> listTermIterator();
+    public List<Term> getAsList();
 }

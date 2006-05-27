@@ -300,8 +300,8 @@ ListTermImpl list() : { ListTermImpl lt = new ListTermImpl(); ListTerm last;
 {
   "["
   [
-  f=t()                   { last = lt.add(f); }
-  ( "," f=t()             { last = last.add(f); }
+  f=t()                   { last = lt.append(f); }
+  ( "," f=t()             { last = last.append(f); }
   )*
   [ "|"  ( K=<VAR>        { last.setNext(new VarTerm(K.image)); }
          | K=<UNNAMEDVAR> { last.setNext(new UnnamedVar()); }

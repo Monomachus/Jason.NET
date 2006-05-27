@@ -51,7 +51,7 @@ import org.w3c.dom.Element;
  * 
  * @author jomi
  */
-public class RelExprTerm extends Term {
+public class RelExprTerm extends TermImpl {
 
     public enum RelationalOp { 
 		none   { public String toString() { return ""; } }, 

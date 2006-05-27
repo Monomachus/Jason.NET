@@ -33,6 +33,7 @@ import jason.asSyntax.PlanLibrary;
 import jason.asSyntax.Pred;
 import jason.asSyntax.RelExprTerm;
 import jason.asSyntax.Term;
+import jason.asSyntax.TermImpl;
 import jason.asSyntax.Trigger;
 import jason.runtime.Settings;
 
@@ -170,14 +171,14 @@ public class TransitionSystem {
 				// the send that put the intention in Pending state was something like
 				//  .send(ask, ag1, value, X)
 				// if the answer was 3, unifies X=3
-                	Term ans = Term.parse(m.getPropCont().toString());
+                	Term ans = TermImpl.parse(m.getPropCont().toString());
                 	BodyLiteral send = (BodyLiteral)intention.peek().getPlan().getBody().remove(0);
                 	intention.peek().getUnif().unifies(send.getTerm().getTerm(3),ans);
 				getC().addIntention(intention);
                 
             // the message is not an ask answer
             } else if (conf.ag.socAcc(m)) {
-				Term content = Term.parse(m.getPropCont().toString());
+				Term content = TermImpl.parse(m.getPropCont().toString());
 				
 				//Literal content = Literal.parseLiteral(m.getPropCont());
 				//content.addAnnot(Term.parse("source("+m.getSender()+")")); 
@@ -188,10 +189,10 @@ public class TransitionSystem {
 	
 				// generate an event
 				Literal received = new Literal(Literal.LPos, new Pred("received"));
-				received.addTerm(new Term(m.getSender()));
-				received.addTerm(new Term(m.getIlForce()));
+				received.addTerm(new TermImpl(m.getSender()));
+				received.addTerm(new TermImpl(m.getIlForce()));
 				received.addTerm(content);
-				received.addTerm(new Term(m.getMsgId()));
+				received.addTerm(new TermImpl(m.getMsgId()));
 				
 				Event evt = new Event(new Trigger(Trigger.TEAdd, Trigger.TEBel, received), focus);
 				conf.ag.updateEvents(evt, conf.C);

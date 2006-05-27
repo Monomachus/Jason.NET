@@ -19,65 +19,6 @@
 // http://www.dur.ac.uk/r.bordini
 // http://www.inf.furb.br/~jomi
 //
-// CVS information:
-//   $Date$
-//   $Revision$
-//   $Log$
-//   Revision 1.32  2006/03/02 02:51:24  jomifred
-//   the jIDE package was remove, the writeScriptInterface's methods was moved to MASLauncher
-//
-//   Revision 1.31  2006/03/02 01:42:14  jomifred
-//   the jIDE package was remove, the writeScriptInterface's methods was moved to MASLauncher
-//
-//   Revision 1.30  2006/02/22 21:28:16  jomifred
-//   no message
-//
-//   Revision 1.29  2006/02/22 21:19:05  jomifred
-//   The internalAction removePlan use plan's label as argument instead of plan's strings
-//
-//   Revision 1.28  2006/02/17 13:13:16  jomifred
-//   change a lot of method/classes names and improve some comments
-//
-//   Revision 1.27  2006/02/14 22:34:40  jomifred
-//   fix a bug in brf (it does not deal correctly with open world)
-//
-//   Revision 1.26  2006/01/14 18:22:45  jomifred
-//   centralised infra does not use xml script file anymore
-//
-//   Revision 1.25  2006/01/06 12:05:37  jomifred
-//   operator - removes bel from BB and changes the current unifier.
-//
-//   Revision 1.24  2006/01/04 02:54:41  jomifred
-//   using java log API instead of apache log
-//
-//   Revision 1.23  2006/01/02 13:49:00  jomifred
-//   add plan unique id, fix some bugs
-//
-//   Revision 1.22  2005/12/31 16:29:58  jomifred
-//   add operator =..
-//
-//   Revision 1.21  2005/12/30 20:40:16  jomifred
-//   new features: unnamed var, var with annots, TE as var
-//
-//   Revision 1.20  2005/12/23 00:48:22  jomifred
-//   StringTerm is now an interface implemented by StringTermImpl
-//
-//   Revision 1.18  2005/10/30 18:38:34  jomifred
-//   change in the AgArch customisation  support (the same customisation is used both to Cent and Saci infrastructures0
-//
-//   Revision 1.17  2005/08/23 17:09:28  jomifred
-//   fix bug in logger
-//
-//   Revision 1.16  2005/08/18 11:38:19  jomifred
-//   do not add <true> or <false> in BB
-//
-//   Revision 1.15  2005/08/15 17:41:36  jomifred
-//   AgentArchitecture renamed to AgArchInterface
-//
-//   Revision 1.14  2005/08/12 22:18:37  jomifred
-//   add cvs keywords
-//
-//
 //----------------------------------------------------------------------------
 
 package jason.asSemantics;
@@ -273,7 +214,7 @@ public class Agent {
 	// TODO: call it BUF (belief update function)
 	
 	/** Belief Revision Function: add/remove perceptions into belief base */
-    public void brf(List percepts) {
+    public void brf(List<Literal> percepts) {
         if (percepts == null) {
             return;
         }
@@ -285,11 +226,11 @@ public class Agent {
             // could not use percepts.contains(l), since equalsAsTerm must be used (to ignore annotations)
             boolean wasPerceived = false;
             for (int j=0; j< percepts.size(); j++) {
-            	Literal t = (Literal)percepts.get(j);
-            	if (l.equalsAsTerm(t) && l.negated() == t.negated()) { // if percept t is already in BB
-            		wasPerceived = true;
-            		break;
-            	}
+            	    Literal t = (Literal)percepts.get(j);
+            	    if (l.equalsAsTerm(t) && l.negated() == t.negated()) { // if percept t is already in BB
+            	        wasPerceived = true;
+            	        break;
+            	    }
             }
             if (!wasPerceived) {
                 l.addAnnot(BeliefBase.TPercept);

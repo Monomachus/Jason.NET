@@ -19,43 +19,6 @@
 // http://www.dur.ac.uk/r.bordini
 // http://www.inf.furb.br/~jomi
 //
-// CVS information:
-//   $Date$
-//   $Revision$
-//   $Log$
-//   Revision 1.6  2006/03/03 23:12:38  jomifred
-//   no message
-//
-//   Revision 1.5  2006/03/02 01:41:14  jomifred
-//   the jIDE package was remove, the writeScriptInterface's methods was moved to MASLauncher
-//
-//   Revision 1.4  2006/02/24 14:53:26  jomifred
-//   no message
-//
-//   Revision 1.3  2006/02/18 16:04:56  jomifred
-//   no message
-//
-//   Revision 1.2  2006/02/18 15:24:50  jomifred
-//   changes in many files to detach jason kernel from any infrastructure implementation
-//
-//   Revision 1.1  2006/01/14 15:18:58  jomifred
-//   Config and some code of RunMAS was moved to package plugin
-//
-//   Revision 1.6  2006/01/11 15:14:39  jomifred
-//   add close all befere opening a mas2j project
-//
-//   Revision 1.5  2006/01/04 02:54:41  jomifred
-//   using java log API instead of apache log
-//
-//   Revision 1.4  2006/01/02 13:49:00  jomifred
-//   add plan unique id, fix some bugs
-//
-//   Revision 1.3  2005/12/30 20:40:16  jomifred
-//   new features: unnamed var, var with annots, TE as var
-//
-//   Revision 1.1  2005/12/08 20:06:02  jomifred
-//   changes for JasonIDE plugin
-//
 //----------------------------------------------------------------------------
 
 package jason.jeditplugin;

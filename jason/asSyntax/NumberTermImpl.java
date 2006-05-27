@@ -19,20 +19,6 @@
 // http://www.dur.ac.uk/r.bordini
 // http://www.inf.furb.br/~jomi
 //
-// CVS information:
-//   $Date$
-//   $Revision$
-//   $Log$
-//   Revision 1.4  2006/01/04 02:54:41  jomifred
-//   using java log API instead of apache log
-//
-//   Revision 1.3  2006/01/02 13:49:00  jomifred
-//   add plan unique id, fix some bugs
-//
-//   Revision 1.2  2005/08/12 22:26:08  jomifred
-//   add cvs keywords
-//
-//
 //----------------------------------------------------------------------------
 
 package jason.asSyntax;
@@ -44,7 +30,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /** implements a term that represents a number */
-public class NumberTermImpl extends Term implements NumberTerm {
+public class NumberTermImpl extends TermImpl implements NumberTerm {
 
 	static private Logger logger = Logger.getLogger(NumberTermImpl.class.getName());
 
@@ -113,10 +99,9 @@ public class NumberTermImpl extends Term implements NumberTerm {
 		return false;
 	}
 
-    public int compareTo(Object o) {
+    public int compareTo(Term o) {
         try {
-            Term t = (Term)o;
-            NumberTerm st = (NumberTerm)t;
+            NumberTerm st = (NumberTerm)o;
             if (solve() > st.solve()) return 1;
             if (solve() < st.solve()) return -1;
         } catch (Exception e) {}
