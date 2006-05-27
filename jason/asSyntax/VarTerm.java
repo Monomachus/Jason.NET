@@ -41,7 +41,7 @@ import org.w3c.dom.Element;
 
 /**
  * Represents a variable Term: like X (starts with upper case). 
- * It may have a value, afert Unifier.apply.
+ * It may have a value, afert {@link Unifier}.apply.
  * 
  * @author jomi
  */
@@ -135,8 +135,6 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
 	/** 
 	 * returns the value of this var. 
 	 * if value is also a var, returns the value of this latter var
-	 * 
-	 * @return
 	 */
 	public Term getValue() {
 		return getLastVarChain().value;

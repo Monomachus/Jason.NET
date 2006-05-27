@@ -34,7 +34,7 @@ import org.w3c.dom.Element;
 
 
 /** 
- *  represents an arithmetic expression like [ <ae> ] <+ | - | * | ...> <ae>.
+ *  represents an arithmetic expression like [ expr ] <+ | - | * | ...> expr.
  * 
  *  It is a var, so unifier.apply(ExprTerm) computes (via solve()) the expression value. 
  *  The var value has the result of this evaluation. 

@@ -85,7 +85,7 @@ public class TermImpl implements Term, Serializable {
 
     protected String functorArityBak = null; // to not compute it all the time (is is called many many times)
     
-    /** returns <functor symbol> "/" <arity> */
+    /** returns functor symbol "/" arity */
     public String getFunctorArity() {
         if (functorArityBak == null) {
             if (terms == null) {

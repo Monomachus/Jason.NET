@@ -40,7 +40,7 @@ public interface Term extends Cloneable, Comparable<Term>, Serializable {
 
     public String getFunctor();
 
-    /** returns <functor symbol> "/" <arity> */
+    /** returns functor symbol "/" arity */
 	public String getFunctorArity();
 
     /** 
