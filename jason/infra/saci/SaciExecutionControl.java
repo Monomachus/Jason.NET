@@ -34,116 +34,122 @@ import saci.Message;
 import saci.MessageHandler;
 
 /**
- * Concrete execution control implementation based on saci distributed infrastructure.
+ * Concrete execution control implementation based on saci distributed
+ * infrastructure.
  */
 public class SaciExecutionControl extends saci.Agent implements ExecutionControlInfraTier {
 
-	private ExecutionControl fUserControl;
+    private ExecutionControl fUserControl;
 
     public void initAg(String[] args) throws JasonException {
         // create the user controller
         try {
-        	System.out.println("Creating controller from "+args[0]);//+" Jason Home is "+args[0]);
-        	fUserControl = (ExecutionControl)Class.forName(args[0]).newInstance();
-        	fUserControl.setExecutionControlInfraTier(this);
-        	//fUserControl.setJasonDir(args[0]);
-        	fUserControl.init();
+            System.out.println("Creating controller from " + args[0]);
+            fUserControl = (ExecutionControl) Class.forName(args[0]).newInstance();
+            fUserControl.setExecutionControlInfraTier(this);
+            // create parameters array
+            String[] p = new String[args.length-1];
+            for (int i=0; i<p.length; i++) {
+                p[i] = args[i+1];
+            }
+            fUserControl.init(p);
         } catch (Exception e) {
-            System.err.println("Error "+e);
+            System.err.println("Error " + e);
             e.printStackTrace();
-            throw new JasonException("The user execution control class instantiation '"+args[1]+"' has failed!"+e.getMessage());
+            throw new JasonException("The user execution control class instantiation '" + args[1] + "' has failed!" + e.getMessage());
         }
-        
+
         try {
-        	// message handler for "informCycleFinished"
+            // message handler for "informCycleFinished"
             mbox.addMessageHandler("cycleFinished", "tell", null, "AS-ExecControl", new MessageHandler() {
                 public boolean processMessage(saci.Message m) {
-                	String sender = (String)m.get("sender");
-                	boolean breakpoint = false;
-                	if (m.get("breakpoint") != null) {
-                		breakpoint = m.get("breakpoint").equals("true");
-                	}
-            		fUserControl.receiveFinishedCycle(sender, breakpoint);
-                    return true; // no other message handler gives this message
+                    String sender = (String) m.get("sender");
+                    boolean breakpoint = false;
+                    if (m.get("breakpoint") != null) {
+                        breakpoint = m.get("breakpoint").equals("true");
+                    }
+                    fUserControl.receiveFinishedCycle(sender, breakpoint);
+                    return true; // no other message handler gives this
+                                    // message
                 }
             });
-            
+
         } catch (Exception e) {
-            System.err.println("Error adding message handler for agent:"+e);
+            System.err.println("Error adding message handler for agent:" + e);
             e.printStackTrace();
         }
     }
-    
+
     public void stopAg() {
-		fUserControl.stop();
-		super.stopAg();
-	}
-
-	public void run() {
-    	try {
-    		Thread.sleep(1000); // gives a time to agents enter in wait
-    	} catch (Exception e) {}
-    	informAllAgsToPerformCycle();
+        fUserControl.stop();
+        super.stopAg();
     }
-	
-	public ExecutionControl getUserControl() {
-		return fUserControl;
-	}
-    
 
-	/**
-	 * @see jason.control.ExecutionControlInfraTier#informAgToPerformCycle(java.lang.String)
-	 */
-	public void informAgToPerformCycle(String agName) {
-	    Message m = new Message("(tell)");
-	    m.put("ontology", "AS-ExecControl");
-	    m.put("receiver", agName);
-	    m.put("content", "performCycle");
-	    try {
-	    	mbox.sendMsg(m);
-	    } catch (Exception e) {
-	    	e.printStackTrace();
-	    }
-	}
+    public void run() {
+        try {
+            Thread.sleep(1000); // gives a time to agents enter in wait
+        } catch (Exception e) {
+        }
+        informAllAgsToPerformCycle();
+    }
 
-	/**
-	 * @see jason.control.ExecutionControlInfraTier#informAllAgsToPerformCycle()
-	 */
-	public void informAllAgsToPerformCycle() {
-	    Message m = new Message("(tell)");
-	    m.put("ontology", "AS-ExecControl");
-	    m.put("content", "performCycle");
-	    try {
-	    	mbox.broadcast(m);
-	    } catch (Exception e) {
-	    	e.printStackTrace();
-	    }
-	}
+    public ExecutionControl getUserControl() {
+        return fUserControl;
+    }
 
-	
-	/**
-	 *  @see jason.control.ExecutionControlInfraTier#getAgState(java.lang.String)
-	 */
-	public Document getAgState(String agName) {
-	    Message m = new Message("(ask)");
-	    m.put("ontology", "AS-ExecControl");
-	    m.put("receiver", agName);
-	    m.put("content", "agState");
-	    try {
-	    	Message r = mbox.ask(m);
+    /**
+     * @see jason.control.ExecutionControlInfraTier#informAgToPerformCycle(java.lang.String)
+     */
+    public void informAgToPerformCycle(String agName) {
+        Message m = new Message("(tell)");
+        m.put("ontology", "AS-ExecControl");
+        m.put("receiver", agName);
+        m.put("content", "performCycle");
+        try {
+            mbox.sendMsg(m);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
-	    	//System.out.println("** ans = "+r.get("content"));
-	        //System.out.println(r.get("content").getClass().getName()+" = "+m.get("content"));
-	    	
-	    	return  (Document)r.get("content");
-	    } catch (Exception e) {
-	    	System.err.println("Error receiving agent state "+e);
-	    	e.printStackTrace();
-	    }
-		return null;
-	}
+    /**
+     * @see jason.control.ExecutionControlInfraTier#informAllAgsToPerformCycle()
+     */
+    public void informAllAgsToPerformCycle() {
+        Message m = new Message("(tell)");
+        m.put("ontology", "AS-ExecControl");
+        m.put("content", "performCycle");
+        try {
+            mbox.broadcast(m);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * @see jason.control.ExecutionControlInfraTier#getAgState(java.lang.String)
+     */
+    public Document getAgState(String agName) {
+        Message m = new Message("(ask)");
+        m.put("ontology", "AS-ExecControl");
+        m.put("receiver", agName);
+        m.put("content", "agState");
+        try {
+            Message r = mbox.ask(m);
+
+            // System.out.println("** ans = "+r.get("content"));
+            // System.out.println(r.get("content").getClass().getName()+" =
+            // "+m.get("content"));
+
+            return (Document) r.get("content");
+        } catch (Exception e) {
+            System.err.println("Error receiving agent state " + e);
+            e.printStackTrace();
+        }
+        return null;
+    }
 
     public RuntimeServicesInfraTier getRuntimeServices() {
-    	return new SaciRuntimeServices(getSociety());
+        return new SaciRuntimeServices(getSociety());
     }
 }

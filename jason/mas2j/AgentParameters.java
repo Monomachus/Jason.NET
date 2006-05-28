@@ -7,13 +7,13 @@ import java.util.Iterator;
 import java.util.Map;
 
 public class AgentParameters {
-	public String name      = null;
-	public File   asSource  = null;
-	public String agClass   = null;
-	public String archClass = null;
-	public Map    options   = null;
-	public int    qty       = 1;
-	public String host      = null;
+	public String              name      = null;
+    public File                asSource  = null;
+    public ClassParameters     agClass   = null;
+    public ClassParameters     archClass = null;
+    public int                 qty       = 1;
+    public String              host      = null;
+    public Map<String, String> options   = null;
 	
 	public String toString() {
 		return getAsInMASProject();
@@ -36,10 +36,10 @@ public class AgentParameters {
 			}
 			s.append("] ");
 		}
-		if (archClass != null && archClass.length() > 0) {
+		if (archClass != null && archClass.className.length() > 0) {
 			s.append("agentArchClass "+archClass+" ");
 		}
-		if (agClass != null && agClass.length() > 0) {
+		if (agClass != null && agClass.className.length() > 0) {
 			s.append("agentClass "+agClass+" ");
 		}
 		if (qty > 1) {

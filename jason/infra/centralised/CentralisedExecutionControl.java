@@ -27,76 +27,73 @@ import jason.JasonException;
 import jason.architecture.AgArch;
 import jason.control.ExecutionControl;
 import jason.control.ExecutionControlInfraTier;
+import jason.mas2j.ClassParameters;
 import jason.runtime.RuntimeServicesInfraTier;
 
-import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.w3c.dom.Document;
 
 /**
- * Concrete implementation of the controller for
- * centralised infrastructure tier.
+ * Concrete implementation of the controller for centralised infrastructure
+ * tier.
  */
 public class CentralisedExecutionControl implements ExecutionControlInfraTier {
 
-	private CentralisedEnvironment    infraEnv;
-	private ExecutionControl          userController;
-	
-	static Logger logger = Logger.getLogger(CentralisedExecutionControl.class.getName());
-	
-	public CentralisedExecutionControl(CentralisedEnvironment envInfraTier, String userControlClass) throws JasonException {
-		infraEnv = envInfraTier;
+    private CentralisedEnvironment infraEnv;
+    private ExecutionControl       userController;
+
+    static Logger                  logger = Logger.getLogger(CentralisedExecutionControl.class.getName());
+
+    public CentralisedExecutionControl(CentralisedEnvironment envInfraTier, ClassParameters userControlClass) throws JasonException {
+        infraEnv = envInfraTier;
         try {
-        	userController = (ExecutionControl)Class.forName(userControlClass).newInstance();
-        	userController.setExecutionControlInfraTier(this);
-        	//fUserControl.setJasonDir(jasonDir);
-        	userController.init();
+            userController = (ExecutionControl) Class.forName(userControlClass.className).newInstance();
+            userController.setExecutionControlInfraTier(this);
+            // fUserControl.setJasonDir(jasonDir);
+            userController.init(userControlClass.getParametersArray());
         } catch (Exception e) {
-            logger.log(Level.SEVERE,"Error ",e);
-            throw new JasonException("The user execution control class instantiation '"+userControlClass+"' has failed!"+e.getMessage());
+            logger.log(Level.SEVERE, "Error ", e);
+            throw new JasonException("The user execution control class instantiation '" + userControlClass + "' has failed!" + e.getMessage());
         }
-	}
-	
-	public void stop() {
-		userController.stop();
-	}
-	
-	public ExecutionControl getUserControl() {
-		return userController;
-	}
-	
-	public CentralisedEnvironment getEnvInfraTier() {
-		return infraEnv;
-	}
-	
-	public void receiveFinishedCycle(String agName, boolean breakpoint) {
-		// pass to user controller
-		userController.receiveFinishedCycle(agName, breakpoint);
-	}
+    }
 
-	public void informAgToPerformCycle(String agName) {
-		// call the agent method to "go on"
-		infraEnv.getAgent(agName).getTS().receiveSyncSignal();
-	}
+    public void stop() {
+        userController.stop();
+    }
 
-	public void informAllAgsToPerformCycle() {
-		synchronized(infraEnv.getAgents()) { 
-			Iterator i = infraEnv.getAgents().values().iterator();
-			while (i.hasNext()) {
-				AgArch ag = (AgArch)i.next();
-				ag.getTS().receiveSyncSignal();
-			}
-		}
-	}
-	
-		
-	public Document getAgState(String agName) {
-		return infraEnv.getAgent(agName).getTS().getAg().getAgState();
-	}
+    public ExecutionControl getUserControl() {
+        return userController;
+    }
 
-	public RuntimeServicesInfraTier getRuntimeServices() {
-		return new CentralisedRuntimeServices();
-	}
+    public CentralisedEnvironment getEnvInfraTier() {
+        return infraEnv;
+    }
+
+    public void receiveFinishedCycle(String agName, boolean breakpoint) {
+        // pass to user controller
+        userController.receiveFinishedCycle(agName, breakpoint);
+    }
+
+    public void informAgToPerformCycle(String agName) {
+        // call the agent method to "go on"
+        infraEnv.getAgent(agName).getTS().receiveSyncSignal();
+    }
+
+    public void informAllAgsToPerformCycle() {
+        synchronized (infraEnv.getAgents()) {
+            for (AgArch ag: infraEnv.getAgents().values()) {
+                ag.getTS().receiveSyncSignal();
+            }
+        }
+    }
+
+    public Document getAgState(String agName) {
+        return infraEnv.getAgent(agName).getTS().getAg().getAgState();
+    }
+
+    public RuntimeServicesInfraTier getRuntimeServices() {
+        return new CentralisedRuntimeServices();
+    }
 }

@@ -21,13 +21,13 @@
 //
 //----------------------------------------------------------------------------
 
-
 package jason.infra.centralised;
 
 import jason.JasonException;
 import jason.architecture.AgArch;
 import jason.control.ExecutionControlGUI;
 import jason.mas2j.AgentParameters;
+import jason.mas2j.ClassParameters;
 import jason.mas2j.MAS2JProject;
 import jason.mas2j.parser.ParseException;
 import jason.runtime.MASConsoleGUI;
@@ -41,7 +41,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Handler;
 import java.util.logging.Level;
@@ -55,19 +54,23 @@ import javax.swing.JButton;
  * Runs MASProject using centralised infrastructure.
  */
 public class RunCentralisedMAS {
-    
-    CentralisedEnvironment env = null;
-    CentralisedExecutionControl control = null;
-    static boolean debug = false;
-    public JButton btDebug;
-    
-    List<CentralisedAgArch> ags = new ArrayList<CentralisedAgArch>();
-    
-    private static Logger logger = Logger.getLogger(RunCentralisedMAS.class.getName());
-    private static RunCentralisedMAS runner = null;
-    
-    public final static String logPropFile = "logging.properties";
-    
+
+    CentralisedEnvironment           env         = null;
+
+    CentralisedExecutionControl      control     = null;
+
+    static boolean                   debug       = false;
+
+    public JButton                   btDebug;
+
+    List<CentralisedAgArch>          ags         = new ArrayList<CentralisedAgArch>();
+
+    private static Logger            logger      = Logger.getLogger(RunCentralisedMAS.class.getName());
+
+    private static RunCentralisedMAS runner      = null;
+
+    public final static String       logPropFile = "logging.properties";
+
     public static void main(String[] args) {
         if (args.length < 1) {
             System.err.println("You should inform the MAS project file.");
@@ -75,317 +78,309 @@ public class RunCentralisedMAS {
         }
 
         setupLogger();
-        
+
         if (args.length > 1) {
-        	if (args[1].equals("-debug")) {
-        		debug = true;
-        		logger.getLogger("").setLevel(Level.FINE);
-        	}
+            if (args[1].equals("-debug")) {
+                debug = true;
+                Logger.getLogger("").setLevel(Level.FINE);
+            }
         }
-        
+
         // discover the handler
-        for (Handler h: Logger.getLogger("").getHandlers()) {
-        	// if there is a MASConsoleLogHandler, show it
-        	if (h.getClass().toString().equals(MASConsoleLogHandler.class.toString())) {
-        		MASConsoleGUI.get().getFrame().setVisible(true);
-		        MASConsoleGUI.get().setAsDefaultOut();
-        	}
+        for (Handler h : Logger.getLogger("").getHandlers()) {
+            // if there is a MASConsoleLogHandler, show it
+            if (h.getClass().toString().equals(MASConsoleLogHandler.class.toString())) {
+                MASConsoleGUI.get().getFrame().setVisible(true);
+                MASConsoleGUI.get().setAsDefaultOut();
+            }
         }
-        
+
         runner = new RunCentralisedMAS();
 
         int errorCode = 0;
-        
-    	final MAS2JProject project;
-		try {
-			jason.mas2j.parser.mas2j parser = new jason.mas2j.parser.mas2j(new FileReader(args[0]));
-	    	project = parser.mas();
 
-			runner.createAg(project, debug);
-			runner.startAgs();
-			runner.startSyncMode();
-			
-	        if (MASConsoleGUI.hasConsole()) {
-				// add Button
-		        JButton btStop = new JButton("Stop", new ImageIcon(RunCentralisedMAS.class.getResource("/images/suspend.gif")));
-		        btStop.addActionListener(new ActionListener() {
-		            public void actionPerformed(ActionEvent evt) {
-		            	MASConsoleGUI.get().setPause(false);
-		            	runner.finish();
-		            }
-		        });
-		        MASConsoleGUI.get().addButton(btStop);
+        final MAS2JProject project;
+        try {
+            jason.mas2j.parser.mas2j parser = new jason.mas2j.parser.mas2j(new FileReader(args[0]));
+            project = parser.mas();
 
-				// add Button
-		        runner.btDebug = new JButton("Debug", new ImageIcon(RunCentralisedMAS.class.getResource("/images/debug.gif")));
-		        runner.btDebug.addActionListener(new ActionListener() {
-		            public void actionPerformed(ActionEvent evt) {
-		            	runner.changeToDebugMode();
-		            	runner.btDebug.setEnabled(false);
-		            	if (runner.control != null) {
-		            		try {
-		            			ExecutionControlGUI ecg = (ExecutionControlGUI)runner.control.getUserControl();
-		            			ecg.setRunMode(false);
-		            		} catch (Exception e) {}
-		            	}
-		            }
-		        });
-		        if (debug) {
-	            	runner.btDebug.setEnabled(false);		        	
-		        }
-		        MASConsoleGUI.get().addButton(runner.btDebug);
+            runner.createAg(project, debug);
+            runner.startAgs();
+            runner.startSyncMode();
 
-		        
-		        // add Button pause
-		        final JButton btPause = new JButton("Pause", new ImageIcon(RunCentralisedMAS.class.getResource("/images/resume_co.gif")));
-		        btPause.addActionListener(new ActionListener() {
-		            public void actionPerformed(ActionEvent evt) {
-		            	if (MASConsoleGUI.get().isPause()) {
-		            		btPause.setText("Pause");
-		            		MASConsoleGUI.get().setPause(false);
-		            	} else {
-		            		btPause.setText("Continue");
-		            		MASConsoleGUI.get().setPause(true);
-		            	}
-		            	
-		            }
-		        });
-		        MASConsoleGUI.get().addButton(btPause);
+            if (MASConsoleGUI.hasConsole()) {
+                // add Button
+                JButton btStop = new JButton("Stop", new ImageIcon(RunCentralisedMAS.class.getResource("/images/suspend.gif")));
+                btStop.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent evt) {
+                        MASConsoleGUI.get().setPause(false);
+                        runner.finish();
+                    }
+                });
+                MASConsoleGUI.get().addButton(btStop);
 
-		        // add Button start
-		        final JButton btStartAg = new JButton("Start new agent", new ImageIcon(RunCentralisedMAS.class.getResource("/images/newAgent.gif")));
-		        btStartAg.addActionListener(new ActionListener() {
-		            public void actionPerformed(ActionEvent evt) {
-		            	new StartNewAgentGUI(MASConsoleGUI.get().getFrame(), "Start a new agent to run in current MAS", System.getProperty("user.dir"));
-		            }
-		        });
-		        MASConsoleGUI.get().addButton(btStartAg);
+                // add Button
+                runner.btDebug = new JButton("Debug", new ImageIcon(RunCentralisedMAS.class.getResource("/images/debug.gif")));
+                runner.btDebug.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent evt) {
+                        runner.changeToDebugMode();
+                        runner.btDebug.setEnabled(false);
+                        if (runner.control != null) {
+                            try {
+                                ExecutionControlGUI ecg = (ExecutionControlGUI) runner.control.getUserControl();
+                                ecg.setRunMode(false);
+                            } catch (Exception e) {
+                            }
+                        }
+                    }
+                });
+                if (debug) {
+                    runner.btDebug.setEnabled(false);
+                }
+                MASConsoleGUI.get().addButton(runner.btDebug);
 
-		        // add Button kill
-		        final JButton btKillAg = new JButton("Kill agent", new ImageIcon(RunCentralisedMAS.class.getResource("/images/killAgent.gif")));
-		        btKillAg.addActionListener(new ActionListener() {
-		            public void actionPerformed(ActionEvent evt) {
-		            	new KillAgentGUI(MASConsoleGUI.get().getFrame(), "Kill an agent of the current MAS");
-		            }
-		        });
-		        MASConsoleGUI.get().addButton(btKillAg);
-	        }
-	    
-	        runner.waitEnd();
-	        errorCode = 0;
-	        
-		} catch (FileNotFoundException e1) {
-			logger.log(Level.SEVERE, "File "+args[0]+" not found!");
-			errorCode = 2;
-		} catch (ParseException e) {
-			logger.log(Level.SEVERE, "Error parsing file "+args[0]+"!",e);
-			errorCode = 3;
-		} catch (Exception e) {
-			logger.log(Level.SEVERE,"Error!?: ",e);
-			errorCode = 4;
-		}
+                // add Button pause
+                final JButton btPause = new JButton("Pause", new ImageIcon(RunCentralisedMAS.class.getResource("/images/resume_co.gif")));
+                btPause.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent evt) {
+                        if (MASConsoleGUI.get().isPause()) {
+                            btPause.setText("Pause");
+                            MASConsoleGUI.get().setPause(false);
+                        } else {
+                            btPause.setText("Continue");
+                            MASConsoleGUI.get().setPause(true);
+                        }
+
+                    }
+                });
+                MASConsoleGUI.get().addButton(btPause);
+
+                // add Button start
+                final JButton btStartAg = new JButton("Start new agent", new ImageIcon(RunCentralisedMAS.class.getResource("/images/newAgent.gif")));
+                btStartAg.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent evt) {
+                        new StartNewAgentGUI(MASConsoleGUI.get().getFrame(), "Start a new agent to run in current MAS", System.getProperty("user.dir"));
+                    }
+                });
+                MASConsoleGUI.get().addButton(btStartAg);
+
+                // add Button kill
+                final JButton btKillAg = new JButton("Kill agent", new ImageIcon(RunCentralisedMAS.class.getResource("/images/killAgent.gif")));
+                btKillAg.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent evt) {
+                        new KillAgentGUI(MASConsoleGUI.get().getFrame(), "Kill an agent of the current MAS");
+                    }
+                });
+                MASConsoleGUI.get().addButton(btKillAg);
+            }
+
+            runner.waitEnd();
+            errorCode = 0;
+
+        } catch (FileNotFoundException e1) {
+            logger.log(Level.SEVERE, "File " + args[0] + " not found!");
+            errorCode = 2;
+        } catch (ParseException e) {
+            logger.log(Level.SEVERE, "Error parsing file " + args[0] + "!", e);
+            errorCode = 3;
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Error!?: ", e);
+            errorCode = 4;
+        }
         System.out.close();
         System.err.close();
 
         if (!MASConsoleGUI.hasConsole() && errorCode != 0) {
-        	System.exit(errorCode);
+            System.exit(errorCode);
         }
 
     }
-    
-    
+
     public static boolean isDebug() {
-    	return debug;
+        return debug;
     }
-    
+
     public static void setupLogger() {
         // see for a local log configuration
         if (new File(logPropFile).exists()) {
-        	try {
-        		LogManager.getLogManager().readConfiguration(new FileInputStream(logPropFile));
-        	} catch (Exception e) {
-        		System.err.println("Error setting up logger:"+e);
-        	}
-        } else {
-        	try {
-        		LogManager.getLogManager().readConfiguration(RunCentralisedMAS.class.getResource("/"+logPropFile).openStream());
-        	} catch (Exception e) {
-        		System.err.println("Error setting up logger:"+e);
-        	}
-        	/*
-            // remove current handlers
-            Handler[] hs = Logger.getLogger("").getHandlers();
-            for (int i = 0; i < hs.length; i++) {
-            	Logger.getLogger("").removeHandler(hs[i]);
+            try {
+                LogManager.getLogManager().readConfiguration(new FileInputStream(logPropFile));
+            } catch (Exception e) {
+                System.err.println("Error setting up logger:" + e);
             }
-            
-            Handler h = new MASConsoleLogHandler(); 
-            h.setFormatter(new MASConsoleLogFormatter());
-            Logger.getLogger("").addHandler(h);
-            Logger.getLogger("").setLevel(Level.INFO);
-            */
+        } else {
+            try {
+                LogManager.getLogManager().readConfiguration(RunCentralisedMAS.class.getResource("/" + logPropFile).openStream());
+            } catch (Exception e) {
+                System.err.println("Error setting up logger:" + e);
+            }
+            /*
+             * // remove current handlers Handler[] hs =
+             * Logger.getLogger("").getHandlers(); for (int i = 0; i <
+             * hs.length; i++) { Logger.getLogger("").removeHandler(hs[i]); }
+             * 
+             * Handler h = new MASConsoleLogHandler(); h.setFormatter(new
+             * MASConsoleLogFormatter()); Logger.getLogger("").addHandler(h);
+             * Logger.getLogger("").setLevel(Level.INFO);
+             */
         }
     }
-    
+
     public static RunCentralisedMAS getRunner() {
-    	return runner;
-    }
-    
-    public CentralisedExecutionControl getControllerInfraTier() {
-    	return control;
-    }
-    
-    public CentralisedEnvironment getEnvironmentInfraTier() {
-    	return env;
+        return runner;
     }
 
+    public CentralisedExecutionControl getControllerInfraTier() {
+        return control;
+    }
+
+    public CentralisedEnvironment getEnvironmentInfraTier() {
+        return env;
+    }
 
     void createAg(MAS2JProject project, boolean debug) throws JasonException {
-        
-    	if (MASConsoleGUI.hasConsole()) {
-    		MASConsoleGUI.get().setTitle("MAS Console - " + project.getSocName());
-	    }
-		
-    	// create environment
-        String envClass = project.getEnvClass();
-        if (envClass == null) {
-            envClass = jason.environment.Environment.class.getName();;
+
+        if (MASConsoleGUI.hasConsole()) {
+            MASConsoleGUI.get().setTitle("MAS Console - " + project.getSocName());
         }
-        logger.fine("Creating environment "+envClass);
+
+        // create environment
+        ClassParameters envClass = project.getEnvClass();
+        if (envClass == null) {
+            envClass = new ClassParameters(jason.environment.Environment.class.getName());
+        }
+        logger.fine("Creating environment " + envClass);
         env = new CentralisedEnvironment(envClass);
-    	
+
         // create the agents
-    	Iterator ia = project.getAgents().iterator();
-    	while (ia.hasNext()) {
-    		AgentParameters ap = (AgentParameters)ia.next();
-    		try {
+        for (AgentParameters ap : project.getAgents()) {
+            try {
                 String agName = ap.name;
 
-                String tmpAgClass = ap.agClass;
+                ClassParameters tmpAgClass = ap.agClass;
                 if (tmpAgClass == null) {
-                	tmpAgClass = jason.asSemantics.Agent.class.getName();
+                    tmpAgClass = new ClassParameters(jason.asSemantics.Agent.class.getName());
                 }
-                String tmpAgArchClass = ap.archClass;
+                ClassParameters tmpAgArchClass = ap.archClass;
                 if (tmpAgArchClass == null) {
-                	tmpAgArchClass = AgArch.class.getName();
+                    tmpAgArchClass = new ClassParameters(AgArch.class.getName());
                 }
                 String tmpAsSrc = ap.asSource.toString();
                 if (!tmpAsSrc.startsWith(File.separator)) {
-                	tmpAsSrc = project.getDirectory() + tmpAsSrc;
+                    tmpAsSrc = project.getDirectory() + tmpAsSrc;
                 }
 
-                for (int cAg=0; cAg < ap.qty; cAg++) {
+                for (int cAg = 0; cAg < ap.qty; cAg++) {
                     String numberedAg = agName;
                     if (ap.qty > 1) {
-                        numberedAg += (cAg+1);
+                        numberedAg += (cAg + 1);
                     }
-                    logger.fine("Creating agent "+numberedAg+" ("+(cAg+1)+"/"+ap.qty+")");
+                    logger.fine("Creating agent " + numberedAg + " (" + (cAg + 1) + "/" + ap.qty + ")");
                     CentralisedAgArch agArch = new CentralisedAgArch();
                     agArch.setAgName(numberedAg);
                     agArch.setEnvInfraTier(env);
-                    agArch.initAg(tmpAgArchClass, tmpAgClass, tmpAsSrc, ap.getAsSetts(debug, project.getControlClass() != null));
+                    agArch.initAg(tmpAgArchClass.className, tmpAgClass.className, tmpAsSrc, ap.getAsSetts(debug, project.getControlClass() != null));
                     env.addAgent(agArch.getUserAgArch());
                     ags.add(agArch);
                 }
-    		} catch (Exception e) {
-    			logger.log(Level.SEVERE,"Error creating agent "+ap.name,e);
-    		}
-    	}
-    	
-    	// create controller
-        String controlClass = project.getControlClass();
-		if (debug && controlClass == null) {
-			controlClass = ExecutionControlGUI.class.getName();
-		}
-		if (controlClass != null) {
-			logger.fine("Creating controller "+controlClass);
-	    	control = new CentralisedExecutionControl(env, controlClass);
-		}
-	}
-    
+            } catch (Exception e) {
+                logger.log(Level.SEVERE, "Error creating agent " + ap.name, e);
+            }
+        }
 
-	void startAgs() {
+        // create controller
+        ClassParameters controlClass = project.getControlClass();
+        if (debug && controlClass == null) {
+            controlClass = new ClassParameters(ExecutionControlGUI.class.getName());
+        }
+        if (controlClass != null) {
+            logger.fine("Creating controller " + controlClass);
+            control = new CentralisedExecutionControl(env, controlClass);
+        }
+    }
+
+    void startAgs() {
         // run the agents
-		for (CentralisedAgArch ag: ags) {
+        for (CentralisedAgArch ag : ags) {
             ag.setControlInfraTier(control);
             ag.start();
         }
-	}
-	
-	void stopAgs() {
+    }
+
+    void stopAgs() {
         // run the agents
-		for (CentralisedAgArch ag: ags) {
+        for (CentralisedAgArch ag : ags) {
             ag.stopAg();
         }
-	}
+    }
 
-	void startSyncMode() {
+    void startSyncMode() {
         if (control != null) {
             // start the execution, if it is controlled
-    		try {
-				Thread.sleep(500); // gives a time to agents enter in wait					
-				control.informAllAgsToPerformCycle();
-    		} catch (Exception e) {
-    			e.printStackTrace();
-            }	
-        }		
-	}
+            try {
+                Thread.sleep(500); // gives a time to agents enter in wait
+                control.informAllAgsToPerformCycle();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
-	/** change the current running MAS to debug mode */
-	void changeToDebugMode() {
-		try {
-			if (control == null) {
-				control = new CentralisedExecutionControl(env, ExecutionControlGUI.class.getName());
-				for (CentralisedAgArch ag: ags) {
-		            ag.setControlInfraTier(control);
-		            Settings stts = ag.getUserAgArch().getTS().getSettings();
-		            stts.setVerbose(2);
-			    	stts.setSync(true);
-			    	ag.getLogger().setLevel(Level.FINE);
-			    	ag.getUserAgArch().getTS().getLogger().setLevel(Level.FINE);
-			    	ag.getUserAgArch().getTS().getAg().getLogger().setLevel(Level.FINE);
-		        }
-			}
-		} catch (Exception e) {
-			logger.log(Level.SEVERE, "Error entering in debug mode",e);
-		}
-	}
-	
-	void waitEnd() {
-		try {
-			int c = System.in.read();
-			while (c != 1) { // RunProject prints "1" out to signal finishing
-				c = System.in.read();
-			}
-			finish();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+    /** change the current running MAS to debug mode */
+    void changeToDebugMode() {
+        try {
+            if (control == null) {
+                control = new CentralisedExecutionControl(env, new ClassParameters(ExecutionControlGUI.class.getName()));
+                for (CentralisedAgArch ag : ags) {
+                    ag.setControlInfraTier(control);
+                    Settings stts = ag.getUserAgArch().getTS().getSettings();
+                    stts.setVerbose(2);
+                    stts.setSync(true);
+                    ag.getLogger().setLevel(Level.FINE);
+                    ag.getUserAgArch().getTS().getLogger().setLevel(Level.FINE);
+                    ag.getUserAgArch().getTS().getAg().getLogger().setLevel(Level.FINE);
+                }
+            }
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Error entering in debug mode", e);
+        }
+    }
 
-	public void finish() {
-		try {
-			stopAgs();
-			
-			if (control != null) {
-				control.stop();
-				control = null;
-			}
-			if (env != null) {
-				env.stop();
-				env = null;
-			}
-		
-			if (MASConsoleGUI.hasConsole()) {
-				MASConsoleGUI.get().close();
-			}
-			
-			runner = null;
-			
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
-		System.exit(0);
-	}
+    void waitEnd() {
+        try {
+            int c = System.in.read();
+            while (c != 1) { // RunProject prints "1" out to signal finishing
+                c = System.in.read();
+            }
+            finish();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void finish() {
+        try {
+            stopAgs();
+
+            if (control != null) {
+                control.stop();
+                control = null;
+            }
+            if (env != null) {
+                env.stop();
+                env = null;
+            }
+
+            if (MASConsoleGUI.hasConsole()) {
+                MASConsoleGUI.get().close();
+            }
+
+            runner = null;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        System.exit(0);
+    }
 }

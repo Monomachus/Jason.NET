@@ -59,16 +59,15 @@ public class Environment {
 	private List<Literal> percepts = Collections.synchronizedList(new ArrayList<Literal>());
 	private Map<String,List<Literal>>  agPercepts = Collections.synchronizedMap(new HashMap<String,List<Literal>>());
 	
-        /** the infrastructure tier for environment (Centralised, Saci, ...) */
+    /** the infrastructure tier for environment (Centralised, Saci, ...) */
 	private EnvironmentInfraTier environmentInfraTier = null;
 
 	// set of agents that already received the last version of perception
 	private Set<String> uptodateAgs = Collections.synchronizedSet(new HashSet<String>());
 	
 	
-	/** Called before the start of MAS execution, the user environment could override it */
+	/** Called before the MAS execution with the args informed in .mas2j, the user environment could override it */
 	public void init(String[] args) {
-		// TODO: implement env. args in .mas2j
 	}
 	
 	/** Called before the end of MAS execution, the user environment could override it */
@@ -87,7 +86,7 @@ public class Environment {
 	}
 
     
-    public void informAgsEnvironmentChanged(Collection agents) {
+    public void informAgsEnvironmentChanged(Collection<String> agents) {
         if (environmentInfraTier != null) {
             environmentInfraTier.informAgsEnvironmentChanged(agents);
         }

@@ -53,7 +53,7 @@ public class JasonProjectSideKickParser extends sidekick.SideKickParser {
             	
             	pd.root.add(new ProjectAsset("Infrastructure: ",project.getInfrastructure(), buf, INFRA_TYPE).createTreeNode());
             	if (project.getEnvClass() != null) {
-                	pd.root.add(new ProjectAsset("Environment: ",project.getEnvClass(), buf, ENV_TYPE).createTreeNode());
+                	pd.root.add(new ProjectAsset("Environment: ",project.getEnvClass().toString(), buf, ENV_TYPE).createTreeNode());
             	}
             	//Object[] aap = new Object[project.getAgents().size()];
             	Iterator i = jasonPluginInstance.iterator();

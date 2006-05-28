@@ -21,7 +21,6 @@
 //
 //----------------------------------------------------------------------------
 
-
 package jason.infra.saci;
 
 import jason.JasonException;
@@ -40,23 +39,24 @@ import java.util.logging.Logger;
 import saci.MessageHandler;
 
 /**
- * This class implements the saci version of the environment infrastructure tier.
+ * This class implements the saci version of the environment infrastructure
+ * tier.
  */
 public class SaciEnvironment extends saci.Agent implements EnvironmentInfraTier {
 
-	private Environment fUserEnv;
+    private Environment fUserEnv;
 
-	static Logger logger = Logger.getLogger(SaciEnvironment.class.getName());
+    static Logger       logger = Logger.getLogger(SaciEnvironment.class.getName());
 
     public SaciEnvironment() {
     }
-    
+
     public void informAgsEnvironmentChanged() {
         try {
             saci.Message m = new saci.Message("(tell :content environmentChanged)");
             mbox.broadcast(m);
         } catch (Exception e) {
-            logger.log(Level.SEVERE,"Error sending notifyEvents ",e);
+            logger.log(Level.SEVERE, "Error sending notifyEvents ", e);
         }
     }
 
@@ -73,101 +73,106 @@ public class SaciEnvironment extends saci.Agent implements EnvironmentInfraTier 
                 }
             }
         } catch (Exception e) {
-        	logger.log(Level.SEVERE,"Error sending notifyEvents ",e);
+            logger.log(Level.SEVERE, "Error sending notifyEvents ", e);
         }
     }
-    
+
     public void initAg(String[] args) throws JasonException {
         // create the user environment
         try {
-            fUserEnv = (Environment)Class.forName(args[0]).newInstance();
+            fUserEnv = (Environment) Class.forName(args[0]).newInstance();
             fUserEnv.setEnvironmentInfraTier(this);
-			fUserEnv.init(null);
+            // create parameters array
+            String[] p = new String[args.length-1];
+            for (int i=0; i<p.length; i++) {
+                p[i] = args[i+1];
+            }
+            fUserEnv.init(p);
         } catch (Exception e) {
-        	logger.log(Level.SEVERE,"Error in Saci Environment initAg",e);
-            throw new JasonException("The user environment class instantiation '"+args[0]+"' fail!"+e.getMessage());
+            logger.log(Level.SEVERE, "Error in Saci Environment initAg", e);
+            throw new JasonException("The user environment class instantiation '" + args[0] + "' fail!" + e.getMessage());
         }
-        
+
         try {
-            
+
             // add a message handler to answer perception asks
             // this handler filter is
-            //  . content: getPercepts
-            //  . performative: ask-all
-            //  . language: all
-            //  . ontology: AS-Perception
+            // . content: getPercepts
+            // . performative: ask-all
+            // . language: all
+            // . ontology: AS-Perception
             mbox.addMessageHandler("getPercepts", "ask-all", null, "AS-Perception", new MessageHandler() {
                 public boolean processMessage(saci.Message m) {
-                	saci.Message r = null;
-                	try {
-						r = new saci.Message("(tell)");
-						r.put("receiver", m.get("sender"));
-						r.put("in-reply-to", m.get("reply-with"));
-						r.put("ontology", m.get("ontology"));
-                        
-						List percepts = fUserEnv.getPercepts(m.get("sender").toString());
-						if (percepts != null) { 
-							synchronized(percepts) {
-								r.put("content", percepts.toString());
-							}
-						}
-						mbox.sendMsg(r);
-                        
+                    saci.Message r = null;
+                    try {
+                        r = new saci.Message("(tell)");
+                        r.put("receiver", m.get("sender"));
+                        r.put("in-reply-to", m.get("reply-with"));
+                        r.put("ontology", m.get("ontology"));
+
+                        List percepts = fUserEnv.getPercepts(m.get("sender").toString());
+                        if (percepts != null) {
+                            synchronized (percepts) {
+                                r.put("content", percepts.toString());
+                            }
+                        }
+                        mbox.sendMsg(r);
+
                     } catch (Exception e) {
-                    	logger.log(Level.SEVERE,"Error sending message "+r,e);
+                        logger.log(Level.SEVERE, "Error sending message " + r, e);
                     }
-                    return true; // no other message handler gives this message
+                    return true; // no other message handler gives this
+                                    // message
                 }
             });
-            
-			
+
             // add a message handler to answer action asks
             // this handler filter is
-            //  . content: execute
-            //  . performative: ask
-            //  . language: all
-            //  . ontology: AS-Action
+            // . content: execute
+            // . performative: ask
+            // . language: all
+            // . ontology: AS-Action
             mbox.addMessageHandler("execute", "ask", null, "AS-Action", new MessageHandler() {
                 public boolean processMessage(saci.Message m) {
-                	saci.Message r = null;
-                	try {
+                    saci.Message r = null;
+                    try {
                         r = new saci.Message("(tell)");
                         r.put("receiver", m.get("sender"));
                         r.put("in-reply-to", m.get("reply-with"));
                         r.put("ontology", m.get("ontology"));
                         String sender = m.get("sender").toString();
-                        Term action   = TermImpl.parse((String)m.get("action"));
-                        
-                        //logger.info("doing: "+action);
-                        
+                        Term action = TermImpl.parse((String) m.get("action"));
+
+                        // logger.info("doing: "+action);
+
                         if (fUserEnv.executeAction(sender, action)) {
                             r.put("content", "ok");
                         } else {
                             r.put("content", "error");
                         }
-                        
+
                         if (mbox != null) { // the agent could be out meanwhile
-                        	mbox.sendMsg(r);
+                            mbox.sendMsg(r);
                         }
                     } catch (Exception e) {
-                    	logger.log(Level.SEVERE,"Error sending message "+e,e);
+                        logger.log(Level.SEVERE, "Error sending message " + e, e);
                     }
-                    return true; // no other message handler gives this message
+                    return true; // no other message handler gives this
+                                    // message
                 }
             });
-            
-            
+
         } catch (Exception e) {
-        	logger.log(Level.SEVERE,"Error starting agent",e);
+            logger.log(Level.SEVERE, "Error starting agent", e);
         }
     }
 
-	public void stopAg() {
-		fUserEnv.stop();
-		super.stopAg();
-	}
+    public void stopAg() {
+        fUserEnv.stop();
+        super.stopAg();
+    }
 
     public RuntimeServicesInfraTier getRuntimeServices() {
-    	return new SaciRuntimeServices(getSociety());
+        return new SaciRuntimeServices(getSociety());
     }
 }

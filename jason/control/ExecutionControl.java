@@ -114,9 +114,9 @@ public class ExecutionControl {
 	}
 
 	/**
-	 * This method is called when setJasonExecutionControl and setJasonDir was already called
+	 * This method is called when setExecutionControlInfraTier was already called
 	 */
-	public void init() {
+	public void init(String[] args) {
 		
 	}
 	

@@ -26,14 +26,15 @@ package jason.infra.centralised;
 
 import jason.JasonException;
 import jason.architecture.AgArch;
+import jason.asSemantics.Message;
 import jason.environment.Environment;
 import jason.environment.EnvironmentInfraTier;
+import jason.mas2j.ClassParameters;
 import jason.runtime.RuntimeServicesInfraTier;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -47,26 +48,25 @@ import java.util.logging.Logger;
  */
 public class CentralisedEnvironment implements EnvironmentInfraTier {
 
-	// TODO: try ConcurrentHashMap when moving to jdk 1.5
-    private Map mboxes;
-    private Map agents;
+    private Map<String,List<Message>> mboxes;
+    private Map<String,AgArch> agents;
     
     /** the user customisation class for the environment */
 	private Environment fUserEnv;
     
     static Logger logger = Logger.getLogger(CentralisedEnvironment.class.getName());
 	
-    public CentralisedEnvironment(String userEnvClassName) throws JasonException {
-        mboxes      = Collections.synchronizedMap(new HashMap());
-        agents      = Collections.synchronizedMap(new HashMap());
+    public CentralisedEnvironment(ClassParameters userEnv) throws JasonException {
+        mboxes      = Collections.synchronizedMap(new HashMap<String,List<Message>>());
+        agents      = Collections.synchronizedMap(new HashMap<String,AgArch>());
         
         try { 
-			fUserEnv = (Environment) getClass().getClassLoader().loadClass(userEnvClassName).newInstance();
+			fUserEnv = (Environment) getClass().getClassLoader().loadClass(userEnv.className).newInstance();
 			fUserEnv.setEnvironmentInfraTier(this);
-			fUserEnv.init(null);
+			fUserEnv.init(userEnv.getParametersArray());
         } catch (Exception e) {
             logger.log(Level.SEVERE,"Error in Centralised MAS environment creation",e);
-            throw new JasonException("The user environment class instantiation '"+userEnvClassName+"' has failed!"+e.getMessage());
+            throw new JasonException("The user environment class instantiation '"+userEnv+"' has failed!"+e.getMessage());
         }
     }
 	
@@ -76,29 +76,25 @@ public class CentralisedEnvironment implements EnvironmentInfraTier {
 	}
 
     public Environment getUserEnvironment() {
-    	return fUserEnv;
+        return fUserEnv;
     }
-    
+
     public void informAgsEnvironmentChanged() {
-        Iterator i = agents.values().iterator();
-        while (i.hasNext()) {
-        	AgArch agArch = (AgArch)i.next();
-        	agArch.getTS().newMessageHasArrived();
+        for (AgArch agArch: agents.values()) {
+            agArch.getTS().newMessageHasArrived();
         }
     }
 
-    public void informAgsEnvironmentChanged(Collection agentsToNotify) {
+    public void informAgsEnvironmentChanged(Collection<String> agentsToNotify) {
         if (agentsToNotify == null) {
-        	informAgsEnvironmentChanged();
+            informAgsEnvironmentChanged();
         } else {
-            Iterator i = agentsToNotify.iterator();
-            while (i.hasNext()) {
-                String agName = i.next().toString();
+            for (String agName: agentsToNotify) {
                 AgArch agArch = getAgent(agName);
                 if (agArch != null) {
                     agArch.getTS().newMessageHasArrived();
                 } else {
-                    logger.log(Level.SEVERE,"Error sending message notification: agent "+agName+" does not exist!");
+                    logger.log(Level.SEVERE, "Error sending message notification: agent " + agName + " does not exist!");
                 }
             }
         }
@@ -107,9 +103,9 @@ public class CentralisedEnvironment implements EnvironmentInfraTier {
     
     public void addAgent(AgArch agent) {
         if (mboxes.get(agent.getAgName()) != null) {
-        	logger.warning("Warning: adding an agent that already exists: "+ agent.getAgName());
+            logger.warning("Warning: adding an agent that already exists: " + agent.getAgName());
         }
-        mboxes.put(agent.getAgName(), new LinkedList());
+        mboxes.put(agent.getAgName(), new LinkedList<Message>());
         agents.put(agent.getAgName(), agent);
     }
 
@@ -118,23 +114,23 @@ public class CentralisedEnvironment implements EnvironmentInfraTier {
         agents.remove(agent.getAgName());
     }
     
-    public List getAgMbox(String name) {
-        return (List) mboxes.get(name);
+    public List<Message> getAgMbox(String name) {
+        return mboxes.get(name);
     }
     
     /** 
      * Returns the agents map, key is the agent name (String) and value 
      * is the AgArch agent object.
      */
-    public Map getAgents() {
-    	return agents;
+    public Map<String,AgArch> getAgents() {
+    	    return agents;
     }
         
     public AgArch getAgent(String name) {
-        return (AgArch)agents.get(name);
+        return agents.get(name);
     }
 
     public RuntimeServicesInfraTier getRuntimeServices() {
-    	return new CentralisedRuntimeServices();
+    	    return new CentralisedRuntimeServices();
     }
 }

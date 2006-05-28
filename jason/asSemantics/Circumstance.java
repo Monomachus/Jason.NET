@@ -51,7 +51,7 @@ public class Circumstance implements Serializable {
 
 	protected ActionExec A;
 
-    protected List   MB;
+    protected List<Message>   MB;
     protected List   RP;
     protected List<Option>   AP;
 
@@ -69,7 +69,7 @@ public class Circumstance implements Serializable {
     public Circumstance() {
         E  = new LinkedList<Event>();
         I  = new LinkedList<Intention>();
-        MB = new LinkedList();
+        MB = new LinkedList<Message>();
         PA = new HashMap();
         FA = new LinkedList();
         reset();
@@ -150,7 +150,7 @@ public class Circumstance implements Serializable {
         return listeners.size() > 0;
     }
 
-    public List getMB() {
+    public List<Message> getMB() {
 		return MB;
 	}
 

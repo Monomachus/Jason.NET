@@ -44,7 +44,7 @@ public interface EnvironmentInfraTier {
      * The collection has the agents' names. 
      * (called by the user environment). 
      */
-    public void informAgsEnvironmentChanged(Collection agents);
+    public void informAgsEnvironmentChanged(Collection<String> agents);
 
     /** Gets an object with infrastructure runtime services */
     public RuntimeServicesInfraTier getRuntimeServices();

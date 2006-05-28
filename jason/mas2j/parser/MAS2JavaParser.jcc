@@ -19,43 +19,6 @@
 // http://www.dur.ac.uk/r.bordini
 // http://www.inf.furb.br/~jomi
 //
-// CVS information:
-//   $Date$
-//   $Revision$
-//   $Log$
-//   Revision 1.9  2006/03/02 13:33:41  jomifred
-//   changes in MASLauncher interface
-//
-//   Revision 1.8  2006/03/02 01:42:14  jomifred
-//   the jIDE package was remove, the writeScriptInterface's methods was moved to MASLauncher
-//
-//   Revision 1.7  2006/02/18 15:25:16  jomifred
-//   changes in many files to detach jason kernel from any infrastructure implementation
-//
-//   Revision 1.6  2006/01/14 18:23:22  jomifred
-//   centralised infra does not use xml script file anymore
-//
-//   Revision 1.5  2006/01/14 15:25:15  jomifred
-//   Config and some code of RunMAS was moved to package plugin
-//
-//   Revision 1.4  2005/12/30 20:40:59  jomifred
-//   new features: unnamed var, var with annots, TE as var
-//
-//   Revision 1.1  2005/12/08 20:13:53  jomifred
-//   changes for JasonIDE plugin
-//
-//   Revision 1.18  2005/10/29 21:46:22  jomifred
-//   add a new class (MAS2JProject) to store information parsed by the mas2j parser. This new class also create the project scripts
-//
-//   Revision 1.16  2005/09/02 19:19:16  jomifred
-//   add files in project lib dir on classpath
-//
-//   Revision 1.15  2005/08/23 17:11:13  jomifred
-//   fix bug in the script that starts saci
-//
-//   Revision 1.14  2005/08/15 13:10:41  jomifred
-//   using infrastructure instead of architecture in mas2j
-//
 //----------------------------------------------------------------------------
 
 
@@ -114,15 +77,6 @@ public class mas2j {
         int step = 1;
         System.out.println("To run your MAS, just run \"ant\".");
         //System.out.println("  1. chmod u+x *.sh");
-        /*
-        System.out.println("  "+step+". compile the java files (script ./compile-"+project.getSocName()+".sh)");
-        step++;
-        if (project.getInfrastructure().equals("Saci")) {
-             System.out.println("  "+step+". run saci (script ./saci-"+project.getSocName()+".sh)");
-             step++;
-        }
-        System.out.println("  "+step+". run your agents (script ./"+project.getSocName()+".sh)");
-        */
       } catch(Exception e){
 		System.err.println("mas2j: parsing errors found... \n" + e);
       }
@@ -179,7 +133,7 @@ TOKEN : {
 
 // Identifiers
 |  <ASID: <LC_LETTER> (<LETTER>|<DIGIT>|"_")* >
-|  <CLASSID: <LETTER> (<LETTER>|<DIGIT>|"_")* >
+|  <ID:   <LETTER>    (<LETTER>|<DIGIT>|"_")* >
 
 // Path
 |  <PATH: ( "./" | "/" | "\\" | (<DRIVER>) ) ( (<LETTER>|<DIGIT>|"_")* ( "/" | "\\" ) )* >
@@ -218,7 +172,7 @@ void infra() :              { Token t; }
 {                           { project.setInfrastructure("Centralised"); }
   [ (<ARCH>                 { System.err.println("The id <architecture> was replaced by <infrastructure> in .mas2j syntax, please use the new id."); }
      | <INFRA>) 
-    ":" t = <CLASSID>       { project.setInfrastructure(t.image); } 
+    ":" t = <ID>            { project.setInfrastructure(t.image); } 
   ]
 }
 
@@ -247,9 +201,9 @@ void agent() :              { Token agName;
   ag.options = ASoptions()        
 
 
-  [ <ASAGARCHCLASS> ag.archClass = className() ]
+  [ <ASAGARCHCLASS> ag.archClass = classDef() ]
 
-  [ <ASAGCLASS> ag.agClass = className()  ]
+  [ <ASAGCLASS> ag.agClass = classDef()  ]
 
   [ "#" qty = <NUMBER>      { ag.qty = Integer.parseInt(qty.image); } ] 
 
@@ -277,12 +231,26 @@ File fileName() :           { String path = "";
 }
 
 
-String className() :       {Token c; String p = "";}
+ClassParameters classDef() :  { Token c; String p = ""; ClassParameters cp = new ClassParameters(); }
 {
-   (c = <CLASSID> | c = <ASID> )
-   [ "." p = className()   { return c.image + "." + p; } ]
-                           { return c.image; }
+   (c = <ID> | c = <ASID>)              { cp.className = c.image; }
+   (
+     "." (c = <ID> | c = <ASID>)        { cp.className += "." + c.image; }
+   )*
+   [
+     "("
+	   [
+	     (c=<ID> | c=<ASID> | c=<NUMBER> | c=<STRING>)        { cp.parameters.add(c.image); }
+   	     ( 
+   	       "," (c=<ID> | c=<ASID> | c=<NUMBER> | c=<STRING>)  { cp.parameters.add(c.image); }
+   	     )*
+   	   ]
+     ")"
+   ]
+                           { return cp; }
 }
+
+
 
 Map ASoptions() :          { Map opts = new HashMap(); }
 {
@@ -300,7 +268,7 @@ Map procOption(Map opts): { Token opt; Token oval; }
   | opt=<ASONRC>  "=" oval=<NUMBER>  {opts.put(opt.image,oval.image);} 
   | opt=<ASOV>    "=" oval=<NUMBER>  {opts.put(opt.image,oval.image);} 
   | opt=<ASID>    "=" 
-    (oval=<STRING>|oval=<ASID>|oval=<NUMBER>)
+    (oval=<STRING>|oval=<ASID>|oval=<NUMBER>|oval=<ID>)
                                      {opts.put(opt.image,oval.image);} 
   )
                                      { 
@@ -309,17 +277,17 @@ Map procOption(Map opts): { Token opt; Token oval; }
 }
 
 
-void environment() :        { Token host = null; String envClass = null;}
+void environment() :        { Token host = null; ClassParameters envClass = null;}
 {
 
   [  <ENV> ":"
-     envClass = className() 
+     envClass = classDef() 
      [ <AT> host = <STRING> ]
   ]   
                             { 
                               project.setEnvClass(envClass);
                               if (host != null) {
-		                          project.setEnvHost(host.image);
+		                          envClass.host = host.image;
 	                          }
                             }
 }
@@ -327,15 +295,15 @@ void environment() :        { Token host = null; String envClass = null;}
 
 void control() :            { Token host =  null; }
 {
-                            { String tControlClass = null; 
+                            { ClassParameters controlClass = null; 
                             }
                             
-  [ <CONTROL> ":" tControlClass = className() 
+  [ <CONTROL> ":" controlClass = classDef() 
     [ <AT> host = <STRING> ]
   ]
-                            { project.setControlClass(tControlClass);
+                            { project.setControlClass(controlClass);
                               if (host != null) {
-                                   project.setControlHost(host.image);
+                                   controlClass.host = host.image;
                               }
                             }
 }

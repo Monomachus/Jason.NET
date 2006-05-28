@@ -24,7 +24,7 @@ public interface mas2jConstants {
   int NUMBER = 24;
   int STRING = 25;
   int ASID = 26;
-  int CLASSID = 27;
+  int ID = 27;
   int PATH = 28;
   int DRIVER = 29;
   int LETTER = 30;
@@ -62,7 +62,7 @@ public interface mas2jConstants {
     "<NUMBER>",
     "<STRING>",
     "<ASID>",
-    "<CLASSID>",
+    "<ID>",
     "<PATH>",
     "<DRIVER>",
     "<LETTER>",
@@ -75,8 +75,10 @@ public interface mas2jConstants {
     "\"#\"",
     "\";\"",
     "\".\"",
-    "\"[\"",
+    "\"(\"",
     "\",\"",
+    "\")\"",
+    "\"[\"",
     "\"]\"",
     "\"=\"",
   };

@@ -74,7 +74,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Logger;
 
 /**
  * Represents a MAS2J project (usually created from a .mas2j file)
@@ -84,22 +83,20 @@ public class MAS2JProject {
 	public static final String EXT       = "mas2j";
 	public static final String AS_EXT    = "asl";
 	
-	private Logger logger = Logger.getLogger(MAS2JProject.class.getName());
+	//private Logger logger = Logger.getLogger(MAS2JProject.class.getName());
 		
 	String soc;
 
-	String envClass = null; 
-	String envHost = null;
+	ClassParameters envClass = null; 
 	
-	String controlClass = null;
-	String controlHost = null;
+    ClassParameters controlClass = null;
 	
 	String infrastructure = "Centralised";
 
 	String projectDir = "." + File.separator;
 	File   projectFile = null;
 	
-	List agents = new ArrayList();
+	List<AgentParameters> agents = new ArrayList<AgentParameters>();
 	
 	public void setDirectory(String d) {
 		if (d != null) {
@@ -130,21 +127,13 @@ public class MAS2JProject {
 		return infrastructure;
 	}
 
-	public void setEnvClass(String e) {
+	public void setEnvClass(ClassParameters e) {
 		envClass = e;
 	}
-	public String getEnvClass() {
+	public ClassParameters getEnvClass() {
 		return envClass;
 	}
 	
-	public void setEnvHost(String h) {
-		envHost = h;
-	}
-	
-	public String getEnvHost() {
-		return envHost;
-	}
-
 	public void setSocName(String s) {
 		soc = s;
 	}
@@ -153,21 +142,15 @@ public class MAS2JProject {
 		return soc;
 	}
 
-	public void setControlClass(String sControl) {
+	public void setControlClass(ClassParameters sControl) {
 		controlClass = sControl;
 	}
-	public String getControlClass() {
+	public ClassParameters getControlClass() {
 		return controlClass;
-	}
-	public void setControlHost(String h) {
-		controlHost = h;
-	}
-	public String getControlHost() {
-		return controlHost;
 	}
 
 	public void initAgMap() {
-		agents = new ArrayList();
+		agents = new ArrayList<AgentParameters>();
 	}
 	public void addAgent(AgentParameters a) {
 		agents.add(a);
@@ -183,15 +166,13 @@ public class MAS2JProject {
 		return null;
 	}
 	
-	public List getAgents() {
+	public List<AgentParameters> getAgents() {
 		return agents;
 	}
 	
-	public Set getAllASFiles() {
-		Set files = new HashSet();
-		Iterator iag = agents.iterator();
-		while (iag.hasNext()) {
-			AgentParameters agp = (AgentParameters)iag.next();
+	public Set<File> getAllASFiles() {
+		Set<File> files = new HashSet<File>();
+		for (AgentParameters agp: agents) {
 			if (agp.asSource != null) {
 				String dir = projectDir + File.separator;
 				if (agp.asSource.toString().startsWith(File.separator)) {
@@ -207,15 +188,15 @@ public class MAS2JProject {
 		StringBuffer s = new StringBuffer("MAS " + getSocName() + " {\n");
 		s.append("   infrastructure: "+getInfrastructure()+"\n");
 		s.append("   environment: "+getEnvClass());
-		if (envHost != null) {
-			s.append(" at "+envHost);
+		if (envClass.host != null) {
+			s.append(" at "+envClass.host);
 		}
 		s.append("\n");
 		
 		if (getControlClass() != null) {
 			s.append("   executionControl: "+getControlClass());
-			if (controlHost != null) {
-				s.append(" at "+controlHost);
+			if (getControlClass().host != null) {
+				s.append(" at "+getControlClass().host);
 			}
 			s.append("\n");
 		}
