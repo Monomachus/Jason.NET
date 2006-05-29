@@ -796,7 +796,7 @@ public class TransitionSystem {
 				nrcslbr = 0;
 				
 				//logger.fine("perceiving...");
-				List percept = agArch.perceive();
+				List<Literal> percept = agArch.perceive();
 
 				//logger.fine("checking mail...");
 				agArch.checkMail();

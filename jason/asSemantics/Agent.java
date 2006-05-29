@@ -40,7 +40,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -152,46 +151,34 @@ public class Agent {
 		return true;
 	}
 	
-	public Event selectEvent(List evList) {
+	public Event selectEvent(List<Event> evList) {
 		// make sure the selected Event is removed from evList
-		return ((Event) evList.remove(0));
+		return evList.remove(0);
 	}
 
-	public Option selectOption(List optList) {
+	public Option selectOption(List<Option> optList) {
 		if (optList.size() > 0) {
-			return ((Option) optList.remove(0));
+			return optList.remove(0);
 		} else {
 			return null;
 		}
 	}
 
-	public Intention selectIntention(List intList) {
+	public Intention selectIntention(List<Intention> intList) {
 		// make sure the selected Intention is removed from intList AND
 		// make sure no intention will "starve"!!!
-		return ((Intention) intList.remove(0));
+		return intList.remove(0);
 	}
 
-	public Message selectMessage(List msgList) {
+	public Message selectMessage(List<Message> msgList) {
 		// make sure the selected Message is removed from msgList
-		return ((Message) msgList.remove(0));
+		return msgList.remove(0);
 	}
 
-	public ActionExec selectAction(List actList) {
+	public ActionExec selectAction(List<ActionExec> actList) {
 		// make sure the selected Action is removed from actList
-		return ((ActionExec) actList.remove(0));
+		return actList.remove(0);
 	}
-
-	/** Agent's Source Beliefs Initialisation (called by the parser) */
-	/*
-	public void importBS(BeliefBase bb) {
-		Iterator i = bb.allIterator();
-		while (i.hasNext()) {
-			Literal l = (Literal)i.next();
-			addBel(l, BeliefBase.TSelf, fTS.C, Intention.EmptyInt);
-		}
-		//fBS.addAll(bb);
-	}
-	*/
 
 	/** TS Initialisation (called by the AgArch) */
 	public void setTS(TransitionSystem ts) {
@@ -220,13 +207,13 @@ public class Agent {
         }
 		
         // deleting percepts in the BB that is not perceived anymore
-        List perceptsInBB = getBS().getPercepts();
+        List<Literal> perceptsInBB = getBS().getPercepts();
         for (int i=0; i<perceptsInBB.size(); i++) { 
-            Literal l = (Literal)perceptsInBB.get(i);
+            Literal l = perceptsInBB.get(i);
             // could not use percepts.contains(l), since equalsAsTerm must be used (to ignore annotations)
             boolean wasPerceived = false;
             for (int j=0; j< percepts.size(); j++) {
-            	    Literal t = (Literal)percepts.get(j);
+            	    Literal t = percepts.get(j);
             	    if (l.equalsAsTerm(t) && l.negated() == t.negated()) { // if percept t is already in BB
             	        wasPerceived = true;
             	        break;
@@ -242,9 +229,7 @@ public class Agent {
 
         // addBel only adds a belief when appropriate
         // checking all percepts for new beliefs
-        Iterator i = percepts.iterator();
-        while (i.hasNext()) {
-			Literal l = (Literal)i.next();
+		for (Literal l: percepts) {
 			try {
 				addBel( l, BeliefBase.TPercept, fTS.getC(), Intention.EmptyInt);
 			} catch (Exception e) {
@@ -260,10 +245,9 @@ public class Agent {
 	 * 
 	 */
 	public Literal believes(Literal l, Unifier un) {
-		List relB = fBS.getRelevant(l);
+		List<Literal> relB = fBS.getRelevant(l);
 		if (relB != null) {
-			for (int i=0; i < relB.size(); i++) {
-				Literal b = (Literal) relB.get(i);
+			for (Literal b: relB) {
 				// recall that order is important because of annotations!
 				if (un.unifies(l,b)) {
 					return b;
@@ -273,21 +257,6 @@ public class Agent {
 		return null;
 	}
 
-	public Literal findBel(Literal l, Unifier un) {
-		List relB = fBS.getRelevant(l);
-		if (relB != null) {
-			for (int i=0; i < relB.size(); i++) {
-				Literal b = (Literal) relB.get(i);
-				Unifier newUn = (un == null) ? new Unifier() : (Unifier) un.clone();
-				// recall that order is important because of annotations!
-				if (newUn.unifies(l,b))
-					// if literals are negated or not
-					return b;
-			}
-		}
-		return null;
-	}
-	
 	/** 
 	 * Adds a new Literal <i>l</i> in BB with "source(<i>source</i>)" annotation.
 	 *  <i>l</i> will be cloned before being added in the BB 
@@ -303,7 +272,7 @@ public class Agent {
 				l.addAnnot(source);
 			}
 			if (fBS.add(l)) {
-				logger.fine("Added belief "+l);
+				if (logger.isLoggable(Level.FINE)) logger.fine("Added belief "+l);
 				updateEvents(new Event(new Trigger(Trigger.TEAdd, Trigger.TEBel, l), focus), c);
 				return true;
 			}
@@ -328,7 +297,7 @@ public class Agent {
 		if (c != null) {
 			if (e.isInternal() || c.hasListener() || fPS.isRelevant(e.trigger)) {
 				c.addEvent(e);
-				logger.fine("Added event "+e);
+				if (logger.isLoggable(Level.FINE)) logger.fine("Added event "+e);
 			}
 		}
 	}

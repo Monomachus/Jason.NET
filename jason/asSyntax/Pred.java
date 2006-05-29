@@ -81,7 +81,7 @@ public class Pred extends TermImpl {
 
 	public void addAnnot(Term t) {
 		if (annots == null)
-			annots = new ListTermImpl(); //new ArrayList();
+			annots = new ListTermImpl();
 		if (!annots.contains(t))
 			annots.add(t);
 	}
@@ -107,7 +107,7 @@ public class Pred extends TermImpl {
 
 	public void clearAnnots() {
 		if (annots != null)
-			annots.clear();
+			annots = null;
 	}
 	
 	public ListTerm getAnnots() {
@@ -204,18 +204,15 @@ public class Pred extends TermImpl {
 	 *  p will only contain the annots actually imported (for Event)
 	 */
 	public void importAnnots(Pred p) {
-		if (p.getAnnots() == null) {
+		if (! p.hasAnnot()) {
 			return;
 		}
-		if (annots == null && p.hasAnnot()) {
-			annots = new ListTermImpl();
-		}
-		Iterator i = p.getAnnots().iterator();
+		Iterator<Term> i = p.getAnnots().iterator();
 		while (i.hasNext()) {
-			Term t = (Term) i.next();
+			Term t = i.next();
 			// p will only contain the annots actually added (for Event)
-			if (!annots.contains(t)) {
-				annots.add((Term)t.clone());
+			if (!hasAnnot(t)) {
+				addAnnot((Term)t.clone());
 			} else {
 				// Remove what is not new from p 
 				i.remove();
@@ -233,10 +230,10 @@ public class Pred extends TermImpl {
 		if (!hasAnnot()) {
 			p.clearAnnots();
 		} else {
-			Iterator i = p.getAnnots().iterator();
+			Iterator<Term> i = p.getAnnots().iterator();
 			while (i.hasNext()) {
-				Term t = (Term)i.next();				
-				if (annots.contains(t)) {
+				Term t = i.next();				
+				if (hasAnnot(t)) {
 					annots.remove(t);
 				} else {
 					i.remove();
@@ -260,7 +257,7 @@ public class Pred extends TermImpl {
         if (annots != null && p.getAnnots() == null)
             return false;
         for (Term myAnnot: annots) {
-            if (!p.getAnnots().contains(myAnnot)) {
+            if (!p.hasAnnot(myAnnot)) {
                 return false;
             }
         }
@@ -285,15 +282,12 @@ public class Pred extends TermImpl {
 			pTail = (VarTerm)p.getAnnots().getTail();
 		}  catch (Exception e) {}
 		
-		Iterator i = annots.iterator();
-		while (i.hasNext()) {
-			Term annot = (Term)i.next();
-			
+		for (Term annot: annots) {
 			// search annot in p's annots
 			boolean ok = false;
-			Iterator j = p.getAnnots().iterator();
+			Iterator<Term> j = p.getAnnots().iterator();
 			while (j.hasNext() && !ok) {
-				Term pAnnot = (Term)j.next();
+				Term pAnnot = j.next();
 				if (u.unifies(annot, pAnnot)) {
 					ok = true;
 					j.remove();
@@ -305,7 +299,7 @@ public class Pred extends TermImpl {
 				ListTerm pTailAnnots = (ListTerm)u.get(pTail.getFunctor());
 				if (pTailAnnots == null) {
 					pTailAnnots = new ListTermImpl();
-					u.unifies(pTail, (Term)pTailAnnots);
+					u.unifies(pTail, pTailAnnots);
 					pTailAnnots = (ListTerm)u.get(pTail.getFunctor());
 				}
 				pTailAnnots.add(annot);
@@ -320,7 +314,7 @@ public class Pred extends TermImpl {
 			VarTerm tail = (VarTerm)annots.getTail();
 			if (tail != null) {
 				//System.out.println("tail="+tail+"/"+p.getAnnots());
-				u.unifies(tail, (Term)p.getAnnots());
+				u.unifies(tail, p.getAnnots());
 			}
 		}  catch (Exception e) {}
 		

@@ -49,7 +49,7 @@ public class BeliefBase {
 	 * value is a list of literals with the same functorArity.
 	 */
 	Map<String,List<Literal>> belsMap = new HashMap<String,List<Literal>>();
-
+	private int size = 0;
 	
 	/** list of beliefs with percept annot, used to improve performance of brf */
 	List<Literal> percepts = new ArrayList<Literal>();
@@ -57,12 +57,9 @@ public class BeliefBase {
 	public BeliefBase() {
 	}
 
+	
 	public int size() {
-		int c = 0;
-		for (List<Literal> l: belsMap.values()) {
-			c += l.size();
-		}
-		return c;
+		return size;
 	}
 
 	private void addPercept(Literal l) {
@@ -108,6 +105,7 @@ public class BeliefBase {
 			}
 			listFunctor.add(l);
 			addPercept(l); // add it in the percepts list
+			size++;
 			return true;
 		}
 	}
@@ -115,7 +113,7 @@ public class BeliefBase {
 
 	/** returns a list with all beliefs. */
 	public List<Literal> getAllBeliefs() {
-		List<Literal> all = new ArrayList<Literal>();
+		List<Literal> all = new ArrayList<Literal>(size());
         for (List<Literal> l: belsMap.values()) {
 			all.addAll(l);
 		}
@@ -137,6 +135,7 @@ public class BeliefBase {
 					if (listFunctor.isEmpty()) {
 						belsMap.remove(key);
 					}
+					size--;
 				}
 				return true;
 			} else {
@@ -155,9 +154,9 @@ public class BeliefBase {
 		boolean result = false;
 		List<Literal> all = getRelevant(l);
 		if (all != null) {
-			Iterator i = all.iterator();
+			Iterator<Literal> i = all.iterator();
 			while (i.hasNext()) {
-				if (((Literal)i.next()).getFunctor().equals(l.getFunctor())) {
+				if (i.next().getFunctor().equals(l.getFunctor())) {
 					i.remove();
 					result = true;
 				}
@@ -172,8 +171,7 @@ public class BeliefBase {
 		if (listFunctor == null) {
 			return null;
 		}
-		for (int i=0; i<listFunctor.size(); i++) {
-			Literal bl = (Literal)listFunctor.get(i);
+		for (Literal bl: listFunctor) {
 			if (l.equalsAsTerm(bl)) {
 				return bl;
 			}

@@ -52,6 +52,8 @@ public class Literal extends Pred implements Cloneable {
 
 	boolean type = LPos;
 
+	private boolean internalAction = false;
+	
 	public Literal() {
 	}
 
@@ -71,6 +73,11 @@ public class Literal extends Pred implements Cloneable {
 		type = LPos;
 	}
 
+	@Override public void setFunctor(String s) {
+		super.setFunctor(s);
+		internalAction = getFunctor() != null && getFunctor().indexOf('.') >= 0;
+	}
+	
 	public static Literal parseLiteral(String sLiteral) {
 		as2j parser = new as2j(new StringReader(sLiteral));
 		try {
@@ -82,7 +89,7 @@ public class Literal extends Pred implements Cloneable {
 	}
 
 	public boolean isInternalAction() {
-		return getFunctor() != null && getFunctor().indexOf('.') >= 0;
+		return internalAction;
 	}
 	
 	public boolean isLiteral() {
@@ -223,11 +230,6 @@ public class Literal extends Pred implements Cloneable {
             u.setAttribute("ia", isInternalAction()+"");
         }
         u.appendChild(super.getAsDOM(document));
-        /*u.setAttribute("term",super.toStringAsTerm());
-        if (getAnnots() != null && !getAnnots().isEmpty()) {
-            u.setAttribute("annots", getAnnots().toString());
-        }
-        */
         return u;
     }    
     

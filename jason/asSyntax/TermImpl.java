@@ -30,6 +30,7 @@ import jason.asSyntax.parser.as2j;
 import java.io.Serializable;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
@@ -111,8 +112,7 @@ public class TermImpl implements Term, Serializable {
         return null;
     }   
 
-    protected static final List<Unifier> EMPTY_UNIF_LIST = new ArrayList<Unifier>(0);
-    
+    protected static final List<Unifier> EMPTY_UNIF_LIST = Collections.emptyList();
 
     /** create an iterator for a list of unifiers */
     protected Iterator<Unifier> createUnifIterator(Unifier... unifs) {
@@ -329,9 +329,9 @@ public class TermImpl implements Term, Serializable {
         }
         if (terms != null) {
             s.append("(");
-            Iterator i = terms.iterator();
+            Iterator<Term> i = terms.iterator();
             while (i.hasNext()) {
-                s.append((Term) i.next());
+                s.append(i.next());
                 if (i.hasNext())
                     s.append(",");
             }

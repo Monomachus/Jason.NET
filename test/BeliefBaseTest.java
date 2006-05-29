@@ -35,12 +35,14 @@ public class BeliefBaseTest extends TestCase {
 		l2.addAnnot(new TermImpl("a"));
 		assertTrue(bb.add(l2));
 		assertFalse(bb.add(l2));
+		assertEquals(bb.size(),1);
 
 		l3 = new Literal(true, new Pred("pos"));
 		l3.addAnnot(new TermImpl("b"));
 		l3.addAnnot(BeliefBase.TPercept);
 		assertTrue(bb.add(l3));
 		assertFalse(bb.add(l3));
+		assertEquals(bb.size(),1);
 
 		l3 = new Literal(true, new Pred("pos"));
 		l3.addSource(new TermImpl("ag1"));
@@ -62,6 +64,7 @@ public class BeliefBaseTest extends TestCase {
 		l4.addTerm(new TermImpl("2"));
 		l4.addAnnot(BeliefBase.TPercept);
 		assertFalse(bb.add(l4));
+		assertEquals(bb.size(),2);
 
 		l4 = new Literal(true, new Pred("pos"));
 		l4.addTerm(new TermImpl("5"));
@@ -84,13 +87,14 @@ public class BeliefBaseTest extends TestCase {
 		lRel2.addTerm(new VarTerm("X"));
 		lRel2.addTerm(new VarTerm("Y"));
 		//System.out.println("Rel "+lRel2.getFunctorArity()+"="+bb.getRelevant(lRel2));
-
+		assertEquals(bb.size(), 4);
 		
 		// remove
 		l5 = new Literal(true, new Pred("garb"));
 		l5.addTerm(new TermImpl("r1"));
 		assertTrue(bb.remove(l5));
 		assertEquals(bb.getRelevant(l5), null);
+		assertEquals(bb.size(), 3);
 
 		l4 = new Literal(true, new Pred("pos"));
 		l4.addTerm(new TermImpl("5"));
@@ -98,6 +102,7 @@ public class BeliefBaseTest extends TestCase {
 		l4.addAnnot(BeliefBase.TPercept);
 		assertTrue(bb.remove(l4));
 		assertEquals(bb.getRelevant(l4).size(), 1);
+		assertEquals(bb.size(), 2);
 
 		//System.out.println("remove grab(r1), pos(5,6)");
 		//System.out.println("BB="+bb);
@@ -110,6 +115,7 @@ public class BeliefBaseTest extends TestCase {
 		l4.addAnnot(BeliefBase.TPercept);
 		assertTrue(bb.remove(l4));
 		assertEquals(bb.getRelevant(l4), null);
+		assertEquals(bb.size(), 1);
 
 		//System.out.println("remove pos(1,2)");
 		//System.out.println("BB="+bb);
