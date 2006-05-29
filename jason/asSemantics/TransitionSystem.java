@@ -834,13 +834,7 @@ public class TransitionSystem {
 			nrcslbr++;
 			
 			if (setts.isSync()) {
-				boolean isBreakPoint = false;
-				try {
-					isBreakPoint = getC().getSelectedOption().getPlan().getLabel().hasAnnot(Plan.TBreakPoint);
-				} catch (Exception e) {
-					// no problem, the plan has no label
-					//logger.error("E!",e);
-				}
+				boolean isBreakPoint = getC().getSelectedOption().getPlan().hasBreakpoint();
 				if (logger.isLoggable(Level.FINE)) {
 					logger.fine("Informing controller that I finished a reasoning cycle. Breakpoint is "+isBreakPoint);
 				}

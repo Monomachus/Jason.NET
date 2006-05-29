@@ -113,7 +113,7 @@ public class PlanLibrary {
             do {
                 l = "l__" + (lastPlanLabel++);
             } while (planLabels.keySet().contains(l));
-            p.setLabel(l);
+            p.setLabel(new Pred(l));
         }
 
         // add self source
@@ -122,13 +122,6 @@ public class PlanLibrary {
         }
         planLabels.put(p.getLabel().getFunctor(), p);
 
-        // trim the plan
-        if (p.body != null) {
-            p.body.trimToSize();
-        }
-        //if (p.context != null) {
-        //    p.context.trimToSize();
-        //}
         if (p.getTriggerEvent().getLiteral().isVar()) {
             varPlans.add(p);
             // add plan p in all entries

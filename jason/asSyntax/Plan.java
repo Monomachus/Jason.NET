@@ -29,6 +29,8 @@ import jason.asSyntax.parser.as2j;
 import java.io.Serializable;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
@@ -39,15 +41,18 @@ import org.w3c.dom.Element;
 
 public class Plan implements Cloneable, Serializable {
 
-	public static final Term TAtomic     = TermImpl.parse("atomic");	
-	public static final Term TBreakPoint = TermImpl.parse("breakpoint");	
-	
 	protected Pred label = null;
 	protected Trigger tevent = null;
 	protected Term context;
-	protected ArrayList<BodyLiteral>    body;
+	protected List<BodyLiteral>    body;
 
-	Boolean isAtomic = null; // if the label has atomic annotation, used to cache the value, so we do not need to seach all label annotations each isAtomic()
+	private enum Annots { atomic, breakpoint } 
+	private static final Term TAtomic     = TermImpl.parse("atomic");	
+	private static final Term TBreakPoint = TermImpl.parse("breakpoint");	
+	// enum set of special annots, to improve performance in isAtomic, isBreak, ...
+	private EnumSet<Annots> reservedAnnots = EnumSet.noneOf(Annots.class); 
+		
+	boolean isAtomic = false; // if the label has atomic annotation
 	
 	private int startSourceLine = 0; // the line number in the AS source
 	private int endSourceLine = 0; // the line number in the AS source
@@ -65,13 +70,30 @@ public class Plan implements Cloneable, Serializable {
 	}
 
 	public Plan(Pred lb, Trigger te, Term ct, ArrayList<BodyLiteral> bd) {
-		label = lb;
 		tevent = te;
+		setLabel(lb);
 		setContext(ct);
 		setBody(bd);
 	}
 
-    public void setContext(Term le) {
+	
+	public void setLabel(Pred p) {
+		label = p;
+		if (p != null) {
+			//isAtomic = label.hasAnnot(TAtomic);
+			if (label.hasAnnot(TAtomic)) {
+				reservedAnnots.add(Annots.atomic);
+			}
+			if (label.hasAnnot(TBreakPoint)) {
+				reservedAnnots.add(Annots.breakpoint);
+			}
+		}
+	}
+	public Pred getLabel() {
+		return label;
+	}
+
+	public void setContext(Term le) {
         context = le;
         if (le != null && le.isLiteral() && ((Literal)le).equals(Literal.LTrue)) {
             context = null;
@@ -79,8 +101,10 @@ public class Plan implements Cloneable, Serializable {
     }
     
     public void setBody(ArrayList<BodyLiteral> bd) {
-        if (bd == null) bd = new ArrayList<BodyLiteral>(0);
-        body = bd;
+        if (bd == null) 
+        	body = Collections.emptyList();
+        else
+        	body = bd;
     }
     
 	public static Plan parse(String sPlan) {
@@ -103,14 +127,7 @@ public class Plan implements Cloneable, Serializable {
 	public int getEndSourceLine() {
 		return endSourceLine;
 	}
-	
-	public Pred getLabel() {
-		return label;
-	}
 
-	public void setLabel(String l) {
-		label = new Pred(l);
-	}
 	
 	public Trigger getTriggerEvent() {
 		return tevent;
@@ -125,14 +142,10 @@ public class Plan implements Cloneable, Serializable {
 	}
 
 	public boolean isAtomic() {
-		if (isAtomic == null) {
-			if (label != null) {
-				isAtomic = new Boolean(label.hasAnnot(TAtomic));
-			} else {
-				isAtomic = new Boolean(false);
-			}
-		}
-		return isAtomic.booleanValue();
+		return reservedAnnots.contains(Annots.atomic);
+	}
+	public boolean hasBreakpoint() {
+		return reservedAnnots.contains(Annots.breakpoint);
 	}
 
 	public Unifier relevant(Trigger te) {
@@ -165,10 +178,6 @@ public class Plan implements Cloneable, Serializable {
 			p.context = null;
 		else {
 			p.context = (Term)context.clone();
-            /*new ArrayList<DefaultLiteral>(context.size());
-			for (DefaultLiteral l: context) {
-				p.context.add( (DefaultLiteral)l.clone());
-			}*/
 		}
 		
 		if (body == null)
@@ -196,21 +205,14 @@ public class Plan implements Cloneable, Serializable {
 
 	public String toString() {
 		return toASString();
-		/*
-		return ("<<" + ((label == null) ? "" : label.toString())
-				+ tevent.toString() + " : " + listToString(context, " & ") + " <- "
-				+ listToString(body, "; ") + ">>");
-		*/
 	}
 
 	/** returns this plan in a string compliant with AS syntax */
 	public String toASString() {
-		return  ((label == null) ? "" : "@" + label.toString() + " ")
+		return  ((label == null) ? "" : "@" + label + " ")
 				+ tevent  
-				//((context.size() == 0) ? "true" : listToString(context, " & "))
 				+ ((context == null) ? "" : " : " + context)
-				+ " <- " +
-				((body.size() == 0) ? "true" : listToString(body, "; ")) 
+				+ ((body.size() == 0) ? "" : " <- " + listToString(body, "; ")) 
 				+ ".";
 	}
 
@@ -225,8 +227,6 @@ public class Plan implements Cloneable, Serializable {
 		}
         u.appendChild(tevent.getAsDOM(document));
         
-		//u.setAttribute("context", listToString(context, " & "));
-		//u.setAttribute("body", listToString(body, "; "));
         if (context != null) {
             Element ec = (Element) document.createElement("context");
             ec.appendChild(context.getAsDOM(document));
@@ -243,5 +243,4 @@ public class Plan implements Cloneable, Serializable {
         
 		return u;
 	}
-
 }
