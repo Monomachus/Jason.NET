@@ -77,29 +77,25 @@ public class TermImpl implements Term, Serializable {
     
     public void setFunctor(String fs) {
         functor = fs;
-        functorArityBak = null;
+        predicateIndicatorCache = null;
     }
 
     public String getFunctor() {
         return functor;
     }
 
-    protected String functorArityBak = null; // to not compute it all the time (is is called many many times)
+    protected PredicateIndicator predicateIndicatorCache = null; // to not compute it all the time (is is called many many times)
     
     /** returns functor symbol "/" arity */
-    public String getFunctorArity() {
-        if (functorArityBak == null) {
-            if (terms == null) {
-                functorArityBak = getFunctor() + "/0";
-            } else {
-                functorArityBak = getFunctor() + "/" + getTermsSize();
-            }
+    public PredicateIndicator getPredicateIndicator() {
+        if (predicateIndicatorCache == null) {
+            predicateIndicatorCache = new PredicateIndicator(getFunctor(),getTermsSize());
         }
-        return functorArityBak;
+        return predicateIndicatorCache;
     }
 
     public int hashCode() {
-        return getFunctorArity().hashCode();
+        return getPredicateIndicator().hashCode();
     }
     
     /** 
@@ -128,7 +124,7 @@ public class TermImpl implements Term, Serializable {
         if (terms == null)
             terms = new ArrayList<Term>();
         terms.add(t);
-        functorArityBak = null;
+        predicateIndicatorCache = null;
     }
     public void addTerms(List<Term> l) {
         for (Term t: l) {

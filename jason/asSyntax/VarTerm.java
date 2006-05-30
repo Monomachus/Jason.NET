@@ -203,11 +203,11 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
 	}
 
 	
-    @Override public String getFunctorArity() {
+    @Override public PredicateIndicator getPredicateIndicator() {
 		if (value != null)
-			return value.getFunctorArity();
+			return value.getPredicateIndicator();
 		else 
-			return null;
+			return super.getPredicateIndicator();
 	}
 
     @Override public Iterator<Unifier> logCons(Agent ag, Unifier un) {

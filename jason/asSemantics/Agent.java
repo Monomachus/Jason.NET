@@ -295,7 +295,7 @@ public class Agent {
 	// only add External Event if it is relevant in respect to the PlanLibrary
 	public void updateEvents(Event e, Circumstance c) {
 		if (c != null) {
-			if (e.isInternal() || c.hasListener() || fPS.isRelevant(e.trigger)) {
+			if (e.isInternal() || c.hasListener() || fPS.isRelevant(e.trigger.getPredicateIndicator())) {
 				c.addEvent(e);
 				if (logger.isLoggable(Level.FINE)) logger.fine("Added event "+e);
 			}

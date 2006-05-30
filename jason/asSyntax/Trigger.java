@@ -98,18 +98,23 @@ public class Trigger implements Cloneable {
 		return new Trigger(trigType, goal, literal); 
 	}
 
+    
+    PredicateIndicator piCache = null;
 	/** return [+|-][!|?] super.getFucntorArity */
-	public String getFunctorArity() {
-		String s;
-		if (trigType == TEAdd)
-			s = "+";
-		else
-			s = "-";
-		if (goal == TEAchvG)
-			s += "!";
-		else if (goal == TETestG)
-			s += "?";
-		return s + literal.getFunctorArity();
+	public PredicateIndicator getPredicateIndicator() {
+        if (piCache == null) {
+        		String s;
+        		if (trigType == TEAdd)
+        			s = "+";
+        		else
+        			s = "-";
+        		if (goal == TEAchvG)
+        			s += "!";
+        		else if (goal == TETestG)
+        			s += "?";
+            piCache = new PredicateIndicator(s, literal.getPredicateIndicator());//s + literal.getFunctorArity();
+        }
+        return piCache;
 	}
 
 	public Literal getLiteral() {
@@ -117,7 +122,7 @@ public class Trigger implements Cloneable {
 	}
 	
 	public int hashCode() {
-		return getFunctorArity().hashCode();
+		return getPredicateIndicator().hashCode();
 	}
 
 	public String toString() {

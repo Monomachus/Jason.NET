@@ -40,7 +40,7 @@ import org.w3c.dom.Element;
 public class PlanLibrary {
 
 	/** a MAP from TE to a list of relevant plans */
-    Map<String,List<Plan>> relPlans = new HashMap<String,List<Plan>>();
+    Map<PredicateIndicator,List<Plan>> relPlans = new HashMap<PredicateIndicator,List<Plan>>();
 
 	/**
 	 * All plans as defined in the AS code (maintains the order of the plans)
@@ -129,11 +129,11 @@ public class PlanLibrary {
                 lp.add(p);
             }
         } else {
-            List<Plan> codesList = relPlans.get(p.tevent.getFunctorArity());
+            List<Plan> codesList = relPlans.get(p.tevent.getPredicateIndicator());
             if (codesList == null) {
                 codesList = new ArrayList<Plan>();
                 codesList.addAll(varPlans);
-                relPlans.put(p.tevent.getFunctorArity(), codesList);
+                relPlans.put(p.tevent.getPredicateIndicator(), codesList);
             }
             codesList.add(p);
         }
@@ -156,11 +156,6 @@ public class PlanLibrary {
     	    return plans;
     }
 
-    /*
-    public int indexOf(Plan p) {
-        return plans.indexOf(p);
-    }
-    */
 
     /** 
 	 * Remove a plan represented by the label <i>pLabel</i>.
@@ -183,7 +178,6 @@ public class PlanLibrary {
 
 	/** remove the plan with label <i>pLabel</i> */
     public Plan remove(String pLabel) {
-        // codes.remove(i);
         Plan p = (Plan) planLabels.remove(pLabel);
 
         // remove it from plans' list
@@ -196,24 +190,24 @@ public class PlanLibrary {
                 lp.remove(p);
             }
         } else {
-            List<Plan> codesList = relPlans.get(p.tevent.getFunctorArity());
+            List<Plan> codesList = relPlans.get(p.tevent.getPredicateIndicator());
             codesList.remove(p);
             if (codesList.isEmpty()) {
                 // no more plans for this TE
-                relPlans.remove(p.tevent.getFunctorArity());
+                relPlans.remove(p.tevent.getPredicateIndicator());
             }
         }
         return p;
     }
 
-    public boolean isRelevant(Trigger t) {
-        	List l = getAllRelevant(t);
+    public boolean isRelevant(PredicateIndicator pi) {
+        	List l = getAllRelevant(pi);
         	return l != null && l.size() > 0;
     }
 
 
-    public List<Plan> getAllRelevant(Trigger t) {
-        	List<Plan> l = relPlans.get(t.getFunctorArity());
+    public List<Plan> getAllRelevant(PredicateIndicator pi) {
+        	List<Plan> l = relPlans.get(pi);
         	if ((l == null || l.size() == 0) && varPlans.size() > 0) { // no rel plan, try varPlan
         		l = varPlans;
         	}
@@ -223,7 +217,7 @@ public class PlanLibrary {
     public static final Trigger TE_IDLE = Trigger.parseTrigger("+!idle");
 
     public List<Plan> getIdlePlans() {
-        return relPlans.get(TE_IDLE.getFunctorArity());
+        return relPlans.get(TE_IDLE.getPredicateIndicator());
     }
 
     public String toString() {
