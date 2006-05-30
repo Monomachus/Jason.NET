@@ -45,9 +45,10 @@ import java.util.logging.Logger;
 
 public class TransitionSystem {
 
-    static final byte     SStartRC   = 0;
+    enum State { startRC, selEv, RelPl, ApplPl, selAppl, addIM, procAct, selInt, execInt, clrInt }
 
-    static final byte     SProcMsg   = 0;
+    // TODO: remove and use State
+    static final byte     SStartRC   = 0;
 
     static final byte     SSelEv     = 1;
 
@@ -72,28 +73,16 @@ public class TransitionSystem {
     private Logger        logger     = null;
 
     Agent                 ag         = null;
-
     AgArch                agArch     = null;
-
     Circumstance          C          = null;
-
     Settings              setts      = null;
 
-    private byte          step       = SStartRC;                                                                                               // First
-                                                                                                                                                // step
-                                                                                                                                                // of
-                                                                                                                                                // the
-                                                                                                                                                // SOS
+    // first step of the SOS 
+    private byte          step       = SStartRC;                                                                                               
 
-    private int           nrcslbr;                                                                                                             // number
-                                                                                                                                                // of
-                                                                                                                                                // reasoning
-                                                                                                                                                // cycles
-                                                                                                                                                // since
-                                                                                                                                                // last
-                                                                                                                                                // belief
-                                                                                                                                                // revision
-
+    // number of reasoning cycles since last belief revision
+    private int           nrcslbr;                                                                                                             
+    
     // both configuration and configuration' point to this
     // object, this is just to make it look more like the SOS
     TransitionSystem      confP;
@@ -141,7 +130,7 @@ public class TransitionSystem {
         // the individual semantic rules appear below
 
         switch (conf.step) {
-        case SProcMsg:
+        case SStartRC:
             applyProcMsg();
             break;
         case SSelEv:
@@ -267,9 +256,8 @@ public class TransitionSystem {
         confP.C.RP = relevantPlans(conf.C.SE.trigger);
 
         // Rule Rel1
-        if (!confP.C.RP.isEmpty() || setts.retrieve()) { // retrieve is
-                                                            // mainly for
-                                                            // Coo-AgentSpeak
+        if (!confP.C.RP.isEmpty() || setts.retrieve()) { 
+            // retrieve is mainly for Coo-AgentSpeak
             confP.step = SApplPl;
         }
         // Rule Rel2
@@ -297,7 +285,7 @@ public class TransitionSystem {
             confP.step = SProcAct;
             return;
         }
-        confP.C.AP = applicablePlans(new ArrayList(confP.C.RP));
+        confP.C.AP = applicablePlans(confP.C.RP);
 
         // Rule Appl1
         if (!confP.C.AP.isEmpty() || setts.retrieve()) { // retrieve is
@@ -646,20 +634,21 @@ public class TransitionSystem {
         return rp;
     }
 
-    public List applicablePlans(List rp) throws JasonException {
-        for (Iterator i = rp.iterator(); i.hasNext();) {
-            Option opt = (Option) i.next();
+    public List<Option> applicablePlans(List<Option> rp) throws JasonException {
+        List<Option> ap = new ArrayList<Option>(rp.size());
+        for (Option opt: rp) {
             Term context = opt.plan.getContext();
-            if (context != null) {
+            if (context == null) { // context is true
+                ap.add(opt);
+            } else {
                 Iterator<Unifier> r = context.logCons(ag, opt.unif);
                 if (r != null && r.hasNext()) {
                     opt.unif = r.next();
-                } else {
-                    i.remove();
+                    ap.add(opt);
                 }
             }
         }
-        return rp;
+        return ap;
     }
 
     /** remove the top action and requeue the current intention */

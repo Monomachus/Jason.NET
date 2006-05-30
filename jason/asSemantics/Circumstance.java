@@ -52,8 +52,8 @@ public class Circumstance implements Serializable {
 	protected ActionExec A;
 
     protected List<Message>   MB;
-    protected List   RP;
-    protected List<Option>   AP;
+    protected List<Option>    RP;
+    protected List<Option>    AP;
 
 	protected Event SE;
 

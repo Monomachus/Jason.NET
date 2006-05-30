@@ -356,6 +356,7 @@ public class Unifier implements Cloneable {
         return function.size();
     }
     
+    @SuppressWarnings("unchecked")
     public Object clone() {
         try {
             Unifier newUn = new Unifier();
