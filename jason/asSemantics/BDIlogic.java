@@ -196,7 +196,7 @@ public final class BDIlogic {
                 } catch (Exception e) {
                     i = (Intention) o;
                 }
-                // TODO CAREFUL: The semantics for this isn't well defined yet.
+                // CAREFUL: The semantics for this isn't well defined yet.
                 // The goal deletion on top of the intention will not get to
                 // know the result of the action, as it is removed from the PA set!
                 // If left in PA, the action won't be the the top of

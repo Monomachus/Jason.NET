@@ -22,24 +22,15 @@ import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileFilter;
 
-// TODO ask for source, browse button
-
 public class StartNewAgentGUI extends BaseDialogGUI {
 
     protected JTextField agName;
-
     protected JTextField agSource;
-
     protected JTextField archClass;
-
     protected JTextField agClass;
-
     protected JTextField nbAgs;
-
     protected JTextField agHost;
-
     protected JComboBox  verbose;
-
     String               openDir;
 
     public StartNewAgentGUI(Frame f, String title, String openDir) {
