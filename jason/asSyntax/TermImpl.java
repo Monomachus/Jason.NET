@@ -236,7 +236,7 @@ public class TermImpl implements Term, Serializable {
     public boolean equals(Object t) {
         if (t == null)  return false;
         
-        // it is a var, uses var's equals
+        // if t is a VarTerm, uses var's equals
         try {
             VarTerm vt = (VarTerm)t;
             //System.out.println(this.functor+" equals1 "+vt.getFunctor());

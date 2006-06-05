@@ -5,6 +5,7 @@ import jason.asSyntax.BeliefBase;
 import jason.asSyntax.ListTerm;
 import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Literal;
+import jason.asSyntax.NumberTermImpl;
 import jason.asSyntax.Pred;
 import jason.asSyntax.Term;
 import jason.asSyntax.TermImpl;
@@ -95,8 +96,8 @@ public class TermTest extends TestCase {
 		assertTrue(u.unifies(b, x));
 		assertTrue(u.unifies(new TermImpl("a"), x));
 		//System.out.println("u="+u);
-		assertEquals(u.get("B").toString(), "a");
-		assertEquals(u.get("X").toString(), "a");
+		assertEquals(u.get(b).toString(), "a");
+		assertEquals(u.get(x).toString(), "a");
 		u.apply(b);
 		//System.out.println("x="+x);
 		//System.out.println("b="+b);
@@ -134,10 +135,6 @@ public class TermTest extends TestCase {
 		assertTrue(u.unifies(z1,z2));
 		assertTrue(u.unifies(z2,z3));
 		assertTrue(u.unifies(z2,z4));
-		
-		//System.out.println("u="+u);
-		assertEquals(u.get("Z1"), null);
-		assertEquals(u.get("Z2"), null);
 		
 		assertTrue(z1.isVar()); // z1 is still a var
 		assertTrue(z2.isVar()); // z2 is still a var
@@ -204,7 +201,7 @@ public class TermTest extends TestCase {
 		p1.addAnnot(new VarTerm("X1"));
 		p1.addAnnot(new VarTerm("X2"));
 		p1.addAnnot(new VarTerm("X3"));
-		//System.out.println("p1="+p1+"; p2="+p2);
+		System.out.println("p1="+p1+"; p2="+p2);
 		u = new Unifier();
 		assertFalse(u.unifies(p1, p2));
 		//System.out.println("u="+u);
@@ -220,6 +217,10 @@ public class TermTest extends TestCase {
 		assertTrue(u.unifies(p1, p2));
 		//System.out.println("u="+u);
 	}
+    
+    public void testAnnotsUnify3() {
+        //Pred p1 = Pred.parsePred("p1[a,X")
+    }
 	
 	public void testTrigger() {
 		Pred p1 = new Pred("pos");
@@ -337,5 +338,13 @@ public class TermTest extends TestCase {
         ListTerm l = ListTermImpl.parseList("[b,c,g,casa,f(10),[3,4],[3,1],f(4)]");
         Collections.sort(l);
         assertEquals(l.toString(), "[b,c,casa,f(4),f(10),g,[3,1],[3,4]]");
+    }
+    
+    public void testUnify4() {
+        Term a1 = TermImpl.parse("a(1)");
+        Term a2 = TermImpl.parse("a(X+1)");
+        Unifier u = new Unifier();
+        u.unifies(new VarTerm("X"),new NumberTermImpl(0));
+        assertFalse(a1.equals(a2));   
     }
 }

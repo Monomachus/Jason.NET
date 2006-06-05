@@ -92,7 +92,7 @@ public class NumberTermImpl extends TermImpl implements NumberTerm {
 	public boolean equals(Object o) {
 		try {
 			Term t = (Term)o;
-			if (t.isVar()) return false;
+			if (t.isVar() || t.isExpr()) return false;
 			NumberTerm st = (NumberTerm)t;
 			return solve() == st.solve();
 		} catch (Exception e) {}

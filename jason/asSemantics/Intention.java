@@ -41,6 +41,8 @@ public class Intention implements Serializable {
 	private static int idCount = 1;
 	private int id;
 	
+	private boolean isAtomic = false;
+
     Stack<IntendedMeans> fIntendedMeans = new Stack<IntendedMeans>();
 
 //	static private Logger logger = Logger.getLogger(intend.class.getName());
@@ -55,6 +57,9 @@ public class Intention implements Serializable {
     
     public void push(IntendedMeans im) {
         fIntendedMeans.push(im);
+	if (im.isAtomic()) {
+		isAtomic = true;
+	}
     }
     
     public IntendedMeans peek() {
@@ -66,10 +71,19 @@ public class Intention implements Serializable {
     }
 
     public IntendedMeans pop() {
-        return fIntendedMeans.pop();
+	IntendedMeans top = fIntendedMeans.pop();
+
+	isAtomic = false;
+	for (IntendedMeans im: fIntendedMeans) {
+		if (im.isAtomic()) {
+			isAtomic = true;
+			break;
+		}
+	}
+	return top;
     }
     
-    public Iterator iterator() {
+    public Iterator<IntendedMeans> iterator() {
         return fIntendedMeans.iterator();
     }
     
@@ -78,12 +92,7 @@ public class Intention implements Serializable {
     }
     
 	boolean isAtomic() {
-		for (IntendedMeans im: fIntendedMeans) {
-			if (im.isAtomic()) {
-				return true;
-			}
-		}
-		return false;
+		return isAtomic;
 	}
 	
     public boolean hasTrigger(Trigger g, Unifier u) {

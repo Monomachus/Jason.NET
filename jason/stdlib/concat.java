@@ -52,7 +52,7 @@ public class concat implements InternalAction {
 		
 			ListTerm l1l = (ListTerm)l1;
 			l1l.concat((ListTerm)l2);
-			return un.unifiesNoClone(l3, (Term)l1l);
+			return un.unifies(l3, (Term)l1l);
 		} else {
 			String v1 = l1.toString();
 			if (l1.isString()) {

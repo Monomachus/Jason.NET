@@ -180,6 +180,10 @@ public class ArithExprTerm extends VarTerm implements NumberTerm {
 		logger.warning("Do not use addTerm in expressions!");
 	}
 
+    public boolean isVar() {
+        return false;
+    }
+    
 	public boolean isExpr() {
 		return !hasValue();
 	}

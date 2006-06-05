@@ -30,12 +30,7 @@ import jason.asSyntax.Literal;
 import jason.asSyntax.Trigger;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -62,16 +57,17 @@ public class Circumstance implements Serializable {
     protected Intention SI;
     //protected Intention AI; // atomic intention
     private   Map       PA;
-    protected List      FA;
+    protected List<ActionExec> FA;
 
     private List<CircumstanceListener> listeners = new ArrayList<CircumstanceListener>();
     
     public Circumstance() {
-        E  = new LinkedList<Event>();
-        I  = new LinkedList<Intention>();
-        MB = new LinkedList<Message>();
+	// use LinkedList since we use a lot of remove(0) in selectEvent
+        E  = new LinkedList<Event>(); 
+        I  = new LinkedList <Intention>();
+        MB = new LinkedList <Message>();
         PA = new HashMap();
-        FA = new LinkedList();
+        FA = new ArrayList<ActionExec>();
         reset();
     }
     
@@ -111,6 +107,8 @@ public class Circumstance implements Serializable {
     	    addEvent(new Event(trig, Intention.EmptyInt));
     }
 
+    /** Events */
+    
     public void addEvent(Event ev) {
         E.add(ev);
         
@@ -134,6 +132,21 @@ public class Circumstance implements Serializable {
         return ! E.isEmpty();
     }
     
+    /** remove and returns the event with atomic intention, null if none */
+    public Event removeAtomicEvent() {
+        Iterator<Event> i = E.iterator();
+        while (i.hasNext())  {
+            Event e = i.next();
+            if (e.intention != null && e.intention.isAtomic()) {
+                i.remove();
+                return e;
+            }
+        }
+        return null;
+    }
+    
+    /** Listeners */
+    
     public void addEventListener(CircumstanceListener el) {
         synchronized (listeners) {
             listeners.add(el);
@@ -150,11 +163,14 @@ public class Circumstance implements Serializable {
         return listeners.size() > 0;
     }
 
+    /** Messages */
+    
     public List<Message> getMB() {
 		return MB;
 	}
 
-
+    /** Intentions */
+    
 	public List<Intention> getIntentions() {
 		return I;
 	}
@@ -186,6 +202,37 @@ public class Circumstance implements Serializable {
         synchronized (I) {
             I.clear();
         }
+    }
+    
+    // TODO: improve performance of these methods
+    public Intention removeAtomicIntention() {
+        // can not use SI! We really need to check in the list!
+        //if (SI != null && SI.isAtomic()) {
+        //    return SI;
+       // }
+        synchronized (getIntentions()) {
+            for (Intention inte: I) {
+                if (inte.isAtomic()) {
+                    removeIntention(inte);
+                    return inte;
+                }
+            }
+        }
+        return null;
+    }
+
+    public boolean hasAtomicIntention() {
+        //if (SI != null && SI.isAtomic()) {
+        //    return true;
+        //}
+        synchronized (getIntentions()) {
+            for (Intention inte: I) {
+                if (inte.isAtomic()) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
     
     public ActionExec getAction() {
