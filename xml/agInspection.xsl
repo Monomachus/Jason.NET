@@ -436,7 +436,10 @@
 	    </xsl:if>
 	    	<xsl:if test="count(annotations) > 0">
 	    		<span style="color: rgb(0 ,190, 0)">
-	    			<sub>[<xsl:apply-templates select="annotations"/>]</sub>
+	    			<sub>[<xsl:for-each select="annotations/*">
+		    		<xsl:apply-templates select="." />
+          		<xsl:if test="not(position()=last())">, </xsl:if>
+        		</xsl:for-each>]</sub>
 			</span>
 	    </xsl:if>
     </xsl:template>
