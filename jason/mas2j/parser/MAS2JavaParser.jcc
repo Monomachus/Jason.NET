@@ -33,6 +33,8 @@ package jason.mas2j.parser;
 import java.util.*;
 import java.io.*;
 import jason.mas2j.*;
+import jason.asSyntax.*;
+import jason.asSemantics.*;
 import jason.jeditplugin.*;
 
 public class mas2j {
@@ -121,6 +123,7 @@ TOKEN : {
 
 |  <ASAGCLASS:      "agentClass" >
 |  <ASAGARCHCLASS:  "agentArchClass" >
+|  <BBCLASS:        "beliefBaseClass" >
 
 // Numbers
 |  <NUMBER: ["0"-"9"] (["0"-"9"])* >
@@ -200,15 +203,18 @@ void agent() :              { Token agName;
 
   ag.options = ASoptions()        
 
-
-  [ <ASAGARCHCLASS> ag.archClass = classDef() ]
-
-  [ <ASAGCLASS> ag.agClass = classDef()  ]
-
-  [ "#" qty = <NUMBER>      { ag.qty = Integer.parseInt(qty.image); } ] 
-
-  [ <AT> host = <STRING>    { ag.host = host.image; } ] 
-
+  (
+  <ASAGARCHCLASS> ag.archClass = classDef()
+  |
+  <ASAGCLASS> ag.agClass = classDef()
+  |
+  <BBCLASS> ag.bbClass = classDef()
+  |  
+  "#" qty = <NUMBER>      { ag.qty = Integer.parseInt(qty.image); }
+  |
+  <AT> host = <STRING>    { ag.host = host.image; }
+  )*
+  
   ";"
                             { project.addAgent(ag); } 
 }

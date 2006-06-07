@@ -2,7 +2,6 @@ package test;
 
 import jason.asSemantics.Agent;
 import jason.asSemantics.Unifier;
-import jason.asSyntax.BeliefBase;
 import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Literal;
 import jason.asSyntax.LogExprTerm;
@@ -10,6 +9,8 @@ import jason.asSyntax.Pred;
 import jason.asSyntax.Term;
 import jason.asSyntax.TermImpl;
 import jason.asSyntax.VarTerm;
+import jason.bb.BeliefBase;
+import jason.bb.DefaultBeliefBase;
 
 import java.util.Iterator;
 
@@ -24,7 +25,7 @@ public class BeliefBaseTest extends TestCase {
 
 	public void testAdd() {
 		Literal l1, l2, l3, l4, l5;
-		BeliefBase bb = new BeliefBase();
+		BeliefBase bb = new DefaultBeliefBase();
 		
 		l1 = new Literal(true, new Pred("pos"));
 		assertTrue(bb.add(l1));
@@ -78,7 +79,7 @@ public class BeliefBaseTest extends TestCase {
 		
 		//System.out.println("BB="+bb);
 		//System.out.println("Percepts="+bb.getPercepts());
-		assertEquals(bb.getPercepts().size(), 3);
+		assertEquals(iteratorSize(bb.getPercepts()), 3);
 		
 		//Literal lRel1 = new Literal(true, new Pred("pos"));
 		//System.out.println("Rel "+lRel1.getFunctorArity()+"="+bb.getRelevant(lRel1));
@@ -101,13 +102,13 @@ public class BeliefBaseTest extends TestCase {
 		l4.addTerm(new TermImpl("6"));
 		l4.addAnnot(BeliefBase.TPercept);
 		assertTrue(bb.remove(l4));
-		assertEquals(bb.getRelevant(l4).size(), 1);
+		assertEquals(iteratorSize(bb.getRelevant(l4)), 1);
 		assertEquals(bb.size(), 2);
 
 		//System.out.println("remove grab(r1), pos(5,6)");
 		//System.out.println("BB="+bb);
 		//System.out.println("Percepts="+bb.getPercepts());
-		assertEquals(bb.getPercepts().size(), 2);
+		assertEquals(iteratorSize(bb.getPercepts()), 2);
 	
 		l4 = new Literal(true, new Pred("pos"));
 		l4.addTerm(new TermImpl("1"));
@@ -123,8 +124,8 @@ public class BeliefBaseTest extends TestCase {
 		
 		l2 = new Literal(true, new Pred("pos"));
 		l2.addAnnot(new TermImpl("a"));
-		assertTrue(bb.contains(l2) != null);
-		assertFalse(bb.contains(l2).hasSubsetAnnot(l2)); //
+		assertTrue(((DefaultBeliefBase)bb).containsAsTerm(l2) != null);
+		assertFalse(((DefaultBeliefBase)bb).containsAsTerm(l2).hasSubsetAnnot(l2)); //
 		assertTrue(bb.remove(l2));
 
 		l2.addAnnot(new TermImpl("b"));
@@ -134,7 +135,7 @@ public class BeliefBaseTest extends TestCase {
 		//System.out.println("removed "+l2);
 		//System.out.println("BB="+bb);
 		//System.out.println("Percepts="+bb.getPercepts());
-		assertEquals(bb.getPercepts().size(), 0);
+		assertEquals(iteratorSize(bb.getPercepts()), 0);
 		assertEquals(bb.size(), 1);
 		
 		l3 = Literal.parseLiteral("pos[source(ag1)]");
@@ -147,7 +148,7 @@ public class BeliefBaseTest extends TestCase {
 	
 	public void testRemWithList() {
 		Unifier u = new Unifier();
-		BeliefBase bb = new BeliefBase();
+		BeliefBase bb = new DefaultBeliefBase();
 		Literal s = Literal.parseLiteral("seen(L)");
 		assertTrue(u.unifies(new VarTerm("L"), (Term)ListTermImpl.parseList("[a,b]")));
 		//System.out.println("u="+u);
@@ -248,4 +249,35 @@ public class BeliefBaseTest extends TestCase {
         assertEquals(c,3);
         
     }
+    
+    public void testPercept() {
+        BeliefBase bb = new DefaultBeliefBase();
+        assertTrue(bb.add(Literal.parseLiteral("a[source(percept)]")));
+        assertTrue(bb.add(Literal.parseLiteral("a[ag1]")));
+        assertEquals(iteratorSize(bb.getPercepts()),1);
+
+        // remove annots ag1
+        assertTrue(bb.remove(Literal.parseLiteral("a[ag1]")));
+        assertEquals(iteratorSize(bb.getPercepts()),1);
+        assertTrue(bb.remove(Literal.parseLiteral("a[source(percept)]")));
+        assertEquals(bb.size(),0);
+        assertEquals(iteratorSize(bb.getPercepts()),0);
+
+        // add again and remove percept first
+        assertTrue(bb.add(Literal.parseLiteral("a[source(percept)]")));
+        assertTrue(bb.add(Literal.parseLiteral("a[ag1]")));
+        assertTrue(bb.remove(Literal.parseLiteral("a[source(percept)]")));
+        assertEquals(bb.size(),1);
+        assertEquals(iteratorSize(bb.getPercepts()),0);
+    }
+    
+    private int iteratorSize(Iterator i) {
+        int c = 0;
+        while (i.hasNext()) {
+            i.next();
+            c++;
+        }
+        return c;
+    }
+    
 }

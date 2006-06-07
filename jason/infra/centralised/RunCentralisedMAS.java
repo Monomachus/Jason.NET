@@ -25,6 +25,7 @@ package jason.infra.centralised;
 
 import jason.JasonException;
 import jason.architecture.AgArch;
+import jason.bb.DefaultBeliefBase;
 import jason.control.ExecutionControlGUI;
 import jason.mas2j.AgentParameters;
 import jason.mas2j.ClassParameters;
@@ -265,6 +266,11 @@ public class RunCentralisedMAS {
                 if (tmpAgArchClass == null) {
                     tmpAgArchClass = new ClassParameters(AgArch.class.getName());
                 }
+                ClassParameters tmpBBClass = ap.bbClass;
+                if (tmpBBClass == null) {
+                    tmpBBClass = new ClassParameters(DefaultBeliefBase.class.getName());
+                }
+
                 String tmpAsSrc = ap.asSource.toString();
                 if (!tmpAsSrc.startsWith(File.separator)) {
                     tmpAsSrc = project.getDirectory() + tmpAsSrc;
@@ -279,7 +285,7 @@ public class RunCentralisedMAS {
                     CentralisedAgArch agArch = new CentralisedAgArch();
                     agArch.setAgName(numberedAg);
                     agArch.setEnvInfraTier(env);
-                    agArch.initAg(tmpAgArchClass.className, tmpAgClass.className, tmpAsSrc, ap.getAsSetts(debug, project.getControlClass() != null));
+                    agArch.initAg(tmpAgArchClass.className, tmpAgClass.className, tmpBBClass, tmpAsSrc, ap.getAsSetts(debug, project.getControlClass() != null));
                     env.addAgent(agArch.getUserAgArch());
                     ags.add(agArch);
                 }

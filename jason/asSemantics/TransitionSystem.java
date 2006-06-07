@@ -25,7 +25,6 @@ package jason.asSemantics;
 
 import jason.JasonException;
 import jason.architecture.AgArch;
-import jason.asSyntax.BeliefBase;
 import jason.asSyntax.BodyLiteral;
 import jason.asSyntax.Literal;
 import jason.asSyntax.Plan;
@@ -35,6 +34,7 @@ import jason.asSyntax.RelExprTerm;
 import jason.asSyntax.Term;
 import jason.asSyntax.TermImpl;
 import jason.asSyntax.Trigger;
+import jason.bb.BeliefBase;
 import jason.runtime.Settings;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -44,31 +44,8 @@ import java.util.logging.Logger;
 
 public class TransitionSystem {
 
-    enum State { startRC, selEv, RelPl, ApplPl, selAppl, addIM, procAct, selInt, execInt, clrInt }
-
-    // TODO: remove and use State
-    static final byte     SStartRC   = 0;
-
-    static final byte     SSelEv     = 1;
-
-    static final byte     SRelPl     = 2;
-
-    static final byte     SApplPl    = 3;
-
-    static final byte     SSelAppl   = 4;
-
-    static final byte     SAddIM     = 5;
-
-    static final byte     SProcAct   = 6;
-
-    static final byte     SSelInt    = 7;
-
-    static final byte     SExecInt   = 8;
-
-    static final byte     SClrInt    = 9;
-
-    static final String[] SRuleNames = { "ProcMsg", "SelEv", "RelPl", "ApplPl", "SelAppl", "AddIM", "ProcAct", "SelInt", "ExecInt", "ClrInt" };
-
+    public enum State { StartRC, SelEv, RelPl, ApplPl, SelAppl, AddIM, ProcAct, SelInt, ExecInt, ClrInt }
+    
     private Logger        logger     = null;
 
     Agent                 ag         = null;
@@ -77,7 +54,7 @@ public class TransitionSystem {
     Settings              setts      = null;
 
     // first step of the SOS 
-    private byte          step       = SStartRC;                                                                                               
+    private State         step       = State.StartRC;                                                                                               
 
     // number of reasoning cycles since last belief revision
     private int           nrcslbr;                                                                                                             
@@ -128,35 +105,35 @@ public class TransitionSystem {
         // only the main parts of the interpretation appear here
         // the individual semantic rules appear below
 
-        switch (conf.step) {
-        case SStartRC:
+        switch (step) {
+        case StartRC:
             applyProcMsg();
             break;
-        case SSelEv:
+        case SelEv:
             applySelEv();
             break;
-        case SRelPl:
+        case RelPl:
             applyRelPl();
             break;
-        case SApplPl:
+        case ApplPl:
             applyApplPl();
             break;
-        case SSelAppl:
+        case SelAppl:
             applySelAppl();
             break;
-        case SAddIM:
+        case AddIM:
             applyAddIM();
             break;
-        case SProcAct:
+        case ProcAct:
             applyProcAct();
             break;
-        case SSelInt:
+        case SelInt:
             applySelInt();
             break;
-        case SExecInt:
+        case ExecInt:
             applyExecInt();
             break;
-        case SClrInt:
+        case ClrInt:
             applyClrInt();
             break;
         }
@@ -199,14 +176,14 @@ public class TransitionSystem {
                 conf.ag.updateEvents(evt, conf.C);
             }
         }
-        confP.step = SSelEv;
+        confP.step = State.SelEv;
     }
 
     private void applySelEv() throws JasonException {
         
         // Rule for atomic, if there is an atomic intention, do not select event
         if (C.hasAtomicIntention()) {
-            confP.step = SSelInt;
+            confP.step = State.SelInt;
             return;            
         }
         
@@ -215,20 +192,20 @@ public class TransitionSystem {
             // Rule for atomic, events from atomic intention has priority
             confP.C.SE = C.removeAtomicEvent();
             if (confP.C.SE != null) {
-                confP.step = SRelPl;
+                confP.step = State.RelPl;
                 return;
             }
 
             // Rule SelEv1
             confP.C.SE = conf.ag.selectEvent(confP.C.getEvents());
             if (confP.C.SE != null) {
-                confP.step = SRelPl;
+                confP.step = State.RelPl;
                 return;
             }
         }
         // Rule SelEv2
         // directly to ProcAct if no event to handle
-        confP.step = SProcAct;
+        confP.step = State.ProcAct;
     }
 
     private void applyRelPl() throws JasonException {
@@ -243,7 +220,7 @@ public class TransitionSystem {
         // Rule Rel1
         if (!confP.C.RP.isEmpty() || setts.retrieve()) { 
             // retrieve is mainly for Coo-AgentSpeak
-            confP.step = SApplPl;
+            confP.step = State.ApplPl;
         }
         // Rule Rel2
         else {
@@ -260,14 +237,14 @@ public class TransitionSystem {
             else if (setts.requeue()) {
                 confP.C.addEvent(conf.C.SE);
             }
-            confP.step = SProcAct;
+            confP.step = State.ProcAct;
         }
     }
 
     private void applyApplPl() throws JasonException {
         if (confP.C.RP == null) {
             logger.warning("applyPl was called even when RP is null!");
-            confP.step = SProcAct;
+            confP.step = State.ProcAct;
             return;
         }
         confP.C.AP = applicablePlans(confP.C.RP);
@@ -275,7 +252,7 @@ public class TransitionSystem {
         // Rule Appl1
         if (!confP.C.AP.isEmpty() || setts.retrieve()) { 
             // retrieve is mainly for Coo-AgentSpeak
-            confP.step = SSelAppl;
+            confP.step = State.SelAppl;
         } else { // Rule Appl2
             if (conf.C.SE.trigger.isGoal()) {
                 generateGoalDeletionFromEvent(); 
@@ -296,7 +273,7 @@ public class TransitionSystem {
             else if (setts.requeue()) {
                 confP.C.addEvent(conf.C.SE);
             }
-            confP.step = SProcAct;
+            confP.step = State.ProcAct;
         }
     }
 
@@ -304,12 +281,12 @@ public class TransitionSystem {
         // Rule SelAppl
         confP.C.SO = conf.ag.selectOption(confP.C.AP);
         if (confP.C.SO != null) {
-            confP.step = SAddIM;
+            confP.step = State.AddIM;
         } else {
             logger.warning("selectOption returned null.");
             generateGoalDeletionFromEvent(); 
             // can't carry on, no applicable plan.
-            confP.step = SProcAct;
+            confP.step = State.ProcAct;
         }
     }
 
@@ -329,12 +306,12 @@ public class TransitionSystem {
             confP.C.SE.intention.push(im);
             confP.C.addIntention(confP.C.SE.intention);
         }
-        confP.step = SProcAct;
+        confP.step = State.ProcAct;
     }
 
     private void applyProcAct() throws JasonException {
         if (conf.C.FA.isEmpty()) {
-            confP.step = SSelInt;
+            confP.step = State.SelInt;
         } else {
             ActionExec a = conf.ag.selectAction(conf.C.FA);
             confP.C.SI = a.getIntention();
@@ -343,7 +320,7 @@ public class TransitionSystem {
             } else {
                 generateGoalDeletion();
             }
-            confP.step = SClrInt;
+            confP.step = State.ClrInt;
         }
     }
 
@@ -372,7 +349,7 @@ public class TransitionSystem {
         // RAFA: Yes. But I do not fix it yet. (i've tried, see comments in this
         // method and ClrInt) Circumstance.AI
 
-        confP.step = SExecInt; // default next step
+        confP.step = State.ExecInt; // default next step
 
         // Rule for Atomic Intentions
         confP.C.SI = C.removeAtomicIntention();
@@ -395,7 +372,7 @@ public class TransitionSystem {
             return;
         }
 
-        confP.step = SStartRC;
+        confP.step = State.StartRC;
     }
 
     private void applyExecInt() throws JasonException {
@@ -512,12 +489,12 @@ public class TransitionSystem {
                 break;
             }
         }
-        confP.step = SClrInt;
+        confP.step = State.ClrInt;
     }
 
     private void applyClrInt() throws JasonException {
         // Rule ClrInt
-        confP.step = SStartRC; // default next step
+        confP.step = State.StartRC; // default next step
         if (conf.C.SI != null) {
             IntendedMeans im = conf.C.SI.peek();
             if (im.getPlan().getBody().isEmpty()) {
@@ -550,7 +527,7 @@ public class TransitionSystem {
 
                     // the new top may have become
                     // empty! need to keep checking.
-                    confP.step = SClrInt; 
+                    confP.step = State.ClrInt; 
 
                     /*
                      * the following was not enought to remove
@@ -772,12 +749,12 @@ public class TransitionSystem {
                 agArch.checkMail();
 
                 // logger.fine("doing belief revision...");
-                ag.brf(percept);
+                ag.buf(percept);
             }
 
             do {
                 applySemanticRule();
-            } while (step != SStartRC); // finished a reasoning cycle
+            } while (step != State.StartRC); // finished a reasoning cycle
 
             agArch.act();
 
@@ -812,7 +789,7 @@ public class TransitionSystem {
         return C;
     }
 
-    public byte getStep() {
+    public State getStep() {
         return step;
     }
 

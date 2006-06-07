@@ -10,6 +10,7 @@ public class AgentParameters {
 	public String              name      = null;
     public File                asSource  = null;
     public ClassParameters     agClass   = null;
+    public ClassParameters     bbClass   = null;
     public ClassParameters     archClass = null;
     public int                 qty       = 1;
     public String              host      = null;
@@ -42,6 +43,9 @@ public class AgentParameters {
 		if (agClass != null && agClass.className.length() > 0) {
 			s.append("agentClass "+agClass+" ");
 		}
+        if (bbClass != null && bbClass.className.length() > 0) {
+            s.append("beliefBaseClass "+bbClass+" ");
+        }
 		if (qty > 1) {
 			s.append("#"+qty+" ");
 		}

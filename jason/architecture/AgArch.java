@@ -27,6 +27,8 @@ import jason.asSemantics.Agent;
 import jason.asSemantics.Message;
 import jason.asSemantics.TransitionSystem;
 import jason.asSyntax.Literal;
+import jason.bb.BeliefBase;
+import jason.mas2j.ClassParameters;
 import jason.runtime.Settings;
 
 import java.util.List;
@@ -52,11 +54,13 @@ public class AgArch {
 	AgArchInfraTier archTier;
 
     /** Creates the agent class defined by <i>agClass</i>, default is jason.semantics.Agent. */
-    public void initAg(String agClass, String asSrc, Settings stts) throws JasonException {
+    public void initAg(String agClass, ClassParameters bbPars, String asSrc, Settings stts) throws JasonException {
         // set the agent
         try {
             Agent ag = (Agent)Class.forName(agClass).newInstance();
-            fTS = ag.initAg(this, asSrc, stts);
+            BeliefBase bb = (BeliefBase)Class.forName(bbPars.className).newInstance();
+            fTS = ag.initAg(this, bb, asSrc, stts);
+            bb.init(ag, bbPars.getParametersArray());
         } catch (Exception e) {
             throw new JasonException("as2j: error creating the agent class! - "+e);
         }
@@ -64,6 +68,7 @@ public class AgArch {
 
     /** Stops the agent, the user should override this method to do something before the agent is killed. The default implementation does nothing. */
     public void stopAg() {
+        fTS.getAg().getBS().stop();
     }
 
     public void setArchInfraTier(AgArchInfraTier ai) {

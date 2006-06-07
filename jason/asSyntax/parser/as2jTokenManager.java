@@ -4,6 +4,7 @@ import java.util.*;
 import java.io.*;
 import jason.asSyntax.*;
 import jason.asSemantics.*;
+import jason.bb.*;
 import jason.*;
 import jason.asSyntax.ArithExprTerm.ArithmeticOp;
 import jason.asSyntax.LogExprTerm.LogicalOp;

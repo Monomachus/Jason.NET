@@ -56,6 +56,7 @@
  		<LITERAL4>synchronised</LITERAL4>
  		<LITERAL4>agentClass</LITERAL4>
  		<LITERAL4>agentArchClass</LITERAL4>
+ 		<LITERAL4>beliefBaseClass</LITERAL4>
 
 
 		<!-- values -->

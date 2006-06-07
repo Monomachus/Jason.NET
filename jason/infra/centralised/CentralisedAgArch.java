@@ -30,6 +30,7 @@ import jason.asSemantics.ActionExec;
 import jason.asSemantics.Message;
 import jason.asSyntax.Literal;
 import jason.asSyntax.Term;
+import jason.mas2j.ClassParameters;
 import jason.runtime.RuntimeServicesInfraTier;
 import jason.runtime.Settings;
 
@@ -72,12 +73,12 @@ public class CentralisedAgArch extends Thread implements AgArchInfraTier {
      * jason.architecture.AgArch. The arch will create the agent that creates
      * the TS.
      */
-    public void initAg(String agArchClass, String agClass, String asSrc, Settings stts) throws JasonException {
+    public void initAg(String agArchClass, String agClass, ClassParameters bbPars, String asSrc, Settings stts) throws JasonException {
         logger = Logger.getLogger(CentralisedAgArch.class.getName() + "." + getAgName());
         try {
             fUserAgArh = (AgArch) Class.forName(agArchClass).newInstance();
             fUserAgArh.setArchInfraTier(this);
-            fUserAgArh.initAg(agClass, asSrc, stts);
+            fUserAgArh.initAg(agClass, bbPars, asSrc, stts);
             logger.setLevel(fUserAgArh.getTS().getSettings().logLevel());
         } catch (Exception e) {
             running = false;

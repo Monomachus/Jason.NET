@@ -1,7 +1,6 @@
 package test;
 
 import jason.asSemantics.Unifier;
-import jason.asSyntax.BeliefBase;
 import jason.asSyntax.ListTerm;
 import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Literal;
@@ -11,6 +10,7 @@ import jason.asSyntax.Term;
 import jason.asSyntax.TermImpl;
 import jason.asSyntax.Trigger;
 import jason.asSyntax.VarTerm;
+import jason.bb.BeliefBase;
 
 import java.util.Collections;
 

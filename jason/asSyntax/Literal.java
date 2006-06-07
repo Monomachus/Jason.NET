@@ -30,7 +30,6 @@ import jason.asSyntax.parser.as2j;
 
 import java.io.StringReader;
 import java.util.Iterator;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -110,43 +109,14 @@ public class Literal extends Pred implements Cloneable {
             } catch (Exception e) {
                 logger.log(Level.SEVERE,"Error in IA ",e);
             }
+            return EMPTY_UNIF_LIST.iterator();  // empty iterator for unifier
         } else if (this == LTrue) {
             return createUnifIterator(un);            
         } else if (this == LFalse) {
             return EMPTY_UNIF_LIST.iterator();            
         } else {
-            List<Literal> relList = ag.getBS().getRelevant(this);
-            if (relList != null) {
-                final Iterator<Literal> il = relList.iterator();
-                return new Iterator<Unifier>() {
-                    Unifier current = null;
-                    public boolean hasNext() {
-                        if (current == null) get();
-                        return current != null;
-                    }
-                    public Unifier next() {
-                        if (current == null) get();
-                        Unifier a = current;
-                        get();
-                        return a;
-                    }
-                    private void get() {
-                        current = null;
-                        while (il.hasNext()) {
-                            Literal b = il.next();
-                            Unifier unC = (Unifier) un.clone();
-                            if (unC.unifies(Literal.this,b)) {
-                                current = unC;
-                                return;
-                            }
-                        }
-                    }
-                    public void remove() {}
-                };
-            }
+            return ag.getBS().logCons(this,un);
         }
-        
-        return EMPTY_UNIF_LIST.iterator();  // empty iterator for unifier
     }   
 
     public boolean equals(Object o) {

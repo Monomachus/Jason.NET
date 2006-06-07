@@ -2,6 +2,8 @@ package jason.infra.saci;
 
 import jason.architecture.AgArch;
 import jason.asSemantics.Agent;
+import jason.bb.DefaultBeliefBase;
+import jason.mas2j.ClassParameters;
 import jason.runtime.RuntimeServicesInfraTier;
 import jason.runtime.Settings;
 
@@ -40,7 +42,7 @@ public class SaciRuntimeServices implements RuntimeServicesInfraTier {
         }
     }
 
-    public boolean createAgent(String agName, String agSource, String agClass, String archClass, Settings stts) throws Exception {
+    public boolean createAgent(String agName, String agSource, String agClass, String archClass, ClassParameters bbPars, Settings stts) throws Exception {
         try {
             logger.fine("Creating saci agent from source " + agSource);
 
@@ -50,6 +52,9 @@ public class SaciRuntimeServices implements RuntimeServicesInfraTier {
                 archClass = AgArch.class.getName();
             if (stts == null)
                 stts = new Settings();
+            if (bbPars == null) {
+                bbPars = new ClassParameters(DefaultBeliefBase.class.getName());
+            }
 
             String extraOp = "";
             if (stts.isSync()) {
@@ -61,6 +66,7 @@ public class SaciRuntimeServices implements RuntimeServicesInfraTier {
             c1.addArg("class", SaciAgArch.class.getName());
             c1.addArg("name", agName);
             c1.addArg("society.name", socName);
+            // TODO: send the bb class
             c1.addArg("args", archClass + " " + agClass + " " + agSource + extraOp);
             // c1.addArg("host", "?");
             l.execCommand(c1);

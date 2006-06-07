@@ -108,7 +108,7 @@ public class TermImpl implements Term, Serializable {
         return null;
     }   
 
-    protected static final List<Unifier> EMPTY_UNIF_LIST = Collections.emptyList();
+    public static final List<Unifier> EMPTY_UNIF_LIST = Collections.emptyList();
 
     /** create an iterator for a list of unifiers */
     protected Iterator<Unifier> createUnifIterator(Unifier... unifs) {

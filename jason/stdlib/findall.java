@@ -32,46 +32,35 @@ import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Literal;
 import jason.asSyntax.Term;
 
-import java.util.List;
+import java.util.Iterator;
 
 public class findall implements InternalAction {
 
-	/** .findall(Var, a(Var), List) */
-	public boolean execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
-		try {
-			Term var = (Term) args[0].clone();
-			//if (!var.isVar()) {
-			//	throw new JasonException("The first parameter ('"+args[0]+"') of the internal action 'findAll' is not a Variable!");
-			//}
-			Literal bel = Literal.parseLiteral(args[1].toString());
-			if (bel == null) {
-				throw new JasonException("The second parameter ('"+args[1]+"') of the internal action 'findAll' is not a literal!");
-			}
-			un.apply(bel);
+    /** .findall(Var, a(Var), List) */
+    public boolean execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
+        try {
+            Term var = (Term) args[0].clone();
+            Literal bel = Literal.parseLiteral(args[1].toString());
+            if (bel == null) {
+                throw new JasonException("The second parameter ('" + args[1] + "') of the internal action 'findAll' is not a literal!");
+            }
+            un.apply(bel);
 
-			// find all bel in belief base and build a list with them
-			ListTerm all = new ListTermImpl();
-			List relB = ts.getAg().getBS().getRelevant(bel);
-			if (relB != null) {
-				for (int i = 0; i < relB.size(); i++) {
-					Literal b = (Literal) relB.get(i);
-					Unifier newUn = (Unifier) un.clone();
-					// recall that order is important because of annotations!
-					//System.out.println("b="+b+"="+bel);
-					if (newUn.unifies(bel, b)) {
-						// apply to var the resulted unifier
-						Term vl = (Term)var.clone();
-                        newUn.apply(vl);
-                        all.add((Term) vl);
-					}
-				}
-			}
-			Term list = args[2];
-			return un.unifies(list, all);
-		} catch (ArrayIndexOutOfBoundsException e) {
-			throw new JasonException("The internal action 'findall' has not received three arguments");
-		} catch (Exception e) {
-			throw new JasonException("Error in internal action 'findall': " + e);
-		}
-	}
+            // find all bel in belief base and build a list with them
+            ListTerm all = new ListTermImpl();
+            Iterator<Unifier> iu = bel.logCons(ts.getAg(), un);
+            while (iu.hasNext()) {
+                Unifier nu = iu.next();
+                Term vl = (Term) var.clone();
+                nu.apply(vl);
+                all.add((Term) vl);
+            }
+            Term list = args[2];
+            return un.unifies(list, all);
+        } catch (ArrayIndexOutOfBoundsException e) {
+            throw new JasonException("The internal action 'findall' has not received three arguments");
+        } catch (Exception e) {
+            throw new JasonException("Error in internal action 'findall': " + e);
+        }
+    }
 }

@@ -2,6 +2,8 @@ package jason.infra.centralised;
 
 import jason.architecture.AgArch;
 import jason.asSemantics.Agent;
+import jason.bb.DefaultBeliefBase;
+import jason.mas2j.ClassParameters;
 import jason.runtime.RuntimeServicesInfraTier;
 import jason.runtime.Settings;
 
@@ -14,7 +16,7 @@ public class CentralisedRuntimeServices implements RuntimeServicesInfraTier {
 
     private static Logger logger = Logger.getLogger(CentralisedRuntimeServices.class.getName());
 
-    public boolean createAgent(String agName, String agSource, String agClass, String archClass, Settings stts) throws Exception {
+    public boolean createAgent(String agName, String agSource, String agClass, String archClass, ClassParameters bbPars, Settings stts) throws Exception {
         if (logger.isLoggable(Level.FINE)) {
             logger.fine("Creating centralised agent " + agName + "from source " + agSource + "(agClass=" + agClass + ", archClass=" + archClass + ", settings=" + stts);
         }
@@ -26,14 +28,16 @@ public class CentralisedRuntimeServices implements RuntimeServicesInfraTier {
             archClass = AgArch.class.getName();
         if (stts == null)
             stts = new Settings();
-
+        if (bbPars == null) {
+            bbPars = new ClassParameters(DefaultBeliefBase.class.getName());
+        }
         while (RunCentralisedMAS.getRunner().getEnvironmentInfraTier().getAgent(agName) != null) {
             agName += "_a";
         }
 
         CentralisedAgArch agArch = new CentralisedAgArch();
         agArch.setAgName(agName);
-        agArch.initAg(archClass, agClass, agSource, stts);
+        agArch.initAg(archClass, agClass, bbPars, agSource, stts);
         agArch.setEnvInfraTier(RunCentralisedMAS.getRunner().getEnvironmentInfraTier());
         agArch.setControlInfraTier(RunCentralisedMAS.getRunner().getControllerInfraTier());
         agArch.getEnvInfraTier().addAgent(agArch.getUserAgArch());

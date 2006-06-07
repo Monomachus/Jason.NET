@@ -31,7 +31,7 @@ import jason.asSyntax.Term;
 
 public class perceive implements InternalAction {
     public boolean execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
-        ts.getAg().brf(ts.getUserAgArch().perceive());
+        ts.getAg().buf(ts.getUserAgArch().perceive());
         return true;
     }
 }

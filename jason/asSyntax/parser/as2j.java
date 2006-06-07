@@ -5,11 +5,12 @@
   import java.io.*;
   import jason.asSyntax.*;
   import jason.asSemantics.*;
+  import jason.bb.*;
   import jason.*;
   import jason.asSyntax.ArithExprTerm.ArithmeticOp;
   import jason.asSyntax.LogExprTerm.LogicalOp;
   import jason.asSyntax.RelExprTerm.RelationalOp;
-  import jason.asSyntax.BodyLiteral.BodyType;
+import jason.asSyntax.BodyLiteral.BodyType;
 
   public class as2j implements as2jConstants {
 
@@ -890,16 +891,6 @@
     finally { jj_save(1, xla); }
   }
 
-  final private boolean jj_3R_51() {
-    if (jj_3R_52()) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_45() {
-    if (jj_scan_token(49)) return true;
-    return false;
-  }
-
   final private boolean jj_3R_44() {
     if (jj_scan_token(48)) return true;
     return false;
@@ -1398,6 +1389,16 @@
 
   final private boolean jj_3R_46() {
     if (jj_scan_token(50)) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_51() {
+    if (jj_3R_52()) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_45() {
+    if (jj_scan_token(49)) return true;
     return false;
   }
 

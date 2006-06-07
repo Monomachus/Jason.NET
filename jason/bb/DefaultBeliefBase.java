@@ -21,26 +21,31 @@
 //
 //----------------------------------------------------------------------------
 
-package jason.asSyntax;
+package jason.bb;
+
+import jason.asSemantics.Agent;
+import jason.asSemantics.Unifier;
+import jason.asSyntax.Literal;
+import jason.asSyntax.Pred;
+import jason.asSyntax.PredicateIndicator;
+import jason.asSyntax.TermImpl;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-public class BeliefBase {
+public class DefaultBeliefBase implements BeliefBase {
 
-    public static final Term               TPercept = TermImpl.parse("source(percept)");
-
-    public static final Term               TSelf    = TermImpl.parse("source(self)");
-
-    static private Logger                  logger   = Logger.getLogger(BeliefBase.class.getName());
+    static private Logger                  logger   = Logger.getLogger(DefaultBeliefBase.class.getName());
 
     /**
      * belsMap is a table where the key is the bel.getFunctorArity and the value
@@ -50,42 +55,36 @@ public class BeliefBase {
 
     private int                            size     = 0;
 
-    /** list of beliefs with percept annot, used to improve performance of brf */
-    List<Literal>                          percepts = new ArrayList<Literal>();
+    /** set of beliefs with percept annot, used to improve performance of buf */
+    Set<Literal>                          percepts = new HashSet<Literal>();
 
-    public BeliefBase() {
+    public void init(Agent ag, String[] args) {
+    }
+
+    public void stop() {
     }
 
     public int size() {
         return size;
     }
 
-    private void addPercept(Literal l) {
-        if (l.hasAnnot(TPercept)) {
-            if (!percepts.contains(l)) {
-                percepts.add(l);
-            }
-        }
-    }
-
-    private void removePercept(Literal l) {
-        percepts.remove(l);
-    }
-
-    public List<Literal> getPercepts() {
-        return percepts;
+    public Iterator<Literal> getPercepts() {
+        return percepts.iterator();
     }
 
     public boolean add(Literal l) {
-        Literal bl = contains(l);
+        Literal bl = containsAsTerm(l);
         if (bl != null) {
-            if (l.hasSubsetAnnot(bl)) // the current bel bl already has l's
-                                        // annots
+            if (l.hasSubsetAnnot(bl))
+                // the current bel bl already has l's annots
                 return false;
             else {
-                bl.importAnnots((Pred) l); // "import" annots from the new bel
-                addPercept(bl); // check if it needs to be added in the percepts
-                                // list
+                // "import" annots from the new bel
+                bl.importAnnots((Pred) l);
+                // check if it needs to be added in the percepts list
+                if (l.hasAnnot(TPercept)) {
+                    percepts.add(bl);
+                }
                 return true;
             }
         } else {
@@ -94,7 +93,7 @@ public class BeliefBase {
                 if (l.getTerms() != null)
                     ((ArrayList) l.getTerms()).trimToSize();
             } catch (Exception e) {
-                logger.log(Level.SEVERE, "Error trimming literal's terms/annotations!", e);
+                logger.log(Level.SEVERE, "Error trimming literal's terms!", e);
             }
 
             List<Literal> listFunctor = belsMap.get(l.getPredicateIndicator());
@@ -103,27 +102,29 @@ public class BeliefBase {
                 belsMap.put(l.getPredicateIndicator(), listFunctor);
             }
             listFunctor.add(l);
-            addPercept(l); // add it in the percepts list
+            // add it in the percepts list
+            if (l.hasAnnot(TPercept)) {
+                percepts.add(l);
+            }
             size++;
             return true;
         }
     }
 
-    /** returns a list with all beliefs. */
-    public List<Literal> getAllBeliefs() {
+    public Iterator<Literal> getAll() {
         List<Literal> all = new ArrayList<Literal>(size());
         for (List<Literal> l : belsMap.values()) {
             all.addAll(l);
         }
-        return all;
+        return all.iterator();
     }
 
     public boolean remove(Literal l) {
-        Literal bl = contains(l);
+        Literal bl = containsAsTerm(l);
         if (bl != null) {
             if (l.hasSubsetAnnot(bl)) {
-                if (bl.hasAnnot(TPercept)) {
-                    removePercept(bl);
+                if (l.hasAnnot(TPercept)) {
+                    percepts.remove(bl);
                 }
                 bl.delAnnot((Pred) l);
                 if (!bl.hasAnnot()) {
@@ -141,7 +142,7 @@ public class BeliefBase {
             }
         } else {
             if (logger.isLoggable(Level.FINE)) {
-                logger.fine("Does not contain " + l + " in " + getAllBeliefs());
+                logger.fine("Does not contain " + l + " in " + belsMap);
             }
             return false;
         }
@@ -150,23 +151,14 @@ public class BeliefBase {
     /** remove all believes with some functor/arity */
     public boolean abolish(PredicateIndicator pi) {
         return belsMap.remove(pi) != null;
-        /*
-        boolean result = false;
-        List<Literal> all = belsMap.get(pi);
-        if (all != null) {
-            Iterator<Literal> i = all.iterator();
-            while (i.hasNext()) {
-                if (i.next().getFunctor().equals(l.getFunctor())) {
-                    i.remove();
-                    result = true;
-                }
-            }
-        }
-        return result;
-        */
     }
 
-    public Literal contains(Literal l) {
+    /**
+     * returns the literal l as it is in BB, this method does not consider
+     * annots in the search. e.g. if BB={a(10)[a,b]}, contains(a(10)[d]) returns
+     * a(10)[a,b]
+     */
+    public Literal containsAsTerm(Literal l) {
         List<Literal> listFunctor = belsMap.get(l.getPredicateIndicator());
         if (listFunctor == null) {
             return null;
@@ -179,13 +171,57 @@ public class BeliefBase {
         return null;
     }
 
-    public List<Literal> getRelevant(Literal l) {
+    public Iterator<Literal> getRelevant(Literal l) {
         if (l.isVar()) {
             // all bels are relevant
-            return getAllBeliefs();
+            return getAll();
         } else {
-            return belsMap.get(l.getPredicateIndicator());
+            List<Literal> relList = belsMap.get(l.getPredicateIndicator());
+            if (relList != null) {
+                return relList.iterator();
+            } else {
+                return null;
+            }
         }
+    }
+
+    public Iterator<Unifier> logCons(final Literal l, final Unifier un) {
+        final Iterator<Literal> il = getRelevant(l);
+        if (il == null)
+            return TermImpl.EMPTY_UNIF_LIST.iterator();
+
+        return new Iterator<Unifier>() {
+            Unifier current = null;
+
+            public boolean hasNext() {
+                if (current == null)
+                    get();
+                return current != null;
+            }
+
+            public Unifier next() {
+                if (current == null)
+                    get();
+                Unifier a = current;
+                get();
+                return a;
+            }
+
+            private void get() {
+                current = null;
+                while (il.hasNext()) {
+                    Literal b = il.next();
+                    Unifier unC = (Unifier) un.clone();
+                    if (unC.unifies(l, b)) {
+                        current = unC;
+                        return;
+                    }
+                }
+            }
+
+            public void remove() {
+            }
+        };
     }
 
     public String toString() {

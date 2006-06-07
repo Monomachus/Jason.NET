@@ -31,7 +31,9 @@ import jason.asSemantics.TransitionSystem;
 import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Term;
 import jason.asSyntax.TermImpl;
+import jason.bb.DefaultBeliefBase;
 import jason.infra.centralised.RunCentralisedMAS;
+import jason.mas2j.ClassParameters;
 import jason.runtime.MASConsoleGUI;
 import jason.runtime.RuntimeServicesInfraTier;
 import jason.runtime.Settings;
@@ -112,7 +114,9 @@ public class SaciAgArch extends saci.Agent implements AgArchInfraTier {
             }
             userAgArh = (AgArch) Class.forName(archClassName).newInstance();
             userAgArh.setArchInfraTier(this);
-            userAgArh.initAg(agClassName, asSource, stts);
+            // TODO: read bb class name from args!
+            ClassParameters bbPars = new ClassParameters(DefaultBeliefBase.class.getName());
+            userAgArh.initAg(agClassName, bbPars, asSource, stts);
             logger.setLevel(userAgArh.getTS().getSettings().logLevel());
         } catch (Exception e) {
             running = false;

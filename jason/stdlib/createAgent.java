@@ -35,34 +35,31 @@ import java.io.File;
 
 public class createAgent implements InternalAction {
 
-    //private static Logger logger = Logger.getLogger(createAgent.class.getName());
+    /**
+     * args[0] is the agent name; args[1] is the agent code (as StringTerm)
+     */
+    public boolean execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
 
-	/** args[0] is the agent name
-	 *  args[1] is the agent code (as StringTerm)
-	 */
-	public boolean execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
-		
-		try {
-            Term name = (Term)args[0].clone();
+        try {
+            Term name = (Term) args[0].clone();
             un.apply(name);
-            
-            StringTerm source = (StringTerm)args[1].clone();
-            un.apply((Term)source);
-            
+
+            StringTerm source = (StringTerm) args[1].clone();
+            un.apply((Term) source);
+
             File fSource = new File(source.getString());
-            if (! fSource.exists()) {
-            	throw new JasonException("The file source "+source+" was not found!");
+            if (!fSource.exists()) {
+                throw new JasonException("The file source " + source + " was not found!");
             }
 
             RuntimeServicesInfraTier rs = ts.getUserAgArch().getArchInfraTier().getRuntimeServices();
-            return rs.createAgent(name.toString(), fSource.getAbsolutePath(), null, null, ts.getSettings());
-            
-		} catch (IndexOutOfBoundsException e) {
-			throw new JasonException("The internal action 'createAgent' received a wrong number of arguments");
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return false;
-	}
+            return rs.createAgent(name.toString(), fSource.getAbsolutePath(), null, null, null, ts.getSettings());
 
+        } catch (IndexOutOfBoundsException e) {
+            throw new JasonException("The internal action 'createAgent' received a wrong number of arguments");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 }

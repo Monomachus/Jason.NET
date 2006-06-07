@@ -104,14 +104,6 @@ public class Unifier implements Cloneable {
      */
     public Term get(VarTerm vtp) {
         return function.get(vtp);
-        /*
-        Term t = function.get(getLastVarTermChain(vtp));
-        if (t == null) {
-            // TODO: remove this with var clusters!
-            return function.get(getFirstVarTermChain(vtp));
-        }
-        return t; // we still need it see expr term test
-        */
     }
 
     public Term get(Term t) {
@@ -243,38 +235,6 @@ public class Unifier implements Cloneable {
         return true;
     }
 
-    /*
-    private boolean setVarValue(VarTerm vt, Term value) {
-        if (vt.isUnnamedVar()) return true;
-        try {
-            VarTerm nextvl = (VarTerm) function.get(vt);
-            if (nextvl != null) { 
-                setVarValue(nextvl, value);
-            }
-        } catch (Exception e) { }
-        function.put(vt, value);
-        return true;
-    }
-
-    private VarTerm getLastVarTermChain(VarTerm vt) {
-        Term next = function.get(vt);
-        if (next == null || !next.isVar()) {
-            return vt;
-        } else {
-            return getLastVarTermChain((VarTerm)next);
-        }
-    }
-    
-    private VarTerm getFirstVarTermChain(VarTerm vt) {
-        // apply value to other vars unified with vt (vt is their value)
-        for (VarTerm ovt: function.keySet()) {
-            if (vt.equals(function.get(ovt))) {
-                return getFirstVarTermChain(ovt);
-            }
-        }
-        return vt;
-    }
-    */
 
     /**
      * this version of unify tries to call the appropriate unify method

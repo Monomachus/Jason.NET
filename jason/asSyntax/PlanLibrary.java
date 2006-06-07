@@ -26,6 +26,7 @@ package jason.asSyntax;
 
 
 import jason.JasonException;
+import jason.bb.BeliefBase;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -129,11 +130,11 @@ public class PlanLibrary {
                 lp.add(p);
             }
         } else {
-            List<Plan> codesList = relPlans.get(p.tevent.getPredicateIndicator());
+            List<Plan> codesList = relPlans.get(p.getTriggerEvent().getPredicateIndicator());
             if (codesList == null) {
                 codesList = new ArrayList<Plan>();
                 codesList.addAll(varPlans);
-                relPlans.put(p.tevent.getPredicateIndicator(), codesList);
+                relPlans.put(p.getTriggerEvent().getPredicateIndicator(), codesList);
             }
             codesList.add(p);
         }
@@ -190,11 +191,11 @@ public class PlanLibrary {
                 lp.remove(p);
             }
         } else {
-            List<Plan> codesList = relPlans.get(p.tevent.getPredicateIndicator());
+            List<Plan> codesList = relPlans.get(p.getTriggerEvent().getPredicateIndicator());
             codesList.remove(p);
             if (codesList.isEmpty()) {
                 // no more plans for this TE
-                relPlans.remove(p.tevent.getPredicateIndicator());
+                relPlans.remove(p.getTriggerEvent().getPredicateIndicator());
             }
         }
         return p;
