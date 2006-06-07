@@ -310,9 +310,10 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
         return value != null && getValue().isString();
     }
 
+    /** variable without value is numeric, with value depends on the value */
     @Override
-    public boolean isNumber() {
-        return value != null && getValue().isNumber();
+    public boolean isNumeric() {
+        return value == null || value.isNumeric();
     }
 
     @Override
@@ -326,8 +327,8 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
     }
 
     @Override
-    public boolean isExpr() {
-        return value != null && value.isExpr();
+    public boolean isArithExpr() {
+        return value != null && value.isArithExpr();
     }
 
     @Override
@@ -514,7 +515,7 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
     // ----------
 
     public double solve() {
-        if (hasValue() && value.isNumber()) {
+        if (hasValue() && value.isNumeric()) {
             return ((NumberTerm) value).solve();
         } else {
             logger.warning("Error getting numerical value of VarTerm " + this);

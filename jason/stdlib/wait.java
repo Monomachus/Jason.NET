@@ -50,10 +50,10 @@ public class wait implements InternalAction {
 	 * 
 	 */
 	public boolean execute(final TransitionSystem ts, Unifier un, Term[] args)	throws Exception {
-		if (args[0].isNumber()) {
+		if (args[0].isNumeric()) {
 			// time in mile seconds
 			NumberTerm time = (NumberTerm)args[0].clone();
-			un.apply((Term)time);
+			un.apply(time);
 			try {
 				Thread.sleep((long)time.solve());
 			} catch (Exception e) {		}

@@ -10,7 +10,7 @@
   import jason.asSyntax.ArithExprTerm.ArithmeticOp;
   import jason.asSyntax.LogExprTerm.LogicalOp;
   import jason.asSyntax.RelExprTerm.RelationalOp;
-import jason.asSyntax.BodyLiteral.BodyType;
+  import jason.asSyntax.BodyLiteral.BodyType;
 
   public class as2j implements as2jConstants {
 
@@ -422,7 +422,7 @@ import jason.asSyntax.BodyLiteral.BodyType;
   }
 
   final public Term t() throws ParseException {
-                     Token K; Term u; NumberTerm nb;
+                     Token K; Term u;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case TK_TRUE:
     case TK_FALSE:
@@ -440,8 +440,8 @@ import jason.asSyntax.BodyLiteral.BodyType;
     case UNNAMEDVAR:
     case 31:
     case 36:
-      nb = ae();
-                     {if (true) return (Term)nb;}
+      u = ae();
+                     {if (true) return u;}
       break;
     case STRING:
       K = jj_consume_token(STRING);
@@ -559,36 +559,30 @@ import jason.asSyntax.BodyLiteral.BodyType;
   }
 
   final public Term le_factor() throws ParseException {
-                   Term t;
-    if (jj_2_2(4)) {
+                                Term t;
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case TK_NOT:
       jj_consume_token(TK_NOT);
       t = le_factor();
-                                 {if (true) return new LogExprTerm(LogicalOp.not,t);}
-    } else {
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case 36:
-        jj_consume_token(36);
-        t = le();
-        jj_consume_token(37);
-                                 {if (true) return t;}
-        break;
-      case TK_TRUE:
-      case TK_FALSE:
-      case TK_NEG:
-      case NUMBER:
-      case STRING:
-      case ATOM:
-      case VAR:
-      case UNNAMEDVAR:
-      case 31:
-        t = re();
-                                 {if (true) return t;}
-        break;
-      default:
-        jj_la1[26] = jj_gen;
-        jj_consume_token(-1);
-        throw new ParseException();
-      }
+                                {if (true) return new LogExprTerm(LogicalOp.not,t);}
+      break;
+    case TK_TRUE:
+    case TK_FALSE:
+    case TK_NEG:
+    case NUMBER:
+    case STRING:
+    case ATOM:
+    case VAR:
+    case UNNAMEDVAR:
+    case 31:
+    case 36:
+      t = re();
+                                {if (true) return t;}
+      break;
+    default:
+      jj_la1[26] = jj_gen;
+      jj_consume_token(-1);
+      throw new ParseException();
     }
     throw new Error("Missing return statement in function");
   }
@@ -598,16 +592,14 @@ import jason.asSyntax.BodyLiteral.BodyType;
    
      <VAR>      [ <OPREL> <EXP> ]  --> this method returns the VarTerm
    | <LITERAL>  [ <OPREL> <EXP> ]  --> returns the Literal
-   | <EXP> <OPREL> <EXP>           --> returns a RelExprTerm
+   | <EXP>      [ <OPREL> <EXP> ]  --> returns the NumberTerm 
 */
   final public Term re() throws ParseException {
                                              Token k;
                                              Term op1 = null;
                                              Term op2 = null;
-                                             NumberTerm nb;
+                                             Term nb;
                                              RelationalOp operator = RelationalOp.none;
-                                             //boolean change = false;
-                                             Term rel = null;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case NUMBER:
     case VAR:
@@ -615,7 +607,7 @@ import jason.asSyntax.BodyLiteral.BodyType;
     case 31:
     case 36:
       nb = ae();
-                                             op1 = (Term)nb;
+                                             op1 = nb;
       break;
     case TK_TRUE:
     case TK_FALSE:
@@ -686,7 +678,7 @@ import jason.asSyntax.BodyLiteral.BodyType;
       case 31:
       case 36:
         nb = ae();
-                                             op2 = (Term)nb;
+                                             op2 = nb;
         break;
       case TK_TRUE:
       case TK_FALSE:
@@ -706,26 +698,27 @@ import jason.asSyntax.BodyLiteral.BodyType;
         jj_consume_token(-1);
         throw new ParseException();
       }
-                                             rel = new RelExprTerm(op1, operator, op2);
+                                             {if (true) return new RelExprTerm(op1, operator, op2);}
       break;
     default:
       jj_la1[30] = jj_gen;
       ;
     }
-                                             if (rel == null && !op1.isVar() && !op1.isLiteral()) {
-                                                {if (true) throw new ParseException("RelExp: second operand expected");}
-                                             }
-                                             if (rel != null) {
-                                                {if (true) return rel;}
-                                             } else { // op1 is a Var or Literal
+                                             //if (rel == null && !op1.isVar() && !op1.isLiteral() && !op1.isNumeric()) {
+                                             //   throw new ParseException("RelExp: second operand expected!");
+                                             //}
+                                             //if (rel != null) {
+                                             //   return rel; 
+                                             //} else { // op1 is a Var or Literal
                                                 {if (true) return op1;}
-                                             }
+                                             //}
+
     throw new Error("Missing return statement in function");
   }
 
 /* arithmetic expression */
-  final public NumberTerm ae() throws ParseException {
-                       NumberTerm t1, t2; ArithmeticOp op;
+  final public Term ae() throws ParseException {
+                       Term t1, t2; ArithmeticOp op;
     t1 = trm();
                        op = ArithmeticOp.none;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -746,7 +739,13 @@ import jason.asSyntax.BodyLiteral.BodyType;
         throw new ParseException();
       }
       t2 = ae();
-                       {if (true) return new ArithExprTerm(t1,op,t2);}
+                       if (!t1.isNumeric()) {
+                          {if (true) throw new ParseException("ArithExpr: first operand is not numeric.");}
+                      }
+                      if (!t2.isNumeric()) {
+                          {if (true) throw new ParseException("ArithExpr: second operand is not numeric.");}
+                      }
+                      {if (true) return new ArithExprTerm((NumberTerm)t1, op, (NumberTerm)t2);}
       break;
     default:
       jj_la1[32] = jj_gen;
@@ -756,8 +755,8 @@ import jason.asSyntax.BodyLiteral.BodyType;
     throw new Error("Missing return statement in function");
   }
 
-  final public NumberTerm trm() throws ParseException {
-                      NumberTerm t1, t2; ArithmeticOp op;
+  final public Term trm() throws ParseException {
+                      Term t1, t2; ArithmeticOp op;
     t1 = factor();
                       op = ArithmeticOp.none;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -788,7 +787,13 @@ import jason.asSyntax.BodyLiteral.BodyType;
         throw new ParseException();
       }
       t2 = trm();
-                      {if (true) return new ArithExprTerm(t1,op,t2);}
+                      if (!t1.isNumeric()) {
+                          {if (true) throw new ParseException("ArithTerm: first operand is not numeric.");}
+                      }
+                      if (!t2.isNumeric()) {
+                          {if (true) throw new ParseException("ArithTerm: second operand is not numeric.");}
+                      }
+                      {if (true) return new ArithExprTerm((NumberTerm)t1, op, (NumberTerm)t2);}
       break;
     default:
       jj_la1[34] = jj_gen;
@@ -798,8 +803,8 @@ import jason.asSyntax.BodyLiteral.BodyType;
     throw new Error("Missing return statement in function");
   }
 
-  final public NumberTerm factor() throws ParseException {
-                      NumberTerm t1, t2; ArithmeticOp op;
+  final public Term factor() throws ParseException {
+                      Term t1, t2; ArithmeticOp op;
     t1 = simple();
                       op = ArithmeticOp.none;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -807,7 +812,13 @@ import jason.asSyntax.BodyLiteral.BodyType;
       jj_consume_token(53);
                       op = ArithmeticOp.pow;
       t2 = factor();
-                      {if (true) return new ArithExprTerm(t1,op,t2);}
+                      if (!t1.isNumeric()) {
+                          {if (true) throw new ParseException("ArithFactor: first operand is not numeric.");}
+                      }
+                      if (!t2.isNumeric()) {
+                          {if (true) throw new ParseException("ArithFactor: second operand is not numeric.");}
+                      }
+                      {if (true) return new ArithExprTerm((NumberTerm)t1, op, (NumberTerm)t2);}
       break;
     default:
       jj_la1[35] = jj_gen;
@@ -817,8 +828,8 @@ import jason.asSyntax.BodyLiteral.BodyType;
     throw new Error("Missing return statement in function");
   }
 
-  final public NumberTerm simple() throws ParseException {
-                      Token K; NumberTerm t; VarTerm v;
+  final public Term simple() throws ParseException {
+                      Token K; Term t; VarTerm v;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case NUMBER:
       K = jj_consume_token(NUMBER);
@@ -827,11 +838,14 @@ import jason.asSyntax.BodyLiteral.BodyType;
     case 31:
       jj_consume_token(31);
       t = simple();
-                      {if (true) return new ArithExprTerm(ArithmeticOp.minus, t);}
+                      if (!t.isNumeric()) {
+                          {if (true) throw new ParseException("operator '-' applied to argument not numeric.");}
+                      }
+                      {if (true) return new ArithExprTerm(ArithmeticOp.minus, (NumberTerm)t);}
       break;
     case 36:
       jj_consume_token(36);
-      t = ae();
+      t = le();
       jj_consume_token(37);
                       {if (true) return t;}
       break;
@@ -884,145 +898,97 @@ import jason.asSyntax.BodyLiteral.BodyType;
     finally { jj_save(0, xla); }
   }
 
-  final private boolean jj_2_2(int xla) {
-    jj_la = xla; jj_lastpos = jj_scanpos = token;
-    try { return !jj_3_2(); }
-    catch(LookaheadSuccess ls) { return true; }
-    finally { jj_save(1, xla); }
-  }
-
-  final private boolean jj_3R_44() {
-    if (jj_scan_token(48)) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_43() {
-    if (jj_scan_token(47)) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_42() {
-    if (jj_scan_token(46)) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_41() {
-    if (jj_scan_token(45)) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_40() {
-    if (jj_scan_token(44)) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_35() {
-    if (jj_3R_27()) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_39() {
-    if (jj_scan_token(43)) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_33() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_39()) {
-    jj_scanpos = xsp;
-    if (jj_3R_40()) {
-    jj_scanpos = xsp;
-    if (jj_3R_41()) {
-    jj_scanpos = xsp;
-    if (jj_3R_42()) {
-    jj_scanpos = xsp;
-    if (jj_3R_43()) {
-    jj_scanpos = xsp;
-    if (jj_3R_44()) {
-    jj_scanpos = xsp;
-    if (jj_3R_45()) {
-    jj_scanpos = xsp;
-    if (jj_3R_46()) return true;
-    }
-    }
-    }
-    }
-    }
-    }
-    }
-    xsp = jj_scanpos;
-    if (jj_3R_47()) {
-    jj_scanpos = xsp;
-    if (jj_3R_48()) {
-    jj_scanpos = xsp;
-    if (jj_3R_49()) {
-    jj_scanpos = xsp;
-    if (jj_3R_50()) return true;
-    }
-    }
-    }
-    return false;
-  }
-
-  final private boolean jj_3R_34() {
-    if (jj_scan_token(36)) return true;
-    if (jj_3R_51()) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_32() {
-    if (jj_scan_token(STRING)) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_31() {
-    if (jj_3R_13()) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_30() {
-    if (jj_3R_38()) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_26() {
-    if (jj_scan_token(ATOM)) return true;
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_34()) jj_scanpos = xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_35()) jj_scanpos = xsp;
+  final private boolean jj_3R_19() {
+    if (jj_3R_22()) return true;
     return false;
   }
 
   final private boolean jj_3R_24() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_30()) {
-    jj_scanpos = xsp;
-    if (jj_3R_31()) {
-    jj_scanpos = xsp;
-    if (jj_3R_32()) return true;
-    }
-    }
-    xsp = jj_scanpos;
-    if (jj_3R_33()) jj_scanpos = xsp;
+    if (jj_3R_22()) return true;
     return false;
   }
 
-  final private boolean jj_3R_22() {
-    if (jj_3R_27()) return true;
+  final private boolean jj_3R_18() {
+    if (jj_scan_token(UNNAMEDVAR)) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_17() {
+    if (jj_scan_token(VAR)) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_23() {
+    if (jj_scan_token(36)) return true;
+    if (jj_3R_26()) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_13() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_17()) {
+    jj_scanpos = xsp;
+    if (jj_3R_18()) return true;
+    }
+    xsp = jj_scanpos;
+    if (jj_3R_19()) jj_scanpos = xsp;
+    return false;
+  }
+
+  final private boolean jj_3R_39() {
+    if (jj_3R_13()) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_21() {
+    if (jj_scan_token(ATOM)) return true;
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_23()) jj_scanpos = xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_24()) jj_scanpos = xsp;
+    return false;
+  }
+
+  final private boolean jj_3R_38() {
+    if (jj_scan_token(36)) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_37() {
+    if (jj_scan_token(31)) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_36() {
+    if (jj_scan_token(NUMBER)) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_35() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_36()) {
+    jj_scanpos = xsp;
+    if (jj_3R_37()) {
+    jj_scanpos = xsp;
+    if (jj_3R_38()) {
+    jj_scanpos = xsp;
+    if (jj_3R_39()) return true;
+    }
+    }
+    }
     return false;
   }
 
   final private boolean jj_3R_11() {
-    if (jj_3R_14()) return true;
+    if (jj_3R_13()) return true;
     return false;
   }
 
   final private boolean jj_3R_10() {
-    if (jj_3R_13()) return true;
+    if (jj_3R_12()) return true;
     return false;
   }
 
@@ -1031,18 +997,8 @@ import jason.asSyntax.BodyLiteral.BodyType;
     return false;
   }
 
-  final private boolean jj_3R_21() {
-    if (jj_scan_token(UNNAMEDVAR)) return true;
-    return false;
-  }
-
   final private boolean jj_3R_8() {
     if (jj_scan_token(30)) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_20() {
-    if (jj_scan_token(VAR)) return true;
     return false;
   }
 
@@ -1056,50 +1012,13 @@ import jason.asSyntax.BodyLiteral.BodyType;
     return false;
   }
 
-  final private boolean jj_3R_14() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_20()) {
-    jj_scanpos = xsp;
-    if (jj_3R_21()) return true;
-    }
-    xsp = jj_scanpos;
-    if (jj_3R_22()) jj_scanpos = xsp;
-    return false;
-  }
-
   final private boolean jj_3R_5() {
     if (jj_scan_token(32)) return true;
     return false;
   }
 
-  final private boolean jj_3R_72() {
-    if (jj_3R_14()) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_16() {
-    if (jj_3R_24()) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_71() {
-    if (jj_scan_token(36)) return true;
-    if (jj_3R_38()) return true;
-    if (jj_scan_token(37)) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_15() {
-    if (jj_scan_token(36)) return true;
-    if (jj_3R_23()) return true;
-    if (jj_scan_token(37)) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_70() {
-    if (jj_scan_token(31)) return true;
-    if (jj_3R_63()) return true;
+  final private boolean jj_3R_34() {
+    if (jj_3R_35()) return true;
     return false;
   }
 
@@ -1127,37 +1046,43 @@ import jason.asSyntax.BodyLiteral.BodyType;
     return false;
   }
 
-  final private boolean jj_3R_69() {
-    if (jj_scan_token(NUMBER)) return true;
+  final private boolean jj_3R_33() {
+    if (jj_3R_34()) return true;
     return false;
   }
 
-  final private boolean jj_3_2() {
-    if (jj_scan_token(TK_NOT)) return true;
-    if (jj_3R_12()) return true;
+  final private boolean jj_3R_16() {
+    if (jj_scan_token(TK_FALSE)) return true;
     return false;
   }
 
-  final private boolean jj_3R_63() {
+  final private boolean jj_3R_20() {
+    if (jj_scan_token(TK_NEG)) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_15() {
+    if (jj_scan_token(TK_TRUE)) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_14() {
     Token xsp;
     xsp = jj_scanpos;
-    if (jj_3R_69()) {
-    jj_scanpos = xsp;
-    if (jj_3R_70()) {
-    jj_scanpos = xsp;
-    if (jj_3R_71()) {
-    jj_scanpos = xsp;
-    if (jj_3R_72()) return true;
-    }
-    }
-    }
+    if (jj_3R_20()) jj_scanpos = xsp;
+    if (jj_3R_21()) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_25() {
+    if (jj_3R_27()) return true;
     return false;
   }
 
   final private boolean jj_3R_12() {
     Token xsp;
     xsp = jj_scanpos;
-    if (jj_3_2()) {
+    if (jj_3R_14()) {
     jj_scanpos = xsp;
     if (jj_3R_15()) {
     jj_scanpos = xsp;
@@ -1167,238 +1092,58 @@ import jason.asSyntax.BodyLiteral.BodyType;
     return false;
   }
 
-  final private boolean jj_3R_37() {
-    if (jj_scan_token(42)) return true;
+  final private boolean jj_3R_32() {
+    if (jj_3R_33()) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_22() {
+    if (jj_scan_token(39)) return true;
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_25()) jj_scanpos = xsp;
+    if (jj_scan_token(41)) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_31() {
+    if (jj_scan_token(STRING)) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_30() {
+    if (jj_3R_32()) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_29() {
+    if (jj_3R_22()) return true;
     return false;
   }
 
   final private boolean jj_3R_28() {
     if (jj_3R_12()) return true;
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_37()) jj_scanpos = xsp;
-    return false;
-  }
-
-  final private boolean jj_3R_64() {
-    if (jj_scan_token(53)) return true;
-    if (jj_3R_59()) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_59() {
-    if (jj_3R_63()) return true;
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_64()) jj_scanpos = xsp;
-    return false;
-  }
-
-  final private boolean jj_3R_29() {
-    if (jj_scan_token(40)) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_23() {
-    if (jj_3R_28()) return true;
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_29()) jj_scanpos = xsp;
-    return false;
-  }
-
-  final private boolean jj_3R_68() {
-    if (jj_scan_token(TK_INTMOD)) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_67() {
-    if (jj_scan_token(TK_INTDIV)) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_66() {
-    if (jj_scan_token(52)) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_65() {
-    if (jj_scan_token(51)) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_60() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_65()) {
-    jj_scanpos = xsp;
-    if (jj_3R_66()) {
-    jj_scanpos = xsp;
-    if (jj_3R_67()) {
-    jj_scanpos = xsp;
-    if (jj_3R_68()) return true;
-    }
-    }
-    }
-    if (jj_3R_53()) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_53() {
-    if (jj_3R_59()) return true;
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_60()) jj_scanpos = xsp;
-    return false;
-  }
-
-  final private boolean jj_3R_19() {
-    if (jj_scan_token(TK_FALSE)) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_18() {
-    if (jj_scan_token(TK_TRUE)) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_25() {
-    if (jj_scan_token(TK_NEG)) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_62() {
-    if (jj_scan_token(31)) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_61() {
-    if (jj_scan_token(30)) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_17() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_25()) jj_scanpos = xsp;
-    if (jj_3R_26()) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_54() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_61()) {
-    jj_scanpos = xsp;
-    if (jj_3R_62()) return true;
-    }
-    if (jj_3R_38()) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_36() {
-    if (jj_3R_52()) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_38() {
-    if (jj_3R_53()) return true;
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_54()) jj_scanpos = xsp;
-    return false;
-  }
-
-  final private boolean jj_3R_13() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_17()) {
-    jj_scanpos = xsp;
-    if (jj_3R_18()) {
-    jj_scanpos = xsp;
-    if (jj_3R_19()) return true;
-    }
-    }
     return false;
   }
 
   final private boolean jj_3R_27() {
-    if (jj_scan_token(39)) return true;
     Token xsp;
     xsp = jj_scanpos;
-    if (jj_3R_36()) jj_scanpos = xsp;
-    if (jj_scan_token(41)) return true;
+    if (jj_3R_28()) {
+    jj_scanpos = xsp;
+    if (jj_3R_29()) {
+    jj_scanpos = xsp;
+    if (jj_3R_30()) {
+    jj_scanpos = xsp;
+    if (jj_3R_31()) return true;
+    }
+    }
+    }
     return false;
   }
 
-  final private boolean jj_3R_58() {
-    if (jj_scan_token(STRING)) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_57() {
-    if (jj_3R_38()) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_56() {
+  final private boolean jj_3R_26() {
     if (jj_3R_27()) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_55() {
-    if (jj_3R_13()) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_52() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_55()) {
-    jj_scanpos = xsp;
-    if (jj_3R_56()) {
-    jj_scanpos = xsp;
-    if (jj_3R_57()) {
-    jj_scanpos = xsp;
-    if (jj_3R_58()) return true;
-    }
-    }
-    }
-    return false;
-  }
-
-  final private boolean jj_3R_50() {
-    if (jj_3R_27()) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_49() {
-    if (jj_scan_token(STRING)) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_48() {
-    if (jj_3R_13()) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_47() {
-    if (jj_3R_38()) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_46() {
-    if (jj_scan_token(50)) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_51() {
-    if (jj_3R_52()) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_45() {
-    if (jj_scan_token(49)) return true;
     return false;
   }
 
@@ -1419,12 +1164,12 @@ import jason.asSyntax.BodyLiteral.BodyType;
       jj_la1_1();
    }
    private static void jj_la1_0() {
-      jj_la1_0 = new int[] {0x20580,0xc4002000,0xc4002000,0x2000,0x10000000,0x20000000,0xc0000000,0x0,0x0,0xe0580,0x400,0x20580,0x0,0xc0000000,0xe0580,0x800f4580,0x0,0x0,0x0,0x800f4580,0x0,0xc0000,0x0,0x800f4580,0x0,0x0,0x800f4580,0x800f4580,0x0,0x800f4580,0x0,0xc0000000,0xc0000000,0x1800,0x1800,0x0,0x800c4000,0xc0000,0x0,};
+      jj_la1_0 = new int[] {0x20580,0xc4002000,0xc4002000,0x2000,0x10000000,0x20000000,0xc0000000,0x0,0x0,0xe0580,0x400,0x20580,0x0,0xc0000000,0xe0580,0x800f4580,0x0,0x0,0x0,0x800f4580,0x0,0xc0000,0x0,0x800f4580,0x0,0x0,0x800f4780,0x800f4580,0x0,0x800f4580,0x0,0xc0000000,0xc0000000,0x1800,0x1800,0x0,0x800c4000,0xc0000,0x0,};
    }
    private static void jj_la1_1() {
       jj_la1_1 = new int[] {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x3,0x3,0x0,0x0,0x0,0x4,0xb,0x0,0x10,0x10,0x80,0x40,0x90,0x40,0x80,0x100,0x90,0x100,0x400,0x10,0x10,0x7f800,0x90,0x7f800,0x0,0x0,0x180000,0x180000,0x200000,0x10,0x0,0x80,};
    }
-  final private JJCalls[] jj_2_rtns = new JJCalls[2];
+  final private JJCalls[] jj_2_rtns = new JJCalls[1];
   private boolean jj_rescan = false;
   private int jj_gc = 0;
 
@@ -1638,14 +1383,13 @@ import jason.asSyntax.BodyLiteral.BodyType;
 
   final private void jj_rescan_token() {
     jj_rescan = true;
-    for (int i = 0; i < 2; i++) {
+    for (int i = 0; i < 1; i++) {
       JJCalls p = jj_2_rtns[i];
       do {
         if (p.gen > jj_gen) {
           jj_la = p.arg; jj_lastpos = jj_scanpos = p.first;
           switch (i) {
             case 0: jj_3_1(); break;
-            case 1: jj_3_2(); break;
           }
         }
         p = p.next;

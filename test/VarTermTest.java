@@ -162,12 +162,12 @@ public class VarTermTest extends TestCase {
         VarTerm k = new VarTerm("K");
         Unifier u = new Unifier();
         NumberTermImpl n = new NumberTermImpl(10);
-        assertTrue(n.isNumber());
+        assertTrue(n.isNumeric());
         assertFalse(n.isVar());
         assertTrue(u.unifies(k, n));
         u.apply(k);
         // System.out.println(k+" u="+u);
-        assertTrue(k.isNumber());
+        assertTrue(k.isNumeric());
         assertFalse(k.isLiteral());
 
         ArithExprTerm exp = new ArithExprTerm(k, ArithmeticOp.plus, new NumberTermImpl(20));

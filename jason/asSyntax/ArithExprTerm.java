@@ -174,28 +174,37 @@ public class ArithExprTerm extends VarTerm implements NumberTerm {
 	public NumberTerm getRHS() {
 		return rhs;
 	}
-	
-	
+		
+    @Override
 	public void addTerm(Term t) {
 		logger.warning("Do not use addTerm in expressions!");
 	}
 
+    @Override
     public boolean isVar() {
         return false;
     }
     
-	public boolean isExpr() {
+    @Override
+	public boolean isArithExpr() {
 		return !hasValue();
+	}
+
+    @Override
+	public boolean isNumeric() {
+		return true;
 	}
 	
 	public boolean isUnary() {
 		return rhs == null;
 	}
 
+    @Override
 	public boolean isGround() {
 		return hasValue() || (lhs.isGround() && rhs.isGround());
 	}
 	
+    @Override
 	public double solve() {
 		if (hasValue()) {
 			// this expr already has a value

@@ -85,14 +85,15 @@ public class NumberTermImpl extends TermImpl implements NumberTerm {
 	}
 	*/
 
-	public boolean isNumber() {
+	@Override
+	public boolean isNumeric() {
 		return true;
 	}
 	
 	public boolean equals(Object o) {
 		try {
 			Term t = (Term)o;
-			if (t.isVar() || t.isExpr()) return false;
+			if (t.isVar() || t.isArithExpr()) return false;
 			NumberTerm st = (NumberTerm)t;
 			return solve() == st.solve();
 		} catch (Exception e) {}

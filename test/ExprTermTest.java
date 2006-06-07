@@ -20,7 +20,20 @@ public class ExprTermTest extends TestCase {
     }
 
     public void testSolve() {
-        NumberTerm nb = ArithExprTerm.parseExpr("-(3+5*(4----1))*-1-15");
+        NumberTerm nb;
+        nb = ArithExprTerm.parseExpr("3");
+        assertTrue(nb.solve() == 3);
+
+        nb = ArithExprTerm.parseExpr("3+2");
+        assertTrue(nb.solve() == 5);
+
+        nb = ArithExprTerm.parseExpr("3+2*5");
+        assertTrue(nb.solve() == 13);
+
+        nb = ArithExprTerm.parseExpr("(3+2)*5");
+        assertTrue(nb.solve() == 25);
+        
+        nb = ArithExprTerm.parseExpr("-(3+5*(4----1))*-1-15");
         // System.out.println(nb+"="+nb.solve());
         assertTrue(nb.solve() == 13d);
 

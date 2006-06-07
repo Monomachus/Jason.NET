@@ -50,7 +50,7 @@ public class Unifier implements Cloneable {
     private HashMap<VarTerm, Term> function = new HashMap<VarTerm, Term>();
 
     public void apply(Term t) {
-        if (t.isExpr()) {
+        if (t.isArithExpr()) {
             ArithExprTerm et = (ArithExprTerm) t;
             // apply values to expression variables
             apply(et.getLHS());
@@ -121,11 +121,11 @@ public class Unifier implements Cloneable {
         List t2gts = t2g.getTerms();
 
         // if args are expressions, apply them to use the values
-        if (t1g.isExpr()) {
+        if (t1g.isArithExpr()) {
             t1g = (Term)t1g.clone();
             apply(t1g);
         }
-        if (t2g.isExpr()) {
+        if (t2g.isArithExpr()) {
             t2g = (Term)t2g.clone();
             apply(t2g);
         }

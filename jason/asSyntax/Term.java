@@ -70,8 +70,8 @@ public interface Term extends Cloneable, Comparable<Term>, Serializable {
 	public boolean isList();
 	public boolean isString();
 	public boolean isInternalAction();
-	public boolean isExpr();
-	public boolean isNumber();
+	public boolean isArithExpr();
+	public boolean isNumeric();
 	public boolean isPred();
 	
 	public boolean isGround();

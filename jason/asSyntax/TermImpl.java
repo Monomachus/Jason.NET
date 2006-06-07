@@ -189,10 +189,10 @@ public class TermImpl implements Term, Serializable {
     public boolean isInternalAction() {
         return false;
     }
-    public boolean isExpr() {
+    public boolean isArithExpr() {
         return false;
     }
-    public boolean isNumber() {
+    public boolean isNumeric() {
         return false;
     }
     public boolean isPred() {
