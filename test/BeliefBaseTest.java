@@ -280,7 +280,7 @@ public class BeliefBaseTest extends TestCase {
                 "jdbc:hsqldb:bookstore",
                 "sa",
                 "",
-                "[book(5,book),book_author(2,book_author),author(2,author),test(2,test)]"
+                "[book(5,book),book_author(2,book_author),author(2,author),test(2,testtable)]"
                 });
         
         bb.abolish(new PredicateIndicator("book",5));

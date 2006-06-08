@@ -74,7 +74,7 @@ public class JDBCPersistentBB extends DefaultBeliefBase {
                         ct.append(COL_PREFIX + c + " varchar(256), ");
                     }
                     ct.append(COL_NEG + " boolean, " + COL_ANNOT + " varchar(256));");
-                    logger.info("Creating table: " + ct);
+                    logger.fine("Creating table: " + ct);
                     stmt.executeUpdate(ct.toString());
                     rs = stmt.executeQuery("select * from " + table);
                 }
@@ -162,7 +162,7 @@ public class JDBCPersistentBB extends DefaultBeliefBase {
 
                         // store bl annots
                         stmt = conn.createStatement();
-                        stmt.executeUpdate("update "+bl.getFunctor()+" set "+COL_ANNOT+" = '"+bl.getAnnots()+"' "+getWhere(l));
+                        stmt.executeUpdate("update "+getTableName(bl)+" set "+COL_ANNOT+" = '"+bl.getAnnots()+"' "+getWhere(l));
                         return true;
                     }
                 }
@@ -204,10 +204,10 @@ public class JDBCPersistentBB extends DefaultBeliefBase {
                     stmt = conn.createStatement();
                     if (bl.hasAnnot() && isCreatedByJason(l.getPredicateIndicator())) {
                         // store new bl annots
-                        stmt.executeUpdate("update "+bl.getFunctor()+" set "+COL_ANNOT+" = '"+bl.getAnnots()+"' "+getWhere(l));
+                        stmt.executeUpdate("update "+getTableName(bl)+" set "+COL_ANNOT+" = '"+bl.getAnnots()+"' "+getWhere(l));
                     } else {
                         // remove from DB
-                        stmt.executeUpdate("delete from "+bl.getFunctor()+getWhere(bl));                        
+                        stmt.executeUpdate("delete from "+getTableName(bl)+getWhere(bl));                        
                     }
                     return true;
                 } else {
@@ -233,7 +233,7 @@ public class JDBCPersistentBB extends DefaultBeliefBase {
         Statement stmt = null;
         try {
             stmt = conn.createStatement();
-            stmt.executeUpdate("delete from " + pi.getFunctor());
+            stmt.executeUpdate("delete from " + getTableName(pi));
         } catch (SQLException e) {
             logger.log(Level.SEVERE, "SQL Error", e);
         } finally {
@@ -258,7 +258,7 @@ public class JDBCPersistentBB extends DefaultBeliefBase {
             Statement stmt = null;
             try {
                 stmt = conn.createStatement();
-                final ResultSet rs = stmt.executeQuery("select * from " + pi.getFunctor());
+                final ResultSet rs = stmt.executeQuery("select * from " + getTableName(pi));
                 return new Iterator<Literal>() {
                     boolean hasNext = true;
                     boolean firstcall = true;
@@ -311,7 +311,7 @@ public class JDBCPersistentBB extends DefaultBeliefBase {
             // for all tables, count rows
             for (PredicateIndicator pi : belsDB.keySet()) {
                 if (!pi.getFunctor().startsWith("~")) {
-                    ResultSet rs = stmt.executeQuery("select count(*) from " + pi.getFunctor());
+                    ResultSet rs = stmt.executeQuery("select count(*) from " + getTableName(pi));
                     if (rs.next()) {
                         count += rs.getInt(1);
                     }
@@ -340,7 +340,7 @@ public class JDBCPersistentBB extends DefaultBeliefBase {
             // for all tables, get rows literal
             for (PredicateIndicator pi : belsDB.keySet()) {
                 if (!pi.getFunctor().startsWith("~")) {
-                    ResultSet rs = stmt.executeQuery("select * from " + pi.getFunctor());
+                    ResultSet rs = stmt.executeQuery("select * from " + getTableName(pi));
                     while (rs.next()) {
                         all.add( resultSetToLiteral(rs, pi));
                     }
@@ -368,14 +368,12 @@ public class JDBCPersistentBB extends DefaultBeliefBase {
             end = end - 2;
         for (int c = 1; c <= end; c++) {
             String sc = rs.getString(c);
-            // if (meta.getColumnType(c) == Types.VARCHAR ||
-            // meta.getColumnType(c) == Types.CHAR ||
-            // meta.getColumnType(c) == Types.LONGVARCHAR) {
-            // sc = "\"" + sc + "\"";
-            // }
             Term parsed = null;
             if (sc.trim().length() == 0) {
                 parsed = new StringTermImpl("");
+            } else if (Character.isUpperCase(sc.charAt(0))) {
+                // there no var at BB
+                parsed = new StringTermImpl(sc);
             } else {
                 parsed = TermImpl.parse(sc);
                 
@@ -393,8 +391,16 @@ public class JDBCPersistentBB extends DefaultBeliefBase {
         return ldb;
     }
     
+    private String getTableName(Literal l) throws SQLException {
+        return getTableName(l.getPredicateIndicator());
+    }
+    private String getTableName(PredicateIndicator pi) throws SQLException {
+        ResultSetMetaData meta = belsDB.get(pi);
+        return meta.getTableName(1);
+    }
+    
     private String getSelect(Literal l) throws SQLException {
-        return "select * from "+l.getFunctor()+getWhere(l);
+        return "select * from "+getTableName(l)+getWhere(l);
     }
 
     private String getWhere(Literal l) throws SQLException {
@@ -429,15 +435,6 @@ public class JDBCPersistentBB extends DefaultBeliefBase {
         StringBuffer q = new StringBuffer("insert into ");
         ResultSetMetaData meta = belsDB.get(l.getPredicateIndicator());
         q.append(meta.getTableName(1));
-        // columns
-        // q.append("(");
-        // for (int c = 1; c <= meta.getColumnCount(); c++) {
-        // q.append(meta.getColumnName(c));
-        // if (c < meta.getColumnCount()) {
-        // q.append(",");
-        // }
-        // }
-        // q.append(")");
         q.append(" values(");
 
         // values
@@ -461,25 +458,7 @@ public class JDBCPersistentBB extends DefaultBeliefBase {
             }
         }
         q.append(")");
-        // System.out.println(q.toString());
         return q.toString();
-    }
-
-    void dump(ResultSet rs) throws SQLException {
-        ResultSetMetaData meta = rs.getMetaData();
-        int colmax = meta.getColumnCount();
-        int i;
-        Object o = null;
-
-        for (; rs.next();) {
-            for (i = 0; i < colmax; ++i) {
-                o = rs.getObject(i + 1); // Is SQL the first column is
-                // indexed
-                System.out.print(o.toString() + " ");
-            }
-
-            System.out.println(" ");
-        }
     }
 
     /** just create some data to test */
