@@ -1,6 +1,7 @@
 package jason.infra.saci;
 
 import jason.architecture.AgArch;
+import jason.bb.DefaultBeliefBase;
 import jason.control.ExecutionControlGUI;
 import jason.infra.centralised.CentralisedMASLauncherAnt;
 import jason.jeditplugin.Config;
@@ -185,9 +186,17 @@ public class SaciMASLauncherAnt extends CentralisedMASLauncherAnt implements MAS
         if (tmpAgArchClass == null) {
             tmpAgArchClass = new ClassParameters(AgArch.class.getName());
         }
+        
+        ClassParameters tmpBBClass = agp.bbClass;
+        if (tmpBBClass == null) {
+            tmpBBClass = new ClassParameters(DefaultBeliefBase.class.getName());
+        }
+        String sBBClass = tmpBBClass.toString().replace('\"','$');
 
         File tmpAsSrc = new File(project.getDirectory() + File.separator + agp.asSource);
-        s.append("\n\t\targs=\"" + tmpAgArchClass.className + " " + tmpAgClass.className + " '" + tmpAsSrc.getAbsolutePath() + "'" + getSaciOptsStr(agp, debug, forceSync) + "\"");
+        s.append("\n\t\targs=\"" + tmpAgArchClass.className + " " + tmpAgClass.className +
+                " '" + sBBClass + "' " +
+                " '" + tmpAsSrc.getAbsolutePath() + "'" + getSaciOptsStr(agp, debug, forceSync) + "\"");
         if (agp.qty > 1) {
             s.append("\n\t\tqty=\"" + agp.qty + "\" ");
         }

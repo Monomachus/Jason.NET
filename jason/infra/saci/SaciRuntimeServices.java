@@ -66,8 +66,8 @@ public class SaciRuntimeServices implements RuntimeServicesInfraTier {
             c1.addArg("class", SaciAgArch.class.getName());
             c1.addArg("name", agName);
             c1.addArg("society.name", socName);
-            // TODO: send the bb class
-            c1.addArg("args", archClass + " " + agClass + " " + agSource + extraOp);
+            String sBBClass = bbPars.toString().replace('\"','$');
+            c1.addArg("args", archClass + " " + agClass + " '" + sBBClass + "' "+ agSource + extraOp);
             // c1.addArg("host", "?");
             l.execCommand(c1);
             logger.fine("Agent " + agName + " created!");

@@ -207,7 +207,6 @@ public class VarTermTest extends TestCase {
         u.unifies(v1, v2);
         VarTerm vy = new VarTerm("Y");
         assertEquals(v1.hashCode(),vy.hashCode());
-        // TODO: assertEquals(u.get("Y").toString(), "a(4)");
     }
 
     public void testVarWithAnnots() {

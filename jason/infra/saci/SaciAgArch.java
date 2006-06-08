@@ -34,10 +34,12 @@ import jason.asSyntax.TermImpl;
 import jason.bb.DefaultBeliefBase;
 import jason.infra.centralised.RunCentralisedMAS;
 import jason.mas2j.ClassParameters;
+import jason.mas2j.parser.mas2j;
 import jason.runtime.MASConsoleGUI;
 import jason.runtime.RuntimeServicesInfraTier;
 import jason.runtime.Settings;
 
+import java.io.StringReader;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -70,9 +72,13 @@ public class SaciAgArch extends saci.Agent implements AgArchInfraTier {
     private Logger   logger;
 
     /**
-     * Method used by SACI to initialize the agent args[0] is the agent
-     * architecture class args[1] is the user Agent class args[2] is the
-     * AgentSpeak source file args[3] "options" args[4] options
+     * Method used by SACI to initialize the agent 
+     * args[0] is the agent architecture class 
+     * args[1] is the user Agent class 
+     * args[2] is the user BB class 
+     * args[3] is the AgentSpeak source file 
+     * args[4] "options" 
+     * args[5] options
      */
     public void initAg(String[] args) throws JasonException {
         // create a logger
@@ -100,22 +106,27 @@ public class SaciAgArch extends saci.Agent implements AgArchInfraTier {
             } else {
                 agClassName = args[1].trim();
             }
+
+            // TODO: read bb class name from args!
+
+            // parse bb class
+            mas2j parser = new mas2j(new StringReader(args[2].replace('$','\"')));
+            ClassParameters bbPars = parser.classDef();
+            
             String asSource = null;
             if (args.length < 3) { // error
                 throw new JasonException("The AgentSpeak source file was not informed, cannot create the Agent!");
             } else {
-                asSource = args[2].trim();
+                asSource = args[3].trim();
             }
             Settings stts = new Settings();
-            if (args.length > 3) {
-                if (args[3].equals("options")) {
-                    stts.setOptions("[" + args[4] + "]");
+            if (args.length > 4) {
+                if (args[4].equals("options")) {
+                    stts.setOptions("[" + args[5] + "]");
                 }
             }
             userAgArh = (AgArch) Class.forName(archClassName).newInstance();
             userAgArh.setArchInfraTier(this);
-            // TODO: read bb class name from args!
-            ClassParameters bbPars = new ClassParameters(DefaultBeliefBase.class.getName());
             userAgArh.initAg(agClassName, bbPars, asSource, stts);
             logger.setLevel(userAgArh.getTS().getSettings().logLevel());
         } catch (Exception e) {
