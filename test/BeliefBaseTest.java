@@ -6,11 +6,13 @@ import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Literal;
 import jason.asSyntax.LogExprTerm;
 import jason.asSyntax.Pred;
+import jason.asSyntax.PredicateIndicator;
 import jason.asSyntax.Term;
 import jason.asSyntax.TermImpl;
 import jason.asSyntax.VarTerm;
 import jason.bb.BeliefBase;
 import jason.bb.DefaultBeliefBase;
+import jason.bb.JDBCPersistentBB;
 
 import java.util.Iterator;
 
@@ -269,6 +271,116 @@ public class BeliefBaseTest extends TestCase {
         assertTrue(bb.remove(Literal.parseLiteral("a[source(percept)]")));
         assertEquals(bb.size(),1);
         assertEquals(iteratorSize(bb.getPercepts()),0);
+    }
+    
+    public void testJDBCBB() {
+        BeliefBase bb = new JDBCPersistentBB();
+        bb.init(null, new String[] {
+                "org.hsqldb.jdbcDriver",
+                "jdbc:hsqldb:bookstore",
+                "sa",
+                "",
+                "[book(5,book),book_author(2,book_author),author(2,author),test(2,test)]"
+                });
+        
+        bb.abolish(new PredicateIndicator("book",5));
+        bb.abolish(new PredicateIndicator("author",2));
+        bb.abolish(new PredicateIndicator("book_author",2));
+        bb.abolish(new PredicateIndicator("test",2));
+        assertEquals(bb.size(),0);
+
+        assertTrue(bb.add(Literal.parseLiteral("test(30)")));
+        assertEquals(bb.size(),1);
+        Literal l;
+        
+        // add authors
+        assertTrue(bb.add(Literal.parseLiteral("author(1,\"Rafael H. Bordini\")")));
+        assertFalse(bb.add(Literal.parseLiteral("author(1,\"Rafael H. Bordini\")")));
+        assertTrue(bb.add(Literal.parseLiteral("author(2,\"Mehdi Dastani\")")));
+        assertTrue(bb.add(Literal.parseLiteral("author(3,\"Jurgen Dix\")")));
+        assertTrue(bb.add(Literal.parseLiteral("author(4,\"Amal El Fallah Seghrouchni\")")));
+        assertTrue(bb.add(Literal.parseLiteral("author(5,\"Michael Wooldridge\")")));
+        assertEquals(bb.size(),6);
+        
+        // add books
+        l = Literal.parseLiteral("book(1,\"Multi-Agent Programming : Languages, Platforms and Applications\", \"Springer\", 2005, \"0387245685\")");
+        assertTrue(bb.add(l));
+        assertFalse(bb.add(l));
+        // add book authors
+        assertTrue(bb.add(Literal.parseLiteral("book_author(1,1)")));
+        assertTrue(bb.add(Literal.parseLiteral("book_author(1,2)")));
+        assertTrue(bb.add(Literal.parseLiteral("book_author(1,3)")));
+        assertTrue(bb.add(Literal.parseLiteral("book_author(1,4)")));
+        assertEquals(bb.size(),11);
+
+        // add another book
+        l = Literal.parseLiteral("book(2,\"Another Multi-Agent Programming : Languages, Platforms and Applications\", \"Springer\", 2005, \"0387245685\")");
+        assertTrue(bb.add(l));
+
+        l = Literal.parseLiteral("book(3,\"An introduction to multiagent systems\", \"John Wiley & Sons\", 2002, \"\")");
+        assertTrue(bb.add(l));
+        assertTrue(bb.add(Literal.parseLiteral("book_author(3,5)")));
+        assertEquals(bb.size(),14);
+
+        // test with legacy table
+        ((JDBCPersistentBB)bb).test();
+        // test add two records
+        assertEquals(bb.size(),16);
+        assertTrue(bb.add(Literal.parseLiteral("publisher(10,\"Prentice Hall\")")));
+        assertFalse(bb.add(Literal.parseLiteral("publisher(10,\"Prentice Hall\")")));
+        assertEquals(bb.size(),17);
+
+        // test annots
+        l = Literal.parseLiteral("test(t1(a(10),b(20)),[v1,30,\"a vl\"])[annot1,source(carlos)]");
+        assertTrue(bb.add(l));
+        assertFalse(bb.add(l));
+        Literal linbb = ((JDBCPersistentBB)bb).containsAsTerm(l);
+        assertTrue(l.getTerm(0).equals(linbb.getTerm(0)));
+        assertTrue(l.getTerm(1).equals(linbb.getTerm(1)));
+        assertTrue(l.equals(linbb));
+        l = Literal.parseLiteral("test(t1(a(10),b(20)),[v1,30,\"a vl\"])[annot2]");
+        assertTrue(bb.add(l));
+        linbb = ((JDBCPersistentBB)bb).containsAsTerm(l);
+        assertEquals(linbb.getAnnots().size(),3);
+        l = Literal.parseLiteral("test(t1(a(10),b(20)),[v1,30,\"a vl\"])[annot2]");
+        assertFalse(bb.add(l));
+        linbb = ((JDBCPersistentBB)bb).containsAsTerm(l);
+        assertEquals(linbb.getAnnots().size(),3);
+
+        // test negated
+        int size = bb.size();
+        l = Literal.parseLiteral("test(a,b)");
+        assertTrue(bb.add(l));
+        l = Literal.parseLiteral("~test(a,b)");
+        assertTrue(bb.add(l));
+        assertEquals(bb.size(),size+2);
+        
+        // test get all
+        //Iterator<Literal> il = bb.getAll();
+        //while (il.hasNext()) {
+        //    System.out.println(il.next());
+        //}
+        assertEquals(iteratorSize(bb.getAll()),size+2);
+
+        // test remove
+        size = bb.size();
+        assertTrue(bb.remove(Literal.parseLiteral("test(a,b)")));
+        assertFalse(bb.remove(Literal.parseLiteral("test(a,b)")));
+        assertTrue(bb.remove(Literal.parseLiteral("publisher(10,\"Prentice Hall\")")));
+        l = Literal.parseLiteral("test(t1(a(10),b(20)),[v1,30,\"a vl\"])[annot2]");
+        assertTrue(bb.remove(l));
+        linbb = ((JDBCPersistentBB)bb).containsAsTerm(l);
+        assertEquals(linbb.getAnnots().size(),2);
+        assertEquals(bb.size(),size-2);
+        
+        // test getRelevant
+        //Iterator ir = bb.getRelevant(Literal.parseLiteral("book_author(_,_)"));
+        //while (ir.hasNext()) {
+        //    System.out.println(ir.next());
+        //}
+        assertEquals(iteratorSize(bb.getRelevant(Literal.parseLiteral("book_author(_,_)"))),5);
+        
+        bb.stop();
     }
     
     private int iteratorSize(Iterator i) {

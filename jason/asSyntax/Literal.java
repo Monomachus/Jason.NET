@@ -91,6 +91,10 @@ public class Literal extends Pred implements Cloneable {
 	public boolean negated() {
 		return (type == LNeg);
 	}
+    
+    public void setNegated(boolean b) {
+        type = b;
+    }
 
     /** 
      * logCons checks whether one particular predicate

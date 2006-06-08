@@ -76,6 +76,9 @@ public class Pred extends TermImpl {
 
     public void setAnnots(ListTerm l) {
         annots = l;
+        if (annots.isEmpty()) {
+            annots = null;
+        }
     }
 
     public void addAnnot(Term t) {
