@@ -37,6 +37,7 @@ public class BodyLiteral implements Cloneable {
 		test           { public String toString() { return "?"; } }, 
 		addBel         { public String toString() { return "+"; } }, 
 		delBel         { public String toString() { return "-"; } },
+		delAddBel      { public String toString() { return "-+"; } },
 		achieveNF      { public String toString() { return "!!"; } }, 
 		constraint     { public String toString() { return ""; } }
 	}

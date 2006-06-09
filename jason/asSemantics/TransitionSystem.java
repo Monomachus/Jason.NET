@@ -34,8 +34,8 @@ import jason.asSyntax.RelExprTerm;
 import jason.asSyntax.Term;
 import jason.asSyntax.TermImpl;
 import jason.asSyntax.Trigger;
-import jason.bb.BeliefBase;
 import jason.runtime.Settings;
+
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -163,8 +163,6 @@ public class TransitionSystem {
             } else if (conf.ag.socAcc(m)) {
                 Term content = TermImpl.parse(m.getPropCont().toString());
 
-                Intention focus = Intention.EmptyInt;
-
                 // generate an event
                 Literal received = new Literal(Literal.LPos, new Pred("received"));
                 received.addTerm(new TermImpl(m.getSender()));
@@ -172,8 +170,7 @@ public class TransitionSystem {
                 received.addTerm(content);
                 received.addTerm(new TermImpl(m.getMsgId()));
 
-                Event evt = new Event(new Trigger(Trigger.TEAdd, Trigger.TEBel, received), focus);
-                conf.ag.updateEvents(evt, conf.C);
+                updateEvents(new Event(new Trigger(Trigger.TEAdd, Trigger.TEBel, received), Intention.EmptyInt));
             }
         }
         confP.step = State.SelEv;
@@ -446,45 +443,41 @@ public class TransitionSystem {
                 }
                 break;
 
+                
+            case delAddBel: 
+                // -+a(1,X) ===> remove a(_,_), add a(1,X)
+                // change all vars to anon vars to remove it
+                Literal bc = (Literal)body.clone();
+                bc.makeTermsAnnon();
+                // to delete, create events as external to avoid that
+                // remove/add create two events for the same intention
+                ag.delBel(bc, u, Intention.EmptyInt);
+
+                // add the belief, so no break;
+                
             // Rule AddBel
             case addBel:
-                Term source = BeliefBase.TSelf;
-                bodyl = (Literal) body;
-                if (bodyl.hasSource()) {
-                    // do not add source(self) in case the
-                    // programmer set the source
-                    source = null; 
-                }
-                if (setts.sameFocus())
-                    conf.ag.addBel(bodyl, source, conf.C, conf.C.SI);
-                else {
-                    conf.ag.addBel(bodyl, source, conf.C, Intention.EmptyInt);
+                Intention focus = Intention.EmptyInt;
+                if (setts.sameFocus()) {
+                    focus = conf.C.SI;
+                } else {
                     updateIntention();
                 }
+                ag.addBel((Literal) body, focus);
                 break;
-
-            // Rule DelBel
+                
             case delBel:
-                bodyl = (Literal) body;
-                if (logger.isLoggable(Level.FINE))  logger.fine("doing -" + body + " in BB=" + conf.ag.believes(bodyl, u));
-                Literal lInBB = conf.ag.believes(bodyl, u);
-                if (lInBB != null) {
-                    // lInBB is l unified in BB
-                    // we can not use l for delBel in case l is g(_,_)
-                    if (bodyl.hasAnnot()) {
-                        // if the command has annots, use them
-                        lInBB = (Literal) lInBB.clone();
-                        lInBB.clearAnnots();
-                        lInBB.addAnnots(bodyl.getAnnots());
-                    }
-                    if (setts.sameFocus())
-                        conf.ag.delBel(lInBB, conf.C, conf.C.SI);
-                    else {
-                        conf.ag.delBel(lInBB, conf.C, Intention.EmptyInt);
+                focus = Intention.EmptyInt;
+                if (setts.sameFocus()) {
+                    focus = conf.C.SI;
+                }
+                
+                if (ag.delBel((Literal) body, u, focus)) {
+                    if (!setts.sameFocus()) {
                         updateIntention();
-                    }
+                    }                    
                 } else {
-                    generateGoalDeletion();
+                    updateIntention();                    
                 }
                 break;
             }
@@ -586,6 +579,15 @@ public class TransitionSystem {
         return ap;
     }
 
+
+    // only add External Event if it is relevant in respect to the PlanLibrary
+    public void updateEvents(Event e) {
+        if (e.isInternal() || C.hasListener() || ag.getPS().isRelevant(e.trigger.getPredicateIndicator())) {
+            C.addEvent(e);
+            if (logger.isLoggable(Level.FINE)) logger.fine("Added event " + e);
+        }
+    }
+    
     /** remove the top action and requeue the current intention */
     private void updateIntention() {
         IntendedMeans im = conf.C.SI.peek();

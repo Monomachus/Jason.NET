@@ -210,15 +210,18 @@ public class TermImpl implements Term, Serializable {
     }
 
     public void makeVarsAnnon() {
-        if (terms==null)
-            return;
         for (int i=0; i<getTermsSize(); i++) {
             if (getTerm(i).isVar()) {
                 setTerm(i,new UnnamedVar());
-            }
-            else if (getTerm(i).getTermsSize()>0) {
+            } else if (getTerm(i).getTermsSize()>0) {
                 getTerm(i).makeVarsAnnon();
             }
+        }
+    }
+    
+    public void makeTermsAnnon() {
+        for (int i=0; i<getTermsSize(); i++) {
+            setTerm(i,new UnnamedVar());
         }
     }
 

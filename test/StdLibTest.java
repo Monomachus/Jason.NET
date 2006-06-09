@@ -65,9 +65,9 @@ public class StdLibTest extends TestCase {
     public void testFindAll() {
         Agent ag = new Agent();
         ag.setLogger(null);
-        ag.addBel(Literal.parseLiteral("a(10,x)"), BeliefBase.TPercept, null, Intention.EmptyInt);
-        ag.addBel(Literal.parseLiteral("a(20,y)"), BeliefBase.TPercept, null, Intention.EmptyInt);
-        ag.addBel(Literal.parseLiteral("a(30,x)"), BeliefBase.TPercept, null, Intention.EmptyInt);
+        ag.addBel(Literal.parseLiteral("a(10,x)"), Intention.EmptyInt);
+        ag.addBel(Literal.parseLiteral("a(20,y)"), Intention.EmptyInt);
+        ag.addBel(Literal.parseLiteral("a(30,x)"), Intention.EmptyInt);
 
         TransitionSystem ts = new TransitionSystem(ag, null, null, null);
 

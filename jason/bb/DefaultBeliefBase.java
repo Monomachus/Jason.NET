@@ -73,6 +73,10 @@ public class DefaultBeliefBase implements BeliefBase {
     }
 
     public boolean add(Literal l) {
+        if (l.equals(Literal.LTrue) || l.equals(Literal.LFalse)) {
+            logger.log(Level.SEVERE, "Error: <true> or <false> can not be added as beliefs.");
+            return false;
+        }
         Literal bl = containsAsTerm(l);
         if (bl != null) {
             // add only annots

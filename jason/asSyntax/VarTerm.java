@@ -386,11 +386,11 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
     }
 
     @Override
-    public void addAnnot(Term t) {
+    public boolean addAnnot(Term t) {
         if (value != null && getValue().isPred())
-            ((Pred) getValue()).addAnnot(t);
+            return ((Pred) getValue()).addAnnot(t);
         else
-            super.addAnnot(t);
+            return super.addAnnot(t);
     }
 
     @Override

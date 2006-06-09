@@ -253,29 +253,25 @@ public class Agent {
                 }
             }
             if (!wasPerceived) {
-                // perceptsInBB.remove();
-                // l.addAnnot(BeliefBase.TPercept);
-                removed.add(l); // do not remove here, concurrent modification!
-                // if (delBel(l, fTS.getC(), Intention.EmptyInt)) {
-                // i--;
-                // TODO: remove with (not implemented!!!!!)
-                // }
+                removed.add(l); // do not remove using the iterator here, concurrent modification!
             }
         }
 
         for (Literal lr : removed) {
-            // TODO: do not generate events form removed here
-            delBel(lr, fTS.getC(), Intention.EmptyInt);
+            if (fBS.remove(lr)) {
+                fTS.updateEvents(new Event(new Trigger(Trigger.TEDel, Trigger.TEBel, lr), Intention.EmptyInt));
+            }
         }
 
         // addBel only adds a belief when appropriate
         // checking all percepts for new beliefs
-        for (Literal l : percepts) {
+        for (Literal lp : percepts) {
             try {
-                addBel(l, BeliefBase.TPercept, fTS.getC(), Intention.EmptyInt);
-                // TODO: do not generate event here
+                lp = (Literal) lp.clone();
+                lp.addAnnot(BeliefBase.TPercept);
+                addBel(lp,Intention.EmptyInt);
             } catch (Exception e) {
-                logger.log(Level.SEVERE, "Error adding percetion " + l, e);
+                logger.log(Level.SEVERE, "Error adding percetion " + lp, e);
             }
         }
     }
@@ -306,11 +302,6 @@ public class Agent {
      * annotation. <i>l</i> will be cloned before being added in the BB
      */
     public boolean addBel(Literal l, Term source, Circumstance c, Intention focus) {
-        if (source != null && !source.isGround()) {
-            logger.log(Level.SEVERE, "Error: Annotations must be ground!\n Cannot use " + source + " as annotation.");
-        } else if (l.equals(Literal.LTrue) || l.equals(Literal.LFalse)) {
-            logger.log(Level.SEVERE, "Error: <true> or <false> can not be added as beliefs.");
-        } else {
             l = (Literal) l.clone();
             if (source != null) {
                 l.addAnnot(source);
@@ -318,37 +309,61 @@ public class Agent {
             if (fBS.add(l)) {
                 if (logger.isLoggable(Level.FINE))
                     logger.fine("Added belief " + l);
-                updateEvents(new Event(new Trigger(Trigger.TEAdd, Trigger.TEBel, l), focus), c);
+                fTS.updateEvents(new Event(new Trigger(Trigger.TEAdd, Trigger.TEBel, l), focus));
                 return true;
             }
-            return false;
-        }
         return false;
     }
 
-    public boolean delBel(Literal l, Circumstance c, Intention focus) {
-        if (fBS.remove(l)) {
-            if (logger.isLoggable(Level.FINE))
-                logger.fine("Removed:" + l);
-            updateEvents(new Event(new Trigger(Trigger.TEDel, Trigger.TEBel, l), focus), c);
+    /**
+     * Adds bel in belief base and generate the event.
+     * If bel has not source, add source(self).
+     * (the belief is not cloned!)
+     */
+    public boolean addBel(Literal bel, Intention focus) {
+        if (!bel.hasSource()) {
+            // do not add source(self) in case the
+            // programmer set the source
+            bel.addAnnot(BeliefBase.TSelf);
+        }
+        if (getBS().add(bel)) {
+            if (fTS != null) {
+                Trigger te = new Trigger(Trigger.TEAdd, Trigger.TEBel, bel);
+                fTS.updateEvents(new Event(te, focus));
+            }
+            if (logger.isLoggable(Level.FINE)) logger.fine("Added belief " + bel);
             return true;
-        } else {
-            if (logger.isLoggable(Level.FINE))
-                logger.fine("Not removed: " + l);
         }
         return false;
     }
-
-    // only add External Event if it is relevant in respect to the PlanLibrary
-    public void updateEvents(Event e, Circumstance c) {
-        if (c != null) {
-            if (e.isInternal() || c.hasListener() || fPS.isRelevant(e.trigger.getPredicateIndicator())) {
-                c.addEvent(e);
-                if (logger.isLoggable(Level.FINE))
-                    logger.fine("Added event " + e);
+    
+    
+    /**
+     * if the agent believes in bel, removes it and generate the event.
+     */
+    public boolean delBel(Literal bel, Unifier u, Intention focus) {
+        if (logger.isLoggable(Level.FINE))  logger.fine("doing -" + bel + " in BB=" + believes(bel, u));
+        Literal inBB = believes(bel, u);
+        if (inBB != null) {
+            // lInBB is l unified in BB
+            // we can not use l for delBel in case l is g(_,_)
+            if (bel.hasAnnot()) {
+                // if the command has annots, use them
+                inBB = (Literal) inBB.clone();
+                inBB.clearAnnots();
+                inBB.addAnnots(bel.getAnnots());
+            }
+            
+            if (getBS().remove(inBB)) {
+                Trigger te = new Trigger(Trigger.TEDel, Trigger.TEBel, inBB);
+                fTS.updateEvents(new Event(te, focus));
+                if (logger.isLoggable(Level.FINE))  logger.fine("Removed:" + inBB);
+                return true;
             }
         }
+        return false;
     }
+    
 
     static DocumentBuilder builder = null;
 

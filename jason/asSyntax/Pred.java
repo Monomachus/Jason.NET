@@ -81,11 +81,17 @@ public class Pred extends TermImpl {
         }
     }
 
-    public void addAnnot(Term t) {
-        if (annots == null)
+    public boolean addAnnot(Term t) {
+        if (annots == null) {
             annots = new ListTermImpl();
-        if (!annots.contains(t))
+        }
+        if (!t.isGround()) {
+            logger.log(Level.SEVERE, "Error: Annotations must be ground!\n Cannot use " + t + " as annotation.");
+        } else if (!annots.contains(t)) {
             annots.add(t);
+            return true;
+        }
+        return false;
     }
 
     public void addAnnots(List<Term> l) {

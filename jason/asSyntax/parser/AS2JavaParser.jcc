@@ -120,11 +120,7 @@ void ag(Agent a) : { List bbl = new LinkedList(); PlanLibrary pp;  }
                     Iterator i = bbl.iterator();
                     while (i.hasNext()) {
                        Literal l = (Literal)i.next();
-                       Circumstance c = null;
-                       try {
-                          c = a.getTS().getC();
-                       } catch (Exception e) {}
-                       a.addBel(l, BeliefBase.TSelf, c, Intention.EmptyInt);
+ 	                   a.addBel(l, Intention.EmptyInt);
                     }
                   } catch (JasonException je) {
                      System.err.println("Error:"+je);
@@ -243,7 +239,10 @@ BodyLiteral f() :     { Literal A; Token k;
     | "!!"            { formType = BodyType.achieveNF; }
     | "?"             { formType = BodyType.test; }
     | "+"             { formType = BodyType.addBel; }
-    | "-"             { formType = BodyType.delBel; }
+    | ( "-"           { formType = BodyType.delBel; }
+        ["+"          { formType = BodyType.delAddBel; }
+        ]
+      ) 
    )
    ( A=l()            { return new BodyLiteral(formType,A); }
    | v = var()        { return new BodyLiteral(formType,v); } // used in communication "+C"
