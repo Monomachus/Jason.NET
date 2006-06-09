@@ -71,9 +71,9 @@ public class JDBCPersistentBB extends DefaultBeliefBase {
                     // create table
                     StringBuffer ct = new StringBuffer("create table " + table + " (");
                     for (int c = 0; c < arity; c++) {
-                        ct.append(COL_PREFIX + c + " varchar(256), ");
+                        ct.append(COL_PREFIX + c + " varchar, ");
                     }
-                    ct.append(COL_NEG + " boolean, " + COL_ANNOT + " varchar(256));");
+                    ct.append(COL_NEG + " boolean, " + COL_ANNOT + " varchar);");
                     logger.fine("Creating table: " + ct);
                     stmt.executeUpdate(ct.toString());
                     rs = stmt.executeQuery("select * from " + table);
@@ -471,7 +471,7 @@ public class JDBCPersistentBB extends DefaultBeliefBase {
                 stmt.executeUpdate("drop table publisher");
             } catch (Exception e) {
             }
-            stmt.executeUpdate("create table publisher (id integer, name varchar(256))");
+            stmt.executeUpdate("create table publisher (id integer, name varchar)");
             stmt.executeUpdate("insert into publisher values(1, 'Springer')");
             stmt.executeUpdate("insert into publisher values(2, 'MIT Press')");
             ResultSetMetaData meta = stmt.executeQuery("select * from publisher").getMetaData();

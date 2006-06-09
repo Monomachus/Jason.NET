@@ -76,7 +76,7 @@ public class Pred extends TermImpl {
 
     public void setAnnots(ListTerm l) {
         annots = l;
-        if (annots.isEmpty()) {
+        if (annots != null && annots.isEmpty()) {
             annots = null;
         }
     }

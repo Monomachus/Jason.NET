@@ -201,7 +201,7 @@ public class TermTest extends TestCase {
 		p1.addAnnot(new VarTerm("X1"));
 		p1.addAnnot(new VarTerm("X2"));
 		p1.addAnnot(new VarTerm("X3"));
-		System.out.println("p1="+p1+"; p2="+p2);
+		//System.out.println("p1="+p1+"; p2="+p2);
 		u = new Unifier();
 		assertFalse(u.unifies(p1, p2));
 		//System.out.println("u="+u);
