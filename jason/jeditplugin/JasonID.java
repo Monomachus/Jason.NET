@@ -138,6 +138,8 @@ public class JasonID extends JPanel implements EBComponent, RunProjectListener {
         
         // add myself in project parser
         JasonIDPlugin.jpskp.addPluginInstance(this);
+        
+        new CheckVersion().start();
 	}
 	
 	public synchronized void start() {

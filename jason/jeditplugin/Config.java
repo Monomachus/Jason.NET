@@ -41,12 +41,12 @@ public class Config extends Properties {
 
 	public static final String JASON_JAR = "jasonJar";
 	public static final String SACI_JAR  = "saciJar";
-	//public static final String LOG4J_JAR = "log4jJar";
 	public static final String JAVA_HOME = "javaHome";
 	public static final String ANT_LIB  = "antLib";
 	public static final String RUN_AS_THREAD = "runCentralisedInsideJIDE";
 	public static final String SHELL_CMD = "shellCommand";
 	public static final String CLOSEALL = "closeAllBeforeOpenMAS2J";
+    public static final String CHECK_VERSION = "checkLatestVersion";
 		
 	private static Config singleton = null;
 	
@@ -114,14 +114,6 @@ public class Config extends Properties {
 		}
 	}
 
-	public boolean runAsInternalTread() {
-		return false; // it not works with jedit
-		/*
-		String r = getProperty(RUN_AS_THREAD);
-		return r != null && r.equals("true");
-		*/
-	}
-	
 	public String getShellCommand() {
 		return getProperty(SHELL_CMD);
 	}
@@ -129,7 +121,6 @@ public class Config extends Properties {
 	public void fix() {
     	tryToFixJarFileConf(JASON_JAR, "jason.jar", 300000);
     	tryToFixJarFileConf(SACI_JAR,  "saci.jar",  300000);
-    	//tryToFixJarFileConf(LOG4J_JAR, "log4j.jar", 350000);
 		
     	// fix java home
         if (get(JAVA_HOME) == null || !checkJavaHomePath(getProperty(JAVA_HOME))) {
