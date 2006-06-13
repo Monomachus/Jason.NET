@@ -41,6 +41,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -215,18 +216,7 @@ public class Agent {
         return fPS;
     }
 
-    /**
-     * This function should revise the belief base with the given literals to
-     * add and delete.
-     * 
-     * In its return, List[0] has the list of actual additions to the belief
-     * base, and List[1] has the list of actual deletions; this is used to
-     * generate the appropriate internal events.
-     */
-    public List<Literal>[] brf(List<Literal> adds, List<Literal> dels) {
-        return null;
-    }
-
+    
     /** Belief Update Function: add/remove perceptions into belief base */
     public void buf(List<Literal> percepts) {
         if (percepts == null) {
@@ -269,7 +259,10 @@ public class Agent {
             try {
                 lp = (Literal) lp.clone();
                 lp.addAnnot(BeliefBase.TPercept);
-                addBel(lp,Intention.EmptyInt);
+                if (getBS().add(lp)) {
+                    Trigger te = new Trigger(Trigger.TEAdd, Trigger.TEBel, lp);
+                    fTS.updateEvents(new Event(te, Intention.EmptyInt));
+                }
             } catch (Exception e) {
                 logger.log(Level.SEVERE, "Error adding percetion " + lp, e);
             }
@@ -297,71 +290,97 @@ public class Agent {
         return null;
     }
 
+    
     /**
-     * Adds a new Literal <i>l</i> in BB with "source(<i>source</i>)"
-     * annotation. <i>l</i> will be cloned before being added in the BB
+     * This function should revise the belief base with the given literal to add
+     * and the current intention that triggered the addition.
+     * 
+     * In its return, List[0] has the list of actual additions to the belief
+     * base, and List[1] has the list of actual deletions; this is used to
+     * generate the appropriate internal events.
+     * If nothing change, returns null.
+     * 
      */
-    public boolean addBel(Literal l, Term source, Circumstance c, Intention focus) {
-            l = (Literal) l.clone();
-            if (source != null) {
-                l.addAnnot(source);
+    public List<Literal>[] brfAddBel(Literal belief, Intention i) {
+        // This class does not implement belief revision! It
+        // is supposed that a subclass will do it.
+        // It simply add the belief.
+        if (getBS().add(belief)) {
+            List<Literal>[] result = new List[2];
+            result[0] = Collections.singletonList(belief);
+            result[1] = Collections.emptyList();
+            return result;
+        } else {
+            return null;
+        }
+    }
+
+    /** Same as above, but for belief deletion. */
+    public List<Literal>[] brfDelBel(Literal belief, Intention i) {
+        Unifier u = null;
+        try {
+            u = fTS.C.SI.peek().unif; // get from current intention
+        } catch (Exception e) {
+            u = new Unifier();
+        }
+        
+        if (logger.isLoggable(Level.FINE))  logger.fine("doing brf for " + belief + " in BB=" + believes(belief, u));
+        Literal inBB = believes(belief, u);
+        if (inBB != null) {
+            // lInBB is l unified in BB
+            // we can not use l for delBel in case l is g(_,_)
+            if (belief.hasAnnot()) {
+                // if belief has annots, use them
+                inBB = (Literal) inBB.clone();
+                inBB.clearAnnots();
+                inBB.addAnnots(belief.getAnnots());
             }
-            if (fBS.add(l)) {
-                if (logger.isLoggable(Level.FINE))
-                    logger.fine("Added belief " + l);
-                fTS.updateEvents(new Event(new Trigger(Trigger.TEAdd, Trigger.TEBel, l), focus));
-                return true;
+            
+            if (getBS().remove(inBB)) {
+                if (logger.isLoggable(Level.FINE))  logger.fine("Removed:" + inBB);
+                List<Literal>[] result = new List[2];
+                result[0] = Collections.emptyList();
+                result[1] = Collections.singletonList(inBB);
+                return result;
+                //Trigger te = new Trigger(Trigger.TEDel, Trigger.TEBel, inBB);
+                //fTS.updateEvents(new Event(te, focus));
             }
-        return false;
+        }
+        return null;
     }
 
     /**
-     * Adds bel in belief base and generate the event.
-     * If bel has not source, add source(self).
+     * Adds bel in belief base (calling brf) and generate the events.
+     * If bel has no source, add source(self).
      * (the belief is not cloned!)
      */
-    public boolean addBel(Literal bel, Intention focus) {
+    public boolean addBel(Literal bel) {
         if (!bel.hasSource()) {
             // do not add source(self) in case the
             // programmer set the source
             bel.addAnnot(BeliefBase.TSelf);
         }
-        if (getBS().add(bel)) {
-            if (fTS != null) {
-                Trigger te = new Trigger(Trigger.TEAdd, Trigger.TEBel, bel);
-                fTS.updateEvents(new Event(te, focus));
-            }
-            if (logger.isLoggable(Level.FINE)) logger.fine("Added belief " + bel);
+        List<Literal>[] result = brfAddBel(bel,Intention.EmptyInt);
+        if (result != null && fTS != null) {
+            fTS.updateEvents(result,Intention.EmptyInt);
             return true;
+        } else {
+            return false;
         }
-        return false;
     }
     
     
     /**
-     * if the agent believes in bel, removes it and generate the event.
+     * if the agent believes in bel, removes it (calling brf) and generate the event.
      */
-    public boolean delBel(Literal bel, Unifier u, Intention focus) {
-        if (logger.isLoggable(Level.FINE))  logger.fine("doing -" + bel + " in BB=" + believes(bel, u));
-        Literal inBB = believes(bel, u);
-        if (inBB != null) {
-            // lInBB is l unified in BB
-            // we can not use l for delBel in case l is g(_,_)
-            if (bel.hasAnnot()) {
-                // if the command has annots, use them
-                inBB = (Literal) inBB.clone();
-                inBB.clearAnnots();
-                inBB.addAnnots(bel.getAnnots());
-            }
-            
-            if (getBS().remove(inBB)) {
-                Trigger te = new Trigger(Trigger.TEDel, Trigger.TEBel, inBB);
-                fTS.updateEvents(new Event(te, focus));
-                if (logger.isLoggable(Level.FINE))  logger.fine("Removed:" + inBB);
-                return true;
-            }
+    public boolean delBel(Literal bel) {
+        List<Literal>[] result = brfDelBel(bel,Intention.EmptyInt);
+        if (result != null) {
+            fTS.updateEvents(result,Intention.EmptyInt);
+            return true;
+        } else {
+            return false;
         }
-        return false;
     }
     
 

@@ -34,6 +34,7 @@ import jason.asSyntax.RelExprTerm;
 import jason.asSyntax.Term;
 import jason.asSyntax.TermImpl;
 import jason.asSyntax.Trigger;
+import jason.bb.BeliefBase;
 import jason.runtime.Settings;
 
 import java.util.Iterator;
@@ -451,28 +452,55 @@ public class TransitionSystem {
                 bc.makeTermsAnnon();
                 // to delete, create events as external to avoid that
                 // remove/add create two events for the same intention
-                ag.delBel(bc, u, Intention.EmptyInt);
+
+                List<Literal>[]  result = ag.brfDelBel(bc, conf.C.SI); // the intention is not the new focus
+                if (result != null) { // really add something
+                    // generate events
+                    updateEvents(result,Intention.EmptyInt);
+                }
 
                 // add the belief, so no break;
                 
             // Rule AddBel
             case addBel:
-                Intention focus = Intention.EmptyInt;
-                if (setts.sameFocus()) {
-                    focus = conf.C.SI;
-                } else {
-                    updateIntention();
+                bodyl = (Literal) body;
+                if (!bodyl.hasSource()) {
+                    // do not add source(self) in case the
+                    // programmer set the source
+                    bodyl.addAnnot(BeliefBase.TSelf);
                 }
-                ag.addBel((Literal) body, focus);
+
+                // calculate focus
+                Intention newfocus = Intention.EmptyInt;
+                if (setts.sameFocus()) {
+                    newfocus = conf.C.SI;
+                }
+
+                // call BRF
+                result = ag.brfAddBel(bodyl,conf.C.SI); // the intention is not the new focus
+                if (result != null) { // really add something
+                    // generate events
+                    updateEvents(result,newfocus);
+                    if (!setts.sameFocus()) {
+                        updateIntention();
+                    }                    
+                } else {
+                    updateIntention();                    
+                }
                 break;
                 
             case delBel:
-                focus = Intention.EmptyInt;
+                bodyl = (Literal) body;
+                newfocus = Intention.EmptyInt;
                 if (setts.sameFocus()) {
-                    focus = conf.C.SI;
+                    newfocus = conf.C.SI;
                 }
-                
-                if (ag.delBel((Literal) body, u, focus)) {
+
+                // call BRF
+                result = ag.brfDelBel(bodyl, conf.C.SI); // the intention is not the new focus
+                if (result != null) { // really add something
+                    // generate events
+                    updateEvents(result,newfocus);
                     if (!setts.sameFocus()) {
                         updateIntention();
                     }                    
@@ -579,6 +607,19 @@ public class TransitionSystem {
         return ap;
     }
 
+
+    public void updateEvents(List<Literal>[] result, Intention focus) {
+        if (result == null) return;
+        // create the events
+        for (Literal ladd: result[0]) {
+            Trigger te = new Trigger(Trigger.TEAdd, Trigger.TEBel, ladd);
+            updateEvents(new Event(te, focus));
+        }
+        for (Literal lrem: result[1]) {
+            Trigger te = new Trigger(Trigger.TEDel, Trigger.TEBel, lrem);
+            updateEvents(new Event(te, focus));
+        }
+    }
 
     // only add External Event if it is relevant in respect to the PlanLibrary
     public void updateEvents(Event e) {

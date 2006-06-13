@@ -1,7 +1,6 @@
 package test;
 
 import jason.asSemantics.Agent;
-import jason.asSemantics.Intention;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.ListTerm;
@@ -65,9 +64,9 @@ public class StdLibTest extends TestCase {
     public void testFindAll() {
         Agent ag = new Agent();
         ag.setLogger(null);
-        ag.addBel(Literal.parseLiteral("a(10,x)"), Intention.EmptyInt);
-        ag.addBel(Literal.parseLiteral("a(20,y)"), Intention.EmptyInt);
-        ag.addBel(Literal.parseLiteral("a(30,x)"), Intention.EmptyInt);
+        ag.addBel(Literal.parseLiteral("a(10,x)"));
+        ag.addBel(Literal.parseLiteral("a(20,y)"));
+        ag.addBel(Literal.parseLiteral("a(30,x)"));
 
         TransitionSystem ts = new TransitionSystem(ag, null, null, null);
 

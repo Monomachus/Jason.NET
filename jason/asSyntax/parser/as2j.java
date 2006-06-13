@@ -42,8 +42,7 @@
                     // add beliefs (when the plans are loaded, so the events are relevant
                     Iterator i = bbl.iterator();
                     while (i.hasNext()) {
-                       Literal l = (Literal)i.next();
-                           a.addBel(l, Intention.EmptyInt);
+                           a.addBel((Literal)i.next());
                     }
                   } catch (JasonException je) {
                      System.err.println("Error:"+je);

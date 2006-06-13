@@ -64,8 +64,8 @@ public class Circumstance implements Serializable {
     public Circumstance() {
 	// use LinkedList since we use a lot of remove(0) in selectEvent
         E  = new LinkedList<Event>(); 
-        I  = new LinkedList <Intention>();
-        MB = new LinkedList <Message>();
+        I  = new LinkedList<Intention>();
+        MB = new LinkedList<Message>();
         PA = new HashMap();
         FA = new ArrayList<ActionExec>();
         reset();
@@ -171,7 +171,7 @@ public class Circumstance implements Serializable {
 
     /** Intentions */
     
-	public List<Intention> getIntentions() {
+ 	public List<Intention> getIntentions() {
 		return I;
 	}
     
