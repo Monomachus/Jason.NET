@@ -51,7 +51,7 @@ public class Trigger implements Cloneable {
 	
 	public Trigger(boolean t, byte g, Literal l) {
 		literal = (Literal)l.clone();
-		trigType = t;
+		setTrigType(t);
 		goal = g;
 	}
 
@@ -67,6 +67,7 @@ public class Trigger implements Cloneable {
 
 	public void setTrigType(boolean t) {
 		trigType = t;
+                piCache = null;
 	}
 
 	public boolean sameType(Trigger e) {
@@ -95,14 +96,16 @@ public class Trigger implements Cloneable {
 	}
 
 	public Object clone() {
-		return new Trigger(trigType, goal, literal); 
+            Trigger c = new Trigger(trigType, goal, literal);
+            c.piCache = this.piCache;
+            return c; 
 	}
 
     
-    PredicateIndicator piCache = null;
+        PredicateIndicator piCache = null;
 	/** return [+|-][!|?] super.getFucntorArity */
 	public PredicateIndicator getPredicateIndicator() {
-        if (piCache == null) {
+            if (piCache == null) {
         		String s;
         		if (trigType == TEAdd)
         			s = "+";
@@ -112,9 +115,9 @@ public class Trigger implements Cloneable {
         			s += "!";
         		else if (goal == TETestG)
         			s += "?";
-            piCache = new PredicateIndicator(s, literal.getPredicateIndicator());//s + literal.getFunctorArity();
-        }
-        return piCache;
+                piCache = new PredicateIndicator(s+literal.getFunctor(), literal.getTermsSize());
+            }
+            return piCache;
 	}
 
 	public Literal getLiteral() {

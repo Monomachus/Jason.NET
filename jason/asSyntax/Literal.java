@@ -133,14 +133,16 @@ public class Literal extends Pred implements Cloneable {
 	}
 
 	public Object clone() {
-		return new Literal(type, (Pred)this);
+            Literal c = new Literal(type, (Pred)this);
+            c.predicateIndicatorCache = this.predicateIndicatorCache;
+            return c;
 	}
 
 	
 	/** return [~] super.getFunctorArity */
 	@Override public PredicateIndicator getPredicateIndicator() {
 		if (predicateIndicatorCache == null) {
-            predicateIndicatorCache = new PredicateIndicator((type == LPos) ? "" : "~", super.getPredicateIndicator()); 
+                    predicateIndicatorCache = new PredicateIndicator(((type == LPos) ? "" : "~")+getFunctor(),getTermsSize());
 		}
 		return predicateIndicatorCache;
 	}

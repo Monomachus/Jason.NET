@@ -76,7 +76,7 @@ public class LogExprTerm extends TermImpl {
      */
     @Override
     public Iterator<Unifier> logCons(final Agent ag, Unifier un) {
-    	try {
+        try {
 	        final Iterator<Unifier> ileft;
 	        switch (op) {
 	        
@@ -139,34 +139,34 @@ public class LogExprTerm extends TermImpl {
 	                public void remove() {}
 	            };
 	        }
-    	} catch (Exception e) {
-    		String slhs = "is null";
-    		if (lhs != null) {
-    			Iterator<Unifier> i = lhs.logCons(ag,un);
-    			if (i != null) {
-    				slhs = "";
-    				while (i.hasNext()) {
-    					slhs += i.next().toString()+", ";
-    				}
-    			} else {
-    				slhs = "iterator is null";
-    			}
-    		} 
-    		String srhs = "is null";
-    		if (lhs != null) {
-    			Iterator<Unifier> i = rhs.logCons(ag,un);
-    			if (i != null) {
-    				srhs = "";
-    				while (i.hasNext()) {
-    					srhs += i.next().toString()+", ";
-    				}
-    			} else {
-    				srhs = "iterator is null";
-    			}
-    		} 
-    		
-    		logger.log(Level.SEVERE, "Error evaluating expression "+this+". \nlhs elements="+slhs+". \nrhs elements="+srhs,e);
-    	}
+    	    } catch (Exception e) {
+        		String slhs = "is null";
+        		if (lhs != null) {
+        			Iterator<Unifier> i = lhs.logCons(ag,un);
+        			if (i != null) {
+        				slhs = "";
+        				while (i.hasNext()) {
+        					slhs += i.next().toString()+", ";
+        				}
+        			} else {
+        				slhs = "iterator is null";
+        			}
+        		} 
+        		String srhs = "is null";
+        		if (lhs != null) {
+        			Iterator<Unifier> i = rhs.logCons(ag,un);
+        			if (i != null) {
+        				srhs = "";
+        				while (i.hasNext()) {
+        					srhs += i.next().toString()+", ";
+        				}
+        			} else {
+        				srhs = "iterator is null";
+        			}
+        		} 
+        		
+        		logger.log(Level.SEVERE, "Error evaluating expression "+this+". \nlhs elements="+slhs+". \nrhs elements="+srhs,e);
+        	}
         return EMPTY_UNIF_LIST.iterator();  // empty iterator for unifier
     }   
 

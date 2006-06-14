@@ -279,6 +279,11 @@ public class TermImpl implements Term, Serializable {
     }
 
     public int compareTo(Term tAsTerm) {
+        try {
+            // TODO: why overriding in ArithExprTerm is not working and we need this if?
+            return ((ArithExprTerm)this).compareTo(tAsTerm);
+        } catch (Exception e) {}
+
         int c;
         if (getFunctor() != null && tAsTerm.getFunctor() != null) {
             c = getFunctor().compareTo(tAsTerm.getFunctor());
@@ -307,7 +312,9 @@ public class TermImpl implements Term, Serializable {
 
     /** make a deep copy of the terms */
     public Object clone() {
-        return new TermImpl(this);
+        TermImpl c = new TermImpl(this);
+        c.predicateIndicatorCache = this.predicateIndicatorCache;
+        return c;
     }
 
     protected List<Term> getDeepCopyOfTerms() {

@@ -100,12 +100,14 @@ public class NumberTermImpl extends TermImpl implements NumberTerm {
 		return false;
 	}
 
+    @Override
     public int compareTo(Term o) {
         try {
             NumberTerm st = (NumberTerm)o;
             if (solve() > st.solve()) return 1;
             if (solve() < st.solve()) return -1;
-        } catch (Exception e) {}
+        } catch (Exception e) {
+        }
         return 0;    
     }
 

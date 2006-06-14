@@ -244,6 +244,17 @@ public class ArithExprTerm extends VarTerm implements NumberTerm {
     }
 
     @Override
+    public int compareTo(Term o) {
+        try {
+            NumberTerm st = (NumberTerm)o;
+            if (solve() > st.solve()) return 1;
+            if (solve() < st.solve()) return -1;
+        } catch (Exception e) {
+        }
+        return 0;    
+    }
+    
+    @Override
     public double solve() {
         if (hasValue()) {
             // this expr already has a value

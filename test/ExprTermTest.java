@@ -32,7 +32,10 @@ public class ExprTermTest extends TestCase {
 
         nb = ArithExprTerm.parseExpr("(3+2)*5");
         assertTrue(nb.solve() == 25);
-        
+
+        nb = ArithExprTerm.parseExpr("3 - 5");
+        assertTrue(nb.solve() == -2);
+                
         nb = ArithExprTerm.parseExpr("-(3+5*(4----1))*-1-15");
         // System.out.println(nb+"="+nb.solve());
         assertTrue(nb.solve() == 13d);
