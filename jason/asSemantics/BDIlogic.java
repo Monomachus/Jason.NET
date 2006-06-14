@@ -107,20 +107,20 @@ public final class BDIlogic {
 
         // intention may be suspended in PA! (in the new semantics)
         if (ts.C.hasPendingAction()) {
-            Iterator i = ts.C.getPendingActions().values().iterator();
-            while (i.hasNext()) {
-                // logger.log(Level.SEVERE,"Int: "+g+" unif "+ts.C.SI);
-                Object o = i.next();
-                Intention intention = null;
-                try {
-                    intention = ((ActionExec) o).getIntention();
-                } catch (Exception e) {
-                    intention = (Intention) o;
-                }
+            for (ActionExec ac: ts.C.getPendingActions().values()) {
+                Intention intention = ac.getIntention();
                 if (intention.hasTrigger(g, un))
                     return true;
             }
         }
+        // intention may be suspended in PI! (in the new semantics)
+        if (ts.C.hasPendingIntention()) {
+            for (Intention intention: ts.C.getPendingIntentions().values()) {
+                if (intention.hasTrigger(g, un))
+                    return true;
+            }
+        }
+
         synchronized (ts.C.getIntentions()) {
             for (Intention i : ts.C.getIntentions()) {
                 if (i.hasTrigger(g, un))
@@ -186,21 +186,24 @@ public final class BDIlogic {
         
         // intention may be suspended in PA! (in the new semantics)
         if (ts.C.hasPendingAction()) {
-            Iterator j = ts.C.getPendingActions().values().iterator();
+            Iterator<ActionExec> j = ts.C.getPendingActions().values().iterator();
             while (j.hasNext()) {
-                // PA may contain ActionExec or Intention
-                Object o = j.next();
-                Intention i = null;
-                try {
-                    i = ((ActionExec) o).getIntention();
-                } catch (Exception e) {
-                    i = (Intention) o;
-                }
+                Intention i = j.next().getIntention();
                 // CAREFUL: The semantics for this isn't well defined yet.
                 // The goal deletion on top of the intention will not get to
                 // know the result of the action, as it is removed from the PA set!
                 // If left in PA, the action won't be the the top of
                 // the stack (that might cause problems?)
+                if (i.hasTrigger(g, un)) {
+                    j.remove();
+                }
+            }
+        }
+        // intention may be suspended in PI! (in the new semantics)
+        if (ts.C.hasPendingIntention()) {
+            Iterator<Intention> j = ts.C.getPendingIntentions().values().iterator();
+            while (j.hasNext()) {
+                Intention i = j.next(); 
                 if (i.hasTrigger(g, un)) {
                     j.remove();
                 }

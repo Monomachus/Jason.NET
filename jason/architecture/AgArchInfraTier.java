@@ -24,6 +24,7 @@
 
 package jason.architecture;
 
+import jason.asSemantics.ActionExec;
 import jason.asSemantics.Message;
 import jason.asSyntax.Literal;
 import jason.runtime.RuntimeServicesInfraTier;
@@ -45,8 +46,8 @@ public interface AgArchInfraTier {
     /** Reads the agent's mailbox and adds messages into the agent's circumstance */
     public void checkMail();
 
-    /** Executes the action in agent's circumstance (C.A) */
-    public void act();
+    /** Executes the action <i>action</i> and, when finished, add it back in <i>feedback</i> actions. */
+    public void act(ActionExec action, List<ActionExec> feedback);
 
     /** Returns true whether the agent can sleep according to the arch */
     public boolean canSleep();

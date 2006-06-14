@@ -32,219 +32,255 @@ import java.util.logging.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-
-/** 
- *  represents an arithmetic expression like [ expr ] <+ | - | * | ...> expr.
+/**
+ * represents an arithmetic expression like [ expr ] <+ | - | * | ...> expr.
  * 
- *  It is a var, so unifier.apply(ExprTerm) computes (via solve()) the expression value. 
- *  The var value has the result of this evaluation. 
+ * It is a var, so unifier.apply(ExprTerm) computes (via solve()) the expression
+ * value. The var value has the result of this evaluation.
  */
 public class ArithExprTerm extends VarTerm implements NumberTerm {
 
-    public enum ArithmeticOp { 
-		none   { 
-				double eval(double x, double y) { return 0; }
-			    public String toString() { return ""; }
-			   }, 
-		plus   { 
-				   double eval(double x, double y) { return x+y; }
-				   public String toString() { return "+"; }
-			   }, 
-		minus  {  
-                   double eval(double x, double y) { return x-y; }
-                   public String toString() { return "-"; }
-			   }, 
-		times  {  
-				   double eval(double x, double y) { return x*y; }
-				   public String toString() { return "*"; }
-		       }, 
-		div    {  
-				   double eval(double x, double y) { return x/y; }
-				   public String toString() { return "/"; }
-		       }, 
-		mod    {  
-				   double eval(double x, double y) { return x % y; }
-				   public String toString() { return " mod "; }
-		       }, 
-		pow    {  
-				   double eval(double x, double y) { return Math.pow(x,y); }
-				   public String toString() { return "**"; }
-		       }, 
-		intdiv {  
-				   double eval(double x, double y) { return (int)x/(int)y; }
-				   public String toString() { return " div "; }
-		       };
-		
-		abstract double eval(double x, double y);
-	}
+    public enum ArithmeticOp {
+        none {
+            double eval(double x, double y) {
+                return 0;
+            }
 
-	private NumberTerm lhs, rhs;
-	private ArithmeticOp op = ArithmeticOp.none;
+            public String toString() {
+                return "";
+            }
+        },
+        plus {
+            double eval(double x, double y) {
+                return x + y;
+            }
 
-	static private Logger logger = Logger.getLogger(ArithExprTerm.class.getName());
-	
-	public ArithExprTerm() {
-		super();
-	}
-	
-	public ArithExprTerm(NumberTerm t1, ArithmeticOp oper, NumberTerm t2) {
-		lhs = t1;
-		op = oper;
-		rhs = t2;
-	}
+            public String toString() {
+                return "+";
+            }
+        },
+        minus {
+            double eval(double x, double y) {
+                return x - y;
+            }
 
-	public ArithExprTerm(ArithmeticOp oper, NumberTerm t1) {
-		op = oper;
-		lhs = t1;
-	}
+            public String toString() {
+                return "-";
+            }
+        },
+        times {
+            double eval(double x, double y) {
+                return x * y;
+            }
 
-	/** returns some Term that can be evaluated as Number */
+            public String toString() {
+                return "*";
+            }
+        },
+        div {
+            double eval(double x, double y) {
+                return x / y;
+            }
+
+            public String toString() {
+                return "/";
+            }
+        },
+        mod {
+            double eval(double x, double y) {
+                return x % y;
+            }
+
+            public String toString() {
+                return " mod ";
+            }
+        },
+        pow {
+            double eval(double x, double y) {
+                return Math.pow(x, y);
+            }
+
+            public String toString() {
+                return "**";
+            }
+        },
+        intdiv {
+            double eval(double x, double y) {
+                return (int) x / (int) y;
+            }
+
+            public String toString() {
+                return " div ";
+            }
+        };
+
+        abstract double eval(double x, double y);
+    }
+
+    private NumberTerm    lhs, rhs;
+
+    private ArithmeticOp  op     = ArithmeticOp.none;
+
+    static private Logger logger = Logger.getLogger(ArithExprTerm.class.getName());
+
+    public ArithExprTerm() {
+        super();
+    }
+
+    public ArithExprTerm(NumberTerm t1, ArithmeticOp oper, NumberTerm t2) {
+        lhs = t1;
+        op = oper;
+        rhs = t2;
+    }
+
+    public ArithExprTerm(ArithmeticOp oper, NumberTerm t1) {
+        op = oper;
+        lhs = t1;
+    }
+
+    /** returns some Term that can be evaluated as Number */
     public static NumberTerm parseExpr(String sExpr) {
         as2j parser = new as2j(new StringReader(sExpr));
         try {
-            return (NumberTerm)parser.ae();
+            return (NumberTerm) parser.ae();
         } catch (Exception e) {
-            logger.log(Level.SEVERE,"Error parsing expression "+sExpr,e);
-			return null;
+            logger.log(Level.SEVERE, "Error parsing expression " + sExpr, e);
+            return null;
         }
     }
-	
-	/** make a hard copy of the terms */
-	public Object clone() {
-		// do not call constructor with term parameter!
-		ArithExprTerm t = new ArithExprTerm();
-		if (hasValue()) {
-			t.setValue((Term)getValue().clone());
-		} else {
-			if (lhs != null) {
-				t.lhs = (NumberTerm) lhs.clone();
-			}
-	
-			t.op = this.op;
-			
-			if (rhs != null) {
-				t.rhs = (NumberTerm) rhs.clone();
-			}
-		}
-		return t;
-	}
-	
 
-	public boolean equals(Object t) {
-		try {
-			if (hasValue()) {
-				return getValue().equals(t);
-			} else {
-				ArithExprTerm eprt = (ArithExprTerm)t;
-				if (lhs == null && eprt.lhs != null) {
-					return false;
-				}
-				if (lhs != null && !lhs.equals(eprt.lhs)) {
-					return false;
-				}
-				
-				if (op != eprt.op) {
-					return false;
-				}
-	
-				if (rhs == null && eprt.rhs != null) {
-					return false;
-				}
-				if (rhs != null && !rhs.equals(eprt.rhs)) {
-					return false;
-				}
-				return true;
-			}
-		} catch (ClassCastException e) {
-			return false;
-		}
-	}
-	
-	/** gets the Operation of this Expression */
-	public ArithmeticOp getOp() {
-		return op;
-	}
-	
-	/** gets the LHS of this Expression */
-	public NumberTerm getLHS() {
-		return lhs;
-	}
-	
-	/** gets the RHS of this Expression */
-	public NumberTerm getRHS() {
-		return rhs;
-	}
-		
+    /** make a hard copy of the terms */
+    public Object clone() {
+        // do not call constructor with term parameter!
+        if (hasValue()) {
+            return getValue().clone();
+        } else {
+            ArithExprTerm t = new ArithExprTerm();
+            if (lhs != null) {
+                t.lhs = (NumberTerm) lhs.clone();
+            }
+
+            t.op = this.op;
+
+            if (rhs != null) {
+                t.rhs = (NumberTerm) rhs.clone();
+            }
+            return t;
+        }
+    }
+
+    public boolean equals(Object t) {
+        try {
+            if (hasValue()) {
+                return getValue().equals(t);
+            } else {
+                ArithExprTerm eprt = (ArithExprTerm) t;
+                if (lhs == null && eprt.lhs != null) {
+                    return false;
+                }
+                if (lhs != null && !lhs.equals(eprt.lhs)) {
+                    return false;
+                }
+
+                if (op != eprt.op) {
+                    return false;
+                }
+
+                if (rhs == null && eprt.rhs != null) {
+                    return false;
+                }
+                if (rhs != null && !rhs.equals(eprt.rhs)) {
+                    return false;
+                }
+                return true;
+            }
+        } catch (ClassCastException e) {
+            return false;
+        }
+    }
+
+    /** gets the Operation of this Expression */
+    public ArithmeticOp getOp() {
+        return op;
+    }
+
+    /** gets the LHS of this Expression */
+    public NumberTerm getLHS() {
+        return lhs;
+    }
+
+    /** gets the RHS of this Expression */
+    public NumberTerm getRHS() {
+        return rhs;
+    }
+
     @Override
-	public void addTerm(Term t) {
-		logger.warning("Do not use addTerm in expressions!");
-	}
+    public void addTerm(Term t) {
+        logger.warning("Do not use addTerm in expressions!");
+    }
 
     @Override
     public boolean isVar() {
         return false;
     }
-    
-    @Override
-	public boolean isArithExpr() {
-		return !hasValue();
-	}
 
     @Override
-	public boolean isNumeric() {
-		return true;
-	}
-	
-	public boolean isUnary() {
-		return rhs == null;
-	}
+    public boolean isArithExpr() {
+        return !hasValue();
+    }
 
     @Override
-	public boolean isGround() {
-		return hasValue() || (lhs.isGround() && rhs.isGround());
-	}
-	
-    @Override
-	public double solve() {
-		if (hasValue()) {
-			// this expr already has a value
-			return ((NumberTerm)getValue()).solve();
-		}
-		double l = lhs.solve();
-		if (rhs == null && op == ArithmeticOp.minus) {
-		    return -l;
-		} else if (rhs != null) {
-		    double r = rhs.solve();
-		    return op.eval(l,r);
-		}
-		logger.log(Level.SEVERE,"ERROR IN EXPRESION!");
-		return 0;
-	}
+    public boolean isNumeric() {
+        return true;
+    }
 
-	
-	public String toString() {
-		if (hasValue()) {
-			return getValue().toString();
-		} else {
-			if (rhs==null) {
-				return "("+op+lhs+")";
-			} else {
-				return "("+lhs+op+rhs+")";
-			}
-		}
-	}
+    public boolean isUnary() {
+        return rhs == null;
+    }
+
+    @Override
+    public boolean isGround() {
+        return hasValue() || (lhs.isGround() && rhs.isGround());
+    }
+
+    @Override
+    public double solve() {
+        if (hasValue()) {
+            // this expr already has a value
+            return ((NumberTerm) getValue()).solve();
+        }
+        double l = lhs.solve();
+        if (rhs == null && op == ArithmeticOp.minus) {
+            return -l;
+        } else if (rhs != null) {
+            double r = rhs.solve();
+            return op.eval(l, r);
+        }
+        logger.log(Level.SEVERE, "ERROR IN EXPRESION!");
+        return 0;
+    }
+
+    public String toString() {
+        if (hasValue()) {
+            return getValue().toString();
+        } else {
+            if (rhs == null) {
+                return "(" + op + lhs + ")";
+            } else {
+                return "(" + lhs + op + rhs + ")";
+            }
+        }
+    }
 
     /** get as XML */
     public Element getAsDOM(Document document) {
         if (hasValue()) {
-            Element u = (Element) document.createElement("term");
-            u.appendChild(document.createTextNode(toString()));
-            return u;
+            return getValue().getAsDOM(document);
         } else {
             Element u = (Element) document.createElement("expression");
-            u.setAttribute("type","arithmetic");
+            u.setAttribute("type", "arithmetic");
             u.setAttribute("operator", op.toString());
-            if (rhs!=null) {
+            if (rhs != null) {
                 Element l = (Element) document.createElement("left");
                 l.appendChild(lhs.getAsDOM(document));
                 u.appendChild(l);

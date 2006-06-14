@@ -31,7 +31,6 @@ import jason.asSemantics.TransitionSystem;
 import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Term;
 import jason.asSyntax.TermImpl;
-import jason.bb.DefaultBeliefBase;
 import jason.infra.centralised.RunCentralisedMAS;
 import jason.mas2j.ClassParameters;
 import jason.mas2j.parser.mas2j;
@@ -270,7 +269,7 @@ public class SaciAgArch extends saci.Agent implements AgArchInfraTier {
                         if (((String) m.get("ontology")).equals("AS-Action")) {
                             String irt = (String) m.get("in-reply-to");
                             if (irt != null) {
-                                ActionExec a = (ActionExec) userAgArh.getTS().getC().getPendingActions().remove(irt);
+                                ActionExec a = userAgArh.getTS().getC().getPendingActions().remove(irt);
                                 // was it a pending action?
                                 if (a != null) {
                                     if (((String) m.get("content")).equals("ok")) {
@@ -300,7 +299,7 @@ public class SaciAgArch extends saci.Agent implements AgArchInfraTier {
     public void sendMsg(jason.asSemantics.Message m) throws Exception {
         // suspend intention if it is an ask
         if (m.isAsk()) {
-            userAgArh.getTS().getC().getPendingActions().put(m.getMsgId(), userAgArh.getTS().getC().getSelectedIntention());
+            userAgArh.getTS().getC().getPendingIntentions().put(m.getMsgId(), userAgArh.getTS().getC().getSelectedIntention());
         }
         saci.Message msaci = new saci.Message("(" + m.getIlForce() + ")");
         msaci.put("receiver", m.getReceiver());
@@ -378,16 +377,13 @@ public class SaciAgArch extends saci.Agent implements AgArchInfraTier {
     }
 
     // Default acting on the environment
-    // it gets action from CA; it must be NULL after that!
-    public void act() {
+    public void act(ActionExec action, List<ActionExec> feedback) {
         if (!running) {
             return;
         }
         TransitionSystem ts = userAgArh.getTS();
-        if (ts.getC().getAction() == null)
-            return;
         try {
-            Term acTerm = ts.getC().getAction().getActionTerm();
+            Term acTerm = action.getActionTerm();
             logger.info("doing: " + acTerm);
 
             String rw = mboxPercept.getRW();

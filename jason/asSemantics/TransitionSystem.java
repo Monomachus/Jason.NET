@@ -147,7 +147,7 @@ public class TransitionSystem {
             Message m = conf.ag.selectMessage(conf.C.MB);
 
             // check if an intention was suspended waiting this message
-            Intention intention = (Intention) getC().getPendingActions().remove(m.getInReplyTo());
+            Intention intention = getC().getPendingIntentions().remove(m.getInReplyTo());
             // is it a pending intention?
             if (intention != null) {
                 // unify the message answer with the .send fourth parameter
@@ -453,7 +453,7 @@ public class TransitionSystem {
                 // to delete, create events as external to avoid that
                 // remove/add create two events for the same intention
 
-                List<Literal>[]  result = ag.brfDelBel(bc, conf.C.SI); // the intention is not the new focus
+                List<Literal>[] result = ag.brf(null, bc, conf.C.SI); // the intention is not the new focus
                 if (result != null) { // really add something
                     // generate events
                     updateEvents(result,Intention.EmptyInt);
@@ -477,7 +477,7 @@ public class TransitionSystem {
                 }
 
                 // call BRF
-                result = ag.brfAddBel(bodyl,conf.C.SI); // the intention is not the new focus
+                result = ag.brf(bodyl,null,conf.C.SI); // the intention is not the new focus
                 if (result != null) { // really add something
                     // generate events
                     updateEvents(result,newfocus);
@@ -497,7 +497,7 @@ public class TransitionSystem {
                 }
 
                 // call BRF
-                result = ag.brfDelBel(bodyl, conf.C.SI); // the intention is not the new focus
+                result = ag.brf(null,bodyl, conf.C.SI); // the intention is not the new focus
                 if (result != null) { // really add something
                     // generate events
                     updateEvents(result,newfocus);
@@ -799,7 +799,9 @@ public class TransitionSystem {
                 applySemanticRule();
             } while (step != State.StartRC); // finished a reasoning cycle
 
-            agArch.act();
+            if (C.getAction() != null) {
+                agArch.act(C.getAction(), C.getFeedbackActions());
+            }
 
             // counting number of cycles since last belief revision
             nrcslbr++;

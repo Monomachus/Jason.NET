@@ -292,8 +292,8 @@ public class Agent {
 
     
     /**
-     * This function should revise the belief base with the given literal to add
-     * and the current intention that triggered the addition.
+     * This function should revise the belief base with the given literal to add,
+     * to remove, and the current intention that triggered the operation.
      * 
      * In its return, List[0] has the list of actual additions to the belief
      * base, and List[1] has the list of actual deletions; this is used to
@@ -301,52 +301,62 @@ public class Agent {
      * If nothing change, returns null.
      * 
      */
-    public List<Literal>[] brfAddBel(Literal belief, Intention i) {
+    public List<Literal>[] brf(Literal beliefToAdd, Literal beliefToDel, Intention i) {
         // This class does not implement belief revision! It
         // is supposed that a subclass will do it.
-        // It simply add the belief.
-        if (getBS().add(belief)) {
-            List<Literal>[] result = new List[2];
-            result[0] = Collections.singletonList(belief);
-            result[1] = Collections.emptyList();
+        // It simply add/del the belief.
+
+        List<Literal>[] result = new List[2];
+        result[0] = Collections.emptyList();
+        result[1] = Collections.emptyList();
+        
+        boolean changed = false; // if the BB is changed
+        
+        
+        if (beliefToAdd != null) {
+            if (logger.isLoggable(Level.FINE)) {
+                logger.fine("adding "+beliefToAdd);
+            }
+            if (getBS().add(beliefToAdd)) {
+                result[0] = Collections.singletonList(beliefToAdd);
+                changed = true;
+            }
+        }
+        
+        if (beliefToDel != null) {
+            Unifier u = null;
+            try {
+                u = i.peek().unif; // get from current intention
+            } catch (Exception e) {
+                u = new Unifier();
+            }
+            
+            if (logger.isLoggable(Level.FINE)) {
+                logger.fine("doing brf for " + beliefToDel + " in BB=" + believes(beliefToDel, u));
+            }
+            Literal inBB = believes(beliefToDel, u);
+            if (inBB != null) {
+                // lInBB is l unified in BB
+                // we can not use l for delBel in case l is g(_,_)
+                if (beliefToDel.hasAnnot()) {
+                    // if belief has annots, use them
+                    inBB = (Literal) inBB.clone();
+                    inBB.clearAnnots();
+                    inBB.addAnnots(beliefToDel.getAnnots());
+                }
+                
+                if (getBS().remove(inBB)) {
+                    if (logger.isLoggable(Level.FINE))  logger.fine("Removed:" + inBB);
+                    result[1] = Collections.singletonList(inBB);
+                    changed = true;
+                }
+            }
+        }
+        if (changed) {
             return result;
         } else {
             return null;
         }
-    }
-
-    /** Same as above, but for belief deletion. */
-    public List<Literal>[] brfDelBel(Literal belief, Intention i) {
-        Unifier u = null;
-        try {
-            u = fTS.C.SI.peek().unif; // get from current intention
-        } catch (Exception e) {
-            u = new Unifier();
-        }
-        
-        if (logger.isLoggable(Level.FINE))  logger.fine("doing brf for " + belief + " in BB=" + believes(belief, u));
-        Literal inBB = believes(belief, u);
-        if (inBB != null) {
-            // lInBB is l unified in BB
-            // we can not use l for delBel in case l is g(_,_)
-            if (belief.hasAnnot()) {
-                // if belief has annots, use them
-                inBB = (Literal) inBB.clone();
-                inBB.clearAnnots();
-                inBB.addAnnots(belief.getAnnots());
-            }
-            
-            if (getBS().remove(inBB)) {
-                if (logger.isLoggable(Level.FINE))  logger.fine("Removed:" + inBB);
-                List<Literal>[] result = new List[2];
-                result[0] = Collections.emptyList();
-                result[1] = Collections.singletonList(inBB);
-                return result;
-                //Trigger te = new Trigger(Trigger.TEDel, Trigger.TEBel, inBB);
-                //fTS.updateEvents(new Event(te, focus));
-            }
-        }
-        return null;
     }
 
     /**
@@ -360,7 +370,7 @@ public class Agent {
             // programmer set the source
             bel.addAnnot(BeliefBase.TSelf);
         }
-        List<Literal>[] result = brfAddBel(bel,Intention.EmptyInt);
+        List<Literal>[] result = brf(bel,null,Intention.EmptyInt);
         if (result != null && fTS != null) {
             fTS.updateEvents(result,Intention.EmptyInt);
             return true;
@@ -374,7 +384,7 @@ public class Agent {
      * if the agent believes in bel, removes it (calling brf) and generate the event.
      */
     public boolean delBel(Literal bel) {
-        List<Literal>[] result = brfDelBel(bel,Intention.EmptyInt);
+        List<Literal>[] result = brf(null,bel,Intention.EmptyInt);
         if (result != null) {
             fTS.updateEvents(result,Intention.EmptyInt);
             return true;

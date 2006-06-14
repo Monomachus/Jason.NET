@@ -43,16 +43,19 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 
-/** the GUI console to output log messages  */
-public class MASConsoleGUI  {
-    
-    private static MASConsoleGUI masConsole = null;
+/** the GUI console to output log messages */
+public class MASConsoleGUI {
 
-    public static String isTabbedPropField = MASConsoleLogHandler.class.getName()+".tabbed";
-    private boolean isTabbed = false;
-    JTabbedPane tabPane;
-    Map<String,JTextArea> agsTextArea = new HashMap<String,JTextArea>();
-    
+    private static MASConsoleGUI masConsole        = null;
+
+    public static String         isTabbedPropField = MASConsoleLogHandler.class.getName() + ".tabbed";
+
+    private boolean              isTabbed          = false;
+
+    JTabbedPane                  tabPane;
+
+    Map<String, JTextArea>       agsTextArea       = new HashMap<String, JTextArea>();
+
     /** for sigleton pattern */
     public static MASConsoleGUI get() {
         if (masConsole == null) {
@@ -60,26 +63,29 @@ public class MASConsoleGUI  {
         }
         return masConsole;
     }
-    
+
     public static boolean hasConsole() {
         return masConsole != null;
     }
-    
-    JFrame frame = null;
-    JTextArea output;
-    JPanel    pBt = null;
+
+    JFrame              frame   = null;
+
+    JTextArea           output;
+
+    JPanel              pBt     = null;
+
     OutputStreamAdapter out;
-    
-    private boolean inPause = false; 
-    
+
+    private boolean     inPause = false;
+
     private MASConsoleGUI(String title) {
-		String tabbed = LogManager.getLogManager().getProperty(isTabbedPropField);
-		if (tabbed != null && tabbed.equals("true")) {
-			isTabbed = true;
-		}
-    	
-    	frame = new JFrame(title);
-    	frame.addWindowListener(new WindowAdapter() {
+        String tabbed = LogManager.getLogManager().getProperty(isTabbedPropField);
+        if (tabbed != null && tabbed.equals("true")) {
+            isTabbed = true;
+        }
+
+        frame = new JFrame(title);
+        frame.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
                 close();
             }
@@ -89,16 +95,16 @@ public class MASConsoleGUI  {
         output.setEditable(false);
 
         JPanel pcenter = new JPanel(new BorderLayout());
-    	if (isTabbed) {
-    		tabPane = new JTabbedPane(JTabbedPane.LEFT);
-    		tabPane.add("common", new JScrollPane(output));
-    		pcenter.add(BorderLayout.CENTER, tabPane);
-    	} else {
-    		pcenter.add(BorderLayout.CENTER, new JScrollPane(output));
-    	}
-        
-		pBt = new JPanel();
-		pBt.setLayout(new FlowLayout(FlowLayout.CENTER));
+        if (isTabbed) {
+            tabPane = new JTabbedPane(JTabbedPane.LEFT);
+            tabPane.add("common", new JScrollPane(output));
+            pcenter.add(BorderLayout.CENTER, tabPane);
+        } else {
+            pcenter.add(BorderLayout.CENTER, new JScrollPane(output));
+        }
+
+        pBt = new JPanel();
+        pBt.setLayout(new FlowLayout(FlowLayout.CENTER));
 
         frame.getContentPane().setLayout(new BorderLayout());
         frame.getContentPane().add(BorderLayout.CENTER, pcenter);
@@ -110,98 +116,102 @@ public class MASConsoleGUI  {
                 output.setText("");
             }
         });
-        
+
         addButton(btClean);
-        
+
         frame.setBounds(250, 10, 700, 500);
     }
-    
-    public void setTitle(String s) {
-    	frame.setTitle(s);
-    }
-    
-    public JFrame getFrame() {
-    	return frame;
-    }
-    
-    public void addButton(JButton jb) {
-    	pBt.add(jb);
-    	pBt.revalidate();
-    	//pack();
-    }
-    
-    synchronized public void setPause(boolean b) {
-    	inPause = b;
-    	notifyAll();
-    }
-    
-    synchronized void waitNotPause() {
-    	try {
-    		while (inPause) {
-    			wait();
-    		}
-    	} catch (Exception e) {}
-    }
-    
-    public boolean isPause() {
-    	return inPause;
-    }
-  
-	public void append(String s) {
-		append(null,s);
-    }
-    
-	public void append(String agName, String s) {
-		try {
-		if (!frame.isVisible()) {
-			frame.setVisible(true);
-		}
-		if (inPause) {
-			waitNotPause();
-		}
-		if (isTabbed) {
-			JTextArea ta = agsTextArea.get(agName);
-			if (ta == null && agName != null) {
-				ta = new JTextArea();
-		        ta.setEditable(false);
-				agsTextArea.put(agName, ta);
-				tabPane.add(agName, new JScrollPane(ta));
 
-			
-			} 
-			if (ta != null) { // no new TA was created
-				// print out 
-				int l = ta.getDocument().getLength();
-				if (l > 50000) {
-					ta.setText("");
-					//l = output.getDocument().getLength();
-				}
-				ta.append(s);
-				//output.setCaretPosition(l);
-			}
-		}
-		
-		// print in output
-		int l = output.getDocument().getLength();
-		if (l > 30000) {
-			output.setText("");
-			//l = output.getDocument().getLength();
-		}
-		output.append(s);
-		} catch (Exception e) {
-			
-		}
-	}
+    public void setTitle(String s) {
+        frame.setTitle(s);
+    }
+
+    public JFrame getFrame() {
+        return frame;
+    }
+
+    public void addButton(JButton jb) {
+        pBt.add(jb);
+        pBt.revalidate();
+        // pack();
+    }
+
+    synchronized public void setPause(boolean b) {
+        inPause = b;
+        notifyAll();
+    }
+
+    synchronized void waitNotPause() {
+        try {
+            while (inPause) {
+                wait();
+            }
+        } catch (Exception e) {
+        }
+    }
+
+    public boolean isPause() {
+        return inPause;
+    }
+
+    public void append(String s) {
+        append(null, s);
+    }
+
+    public void append(String agName, String s) {
+        try {
+            if (!frame.isVisible()) {
+                frame.setVisible(true);
+            }
+            if (inPause) {
+                waitNotPause();
+            }
+            if (isTabbed) {
+                JTextArea ta = agsTextArea.get(agName);
+                if (ta == null && agName != null) {
+                    ta = new JTextArea();
+                    ta.setEditable(false);
+                    agsTextArea.put(agName, ta);
+                    tabPane.add(agName, new JScrollPane(ta));
+
+                }
+                if (ta != null) { // no new TA was created
+                    // print out
+                    int l = ta.getDocument().getLength();
+                    if (l > 50000) {
+                        ta.setText("");
+                        // l = output.getDocument().getLength();
+                    }
+                    ta.append(s);
+                    // output.setCaretPosition(l);
+                }
+            }
+
+            // print in output
+            int l = output.getDocument().getLength();
+            if (l > 30000) {
+                output.setText("");
+                // l = output.getDocument().getLength();
+            }
+            synchronized (this) {
+                output.append(s);
+            }
+        } catch (Exception e) {
+
+        }
+    }
 
     public void close() {
-    	if (masConsole != null && masConsole.frame != null) masConsole.frame.setVisible(false);
-        if (out != null) out.restoreOriginalOut();
+        if (masConsole != null && masConsole.frame != null)
+            masConsole.frame.setVisible(false);
+        if (out != null)
+            out.restoreOriginalOut();
         masConsole = null;
     }
-    
+
     public void setAsDefaultOut() {
         out = new OutputStreamAdapter(this, null);
         out.setAsDefaultOut();
     }
-    
+
 }

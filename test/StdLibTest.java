@@ -64,16 +64,20 @@ public class StdLibTest extends TestCase {
     public void testFindAll() {
         Agent ag = new Agent();
         ag.setLogger(null);
-        ag.addBel(Literal.parseLiteral("a(10,x)"));
+        
+        Literal l1 = Literal.parseLiteral("a(10,x)");
+        assertFalse(l1.hasSource());
+        ag.addBel(l1);
         ag.addBel(Literal.parseLiteral("a(20,y)"));
         ag.addBel(Literal.parseLiteral("a(30,x)"));
-
+        assertEquals(ag.getBS().size(),3);
+        
         TransitionSystem ts = new TransitionSystem(ag, null, null, null);
 
         Unifier u = new Unifier();
         Term X = TermImpl.parse("f(X)");
         Literal c = Literal.parseLiteral("a(X,x)");
-        c.addAnnot(BeliefBase.TPercept);
+        c.addAnnot(BeliefBase.TSelf);
         VarTerm L = new VarTerm("L");
         // System.out.println(ag.getPS().getAllRelevant(Trigger.parseTrigger(ste.getFunctor())));
         try {

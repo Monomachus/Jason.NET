@@ -45,7 +45,6 @@ public class findall implements InternalAction {
                 throw new JasonException("The second parameter ('" + args[1] + "') of the internal action 'findAll' is not a literal!");
             }
             un.apply(bel);
-
             // find all bel in belief base and build a list with them
             ListTerm all = new ListTermImpl();
             Iterator<Unifier> iu = bel.logCons(ts.getAg(), un);
@@ -53,7 +52,7 @@ public class findall implements InternalAction {
                 Unifier nu = iu.next();
                 Term vl = (Term) var.clone();
                 nu.apply(vl);
-                all.add((Term) vl);
+                all.add(vl);
             }
             Term list = args[2];
             return un.unifies(list, all);

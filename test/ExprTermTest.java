@@ -46,7 +46,7 @@ public class ExprTermTest extends TestCase {
         NumberTerm nb = ArithExprTerm.parseExpr("(30-X)/(2*X)");
         Unifier u = new Unifier();
         u.unifies(new VarTerm("X"), new NumberTermImpl(5));
-        u.apply((Term) nb);
+        u.apply(nb);
         //System.out.println(nb+"="+nb.solve());
         assertTrue(nb.solve() == 2.5);
     }
@@ -59,7 +59,9 @@ public class ExprTermTest extends TestCase {
         u.unifies(new VarTerm("X"), new VarTerm("H"));
         assertTrue(u.unifies(t1, t2));
         u.apply(t1);
+        t1 = (Literal)t1.clone();
         assertEquals(t1.toString(), "p(10)");
+        assertTrue(t1.getTerm(0).isNumeric());
         VarTerm yvl = new VarTerm("Y");
         u.apply(yvl);
         assertEquals(yvl, new NumberTermImpl(10));

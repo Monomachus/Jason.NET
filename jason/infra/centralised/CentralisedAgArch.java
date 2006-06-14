@@ -159,7 +159,7 @@ public class CentralisedAgArch extends Thread implements AgArchInfraTier {
     public void sendMsg(jason.asSemantics.Message m) throws Exception {
         // suspend intention if it is an ask
         if (m.isAsk()) {
-            fUserAgArh.getTS().getC().getPendingActions().put(m.getMsgId(), fUserAgArh.getTS().getC().getSelectedIntention());
+            fUserAgArh.getTS().getC().getPendingIntentions().put(m.getMsgId(), fUserAgArh.getTS().getC().getSelectedIntention());
         }
 
         // actually send the message
@@ -203,20 +203,16 @@ public class CentralisedAgArch extends Thread implements AgArchInfraTier {
 
     // Default acting on the environment
     // it gets action from ts.C.A;
-    public void act() {
-        ActionExec acExec = fUserAgArh.getTS().getC().getAction();
-        if (acExec == null) {
-            return;
-        }
-        Term acTerm = acExec.getActionTerm();
+    public void act(ActionExec action, List<ActionExec> feedback) {
+        Term acTerm = action.getActionTerm();
         logger.info("doing: " + acTerm);
 
         if (infraEnv.getUserEnvironment().executeAction(getName(), acTerm)) {
-            acExec.setResult(true);
+            action.setResult(true);
         } else {
-            acExec.setResult(false);
+            action.setResult(false);
         }
-        fUserAgArh.getTS().getC().getFeedbackActions().add(acExec);
+        feedback.add(action);
     }
 
     public boolean canSleep() {

@@ -23,6 +23,7 @@
 package jason.architecture;
 
 import jason.JasonException;
+import jason.asSemantics.ActionExec;
 import jason.asSemantics.Agent;
 import jason.asSemantics.Message;
 import jason.asSemantics.TransitionSystem;
@@ -94,9 +95,9 @@ public class AgArch {
 		archTier.checkMail();
 	}
 
-    /** Executes the action in agent's circumstance (C.A) */
-	public void act() {
-		archTier.act();
+    /** Executes the action <i>action</i> and, when finished, add it back in <i>feedback</i> actions. */
+	public void act(ActionExec action, List<ActionExec> feedback) {
+		archTier.act(action, feedback);
 	}
 
 	/** Returns true if the agent can enter in sleep mode. */

@@ -74,6 +74,15 @@ public class Pred extends TermImpl {
         return true;
     }
 
+    @Override
+    public boolean isGround() {
+        if (annots == null) {
+            return super.isGround();
+        } else {
+            return super.isGround() && annots.isGround();
+        }
+    }
+
     public void setAnnots(ListTerm l) {
         annots = l;
         if (annots != null && annots.isEmpty()) {
@@ -85,9 +94,7 @@ public class Pred extends TermImpl {
         if (annots == null) {
             annots = new ListTermImpl();
         }
-        if (!t.isGround()) {
-            logger.log(Level.SEVERE, "Error: Annotations must be ground!\n Cannot use " + t + " as annotation.");
-        } else if (!annots.contains(t)) {
+        if (!annots.contains(t)) {
             annots.add(t);
             return true;
         }

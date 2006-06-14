@@ -111,7 +111,7 @@ public class wait implements InternalAction {
 
 				// add SI again in C.I
 				c.addIntention(si);
-				c.getPendingActions().remove(te.toString());
+				c.getPendingIntentions().remove(te.toString());
 				
 			} catch (Exception e) {
 				ts.getLogger().log(Level.SEVERE, "Error at .wait thread",e);
@@ -153,7 +153,7 @@ public class wait implements InternalAction {
 			// if the .wait intention where is being added in C.I, remove it
 			if (i == si) {
 			    if (c.removeIntention(si)) {
-                    c.getPendingActions().put(te.toString(), si);          
+                    c.getPendingIntentions().put(te.toString(), si);          
                 } else {
                     ts.getLogger().warning("The following intentions sould be removed, but wasn't!"+si+"\nWait intention is"+i);
                 }
