@@ -383,8 +383,11 @@ public class Circumstance implements Serializable {
         // pending intentions
         for (String wip : getPendingIntentions().keySet()) {
             Intention ip = getPendingIntentions().get(wip);
-            e = ip.getAsDOM(document);
-            e.setAttribute("pending", wip);
+            if (getSelectedIntention() != ip) {
+                e = ip.getAsDOM(document);
+                e.setAttribute("pending", wip);
+                ints.appendChild(e);
+            }
         }
 
         Element acts = (Element) document.createElement("actions");

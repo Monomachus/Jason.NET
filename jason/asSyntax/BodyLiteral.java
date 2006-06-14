@@ -79,7 +79,7 @@ public class BodyLiteral implements Cloneable {
 	    	}
     }
 
-    private static final PredicateIndicator SEND_PI = new PredicateIndicator("send",4);
+    private static final PredicateIndicator SEND_PI = new PredicateIndicator(".send",4);
     public boolean isAsk() {
 	    	if (! term.getPredicateIndicator().equals(SEND_PI)) {
 	    		return false;
