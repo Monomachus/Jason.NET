@@ -598,7 +598,6 @@ public class TransitionSystem {
                 ap.add(opt);
             } else {
                 boolean multiUnif = opt.getPlan().isMultiUnif();
-                Unifier ubak = opt.unif;
                 Iterator<Unifier> r = context.logCons(ag, opt.unif);
                 if (r != null) {
                     while (r.hasNext()) {
@@ -606,7 +605,8 @@ public class TransitionSystem {
                         ap.add(opt);
                         if (!multiUnif) break; // returns only one unification
                         if (r.hasNext()) {
-                            opt = new Option((Plan)opt.plan.clone(), ubak);
+                            // create a new option
+                            opt = new Option((Plan)opt.plan.clone(), null);
                         }
                     }
                 }
