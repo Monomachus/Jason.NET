@@ -372,6 +372,7 @@
  		<SEQ TYPE="LITERAL2">source</SEQ>
  		<SEQ TYPE="LITERAL2">atomic</SEQ>
  		<SEQ TYPE="LITERAL2">breakpoint</SEQ>
+ 		<SEQ TYPE="LITERAL2">multi_unif</SEQ>
 
 	<!-- special reserved words and operators -->
 		<SEQ TYPE="OPERATOR">div</SEQ>

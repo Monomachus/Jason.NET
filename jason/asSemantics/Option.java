@@ -22,7 +22,6 @@
 //
 //----------------------------------------------------------------------------
 
-
 package jason.asSemantics;
 
 import jason.asSyntax.Plan;
@@ -32,45 +31,42 @@ import java.io.Serializable;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-
-/** 
- * An Option is a Plan and the Unifier that has made it
-*  relevant and applicable
-*/
+/**
+ * An Option is a Plan and the Unifier that has made it relevant and applicable
+ */
 
 public class Option implements Serializable {
 
-	Plan plan;
-
-	Unifier unif;
+    Plan    plan;
+    Unifier unif;
 
     public Option(Plan p, Unifier u) {
         plan = p;
         unif = u;
     }
-	
-	public Object clone() {
-		return new Option( (Plan)plan.clone(), (Unifier)unif.clone());
-	}
+
+    public Object clone() {
+        return new Option((Plan) plan.clone(), (Unifier) unif.clone());
+    }
 
     public String toString() {
-        return "("+plan+","+unif+")";
+        return "(" + plan + "," + unif + ")";
     }
-    
+
     public Plan getPlan() {
-    	return plan;
+        return plan;
     }
-    
-	/** get as XML */
-	public Element getAsDOM(Document document) {
-		Element op = (Element) document.createElement("option");
-		if (plan != null) {
-			op.appendChild(plan.getAsDOM(document));
-		}
-		if (unif != null) {
-			op.appendChild(unif.getAsDOM(document));
-		}
-		return op;
-	}
-    
+
+    /** get as XML */
+    public Element getAsDOM(Document document) {
+        Element op = (Element) document.createElement("option");
+        if (plan != null) {
+            op.appendChild(plan.getAsDOM(document));
+        }
+        if (unif != null) {
+            op.appendChild(unif.getAsDOM(document));
+        }
+        return op;
+    }
+
 }

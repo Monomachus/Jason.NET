@@ -47,10 +47,12 @@ public class Plan implements Cloneable, Serializable {
     protected List<BodyLiteral> body;
     
     private boolean isAtomic = false;
+    private boolean isMultiUnif = false;
     private boolean hasBreakpoint = false;
     
     private static final Term TAtomic         = TermImpl.parse("atomic");
     private static final Term TBreakPoint     = TermImpl.parse("breakpoint");
+    private static final Term TMultiUnif     = TermImpl.parse("multi_unif");
     
     /*
     private enum Annots {
@@ -93,6 +95,9 @@ public class Plan implements Cloneable, Serializable {
             if (label.hasAnnot(TBreakPoint)) {
                 //properties.add(Annots.breakpoint);
                 hasBreakpoint = true;
+            }
+            if (label.hasAnnot(TMultiUnif)) {
+                isMultiUnif = true;
             }
         }
     }
@@ -156,6 +161,10 @@ public class Plan implements Cloneable, Serializable {
     
     public boolean hasBreakpoint() {
         return hasBreakpoint;//properties.contains(Annots.breakpoint);
+    }
+
+    public boolean isMultiUnif() {
+        return isMultiUnif; 
     }
     
     public Unifier relevant(Trigger te) {
