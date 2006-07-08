@@ -211,7 +211,7 @@ public class RunCentralisedMAS {
             }
         } else {
             try {
-                LogManager.getLogManager().readConfiguration(RunCentralisedMAS.class.getResource("/" + logPropFile).openStream());
+                LogManager.getLogManager().readConfiguration(RunCentralisedMAS.class.getResource("/templates/" + logPropFile).openStream());
             } catch (Exception e) {
                 System.err.println("Error setting up logger:" + e);
             }

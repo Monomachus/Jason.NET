@@ -22,17 +22,17 @@
     </path>
 
     <target name="compile" >
-    	<javac srcdir="${basedir}" destdir="${basedir}" debug="true" optimize="true" >
-            <classpath refid="project.classpath"/>
-        </javac>
+		<javac srcdir="${basedir}" destdir="${basedir}" debug="true" optimize="true" >
+			<classpath refid="project.classpath"/>
+		</javac>
     </target>
 	
     <target name="run" depends="compile" >
         <echo message="Running project ${ant.project.name}" />
         <java classname="<PROJECT-RUNNER-CLASS>"
-                failonerror="true" fork="yes" dir="${basedir}" >
-        	<classpath refid="project.classpath"/>
-        	<arg line="${mas2j.project.file} ${debug}"/>
+              failonerror="true" fork="yes" dir="${basedir}" >
+            <classpath refid="project.classpath"/>
+            <arg line="${mas2j.project.file} ${debug}"/>
         </java>
     </target>
 

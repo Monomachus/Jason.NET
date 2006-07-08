@@ -110,6 +110,7 @@ TOKEN : {
 void ag(Agent a) : { List bbl = new LinkedList(); PlanLibrary pp;  }
 {
   bs(bbl)
+  ig(a)
   pp = ps(bbl)
   <EOF>
               { if (a != null) {
@@ -128,6 +129,7 @@ void ag(Agent a) : { List bbl = new LinkedList(); PlanLibrary pp;  }
               }
 }
 
+
 /* Beliefs */
 void bs(List bbl) : { Literal F; }
 {
@@ -135,6 +137,17 @@ void bs(List bbl) : { Literal F; }
 				            throw new ParseException("Error: Initial belief must be ground!\n       Cannot use "+F+" as initial belief.");
                        }
                        bbl.add(F);
+                    } 
+  )*
+}
+
+
+/* Initial goals */
+void ig(Agent a) : { Literal g; }
+{
+  ( "!" g=l() "."   {  if (a != null && a.getTS() != null) {
+				        a.getTS().getC().addAchvGoal(g,Intention.EmptyInt);
+                       }
                     } 
   )*
 }

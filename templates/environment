@@ -1,0 +1,24 @@
+// Environment code for project <PROJECT_NAME>
+
+import jason.asSyntax.*;
+import jason.environment.*;
+import java.util.logging.*;
+
+public class <ENV_NAME> extends jason.environment.Environment {
+
+	private Logger logger = Logger.getLogger("<PROJECT_NAME>."+<ENV_NAME>.class.getName());
+
+	/** Called before the MAS execution with the args informed in .mas2j */
+	public void init(String[] args) {
+		addPercept(Literal.parseLiteral("percept(demo)"));
+	}
+
+	public boolean executeAction(String ag, Term action) {
+		logger.info("executing: "+action+", but not implemented!");
+		return true;
+	}
+
+	/** Called before the end of MAS execution */
+	public void stop() {
+	}
+}
