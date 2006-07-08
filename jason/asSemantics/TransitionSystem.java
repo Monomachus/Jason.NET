@@ -597,13 +597,13 @@ public class TransitionSystem {
             if (context == null) { // context is true
                 ap.add(opt);
             } else {
-                boolean multiUnif = opt.getPlan().isMultiUnif();
+                boolean allUnifs = opt.getPlan().isAllUnifs();
                 Iterator<Unifier> r = context.logCons(ag, opt.unif);
                 if (r != null) {
                     while (r.hasNext()) {
                         opt.unif = r.next();
                         ap.add(opt);
-                        if (!multiUnif) break; // returns only one unification
+                        if (!allUnifs) break; // returns only one unification
                         if (r.hasNext()) {
                             // create a new option
                             opt = new Option((Plan)opt.plan.clone(), null);
