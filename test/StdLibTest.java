@@ -70,7 +70,7 @@ public class StdLibTest extends TestCase {
         ag.addBel(l1);
         ag.addBel(Literal.parseLiteral("a(20,y)"));
         ag.addBel(Literal.parseLiteral("a(30,x)"));
-        assertEquals(ag.getBS().size(),3);
+        assertEquals(ag.getBB().size(),3);
         
         TransitionSystem ts = new TransitionSystem(ag, null, null, null);
 
@@ -94,10 +94,10 @@ public class StdLibTest extends TestCase {
         Agent ag = new Agent();
         ag.setLogger(null);
         StringTerm pt1 = new StringTermImpl("@t1 +a : g(10) <- .print(\"ok 10\").");
-        ag.getPS().add(pt1, null);
-        ag.getPS().add(new StringTermImpl("@t2 +a : g(20) <- .print(\"ok 20\")."), new TermImpl("nosource"));
-        ((Plan) ag.getPS().getPlans().get(1)).getLabel().addSource(new TermImpl("ag1"));
-        ag.getPS().add(new StringTermImpl("@t3 +b : true <- true."), null);
+        ag.getPL().add(pt1, null);
+        ag.getPL().add(new StringTermImpl("@t2 +a : g(20) <- .print(\"ok 20\")."), new TermImpl("nosource"));
+        ((Plan) ag.getPL().getPlans().get(1)).getLabel().addSource(new TermImpl("ag1"));
+        ag.getPL().add(new StringTermImpl("@t3 +b : true <- true."), null);
         // System.out.println(ag.getPS());
         TransitionSystem ts = new TransitionSystem(ag, null, null, null);
 
@@ -110,14 +110,14 @@ public class StdLibTest extends TestCase {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        assertTrue(ag.getPS().getPlans().get(0).equals(Plan.parse(pt1.getString())));
+        assertTrue(ag.getPL().getPlans().get(0).equals(Plan.parse(pt1.getString())));
 
         ListTerm plans = (ListTerm) u.get("X");
         // System.out.println("plans="+plans);
 
         assertEquals(plans.size(), 2);
 
-        assertEquals(ag.getPS().getPlans().size(), 3);
+        assertEquals(ag.getPL().getPlans().size(), 3);
         // remove plan t1 from PS
         try {
             new removePlan().execute(ts, new Unifier(), new Term[] { new TermImpl("t1") });
@@ -125,7 +125,7 @@ public class StdLibTest extends TestCase {
             e.printStackTrace();
         }
         // ag.getPS().remove(0);
-        assertEquals(ag.getPS().getPlans().size(), 2);
+        assertEquals(ag.getPL().getPlans().size(), 2);
 
         // add plans returned from getRelevantPlans
         // using IA addPlan
@@ -148,10 +148,10 @@ public class StdLibTest extends TestCase {
         }
 
         // the plan t2 (first plan now) must have 4 sources
-        assertEquals(ag.getPS().get("t2").getLabel().getSources().size(), 4);
+        assertEquals(ag.getPL().get("t2").getLabel().getSources().size(), 4);
 
         // the plan t1 (third plan now) must have 2 sources
-        assertEquals(ag.getPS().get("t1").getLabel().getSources().size(), 2);
+        assertEquals(ag.getPL().get("t1").getLabel().getSources().size(), 2);
 
         // remove plan t2,t3 (source = nosource) from PS
         ListTerm llt = ListTermImpl.parseList("[t2,t3]");
@@ -160,7 +160,7 @@ public class StdLibTest extends TestCase {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        assertEquals(ag.getPS().getPlans().size(), 3);
+        assertEquals(ag.getPL().getPlans().size(), 3);
 
         // remove plan t2,t3 (source = self) from PS
         llt = ListTermImpl.parseList("[t2,t3]");
@@ -169,10 +169,10 @@ public class StdLibTest extends TestCase {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        assertEquals(ag.getPS().getPlans().size(), 2);
+        assertEquals(ag.getPL().getPlans().size(), 2);
 
         // the plan t2 (first plan now) must have 3 sources
-        assertEquals(ag.getPS().get("t2").getLabel().getSources().size(), 3);
+        assertEquals(ag.getPL().get("t2").getLabel().getSources().size(), 3);
 
     }
 

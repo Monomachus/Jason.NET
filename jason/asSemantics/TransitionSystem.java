@@ -578,7 +578,7 @@ public class TransitionSystem {
     public List<Option> relevantPlans(Trigger teP) throws JasonException {
         Trigger te = (Trigger) teP.clone();
         List<Option> rp = new LinkedList<Option>();
-        List<Plan> candidateRPs = conf.ag.fPS.getAllRelevant(te.getPredicateIndicator());
+        List<Plan> candidateRPs = conf.ag.fPL.getAllRelevant(te.getPredicateIndicator());
         if (candidateRPs == null)
             return rp;
         for (Plan pl : candidateRPs) {
@@ -631,7 +631,7 @@ public class TransitionSystem {
 
     // only add External Event if it is relevant in respect to the PlanLibrary
     public void updateEvents(Event e) {
-        if (e.isInternal() || C.hasListener() || ag.getPS().isRelevant(e.trigger.getPredicateIndicator())) {
+        if (e.isInternal() || C.hasListener() || ag.getPL().isRelevant(e.trigger.getPredicateIndicator())) {
             C.addEvent(e);
             if (logger.isLoggable(Level.FINE)) logger.fine("Added event " + e);
         }
@@ -677,7 +677,7 @@ public class TransitionSystem {
             // relevant="+getAg().getPS().isRelevant(failTrigger));
 
             // find a relevant failure plan
-            while (!getAg().getPS().isRelevant(failTrigger.getPredicateIndicator()) && ev.intention.size() > 0) {
+            while (!getAg().getPL().isRelevant(failTrigger.getPredicateIndicator()) && ev.intention.size() > 0) {
                 tevent = ev.intention.peek().getTrigger();
                 failTrigger = new Trigger(Trigger.TEDel, tevent.getGoal(), tevent.getLiteral());
                 // logger.info("Trying "+failTrigger+"
@@ -685,7 +685,7 @@ public class TransitionSystem {
 
                 ev.intention.pop();
             }
-            if (tevent.isGoal() && getAg().getPS().isRelevant(failTrigger.getPredicateIndicator())) {
+            if (tevent.isGoal() && getAg().getPL().isRelevant(failTrigger.getPredicateIndicator())) {
                 confP.C.addEvent(new Event(failTrigger, ev.intention));
                 logger.warning("Generating goal deletion " + failTrigger + " from event: " + ev.getTrigger());
             } else {
@@ -778,7 +778,7 @@ public class TransitionSystem {
             if (setts.isSync()) {
                 waitSyncSignal();
             } else if (canSleep()) {
-                if (getAg().fPS.getIdlePlans() != null) {
+                if (getAg().fPL.getIdlePlans() != null) {
                     logger.fine("generating idle event");
                     C.addExternalEv(PlanLibrary.TE_IDLE);
                 } else {

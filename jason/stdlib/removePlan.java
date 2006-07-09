@@ -65,11 +65,11 @@ public class removePlan implements InternalAction {
         		Iterator i = lt.iterator();
         		while (i.hasNext()) {
         			label = (Term)i.next();
-        			r = r && ts.getAg().getPS().removePlan(label, source);
+        			r = r && ts.getAg().getPL().removePlan(label, source);
         		}
         		return r;
         	} else { // args[0] is a plan's label
-        		return ts.getAg().getPS().removePlan(label, source);
+        		return ts.getAg().getPL().removePlan(label, source);
         	}
         } catch (ArrayIndexOutOfBoundsException e) {
             throw new JasonException("The internal action 'removePlan' has not received the plan's label as argument.");

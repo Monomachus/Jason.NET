@@ -180,6 +180,9 @@ public class TermImpl implements Term, Serializable {
     public boolean isLiteral() {
         return false;
     }
+    public boolean isRule() {
+        return false;
+    }
     public boolean isList() {
         return false;
     }

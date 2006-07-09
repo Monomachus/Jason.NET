@@ -84,6 +84,7 @@ public class Literal extends Pred implements Cloneable {
 		return getFunctor() != null && getFunctor().indexOf('.') >= 0;
 	}
 	
+    @Override
 	public boolean isLiteral() {
 		return true;
 	}
@@ -119,7 +120,57 @@ public class Literal extends Pred implements Cloneable {
         } else if (this == LFalse) {
             return EMPTY_UNIF_LIST.iterator();            
         } else {
-            return ag.getBS().logCons(this,un);
+            final Iterator<Literal> il = ag.getBB().getRelevant(this);
+            if (il == null)
+                return TermImpl.EMPTY_UNIF_LIST.iterator();
+
+            return new Iterator<Unifier>() {
+                Unifier current = null;
+                Iterator<Unifier> ruleIt = null;
+
+                public boolean hasNext() {
+                    if (current == null)
+                        get();
+                    return current != null;
+                }
+
+                public Unifier next() {
+                    if (current == null)
+                        get();
+                    Unifier a = current;
+                    get();
+                    return a;
+                }
+
+                private void get() {
+                    current = null;
+                    // try rule iterator
+                    if (ruleIt != null && ruleIt.hasNext()) {
+                        current = ruleIt.next();
+                        return;
+                    }
+                    
+                    // try literal iterator
+                    while (il.hasNext()) {
+                        Literal b = il.next(); // b it the relevant entry in BB
+                        Unifier unC = (Unifier) un.clone();
+                        if (unC.unifies(Literal.this, b)) {
+                            if (b.isRule()) {
+                                Rule r = (Rule)b;
+                                ruleIt = r.getBody().logCons(ag,unC);
+                                get();
+                                return;
+                            } else {
+                                current = unC;
+                                return;
+                            }
+                        }
+                    }
+                }
+
+                public void remove() {
+                }
+            };
         }
     }   
 

@@ -90,7 +90,7 @@
 	        <td style="{$td-style}">
 		        <hr/>
 		        <table cellspacing="0" cellpadding="2">
-		        <xsl:for-each select="literal">
+		        <xsl:for-each select="literal|rule">
 			        <tr style="{$trh-style}">
 			            <td style="text-align: left">
 				        	<span style="color: {$bc}">
@@ -395,7 +395,7 @@
     
     <xsl:template match="body">
         <xsl:for-each select="body-literal">
-        	<xsl:choose>
+           <xsl:choose>
         		<xsl:when test="literal/@ia = 'true'">
 		        	<span style="color: {$iac}"><xsl:apply-templates />	</span>
         		</xsl:when>
@@ -414,9 +414,9 @@
         		<xsl:otherwise>
 	        		<xsl:value-of select="@type"/><xsl:apply-templates />
         		</xsl:otherwise>        		
-        	</xsl:choose>
-            <xsl:if test="not(position()=last())">; </xsl:if>
-            <xsl:if test="position()=last()">.</xsl:if>
+        	  </xsl:choose>
+          <xsl:if test="not(position()=last())">; </xsl:if>
+          <xsl:if test="position()=last()">.</xsl:if>
         </xsl:for-each>
     </xsl:template>
 
@@ -425,6 +425,12 @@
 	    	<xsl:value-of select="@add"/>
 	    	<xsl:value-of select="@type"/>
 	    	<xsl:apply-templates />
+    </xsl:template>
+
+    <xsl:template match="rule">
+	    	<xsl:apply-templates select="head"/>
+	    	<b> :- </b>
+	    	<xsl:apply-templates select="context"/>
     </xsl:template>
 
     <xsl:template match="term">

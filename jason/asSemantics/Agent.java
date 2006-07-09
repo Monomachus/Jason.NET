@@ -62,16 +62,13 @@ import org.w3c.dom.Element;
 public class Agent {
 
     // Members
-    protected BeliefBase                fBS             = new DefaultBeliefBase();
-
-    protected PlanLibrary               fPS             = new PlanLibrary();
+    protected BeliefBase                fBB             = new DefaultBeliefBase();
+    protected PlanLibrary               fPL             = new PlanLibrary();
 
     private Map<String, InternalAction> internalActions = new HashMap<String, InternalAction>();
 
     protected TransitionSystem          fTS             = null;
-
     protected String                    aslSource       = null;
-
     private Logger                      logger;
 
     /** creates the TS of this agent, parse its AS source, and set its Settings */
@@ -82,7 +79,7 @@ public class Agent {
             logger.setLevel(stts.logLevel());
             
             if (bb != null) {
-                this.fBS = bb;
+                this.fBB = bb;
             }
             
             setTS(new TransitionSystem(this, new Circumstance(), stts, arch));
@@ -208,12 +205,12 @@ public class Agent {
     }
 
     // Accessing the agent's belief base and plans
-    public BeliefBase getBS() {
-        return fBS;
+    public BeliefBase getBB() {
+        return fBB;
     }
 
-    public PlanLibrary getPS() {
-        return fPS;
+    public PlanLibrary getPL() {
+        return fPL;
     }
 
     
@@ -227,7 +224,7 @@ public class Agent {
         List<Literal> removed = new ArrayList<Literal>();
 
         // deleting percepts in the BB that is not perceived anymore
-        Iterator<Literal> perceptsInBB = getBS().getPercepts();
+        Iterator<Literal> perceptsInBB = getBB().getPercepts();
         while (perceptsInBB.hasNext()) { // for (int i = 0; i <
             // perceptsInBB.size(); i++) {
             Literal l = perceptsInBB.next(); // get(i);
@@ -248,7 +245,7 @@ public class Agent {
         }
 
         for (Literal lr : removed) {
-            if (fBS.remove(lr)) {
+            if (fBB.remove(lr)) {
                 fTS.updateEvents(new Event(new Trigger(Trigger.TEDel, Trigger.TEBel, lr), Intention.EmptyInt));
             }
         }
@@ -259,7 +256,7 @@ public class Agent {
             try {
                 lp = (Literal) lp.clone();
                 lp.addAnnot(BeliefBase.TPercept);
-                if (getBS().add(lp)) {
+                if (getBB().add(lp)) {
                     Trigger te = new Trigger(Trigger.TEAdd, Trigger.TEBel, lp);
                     fTS.updateEvents(new Event(te, Intention.EmptyInt));
                 }
@@ -276,7 +273,7 @@ public class Agent {
      * 
      */
     public Literal believes(Literal l, Unifier un) {
-        Iterator<Literal> relB = fBS.getRelevant(l);
+        Iterator<Literal> relB = fBB.getRelevant(l);
         if (relB != null) {
             while (relB.hasNext()) {
                 Literal b = relB.next();
@@ -317,7 +314,7 @@ public class Agent {
             if (logger.isLoggable(Level.FINE)) {
                 logger.fine("adding "+beliefToAdd);
             }
-            if (getBS().add(beliefToAdd)) {
+            if (getBB().add(beliefToAdd)) {
                 result[0] = Collections.singletonList(beliefToAdd);
                 changed = true;
             }
@@ -345,7 +342,7 @@ public class Agent {
                     inBB.addAnnots(beliefToDel.getAnnots());
                 }
                 
-                if (getBS().remove(inBB)) {
+                if (getBB().remove(inBB)) {
                     if (logger.isLoggable(Level.FINE))  logger.fine("Removed:" + inBB);
                     result[1] = Collections.singletonList(inBB);
                     changed = true;
@@ -418,7 +415,7 @@ public class Agent {
     public Element getAsDOM(Document document) {
         Element ag = (Element) document.createElement("agent");
         ag.setAttribute("name", fTS.getUserAgArch().getAgName());
-        ag.appendChild(fBS.getAsDOM(document));
+        ag.appendChild(fBB.getAsDOM(document));
         // ag.appendChild(ps.getAsDOM(document));
         return ag;
     }

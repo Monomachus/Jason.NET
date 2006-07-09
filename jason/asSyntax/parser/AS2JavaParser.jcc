@@ -115,7 +115,7 @@ void ag(Agent a) : { List bbl = new LinkedList(); PlanLibrary pp;  }
   <EOF>
               { if (a != null) {
                   try {
-                    a.getPS().addAll(pp); 
+                    a.getPL().addAll(pp); 
   
                     // add beliefs (when the plans are loaded, so the events are relevant
                     Iterator i = bbl.iterator();
@@ -130,14 +130,14 @@ void ag(Agent a) : { List bbl = new LinkedList(); PlanLibrary pp;  }
 }
 
 
-/* Beliefs */
-void bs(List bbl) : { Literal F; }
+/* Beliefs & Rules */
+void bs(List bbl) : { Literal h; Term t; }
 {
-  ( F=l() "."       {  if(!F.isGround()) {
-				            throw new ParseException("Error: Initial belief must be ground!\n       Cannot use "+F+" as initial belief.");
-                       }
-                       bbl.add(F);
-                    } 
+  ( h=l()
+    [
+      ":-" t = le()  { h = new Rule(h,t); }
+    ] 
+    "."              {  bbl.add(h);  } 
   )*
 }
 

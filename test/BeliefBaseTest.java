@@ -169,23 +169,23 @@ public class BeliefBaseTest extends TestCase {
 	
 	public void testRemWithUnnamedVar() {
 		Agent ag = new Agent();
-		ag.getBS().add(Literal.parseLiteral("pos(2,3)"));
+		ag.getBB().add(Literal.parseLiteral("pos(2,3)"));
 		Unifier u = new Unifier();
 
 		Literal l = ag.believes(Literal.parseLiteral("pos(_,_)"), u);
 		assertTrue(l != null);
 		assertEquals(l, Literal.parseLiteral("pos(2,3)"));
 		
-		assertTrue(ag.getBS().remove(l));
+		assertTrue(ag.getBB().remove(l));
 	}
     
     public void testLogCons() {
         Agent ag = new Agent();
-        ag.getBS().add(Literal.parseLiteral("a(10)"));
-        ag.getBS().add(Literal.parseLiteral("a(20)"));
-        ag.getBS().add(Literal.parseLiteral("b(20,10)"));
-        ag.getBS().add(Literal.parseLiteral("c(x)"));
-        ag.getBS().add(Literal.parseLiteral("c(y)"));
+        ag.getBB().add(Literal.parseLiteral("a(10)"));
+        ag.getBB().add(Literal.parseLiteral("a(20)"));
+        ag.getBB().add(Literal.parseLiteral("b(20,10)"));
+        ag.getBB().add(Literal.parseLiteral("c(x)"));
+        ag.getBB().add(Literal.parseLiteral("c(y)"));
         Term texpr;
         
         Iterator<Unifier> iun = Literal.parseLiteral("a(X)").logCons(ag, new Unifier());

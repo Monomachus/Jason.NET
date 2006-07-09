@@ -20,6 +20,55 @@
 			</annotations>
 		</term>
 	</literal>
+
+<rule>
+<head>
+<literal>
+<term functor="gvl">
+<arguments>
+<var-term>X</var-term>
+</arguments>
+<annotations>
+<literal>
+<term functor="source">
+<arguments>
+<literal>
+<term functor="self"/>
+</literal>
+</arguments>
+</term>
+</literal>
+</annotations>
+</term>
+</literal>
+</head>
+
+<context>
+<expression operator=" &amp; " type="logical">
+<left>
+<literal>
+<term functor="a">
+<arguments>
+<var-term>X</var-term>
+</arguments>
+</term>
+</literal>
+</left>
+<right>
+<expression operator=" &gt; " type="relational">
+<left>
+<var-term>X</var-term>
+</left>
+<right>
+<number-term>10</number-term>
+</right>
+</expression>
+</right>
+</expression>
+</context>
+
+</rule>
+
 <literal>
 <term functor="demo">
 <annotations>

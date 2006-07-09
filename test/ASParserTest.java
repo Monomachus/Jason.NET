@@ -26,7 +26,7 @@ public class ASParserTest extends TestCase {
 
         assertTrue(ag.parseAS("src/asl/kqmlPlans.asl"));
         assertTrue(ag.parseAS("examples/Auction/ag1.asl"));
-        Plan p = ag.getPS().get("l__0");
+        Plan p = ag.getPL().get("l__0");
         assertEquals(p.getBody().size(), 1);
         assertEquals(p.getBody().get(0).getType(), BodyLiteral.BodyType.internalAction);
         assertTrue(ag.parseAS("examples/Auction/ag2.asl"));

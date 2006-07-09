@@ -327,6 +327,11 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
     }
 
     @Override
+    public boolean isRule() {
+        return value != null && getValue().isRule();
+    }
+
+    @Override
     public boolean isArithExpr() {
         return value != null && value.isArithExpr();
     }

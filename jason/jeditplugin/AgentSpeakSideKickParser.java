@@ -43,7 +43,7 @@ public class AgentSpeakSideKickParser extends sidekick.SideKickParser {
             	
             	// create nodes 
             	SideKickParsedData pd = new SideKickParsedData(buf.getName());
-            	Iterator i = ag.getPS().getPlans().iterator();
+            	Iterator i = ag.getPL().getPlans().iterator();
             	while (i.hasNext()) {
             		Plan p = (Plan)i.next();
             		DefaultMutableTreeNode node = new PlanAsset(p, buf).createTreeNode();

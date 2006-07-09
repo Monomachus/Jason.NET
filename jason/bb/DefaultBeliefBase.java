@@ -24,11 +24,9 @@
 package jason.bb;
 
 import jason.asSemantics.Agent;
-import jason.asSemantics.Unifier;
 import jason.asSyntax.Literal;
 import jason.asSyntax.Pred;
 import jason.asSyntax.PredicateIndicator;
-import jason.asSyntax.TermImpl;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -77,7 +75,7 @@ public class DefaultBeliefBase implements BeliefBase {
             logger.log(Level.SEVERE, "Error: <true> or <false> can not be added as beliefs.");
             return false;
         }
-        if (!l.isGround()) {
+        if (!l.isGround() && !l.isRule()) {
             logger.log(Level.SEVERE, "Error: Literal must be ground!");
             return false;
         }
@@ -193,45 +191,6 @@ public class DefaultBeliefBase implements BeliefBase {
                 return null;
             }
         }
-    }
-
-    public Iterator<Unifier> logCons(final Literal l, final Unifier un) {
-        final Iterator<Literal> il = getRelevant(l);
-        if (il == null)
-            return TermImpl.EMPTY_UNIF_LIST.iterator();
-
-        return new Iterator<Unifier>() {
-            Unifier current = null;
-
-            public boolean hasNext() {
-                if (current == null)
-                    get();
-                return current != null;
-            }
-
-            public Unifier next() {
-                if (current == null)
-                    get();
-                Unifier a = current;
-                get();
-                return a;
-            }
-
-            private void get() {
-                current = null;
-                while (il.hasNext()) {
-                    Literal b = il.next();
-                    Unifier unC = (Unifier) un.clone();
-                    if (unC.unifies(l, b)) {
-                        current = unC;
-                        return;
-                    }
-                }
-            }
-
-            public void remove() {
-            }
-        };
     }
 
     public String toString() {

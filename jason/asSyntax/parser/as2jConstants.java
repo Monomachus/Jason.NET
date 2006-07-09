@@ -51,6 +51,7 @@ public interface as2jConstants {
     "<LC_LETTER>",
     "<UP_LETTER>",
     "<DIGIT>",
+    "\":-\"",
     "\".\"",
     "\"!\"",
     "\"{\"",

@@ -24,7 +24,6 @@
 package jason.bb;
 
 import jason.asSemantics.Agent;
-import jason.asSemantics.Unifier;
 import jason.asSyntax.Literal;
 import jason.asSyntax.PredicateIndicator;
 import jason.asSyntax.Term;
@@ -65,15 +64,6 @@ public interface BeliefBase {
      * BB={a(10),a(20)}, getRelecant(X) = {{a(10),a(20)}.
      */
     public Iterator<Literal> getRelevant(Literal l);
-
-    /** 
-     * logCons checks whether one particular literal
-     * is a log(ical)Cons(equence) of the belief base
-     * using unification.
-     * 
-     * Returns an iterator for all unifiers that are logCons.
-     */
-    public Iterator<Unifier> logCons(Literal l, Unifier un);
 
     public int size();
 

@@ -41,46 +41,62 @@ public interface Term extends Cloneable, Comparable<Term>, Serializable {
     public String getFunctor();
 
     /** returns functor symbol "/" arity */
-	public PredicateIndicator getPredicateIndicator();
+    public PredicateIndicator getPredicateIndicator();
 
-    /** 
-     * logCons checks whether one particular predicate
-     * is a log(ical)Cons(equence) of the belief base.
+    /**
+     * logCons checks whether one particular predicate is a
+     * log(ical)Cons(equence) of the belief base.
      * 
      * Returns an iterator for all unifiers that are logCons.
      */
     public Iterator<Unifier> logCons(Agent ag, Unifier un);
-    
-	public void addTerm(Term t);
+
+    public void addTerm(Term t);
+
     public void addTerms(List<Term> l);
-    
-    
-	public void setTerm(int i, Term t);
+
+    public void setTerm(int i, Term t);
+
     public void setTerms(List<Term> l);
-		
-	public int getTermsSize();
+
+    public int getTermsSize();
 
     /** returns the i-th term (first term is 0) */
     public Term getTerm(int i);
-    public List<Term> getTerms();
-	public Term[] getTermsArray();
 
-	public boolean isVar();
+    public List<Term> getTerms();
+
+    public Term[] getTermsArray();
+
+    public boolean isVar();
+
     public boolean isLiteral();
-	public boolean isList();
-	public boolean isString();
-	public boolean isInternalAction();
-	public boolean isArithExpr();
-	public boolean isNumeric();
-	public boolean isPred();
-	
-	public boolean isGround();
+    
+    public boolean isRule();
+
+    public boolean isList();
+
+    public boolean isString();
+
+    public boolean isInternalAction();
+
+    public boolean isArithExpr();
+
+    public boolean isNumeric();
+
+    public boolean isPred();
+
+    public boolean isGround();
+
     public boolean hasVar(Term t);
 
     public void makeVarsAnnon();
+
     public void makeTermsAnnon();
 
     public Object clone();
+
     public boolean equals(Object o);
+
     public Element getAsDOM(Document document);
 }

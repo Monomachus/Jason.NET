@@ -69,7 +69,7 @@ public class AgArch {
 
     /** Stops the agent, the user should override this method to do something before the agent is killed. The default implementation does nothing. */
     public void stopAg() {
-        fTS.getAg().getBS().stop();
+        fTS.getAg().getBB().stop();
     }
 
     public void setArchInfraTier(AgArchInfraTier ai) {

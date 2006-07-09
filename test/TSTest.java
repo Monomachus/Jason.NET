@@ -25,9 +25,9 @@ public class TSTest extends TestCase {
         Agent ag = new Agent();
         Circumstance c = new Circumstance();
         StringTerm pt1 = new StringTermImpl("@t1 +a(X) : g(10) <- .print(\"ok 10\").");
-        ag.getPS().add(pt1, new TermImpl("nosource"));
-        ag.getPS().add(new StringTermImpl("@t2 +a(X) : true <- .print(\"ok 20\")."), new TermImpl("nosource"));
-        ag.getPS().add(new StringTermImpl("@t3 +b : true <- true."), new TermImpl("nosource"));
+        ag.getPL().add(pt1, new TermImpl("nosource"));
+        ag.getPL().add(new StringTermImpl("@t2 +a(X) : true <- .print(\"ok 20\")."), new TermImpl("nosource"));
+        ag.getPL().add(new StringTermImpl("@t3 +b : true <- true."), new TermImpl("nosource"));
         TransitionSystem ts = new TransitionSystem(ag, c, null, null);
         Literal content = Literal.parseLiteral("~alliance");
         content.addSource(new TermImpl("ag1"));

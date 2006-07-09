@@ -55,10 +55,10 @@ public class addPlan implements InternalAction {
     				ListTerm lt = (ListTerm)plans;
             		Iterator i = lt.iterator();
             		while (i.hasNext()) {
-    					ts.getAg().getPS().add( (StringTerm)i.next(), source);
+    					ts.getAg().getPL().add( (StringTerm)i.next(), source);
             		}
             	} else { // args[0] is a plan
-            		ts.getAg().getPS().add((StringTerm)plans, source);
+            		ts.getAg().getPL().add((StringTerm)plans, source);
             	}
             return true;
         } catch (ArrayIndexOutOfBoundsException e) {
