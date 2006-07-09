@@ -171,7 +171,7 @@ public class TransitionSystem {
                 received.addTerm(content);
                 received.addTerm(new TermImpl(m.getMsgId()));
 
-                updateEvents(new Event(new Trigger(Trigger.TEAdd, Trigger.TEBel, received), Intention.EmptyInt));
+                updateEvents(new Event(new Trigger(Trigger.TEAdd, Trigger.TEAchvG, received), Intention.EmptyInt));
             }
         }
         confP.step = State.SelEv;
