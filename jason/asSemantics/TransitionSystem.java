@@ -145,6 +145,7 @@ public class TransitionSystem {
     private void applyProcMsg() throws JasonException {
         if (!conf.C.MB.isEmpty()) {
             Message m = conf.ag.selectMessage(conf.C.MB);
+            Term content = TermImpl.parse(m.getPropCont().toString());
 
             // check if an intention was suspended waiting this message
             Intention intention = getC().getPendingIntentions().remove(m.getInReplyTo());
@@ -155,14 +156,12 @@ public class TransitionSystem {
                 // something like
                 // .send(ask, ag1, value, X)
                 // if the answer was 3, unifies X=3
-                Term ans = TermImpl.parse(m.getPropCont().toString());
                 BodyLiteral send = (BodyLiteral) intention.peek().getPlan().getBody().remove(0);
-                intention.peek().getUnif().unifies(send.getTerm().getTerm(3), ans);
+                intention.peek().getUnif().unifies(send.getTerm().getTerm(3), content);
                 getC().addIntention(intention);
 
                 // the message is not an ask answer
             } else if (conf.ag.socAcc(m)) {
-                Term content = TermImpl.parse(m.getPropCont().toString());
 
                 // generate an event
                 Literal received = new Literal(Literal.LPos, new Pred("received"));
