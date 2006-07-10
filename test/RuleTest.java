@@ -50,6 +50,24 @@ public class RuleTest extends TestCase {
 
         iun = Literal.parseLiteral("v(A)").logCons(ag, new Unifier());
         assertEquals(5,iteratorSize(iun));
+
+        // add s(X) :- r(X)
+        r = new Rule(Literal.parseLiteral("s(X)"), LogExprTerm.parseExpr("r(X)"));
+        ag.getBB().add(r);
+        iun = Literal.parseLiteral("s(X)").logCons(ag, new Unifier());
+        assertEquals(3,iteratorSize(iun));
+        
+        // add t(a) :- s(X)
+        r = new Rule(Literal.parseLiteral("t(a)"), LogExprTerm.parseExpr("s(X)"));
+        ag.getBB().add(r);
+        
+        iun = Literal.parseLiteral("t(X)").logCons(ag, new Unifier());
+        assertEquals(3,iteratorSize(iun));
+        /*
+        while (iun.hasNext()) {
+            System.out.println(iun.next());
+        }
+        */
     }
         
     private int iteratorSize(Iterator i) {

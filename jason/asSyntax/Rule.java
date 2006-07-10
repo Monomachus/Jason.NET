@@ -70,6 +70,10 @@ public class Rule extends Literal {
         return new Rule(this, (Term)body.clone());
     }
 
+    public Literal headClone() {
+        return (Literal)super.clone();
+    }
+    
     public String toString() {
         return super.toString() + " :- " + body;
     }

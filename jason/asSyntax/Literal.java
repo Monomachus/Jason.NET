@@ -126,8 +126,9 @@ public class Literal extends Pred implements Cloneable {
 
             return new Iterator<Unifier>() {
                 Unifier current = null;
-                Iterator<Unifier> ruleIt = null;
-
+                Iterator<Unifier> ruleIt = null; // current rule solutions iterator
+                Rule rule; // current rule
+                
                 public boolean hasNext() {
                     if (current == null)
                         get();
@@ -144,23 +145,43 @@ public class Literal extends Pred implements Cloneable {
 
                 private void get() {
                     current = null;
+                    
                     // try rule iterator
                     if (ruleIt != null && ruleIt.hasNext()) {
-                        current = ruleIt.next();
+                        // unifies the rule head with the result of rule evaluation
+                        Unifier ruleUn = ruleIt.next(); // evaluation result
+                        Literal rhead = rule.headClone();
+                        ruleUn.apply(rhead);
+                        
+                        Unifier unC = (Unifier) un.clone();
+                        if (unC.unifies(Literal.this, rhead)) {
+                            current = unC;
+                            return;
+                        }                        
                         return;
                     }
                     
                     // try literal iterator
                     while (il.hasNext()) {
-                        Literal b = il.next(); // b it the relevant entry in BB
-                        Unifier unC = (Unifier) un.clone();
-                        if (unC.unifies(Literal.this, b)) {
-                            if (b.isRule()) {
-                                Rule r = (Rule)b;
-                                ruleIt = r.getBody().logCons(ag,unC);
+                        Literal b = il.next(); // b is the relevant entry in BB
+                        if (b.isRule()) {
+                            rule = (Rule)b;
+                            // create a copy of this literal, ground it and 
+                            // make its vars annonim, it is
+                            // used to define what will be the unifier used
+                            // inside the rule.
+                            Literal h = (Literal)Literal.this.clone();
+                            un.apply(h);
+                            h.makeVarsAnnon();
+                            Unifier ruleUn = new Unifier();
+                            if (ruleUn.unifies(h, b)) {
+                                ruleIt = rule.getBody().logCons(ag,ruleUn);
                                 get();
                                 return;
-                            } else {
+                            }
+                        } else {
+                            Unifier unC = (Unifier) un.clone();
+                            if (unC.unifies(Literal.this, b)) {
                                 current = unC;
                                 return;
                             }
