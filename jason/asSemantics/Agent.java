@@ -62,26 +62,30 @@ import org.w3c.dom.Element;
 public class Agent {
 
     // Members
-    protected BeliefBase                fBB             = new DefaultBeliefBase();
-    protected PlanLibrary               fPL             = new PlanLibrary();
+    protected BeliefBase fBB = new DefaultBeliefBase();
+
+    protected PlanLibrary fPL = new PlanLibrary();
 
     private Map<String, InternalAction> internalActions = new HashMap<String, InternalAction>();
 
-    protected TransitionSystem          fTS             = null;
-    protected String                    aslSource       = null;
-    private Logger                      logger;
+    protected TransitionSystem fTS = null;
+
+    protected String aslSource = null;
+
+    private Logger logger;
 
     /** creates the TS of this agent, parse its AS source, and set its Settings */
-    public TransitionSystem initAg(AgArch arch, BeliefBase bb, String asSrc, Settings stts) throws JasonException {
+    public TransitionSystem initAg(AgArch arch, BeliefBase bb, String asSrc,
+            Settings stts) throws JasonException {
         // set the agent
         try {
             setLogger(arch);
             logger.setLevel(stts.logLevel());
-            
+
             if (bb != null) {
                 this.fBB = bb;
             }
-            
+
             setTS(new TransitionSystem(this, new Circumstance(), stts, arch));
 
             this.aslSource = asSrc;
@@ -98,7 +102,8 @@ public class Agent {
 
     public void setLogger(AgArch arch) {
         if (arch != null) {
-            logger = Logger.getLogger(Agent.class.getName() + "." + arch.getAgName());
+            logger = Logger.getLogger(Agent.class.getName() + "."
+                    + arch.getAgName());
         } else {
             logger = Logger.getLogger(Agent.class.getName());
         }
@@ -112,17 +117,21 @@ public class Agent {
     public String getASLSource() {
         return aslSource;
     }
-    
+
     /** add beliefs and plan form a URL */
     public boolean parseAS(URL asURL) {
         try {
             parseAS(asURL.openStream());
-            logger.fine("as2j: AgentSpeak program '" + asURL + "' parsed successfully!");
+            logger.fine("as2j: AgentSpeak program '" + asURL
+                    + "' parsed successfully!");
             return true;
         } catch (IOException e) {
-            logger.log(Level.SEVERE, "as2j: the AgentSpeak source file was not found", e);
+            logger.log(Level.SEVERE,
+                    "as2j: the AgentSpeak source file was not found", e);
         } catch (ParseException e) {
-            logger.log(Level.SEVERE, "as2j: error parsing \"" + asURL + "\"", e);
+            logger
+                    .log(Level.SEVERE, "as2j: error parsing \"" + asURL + "\"",
+                            e);
         }
         return false;
     }
@@ -131,12 +140,15 @@ public class Agent {
     public boolean parseAS(String asFileName) {
         try {
             parseAS(new FileInputStream(asFileName));
-            logger.fine("as2j: AgentSpeak program '" + asFileName + "' parsed successfully!");
+            logger.fine("as2j: AgentSpeak program '" + asFileName
+                    + "' parsed successfully!");
             return true;
         } catch (FileNotFoundException e) {
-            logger.log(Level.SEVERE, "as2j: the AgentSpeak source file was not found", e);
+            logger.log(Level.SEVERE,
+                    "as2j: the AgentSpeak source file was not found", e);
         } catch (ParseException e) {
-            logger.log(Level.SEVERE, "as2j: error parsing \"" + asFileName + "\"", e);
+            logger.log(Level.SEVERE, "as2j: error parsing \"" + asFileName
+                    + "\"", e);
         }
         return false;
     }
@@ -213,7 +225,6 @@ public class Agent {
         return fPL;
     }
 
-    
     /** Belief Update Function: add/remove perceptions into belief base */
     public void buf(List<Literal> percepts) {
         if (percepts == null) {
@@ -240,13 +251,15 @@ public class Agent {
                 }
             }
             if (!wasPerceived) {
-                removed.add(l); // do not remove using the iterator here, concurrent modification!
+                removed.add(l); // do not remove using the iterator here,
+                                // concurrent modification!
             }
         }
 
         for (Literal lr : removed) {
             if (fBB.remove(lr)) {
-                fTS.updateEvents(new Event(new Trigger(Trigger.TEDel, Trigger.TEBel, lr), Intention.EmptyInt));
+                fTS.updateEvents(new Event(new Trigger(Trigger.TEDel,
+                        Trigger.TEBel, lr), Intention.EmptyInt));
             }
         }
 
@@ -271,34 +284,52 @@ public class Agent {
      * the BB; otherwise, returns null. E.g.: if l is g(_,_) and BB is={....,
      * g(10,20), ...}, this method returns g(10,20).
      * 
+     * The unifier <i>un</i> is updated by the method.
+     * 
      */
     public Literal believes(Literal l, Unifier un) {
-        Iterator<Literal> relB = fBB.getRelevant(l);
-        if (relB != null) {
-            while (relB.hasNext()) {
-                Literal b = relB.next();
+        try {
+            // tries simple beliefs first
+            Iterator<Literal> relB = fBB.getRelevant(l);
+            if (relB != null) {
+                while (relB.hasNext()) {
+                    Literal b = relB.next();
 
-                // recall that order is important because of annotations!
-                if (un.unifies(l, b)) {
-                    return b;
+                    // recall that order is important because of annotations!
+                    if (!b.isRule() && un.unifies(l, b)) {
+                        return b;
+                    }
                 }
             }
+
+            // try rules
+            Iterator<Unifier> iun = l.logCons(this, un);
+            if (iun != null && iun.hasNext()) {
+                Unifier r = iun.next();
+                Literal lc = (Literal) l.clone();
+                r.apply(lc);
+                // update the unifier with the l in BB
+                un.unifies(l, lc);
+                return lc;
+            }
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Error in believe("+l+","+un+").",e);
         }
         return null;
     }
 
-    
     /**
-     * This function should revise the belief base with the given literal to add,
-     * to remove, and the current intention that triggered the operation.
+     * This function should revise the belief base with the given literal to
+     * add, to remove, and the current intention that triggered the operation.
      * 
      * In its return, List[0] has the list of actual additions to the belief
      * base, and List[1] has the list of actual deletions; this is used to
-     * generate the appropriate internal events.
-     * If nothing change, returns null.
+     * generate the appropriate internal events. If nothing change, returns
+     * null.
      * 
      */
-    public List<Literal>[] brf(Literal beliefToAdd, Literal beliefToDel, Intention i) {
+    public List<Literal>[] brf(Literal beliefToAdd, Literal beliefToDel,
+            Intention i) {
         // This class does not implement belief revision! It
         // is supposed that a subclass will do it.
         // It simply add/del the belief.
@@ -306,20 +337,19 @@ public class Agent {
         List<Literal>[] result = new List[2];
         result[0] = Collections.emptyList();
         result[1] = Collections.emptyList();
-        
+
         boolean changed = false; // if the BB is changed
-        
-        
+
         if (beliefToAdd != null) {
             if (logger.isLoggable(Level.FINE)) {
-                logger.fine("adding "+beliefToAdd);
+                logger.fine("adding " + beliefToAdd);
             }
             if (getBB().add(beliefToAdd)) {
                 result[0] = Collections.singletonList(beliefToAdd);
                 changed = true;
             }
         }
-        
+
         if (beliefToDel != null) {
             Unifier u = null;
             try {
@@ -327,9 +357,10 @@ public class Agent {
             } catch (Exception e) {
                 u = new Unifier();
             }
-            
+
             if (logger.isLoggable(Level.FINE)) {
-                logger.fine("doing brf for " + beliefToDel + " in BB=" + believes(beliefToDel, u));
+                logger.fine("doing brf for " + beliefToDel + " in BB="
+                        + believes(beliefToDel, u));
             }
             Literal inBB = believes(beliefToDel, u);
             if (inBB != null) {
@@ -341,9 +372,10 @@ public class Agent {
                     inBB.clearAnnots();
                     inBB.addAnnots(beliefToDel.getAnnots());
                 }
-                
+
                 if (getBB().remove(inBB)) {
-                    if (logger.isLoggable(Level.FINE))  logger.fine("Removed:" + inBB);
+                    if (logger.isLoggable(Level.FINE))
+                        logger.fine("Removed:" + inBB);
                     result[1] = Collections.singletonList(inBB);
                     changed = true;
                 }
@@ -357,9 +389,8 @@ public class Agent {
     }
 
     /**
-     * Adds bel in belief base (calling brf) and generate the events.
-     * If bel has no source, add source(self).
-     * (the belief is not cloned!)
+     * Adds bel in belief base (calling brf) and generate the events. If bel has
+     * no source, add source(self). (the belief is not cloned!)
      */
     public boolean addBel(Literal bel) {
         if (!bel.hasSource()) {
@@ -367,29 +398,28 @@ public class Agent {
             // programmer set the source
             bel.addAnnot(BeliefBase.TSelf);
         }
-        List<Literal>[] result = brf(bel,null,Intention.EmptyInt);
+        List<Literal>[] result = brf(bel, null, Intention.EmptyInt);
         if (result != null && fTS != null) {
-            fTS.updateEvents(result,Intention.EmptyInt);
+            fTS.updateEvents(result, Intention.EmptyInt);
             return true;
         } else {
             return false;
         }
     }
-    
-    
+
     /**
-     * if the agent believes in bel, removes it (calling brf) and generate the event.
+     * if the agent believes in bel, removes it (calling brf) and generate the
+     * event.
      */
     public boolean delBel(Literal bel) {
-        List<Literal>[] result = brf(null,bel,Intention.EmptyInt);
+        List<Literal>[] result = brf(null, bel, Intention.EmptyInt);
         if (result != null) {
-            fTS.updateEvents(result,Intention.EmptyInt);
+            fTS.updateEvents(result, Intention.EmptyInt);
             return true;
         } else {
             return false;
         }
     }
-    
 
     static DocumentBuilder builder = null;
 
@@ -397,7 +427,8 @@ public class Agent {
     public Document getAgState() {
         if (builder == null) {
             try {
-                builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+                builder = DocumentBuilderFactory.newInstance()
+                        .newDocumentBuilder();
             } catch (Exception e) {
                 logger.log(Level.SEVERE, "Error creating XML builder\n");
                 return null;

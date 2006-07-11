@@ -42,12 +42,12 @@ public class println implements InternalAction {
 			//throw new JasonException(".print without parameters!");
 		}
 
-		StringBuffer sout = null;
-		if (ts.getSettings().logLevel() == Level.WARNING) {
-			sout = new StringBuffer("");
-		} else {
-			sout = new StringBuffer("saying: ");
-		}
+		StringBuffer sout = new StringBuffer("");
+        try {
+    		if (ts.getSettings().logLevel() != Level.WARNING) {
+    			sout = new StringBuffer("saying: ");
+    		}
+        } catch (Exception e) {}
 		
 		for (int i = 0; i < args.length; i++) {
 			if (args[i].isString()) {
@@ -63,11 +63,12 @@ public class println implements InternalAction {
 				}
 			}
 		}
-		if (ts.getSettings().logLevel() == Level.WARNING) {
-			System.out.print(sout.toString()+getNewLine());
-		} else {
-			ts.getLogger().info(sout.toString());
-		}
+
+        if (ts != null && ts.getSettings().logLevel() != Level.WARNING) {
+            ts.getLogger().info(sout.toString());
+        } else {
+            System.out.print(sout.toString() + getNewLine());
+        }
 
 		return true;
 	}

@@ -280,6 +280,13 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
     }
 
     @Override
+    public void setTerm(int i, Term t) {
+        if (value != null) {
+            value.setTerm(i,t);
+        }
+    }
+
+    @Override
     public void addTerms(List<Term> l) {
         if (value != null) {
             value.addTerms(l);

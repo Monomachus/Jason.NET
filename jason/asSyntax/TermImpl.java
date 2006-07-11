@@ -221,7 +221,7 @@ public class TermImpl implements Term, Serializable {
             }
         }
     }
-    
+
     public void makeTermsAnnon() {
         for (int i=0; i<getTermsSize(); i++) {
             setTerm(i,new UnnamedVar());

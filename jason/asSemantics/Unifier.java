@@ -23,6 +23,7 @@
 
 package jason.asSemantics;
 
+import static jason.asSemantics.Unifier.logger;
 import jason.asSyntax.ArithExprTerm;
 import jason.asSyntax.ListTerm;
 import jason.asSyntax.Literal;
@@ -38,6 +39,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.w3c.dom.Document;
@@ -45,7 +47,7 @@ import org.w3c.dom.Element;
 
 public class Unifier implements Cloneable {
 
-    static Logger                 logger   = Logger.getLogger(Unifier.class.getName());
+    static Logger logger = Logger.getLogger(Unifier.class.getName());
 
     private HashMap<VarTerm, Term> function = new HashMap<VarTerm, Term>();
 
@@ -71,7 +73,7 @@ public class Unifier implements Cloneable {
             return;
         }
         // do not use iterator! (see ListTermImpl class)
-        for (int i = 0; i < t.getTermsSize(); i++) { 
+        for (int i = 0; i < t.getTermsSize(); i++) {
             apply(t.getTerm(i));
         }
     }
@@ -97,10 +99,10 @@ public class Unifier implements Cloneable {
     public Term get(String var) {
         return get(new VarTerm(var));
     }
-    
+
     /**
-     * gets the value for a Var, if it is unified with another var,
-     * gets this other's value
+     * gets the value for a Var, if it is unified with another var, gets this
+     * other's value
      */
     public Term get(VarTerm vtp) {
         return function.get(vtp);
@@ -108,7 +110,8 @@ public class Unifier implements Cloneable {
 
     public Term get(Term t) {
         if (t.isVar()) {
-            return function.get((VarTerm)t); //getLastVarTermChain( (VarTerm)t));
+            return function.get((VarTerm) t); // getLastVarTermChain(
+                                                // (VarTerm)t));
         } else {
             return null;
         }
@@ -122,11 +125,11 @@ public class Unifier implements Cloneable {
 
         // if args are expressions, apply them to use the values
         if (t1g.isArithExpr()) {
-            t1g = (Term)t1g.clone();
+            t1g = (Term) t1g.clone();
             apply(t1g);
         }
         if (t2g.isArithExpr()) {
-            t2g = (Term)t2g.clone();
+            t2g = (Term) t2g.clone();
             apply(t2g);
         }
 
@@ -139,77 +142,87 @@ public class Unifier implements Cloneable {
         // if two atoms or structures
         if (!t1g.isVar() && !t2g.isVar()) {
             // different arities
-            if ((t1gts == null && t2gts != null) || (t1gts != null && t2gts == null)) {
+            if ((t1gts == null && t2gts != null)
+                    || (t1gts != null && t2gts == null)) {
                 return false;
             }
             if (t1g.getTermsSize() != t2g.getTermsSize()) {
                 return false;
             }
             // different funcSymb in atoms or structures
-            if (t1g.getFunctor() != null && !t1g.getFunctor().equals(t2g.getFunctor())) {
+            if (t1g.getFunctor() != null
+                    && !t1g.getFunctor().equals(t2g.getFunctor())) {
                 return false;
             }
         }
 
         // both are vars
         if (t1g.isVar() && t2g.isVar()) {
-            VarTerm t1gv = (VarTerm)t1g;
-            VarTerm t2gv = (VarTerm)t2g;
+            VarTerm t1gv = (VarTerm) t1g;
+            VarTerm t2gv = (VarTerm) t2g;
             Term t1vl = function.get(t1gv);
             Term t2vl = function.get(t2gv);
-            
+
             // if the variable value is a var cluster, it means it has no value
-            if (t1vl instanceof VarsCluster) t1vl = null;
-            if (t2vl instanceof VarsCluster) t2vl = null;
-            
+            if (t1vl instanceof VarsCluster)
+                t1vl = null;
+            if (t2vl instanceof VarsCluster)
+                t2vl = null;
+
             // both has value, their values should unify
             if (t1vl != null && t2vl != null) {
-                return unifies(t1vl,t2vl);
+                return unifies(t1vl, t2vl);
             }
             // only t1 has value, t1's value should unify with var t2
             if (t1vl != null) {
-                return unifies(t2gv,t1vl);
+                return unifies(t2gv, t1vl);
             }
             // only t2 has value, t2's value should unify with var t2
             if (t2vl != null) {
-                return unifies(t1gv,t2vl);
+                return unifies(t1gv, t2vl);
             }
-            
+
             // both are var with no value
             // we must ensure that vars will form a line
-            VarTerm t1c = (VarTerm)t1gv.clone();
-            VarTerm t2c = (VarTerm)t2gv.clone();
-            VarsCluster cluster = new VarsCluster(t1c,t2c);
-            // all vars of the cluster should have the same value
-            for (VarTerm vtc: cluster.get()) {
-                function.put(vtc,cluster);                
+            VarTerm t1c = (VarTerm) t1gv.clone();
+            VarTerm t2c = (VarTerm) t2gv.clone();
+            VarsCluster cluster = new VarsCluster(t1c, t2c);
+            if (cluster.hasValue()) {
+                // all vars of the cluster should have the same value
+                for (VarTerm vtc : cluster.get()) {
+                    function.put(vtc, cluster);
+                }
             }
             return true;
         }
 
         // t1 is var that doesn't occur in t2
         if (t1g.isVar() && !t2g.hasVar(t1g)) {
-            return setVarValue( (VarTerm)t1g, t2g);
+            return setVarValue((VarTerm) t1g, t2g);
         }
 
         // t2 is var that doesn't occur in t1
         if (t2g.isVar() && !t1g.hasVar(t2g)) {
-            return setVarValue( (VarTerm)t2g, t1g);
+            return setVarValue((VarTerm) t2g, t1g);
         }
 
         // both are structures, same funcSymb, same arity
-        if (t1gts == null && t2gts == null && !t1g.isList() && !t2g.isList()) { 
+        if (t1gts == null && t2gts == null && !t1g.isList() && !t2g.isList()) {
             // lists always have terms == null
             return true;
         }
-        
+
         // do not use iterator! (see ListTermImpl class)
-        for (int i = 0; i < t1g.getTermsSize(); i++) { 
+        for (int i = 0; i < t1g.getTermsSize(); i++) {
             Term t1 = t1g.getTerm(i);
             Term t2 = t2g.getTerm(i);
             // if t1 or t2 are var with value, use the value
-            Term t1vl = get(t1); if (t1vl != null && !(t1vl instanceof VarsCluster)) t1 = t1vl;
-            Term t2vl = get(t2); if (t2vl != null && !(t2vl instanceof VarsCluster)) t2 = t2vl;
+            Term t1vl = get(t1);
+            if (t1vl != null && !(t1vl instanceof VarsCluster))
+                t1 = t1vl;
+            Term t2vl = get(t2);
+            if (t2vl != null && !(t2vl instanceof VarsCluster))
+                t2 = t2vl;
             if (!unifies2(t1, t2)) {
                 return false;
             }
@@ -218,23 +231,23 @@ public class Unifier implements Cloneable {
     }
 
     private boolean setVarValue(VarTerm vt, Term value) {
-        if (vt.isUnnamedVar()) return true;
-        
-        value = (Term)value.clone();
-        
+        if (vt.isUnnamedVar())
+            return true;
+
+        value = (Term) value.clone();
+
         // if the var has a cluster, set value for all cluster
         try {
-            VarsCluster cluster = (VarsCluster)function.get(vt);
-            for (VarTerm cvt: cluster.get()) {
+            VarsCluster cluster = (VarsCluster) function.get(vt);
+            for (VarTerm cvt : cluster.get()) {
                 function.put(cvt, value);
             }
         } catch (Exception e) {
             // no value in cluster
-            function.put( (VarTerm)vt.clone(), value);
+            function.put((VarTerm) vt.clone(), value);
         }
         return true;
     }
-
 
     /**
      * this version of unify tries to call the appropriate unify method
@@ -278,10 +291,10 @@ public class Unifier implements Cloneable {
 
         // if np1 is a var that unified, clear its annots
         if (ok && np1.isVar() && np1.hasAnnot()) {
-            ((Pred) function.get((VarTerm)np1)).setAnnots(null);
+            ((Pred) function.get((VarTerm) np1)).setAnnots(null);
         }
         if (ok && np2.isVar() && np2.hasAnnot()) {
-            ((Pred) function.get((VarTerm)np2)).setAnnots(null);
+            ((Pred) function.get((VarTerm) np2)).setAnnots(null);
         }
         return ok;
     }
@@ -289,20 +302,21 @@ public class Unifier implements Cloneable {
     // ----- Literal
 
     public boolean unifies(Literal l1, Literal l2) {
-        
+
         // if l1 and l2 are vars with values, compare using their values
         Term l1vl = get(l1);
-        if (l1vl != null && l1vl.isLiteral()) l1 = (Literal)l1vl;
+        if (l1vl != null && l1vl.isLiteral())
+            l1 = (Literal) l1vl;
         Term l2vl = get(l2);
-        if (l2vl != null && l2vl.isLiteral()) l2 = (Literal)l2vl;
-        
+        if (l2vl != null && l2vl.isLiteral())
+            l2 = (Literal) l2vl;
+
         if (!l1.isVar() && !l2.isVar() && l1.negated() != l2.negated()) {
             return false;
         }
         return unifies((Pred) l1, (Pred) l2);
     }
 
-    
     public boolean unifies(Trigger te1, Trigger te2) {
         return te1.sameType(te2) && unifies(te1.getLiteral(), te2.getLiteral());
     }
@@ -319,69 +333,82 @@ public class Unifier implements Cloneable {
         return function.size();
     }
 
-    @SuppressWarnings("unchecked")
     public Object clone() {
         try {
             Unifier newUn = new Unifier();
-            newUn.function = (HashMap) this.function.clone();
+            for (VarTerm k: function.keySet()) {
+                newUn.function.put( (VarTerm)k.clone(), (Term)function.get(k).clone());
+            }
             return newUn;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.log(Level.SEVERE, "Error cloning unifier.",e);
             return null;
         }
     }
+    
+    public void removeUngroundVars() {
+        Iterator<VarTerm> ik = function.keySet().iterator();
+        while (ik.hasNext()) {
+            VarTerm k = ik.next();
+            Term vl = function.get(k); 
+            if (!vl.isGround() || vl instanceof VarsCluster) {
+                ik.remove();
+            }
+        }        
+    }
 
-    /** 
-     * used to group a set of vars.
-     * E.g.: when X = Y = W = Z
-     * the function map has
-     * X -> { X, Y, W, Z }
-     * Y -> { X, Y, W, Z }
-     * W -> { X, Y, W, Z }
-     * Z -> { X, Y, W, Z }
-     * So when one var is assigned to a value, all var gives this value.
+    /**
+     * used to group a set of vars. E.g.: when X = Y = W = Z the function map
+     * has X -> { X, Y, W, Z } Y -> { X, Y, W, Z } W -> { X, Y, W, Z } Z -> { X,
+     * Y, W, Z } So when one var is assigned to a value, all var gives this
+     * value.
      * 
      * @author jomi
-     *
+     * 
      */
     class VarsCluster extends TermImpl {
         Set<VarTerm> vars = null;
-        
+
         VarsCluster(VarTerm v1, VarTerm v2) {
             add(v1);
             add(v2);
         }
-        
+
         void add(VarTerm vt) {
-            if (vt.isUnnamedVar()) return;
-            
+            if (vt.isUnnamedVar())
+                return;
+
             Term vl = function.get(vt);
             if (vl == null) {
                 // v1 has no value
-		if (vars == null) {
-			vars = new HashSet<VarTerm>();
-		}
+                if (vars == null) {
+                    vars = new HashSet<VarTerm>();
+                }
                 vars.add(vt);
             } else if (vl instanceof VarsCluster) {
                 if (vars == null) {
-			vars = ((VarsCluster)vl).get();
-		} else {
-			vars.addAll(((VarsCluster)vl).get());
-		}
+                    vars = ((VarsCluster) vl).get();
+                } else {
+                    vars.addAll(((VarsCluster) vl).get());
+                }
             } else {
                 logger.warning("joining var that has value!");
             }
         }
-        
+
         Set<VarTerm> get() {
             return vars;
         }
         
+        boolean hasValue() {
+            return vars != null && !vars.isEmpty();
+        }
+
         public String toString() {
             return vars.toString();
         }
     }
-    
+
     /** get as XML */
     public Element getAsDOM(Document document) {
         Element u = (Element) document.createElement("unifier");

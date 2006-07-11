@@ -435,7 +435,8 @@ public class TransitionSystem {
             // Rule Test
             case test:
                 Literal bodyl = (Literal) body;
-                if (conf.ag.believes(bodyl, u) != null) {
+                Literal lInBB = conf.ag.believes(bodyl, u);
+                if (lInBB != null) {
                     updateIntention();
                 } else {
                     logger.warning("Test Goal '" + h + "' failed as simple query. Generating internal event for it...");
@@ -583,6 +584,7 @@ public class TransitionSystem {
         for (Plan pl : candidateRPs) {
             Unifier relUn = pl.relevant(te);
             if (relUn != null) {
+                relUn.removeUngroundVars();
                 rp.add(new Option(pl, relUn));
             }
         }

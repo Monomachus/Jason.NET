@@ -75,10 +75,13 @@ public class DefaultBeliefBase implements BeliefBase {
             logger.log(Level.SEVERE, "Error: <true> or <false> can not be added as beliefs.");
             return false;
         }
+        
+        /*
         if (!l.isGround() && !l.isRule()) {
             logger.log(Level.SEVERE, "Error: Literal must be ground!");
             return false;
         }
+        */
         
         Literal bl = containsAsTerm(l);
         if (bl != null) {

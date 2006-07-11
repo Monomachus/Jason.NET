@@ -155,6 +155,7 @@ public class Literal extends Pred implements Cloneable {
                         
                         Unifier unC = (Unifier) un.clone();
                         if (unC.unifies(Literal.this, rhead)) {
+                            //System.out.println("retornando com "+rhead+" l="+Literal.this+" u="+ruleUn+" unC="+unC+" un="+un);
                             current = unC;
                             return;
                         }                        
@@ -166,15 +167,20 @@ public class Literal extends Pred implements Cloneable {
                         Literal b = il.next(); // b is the relevant entry in BB
                         if (b.isRule()) {
                             rule = (Rule)b;
+                            
                             // create a copy of this literal, ground it and 
                             // make its vars annonim, it is
                             // used to define what will be the unifier used
                             // inside the rule.
+                            // Only vars from rule head should get value in the
+                            // unifier used inside the rule evaluation.
                             Literal h = (Literal)Literal.this.clone();
                             un.apply(h);
                             h.makeVarsAnnon();
                             Unifier ruleUn = new Unifier();
-                            if (ruleUn.unifies(h, b)) {
+                            if (ruleUn.unifies(h, rule)) {
+                                ruleUn.removeUngroundVars();
+                                //System.out.println("indo com "+h+" un="+ruleUn);
                                 ruleIt = rule.getBody().logCons(ag,ruleUn);
                                 get();
                                 return;
