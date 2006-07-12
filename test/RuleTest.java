@@ -16,7 +16,7 @@ public class RuleTest extends TestCase {
 	protected void setUp() throws Exception {
 		super.setUp();
 	}
-
+ 
     public void testLogCons() {
         Agent ag = new Agent();
         ag.getBB().add(Literal.parseLiteral("a(10)"));
@@ -48,6 +48,9 @@ public class RuleTest extends TestCase {
         assertEquals(2,iteratorSize(iun));
 
         iun = Literal.parseLiteral("v(A)").logCons(ag, new Unifier());
+        //while (iun.hasNext()) {
+        //    System.out.println(iun.next());
+        //}
         assertEquals(5,iteratorSize(iun));
 
         // add s(X) :- r(X)
@@ -79,7 +82,7 @@ public class RuleTest extends TestCase {
         assertEquals(u.get("Y").toString(),"4");
     
     }    
-    
+
     public void testLogConsRec() {
         Agent ag = new Agent();
         
@@ -92,18 +95,22 @@ public class RuleTest extends TestCase {
                 LogExprTerm.parseExpr(".println(fim,M)")));
         ag.getBB().add(new Rule(Literal.parseLiteral("min([op(C)|T], op(V), M)"), 
                 LogExprTerm.parseExpr("C < V & min(T,op(C),M)")));
-        ag.getBB().add(new Rule(Literal.parseLiteral("min([_|T],V,M)"), 
-                LogExprTerm.parseExpr("min(T,V,M)")));
+        ag.getBB().add(new Rule(Literal.parseLiteral("min([op(C)|T], op(V), M)"), 
+                LogExprTerm.parseExpr("C >= V & min(T,op(V),M)")));
 
         Iterator<Unifier> iun = Literal.parseLiteral("min([],op(20),op(M))").logCons(ag, new Unifier());
         assertTrue(iun.hasNext());
         Unifier u = iun.next();
         assertEquals(u.get("M").toString(),"20");
 
-        iun = Literal.parseLiteral("min([op(5),op(3),op(8),op(1),op(40)],op(1000),op(M))").logCons(ag, new Unifier());
+        Literal cons = Literal.parseLiteral("min([op(5),op(3),op(8),op(1),op(40)],op(1000),op(M))");
+        Iterator<Literal> il = ag.getBB().getRelevant(cons);
+        assertEquals(3,iteratorSize(il));
+        
+        iun = cons.logCons(ag, new Unifier());
         u = iun.next();
+        //System.out.println(u);
         assertEquals(u.get("M").toString(),"1");
-    
     }    
     
     

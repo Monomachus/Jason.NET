@@ -23,34 +23,48 @@
 
 package jason.asSyntax;
 
-
-
 /**
- * Represents an unnamed variable '_'. 
+ * Represents an unnamed variable '_'.
  * 
  * @author jomi
  */
 public class UnnamedVar extends VarTerm {
-	//static private Logger logger = Logger.getLogger(UnnamedVar.class.getName());
-	
-	public UnnamedVar() {
-		super();
-	}
+    // static private Logger logger =
+    // Logger.getLogger(UnnamedVar.class.getName());
+    private static int varCont = 1;
 
-	public Object clone() {
-		return new UnnamedVar();
-	}
-	
-	/** overridden VarTerm setValue, this method does nothing, so the Var never has value */
-    @Override public boolean setValue(Term vl) {
-		return true;
-	}
-	
-    @Override public boolean isUnnamedVar() {
-		return true;
-	}
-	
-	public String toString() {
-		return "_";
-	}
+    public UnnamedVar() {
+        super();
+        setFunctor("_" + (varCont++));
+    }
+
+    private UnnamedVar(String name) {
+        super();
+        setFunctor(name);
+    }
+
+    public Object clone() {
+        UnnamedVar v = new UnnamedVar(getFunctor());
+        if (hasValue()) {
+            v.setValue((Term) getValue().clone());
+        }
+        return v;
+    }
+
+    /**
+     * overridden VarTerm setValue, this method does nothing, so the Var never
+     * has value
+     */
+    // @Override public boolean setValue(Term vl) {
+    // return true;
+    // }
+    
+    @Override
+    public boolean isUnnamedVar() {
+        return !hasValue();
+    }
+
+    // public String toString() {
+    // return "_";
+    // }
 }

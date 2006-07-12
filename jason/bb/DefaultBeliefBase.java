@@ -84,7 +84,7 @@ public class DefaultBeliefBase implements BeliefBase {
         */
         
         Literal bl = containsAsTerm(l);
-        if (bl != null) {
+        if (bl != null && !bl.isRule()) {
             // add only annots
             if (l.hasSubsetAnnot(bl))
                 // the current bel bl already has l's annots

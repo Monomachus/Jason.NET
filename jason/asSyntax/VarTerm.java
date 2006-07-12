@@ -348,7 +348,7 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
         if (value == null) {
             return super.hasVar(t);
         } else {
-            return getValue().hasVar(t);
+            return value.hasVar(t);
         }
     }
 
@@ -363,7 +363,7 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
             return s;
         } else {
             // campare the values
-            return getValue().toString();
+            return value.toString();
         }
     }
 
@@ -375,8 +375,8 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
 
     @Override
     public void setAnnots(ListTerm l) {
-        if (value != null && getValue().isPred())
-            ((Pred) getValue()).setAnnots(l);
+        if (value != null && value.isPred())
+            ((Pred) value).setAnnots(l);
         else
             super.setAnnots(l);
     }

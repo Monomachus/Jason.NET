@@ -584,7 +584,7 @@ public class TransitionSystem {
         for (Plan pl : candidateRPs) {
             Unifier relUn = pl.relevant(te);
             if (relUn != null) {
-                relUn.removeUngroundVars();
+                //relUn.removeUngroundVars();
                 rp.add(new Option(pl, relUn));
             }
         }

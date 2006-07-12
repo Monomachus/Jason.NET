@@ -110,8 +110,7 @@ public class Unifier implements Cloneable {
 
     public Term get(Term t) {
         if (t.isVar()) {
-            return function.get((VarTerm) t); // getLastVarTermChain(
-                                                // (VarTerm)t));
+            return function.get((VarTerm) t);
         } else {
             return null;
         }
@@ -182,15 +181,17 @@ public class Unifier implements Cloneable {
                 return unifies(t1gv, t2vl);
             }
 
-            // both are var with no value
-            // we must ensure that vars will form a line
-            VarTerm t1c = (VarTerm) t1gv.clone();
-            VarTerm t2c = (VarTerm) t2gv.clone();
-            VarsCluster cluster = new VarsCluster(t1c, t2c);
-            if (cluster.hasValue()) {
-                // all vars of the cluster should have the same value
-                for (VarTerm vtc : cluster.get()) {
-                    function.put(vtc, cluster);
+            // both are var (not unnamedvar) with no value, like X=Y
+            // we must ensure that these vars will form a cluster
+            if (! t1gv.isUnnamedVar() && ! t2gv.isUnnamedVar()) {
+                VarTerm t1c = (VarTerm) t1gv.clone();
+                VarTerm t2c = (VarTerm) t2gv.clone();
+                VarsCluster cluster = new VarsCluster(t1c, t2c);
+                if (cluster.hasValue()) {
+                    // all vars of the cluster should have the same value
+                    for (VarTerm vtc : cluster.get()) {
+                        function.put(vtc, cluster);
+                    }
                 }
             }
             return true;
@@ -231,8 +232,8 @@ public class Unifier implements Cloneable {
     }
 
     private boolean setVarValue(VarTerm vt, Term value) {
-        if (vt.isUnnamedVar())
-            return true;
+        //if (vt.isUnnamedVar())
+        //    return true;
 
         value = (Term) value.clone();
 
@@ -314,6 +315,7 @@ public class Unifier implements Cloneable {
         if (!l1.isVar() && !l2.isVar() && l1.negated() != l2.negated()) {
             return false;
         }
+        //System.out.println(l1+"="+l2);
         return unifies((Pred) l1, (Pred) l2);
     }
 
@@ -346,6 +348,7 @@ public class Unifier implements Cloneable {
         }
     }
     
+    /*
     public void removeUngroundVars() {
         Iterator<VarTerm> ik = function.keySet().iterator();
         while (ik.hasNext()) {
@@ -356,6 +359,7 @@ public class Unifier implements Cloneable {
             }
         }        
     }
+    */
 
     /**
      * used to group a set of vars. E.g.: when X = Y = W = Z the function map
@@ -375,9 +379,6 @@ public class Unifier implements Cloneable {
         }
 
         void add(VarTerm vt) {
-            if (vt.isUnnamedVar())
-                return;
-
             Term vl = function.get(vt);
             if (vl == null) {
                 // v1 has no value

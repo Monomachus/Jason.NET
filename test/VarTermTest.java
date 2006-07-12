@@ -260,4 +260,25 @@ public class VarTermTest extends TestCase {
         assertTrue(u.unifies(a1,a2));
         assertEquals(u.get("X3").toString(),"1");
     }
+    
+    public void testInnerVarUnif() {
+        Unifier u = new Unifier();
+        Literal l = Literal.parseLiteral("op(X)");
+        u.unifies(new VarTerm("M"), l);
+        u.unifies(new VarTerm("M"), Literal.parseLiteral("op(1)"));
+        u.apply(l);
+        //assertEquals(u.get("M").toString(),"op(1)");
+        assertEquals(l.toString(),"op(1)");
+    }
+    
+    public void testUnnamedVar() {
+        Term a1 = TermImpl.parse("a(_,_)");
+        Term a2 = TermImpl.parse("a(10,20)");
+        Term a3 = TermImpl.parse("a(30,40)");
+        Unifier u = new Unifier();
+        assertTrue(u.unifies(a1,a2));
+        assertFalse(u.unifies(a1,a3));
+        u.apply(a1);
+        assertEquals(a1.toString(), "a(10,20)");
+    }
 }

@@ -147,7 +147,7 @@ public class Literal extends Pred implements Cloneable {
                     current = null;
                     
                     // try rule iterator
-                    if (ruleIt != null && ruleIt.hasNext()) {
+                    while (ruleIt != null && ruleIt.hasNext()) {
                         // unifies the rule head with the result of rule evaluation
                         Unifier ruleUn = ruleIt.next(); // evaluation result
                         Literal rhead = rule.headClone();
@@ -155,11 +155,10 @@ public class Literal extends Pred implements Cloneable {
                         
                         Unifier unC = (Unifier) un.clone();
                         if (unC.unifies(Literal.this, rhead)) {
-                            //System.out.println("retornando com "+rhead+" l="+Literal.this+" u="+ruleUn+" unC="+unC+" un="+un);
+                            //System.out.println("retornando com "+Literal.this+"="+rhead+" ruleUn ="+ruleUn+" unC="+unC+" un="+un);
                             current = unC;
                             return;
-                        }                        
-                        return;
+                        }
                     }
                     
                     // try literal iterator
@@ -179,11 +178,13 @@ public class Literal extends Pred implements Cloneable {
                             h.makeVarsAnnon();
                             Unifier ruleUn = new Unifier();
                             if (ruleUn.unifies(h, rule)) {
-                                ruleUn.removeUngroundVars();
-                                //System.out.println("indo com "+h+" un="+ruleUn);
+                                //System.out.println("indo com "+h+" rule="+rule+" un="+ruleUn);
                                 ruleIt = rule.getBody().logCons(ag,ruleUn);
                                 get();
-                                return;
+                                //System.out.println("get="+current+" - "+il.hasNext());
+                                if (current != null) { // if it get a value
+                                    return;
+                                }
                             }
                         } else {
                             Unifier unC = (Unifier) un.clone();
