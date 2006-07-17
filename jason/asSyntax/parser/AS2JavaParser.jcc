@@ -97,7 +97,7 @@ TOKEN : {
 // Identifiers
 |  <ATOM      : (<LC_LETTER> | "." <CHAR>) (<CHAR> | "." <CHAR>)*>
 |  <VAR       :  <UP_LETTER> (<CHAR>)*>
-|  <UNNAMEDVAR:  "_">
+|  <UNNAMEDVAR:  "_" (["0"-"9"])* >
 |  <CHAR      : (<LETTER> | <DIGIT> | "_")>
 |  <LETTER    : ( <LC_LETTER> | <UP_LETTER> )>
 |  <LC_LETTER : ["a"-"z"]>

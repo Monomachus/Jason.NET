@@ -45,7 +45,7 @@ public interface as2jConstants {
     "<STRING>",
     "<ATOM>",
     "<VAR>",
-    "\"_\"",
+    "<UNNAMEDVAR>",
     "<CHAR>",
     "<LETTER>",
     "<LC_LETTER>",

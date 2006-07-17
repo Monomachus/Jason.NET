@@ -24,9 +24,14 @@
 
 package jason.asSemantics;
 
+import jason.asSyntax.BodyLiteral;
+import jason.asSyntax.ListTerm;
+import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Plan;
-import jason.asSyntax.Trigger; // To remember the triggering event that generated
-                               // this intended means (e.g., for failure)
+import jason.asSyntax.StringTermImpl;
+import jason.asSyntax.Term;
+import jason.asSyntax.TermImpl;
+import jason.asSyntax.Trigger;
 
 import java.io.Serializable;
 
@@ -44,6 +49,12 @@ public class IntendedMeans implements Serializable {
     	unif = (Unifier)opt.unif.clone();
     }
 
+    /** removes the current action of the IM */
+    public BodyLiteral step() {
+        return plan.getBody().remove(0);
+    }
+    
+    
     public Plan getPlan() {
     	return plan;
     }
@@ -62,11 +73,32 @@ public class IntendedMeans implements Serializable {
 	public boolean isAtomic() {
 		return plan != null && plan.isAtomic();
 	}
+    
+    public boolean isFinished() {
+        return plan.getBody().isEmpty();
+    }
+    
+    public boolean isGoalAdd() {
+        return trigger.isAddition() && trigger.isGoal();
+    }
 	
     public String toString() {
         return plan + " : " + unif;
     }
 
+    public Term getAsTerm() {
+        Term im = new TermImpl("im");
+        im.addTerm(new StringTermImpl(plan.getLabel().toString()));
+        ListTerm lt = new ListTermImpl();
+        for (BodyLiteral bd: plan.getBody()) {
+            BodyLiteral c = (BodyLiteral)bd.clone();
+            unif.apply(c.getTerm());
+            lt.add(new StringTermImpl(c.toString()));
+        }
+        im.addTerm(lt);
+        return im;        
+    }
+    
     /** get as XML */
 	public Element getAsDOM(Document document) {
 		Element eim = (Element) document.createElement("intended-means");

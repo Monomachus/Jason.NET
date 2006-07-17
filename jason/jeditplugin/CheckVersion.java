@@ -37,7 +37,8 @@ public class CheckVersion extends Thread {
     boolean isLatestVersion() {
         // get user version
         String cVersion = Config.get().getJasonRunningVersion();
-        return cVersion.equals(getLatestVersion());
+        String lv = getLatestVersion();
+        return lv == null || cVersion.equals(lv);
     }
 
     String whatsNew() {
@@ -97,10 +98,14 @@ public class CheckVersion extends Thread {
     }
 
     public void run() {
-        if (Config.get().getProperty(Config.CHECK_VERSION,"true").equals("true")) {
-            if (!isLatestVersion()) {
-                show();
+        try {
+            if (Config.get().getProperty(Config.CHECK_VERSION,"true").equals("true")) {
+                if (!isLatestVersion()) {
+                    show();
+                }
             }
+        } catch (Exception e) {
+            
         }
     }
 

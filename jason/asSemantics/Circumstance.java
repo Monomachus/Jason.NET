@@ -23,13 +23,16 @@
 
 package jason.asSemantics;
 
-import jason.JasonException;
 import jason.asSyntax.Literal;
 import jason.asSyntax.Trigger;
 
 import java.io.Serializable;
-import java.util.*;
-import java.util.logging.Level;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import org.w3c.dom.Document;
@@ -86,6 +89,7 @@ public class Circumstance implements Serializable {
         addEvent(new Event(new Trigger(Trigger.TEAdd, Trigger.TETestG, l), i));
     }
 
+    /*
     public void delAchvGoal(Literal l, Intention i) {
         addEvent(new Event(new Trigger(Trigger.TEDel, Trigger.TEAchvG, l), i));
     }
@@ -102,7 +106,8 @@ public class Circumstance implements Serializable {
         else
             throw new JasonException("Unknown type of goal.");
     }
-
+    */
+    
     public void addExternalEv(Trigger trig) {
         addEvent(new Event(trig, Intention.EmptyInt));
     }

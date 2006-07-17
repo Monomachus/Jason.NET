@@ -34,94 +34,107 @@ import jason.runtime.Settings;
 
 import java.util.List;
 
-/** 
- * Base agent architecture class that defines the overall agent
- * architecture; the AS interpreter is only the reasoner (a kind of mind) within this
+/**
+ * Base agent architecture class that defines the overall agent architecture;
+ * the AS interpreter is only the reasoner (a kind of mind) within this
  * architecture (a kind of body).
  * 
- * <p>The agent reasoning cycle (implemented in TransitionSystem class)
- * calls these methods to get perception, action, and communication.
+ * <p>
+ * The agent reasoning cycle (implemented in TransitionSystem class) calls these
+ * methods to get perception, action, and communication.
  * 
- * <p>This class just calls the AgArchInfraTier methods
- * implemented by the infrastructure tier (Centralised, Saci, ...). 
- * However, the user can customise
+ * <p>
+ * This class just calls the AgArchInfraTier methods implemented by the
+ * infrastructure tier (Centralised, Saci, ...). However, the user can customise
  * this methods overridding some of them in his/her arch. class.
  */
 public class AgArch {
 
-	protected TransitionSystem fTS = null;
-	
-	/** The class that implements the architecture tier for the MAS infrastructure */
-	AgArchInfraTier archTier;
+    protected TransitionSystem fTS = null;
 
-    /** Creates the agent class defined by <i>agClass</i>, default is jason.semantics.Agent. */
-    public void initAg(String agClass, ClassParameters bbPars, String asSrc, Settings stts) throws JasonException {
+    /**
+     * The class that implements the architecture tier for the MAS
+     * infrastructure
+     */
+    AgArchInfraTier archTier;
+
+    /**
+     * Creates the agent class defined by <i>agClass</i>, default is
+     * jason.semantics.Agent.
+     */
+    public void initAg(String agClass, ClassParameters bbPars, String asSrc,
+            Settings stts) throws JasonException {
         // set the agent
         try {
-            Agent ag = (Agent)Class.forName(agClass).newInstance();
-            BeliefBase bb = (BeliefBase)Class.forName(bbPars.className).newInstance();
+            Agent ag = (Agent) Class.forName(agClass).newInstance();
+            BeliefBase bb = (BeliefBase) Class.forName(bbPars.className).newInstance();
             fTS = ag.initAg(this, bb, asSrc, stts);
             bb.init(ag, bbPars.getParametersArray());
         } catch (Exception e) {
-            throw new JasonException("as2j: error creating the agent class! - "+e);
+            throw new JasonException("as2j: error creating the agent class! - " + e);
         }
     }
 
-    /** Stops the agent, the user should override this method to do something before the agent is killed. The default implementation does nothing. */
+    /**
+     * Stops the agent, the user should override this method to do something
+     * before the agent is killed. The default implementation does nothing.
+     */
     public void stopAg() {
         fTS.getAg().getBB().stop();
     }
 
     public void setArchInfraTier(AgArchInfraTier ai) {
-		archTier = ai;
-	}
+        archTier = ai;
+    }
+
     public AgArchInfraTier getArchInfraTier() {
-    	    return archTier;
+        return archTier;
     }
-	
+
     public TransitionSystem getTS() {
-    	    return fTS;
+        return fTS;
     }
 
-
-	
     /** Gets the agent's perception as a list of Literals */
-	public List<Literal> perceive() {
-		return archTier.perceive();
-	}
+    public List<Literal> perceive() {
+        return archTier.perceive();
+    }
 
     /** Reads the agent's mailbox and adds messages into the agent's circumstance */
-	public void checkMail() {
-		archTier.checkMail();
-	}
+    public void checkMail() {
+        archTier.checkMail();
+    }
 
-    /** Executes the action <i>action</i> and, when finished, add it back in <i>feedback</i> actions. */
-	public void act(ActionExec action, List<ActionExec> feedback) {
-		archTier.act(action, feedback);
-	}
+    /**
+     * Executes the action <i>action</i> and, when finished, add it back in
+     * <i>feedback</i> actions.
+     */
+    public void act(ActionExec action, List<ActionExec> feedback) {
+        archTier.act(action, feedback);
+    }
 
-	/** Returns true if the agent can enter in sleep mode. */
-	public boolean canSleep() {
-		return archTier.canSleep();
+    /** Returns true if the agent can enter in sleep mode. */
+    public boolean canSleep() {
+        return archTier.canSleep();
     }
 
     /** Gets the agent's name */
-	public String getAgName() {
-		return archTier.getAgName();
-	}
+    public String getAgName() {
+        return archTier.getAgName();
+    }
 
     /** Sends a Jason message */
-	public void sendMsg(Message m) throws Exception {
-		archTier.sendMsg(m);
-	}
+    public void sendMsg(Message m) throws Exception {
+        archTier.sendMsg(m);
+    }
 
     /** Broadcasts a Jason message */
-	public void broadcast(Message m) throws Exception {
-		archTier.broadcast(m);
-	}
+    public void broadcast(Message m) throws Exception {
+        archTier.broadcast(m);
+    }
 
     /** Checks whether the agent is running */
-	public boolean isRunning() {
-		return archTier.isRunning();
-	}
+    public boolean isRunning() {
+        return archTier.isRunning();
+    }
 }

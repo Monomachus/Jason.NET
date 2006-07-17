@@ -40,6 +40,7 @@ import jason.runtime.Settings;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -252,9 +253,9 @@ public class TransitionSystem {
             confP.step = State.SelAppl;
         } else { // Rule Appl2
             if (conf.C.SE.trigger.isGoal()) {
-                generateGoalDeletionFromEvent(); 
                 // can't carry on, no applicable plan.
                 logger.warning("Found a goal for which there is no applicable plan:\n" + conf.C.SE);
+                generateGoalDeletionFromEvent(); 
             }
             // e.g. belief addition as internal event, just go ahead
             // but note that the event was relevant, yet it is possible
@@ -373,202 +374,205 @@ public class TransitionSystem {
     }
 
     private void applyExecInt() throws JasonException {
+        confP.step = State.ClrInt; // default next stop
+        
+        if (conf.C.SI.isFinished()) {
+            return;
+        }
+        
         // get next formula in the body of the intended means
         // on the top of the selected intention
 
         IntendedMeans im = conf.C.SI.peek();
 
-        if (im.getPlan().getBody().size() == 0) { 
+        if (im.isFinished()) { 
             // for empty plans! may need unif, etc
             updateIntention();
-        } else {
-            Unifier u = im.unif;
-            BodyLiteral h = (BodyLiteral) im.getPlan().getBody().get(0);
-
-            Term body = (Term) h.getTerm().clone();
-            u.apply(body);
-
-            switch (h.getType()) {
-
-            // Rule Action
-            case action:
-                confP.C.A = new ActionExec((Pred) body, conf.C.SI);
-                break;
-
-            case internalAction:
-                boolean ok = true;
-                try {
-                    ok = ag.getIA(body).execute(this, u, body.getTermsArray());
-                    if (ok && !h.isAsk()) {
-                        updateIntention();
-                    }
-                } catch (Exception e) {
-                    logger.log(Level.SEVERE, "Error in IA ", e);
-                    ok = false;
-                }
-                if (!ok) {
-                    generateGoalDeletion();
-                }
-                break;
-
-            case constraint:
-                if (((RelExprTerm) body).logCons(ag, u).hasNext()) {
-                    updateIntention();
-                } else {
-                    generateGoalDeletion();
-                }
-                break;
-
-            // Rule Achieve
-            case achieve:
-                // free variables in an event cannot conflict with those in the plan
-                body.makeVarsAnnon();
-                conf.C.addAchvGoal((Literal) body, conf.C.SI);
-                break;
-
-            // Rule Achieve as a New Focus
-            case achieveNF:
-                conf.C.addAchvGoal((Literal) body, Intention.EmptyInt);
-                updateIntention();
-                break;
-
-            // Rule Test
-            case test:
-                Literal bodyl = (Literal) body;
-                Literal lInBB = conf.ag.believes(bodyl, u);
-                if (lInBB != null) {
-                    updateIntention();
-                } else {
-                    logger.warning("Test Goal '" + h + "' failed as simple query. Generating internal event for it...");
-                    conf.C.addTestGoal(bodyl, conf.C.SI);
-                }
-                break;
-
-                
-            case delAddBel: 
-                // -+a(1,X) ===> remove a(_,_), add a(1,X)
-                // change all vars to anon vars to remove it
-                Literal bc = (Literal)body.clone();
-                bc.makeTermsAnnon();
-                // to delete, create events as external to avoid that
-                // remove/add create two events for the same intention
-
-                List<Literal>[] result = ag.brf(null, bc, conf.C.SI); // the intention is not the new focus
-                if (result != null) { // really add something
-                    // generate events
-                    updateEvents(result,Intention.EmptyInt);
-                }
-
-                // add the belief, so no break;
-                
-            // Rule AddBel
-            case addBel:
-                bodyl = (Literal) body;
-                if (!bodyl.hasSource()) {
-                    // do not add source(self) in case the
-                    // programmer set the source
-                    bodyl.addAnnot(BeliefBase.TSelf);
-                }
-
-                // calculate focus
-                Intention newfocus = Intention.EmptyInt;
-                if (setts.sameFocus()) {
-                    newfocus = conf.C.SI;
-                }
-
-                // call BRF
-                result = ag.brf(bodyl,null,conf.C.SI); // the intention is not the new focus
-                if (result != null) { // really add something
-                    // generate events
-                    updateEvents(result,newfocus);
-                    if (!setts.sameFocus()) {
-                        updateIntention();
-                    }                    
-                } else {
-                    updateIntention();                    
-                }
-                break;
-                
-            case delBel:
-                bodyl = (Literal) body;
-                newfocus = Intention.EmptyInt;
-                if (setts.sameFocus()) {
-                    newfocus = conf.C.SI;
-                }
-
-                // call BRF
-                result = ag.brf(null,bodyl, conf.C.SI); // the intention is not the new focus
-                if (result != null) { // really add something
-                    // generate events
-                    updateEvents(result,newfocus);
-                    if (!setts.sameFocus()) {
-                        updateIntention();
-                    }                    
-                } else {
-                    updateIntention();                    
-                }
-                break;
-            }
+            return;
         }
-        confP.step = State.ClrInt;
+        Unifier u = im.unif;
+        BodyLiteral h = (BodyLiteral) im.getPlan().getBody().get(0);
+
+        Term body = (Term) h.getTerm().clone();
+        u.apply(body);
+
+        switch (h.getType()) {
+
+        // Rule Action
+        case action:
+            confP.C.A = new ActionExec((Pred) body, conf.C.SI);
+            break;
+
+        case internalAction:
+            boolean ok = true;
+            try {
+                ok = ag.getIA(body).execute(this, u, body.getTermsArray());
+                if (ok && !h.isAsk()) {
+                    updateIntention();
+                }
+            } catch (Exception e) {
+                logger.log(Level.SEVERE, "Error in IA ", e);
+                ok = false;
+            }
+            if (!ok) {
+                generateGoalDeletion();
+            }
+            break;
+
+        case constraint:
+            if (((RelExprTerm) body).logCons(ag, u).hasNext()) {
+                updateIntention();
+            } else {
+                generateGoalDeletion();
+            }
+            break;
+
+        // Rule Achieve
+        case achieve:
+            // free variables in an event cannot conflict with those in the plan
+            body.makeVarsAnnon();
+            conf.C.addAchvGoal((Literal) body, conf.C.SI);
+            break;
+
+        // Rule Achieve as a New Focus
+        case achieveNF:
+            conf.C.addAchvGoal((Literal) body, Intention.EmptyInt);
+            updateIntention();
+            break;
+
+        // Rule Test
+        case test:
+            Literal bodyl = (Literal) body;
+            Literal lInBB = conf.ag.believes(bodyl, u);
+            if (lInBB != null) {
+                updateIntention();
+            } else {
+                logger.warning("Test Goal '" + h + "' failed as simple query. Generating internal event for it...");
+                conf.C.addTestGoal(bodyl, conf.C.SI);
+            }
+            break;
+
+            
+        case delAddBel: 
+            // -+a(1,X) ===> remove a(_,_), add a(1,X)
+            // change all vars to anon vars to remove it
+            Literal bc = (Literal)body.clone();
+            bc.makeTermsAnnon();
+            // to delete, create events as external to avoid that
+            // remove/add create two events for the same intention
+
+            List<Literal>[] result = ag.brf(null, bc, conf.C.SI); // the intention is not the new focus
+            if (result != null) { // really add something
+                // generate events
+                updateEvents(result,Intention.EmptyInt);
+            }
+
+            // add the belief, so no break;
+            
+        // Rule AddBel
+        case addBel:
+            bodyl = (Literal) body;
+            if (!bodyl.hasSource()) {
+                // do not add source(self) in case the
+                // programmer set the source
+                bodyl.addAnnot(BeliefBase.TSelf);
+            }
+
+            // calculate focus
+            Intention newfocus = Intention.EmptyInt;
+            if (setts.sameFocus()) {
+                newfocus = conf.C.SI;
+            }
+
+            // call BRF
+            result = ag.brf(bodyl,null,conf.C.SI); // the intention is not the new focus
+            if (result != null) { // really add something
+                // generate events
+                updateEvents(result,newfocus);
+                if (!setts.sameFocus()) {
+                    updateIntention();
+                }                    
+            } else {
+                updateIntention();                    
+            }
+            break;
+            
+        case delBel:
+            bodyl = (Literal) body;
+            newfocus = Intention.EmptyInt;
+            if (setts.sameFocus()) {
+                newfocus = conf.C.SI;
+            }
+
+            // call BRF
+            result = ag.brf(null,bodyl, conf.C.SI); // the intention is not the new focus
+            if (result != null) { // really add something
+                // generate events
+                updateEvents(result,newfocus);
+                if (!setts.sameFocus()) {
+                    updateIntention();
+                }                    
+            } else {
+                updateIntention();                    
+            }
+            break;
+        }
     }
 
     private void applyClrInt() throws JasonException {
         // Rule ClrInt
         confP.step = State.StartRC; // default next step
-        if (conf.C.SI != null) {
-            IntendedMeans im = conf.C.SI.peek();
-            if (im.getPlan().getBody().isEmpty()) {
-                if (conf.C.SI.size() > 1) {
-                    IntendedMeans oldim = confP.C.SI.pop();
-                    if (im.getTrigger().isGoal() && !im.getTrigger().isAddition()) {
-                        // needs to get rid of the failed plan when finished
-                        // handling failure only when it was a -!g for +!g
-                        im = conf.C.SI.peek();
-                        if (im.getTrigger().isAddition() 
-                                && im.getTrigger().isGoal() 
-                                && im.unif.unifies(oldim.getTrigger().getLiteral(), im.getTrigger().getLiteral())
-                                && conf.C.SI.size() > 1) {
-                            confP.C.SI.pop();
-                        }
-                    }
-                    im = conf.C.SI.peek();
-                    // TODO: We needed this if() here but not sure when body
-                    // could be 0!!!
-                    // Check why this can happen; perhaps test goal is removed
-                    // from body when event is created, unlike achievement goal?
-                    if (im.getPlan().getBody().size() > 0) {
-                        BodyLiteral g = (BodyLiteral) im.getPlan().getBody().remove(0);
-                        // make the TE of finished plan ground and unify that
-                        // with goal in the body
-                        Literal tel = oldim.getPlan().getTriggerEvent().getLiteral();
-                        oldim.unif.apply(tel);
-                        im.unif.unifies(tel, g.getTerm());
-                    }
+        if (conf.C.SI == null) {
+            return;
+        }
+        if (conf.C.SI.isFinished()) {
+            // intention finished, remove it
+            confP.C.removeIntention(conf.C.SI);
+            conf.C.SI = null;
+            return;
+        }
 
-                    // the new top may have become
-                    // empty! need to keep checking.
-                    confP.step = State.ClrInt; 
+        IntendedMeans im = conf.C.SI.peek();
+        if (!im.isFinished()) {
+            // nothing todo
+            return;
+        }
 
-                    /*
-                     * the following was not enought to remove
-                     * selectAtomicIntention 
-                     * if (!conf.C.SI.isAtomic()) { // not
-                     * atomic intention anymore conf.C.AI = null;
-                     * System.out.println("111"); }
-                     */
-                } else {
-                    confP.C.removeIntention(conf.C.SI);
-                    /*
-                     * the following was not enought to remove
-                     * selectAtomicIntention if (conf.C.SI.isAtomic()) { //
-                     * remove atomic intention conf.C.AI = null;
-                     * System.out.println("2222"); }
-                     */
-                    conf.C.SI = null;
-                }
+        // remove the finished IM from the top of the intention
+        IntendedMeans topIM = confP.C.SI.pop();
+        
+        // finished an failure handling IM
+        if (im.getTrigger().isGoal() && !im.getTrigger().isAddition()) {
+            // needs to get rid of the IM until the goal that
+            // has failure handling
+            //   -!b
+            //   +!c
+            //   +!d
+            //   +!b
+            //   +!s: !b; !z
+            // should became
+            //   +!s: !z
+            im = conf.C.SI.pop(); // +!c above, old
+            while (!im.unif.unifies(topIM.getTrigger().getLiteral(), im.getTrigger().getLiteral())) {
+                im = confP.C.SI.pop();
             }
         }
+        if (!conf.C.SI.isFinished()) {
+            im = conf.C.SI.peek(); // +!s
+            if (!im.isFinished()) {
+                // removes !b
+                BodyLiteral g = im.step(); 
+                // make the TE of finished plan ground and unify that
+                // with goal in the body
+                Literal tel = topIM.getPlan().getTriggerEvent().getLiteral();
+                topIM.unif.apply(tel);
+                im.unif.unifies(tel, g.getTerm());
+            }
+        }
+
+        // the new top may have become
+        // empty! need to keep checking.
+        confP.step = State.ClrInt; 
     }
 
     /** ******************************************* */
@@ -650,9 +654,16 @@ public class TransitionSystem {
 
     private void generateGoalDeletion() throws JasonException {
         IntendedMeans im = conf.C.SI.peek();
-        Trigger tevent = im.getTrigger();
-        if (tevent.isAddition() && tevent.isGoal()) {
-            confP.C.delGoal(tevent.getGoal(), tevent.getLiteral(), conf.C.SI);
+        if (im.isGoalAdd()) {
+            Event failEvent = findEventForFailure(conf.C.SI, im.getTrigger());
+            if (failEvent != null) {
+                confP.C.addEvent(failEvent);
+                logger.warning("Generating goal deletion " + failEvent.getTrigger() + " from goal: " + im.getTrigger());
+            } else {
+                logger.warning("No fail event was generated for " + im.getTrigger());
+            }
+            
+            //confP.C.delGoal(tevent.getGoal(), tevent.getLiteral(), conf.C.SI);
             // intention will be suspended
         }
         // if "discard" is set, we are deleting the whole intention!
@@ -661,7 +672,7 @@ public class TransitionSystem {
             // get the external event (or the one that started
             // the whole focus of attentiont) and requeue it
             im = conf.C.SI.get(0);
-            confP.C.addExternalEv(tevent);
+            confP.C.addExternalEv(im.getTrigger());
         } else {
             logger.warning("Could not finish intention: " + conf.C.SI);
         }
@@ -671,24 +682,12 @@ public class TransitionSystem {
     private void generateGoalDeletionFromEvent() throws JasonException {
         Event ev = conf.C.SE;
         Trigger tevent = ev.trigger;
-        // TODO: double check all cases here
+
         if (tevent.isAddition() && tevent.isGoal() && ev.isInternal()) {
-            Trigger failTrigger = new Trigger(Trigger.TEDel, tevent.getGoal(), tevent.getLiteral());
-            // logger.info("Trying "+failTrigger+"
-            // relevant="+getAg().getPS().isRelevant(failTrigger));
-
-            // find a relevant failure plan
-            while (!getAg().getPL().isRelevant(failTrigger.getPredicateIndicator()) && ev.intention.size() > 0) {
-                tevent = ev.intention.peek().getTrigger();
-                failTrigger = new Trigger(Trigger.TEDel, tevent.getGoal(), tevent.getLiteral());
-                // logger.info("Trying "+failTrigger+"
-                // relevant="+getAg().getPS().isRelevant(failTrigger));
-
-                ev.intention.pop();
-            }
-            if (tevent.isGoal() && getAg().getPL().isRelevant(failTrigger.getPredicateIndicator())) {
-                confP.C.addEvent(new Event(failTrigger, ev.intention));
-                logger.warning("Generating goal deletion " + failTrigger + " from event: " + ev.getTrigger());
+            Event failEvent = findEventForFailure(ev.intention, tevent);
+            if (failEvent != null) {
+                logger.warning("Generating goal deletion " + failEvent.getTrigger() + " from event: " + ev.getTrigger());
+                confP.C.addEvent(failEvent);
             } else {
                 logger.warning("No fail event was generated for " + ev.getTrigger());
             }
@@ -704,6 +703,21 @@ public class TransitionSystem {
             logger.warning("Discarding external event: " + ev);
     }
 
+    private Event findEventForFailure(Intention i, Trigger tevent) {
+        Trigger failTrigger = new Trigger(Trigger.TEDel, tevent.getGoal(), tevent.getLiteral());
+        ListIterator<IntendedMeans> ii = i.iterator();
+        while (!getAg().getPL().isRelevant(failTrigger.getPredicateIndicator()) && ii.hasPrevious()) {
+            IntendedMeans im = ii.previous(); 
+            tevent = im.getTrigger();
+            failTrigger = new Trigger(Trigger.TEDel, tevent.getGoal(), tevent.getLiteral());
+        }
+        // if some failure handling plan is found
+        if (tevent.isGoal() && getAg().getPL().isRelevant(failTrigger.getPredicateIndicator())) {
+            return new Event(failTrigger, i);
+        }
+        return null;
+    }
+    
     /** ********************************************************************* */
 
     boolean canSleep() {
@@ -829,7 +843,7 @@ public class TransitionSystem {
             }
 
         } catch (Exception e) {
-            logger.log(Level.SEVERE, "*** ERROR in the transition system: ", e);
+            logger.log(Level.SEVERE, "*** ERROR in the transition system. Intention= "+C.SI, e);
         }
     }
 

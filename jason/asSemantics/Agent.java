@@ -420,6 +420,29 @@ public class Agent {
             return false;
         }
     }
+    
+    /** remove all ocurrences of bel in BB */
+    public void abolish(Literal bel, Unifier un) {
+        List<Literal> toDel = new ArrayList<Literal>();
+        
+        Iterator<Literal> il = getBB().getRelevant(bel);
+        if (il != null) {
+            while (il.hasNext()) {
+                Literal inBB = il.next();
+                if (!inBB.isRule()) {
+                    // need to clone unifier since it is changed in previous iteration
+                    Unifier unC = (Unifier)un.clone();
+                    if (unC.unifies(bel, inBB)) {
+                        toDel.add(inBB);
+                    }
+                }
+            }
+        }
+        
+        for (Literal l: toDel) {
+            delBel(l);
+        }
+    }
 
     static DocumentBuilder builder = null;
 

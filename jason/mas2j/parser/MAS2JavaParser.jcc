@@ -105,7 +105,6 @@ TOKEN : {
 |  <ENV:         "environment">
 |  <CONTROL:     "executionControl">
 |  <AT:          "at">
-|  <ARCH:        "architecture" >
 |  <INFRA:       "infrastructure" >
 
 |  <ASOEE:       "events" >
@@ -173,8 +172,7 @@ MAS2JProject mas() :           { Token soc; }
 
 void infra() :              { Token t; }
 {                           { project.setInfrastructure("Centralised"); }
-  [ (<ARCH>                 { System.err.println("The id <architecture> was replaced by <infrastructure> in .mas2j syntax, please use the new id."); }
-     | <INFRA>) 
+  [ <INFRA> 
     ":" t = <ID>            { project.setInfrastructure(t.image); } 
   ]
 }
