@@ -348,6 +348,10 @@ public class Config extends Properties {
         return false;
     }
 
+    public static boolean isWindows() {
+        return System.getProperty("os.name").startsWith("Windows");
+    }
+    
     static String getJavaHomePathFromClassPath(String file) {
         StringTokenizer st = new StringTokenizer(System.getProperty("java.class.path"), File.pathSeparator);
         while (st.hasMoreTokens()) {

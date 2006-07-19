@@ -78,15 +78,11 @@ public class CentralisedMASLauncherAnt implements MASLauncherInfraTier {
 
     public void stopMAS() {
         try {
-            if (processOut != null) {
-                processOut.write(1);// "quit"+System.getProperty("line.separator"));
-            }
-
-            if (masProcess != null) {
-                masProcess.destroy();
-            }
+            // creating this file will stop the MAS, the runner checks for this file creation
+            File stop = new File(project.getDirectory()+RunCentralisedMAS.stopMASFileName);
+            stop.createNewFile();
         } catch (Exception e) {
-            System.err.println("Execution error: " + e);
+            System.err.println("Error stoping RunCentMAS: " + e);
             e.printStackTrace();
         } finally {
             stop = true;
@@ -99,7 +95,6 @@ public class CentralisedMASLauncherAnt implements MASLauncherInfraTier {
         if (hasCBuild())
             build = "c-build.xml";
         return new String[] { Config.get().getJavaHome() + "bin" + File.separator + "java", "-classpath",
-        // Config.get().getAntLib()+ "ant.jar" + File.pathSeparator +
                 Config.get().getAntLib() + "ant-launcher.jar", "org.apache.tools.ant.launch.Launcher", "-e", "-f", build };
     }
 

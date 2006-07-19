@@ -70,8 +70,12 @@ public class RunCentralisedMAS {
 
     private static RunCentralisedMAS runner      = null;
 
+    private static MAS2JProject      project;
+    
     public final static String       logPropFile = "logging.properties";
-
+    public final static String       stopMASFileName = ".stop___MAS";
+    
+    
     public static void main(String[] args) {
         if (args.length < 1) {
             System.err.println("You should inform the MAS project file.");
@@ -100,7 +104,6 @@ public class RunCentralisedMAS {
 
         int errorCode = 0;
 
-        final MAS2JProject project;
         try {
             jason.mas2j.parser.mas2j parser = new jason.mas2j.parser.mas2j(new FileReader(args[0]));
             project = parser.mas();
@@ -238,6 +241,10 @@ public class RunCentralisedMAS {
     public CentralisedEnvironment getEnvironmentInfraTier() {
         return env;
     }
+    
+    public MAS2JProject getProject() {
+        return project;
+    }
 
     void createAg(MAS2JProject project, boolean debug) throws JasonException {
 
@@ -354,9 +361,16 @@ public class RunCentralisedMAS {
 
     void waitEnd() {
         try {
-            int c = System.in.read();
-            while (c != 1) { // RunProject prints "1" out to signal finishing
-                c = System.in.read();
+            // wait a file called .stop___MAS to be created!
+            File stop = new File(stopMASFileName);
+            if (stop.exists()) {
+                stop.delete();
+            }
+            while (!stop.exists()) {
+                Thread.sleep(1500);
+            }
+            if (stop.exists()) {
+                stop.delete();
             }
             finish();
         } catch (Exception e) {

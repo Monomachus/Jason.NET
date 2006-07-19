@@ -69,11 +69,14 @@ import jason.infra.InfrastructureFactory;
 import jason.jeditplugin.Config;
 
 import java.io.File;
+import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Represents a MAS2J project (usually created from a .mas2j file)
@@ -83,7 +86,7 @@ public class MAS2JProject {
 	public static final String EXT       = "mas2j";
 	public static final String AS_EXT    = "asl";
 	
-	//private Logger logger = Logger.getLogger(MAS2JProject.class.getName());
+	private static Logger logger = Logger.getLogger(MAS2JProject.class.getName());
 		
 	String soc;
 
@@ -98,6 +101,17 @@ public class MAS2JProject {
 	
 	List<AgentParameters> agents = new ArrayList<AgentParameters>();
 	
+    
+    public static MAS2JProject parse(String file) {
+        try {
+            jason.mas2j.parser.mas2j parser = new jason.mas2j.parser.mas2j(new FileReader(file));
+            return parser.mas();
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Error parsing mas2j file.", e);
+            return null;
+        }
+    }
+    
 	public void setDirectory(String d) {
 		if (d != null) {
 			projectDir = d;
