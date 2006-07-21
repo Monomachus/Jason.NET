@@ -40,7 +40,9 @@ import org.w3c.dom.Element;
  */
 public class Pred extends TermImpl {
 
-    private ListTerm      annots;
+	private static final long serialVersionUID = 1L;
+
+	private ListTerm      annots;
 
     static private Logger logger = Logger.getLogger(Pred.class.getName());
 

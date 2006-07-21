@@ -40,7 +40,9 @@ import org.w3c.dom.Element;
 
 public class Circumstance implements Serializable {
 
-    static Logger                      logger    = Logger.getLogger(Circumstance.class.getName());
+	private static final long serialVersionUID = 1L;
+
+	static Logger                      logger    = Logger.getLogger(Circumstance.class.getName());
 
     private List<Event>                E;
     private List<Intention>            I;

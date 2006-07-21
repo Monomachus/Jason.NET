@@ -44,6 +44,8 @@ import java.util.logging.Logger;
  */
 public class ListTermImpl extends TermImpl implements ListTerm {
 	
+	private static final long serialVersionUID = 1L;
+
 	private Term term;
 	private Term next;
 

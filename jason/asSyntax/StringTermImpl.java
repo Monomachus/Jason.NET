@@ -34,6 +34,8 @@ import org.w3c.dom.Element;
 
 public class StringTermImpl extends TermImpl implements StringTerm {
 
+	private static final long serialVersionUID = 1L;
+
 	static private Logger logger = Logger.getLogger(StringTermImpl.class.getName());
 
 	public StringTermImpl() {

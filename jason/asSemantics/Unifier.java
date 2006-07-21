@@ -23,7 +23,6 @@
 
 package jason.asSemantics;
 
-import static jason.asSemantics.Unifier.logger;
 import jason.asSyntax.ArithExprTerm;
 import jason.asSyntax.ListTerm;
 import jason.asSyntax.Literal;
@@ -371,7 +370,9 @@ public class Unifier implements Cloneable {
      * 
      */
     class VarsCluster extends TermImpl {
-        Set<VarTerm> vars = null;
+		private static final long serialVersionUID = 1L;
+
+		Set<VarTerm> vars = null;
 
         VarsCluster(VarTerm v1, VarTerm v2) {
             add(v1);

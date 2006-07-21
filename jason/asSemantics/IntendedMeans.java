@@ -40,6 +40,8 @@ import org.w3c.dom.Element;
 
 public class IntendedMeans implements Serializable {
 
+	private static final long serialVersionUID = 1L;
+
 	protected Unifier unif = null;
 	protected Plan plan;
 	protected Trigger trigger;

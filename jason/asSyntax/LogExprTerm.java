@@ -41,7 +41,9 @@ import org.w3c.dom.Element;
  */
 public class LogExprTerm extends TermImpl {
 
-    public enum LogicalOp { 
+	private static final long serialVersionUID = 1L;
+
+	public enum LogicalOp { 
 		none   { public String toString() { return ""; } }, 
 		not    { public String toString() { return "not "; } }, 
 		and    { public String toString() { return " & "; } },

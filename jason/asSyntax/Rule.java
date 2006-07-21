@@ -34,7 +34,9 @@ import org.w3c.dom.Element;
  */
 public class Rule extends Literal {
 
-    private Term          body   = null;
+	private static final long serialVersionUID = 1L;
+
+	private Term          body   = null;
 
     static private Logger logger = Logger.getLogger(Rule.class.getName());
 

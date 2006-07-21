@@ -32,6 +32,8 @@ import org.w3c.dom.Element;
 /** implements a term that represents a number */
 public class NumberTermImpl extends TermImpl implements NumberTerm {
 
+	private static final long serialVersionUID = 1L;
+
 	static private Logger logger = Logger.getLogger(NumberTermImpl.class.getName());
 
 	private double fValue;

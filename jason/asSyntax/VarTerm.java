@@ -45,7 +45,9 @@ import org.w3c.dom.Element;
  * @author jomi
  */
 public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm {
-    static private Logger logger = Logger.getLogger(VarTerm.class.getName());
+	private static final long serialVersionUID = 1L;
+
+	static private Logger logger = Logger.getLogger(VarTerm.class.getName());
 
     private Term          value  = null;
 

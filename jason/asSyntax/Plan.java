@@ -41,7 +41,9 @@ import org.w3c.dom.Element;
 
 public class Plan implements Cloneable, Serializable {
     
-    protected Pred              label  = null;
+	private static final long serialVersionUID = 1L;
+
+	protected Pred              label  = null;
     protected Trigger           tevent = null;
     protected Term              context;
     protected List<BodyLiteral> body;

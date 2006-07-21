@@ -165,7 +165,7 @@ public class TransitionSystem {
             } else if (conf.ag.socAcc(m)) {
 
                 // generate an event
-                Literal received = new Literal(Literal.LPos, new Pred("received"));
+                Literal received = new Literal(Literal.LPos, "received");
                 received.addTerm(new TermImpl(m.getSender()));
                 received.addTerm(new TermImpl(m.getIlForce()));
                 received.addTerm(content);

@@ -42,6 +42,8 @@ import org.w3c.dom.Element;
  */
 public class Literal extends Pred implements Cloneable {
 
+	private static final long serialVersionUID = 1L;
+
 	public static final boolean   LPos       = true;
     public static final boolean   LNeg       = false;
     public static final Literal   LTrue      = new Literal(LPos, new Pred("true"));
@@ -54,7 +56,13 @@ public class Literal extends Pred implements Cloneable {
 	public Literal() {
 	}
 
-	/** if pos == true, the literal is positive, else it is negative */
+	/** if pos == true, the literal is positive, otherwise it is negative */
+	public Literal(boolean pos, String functor) {
+		setFunctor(functor);
+		type = pos;
+	}
+
+	/** if pos == true, the literal is positive, otherwise it is negative */
 	public Literal(boolean pos, Pred p) {
 		super(p);
 		type = pos;
@@ -65,10 +73,6 @@ public class Literal extends Pred implements Cloneable {
 		type = l.type;
 	}
 	
-	public Literal(TermImpl t) {
-		super(t);
-		type = LPos;
-	}
 
 	public static Literal parseLiteral(String sLiteral) {
 		as2j parser = new as2j(new StringReader(sLiteral));
@@ -212,9 +216,9 @@ public class Literal extends Pred implements Cloneable {
 	}
 
 	public Object clone() {
-            Literal c = new Literal(type, (Pred)this);
-            c.predicateIndicatorCache = this.predicateIndicatorCache;
-            return c;
+        Literal c = new Literal(type, (Pred)this);
+        c.predicateIndicatorCache = this.predicateIndicatorCache;
+        return c;
 	}
 
 	
@@ -229,7 +233,7 @@ public class Literal extends Pred implements Cloneable {
 	/** returns this literal as a list [<functor>, <list of terms>, <list of annots>] */
 	public ListTerm getAsListOfTerms() {
 		ListTerm l = new ListTermImpl();
-		l.add(new Literal(type, new Pred(getFunctor())));
+		l.add(new Literal(type, getFunctor()));
 		ListTerm lt = new ListTermImpl();
 		if (getTerms() != null) {
 			lt.addAll(getTerms());

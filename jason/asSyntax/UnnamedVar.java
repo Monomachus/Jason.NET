@@ -29,9 +29,12 @@ package jason.asSyntax;
  * @author jomi
  */
 public class UnnamedVar extends VarTerm {
-    // static private Logger logger =
+
+	private static final long serialVersionUID = 1L;
+	// static private Logger logger =
     // Logger.getLogger(UnnamedVar.class.getName());
-    private static int varCont = 1;
+
+	private static int varCont = 1;
 
     public UnnamedVar() {
         super();

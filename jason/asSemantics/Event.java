@@ -33,6 +33,8 @@ import org.w3c.dom.Element;
 
 public class Event implements Serializable {
 
+	private static final long serialVersionUID = 1L;
+
 	Trigger trigger = null;
 
     Intention intention = Intention.EmptyInt;

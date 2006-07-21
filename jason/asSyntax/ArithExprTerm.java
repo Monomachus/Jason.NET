@@ -40,7 +40,9 @@ import org.w3c.dom.Element;
  */
 public class ArithExprTerm extends VarTerm implements NumberTerm {
 
-    public enum ArithmeticOp {
+	private static final long serialVersionUID = 1L;
+
+	public enum ArithmeticOp {
         none {
             double eval(double x, double y) {
                 return 0;

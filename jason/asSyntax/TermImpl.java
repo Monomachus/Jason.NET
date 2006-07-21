@@ -44,7 +44,9 @@ import org.w3c.dom.Element;
  */
 public class TermImpl implements Term, Serializable {
 
-    private String functor = null;
+	private static final long serialVersionUID = 1L;
+
+	private String functor = null;
     private List<Term> terms;
 
     static private Logger logger = Logger.getLogger(Term.class.getName());

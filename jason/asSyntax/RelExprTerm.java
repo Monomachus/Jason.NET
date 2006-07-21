@@ -53,7 +53,10 @@ import org.w3c.dom.Element;
  */
 public class RelExprTerm extends TermImpl {
 
-    public enum RelationalOp { 
+	private static final long serialVersionUID = 1L;
+
+
+	public enum RelationalOp { 
 		none   { public String toString() { return ""; } }, 
 		gt     { public String toString() { return " > "; } }, 
 		gte    { public String toString() { return " >= "; } },
