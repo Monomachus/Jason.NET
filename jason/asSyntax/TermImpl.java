@@ -123,6 +123,8 @@ public class TermImpl implements Term, Serializable {
     
     
     public void addTerm(Term t) {
+    	if (t == null)
+    		return;
         if (terms == null)
             terms = new ArrayList<Term>();
         terms.add(t);

@@ -13,7 +13,9 @@ import org.gjt.sp.jedit.View;
 
 public class NewAgentGUI extends StartNewAgentGUI {
 
-    Buffer buffer = null;
+ 	private static final long serialVersionUID = 1L;
+
+	Buffer buffer = null;
 
     View   view;
 

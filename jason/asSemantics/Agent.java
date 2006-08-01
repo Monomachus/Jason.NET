@@ -258,8 +258,7 @@ public class Agent {
 
         for (Literal lr : removed) {
             if (fBB.remove(lr)) {
-                fTS.updateEvents(new Event(new Trigger(Trigger.TEDel,
-                        Trigger.TEBel, lr), Intention.EmptyInt));
+                fTS.updateEvents(new Event(new Trigger(Trigger.TEDel,Trigger.TEBel, lr), Intention.EmptyInt));
             }
         }
 

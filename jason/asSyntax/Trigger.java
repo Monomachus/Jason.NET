@@ -50,7 +50,7 @@ public class Trigger implements Cloneable {
 	Literal literal;
 	
 	public Trigger(boolean t, byte g, Literal l) {
-		literal = (Literal)l.clone();
+		literal = l;
 		setTrigType(t);
 		goal = g;
 	}
@@ -96,13 +96,14 @@ public class Trigger implements Cloneable {
 	}
 
 	public Object clone() {
-            Trigger c = new Trigger(trigType, goal, literal);
-            c.piCache = this.piCache;
-            return c; 
+        Trigger c = new Trigger(trigType, goal, (Literal)literal.clone());
+        c.piCache = this.piCache;
+        return c; 
 	}
 
     
-        PredicateIndicator piCache = null;
+	PredicateIndicator piCache = null;
+	
 	/** return [+|-][!|?] super.getFucntorArity */
 	public PredicateIndicator getPredicateIndicator() {
             if (piCache == null) {

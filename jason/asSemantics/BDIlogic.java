@@ -142,8 +142,7 @@ public final class BDIlogic {
      * remove all desires and intentions of l.
      */
     public static final void dropDes(TransitionSystem ts, Literal l, Unifier un) {
-        Event e = new Event(new Trigger(Trigger.TEAdd, Trigger.TEAchvG, l),
-                Intention.EmptyInt);
+        Event e = new Event(new Trigger(Trigger.TEAdd, Trigger.TEAchvG, l),Intention.EmptyInt);
         for (Event ei : ts.C.getEvents()) {
             Trigger t = (Trigger) ei.trigger;
             if (ei.intention != Intention.EmptyInt) {

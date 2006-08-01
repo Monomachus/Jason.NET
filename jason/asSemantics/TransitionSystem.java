@@ -146,7 +146,7 @@ public class TransitionSystem {
     private void applyProcMsg() throws JasonException {
         if (!conf.C.MB.isEmpty()) {
             Message m = conf.ag.selectMessage(conf.C.MB);
-            Term content = TermImpl.parse(m.getPropCont().toString());
+            Literal content = Literal.parseLiteral(m.getPropCont().toString());
 
             // check if an intention was suspended waiting this message
             Intention intention = getC().getPendingIntentions().remove(m.getInReplyTo());

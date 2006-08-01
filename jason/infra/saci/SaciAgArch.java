@@ -61,7 +61,9 @@ import saci.MessageHandler;
 
 public class SaciAgArch extends saci.Agent implements AgArchInfraTier {
 
-    // to get the percepts via SACI (the normal mbox is used for inter-agent
+	private static final long serialVersionUID = 1L;
+
+	// to get the percepts via SACI (the normal mbox is used for inter-agent
     // com.)
     private MBoxSAg  mboxPercept = null;
 

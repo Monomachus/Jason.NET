@@ -50,7 +50,7 @@ public class AgentParameters {
 			s.append("#"+qty+" ");
 		}
 		if (host != null && host.length() > 0) {
-			s.append("at "+host);
+			s.append("at \""+host+"\"");
 		}
 		return s.toString().trim() + ";";
 	}
