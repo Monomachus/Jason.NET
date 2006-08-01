@@ -36,6 +36,8 @@ public class TermTest extends TestCase {
 		
 		t2.addTerm(new TermImpl("a"));
 		assertTrue(t1.equals(t2));
+        assertTrue(t2.equals(t1));
+        assertEquals(t1.hashCode(),t2.hashCode());
 
 		Term targ1 = new TermImpl("b");
 		targ1.addTerm(new TermImpl("1"));
@@ -84,6 +86,13 @@ public class TermTest extends TestCase {
 		VarTerm x2 = new VarTerm("X2");
 		x2.setValue(new TermImpl("a"));
 		assertTrue(x1.equals(x2));
+        assertTrue(x2.equals(x1));
+        assertEquals(x1.hashCode(), x2.hashCode());
+        
+        Term ta = new TermImpl("a");
+        assertTrue(x1.equals(ta));
+        assertTrue(ta.equals(x1));
+        assertEquals(x1.hashCode(), ta.hashCode());
 	}
 
 	public void testUnifies() {

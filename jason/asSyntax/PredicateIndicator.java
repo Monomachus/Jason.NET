@@ -14,12 +14,14 @@ public class PredicateIndicator {
     public PredicateIndicator(String functor, int arity) {
         this.functor = functor;
         this.arity = arity;
-        asStr = functor + "/" + arity;
     }
     public PredicateIndicator(String prefix, PredicateIndicator pi) {
         this.functor = prefix + pi.functor;
         this.arity = pi.arity;
-        asStr = functor + "/" + arity;
+    }
+
+    private void setStr() {
+        asStr = functor + "/" + arity;        
     }
 
     public String getFunctor() {
@@ -29,17 +31,24 @@ public class PredicateIndicator {
     public int getArity() {
         return arity;
     }
+        
+    @Override
+    public boolean equals(Object o) {
+        if (o != null && o instanceof PredicateIndicator) {
+            PredicateIndicator pi = (PredicateIndicator)o;
+            return arity == pi.arity && functor.equals(pi.functor);
+        } 
+        return false;
+    }
     
+    @Override
     public int hashCode() {
+        if (asStr == null) setStr();
         return asStr.hashCode();
     }
-    
-    public boolean equals(Object o) {
-        PredicateIndicator pi = (PredicateIndicator)o;
-        return arity == pi.arity && functor.equals(pi.functor);
-    }
-    
+
     public String toString() {
+        if (asStr == null) setStr();
         return asStr;
     }
 }

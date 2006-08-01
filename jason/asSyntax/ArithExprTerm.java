@@ -171,36 +171,50 @@ public class ArithExprTerm extends VarTerm implements NumberTerm {
         }
     }
 
+    @Override
     public boolean equals(Object t) {
-        try {
-            if (hasValue()) {
-                return getValue().equals(t);
-            } else {
-                ArithExprTerm eprt = (ArithExprTerm) t;
-                if (lhs == null && eprt.lhs != null) {
-                    return false;
-                }
-                if (lhs != null && !lhs.equals(eprt.lhs)) {
-                    return false;
-                }
-
-                if (op != eprt.op) {
-                    return false;
-                }
-
-                if (rhs == null && eprt.rhs != null) {
-                    return false;
-                }
-                if (rhs != null && !rhs.equals(eprt.rhs)) {
-                    return false;
-                }
-                return true;
-            }
-        } catch (ClassCastException e) {
+        if (t == null) 
             return false;
+        if (hasValue()) {
+            return getValue().equals(t);
         }
+        if (t instanceof ArithExprTerm) {
+            ArithExprTerm eprt = (ArithExprTerm) t;
+            if (lhs == null && eprt.lhs != null) {
+                return false;
+            }
+            if (lhs != null && !lhs.equals(eprt.lhs)) {
+                return false;
+            }
+
+            if (op != eprt.op) {
+                return false;
+            }
+
+            if (rhs == null && eprt.rhs != null) {
+                return false;
+            }
+            if (rhs != null && !rhs.equals(eprt.rhs)) {
+                return false;
+            }
+            return true;
+        }
+        return false;
     }
 
+    @Override
+    public int hashCode() {
+        if (hasValue())
+            return getValue().hashCode();
+        
+        int code = op.hashCode();
+        if (lhs != null)
+            code += lhs.hashCode();
+        if (rhs != null)
+            code += rhs.hashCode();
+        return code;
+    }
+    
     /** gets the Operation of this Expression */
     public ArithmeticOp getOp() {
         return op;
@@ -247,11 +261,10 @@ public class ArithExprTerm extends VarTerm implements NumberTerm {
 
     @Override
     public int compareTo(Term o) {
-        try {
+        if (o instanceof NumberTerm) {
             NumberTerm st = (NumberTerm)o;
             if (solve() > st.solve()) return 1;
             if (solve() < st.solve()) return -1;
-        } catch (Exception e) {
         }
         return 0;    
     }
@@ -273,6 +286,7 @@ public class ArithExprTerm extends VarTerm implements NumberTerm {
         return 0;
     }
 
+    @Override
     public String toString() {
         if (hasValue()) {
             return getValue().toString();
@@ -286,6 +300,7 @@ public class ArithExprTerm extends VarTerm implements NumberTerm {
     }
 
     /** get as XML */
+    @Override
     public Element getAsDOM(Document document) {
         if (hasValue()) {
             return getValue().getAsDOM(document);

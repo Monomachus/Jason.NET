@@ -63,7 +63,7 @@ public class NumberTermImpl extends TermImpl implements NumberTerm {
 	}
 	public void setValue(double d) {
 		fValue = d;
-		setFunctor(d+"");
+		setFunctor(String.valueOf(d));
 	}
 	
 	public double solve() {
@@ -92,16 +92,24 @@ public class NumberTermImpl extends TermImpl implements NumberTerm {
 		return true;
 	}
 	
+    @Override
 	public boolean equals(Object o) {
-		try {
-			Term t = (Term)o;
-			if (t.isVar() || t.isArithExpr()) return false;
-			NumberTerm st = (NumberTerm)t;
-			return solve() == st.solve();
-		} catch (Exception e) {}
+        if (o != null && o instanceof NumberTerm) {
+            NumberTerm st = (NumberTerm)o;
+			if (st.isVar() || st.isArithExpr()) 
+                return false;
+            else
+                //return Double.doubleToLongBits(solve()) == Double.doubleToLongBits(st.solve());
+                return solve() == st.solve();
+		} 
 		return false;
 	}
 
+    @Override
+    public int hashCode() {
+        return (int)solve();
+    }
+    
     @Override
     public int compareTo(Term o) {
         try {
@@ -116,14 +124,15 @@ public class NumberTermImpl extends TermImpl implements NumberTerm {
 	public String toString() {
 		long r = Math.round(fValue);
 		if (fValue == (double)r) {
-			return ""+r;
+			return String.valueOf(r);
 		} else {
-			return ""+fValue;
+			return String.valueOf(fValue);
 		}
 	}
     
     
     /** get as XML */
+    @Override
     public Element getAsDOM(Document document) {
         Element u = (Element) document.createElement("number-term");
         u.appendChild(document.createTextNode(toString()));

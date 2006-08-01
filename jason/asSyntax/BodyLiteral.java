@@ -21,78 +21,120 @@
 //
 //----------------------------------------------------------------------------
 
-
 package jason.asSyntax;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-
 public class BodyLiteral implements Cloneable {
-    
-	public enum BodyType { 
-		action         { public String toString() { return ""; } },  
-		internalAction { public String toString() { return ""; } },  
-		achieve        { public String toString() { return "!"; } }, 
-		test           { public String toString() { return "?"; } }, 
-		addBel         { public String toString() { return "+"; } }, 
-		delBel         { public String toString() { return "-"; } },
-		delAddBel      { public String toString() { return "-+"; } },
-		achieveNF      { public String toString() { return "!!"; } }, 
-		constraint     { public String toString() { return ""; } }
-	}
 
-	Term    term;
-	BodyType    formType;
-
-    public BodyLiteral(BodyType t, Term l) {
-        term = (Term)l.clone();
-        formType = t;
-        if (l.isInternalAction()) {
-        		formType = BodyType.internalAction;
+    public enum BodyType {
+        action {
+            public String toString() {
+                return "";
+            }
+        },
+        internalAction {
+            public String toString() {
+                return "";
+            }
+        },
+        achieve {
+            public String toString() {
+                return "!";
+            }
+        },
+        test {
+            public String toString() {
+                return "?";
+            }
+        },
+        addBel {
+            public String toString() {
+                return "+";
+            }
+        },
+        delBel {
+            public String toString() {
+                return "-";
+            }
+        },
+        delAddBel {
+            public String toString() {
+                return "-+";
+            }
+        },
+        achieveNF {
+            public String toString() {
+                return "!!";
+            }
+        },
+        constraint {
+            public String toString() {
+                return "";
+            }
         }
     }
+
+    Term     term;
+
+    BodyType formType;
+
+    public BodyLiteral(BodyType t, Term l) {
+        term = (Term) l.clone();
+        formType = t;
+        if (l.isInternalAction()) {
+            formType = BodyType.internalAction;
+        }
+    }
+
     public BodyLiteral(RelExprTerm re) {
-        term = (Term)re.clone();
+        term = (Term) re.clone();
         formType = BodyType.constraint;
     }
 
     public BodyType getType() {
         return formType;
     }
-	
-	public Term getTerm() {
-		return term;
-	}
-    
-	// used with arithmetic expressions
-	public void addTerm(Term t) {
-		term.addTerm(t);
-	}
-	
-    public boolean equals(Object o) {
-	    	try {
-	    		BodyLiteral b = (BodyLiteral) o;
-	    		return formType==b.formType && term.equals(b.term);
-	    	} catch (Exception e) {
-	    		return false;
-	    	}
+
+    public Term getTerm() {
+        return term;
     }
 
-    private static final PredicateIndicator SEND_PI = new PredicateIndicator(".send",4);
-    public boolean isAsk() {
-	    	if (! term.getPredicateIndicator().equals(SEND_PI)) {
-	    		return false;
-	    	}
-	    	if (term.getTerm(1).toString().startsWith("ask")) {
-	    		return true;
-	    	} else {
-	    		return false;
-	    	}
+    // used with arithmetic expressions
+    public void addTerm(Term t) {
+        term.addTerm(t);
     }
-    
+
+    @Override
+    public boolean equals(Object o) {
+        if (o != null && o instanceof BodyLiteral) {
+            BodyLiteral b = (BodyLiteral) o;
+            return formType == b.formType && term.equals(b.term);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return formType.hashCode() + term.hashCode();
+    }
+
+    private static final PredicateIndicator SEND_PI = new PredicateIndicator(".send", 4);
+
+    public boolean isAsk() {
+        if (!term.getPredicateIndicator().equals(SEND_PI)) {
+            return false;
+        }
+        if (term.getTerm(1).toString().startsWith("ask")) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public Object clone() {
-		return new BodyLiteral(formType, term);
+        return new BodyLiteral(formType, term);
     }
 
     public String toString() {
@@ -107,5 +149,5 @@ public class BodyLiteral implements Cloneable {
         }
         u.appendChild(term.getAsDOM(document));
         return u;
-    }    
+    }
 }

@@ -342,17 +342,17 @@ public class Pred extends TermImpl {
         return true;
     }
 
+    @Override
     public boolean equals(Object o) {
-        if (!super.equals(o))
+        if (o == null)
             return false;
-        try {
+        if (o instanceof Pred) {
             Pred p = (Pred) o;
-            if (this.hasSubsetAnnot(p) && p.hasSubsetAnnot(this))
-                return true;
-            return false;
-        } catch (Exception e) {
-            return true;
+            return super.equals(o) && this.hasSubsetAnnot(p) && p.hasSubsetAnnot(this);
         }
+        if (o instanceof Term) 
+            return super.equals(o);
+        return false;
     }
 
     public boolean equalsAsTerm(Object p) {
@@ -406,6 +406,7 @@ public class Pred extends TermImpl {
     }
 
     /** get as XML */
+    @Override
     public Element getAsDOM(Document document) {
         Element u = super.getAsDOM(document);
         if (getAnnots() != null && !getAnnots().isEmpty()) {

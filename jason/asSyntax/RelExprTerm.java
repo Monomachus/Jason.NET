@@ -165,8 +165,9 @@ public class RelExprTerm extends TermImpl {
 	}
 	
 
+    @Override
 	public boolean equals(Object t) {
-		try {
+		if (t != null && t instanceof RelExprTerm) {
 			RelExprTerm eprt = (RelExprTerm)t;
 			if (lhs == null && eprt.lhs != null) {
 				return false;
@@ -186,10 +187,19 @@ public class RelExprTerm extends TermImpl {
 				return false;
 			}
 			return true;
-		} catch (ClassCastException e) {
-			return false;
 		}
+        return false;
 	}
+
+    @Override
+    public int hashCode() {
+        int code = op.hashCode();
+        if (lhs != null)
+            code += lhs.hashCode();
+        if (rhs != null)
+            code += rhs.hashCode();
+        return code;
+    }
 	
 	/** gets the Operation of this Expression */
 	public RelationalOp getOp() {
@@ -221,6 +231,7 @@ public class RelExprTerm extends TermImpl {
     
     
     /** get as XML */
+    @Override
     public Element getAsDOM(Document document) {
         Element u = (Element) document.createElement("expression");
         u.setAttribute("type","relational");

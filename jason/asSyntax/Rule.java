@@ -55,15 +55,20 @@ public class Rule extends Literal {
         return true;
     }
 
+    @Override
     public boolean equals(Object o) {
-        try {
+        if (o != null && o instanceof Rule) {
             Rule r = (Rule) o;
             return super.equals(o) && body.equals(r.body);
-        } catch (Exception e) {
-            return false;
-        }
+        } 
+        return false;
     }
 
+    @Override
+    public int hashCode() {
+        return super.hashCode() + body.hashCode();
+    }
+    
     public Term getBody() {
         return body;
     }
@@ -81,6 +86,7 @@ public class Rule extends Literal {
     }
 
     /** get as XML */
+    @Override
     public Element getAsDOM(Document document) {
         Element u = (Element) document.createElement("rule");
 

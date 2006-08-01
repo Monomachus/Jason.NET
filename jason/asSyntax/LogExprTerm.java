@@ -200,8 +200,9 @@ public class LogExprTerm extends TermImpl {
 	}
 	
 
+    @Override
 	public boolean equals(Object t) {
-		try {
+		if (t != null && t instanceof LogExprTerm) {
 			LogExprTerm eprt = (LogExprTerm)t;
 			if (lhs == null && eprt.lhs != null) {
 				return false;
@@ -221,11 +222,19 @@ public class LogExprTerm extends TermImpl {
 				return false;
 			}
 			return true;
-		} catch (ClassCastException e) {
-			return false;
-		}
+		} 
+		return false;
 	}
-	
+
+    @Override
+    public int hashCode() {
+        int code = op.hashCode();
+        if (lhs != null)
+            code += lhs.hashCode();
+        if (rhs != null)
+            code += rhs.hashCode();
+        return code;
+    }	
 	/** gets the Operation of this Expression */
 	public LogicalOp getOp() {
 		return op;
@@ -254,7 +263,8 @@ public class LogExprTerm extends TermImpl {
 		return lhs.isGround() && rhs.isGround();
 	}
 	
-	public String toString() {
+    @Override
+    public String toString() {
 		if (lhs == null) {
 			return op+"("+rhs+")";
 		} else {
@@ -263,6 +273,7 @@ public class LogExprTerm extends TermImpl {
 	}
 
     /** get as XML */
+    @Override
     public Element getAsDOM(Document document) {
         Element u = (Element) document.createElement("expression");
         u.setAttribute("type","logical");

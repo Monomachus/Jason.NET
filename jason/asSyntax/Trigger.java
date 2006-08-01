@@ -74,10 +74,20 @@ public class Trigger implements Cloneable {
 		return (trigType == e.trigType && goal == e.goal);
 	}
 
-	public boolean equals(Object obj) {
-		Trigger t = (Trigger) obj;
-		return (trigType == t.trigType && goal == t.goal && literal.equals(t.getLiteral()));
+    @Override
+	public boolean equals(Object o) {
+        if (o != null && o instanceof Trigger) {
+            Trigger t = (Trigger) o;
+            return (trigType == t.trigType && goal == t.goal && literal.equals(t.getLiteral()));
+        }
+        return false;
 	}
+
+    @Override
+    public int hashCode() {
+        return getPredicateIndicator().hashCode();
+    }
+
 
 	public boolean isAchvGoal() {
 		return (goal == TEAchvG);
@@ -106,29 +116,25 @@ public class Trigger implements Cloneable {
 	
 	/** return [+|-][!|?] super.getFucntorArity */
 	public PredicateIndicator getPredicateIndicator() {
-            if (piCache == null) {
-        		String s;
-        		if (trigType == TEAdd)
-        			s = "+";
-        		else
-        			s = "-";
-        		if (goal == TEAchvG)
-        			s += "!";
-        		else if (goal == TETestG)
-        			s += "?";
-                piCache = new PredicateIndicator(s+literal.getFunctor(), literal.getTermsSize());
-            }
-            return piCache;
-	}
+        if (piCache == null) {
+            String s;
+            if (trigType == TEAdd)
+                s = "+";
+            else
+                s = "-";
+            if (goal == TEAchvG)
+                s += "!";
+            else if (goal == TETestG)
+                s += "?";
+            piCache = new PredicateIndicator(s + literal.getFunctor(), literal.getTermsSize());
+        }
+        return piCache;
+    }
 
 	public Literal getLiteral() {
 		return literal;
 	}
 	
-	public int hashCode() {
-		return getPredicateIndicator().hashCode();
-	}
-
 	public String toString() {
 		String s;
 		if (trigType == TEAdd)

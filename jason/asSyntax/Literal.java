@@ -206,13 +206,18 @@ public class Literal extends Pred implements Cloneable {
         }
     }   
 
+    @Override
     public boolean equals(Object o) {
-		try {
+        if (o == null)
+            return false;
+        if (o instanceof Literal) {
 			Literal l = (Literal) o;
-			return (type == l.type && super.equals(l));
-		} catch (Exception e) {
+			return type == l.type && super.equals(l);
+		} 
+        if (o instanceof Term) {
 			return super.equals(o);
 		}
+        return false;
 	}
 
 	public Object clone() {
@@ -223,9 +228,10 @@ public class Literal extends Pred implements Cloneable {
 
 	
 	/** return [~] super.getFunctorArity */
-	@Override public PredicateIndicator getPredicateIndicator() {
+	@Override 
+    public PredicateIndicator getPredicateIndicator() {
 		if (predicateIndicatorCache == null) {
-                    predicateIndicatorCache = new PredicateIndicator(((type == LPos) ? "" : "~")+getFunctor(),getTermsSize());
+		    predicateIndicatorCache = new PredicateIndicator(((type == LPos) ? "" : "~")+getFunctor(),getTermsSize());
 		}
 		return predicateIndicatorCache;
 	}
@@ -272,6 +278,7 @@ public class Literal extends Pred implements Cloneable {
 	}
 
     /** get as XML */
+    @Override
     public Element getAsDOM(Document document) {
         Element u = (Element) document.createElement("literal");
         if (isInternalAction()) {

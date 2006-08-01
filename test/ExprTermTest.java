@@ -22,10 +22,10 @@ public class ExprTermTest extends TestCase {
     public void testSolve() {
         NumberTerm nb;
         nb = ArithExprTerm.parseExpr("3");
-        assertTrue(nb.solve() == 3);
+        assertEquals(nb.solve(),3.0);
 
         nb = ArithExprTerm.parseExpr("3+2");
-        assertTrue(nb.solve() == 5);
+        assertEquals(nb.solve(),new NumberTermImpl(5).solve());
 
         nb = ArithExprTerm.parseExpr("3+2*5");
         assertTrue(nb.solve() == 13);
@@ -51,7 +51,9 @@ public class ExprTermTest extends TestCase {
         u.unifies(new VarTerm("X"), new NumberTermImpl(5));
         u.apply(nb);
         //System.out.println(nb+"="+nb.solve());
-        assertTrue(nb.solve() == 2.5);
+        assertEquals(nb, new NumberTermImpl(2.5));
+        assertEquals(new NumberTermImpl(2.5), nb);
+        assertEquals(new NumberTermImpl(2.5).hashCode(), nb.hashCode());
     }
 
     public void testUnify() {

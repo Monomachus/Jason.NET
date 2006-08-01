@@ -93,19 +93,26 @@ public class StringTermImpl extends TermImpl implements StringTerm {
 		return getString().length();
 	}
 
-	public boolean equals(Object t) {
-		try {
+    @Override
+    public boolean equals(Object t) {
+	    if (t != null && t instanceof StringTerm) {
 			StringTerm st = (StringTerm)t;
 			return this.getString().equals(st.getString());
-		} catch (Exception e) {}
+		}
 		return false;
 	}
+
+    @Override
+    public int hashCode() {
+        return getString().hashCode();
+    }
 	
 	public String toString() {
 		return "\""+getString()+"\"";
 	}
 
     /** get as XML */
+    @Override
     public Element getAsDOM(Document document) {
         Element u = (Element) document.createElement("string-term");
         u.appendChild(document.createTextNode(toString()));

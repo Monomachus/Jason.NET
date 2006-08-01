@@ -100,6 +100,87 @@ public class TermImpl implements Term, Serializable {
         return getPredicateIndicator().hashCode();
     }
     
+    public boolean equals(Object t) {
+        if (t == null)  return false;
+        
+        // if t is a VarTerm, uses var's equals
+        if (t instanceof VarTerm) {
+            VarTerm vt = (VarTerm)t;
+            //System.out.println(this.functor+" equals1 "+vt.getFunctor());
+            return vt.equals(this);
+        }
+
+        if (t instanceof Term) {
+            Term tAsTerm = (Term)t;
+            //System.out.println(this+" equals2 "+tAsTerm);
+            if (getFunctor() == null && tAsTerm.getFunctor() != null) {
+                return false;
+            }
+            if (getFunctor() != null && !getFunctor().equals(tAsTerm.getFunctor())) {
+                return false;
+            }
+            if (getTerms() == null && tAsTerm.getTerms() == null) {
+                return true;
+            }
+            if (getTerms() == null || tAsTerm.getTerms() == null) {
+                return false;
+            }
+            if (getTermsSize() != tAsTerm.getTermsSize()) {
+                return false;
+            }
+
+            for (int i=0; i<getTermsSize(); i++) {
+                //System.out.println(" *term "+i+" "+getTerm(i)+getTerm(i).getClass().getName()
+                //      +"="+tAsTerm.getTerm(i)+tAsTerm.getTerm(i).getClass().getName()+" deu "+getTerm(i).equals(tAsTerm.getTerm(i)));             
+                if (!getTerm(i).equals(tAsTerm.getTerm(i))) {
+                    return false;
+                }
+            }
+            return true;
+        } 
+        return false;
+    }
+
+    public int compareTo(Term tAsTerm) {
+        try {
+            // TODO: why overriding in ArithExprTerm is not working and we need this if?
+            return ((ArithExprTerm)this).compareTo(tAsTerm);
+        } catch (Exception e) {}
+
+        int c;
+        if (getFunctor() != null && tAsTerm.getFunctor() != null) {
+            c = getFunctor().compareTo(tAsTerm.getFunctor());
+            if (c != 0)
+                return c;
+        }
+        if (getTerms() == null && tAsTerm.getTerms() == null)
+            return 0;
+        if (getTerms() == null)
+            return -1;
+        if (tAsTerm.getTerms() == null)
+            return 1;
+        if (getTerms().size() < tAsTerm.getTerms().size())
+            return -1;
+        else if (getTerms().size() > tAsTerm.getTerms().size())
+            return 1;
+
+        // same number of terms
+        for (int i=0; i<getTermsSize(); i++) {
+            c = getTerm(i).compareTo(tAsTerm.getTerm(i));
+            if (c != 0)
+                return c;
+        }
+        return 0;
+    }
+
+    /** make a deep copy of the terms */
+    public Object clone() {
+        TermImpl c = new TermImpl(this);
+        c.predicateIndicatorCache = this.predicateIndicatorCache;
+        return c;
+    }
+
+
     /** 
      * logCons checks whether one particular predicate
      * is a log(ical)Cons(equence) of the belief base.
@@ -139,9 +220,11 @@ public class TermImpl implements Term, Serializable {
     
     public void setTerms(List<Term> l) {
         terms = l;
+        predicateIndicatorCache = null;
     }
     public void setTerm(int i, Term t) {
         terms.set(i,t);
+        predicateIndicatorCache = null;
     }
      
     /** returns the i-th term (first term is 0) */
@@ -241,87 +324,6 @@ public class TermImpl implements Term, Serializable {
             }
         }
         return false;
-    }
-
-    public boolean equals(Object t) {
-        if (t == null)  return false;
-        
-        // if t is a VarTerm, uses var's equals
-        try {
-            VarTerm vt = (VarTerm)t;
-            //System.out.println(this.functor+" equals1 "+vt.getFunctor());
-            return vt.equals(this);
-        } catch (Exception e) {}
-
-        try {
-            Term tAsTerm = (Term)t;
-            //System.out.println(this+" equals2 "+tAsTerm);
-            if (getFunctor() == null && tAsTerm.getFunctor() != null) {
-                return false;
-            }
-            if (getFunctor() != null && !getFunctor().equals(tAsTerm.getFunctor())) {
-                return false;
-            }
-            if (getTerms() == null && tAsTerm.getTerms() == null) {
-                return true;
-            }
-            if (getTerms() == null || tAsTerm.getTerms() == null) {
-                return false;
-            }
-            if (getTermsSize() != tAsTerm.getTermsSize()) {
-                return false;
-            }
-
-            for (int i=0; i<getTermsSize(); i++) {
-                //System.out.println(" *term "+i+" "+getTerm(i)+getTerm(i).getClass().getName()
-                //      +"="+tAsTerm.getTerm(i)+tAsTerm.getTerm(i).getClass().getName()+" deu "+getTerm(i).equals(tAsTerm.getTerm(i)));             
-                if (!getTerm(i).equals(tAsTerm.getTerm(i))) {
-                    return false;
-                }
-            }
-            return true;
-        } catch (ClassCastException e) {
-            return false;
-        }
-    }
-
-    public int compareTo(Term tAsTerm) {
-        try {
-            // TODO: why overriding in ArithExprTerm is not working and we need this if?
-            return ((ArithExprTerm)this).compareTo(tAsTerm);
-        } catch (Exception e) {}
-
-        int c;
-        if (getFunctor() != null && tAsTerm.getFunctor() != null) {
-            c = getFunctor().compareTo(tAsTerm.getFunctor());
-            if (c != 0)
-                return c;
-        }
-        if (getTerms() == null && tAsTerm.getTerms() == null)
-            return 0;
-        if (getTerms() == null)
-            return -1;
-        if (tAsTerm.getTerms() == null)
-            return 1;
-        if (getTerms().size() < tAsTerm.getTerms().size())
-            return -1;
-        else if (getTerms().size() > tAsTerm.getTerms().size())
-            return 1;
-
-        // same number of terms
-        for (int i=0; i<getTermsSize(); i++) {
-            c = getTerm(i).compareTo(tAsTerm.getTerm(i));
-            if (c != 0)
-                return c;
-        }
-        return 0;
-    }
-
-    /** make a deep copy of the terms */
-    public Object clone() {
-        TermImpl c = new TermImpl(this);
-        c.predicateIndicatorCache = this.predicateIndicatorCache;
-        return c;
     }
 
     protected List<Term> getDeepCopyOfTerms() {

@@ -83,7 +83,7 @@ public class ListTermTest extends TestCase {
 		assertEquals(new TermImpl("a2"), l1.get(1));
 		assertEquals(l1.size(), 6);
 		
-		List lal = new ArrayList();
+		List<Term> lal = new ArrayList<Term>();
 		lal.add(new TermImpl("b1"));
 		lal.add(new TermImpl("b2"));
 		l1.addAll(4, lal);
@@ -105,7 +105,7 @@ public class ListTermTest extends TestCase {
 				i.remove();
 			}
 		}
-		assertEquals(l1.toString(), "[b2,c]");
+        assertEquals(l1.toString(), "[b2,c]");
 		i = l1.iterator();
 		i.next(); i.next(); // c is the current
 		i.remove(); // remove c

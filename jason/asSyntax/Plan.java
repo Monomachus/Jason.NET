@@ -179,13 +179,30 @@ public class Plan implements Cloneable, Serializable {
             return null;
     }
     
+    @Override
     public boolean equals(Object o) {
-        Plan p = (Plan) o;
-        if (context == null && p.context != null)
-            return false;
-        if (context != null && p.context != null && !context.equals(p.context))
-            return false;
-        return tevent.equals(p.tevent) && body.equals(p.body);
+        if (o != null && o instanceof Plan) {
+            Plan p = (Plan) o;
+            if (context == null && p.context != null)
+                return false;
+            if (context != null && p.context != null && !context.equals(p.context))
+                return false;
+            return tevent.equals(p.tevent) && body.equals(p.body);
+        }
+        return false;
+    }
+    
+    @Override
+    public int hashCode() {
+        int code = 37;
+        if (context != null)
+            code += context.hashCode();
+        if (tevent != null)
+            code += tevent.hashCode();
+        if (body != null) {
+            code += body.hashCode();
+        }
+        return code;
     }
     
     public Object clone() {

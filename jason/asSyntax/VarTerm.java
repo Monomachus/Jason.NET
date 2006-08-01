@@ -141,47 +141,27 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
         return value;
     }
 
+    @Override
     public boolean equals(Object t) {
         if (t == null)
             return false;
-        try {
+        if (t instanceof Term) {
             Term tAsTerm = (Term) t;
             Term vl = getValue();
             // System.out.println("cheking equals form "+tAsTerm.getFunctor()+"
             // and this "+this.getFunctor()+" my value "+vl);
-            if (vl == null) {
-                // is t also a var? (its value must also be null)
-                try {
-                    VarTerm tAsVT = (VarTerm) t;
-                    if (tAsVT.getValue() != null) {
-                        return false;
-                    }
-
-                    boolean ok = getFunctor().equals(tAsTerm.getFunctor());
-                    if (!ok) {
-                        return false;
-                    }
-
-                    /* removed! identify amongs var is based only on var name
-                     * see unifier.functions
-                    // no value, the var names and annots must be equal
-                    if (getAnnots() == null && tAsVT.getAnnots() != null) {
-                        return false;
-                    }
-                    if (getAnnots() != null && !getAnnots().equals(tAsVT.getAnnots())) {
-                        return false;
-                    }
-                     */
-                    return true;
-                } catch (Exception e) {
-                    return false;
-                }
-
-            } else {
+            if (vl != null) {
                 // campare the values
                 return vl.equals(t);
             }
-        } catch (ClassCastException e) {
+
+            // is t also a var? (its value must also be null)
+            if (t instanceof VarTerm) {
+                VarTerm tAsVT = (VarTerm) t;
+                if (tAsVT.getValue() == null) {
+                    return getFunctor().equals(tAsTerm.getFunctor());
+                }
+            }
         }
         return false;
     }

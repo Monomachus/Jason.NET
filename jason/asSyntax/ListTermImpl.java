@@ -79,11 +79,13 @@ public class ListTermImpl extends TermImpl implements ListTerm {
 	}
 	
 
+    @Override
 	public boolean equals(Object t) {
-		try {
-			if ( ((Term)t).isVar() ) { // unground var is not equals a list
-				return false;
-			}
+        if (t == null)
+            return false;
+		if (t instanceof Term &&  ((Term)t).isVar() )  // unground var is not equals a list
+		    return false;
+		if (t instanceof ListTerm) {
 			ListTerm tAsList = (ListTerm)t;
 			if (term == null && tAsList.getTerm() != null) {
 				return false;
@@ -98,11 +100,20 @@ public class ListTermImpl extends TermImpl implements ListTerm {
 				return next.equals(tAsList.getNext());
 			}
 			return true;
-		} catch (ClassCastException e) {
-			return false;
-		}
+		} 
+	    return false;
 	}
 	
+    @Override
+    public int hashCode() {
+        int code = 37;
+        if (term != null) 
+            code += term.hashCode();
+        if (next != null)
+            code += next.hashCode();
+        return code;
+    }
+    
 	public void setTerm(Term t) {
 		term = t;
 	}

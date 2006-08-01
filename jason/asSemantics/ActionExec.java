@@ -47,12 +47,21 @@ public class ActionExec implements Serializable {
         result = false;
     }
     
+    @Override
     public boolean equals(Object ao) {
         if (ao == null)
-            return(false);
+            return false;
+        if (!(ao instanceof ActionExec)) 
+            return false;
         ActionExec a = (ActionExec)ao;
-        return( action.equals(a.action) );
+        return action.equals(a.action);
     }
+    
+    @Override
+    public int hashCode() {
+        return action.hashCode();
+    }
+    
    
     public Term getActionTerm() {
     	return action;
