@@ -56,7 +56,7 @@ public class AgArch {
      * The class that implements the architecture tier for the MAS
      * infrastructure
      */
-    AgArchInfraTier archTier;
+    protected AgArchInfraTier archTier;
 
     /**
      * Creates the agent class defined by <i>agClass</i>, default is
