@@ -390,15 +390,7 @@ Term re() :                               {  Token k;
 
                                            { return new RelExprTerm(op1, operator, op2); }
     ]
-                                           { //if (rel == null && !op1.isVar() && !op1.isLiteral() && !op1.isNumeric()) {
-                                             //   throw new ParseException("RelExp: second operand expected!");
-                                             //}
-                                             //if (rel != null) {
-                                             //   return rel; 
-                                             //} else { // op1 is a Var or Literal
-                                                return op1;
-                                             //}
-                                           }
+                                           { return op1; }
 }
 
 
@@ -409,13 +401,13 @@ Term ae() :          { Term t1, t2; ArithmeticOp op;}
 [  ( "+"             { op = ArithmeticOp.plus;} 
    | "-"             { op = ArithmeticOp.minus;}
    )
-   t2 = ae()         { if (!t1.isNumeric()) {
-                          throw new ParseException("ArithExpr: first operand is not numeric.");
-                      }
-                      if (!t2.isNumeric()) {
-                          throw new ParseException("ArithExpr: second operand is not numeric.");
-                      }
-                      return new ArithExprTerm((NumberTerm)t1, op, (NumberTerm)t2); 
+   t2 = ae()         { if (!t1.isNumeric() && !t1.isVar()) {
+                          throw new ParseException("ArithExpr: first operand is not numeric or variable.");
+                       }
+                       if (!t2.isNumeric() && !t2.isVar()) {
+                          throw new ParseException("ArithExpr: second operand is not numeric or variable.");
+                       }
+                       return new ArithExprTerm((NumberTerm)t1, op, (NumberTerm)t2); 
                      }
 ]                    { return t1; }
 }
@@ -428,11 +420,11 @@ Term trm() :        { Term t1, t2; ArithmeticOp op;}
    | <TK_INTDIV>    { op = ArithmeticOp.intdiv; }
    | <TK_INTMOD>    { op = ArithmeticOp.mod; }
    )
-   t2 = trm()       { if (!t1.isNumeric()) {
-                          throw new ParseException("ArithTerm: first operand is not numeric.");
+   t2 = trm()       { if (!t1.isNumeric() && !t1.isVar()) {
+                          throw new ParseException("ArithTerm: first operand is not numeric or variable.");
                       }
-                      if (!t2.isNumeric()) {
-                          throw new ParseException("ArithTerm: second operand is not numeric.");
+                      if (!t2.isNumeric() && !t2.isVar()) {
+                          throw new ParseException("ArithTerm: second operand is not numeric or variable.");
                       }
                       return new ArithExprTerm((NumberTerm)t1, op, (NumberTerm)t2); 
                     }
@@ -444,11 +436,11 @@ Term factor():      { Term t1, t2; ArithmeticOp op;}
    t1 = simple()    { op = ArithmeticOp.none; }
 [  ( "**"           { op = ArithmeticOp.pow; }
    )
-   t2 = factor()    { if (!t1.isNumeric()) {
-                          throw new ParseException("ArithFactor: first operand is not numeric.");
+   t2 = factor()    { if (!t1.isNumeric() && !t1.isVar()) {
+                          throw new ParseException("ArithFactor: first operand is not numeric or variable.");
                       }
-                      if (!t2.isNumeric()) {
-                          throw new ParseException("ArithFactor: second operand is not numeric.");
+                      if (!t2.isNumeric() && !t2.isVar()) {
+                          throw new ParseException("ArithFactor: second operand is not numeric or variable.");
                       }
                       return new ArithExprTerm((NumberTerm)t1, op, (NumberTerm)t2); 
                     }
@@ -459,8 +451,8 @@ Term factor():      { Term t1, t2; ArithmeticOp op;}
 Term simple():      { Token K; Term t; VarTerm v; }
 {
  ( K = <NUMBER>     { return new NumberTermImpl(K.image); }
- | "-" t = simple() { if (!t.isNumeric()) {
-                          throw new ParseException("operator '-' applied to argument not numeric.");
+ | "-" t = simple() { if (!t.isNumeric() && !t.isVar()) {
+                          throw new ParseException("operator '-' applied to argument not numeric or variable.");
                       }
                       return new ArithExprTerm(ArithmeticOp.minus, (NumberTerm)t); 
                     }

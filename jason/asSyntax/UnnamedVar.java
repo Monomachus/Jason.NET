@@ -31,8 +31,6 @@ package jason.asSyntax;
 public class UnnamedVar extends VarTerm {
 
 	private static final long serialVersionUID = 1L;
-	// static private Logger logger =
-    // Logger.getLogger(UnnamedVar.class.getName());
 
 	private static int varCont = 1;
 
@@ -54,20 +52,9 @@ public class UnnamedVar extends VarTerm {
         return v;
     }
 
-    /**
-     * overridden VarTerm setValue, this method does nothing, so the Var never
-     * has value
-     */
-    // @Override public boolean setValue(Term vl) {
-    // return true;
-    // }
-    
     @Override
     public boolean isUnnamedVar() {
         return !hasValue();
     }
 
-    // public String toString() {
-    // return "_";
-    // }
 }

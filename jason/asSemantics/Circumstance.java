@@ -87,29 +87,6 @@ public class Circumstance implements Serializable {
         addEvent(new Event(new Trigger(Trigger.TEAdd, Trigger.TEAchvG, l), i));
     }
 
-    public void addTestGoal(Literal l, Intention i) {
-        addEvent(new Event(new Trigger(Trigger.TEAdd, Trigger.TETestG, l), i));
-    }
-
-    /*
-    public void delAchvGoal(Literal l, Intention i) {
-        addEvent(new Event(new Trigger(Trigger.TEDel, Trigger.TEAchvG, l), i));
-    }
-
-    public void delTestGoal(Literal l, Intention i) {
-        addEvent(new Event(new Trigger(Trigger.TEDel, Trigger.TETestG, l), i));
-    }
-
-    public void delGoal(byte g, Literal l, Intention i) throws JasonException {
-        if (g == Trigger.TEAchvG)
-            delAchvGoal(l, i);
-        else if (g == Trigger.TETestG)
-            delTestGoal(l, i);
-        else
-            throw new JasonException("Unknown type of goal.");
-    }
-    */
-    
     public void addExternalEv(Trigger trig) {
         addEvent(new Event(trig, Intention.EmptyInt));
     }

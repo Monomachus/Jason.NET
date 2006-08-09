@@ -738,15 +738,7 @@
       jj_la1[33] = jj_gen;
       ;
     }
-                                             //if (rel == null && !op1.isVar() && !op1.isLiteral() && !op1.isNumeric()) {
-                                             //   throw new ParseException("RelExp: second operand expected!");
-                                             //}
-                                             //if (rel != null) {
-                                             //   return rel; 
-                                             //} else { // op1 is a Var or Literal
-                                                {if (true) return op1;}
-                                             //}
-
+                                             {if (true) return op1;}
     throw new Error("Missing return statement in function");
   }
 
@@ -773,13 +765,13 @@
         throw new ParseException();
       }
       t2 = ae();
-                       if (!t1.isNumeric()) {
-                          {if (true) throw new ParseException("ArithExpr: first operand is not numeric.");}
-                      }
-                      if (!t2.isNumeric()) {
-                          {if (true) throw new ParseException("ArithExpr: second operand is not numeric.");}
-                      }
-                      {if (true) return new ArithExprTerm((NumberTerm)t1, op, (NumberTerm)t2);}
+                       if (!t1.isNumeric() && !t1.isVar()) {
+                          {if (true) throw new ParseException("ArithExpr: first operand is not numeric or variable.");}
+                       }
+                       if (!t2.isNumeric() && !t2.isVar()) {
+                          {if (true) throw new ParseException("ArithExpr: second operand is not numeric or variable.");}
+                       }
+                       {if (true) return new ArithExprTerm((NumberTerm)t1, op, (NumberTerm)t2);}
       break;
     default:
       jj_la1[35] = jj_gen;
@@ -821,11 +813,11 @@
         throw new ParseException();
       }
       t2 = trm();
-                      if (!t1.isNumeric()) {
-                          {if (true) throw new ParseException("ArithTerm: first operand is not numeric.");}
+                      if (!t1.isNumeric() && !t1.isVar()) {
+                          {if (true) throw new ParseException("ArithTerm: first operand is not numeric or variable.");}
                       }
-                      if (!t2.isNumeric()) {
-                          {if (true) throw new ParseException("ArithTerm: second operand is not numeric.");}
+                      if (!t2.isNumeric() && !t2.isVar()) {
+                          {if (true) throw new ParseException("ArithTerm: second operand is not numeric or variable.");}
                       }
                       {if (true) return new ArithExprTerm((NumberTerm)t1, op, (NumberTerm)t2);}
       break;
@@ -846,11 +838,11 @@
       jj_consume_token(54);
                       op = ArithmeticOp.pow;
       t2 = factor();
-                      if (!t1.isNumeric()) {
-                          {if (true) throw new ParseException("ArithFactor: first operand is not numeric.");}
+                      if (!t1.isNumeric() && !t1.isVar()) {
+                          {if (true) throw new ParseException("ArithFactor: first operand is not numeric or variable.");}
                       }
-                      if (!t2.isNumeric()) {
-                          {if (true) throw new ParseException("ArithFactor: second operand is not numeric.");}
+                      if (!t2.isNumeric() && !t2.isVar()) {
+                          {if (true) throw new ParseException("ArithFactor: second operand is not numeric or variable.");}
                       }
                       {if (true) return new ArithExprTerm((NumberTerm)t1, op, (NumberTerm)t2);}
       break;
@@ -872,8 +864,8 @@
     case 33:
       jj_consume_token(33);
       t = simple();
-                      if (!t.isNumeric()) {
-                          {if (true) throw new ParseException("operator '-' applied to argument not numeric.");}
+                      if (!t.isNumeric() && !t.isVar()) {
+                          {if (true) throw new ParseException("operator '-' applied to argument not numeric or variable.");}
                       }
                       {if (true) return new ArithExprTerm(ArithmeticOp.minus, (NumberTerm)t);}
       break;
@@ -932,13 +924,13 @@
     finally { jj_save(0, xla); }
   }
 
-  final private boolean jj_3R_41() {
-    if (jj_3R_15()) return true;
+  final private boolean jj_3R_21() {
+    if (jj_3R_24()) return true;
     return false;
   }
 
-  final private boolean jj_3R_40() {
-    if (jj_scan_token(37)) return true;
+  final private boolean jj_3R_20() {
+    if (jj_scan_token(UNNAMEDVAR)) return true;
     return false;
   }
 
@@ -952,6 +944,33 @@
     return false;
   }
 
+  final private boolean jj_3R_19() {
+    if (jj_scan_token(VAR)) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_15() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_19()) {
+    jj_scanpos = xsp;
+    if (jj_3R_20()) return true;
+    }
+    xsp = jj_scanpos;
+    if (jj_3R_21()) jj_scanpos = xsp;
+    return false;
+  }
+
+  final private boolean jj_3R_41() {
+    if (jj_3R_15()) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_40() {
+    if (jj_scan_token(37)) return true;
+    return false;
+  }
+
   final private boolean jj_3R_39() {
     if (jj_scan_token(33)) return true;
     return false;
@@ -959,6 +978,21 @@
 
   final private boolean jj_3R_38() {
     if (jj_scan_token(NUMBER)) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_12() {
+    if (jj_3R_15()) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_13() {
+    if (jj_scan_token(32)) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_11() {
+    if (jj_3R_14()) return true;
     return false;
   }
 
@@ -975,21 +1009,6 @@
     }
     }
     }
-    return false;
-  }
-
-  final private boolean jj_3R_12() {
-    if (jj_3R_15()) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_13() {
-    if (jj_scan_token(32)) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_11() {
-    if (jj_3R_14()) return true;
     return false;
   }
 
@@ -1013,11 +1032,6 @@
 
   final private boolean jj_3R_7() {
     if (jj_scan_token(36)) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_36() {
-    if (jj_3R_37()) return true;
     return false;
   }
 
@@ -1050,6 +1064,11 @@
     return false;
   }
 
+  final private boolean jj_3R_36() {
+    if (jj_3R_37()) return true;
+    return false;
+  }
+
   final private boolean jj_3R_35() {
     if (jj_3R_36()) return true;
     return false;
@@ -1072,11 +1091,6 @@
 
   final private boolean jj_3R_27() {
     if (jj_3R_29()) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_34() {
-    if (jj_3R_35()) return true;
     return false;
   }
 
@@ -1120,6 +1134,11 @@
     return false;
   }
 
+  final private boolean jj_3R_34() {
+    if (jj_3R_35()) return true;
+    return false;
+  }
+
   final private boolean jj_3R_31() {
     if (jj_3R_24()) return true;
     return false;
@@ -1151,41 +1170,14 @@
     return false;
   }
 
-  final private boolean jj_3R_21() {
-    if (jj_3R_24()) return true;
-    return false;
-  }
-
   final private boolean jj_3R_26() {
     if (jj_3R_24()) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_20() {
-    if (jj_scan_token(UNNAMEDVAR)) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_19() {
-    if (jj_scan_token(VAR)) return true;
     return false;
   }
 
   final private boolean jj_3R_25() {
     if (jj_scan_token(37)) return true;
     if (jj_3R_28()) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_15() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_19()) {
-    jj_scanpos = xsp;
-    if (jj_3R_20()) return true;
-    }
-    xsp = jj_scanpos;
-    if (jj_3R_21()) jj_scanpos = xsp;
     return false;
   }
 

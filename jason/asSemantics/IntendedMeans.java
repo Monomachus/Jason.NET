@@ -52,10 +52,14 @@ public class IntendedMeans implements Serializable {
     }
 
     /** removes the current action of the IM */
-    public BodyLiteral step() {
+    public BodyLiteral removeCurrentStep() {
         return plan.getBody().remove(0);
     }
-    
+
+    public BodyLiteral getCurrentStep() {
+        return plan.getBody().get(0);
+    }
+
     
     public Plan getPlan() {
     	return plan;

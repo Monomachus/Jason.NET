@@ -271,7 +271,7 @@ public class VarTermTest extends TestCase {
         assertEquals(l.toString(),"op(1)");
     }
     
-    public void testUnnamedVar() {
+    public void testUnnamedVar1() {
         Term a1 = TermImpl.parse("a(_,_)");
         Term a2 = TermImpl.parse("a(10,20)");
         Term a3 = TermImpl.parse("a(30,40)");
@@ -280,5 +280,26 @@ public class VarTermTest extends TestCase {
         assertFalse(u.unifies(a1,a3));
         u.apply(a1);
         assertEquals(a1.toString(), "a(10,20)");
+    }
+    
+    public void testUnnamedVar2() {
+        Term t1 = TermImpl.parse("a(Y)");
+        assertFalse(t1.isGround());
+        Term t1c = (Term)t1.clone();
+        assertFalse(t1c.isGround());
+        t1c.makeVarsAnnon();
+        assertFalse(t1c.isGround());
+        Term t1cc = (Term)t1c.clone();
+        assertFalse(t1cc.isGround());
+        
+        Unifier u = new Unifier();
+        VarTerm v = new VarTerm("X");
+        assertTrue(v.isVar());
+        u.unifies(v, t1cc);
+        assertTrue(v.isVar());
+        assertFalse(v.isGround());
+        u.apply(v);
+        assertFalse(v.isVar());
+        assertFalse(v.isGround());        
     }
 }

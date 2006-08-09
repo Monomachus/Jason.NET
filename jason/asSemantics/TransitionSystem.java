@@ -390,8 +390,8 @@ public class TransitionSystem {
             updateIntention();
             return;
         }
-        Unifier u = im.unif;
-        BodyLiteral h = (BodyLiteral) im.getPlan().getBody().get(0);
+        Unifier     u = im.unif;
+        BodyLiteral h = im.getCurrentStep(); 
 
         Term body = (Term) h.getTerm().clone();
         u.apply(body);
@@ -447,8 +447,15 @@ public class TransitionSystem {
             if (lInBB != null) {
                 updateIntention();
             } else {
-                logger.warning("Test Goal '" + h + "' failed as simple query. Generating internal event for it...");
-                conf.C.addTestGoal(bodyl, conf.C.SI);
+                bodyl.makeVarsAnnon();
+                Trigger te = new Trigger(Trigger.TEAdd, Trigger.TETestG, bodyl);
+                if (ag.getPL().isRelevant(te.getPredicateIndicator())) {
+                    Event evt = new Event(te, conf.C.SI);
+                    logger.warning("Test Goal '" + h + "' failed as simple query. Generating internal event for it...");
+                    conf.C.addEvent(evt);
+                } else {
+                    generateGoalDeletion();
+                }
             }
             break;
 
@@ -540,11 +547,12 @@ public class TransitionSystem {
 
         // remove the finished IM from the top of the intention
         IntendedMeans topIM = confP.C.SI.pop();
+        if (logger.isLoggable(Level.FINE)) logger.fine("Returning from IM "+topIM.getPlan().getLabel());
         
-        // finished an failure handling IM
+        // if finished a failure handling IM ...
         if (im.getTrigger().isGoal() && !im.getTrigger().isAddition()) {
-            // needs to get rid of the IM until the goal that
-            // has failure handling
+            // needs to get rid of the IM until a goal that
+            // has failure handling. E.g,
             //   -!b
             //   +!c
             //   +!d
@@ -561,7 +569,7 @@ public class TransitionSystem {
             im = conf.C.SI.peek(); // +!s
             if (!im.isFinished()) {
                 // removes !b
-                BodyLiteral g = im.step(); 
+                BodyLiteral g = im.removeCurrentStep(); 
                 // make the TE of finished plan ground and unify that
                 // with goal in the body
                 Literal tel = topIM.getPlan().getTriggerEvent().getLiteral();

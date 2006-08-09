@@ -88,7 +88,7 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
 
     @Override
     public boolean isVar() {
-        return !isGround();
+        return value == null;
     }
 
     public boolean isUnnamedVar() {
@@ -97,7 +97,7 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
 
     @Override
     public boolean isGround() {
-        return getValue() != null;
+        return value != null && value.isGround();
     }
 
     /**
@@ -109,22 +109,6 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
             logger.warning("Attempted set a variable as a value for a variable, in " + this.getFunctor());
             return false;
         }
-        /*
-        try {
-            // If vl is a Var, find out a possible loop
-            VarTerm vlvl = (VarTerm) ((VarTerm) vl).value; // not getValue!
-                                                            // (use the "real"
-                                                            // value)
-            while (vlvl != null) {
-                if (vlvl == this) {
-                    logger.warning("Attempted loop in VarTerm values of " + this.getFunctor());
-                    return false;
-                }
-                vlvl = (VarTerm) vlvl.value;
-            }
-        } catch (Exception e) {
-        }
-        */
         value = vl;
         return true;
     }
@@ -299,10 +283,9 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
         return value != null && getValue().isString();
     }
 
-    /** variable without value is numeric, with value depends on the value */
     @Override
     public boolean isNumeric() {
-        return value == null || value.isNumeric();
+        return value != null && value.isNumeric();
     }
 
     @Override
