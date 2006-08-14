@@ -33,8 +33,6 @@ import jason.asSyntax.ListTerm;
 import jason.asSyntax.Pred;
 import jason.asSyntax.Term;
 
-import java.util.Iterator;
-
 public class send implements InternalAction {
     
 	/**
@@ -108,21 +106,18 @@ public class send implements InternalAction {
         }
         
         try {
-            	if (to.isList()) {
-            		Iterator i = ((ListTerm)to).iterator();
-            		while (i.hasNext()) {
-            			Term t = (Term)i.next();
-                		m.setReceiver(t.toString());
-                		ts.getUserAgArch().sendMsg(m);        			
-            		}
-            	} else {
-            		m.setReceiver(to.toString());
-            		ts.getUserAgArch().sendMsg(m);
-            	}
+        	if (to.isList()) {
+                for (Term t: (ListTerm)to) {
+            		m.setReceiver(t.toString());
+            		ts.getUserAgArch().sendMsg(m);        			
+        		}
+        	} else {
+        		m.setReceiver(to.toString());
+        		ts.getUserAgArch().sendMsg(m);
+        	}
             return true;
         } catch (Exception e) {
             throw new JasonException("Error sending message " + m + "\nError="+e);
         }
     }
-    
 }

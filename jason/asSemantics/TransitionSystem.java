@@ -146,7 +146,9 @@ public class TransitionSystem {
     private void applyProcMsg() throws JasonException {
         if (!conf.C.MB.isEmpty()) {
             Message m = conf.ag.selectMessage(conf.C.MB);
-            Literal content = Literal.parseLiteral(m.getPropCont().toString());
+            
+            // get the content, it can be any term (literal, list, number, ...; see ask)
+            Term content = TermImpl.parse(m.getPropCont().toString());
 
             // check if an intention was suspended waiting this message
             Intention intention = getC().getPendingIntentions().remove(m.getInReplyTo());
@@ -280,6 +282,9 @@ public class TransitionSystem {
         confP.C.SO = conf.ag.selectOption(confP.C.AP);
         if (confP.C.SO != null) {
             confP.step = State.AddIM;
+            if (logger.isLoggable(Level.FINE)) {
+                logger.fine("Selected option "+confP.C.SO+" for event "+confP.C.SE);
+            }
         } else {
             logger.warning("selectOption returned null.");
             generateGoalDeletionFromEvent(); 

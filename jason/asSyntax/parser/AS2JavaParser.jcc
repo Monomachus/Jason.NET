@@ -107,11 +107,11 @@ TOKEN : {
 
 /* AgentSpeak Grammar */
 
-void ag(Agent a) : { List bbl = new LinkedList(); PlanLibrary pp;  }
+void agent(Agent a) : { List bbl = new LinkedList(); PlanLibrary pp;  }
 {
-  bs(bbl)
-  ig(a)
-  pp = ps(bbl)
+  belief_base(bbl)
+  initial_goals(a)
+  pp = plan_base(bbl)
   <EOF>
               { if (a != null) {
                   try {
@@ -131,31 +131,32 @@ void ag(Agent a) : { List bbl = new LinkedList(); PlanLibrary pp;  }
 
 
 /* Beliefs & Rules */
-void bs(List bbl) : { Literal h; Term t; }
+void belief_base(List bbl) : { Literal h; Term t; }
 {
-  ( h=l()
+  ( h=literal()
     [
-      ":-" t = le()  { h = new Rule(h,t); }
+      ":-" t = log_expr()   { h = new Rule(h,t); }
     ] 
-    "."              {  bbl.add(h);  } 
+    "."                     {  bbl.add(h);  } 
   )*
 }
 
 
 /* Initial goals */
-void ig(Agent a) : { Literal g; }
+void initial_goals(Agent a) : { Literal g; }
 {
-  ( "!" g=l() "."   {  if (a != null && a.getTS() != null) {
-				        a.getTS().getC().addAchvGoal(g,Intention.EmptyInt);
+  ( "!" g=literal() "."   
+                    {  if (a != null && a.getTS() != null) {
+				          a.getTS().getC().addAchvGoal(g,Intention.EmptyInt);
                        }
                     } 
   )*
 }
 
 /* Plans */
-PlanLibrary ps(List bbl) : { PlanLibrary pp = new PlanLibrary(); Plan pl;  }
+PlanLibrary plan_base(List bbl) : { PlanLibrary pp = new PlanLibrary(); Plan pl;  }
 {
-  ( pl = p()       { try {
+  ( pl = plan()    { try {
                        pp.add(pl); 
                      } catch (JasonException je) {
                        System.err.println("Error adding plan:"+je);
@@ -170,27 +171,30 @@ PlanLibrary ps(List bbl) : { PlanLibrary pp = new PlanLibrary(); Plan pl;  }
 void directive(List bbl, PlanLibrary pp) : { Pred d; }
 {
   "{"
-   d = at()        { Directives.process(d, bbl, pp); }
+   d = atom()        { Directives.process(d, bbl, pp); }
   "}"
 }
 
 
 /* Plan */
-Plan p() :         { Token k; Trigger T; Term C = null; ArrayList H = null; Pred L = null; int start = -1, end;}
+Plan plan() :         { Token k; Pred L = null; 
+                        Trigger T; Term C = null; 
+                        ArrayList B = new ArrayList(); 
+                        int start = -1, end;}
 {
-    [ k = <TK_LABEL_AT> L=at()  { start = k.beginLine; }   ]
-    T=te()         
-    [ k = ":"  C=le()           { if (start == -1) start = k.beginLine; } ] 
-    [ k = "<-" H=bd()           { if (start == -1) start = k.beginLine; } ]  
-    k = "."                     { if (start == -1) start = k.beginLine; } 
+    [ k = <TK_LABEL_AT> L=atom()  { start = k.beginLine; }   ]
+    T=trigger()         
+    [ k = ":"  C=log_expr()      { if (start == -1) start = k.beginLine; } ] 
+    [ k = "<-" plan_body(B)      { if (start == -1) start = k.beginLine; } ]  
+    k = "."                      { if (start == -1) start = k.beginLine; } 
                    { end = k.beginLine;
-                     Plan p = new Plan(L,T,C,H);
+                     Plan p = new Plan(L,T,C,B);
                      p.setSourceLines(start,end);
                      return p;}
-}
+                   }
 
 /* Trigger */
-Trigger te() : { 
+Trigger trigger() : { 
                		boolean teType;
 			    	byte    teGoal = Trigger.TEBel;
 				 	Literal F; 
@@ -205,17 +209,17 @@ Trigger te() : {
     )
   ]
   
-  ( F=l()
+  ( F=literal()
   | F=var()
   )            { return new Trigger(teType,teGoal,F); }
 }
 
 /* Literal */
-Literal l() :  { Pred F; Token k; boolean type = Literal.LPos; }
+Literal literal() :  { Pred F; Token k; boolean type = Literal.LPos; }
 {
   ( ( [ <TK_NEG>              { type = Literal.LNeg; }
       ]
-      F=at()                  { return new Literal(type,F); }
+      F=atom()                { return new Literal(type,F); }
     )
   | k=<TK_TRUE>               { return Literal.LTrue; } 
   | k=<TK_FALSE>              { return Literal.LFalse; } 
@@ -224,25 +228,21 @@ Literal l() :  { Pred F; Token k; boolean type = Literal.LPos; }
 
 
 /* Plan body */
-ArrayList bd() : { BodyLiteral F; 
-                   ArrayList BD = new ArrayList(); 
-                   List BD2;}
+void plan_body(ArrayList bd) : { BodyLiteral F; }
 {
-  F=f()          { if (! F.getTerm().equals(Literal.LTrue)) {
-                      BD.add(F); 
-                   } 
-                 }
+  F=body_formula()         { if (! F.getTerm().equals(Literal.LTrue)) {
+                               bd.add(F);
+                             } 
+                           }
                  
-  [ ";" BD2=bd() { BD.addAll(BD2); } ]
-                 { return BD; }
+  [ ";" plan_body(bd) ]
 }
 
 
-BodyLiteral f() :     { Literal A; Token k;
-                        BodyType formType = BodyType.action;
-                        Term rel;
-                        VarTerm v;
-                      }
+BodyLiteral body_formula() :  { Literal A; Token k;
+                                BodyType formType = BodyType.action;
+                                Term rel; VarTerm v;
+                              }
 {
  
  ( LOOKAHEAD(4)
@@ -256,12 +256,12 @@ BodyLiteral f() :     { Literal A; Token k;
         ]
       ) 
    )
-   ( A=l()            { return new BodyLiteral(formType,A); }
+   ( A=literal()      { return new BodyLiteral(formType,A); }
    | v = var()        { return new BodyLiteral(formType,v); } // used in communication "+C"
    )
  |
   // actions or expressions
-  rel = re() 
+  rel = rel_expr() 
                       { if (rel.isVar() || rel.isLiteral()) {
                           return new BodyLiteral(formType, rel);
                         } else {
@@ -273,11 +273,11 @@ BodyLiteral f() :     { Literal A; Token k;
 
 
 /* Annotated Atomic Formulae */
-Pred at() :         { Token K; Pred p = new Pred(); Term t; List l; ListTerm lt;}
+Pred atom() :       { Token K; Pred p = new Pred(); Term t; List l; ListTerm lt;}
 {
   K=<ATOM>          { p.setFunctor(K.image); } 
   [
-      "(" l = lt() 
+      "(" l = terms() 
       ")"           { p.addTerms(l); }
   ]
   [ 
@@ -288,22 +288,23 @@ Pred at() :         { Token K; Pred p = new Pred(); Term t; List l; ListTerm lt;
 
 
 /* List of terms */
-List lt() :         { List listTerms = new ArrayList(); Term v; }
+List terms() : { List listTerms = new ArrayList(); Term v; }
 {
-  v=t()             { listTerms.add(v); } 
-  ( "," v=t()       { listTerms.add(v); }
+  v=term()             { listTerms.add(v); } 
+  ( "," v=term()       { listTerms.add(v); }
   )* 
-                    { return listTerms; }
+                       { return listTerms; }
 }
 
 
-Term t() :         { Token K; Term u; }
+Term term() :       { Term u; }
 {
-  ( u=l()          { return u; }
-  | u=list()       { return u; } 
-  | u=ae()         { return u; }
-  | K=<STRING>     { return new StringTermImpl(K.image.replaceAll("\"", "\\\"")); } 
+  ( u=literal()     
+  | u=list()        
+  | u=arithm_expr() 
+  | u=string()      
   )
+  { return u; }
 }
 
 
@@ -312,8 +313,8 @@ ListTermImpl list() : { ListTermImpl lt = new ListTermImpl(); ListTerm last;
 {
   "["
   [
-  f=t()                   { last = lt.append(f); }
-  ( "," f=t()             { last = last.append(f); }
+  f=term()                { last = lt.append(f); }
+  ( "," f=term()          { last = last.append(f); }
   )*
   [ "|"  ( K=<VAR>        { last.setNext(new VarTerm(K.image)); }
          | K=<UNNAMEDVAR> { last.setNext(new UnnamedVar()); }
@@ -327,26 +328,26 @@ ListTermImpl list() : { ListTermImpl lt = new ListTermImpl(); ListTerm last;
 
 /* logical expression */
 
-Term le() :    { Term t1, t2; }
+Term log_expr() :        { Term t1, t2; }
 {					
-   t1 = le_trm()         
-[  "|" t2 = le()         { return new LogExprTerm(t1,LogicalOp.or,t2); } ]
+   t1 = log_expr_trm()         
+[  "|" t2 = log_expr()   { return new LogExprTerm(t1,LogicalOp.or,t2); } ]
                          { return t1; }
 }
 
-Term le_trm() :  { Term t1, t2; }
+Term log_expr_trm() :      { Term t1, t2; }
 {
-   t1 = le_factor()    
-[  "&" t2 = le_trm() { return new LogExprTerm(t1,LogicalOp.and,t2); } ]
-                     { return t1; }
+   t1 = log_expr_factor()    
+[  "&" t2 = log_expr_trm() { return new LogExprTerm(t1,LogicalOp.and,t2); } ]
+                           { return t1; }
 }
 
-Term le_factor():             { Term t; }
+Term log_expr_factor():             { Term t; }
 {
 (  
-  <TK_NOT> t = le_factor()    { return new LogExprTerm(LogicalOp.not,t); } 
+  <TK_NOT> t = log_expr_factor()    { return new LogExprTerm(LogicalOp.not,t); } 
  | 
-  t = re()                    { return t; } 
+  t = rel_expr()                    { return t; } 
 )
 }
 
@@ -358,17 +359,14 @@ Term le_factor():             { Term t; }
    | <LITERAL>  [ <OPREL> <EXP> ]  --> returns the Literal
    | <EXP>      [ <OPREL> <EXP> ]  --> returns the NumberTerm 
 */
-Term re() :                               {  Token k;
-                                             Term op1 = null;
+Term rel_expr() :                         {  Term op1 = null;
                                              Term op2 = null;
-                                             Term nb; 
                                              RelationalOp operator = RelationalOp.none;
-                                             //Term rel = null;
                                            }
 {
-    (   nb = ae()                          { op1 = nb; }
-      | op1 = l()
-      | k = <STRING>                       { op1 = new StringTermImpl(k.image); }
+    (   op1 = arithm_expr()                
+      | op1 = literal()
+      | op1 = string()
     )
                      
     [
@@ -382,9 +380,9 @@ Term re() :                               {  Token k;
        | "=.."                             { operator = RelationalOp.literalBuilder; } 
        )
 
-       (   nb = ae()                       { op2 = nb; }
-         | op2 = l()
-         | k = <STRING>                    { op2 = new StringTermImpl(k.image); }
+       (   op2 = arithm_expr()        
+         | op2 = literal()
+         | op2 = string()               
          | op2 = list()
        )
 
@@ -395,69 +393,69 @@ Term re() :                               {  Token k;
 
 
 /* arithmetic expression */
-Term ae() :          { Term t1, t2; ArithmeticOp op;}
+Term arithm_expr() : { Term t1, t2; ArithmeticOp op;}
 {
-   t1 = trm()        { op = ArithmeticOp.none; }
+   t1 = arithm_expr_trm()     { op = ArithmeticOp.none; }
 [  ( "+"             { op = ArithmeticOp.plus;} 
    | "-"             { op = ArithmeticOp.minus;}
    )
-   t2 = ae()         { if (!t1.isNumeric() && !t1.isVar()) {
-                          throw new ParseException("ArithExpr: first operand is not numeric or variable.");
-                       }
-                       if (!t2.isNumeric() && !t2.isVar()) {
-                          throw new ParseException("ArithExpr: second operand is not numeric or variable.");
-                       }
-                       return new ArithExprTerm((NumberTerm)t1, op, (NumberTerm)t2); 
-                     }
-]                    { return t1; }
+   t2 = arithm_expr() { if (!t1.isNumeric() && !t1.isVar()) {
+                           throw new ParseException("ArithExpr: first operand is not numeric or variable.");
+                        }
+                        if (!t2.isNumeric() && !t2.isVar()) {
+                           throw new ParseException("ArithExpr: second operand is not numeric or variable.");
+                        }
+                        return new ArithExprTerm((NumberTerm)t1, op, (NumberTerm)t2); 
+                      }
+]                     { return t1; }
 }
 
-Term trm() :        { Term t1, t2; ArithmeticOp op;}
+Term arithm_expr_trm() :        { Term t1, t2; ArithmeticOp op;}
 {
-   t1 = factor()    { op = ArithmeticOp.none; }
-[  ( "*"            { op = ArithmeticOp.times; } 
-   | "/"            { op = ArithmeticOp.div; }
-   | <TK_INTDIV>    { op = ArithmeticOp.intdiv; }
-   | <TK_INTMOD>    { op = ArithmeticOp.mod; }
+   t1 = arithm_expr_factor()    { op = ArithmeticOp.none; }
+[  ( "*"                        { op = ArithmeticOp.times; } 
+   | "/"                        { op = ArithmeticOp.div; }
+   | <TK_INTDIV>                { op = ArithmeticOp.intdiv; }
+   | <TK_INTMOD>                { op = ArithmeticOp.mod; }
    )
-   t2 = trm()       { if (!t1.isNumeric() && !t1.isVar()) {
-                          throw new ParseException("ArithTerm: first operand is not numeric or variable.");
-                      }
-                      if (!t2.isNumeric() && !t2.isVar()) {
-                          throw new ParseException("ArithTerm: second operand is not numeric or variable.");
-                      }
-                      return new ArithExprTerm((NumberTerm)t1, op, (NumberTerm)t2); 
-                    }
-]                   { return t1; }
+   t2 = arithm_expr_trm()       { if (!t1.isNumeric() && !t1.isVar()) {
+                                    throw new ParseException("ArithTerm: first operand is not numeric or variable.");
+                                  }
+                                  if (!t2.isNumeric() && !t2.isVar()) {
+                                    throw new ParseException("ArithTerm: second operand is not numeric or variable.");
+                                  }
+                                  return new ArithExprTerm((NumberTerm)t1, op, (NumberTerm)t2); 
+                                }
+]                               { return t1; }
 }
 
-Term factor():      { Term t1, t2; ArithmeticOp op;}
+Term arithm_expr_factor():   { Term t1, t2; ArithmeticOp op;}
 {
-   t1 = simple()    { op = ArithmeticOp.none; }
-[  ( "**"           { op = ArithmeticOp.pow; }
+   t1 = arithm_expr_simple() { op = ArithmeticOp.none; }
+[  ( "**"                    { op = ArithmeticOp.pow; }
    )
-   t2 = factor()    { if (!t1.isNumeric() && !t1.isVar()) {
-                          throw new ParseException("ArithFactor: first operand is not numeric or variable.");
-                      }
-                      if (!t2.isNumeric() && !t2.isVar()) {
-                          throw new ParseException("ArithFactor: second operand is not numeric or variable.");
-                      }
-                      return new ArithExprTerm((NumberTerm)t1, op, (NumberTerm)t2); 
-                    }
-]                   { return t1; }
+   t2 = arithm_expr_factor() { if (!t1.isNumeric() && !t1.isVar()) {
+                                 throw new ParseException("ArithFactor: first operand is not numeric or variable.");
+                               }
+                               if (!t2.isNumeric() && !t2.isVar()) {
+                                 throw new ParseException("ArithFactor: second operand is not numeric or variable.");
+                               }
+                               return new ArithExprTerm((NumberTerm)t1, op, (NumberTerm)t2); 
+                             }
+]                            { return t1; }
 }
 
 
-Term simple():      { Token K; Term t; VarTerm v; }
+Term arithm_expr_simple(): { Token K; Term t; VarTerm v; }
 {
- ( K = <NUMBER>     { return new NumberTermImpl(K.image); }
- | "-" t = simple() { if (!t.isNumeric() && !t.isVar()) {
-                          throw new ParseException("operator '-' applied to argument not numeric or variable.");
-                      }
-                      return new ArithExprTerm(ArithmeticOp.minus, (NumberTerm)t); 
-                    }
- | "(" t = le() ")" { return t; }
- | v = var()        { return v; }
+ ( K = <NUMBER>                 { return new NumberTermImpl(K.image); }
+ | "-" t = arithm_expr_simple() { if (!t.isNumeric() && !t.isVar()) {
+                                    throw new ParseException("operator '-' applied to argument not numeric or variable.");
+                                  }
+                                  return new ArithExprTerm(ArithmeticOp.minus, (NumberTerm)t); 
+                                }
+ | "(" t = log_expr() ")"       { return t; }
+ | v = var()                    { return v; }
  )
 }
 
@@ -472,3 +470,7 @@ VarTerm var():      { Token K; VarTerm v; ListTerm lt; }
                     { return v; }
 }
 
+StringTerm string():{ Token k; }
+{
+  k = <STRING>      { return new StringTermImpl(k.image.substring(1,k.image.length()-1)); } 
+}

@@ -374,6 +374,9 @@ public class Unifier implements Cloneable {
 
 		Set<VarTerm> vars = null;
 
+        // used in clone
+        private VarsCluster() { }
+        
         VarsCluster(VarTerm v1, VarTerm v2) {
             add(v1);
             add(v2);
@@ -406,6 +409,15 @@ public class Unifier implements Cloneable {
             return vars != null && !vars.isEmpty();
         }
 
+        public Object clone() {
+            VarsCluster c = new VarsCluster();
+            c.vars = new HashSet<VarTerm>();
+            for (VarTerm vt: this.vars) {
+                c.vars.add((VarTerm)vt.clone());
+            }
+            return c;
+        }
+        
         public String toString() {
             return vars.toString();
         }

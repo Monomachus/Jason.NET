@@ -65,7 +65,7 @@ public class Pred extends TermImpl {
     public static Pred parsePred(String sPred) {
         as2j parser = new as2j(new StringReader(sPred));
         try {
-            return parser.at();
+            return parser.atom();
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error parsing predicate " + sPred, e);
             return null;

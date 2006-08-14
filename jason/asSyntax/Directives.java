@@ -27,8 +27,8 @@ public class Directives {
     public static void processInclude(String asFileName, List bels, PlanLibrary pl) {
         try {
             as2j parser = new as2j(new FileInputStream(asFileName));
-            parser.bs(bels);
-            PlanLibrary newPl = parser.ps(bels);
+            parser.belief_base(bels);
+            PlanLibrary newPl = parser.plan_base(bels);
             pl.addAll(newPl);
             logger.fine("as2j: AgentSpeak program '"+asFileName+"' parsed successfully!");
         } catch (FileNotFoundException e) {

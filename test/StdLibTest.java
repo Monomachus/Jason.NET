@@ -94,7 +94,10 @@ public class StdLibTest extends TestCase {
         Agent ag = new Agent();
         ag.setLogger(null);
         StringTerm pt1 = new StringTermImpl("@t1 +a : g(10) <- .print(\"ok 10\").");
-        ag.getPL().add(pt1, null);
+        Plan pa = ag.getPL().add(pt1, null);
+        assertTrue(pa != null);
+        assertEquals(pa.toASString(),"@t1[source(self)] +a : g(10) <- .print(\"ok 10\").");
+
         ag.getPL().add(new StringTermImpl("@t2 +a : g(20) <- .print(\"ok 20\")."), new TermImpl("nosource"));
         ((Plan) ag.getPL().getPlans().get(1)).getLabel().addSource(new TermImpl("ag1"));
         ag.getPL().add(new StringTermImpl("@t3 +b : true <- true."), null);
@@ -113,7 +116,7 @@ public class StdLibTest extends TestCase {
         assertTrue(ag.getPL().getPlans().get(0).equals(Plan.parse(pt1.getString())));
 
         ListTerm plans = (ListTerm) u.get("X");
-        // System.out.println("plans="+plans);
+        //System.out.println("plans="+plans);
 
         assertEquals(plans.size(), 2);
 
@@ -133,7 +136,7 @@ public class StdLibTest extends TestCase {
         try {
             while (i.hasNext()) {
                 StringTerm t = (StringTerm) i.next();
-                new addPlan().execute(ts, new Unifier(), new Term[] { (Term) t, new TermImpl("fromGR") });
+                new addPlan().execute(ts, new Unifier(), new Term[] { t, new TermImpl("fromGR") });
             }
         } catch (Exception e) {
             e.printStackTrace();

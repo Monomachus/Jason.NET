@@ -176,7 +176,7 @@ public class LogExprTerm extends TermImpl {
     public static Term parseExpr(String sExpr) {
         as2j parser = new as2j(new StringReader(sExpr));
         try {
-            return (Term)parser.le();
+            return (Term)parser.log_expr();
         } catch (Exception e) {
             logger.log(Level.SEVERE,"Error parsing expression "+sExpr,e);
         }

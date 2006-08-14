@@ -125,7 +125,7 @@ public class Plan implements Cloneable, Serializable {
     public static Plan parse(String sPlan) {
         as2j parser = new as2j(new StringReader(sPlan));
         try {
-            return parser.p();
+            return parser.plan();
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error parsing plan " + sPlan, e);
             return null;
@@ -244,8 +244,10 @@ public class Plan implements Cloneable, Serializable {
     
     /** returns this plan in a string compliant with AS syntax */
     public String toASString() {
-        return ((label == null) ? "" : "@" + label + " ") + tevent + ((context == null) ? "" : " : " + context) + ((body.size() == 0) ? "" : " <- " + listToString(body, "; "))
-        + ".";
+        return (((label == null) ? "" : "@" + label + " ") + 
+               tevent + ((context == null) ? "" : " : " + context) + 
+               ((body.size() == 0) ? "" : " <- " + listToString(body, "; ")) + 
+               ".");
     }
     
     /** get as XML */

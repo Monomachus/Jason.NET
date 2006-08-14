@@ -387,7 +387,7 @@ public class JasonID extends JPanel implements EBComponent, RunProjectListener {
                 asFile = (File) iASfile.next();
                 textArea.append("Parsing AgentSpeak file '" + asFile.getName() + "'...");
                 jason.asSyntax.parser.as2j parser = new jason.asSyntax.parser.as2j(new FileReader(asFile));
-                parser.ag(null);
+                parser.agent(null);
                 textArea.append(" parsed successfully!\n");
             }
             return true;

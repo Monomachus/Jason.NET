@@ -58,7 +58,7 @@ public class Trigger implements Cloneable {
 	public static Trigger parseTrigger(String sTe) {
 		as2j parser = new as2j(new StringReader(sTe));
 		try {
-			return parser.te(); 
+			return parser.trigger(); 
 		} catch (Exception e) {
 			logger.log(Level.SEVERE,"Error parsing trigger" + sTe,e);
 			return null;

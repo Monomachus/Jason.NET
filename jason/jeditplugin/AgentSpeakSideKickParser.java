@@ -39,7 +39,7 @@ public class AgentSpeakSideKickParser extends sidekick.SideKickParser {
             	
             	Agent ag = new Agent();
             	ag.setLogger(null);
-            	parser.ag(ag);
+            	parser.agent(ag);
             	
             	// create nodes 
             	SideKickParsedData pd = new SideKickParsedData(buf.getName());

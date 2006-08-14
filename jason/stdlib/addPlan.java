@@ -21,7 +21,6 @@
 //
 //----------------------------------------------------------------------------
 
-
 package jason.stdlib;
 
 import jason.JasonException;
@@ -36,35 +35,35 @@ import jason.asSyntax.TermImpl;
 import java.util.Iterator;
 
 public class addPlan implements InternalAction {
-    
-	/**
-	 * args[0] = plan or list of plans (as StringTerm)
-	 * args[1] = source (if not informed, is "self")
-	 */
+
+    /**
+     * args[0] = plan or list of plans (as StringTerm) args[1] = source (if not
+     * informed, is "self")
+     */
     public boolean execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         try {
-			Term plans = TermImpl.parse(args[0].toString());
+            Term plans = TermImpl.parse(args[0].toString());
 
-			Term source = new TermImpl("self");
-            	if (args.length > 1) {
-            		source = (Term)args[1].clone();
-            		un.apply(source);
-            	}
-			
-            	if (plans.isList()) { // if arg[0] is a list
-    				ListTerm lt = (ListTerm)plans;
-            		Iterator i = lt.iterator();
-            		while (i.hasNext()) {
-    					ts.getAg().getPL().add( (StringTerm)i.next(), source);
-            		}
-            	} else { // args[0] is a plan
-            		ts.getAg().getPL().add((StringTerm)plans, source);
-            	}
+            Term source = new TermImpl("self");
+            if (args.length > 1) {
+                source = (Term) args[1].clone();
+                un.apply(source);
+            }
+
+            if (plans.isList()) { // if arg[0] is a list
+                ListTerm lt = (ListTerm) plans;
+                Iterator i = lt.iterator();
+                while (i.hasNext()) {
+                    ts.getAg().getPL().add((StringTerm) i.next(), source);
+                }
+            } else { // args[0] is a plan
+                ts.getAg().getPL().add((StringTerm) plans, source);
+            }
             return true;
         } catch (ArrayIndexOutOfBoundsException e) {
             throw new JasonException("The internal action 'addPlan' has not received two arguments (plan's string and source)");
         } catch (Exception e) {
-            throw new JasonException("Error in internal action 'addPlan': "+e);
+            throw new JasonException("Error in internal action 'addPlan': " + e);
         }
-    }  
+    }
 }

@@ -62,9 +62,11 @@ public class PlanLibrary {
 	 *  Add a new plan based on a String. The source
 	 *  normally is "self" or the agent that sent this plan.
 	 *  If the already has a plan equals to "stPlan", only a
-	 *  new source is added. 
+	 *  new source is added.
+     *  
+     *   returns the plan added, null if it does not work.
 	 */
-	public void add(StringTerm stPlan, Term tSource) {
+	public Plan add(StringTerm stPlan, Term tSource) {
 		String sPlan = stPlan.getString();
 		try {
 			// remove quotes \" -> "
@@ -76,21 +78,21 @@ public class PlanLibrary {
 			}
 			sPlan = sTemp.toString();
 			Plan p = Plan.parse(sPlan);
-
-			int i = plans.indexOf(p);
-			if (i < 0) {
-				p.getLabel().addSource(tSource);
-				add(p);
-			} else {
-				p = (Plan) plans.get(i);
-				p.getLabel().addSource(tSource);
-			}
-			
-			//System.out.println("**** adding plan "+p+" from "+sSource);		
-
+			if (p != null) {
+    			int i = plans.indexOf(p);
+    			if (i < 0) {
+    				p.getLabel().addSource(tSource);
+    				add(p);
+    			} else {
+    				p = (Plan) plans.get(i);
+    				p.getLabel().addSource(tSource);
+    			}
+    			return p;
+            }
 		} catch (Exception e) {
 			logger.log(Level.SEVERE,"Error adding plan "+sPlan,e);
 		}
+        return null;
 	}
 
 

@@ -155,7 +155,7 @@ public class Agent {
 
     void parseAS(InputStream asIn) throws ParseException {
         as2j parser = new as2j(asIn);
-        parser.ag(this);
+        parser.agent(this);
     }
 
     public InternalAction getIA(Term action) throws Exception {
@@ -325,7 +325,6 @@ public class Agent {
      * base, and List[1] has the list of actual deletions; this is used to
      * generate the appropriate internal events. If nothing change, returns
      * null.
-     * 
      */
     public List<Literal>[] brf(Literal beliefToAdd, Literal beliefToDel,
             Intention i) {

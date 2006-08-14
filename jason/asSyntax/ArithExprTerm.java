@@ -144,7 +144,7 @@ public class ArithExprTerm extends VarTerm implements NumberTerm {
     public static NumberTerm parseExpr(String sExpr) {
         as2j parser = new as2j(new StringReader(sExpr));
         try {
-            return (NumberTerm) parser.ae();
+            return (NumberTerm) parser.arithm_expr();
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error parsing expression " + sExpr, e);
             return null;

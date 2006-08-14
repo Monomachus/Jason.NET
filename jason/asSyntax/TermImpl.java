@@ -69,7 +69,7 @@ public class TermImpl implements Term, Serializable {
     public static Term parse(String sTerm) {
         as2j parser = new as2j(new StringReader(sTerm));
         try {
-            return parser.t(); // parse.t() may returns a Pred/List...
+            return parser.term();
         } catch (Exception e) {
             logger.log(Level.SEVERE,"Error parsing term " + sTerm,e);
             return null;

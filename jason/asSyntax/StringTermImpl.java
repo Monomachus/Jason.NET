@@ -50,19 +50,10 @@ public class StringTermImpl extends TermImpl implements StringTerm {
 		setString(t.getString());
 	}
 
-	/*
-	public void setFunctor(String fs) {
-		if (fs.startsWith("\"")) {
-			fs = fs.substring(1,fs.length()-1);
-		}
-		super.setFunctor(fs);
-	}
-	*/
-
 	public void setString(String s) {
-		if (s.startsWith("\"")) {
-			s = s.substring(1,s.length()-1);
-		}
+	    //if (s.startsWith("\"")) {
+		//	s = s.substring(1,s.length()-1);
+		//}
 		setFunctor(s);
 	}
 	
@@ -78,7 +69,7 @@ public class StringTermImpl extends TermImpl implements StringTerm {
 	public static StringTerm parseString(String sTerm) {
 		as2j parser = new as2j(new StringReader(sTerm));
 		try {
-			return (StringTerm)parser.t();
+			return (StringTerm)parser.term();
 		} catch (Exception e) {
 			logger.log(Level.SEVERE,"Error parsing string term " + sTerm,e);
 			return null;

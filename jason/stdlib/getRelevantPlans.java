@@ -46,8 +46,7 @@ public class getRelevantPlans implements InternalAction {
 	 *           that contains all plans (as StringTerms)
 	 *           (the splans'sources in this list are empty)
 	 */
-	public boolean execute(TransitionSystem ts, Unifier un, Term[] args)
-			throws Exception {
+	public boolean execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
 		try {
 			StringTerm sTe = (StringTerm) args[0];
 			Trigger te = Trigger.parseTrigger(sTe.getFunctor());
