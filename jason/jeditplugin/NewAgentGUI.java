@@ -43,7 +43,7 @@ public class NewAgentGUI extends StartNewAgentGUI {
             } else {
                 pos = buffer.getLength();
             }
-            buffer.insert(pos, "\n\t\t" + agDecl.getAsInMASProject());
+            buffer.insert(pos, "\n        " + agDecl.getAsInMASProject());
         } finally {
             buffer.writeUnlock();
         }

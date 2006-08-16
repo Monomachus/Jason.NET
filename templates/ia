@@ -8,10 +8,10 @@ import java.util.logging.*;
 
 public class <IA_NAME> implements jason.asSemantics.InternalAction {
 
-	private Logger logger = Logger.getLogger("<PROJECT_NAME>."+<IA_NAME>.class.getName());
+    private Logger logger = Logger.getLogger("<PROJECT_NAME>."+<IA_NAME>.class.getName());
 
-	public boolean execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
-		logger.info("not implemented!");
-		return true;
-	}
+    public boolean execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
+        logger.info("not implemented!");
+        return true;
+    }
 }

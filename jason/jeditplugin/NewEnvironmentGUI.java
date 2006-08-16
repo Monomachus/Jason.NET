@@ -47,12 +47,10 @@ public class NewEnvironmentGUI extends NewAgentGUI {
             buffer.writeLock();
             String proj = buffer.getText(0, buffer.getLength());
             int pos = proj.lastIndexOf("agents");
-            if (pos > 0) {
-                pos--;
-            } else {
+            if (pos < 0) {
                 pos = buffer.getLength();
             }
-            buffer.insert(pos, "\tenvironment: " + env + "\n");
+            buffer.insert(pos, "environment: " + env + "\n\n    ");
         } finally {
             buffer.writeUnlock();
         }
