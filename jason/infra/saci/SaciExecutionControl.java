@@ -137,11 +137,11 @@ public class SaciExecutionControl extends saci.Agent implements ExecutionControl
         try {
             Message r = mbox.ask(m);
 
-            // System.out.println("** ans = "+r.get("content"));
-            // System.out.println(r.get("content").getClass().getName()+" =
-            // "+m.get("content"));
-
-            return (Document) r.get("content");
+            if (r == null) {
+                System.err.println("No agent state received! (possibly timeout in ask)");
+            } else {
+                return (Document) r.get("content");
+            }
         } catch (Exception e) {
             System.err.println("Error receiving agent state " + e);
             e.printStackTrace();
