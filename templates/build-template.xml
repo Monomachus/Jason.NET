@@ -7,7 +7,7 @@
 -->
 
 <project name   ="<PROJECT-ID>"
-         basedir="<PROJECT-DIR>"
+         basedir="."
          default="run">
 
     <property name="mas2j.project.file" value="<PROJECT-FILE>"/>

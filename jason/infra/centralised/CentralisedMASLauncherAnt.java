@@ -11,16 +11,18 @@ import java.io.FileWriter;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 
+/**
+ * Write the ant script to run the MAS in centralised infrastructure and
+ * start this script.
+ *
+ * @author Jomi
+ */
 public class CentralisedMASLauncherAnt implements MASLauncherInfraTier {
 
     protected MAS2JProject       project;
-
     protected RunProjectListener listener;
-
     protected boolean            stop       = false;
-
     protected Process            masProcess = null;
-
     protected OutputStream       processOut;
 
     public void setProject(MAS2JProject project) {
@@ -50,6 +52,7 @@ public class CentralisedMASLauncherAnt implements MASLauncherInfraTier {
 
             Thread.sleep(300);
             stop = false;
+			// read the program output and print it out
             while (!stop) {// || saciProcess!=null) {
                 while (!stop && in.ready()) {
                     System.out.println(in.readLine());
