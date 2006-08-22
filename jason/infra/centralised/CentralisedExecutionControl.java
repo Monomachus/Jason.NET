@@ -90,7 +90,12 @@ public class CentralisedExecutionControl implements ExecutionControlInfraTier {
     }
 
     public Document getAgState(String agName) {
-        return infraEnv.getAgent(agName).getTS().getAg().getAgState();
+        AgArch arch = infraEnv.getAgent(agName);
+        if (arch != null) { // the agent exists ?
+            return arch.getTS().getAg().getAgState();
+        } else {
+            return null;
+        }
     }
 
     public RuntimeServicesInfraTier getRuntimeServices() {

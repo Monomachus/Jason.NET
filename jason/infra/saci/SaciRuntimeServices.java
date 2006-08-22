@@ -78,6 +78,7 @@ public class SaciRuntimeServices implements RuntimeServicesInfraTier {
         return false;
     }
 
+    @SuppressWarnings("unchecked")
     public Set getAgentsName() {
         try {
             return facilitator.getAllWP().entrySet();

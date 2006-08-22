@@ -23,15 +23,11 @@
 
 package jason.stdlib;
 
-import jason.JasonException;
 import jason.asSemantics.InternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
-import jason.asSyntax.StringTerm;
 import jason.asSyntax.Term;
 import jason.runtime.RuntimeServicesInfraTier;
-
-import java.io.File;
 
 public class stopMAS implements InternalAction {
 

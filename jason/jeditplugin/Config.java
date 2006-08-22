@@ -44,19 +44,13 @@ import java.util.StringTokenizer;
 public class Config extends Properties {
 
     public static final String JASON_JAR     = "jasonJar";
-
     public static final String SACI_JAR      = "saciJar";
-
-    public static final String JAVA_HOME     = "javaHome";
-
     public static final String ANT_LIB       = "antLib";
 
+    public static final String JAVA_HOME     = "javaHome";
     public static final String RUN_AS_THREAD = "runCentralisedInsideJIDE";
-
     public static final String SHELL_CMD     = "shellCommand";
-
     public static final String CLOSEALL      = "closeAllBeforeOpenMAS2J";
-
     public static final String CHECK_VERSION = "checkLatestVersion";
 
     private static Config      singleton     = null;

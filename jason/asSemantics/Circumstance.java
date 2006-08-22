@@ -268,6 +268,7 @@ public class Circumstance implements Serializable {
     }
 
     /** get the agent circunstance as XML */
+    @SuppressWarnings("unchecked")
     public Element getAsDOM(Document document) {
         Element c = (Element) document.createElement("circumstance");
         Element e;

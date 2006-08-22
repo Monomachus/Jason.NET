@@ -65,14 +65,10 @@ public class JasonIDOptionPanel extends AbstractOptionPane  {
     		if (!userProperties.getProperty("version").equals(currJasonVersion) && !currJasonVersion.equals("?")) { 
     			// new version, set all values to default
     			System.out.println("This is a new version of Jason, reseting configuration...");
-    			userProperties.clear();
-    			/*
-    			userProperties.remove(Config.JAVA_HOME);
+    			//userProperties.clear();
     			userProperties.remove(Config.SACI_JAR);
     			userProperties.remove(Config.JASON_JAR);
-    			userProperties.remove(Config.LOG4J_JAR);
-    			userProperties.remove(Config.RUN_AS_THREAD);
-    			*/
+                userProperties.remove(Config.ANT_LIB);
     		}
     	} 
 
@@ -104,7 +100,7 @@ public class JasonIDOptionPanel extends AbstractOptionPane  {
 	                //chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 	                if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
 	                	String jasonJar = (new File(chooser.getSelectedFile().getPath())).getCanonicalPath();
-	                	if (userProperties.checkJar(jasonJar)) {
+	                	if (Config.checkJar(jasonJar)) {
 							jasonTF.setText(jasonJar);
 	                	} else {
 	                		JOptionPane.showMessageDialog(null, "The selected jason.jar file was not ok!");
@@ -135,7 +131,7 @@ public class JasonIDOptionPanel extends AbstractOptionPane  {
 					//chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 	                if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
 	                	String saciJar = (new File(chooser.getSelectedFile().getPath())).getCanonicalPath();
-	                	if (userProperties.checkJar(saciJar)) {
+	                	if (Config.checkJar(saciJar)) {
 	                		saciTF.setText(saciJar);
 	                	} else {
 	                		JOptionPane.showMessageDialog(null, "The selected saci.jar file was not ok!");
@@ -164,7 +160,7 @@ public class JasonIDOptionPanel extends AbstractOptionPane  {
 	                chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 	                if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
 	                	String javaHome = (new File(chooser.getSelectedFile().getPath())).getCanonicalPath();
-	                	if (userProperties.checkJavaHomePath(javaHome)) {
+	                	if (Config.checkJavaHomePath(javaHome)) {
 	                		javaTF.setText(javaHome);
 	                	} else {
 	                		JOptionPane.showMessageDialog(null, "The selected JDK home directory has not the file bin/javac inside!");
@@ -193,7 +189,7 @@ public class JasonIDOptionPanel extends AbstractOptionPane  {
 	                chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 	                if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
 	                	String antLib = (new File(chooser.getSelectedFile().getPath())).getCanonicalPath();
-	                	if (userProperties.checkAntLib(antLib)) {
+	                	if (Config.checkAntLib(antLib)) {
 	                		antTF.setText(antLib);
 	                	} else {
 	                		JOptionPane.showMessageDialog(null, "The selected directory has not the files ant.jar and ant-launcher.jar!");
@@ -207,6 +203,7 @@ public class JasonIDOptionPanel extends AbstractOptionPane  {
 
     	
     	// shell command
+        /*
     	JPanel shellPanel = new JPanel();
     	shellPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory
 				.createEtchedBorder(), "Shell command", TitledBorder.LEFT, TitledBorder.TOP));
@@ -215,7 +212,8 @@ public class JasonIDOptionPanel extends AbstractOptionPane  {
     	shellTF.setToolTipText("This command will be used to run the scripts that run the MAS.");
     	shellPanel.add(shellTF);
     	pop.add(shellPanel);
-
+        */
+        
     	// run centralised inside jIDE
     	/*
     	JPanel insideJIDEPanel = new JPanel();
@@ -246,19 +244,19 @@ public class JasonIDOptionPanel extends AbstractOptionPane  {
 	}
 
 	protected void _save() {
-		if (userProperties.checkJar(saciTF.getText())) {
+		if (Config.checkJar(saciTF.getText())) {
 			userProperties.put(Config.SACI_JAR, saciTF.getText().trim());
 		}
-		if (userProperties.checkJar(jasonTF.getText())) {
+		if (Config.checkJar(jasonTF.getText())) {
 			userProperties.put(Config.JASON_JAR, jasonTF.getText().trim());
 		}
-		if (userProperties.checkJavaHomePath(javaTF.getText())) {
+		if (Config.checkJavaHomePath(javaTF.getText())) {
 			userProperties.setJavaHome(javaTF.getText().trim());
 		}
-		if (userProperties.checkAntLib(antTF.getText())) {
+		if (Config.checkAntLib(antTF.getText())) {
 			userProperties.setAntLib(antTF.getText().trim());
 		}
-		userProperties.put(Config.SHELL_CMD, shellTF.getText().trim());
+		//userProperties.put(Config.SHELL_CMD, shellTF.getText().trim());
 		//userProperties.put(Config.RUN_AS_THREAD, insideJIDECBox.isSelected()+"");
 		userProperties.put(Config.CLOSEALL, closeAllCBox.isSelected()+"");
 		userProperties.store();

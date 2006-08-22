@@ -19,8 +19,7 @@ import javax.swing.JTextArea;
 public class CheckVersion extends Thread {
 
     public static final String JasonSite = "http://jason.sf.net";
-
-    private String download = null;
+    String download;
     
     String getLatestVersion() {
         // read version from Jason site
@@ -61,7 +60,7 @@ public class CheckVersion extends Thread {
         final JFrame f = new JFrame("Jason update");
         f.setLayout(new BorderLayout());
 
-        JTextArea ta = new JTextArea(20, 50);
+        JTextArea ta = new JTextArea(20, 90);
         f.add(BorderLayout.CENTER,new JScrollPane(ta));
         
         JPanel sp = new JPanel(new FlowLayout(FlowLayout.CENTER));
@@ -85,10 +84,10 @@ public class CheckVersion extends Thread {
         f.pack();
         
         ta.append("A new version of Jason (" + getLatestVersion() + ") is available at\n\n");
-        ta.append("         "+JasonSite+"\n\n");
+        ta.append("      "+download+"\n\n");
         String wn = whatsNew();
         if (wn != null) {
-            ta.append("Release notes:\n");
+            ta.append("\nRelease notes:\n");
             ta.append(wn);
         }
 
@@ -97,16 +96,19 @@ public class CheckVersion extends Thread {
         f.setVisible(true);
     }
 
+    static boolean alreadyRun = false;
     public void run() {
+        // to avoid this thread to run twice
+        if (alreadyRun) return;
+        alreadyRun = true;
+        
         try {
             if (Config.get().getProperty(Config.CHECK_VERSION,"true").equals("true")) {
                 if (!isLatestVersion()) {
                     show();
                 }
             }
-        } catch (Exception e) {
-            
-        }
+        } catch (Exception e) { }
     }
 
     public static void main(String[] a) {

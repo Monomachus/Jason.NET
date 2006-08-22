@@ -7,7 +7,6 @@ import jason.mas2j.parser.mas2j;
 import java.io.File;
 import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.Icon;
@@ -25,7 +24,7 @@ import errorlist.ErrorSource;
 public class JasonProjectSideKickParser extends sidekick.SideKickParser {
 	public static final String ID = "jason_parser";
 
-	List jasonPluginInstance = new ArrayList();
+	List<JasonID> jasonPluginInstance = new ArrayList<JasonID>();
 	
 	public JasonProjectSideKickParser() {
 		super(ID);
@@ -55,24 +54,17 @@ public class JasonProjectSideKickParser extends sidekick.SideKickParser {
             	if (project.getEnvClass() != null) {
                 	pd.root.add(new ProjectAsset("Environment: ",project.getEnvClass().toString(), buf, ENV_TYPE).createTreeNode());
             	}
-            	//Object[] aap = new Object[project.getAgents().size()];
-            	Iterator i = jasonPluginInstance.iterator();
-            	while (i.hasNext()) {
-            		((JasonID)i.next()).listModel.clear();
+                for (JasonID jid: jasonPluginInstance) {
+            		jid.listModel.clear();
             	}
-            	Iterator ia = project.getAgents().iterator();
-            	int c = 0;
-            	while (ia.hasNext()) {
-            		AgentParameters ap = (AgentParameters)ia.next();
+            	for (AgentParameters ap: project.getAgents()) {
             		if (!ap.asSource.toString().startsWith(File.separator)) {
             			ap.asSource = new File(buf.getDirectory() + ap.asSource); // add project directory in the AP
             		}
             	    pd.root.add(new ProjectAsset("", ap.name, buf, AG_TYPE).createTreeNode());
-            	    //aap[c++] = ap;
                 	
-            	    i = jasonPluginInstance.iterator();
-                	while (i.hasNext()) {
-                		((JasonID)i.next()).listModel.addElement(ap);
+                    for (JasonID jid: jasonPluginInstance) {
+                		jid.listModel.addElement(ap);
                 	}
             	}
         		return pd;

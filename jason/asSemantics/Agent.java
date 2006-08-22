@@ -326,6 +326,7 @@ public class Agent {
      * generate the appropriate internal events. If nothing change, returns
      * null.
      */
+    @SuppressWarnings("unchecked")
     public List<Literal>[] brf(Literal beliefToAdd, Literal beliefToDel,
             Intention i) {
         // This class does not implement belief revision! It

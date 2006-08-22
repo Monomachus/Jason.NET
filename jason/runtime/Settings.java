@@ -51,7 +51,7 @@ public class Settings {
     int     verbose   = ODefaultVerbose;
     boolean sync      = ODefaultSync; 
 
-    Map userParameters = new HashMap();
+    Map<String,Object> userParameters = new HashMap<String,Object>();
     
     Logger logger = Logger.getLogger(Settings.class.getName());			
     
@@ -62,6 +62,7 @@ public class Settings {
         setOptions(options);
     }
     
+    @SuppressWarnings("unchecked")
     public void setOptions(String options) {
         logger.fine("Setting options from "+options);
         jason.mas2j.parser.mas2j parser = new jason.mas2j.parser.mas2j( new StringReader(options));
@@ -73,7 +74,7 @@ public class Settings {
         }
     }
     
-    public void setOptions(Map options) {
+    public void setOptions(Map<String,Object> options) {
         if (options == null) return;
         userParameters = options;
         
