@@ -34,6 +34,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -61,7 +62,7 @@ public class Circumstance implements Serializable {
 
     protected List<ActionExec>         FA;
 
-    private List<CircumstanceListener> listeners = new ArrayList<CircumstanceListener>();
+    private List<CircumstanceListener> listeners = new CopyOnWriteArrayList<CircumstanceListener>();
 
     public Circumstance() {
         // use LinkedList since we use a lot of remove(0) in selectEvent
@@ -97,10 +98,8 @@ public class Circumstance implements Serializable {
         E.add(ev);
 
         // notify listeners
-        synchronized (listeners) {
-            for (CircumstanceListener el : listeners) {
-                el.eventAdded(ev);
-            }
+        for (CircumstanceListener el : listeners) {
+            el.eventAdded(ev);
         }
     }
 
@@ -132,15 +131,11 @@ public class Circumstance implements Serializable {
     /** Listeners */
 
     public void addEventListener(CircumstanceListener el) {
-        synchronized (listeners) {
             listeners.add(el);
-        }
     }
 
     public void removeEventListener(CircumstanceListener el) {
-        synchronized (listeners) {
             listeners.remove(el);
-        }
     }
 
     public boolean hasListener() {
@@ -169,10 +164,8 @@ public class Circumstance implements Serializable {
         }
 
         // notify listeners
-        synchronized (listeners) {
-            for (CircumstanceListener el : listeners) {
-                el.intentionAdded(intention);
-            }
+        for (CircumstanceListener el : listeners) {
+            el.intentionAdded(intention);
         }
     }
 
@@ -194,7 +187,7 @@ public class Circumstance implements Serializable {
         // if (SI != null && SI.isAtomic()) {
         // return SI;
         // }
-        synchronized (getIntentions()) {
+        synchronized (I) {
             for (Intention inte : I) {
                 if (inte.isAtomic()) {
                     removeIntention(inte);
@@ -209,7 +202,7 @@ public class Circumstance implements Serializable {
         // if (SI != null && SI.isAtomic()) {
         // return true;
         // }
-        synchronized (getIntentions()) {
+        synchronized (I) {
             for (Intention inte : I) {
                 if (inte.isAtomic()) {
                     return true;
