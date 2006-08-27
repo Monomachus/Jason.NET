@@ -27,10 +27,18 @@
 \end{document}
     </xsl:template>
 
+    <xsl:template name="commands">
+<xsl:text>
+\newcommand{\aslnumber}[1]{$#1$}
+\newcommand{\aslstring}[1]{\textsf{#1}}
+\newcommand{\aslvar}[1]{\textit{#1}}
+\newcommand{\asllabel}[1]{\textbf{#1}}
+</xsl:text>
+    </xsl:template>
     
     <xsl:template match="beliefs">
 
-\subsection*{Beliefs}
+\subsection*{Beliefs and Rules}
 
 <xsl:text>
 \noindent
@@ -194,17 +202,17 @@ Intention: </xsl:text><xsl:value-of select="@id" />
     </xsl:template>
 
     <xsl:template match="var-term">
-		<xsl:text>\textit{</xsl:text>
+		<xsl:text>\aslvar{</xsl:text>
 		<xsl:value-of select="text()"/>
 		<xsl:text>}</xsl:text>
     </xsl:template>
     <xsl:template match="number-term">
-		<xsl:text>$</xsl:text>
+		<xsl:text>\aslnumber{</xsl:text>
 		<xsl:value-of select="text()"/>
-		<xsl:text>$</xsl:text>
+		<xsl:text>}</xsl:text>
     </xsl:template>
     <xsl:template match="string-term">
-		<xsl:text>\textsf{</xsl:text>
+		<xsl:text>\aslstring{</xsl:text>
    		<xsl:value-of select="text()"/>
 		<xsl:text>}</xsl:text>
     </xsl:template>

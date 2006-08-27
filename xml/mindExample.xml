@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet href="agInspection2.xsl" type="text/xsl" ?>
+<?xml-stylesheet href="agInspection.xsl" type="text/xsl" ?>
 <agent name="aa" cycle="14">
 <beliefs>
 	<literal>

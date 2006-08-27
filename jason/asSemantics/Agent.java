@@ -72,7 +72,7 @@ public class Agent {
 
     protected String aslSource = null;
 
-    private Logger logger;
+    private Logger logger = Logger.getLogger(Agent.class.getName());
 
     /** creates the TS of this agent, parse its AS source, and set its Settings */
     public TransitionSystem initAg(AgArch arch, BeliefBase bb, String asSrc,
@@ -104,8 +104,6 @@ public class Agent {
         if (arch != null) {
             logger = Logger.getLogger(Agent.class.getName() + "."
                     + arch.getAgName());
-        } else {
-            logger = Logger.getLogger(Agent.class.getName());
         }
     }
 
@@ -449,8 +447,7 @@ public class Agent {
     public Document getAgState() {
         if (builder == null) {
             try {
-                builder = DocumentBuilderFactory.newInstance()
-                        .newDocumentBuilder();
+                builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
             } catch (Exception e) {
                 logger.log(Level.SEVERE, "Error creating XML builder\n");
                 return null;
@@ -471,6 +468,25 @@ public class Agent {
         ag.appendChild(fBB.getAsDOM(document));
         // ag.appendChild(ps.getAsDOM(document));
         return ag;
+    }
+
+    /** get the agent program (Beliefs and plans) as XML */
+    public Document getAgProgram() {
+        if (builder == null) {
+            try {
+                builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            } catch (Exception e) {
+                logger.log(Level.SEVERE, "Error creating XML builder\n");
+                return null;
+            }
+        }
+        Document document = builder.newDocument();
+        Element ag = (Element) document.createElement("agent");
+        ag.appendChild(fBB.getAsDOM(document));
+        ag.appendChild(fPL.getAsDOM(document));
+        document.appendChild(ag);
+
+        return document;
     }
 
 }
