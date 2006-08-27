@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet href="agInspection.xsl" type="text/xsl" ?>
-<agent name="aa">
+<?xml-stylesheet href="agInspection2.xsl" type="text/xsl" ?>
+<agent name="aa" cycle="14">
 <beliefs>
 	<literal>
 		<term functor="b">
@@ -218,6 +218,7 @@
 </right>
 </expression>
 </body-literal>
+
 <body-literal>
 <expression operator=" &gt; " type="relational">
 <left>
@@ -228,6 +229,7 @@
 </right>
 </expression>
 </body-literal>
+
 <body-literal>
 <literal ia="true">
 <term functor=".print">
@@ -240,12 +242,16 @@
 </term>
 </literal>
 </body-literal>
+
 </body>
 </plan>
+
 <unifier>{X=30}</unifier>
 </option>
 </plans>
 <intentions>
+
+
 <intention id="1" selected="true">
 <intended-means>
 <plan>
@@ -314,6 +320,7 @@
 </right>
 </expression>
 </body-literal>
+
 <body-literal>
 <literal ia="true">
 <term functor=".print">
@@ -331,6 +338,93 @@
 <unifier>{W=2, X=30}</unifier>
 </intended-means>
 </intention>
+
+<intention id="2" selected="false">
+<intended-means>
+<plan>
+<label>
+<literal>
+<term functor="l__1">
+<annotations>
+<term functor="source">
+<arguments>
+<term functor="self"/>
+</arguments>
+</term>
+</annotations>
+</term>
+</literal>
+</label>
+<trigger add="+" type="!">
+<literal>
+<term functor="other"/>
+</literal>
+</trigger>
+<context>
+<literal>
+<term functor="a" />
+</literal>
+</context>
+<body>
+<body-literal>
+<literal ia="true">
+<term functor=".print">
+<arguments>
+<string-term>"ok"</string-term>
+</arguments>
+</term>
+</literal>
+</body-literal>
+</body>
+</plan>
+<unifier>{W=2, X=30}</unifier>
+</intended-means>
+
+
+<intended-means>
+<plan>
+<label>
+<literal>
+<term functor="@p1">
+<annotations>
+<term functor="source">
+<arguments>
+<term functor="self"/>
+</arguments>
+</term>
+</annotations>
+</term>
+</literal>
+</label>
+<trigger add="+!">
+<literal>
+<term functor="g"/>
+</literal>
+</trigger>
+<context>
+<literal>
+<term functor="c" />
+</literal>
+</context>
+<body>
+<body-literal>
+<literal>
+<term functor="!other" />
+</literal>
+</body-literal>
+<body-literal>
+<literal>
+<term functor="a2" />
+</literal>
+</body-literal>
+</body>
+</plan>
+<unifier>{X=1}</unifier>
+</intended-means>
+
+</intention>
+
+
 </intentions>
 </circumstance>
 </agent>
