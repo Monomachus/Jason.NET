@@ -8,10 +8,12 @@
 	
 
     <xsl:template match="agent">
-% This stylesheet is not complet
+% This stylesheet is not finished
 \documentclass{article}
 
 \usepackage{booktabs}
+
+	<xsl:call-template name="commands" />
 
 \begin{document}
 

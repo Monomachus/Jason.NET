@@ -52,6 +52,7 @@ public class JasonIDOptionPanel extends AbstractOptionPane  {
 	JTextField shellTF;
 	//JCheckBox  insideJIDECBox;
 	JCheckBox  closeAllCBox;
+    JCheckBox  checkVersionCBox;
 
 	static Config userProperties = Config.get();
 
@@ -69,6 +70,7 @@ public class JasonIDOptionPanel extends AbstractOptionPane  {
     			userProperties.remove(Config.SACI_JAR);
     			userProperties.remove(Config.JASON_JAR);
                 userProperties.remove(Config.ANT_LIB);
+                userProperties.remove(Config.CHECK_VERSION);
     		}
     	} 
 
@@ -232,15 +234,24 @@ public class JasonIDOptionPanel extends AbstractOptionPane  {
     	closeAllPanel.add(closeAllCBox);
     	pop.add(closeAllPanel);
 
-    	addComponent(pop);
+        // check version
+        JPanel checkVersionPanel = new JPanel();
+        checkVersionPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Jason options", TitledBorder.LEFT, TitledBorder.TOP));
+        checkVersionPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+        checkVersionCBox = new JCheckBox("Check for new version on startup.", false);
+        checkVersionPanel.add(checkVersionCBox);
+        pop.add(checkVersionPanel);
+
+        addComponent(pop);
     	
     	saciTF.setText(userProperties.getSaciJar());
     	jasonTF.setText(userProperties.getJasonJar());
     	javaTF.setText(userProperties.getJavaHome());
     	antTF.setText(userProperties.getAntLib());
-    	shellTF.setText(userProperties.getShellCommand());
+    	//shellTF.setText(userProperties.getShellCommand());
     	//insideJIDECBox.setSelected(userProperties.runAsInternalTread());
     	closeAllCBox.setSelected(userProperties.getBoolean(Config.CLOSEALL));
+        checkVersionCBox.setSelected(userProperties.getBoolean(Config.CHECK_VERSION));
 	}
 
 	protected void _save() {
@@ -259,6 +270,7 @@ public class JasonIDOptionPanel extends AbstractOptionPane  {
 		//userProperties.put(Config.SHELL_CMD, shellTF.getText().trim());
 		//userProperties.put(Config.RUN_AS_THREAD, insideJIDECBox.isSelected()+"");
 		userProperties.put(Config.CLOSEALL, closeAllCBox.isSelected()+"");
+        userProperties.put(Config.CHECK_VERSION, checkVersionCBox.isSelected()+"");
 		userProperties.store();
 	}
 

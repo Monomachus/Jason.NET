@@ -51,4 +51,16 @@
 			wm.getDockable(jason.jeditplugin.JasonIDPlugin.NAME).editLog();
 		</CODE>
 	</ACTION>
+	<ACTION NAME="jason.asl2html">
+		<CODE>
+			wm.addDockableWindow(jason.jeditplugin.JasonIDPlugin.NAME);
+			wm.getDockable(jason.jeditplugin.JasonIDPlugin.NAME).asl2html();
+		</CODE>
+	</ACTION>
+	<ACTION NAME="jason.asl2tex">
+		<CODE>
+			wm.addDockableWindow(jason.jeditplugin.JasonIDPlugin.NAME);
+			wm.getDockable(jason.jeditplugin.JasonIDPlugin.NAME).asl2tex();
+		</CODE>
+	</ACTION>
 </ACTIONS>

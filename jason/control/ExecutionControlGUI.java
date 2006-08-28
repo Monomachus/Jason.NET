@@ -24,6 +24,9 @@
 package jason.control;
 
 import jason.infra.centralised.RunCentralisedMAS;
+import jason.util.asl2html;
+import jason.util.asl2tex;
+import jason.util.asl2xml;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -35,7 +38,6 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -57,12 +59,6 @@ import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
 
 import org.w3c.dom.Document;
 
@@ -72,8 +68,11 @@ public class ExecutionControlGUI extends ExecutionControl {
 	boolean inRunMode = false;
 	
 	// xml components
-	Transformer agTransformerHTML = null;
-    Transformer agTransformerXML = null;
+    asl2xml  agTransformerXML = new asl2xml();
+    asl2tex  agTransformerTex = new asl2tex("/xml/ag2tex.xsl");
+    asl2html agTransformerHtml = new asl2html("/xml/agInspection.xsl");
+    asl2xml  agTransformer = agTransformerHtml;
+     
 
 	public ExecutionControlGUI() {
 		initComponents();
@@ -127,9 +126,19 @@ public class ExecutionControlGUI extends ExecutionControl {
         jCbViewAs = new JComboBox();
         jCbViewAs.addItem("html");
         jCbViewAs.addItem("xml");
+        jCbViewAs.addItem("LaTeX");
         jCbViewAs.addItemListener(new ItemListener() {
             public void itemStateChanged(ItemEvent ievt) {
-                jTA.setContentType("text/"+jCbViewAs.getSelectedItem());
+                String mime = jCbViewAs.getSelectedItem().toString();
+                if (mime.equals("html")) {
+                    agTransformer = agTransformerHtml;
+                } else if (mime.equals("xml")) {
+                    agTransformer = agTransformerXML;
+                } else if (mime.equals("LaTeX")) {
+                    mime = "xml";
+                    agTransformer = agTransformerTex;
+                }
+                jTA.setContentType("text/"+mime);
                 previousMind = "--";
                 showAgState();
             }            
@@ -253,42 +262,16 @@ public class ExecutionControlGUI extends ExecutionControl {
     /** show current agent state */
     void showAgState() {
         if (agState != null) {
-            StringWriter so = new StringWriter();
             try {
                 // set parameters
                 if (jCbViewAs.getSelectedItem().toString().equals("html")) {
                     // as HTML
-                    if (agTransformerHTML == null) {
-                        try {
-                            agTransformerHTML = TransformerFactory.newInstance().newTransformer(
-                                    new StreamSource( ExecutionControlGUI.class.getResource("/xml/agInspection.xsl").openStream()));
-                        } catch (Exception e) {
-                            jTA.setText("Error initializing XML transformer");
-                            e.printStackTrace();
-                            return;
-                        }
-                    }
                     for (String p: show.keySet()) {
-                        agTransformerHTML.setParameter("show-"+p, show.get(p)+"");
+                        agTransformer.getTransformer().setParameter("show-"+p, show.get(p)+"");
                     }
-                    agTransformerHTML.transform(new DOMSource(agState), new StreamResult(so));
-                    
-                } else {
-                    // as XML
-                    if (agTransformerXML == null) {
-                        try {
-                            agTransformerXML = TransformerFactory.newInstance().newTransformer();
-                            agTransformerXML.setOutputProperty(OutputKeys.INDENT, "yes");
-                        } catch (Exception e) {
-                            jTA.setText("Error initializing XML transformer");
-                            e.printStackTrace();
-                            return;
-                        }
-                    }
-                    agTransformerXML.transform(new DOMSource(agState),new StreamResult(so));
                 }
+                String sMind = agTransformer.transform(agState);
 
-                String sMind = so.toString();
                 if (!sMind.equals(previousMind)) {
                     jTA.setText(sMind);
                 }

@@ -29,6 +29,7 @@ import jason.mas2j.MAS2JProject;
 import jason.mas2j.parser.ParseException;
 import jason.mas2j.parser.TokenMgrError;
 import jason.runtime.OutputStreamAdapter;
+import jason.util.asl2html;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -74,6 +75,7 @@ import org.gjt.sp.jedit.gui.RolloverButton;
 
 import errorlist.DefaultErrorSource;
 import errorlist.ErrorSource;
+import jason.util.*;
 
 public class JasonID extends JPanel implements EBComponent, RunProjectListener {
 
@@ -565,7 +567,7 @@ public class JasonID extends JPanel implements EBComponent, RunProjectListener {
     public void editLog() {
         Buffer curBuf = getProjectBuffer();
         if (curBuf == null) {
-            textArea.setText("You can not edit log properties since there is no Jason project opned.");
+            textArea.setText("You can not edit log properties since there is no Jason project opened.");
             return;
         }
         try {
@@ -582,6 +584,45 @@ public class JasonID extends JPanel implements EBComponent, RunProjectListener {
                 } finally {
                     b.writeUnlock();
                 }
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    public void asl2html() {
+        asl2txt(new asl2html(), ".html");
+    }
+    public void asl2tex() {
+        asl2txt(new asl2tex(), ".tex");
+    }
+    
+    // TODO: does not work, may be a problem with jEdit (check with new versions)
+    private void asl2txt(asl2xml transformer, String ext) {
+        Buffer buf = view.getBuffer();
+        if (!buf.getPath().endsWith(MAS2JProject.AS_EXT)) {
+            textArea.setText("\n** The current buffer is not an asl source!");
+            return;
+        } else {
+            textArea.setText("");
+        }
+        try {
+            String aslcode;
+            try {
+                buf.readLock();
+                aslcode = buf.getText(0,buf.getLength());
+            } finally {
+                buf.readUnlock();
+            }
+            
+            String  htmlcode = transformer.transform(aslcode);
+            Buffer b = org.gjt.sp.jedit.jEdit.openFile(view,buf.getPath()+ext);
+            try {
+                b.writeLock();
+                b.insert(0, htmlcode);
+                b.save(view, buf.getPath()+".html");
+            } finally {
+                b.writeUnlock();
             }
         } catch (Exception ex) {
             ex.printStackTrace();

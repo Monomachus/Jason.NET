@@ -21,7 +21,10 @@ plugin.jason.jeditplugin.JasonIDPlugin.menu=jason - \
   jason.create-env \
   jason.new-ia \
   - \
-  jason.edit-log
+  jason.edit-log 
+#  - \
+#  jason.asl2html \
+#  jason.asl2tex
 
 # action labels
 jason.run-project.label=Run Project
@@ -32,6 +35,8 @@ jason.new-ag.label=New Agent
 jason.create-env.label=Create project environment
 jason.new-ia.label=New internal action
 jason.edit-log.label=Edit log parameters
+jason.asl2html.label=ASL to HTML
+jason.asl2tex.label=ASL to LaTeX
 
 # Dockables
 jason.title=Jason IDE

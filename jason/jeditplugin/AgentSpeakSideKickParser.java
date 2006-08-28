@@ -38,7 +38,6 @@ public class AgentSpeakSideKickParser extends sidekick.SideKickParser {
             	jason.asSyntax.parser.as2j parser = new jason.asSyntax.parser.as2j(new StringReader(text));
             	
             	Agent ag = new Agent();
-            	ag.setLogger(null);
             	parser.agent(ag);
             	
             	// create nodes 

@@ -1,6 +1,6 @@
 // Agent <AG_NAME> in project <PROJECT_NAME>
 
-/* Beliefs */
+/* Initial beliefs and rules */
 
 /* Initial goals */
 
