@@ -10,7 +10,7 @@ public interface MASLauncherInfraTier extends Runnable {
 	public void setProject(MAS2JProject project);
 	public void setListener(RunProjectListener listener);
 
-	public void writeScripts(boolean debug);
+	public boolean writeScripts(boolean debug);
 
 	public void stopMAS();
 }

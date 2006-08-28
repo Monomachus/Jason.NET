@@ -141,6 +141,8 @@ public class TermImpl implements Term, Serializable {
         return false;
     }
 
+
+    
     public int compareTo(Term tAsTerm) {
         try {
             // TODO: why overriding in ArithExprTerm is not working and we need this if?

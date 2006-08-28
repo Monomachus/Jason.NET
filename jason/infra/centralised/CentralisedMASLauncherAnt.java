@@ -102,10 +102,10 @@ public class CentralisedMASLauncherAnt implements MASLauncherInfraTier {
     }
 
     /** write the scripts necessary to run the project */
-    public void writeScripts(boolean debug) {
+    public boolean writeScripts(boolean debug) {
         if (hasCBuild()) {
             System.out.println("The build.xml file is not being created, the user c-build.xml file is used instead.");
-            return; // if the user has a c-build.xml file, use his build
+            return true; // if the user has a c-build.xml file, use his build
         }
 
         try {
@@ -118,10 +118,11 @@ public class CentralisedMASLauncherAnt implements MASLauncherInfraTier {
             FileWriter out = new FileWriter(project.getDirectory() + "build.xml");
             out.write(script);
             out.close();
-
+            return true;
         } catch (Exception e) {
             System.err.println("Could not write start script for project " + project.getSocName());
             e.printStackTrace();
+            return false;
         }
     }
 

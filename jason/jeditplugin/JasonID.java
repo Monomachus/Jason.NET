@@ -498,8 +498,9 @@ public class JasonID extends JPanel implements EBComponent, RunProjectListener {
                     masLauncher = project.getInfrastructureFactory().createMASLauncher();
                     masLauncher.setProject(project);
                     masLauncher.setListener(JasonID.this);
-                    masLauncher.writeScripts(debug);
-                    new Thread(masLauncher, "MAS-Launcher").start();
+                    if (masLauncher.writeScripts(debug)) {
+                        new Thread(masLauncher, "MAS-Launcher").start();
+                    }
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
