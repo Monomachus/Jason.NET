@@ -35,8 +35,6 @@ import jason.asSyntax.StringTerm;
 import jason.asSyntax.Term;
 import jason.asSyntax.Trigger;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.logging.Level;
 
 public class wait implements InternalAction {
@@ -81,20 +79,7 @@ public class wait implements InternalAction {
         WaitEvent wet = new WaitEvent(te, un, ts, timeout);
         wet.start();
         return true;
-    }
-
-    // maps os running waits, key is the intention id
-    private Map<Integer,WaitEvent> waits = new HashMap<Integer,WaitEvent>();
-    
-    public boolean dropWaitingIntention(int intentionId) {
-        WaitEvent we = waits.get(intentionId);
-        if (we != null) {
-            we.dropIntention();
-            return true;
-        }
-        return false;
-    }
-    
+    }    
     
     class WaitEvent extends Thread implements CircumstanceListener {
         Trigger          te;
@@ -128,8 +113,6 @@ public class wait implements InternalAction {
 
         public void run() {
             try {
-                waits.put(si.getId(), this);
-                
                 waitEvent();
 
                 // unregister (to not receive intentionAdded again)
@@ -143,8 +126,6 @@ public class wait implements InternalAction {
 
             } catch (Exception e) {
                 ts.getLogger().log(Level.SEVERE, "Error at .wait thread", e);
-            } finally {
-                waits.remove(si.getId());
             }
         }
 
@@ -178,10 +159,12 @@ public class wait implements InternalAction {
             }
         }
 
-        synchronized public void dropIntention() {
-            ok = false;
-            drop = true;
-            notifyAll();
+        synchronized public void intentionDropped(Intention i) {
+            if (i.equals(si)) {
+                ok = false;
+                drop = true;
+                notifyAll();
+            }
         }
 
         public void intentionAdded(Intention i) {

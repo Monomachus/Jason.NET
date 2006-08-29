@@ -201,6 +201,104 @@ public class Circumstance implements Serializable {
     public boolean hasAtomicIntention() {
         return AI != null;
     }
+    
+
+    /**
+     * This changes the agent's circumstance. Currently what it does is simply
+     * to change all +!l to -!l in events which would give true for Des(l) in
+     * the whole set of events. IMPORTANT: unlike Des() this only alters
+     * literals explicitly desired (rather than intended), that is, it does NOT
+     * consider intentions. You should use both dropDes() AND dropInt() to
+     * remove all desires and intentions of l.
+     */
+    public void dropDes(Literal l, Unifier un) {
+        Event e = new Event(new Trigger(Trigger.TEAdd, Trigger.TEAchvG, l),Intention.EmptyInt);
+        for (Event ei : getEvents()) {
+            Trigger t = (Trigger) ei.trigger;
+            if (ei.intention != Intention.EmptyInt) {
+                t = (Trigger) t.clone();
+                ei.intention.peek().unif.apply(t.getLiteral());
+            }
+            if (un.unifies(t, e.trigger)) {
+                t.setTrigType(Trigger.TEDel); // Just changing "+!g" to "-!g"
+            }
+        }
+    }
+
+
+    /**
+     * This changes the agent's circumstance. It removes an intention from I, E, PI or PA.
+     */
+    public void dropInt(Literal l, Unifier un) {
+        Trigger g = new Trigger(Trigger.TEAdd, Trigger.TEAchvG, l);
+
+        Iterator<Intention> j = I.iterator(); 
+        while (j.hasNext()) {
+            Intention i = j.next();
+            if (i.hasTrigger(g, un)) {
+                j.remove();
+            }
+        }
+
+        // intention may be suspended in E
+        for (Iterator<Event>ie = E.iterator(); ie.hasNext();) {
+            Intention i = ie.next().intention;
+            if (i != null && i.hasTrigger(g, un)) {
+                ie.remove();
+            }
+        }
+        
+        // intention may be suspended in PA! (in the new semantics)
+        if (hasPendingAction()) {
+            Iterator<ActionExec> ipa = getPendingActions().values().iterator();
+            while (ipa.hasNext()) {
+                Intention i = ipa.next().getIntention();
+                // CAREFUL: The semantics for this isn't well defined yet.
+                // The goal deletion on top of the intention will not get to
+                // know the result of the action, as it is removed from the PA set!
+                // If left in PA, the action won't be the the top of
+                // the stack (that might cause problems?)
+                if (i.hasTrigger(g, un)) {
+                    ipa.remove();
+                }
+            }
+        }
+        
+        // intention may be suspended in PI! (in the new semantics)
+        if (hasPendingIntention()) {
+            Iterator<Intention> ipi = getPendingIntentions().values().iterator();
+            while (ipi.hasNext()) {
+                Intention i = ipi.next(); 
+                if (i.hasTrigger(g, un)) {
+                    ipi.remove();
+                }
+                
+                // check in wait internal action
+                for (CircumstanceListener el : listeners) {
+                    el.intentionDropped(i);
+                }
+            }
+        }
+    }
+
+    /**
+     * This changes the agent's circumstance by simply emptying the whole set of
+     * events (E). IMPORTANT: note that this is different from droping one
+     * desires, in which case a goal deletion event is generated.
+     */
+    public void dropAllDes() {
+        clearEvents();
+    }
+
+    /**
+     * This changes the agent's circumstance by simply emptying the whole set of
+     * intentions (I). IMPORTANT: note that this is different from droping one
+     * intention, in which case a goal deletion event is generated.
+     */
+    public void dropAllInt() {
+        clearIntentions();
+    }
+
 
     public Map<String, Intention> getPendingIntentions() {
         return PI;

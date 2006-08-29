@@ -23,7 +23,6 @@
 
 package jason.stdlib;
 
-import jason.asSemantics.BDIlogic;
 import jason.asSemantics.InternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
@@ -35,7 +34,7 @@ public class dropDesire implements InternalAction {
     public boolean execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         Literal l = Literal.parseLiteral(args[0].toString());
         un.apply(l);
-        BDIlogic.dropDes(ts,l,un);
+        ts.getC().dropDes(l,un);
         return true;
     }
 }

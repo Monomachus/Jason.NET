@@ -24,7 +24,6 @@
 
 package jason.stdlib;
 
-import jason.asSemantics.BDIlogic;
 import jason.asSemantics.InternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
@@ -33,7 +32,7 @@ import jason.asSyntax.Term;
 public class dropAllIntentions implements InternalAction {
     
     public boolean execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
-        BDIlogic.dropAllInt(ts);
+        ts.getC().dropAllInt();
         return true;
     }
 }
