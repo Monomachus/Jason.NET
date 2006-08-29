@@ -25,6 +25,7 @@ package jason.asSemantics;
 
 import jason.asSyntax.ListTerm;
 import jason.asSyntax.ListTermImpl;
+import jason.asSyntax.NumberTermImpl;
 import jason.asSyntax.Term;
 import jason.asSyntax.TermImpl;
 import jason.asSyntax.Trigger;
@@ -36,13 +37,11 @@ import java.util.Stack;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-public class Intention implements Serializable {
+public class Intention implements Serializable, Comparable<Intention> {
 
 	private static final long serialVersionUID = 1L;
-
-	public static final Intention EmptyInt = null;
-
-    private static int idCount = 1;
+	public  static final Intention EmptyInt = null;
+    private static int idCount = 0;
 
     private int id;
 
@@ -53,7 +52,7 @@ public class Intention implements Serializable {
     // static private Logger logger = Logger.getLogger(intend.class.getName());
 
     public Intention() {
-        id = idCount++;
+        id = ++idCount;
     }
 
     public int getId() {
@@ -100,8 +99,12 @@ public class Intention implements Serializable {
         return fIntendedMeans.size();
     }
 
-    boolean isAtomic() {
+    public boolean isAtomic() {
         return isAtomic;
+    }
+    
+    public void setAtomic(boolean b) {
+        isAtomic = b;
     }
     
 
@@ -116,6 +119,26 @@ public class Intention implements Serializable {
         return false;
     }
 
+    
+    public int compareTo(Intention o) {
+        if (o.isAtomic) return 1;
+        if (this.isAtomic) return -1;
+        return 0;
+    }
+    
+    public boolean equals(Object o) {
+        if (o == null) return false;
+        if (o == this) return true;
+        if (o instanceof Intention) {
+            return ((Intention)o).id == this.id;
+        }
+        return false;
+    }
+    
+    public int hashCode() {
+        return String.valueOf(id).hashCode();
+    }
+    
     public String toString() {
         StringBuffer s = new StringBuffer();
         ListIterator<IntendedMeans> i = fIntendedMeans.listIterator(fIntendedMeans.size());
@@ -127,6 +150,7 @@ public class Intention implements Serializable {
 
     public Term getAsTerm() {
         Term intention = new TermImpl("intention");
+        intention.addTerm(new NumberTermImpl(getId()));
         ListTerm lt = new ListTermImpl();
         ListIterator<IntendedMeans> i = fIntendedMeans.listIterator(fIntendedMeans.size());
         while (i.hasPrevious()) {
@@ -146,4 +170,5 @@ public class Intention implements Serializable {
         }
         return eint;
     }
+
 }

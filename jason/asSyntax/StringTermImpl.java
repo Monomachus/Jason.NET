@@ -86,12 +86,14 @@ public class StringTermImpl extends TermImpl implements StringTerm {
 
     @Override
     public boolean equals(Object t) {
-	    if (t != null && t instanceof StringTerm) {
-			StringTerm st = (StringTerm)t;
-			return this.getString().equals(st.getString());
-		}
-		return false;
+        if (t == this) return true;
+
+	if (t != null && t instanceof StringTerm) {
+            StringTerm st = (StringTerm)t;
+            return this.getString().equals(st.getString());
 	}
+	return false;
+    }
 
     @Override
     public int hashCode() {

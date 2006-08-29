@@ -366,7 +366,7 @@ public class SaciAgArch extends saci.Agent implements AgArchInfraTier {
                     if (irt != null) {
                         im.setInReplyTo(irt);
                     }
-                    userAgArh.getTS().getC().getMB().add(im);
+                    userAgArh.getTS().getC().getMailBox().add(im);
 
                     /*
                      * if (Term.parse(sPropCont) != null) { // the contents are

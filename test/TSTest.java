@@ -2,6 +2,7 @@ package test;
 
 import jason.asSemantics.Agent;
 import jason.asSemantics.Circumstance;
+import jason.asSemantics.Intention;
 import jason.asSemantics.Option;
 import jason.asSemantics.TransitionSystem;
 import jason.asSyntax.Literal;
@@ -11,6 +12,8 @@ import jason.asSyntax.TermImpl;
 import jason.asSyntax.Trigger;
 
 import java.util.List;
+import java.util.PriorityQueue;
+import java.util.Queue;
 
 import junit.framework.TestCase;
 
@@ -67,6 +70,38 @@ public class TSTest extends TestCase {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+    
+    public void testIntentionOrder() {
+        Intention i1 = new Intention();
+        Intention i2 = new Intention(); 
+        
+        Intention i3 = new Intention(); 
+        i3.setAtomic(true);
+        assertTrue(i3.isAtomic());
+        
+        Intention i4 = new Intention();
+        
+        Queue<Intention> q1 = new PriorityQueue<Intention>();
+        q1.offer(i1);
+        q1.offer(i2);
+        q1.offer(i3);
+        q1.offer(i4);
+        assertTrue(q1.poll().getId() == 3);
+        //System.out.println(q1.poll());
+        //System.out.println(q1.poll());
+        //System.out.println(q1.poll());
 
+        /*
+        List<Intention> l = new ArrayList<Intention>();
+        l.add(i1);
+        l.add(i2);
+        l.add(i3);
+        l.add(i4);
+        Collections.sort(l);
+        
+        System.out.println(l);
+        */
+        
     }
 }

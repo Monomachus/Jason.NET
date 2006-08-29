@@ -344,8 +344,8 @@ public class Pred extends TermImpl {
 
     @Override
     public boolean equals(Object o) {
-        if (o == null)
-            return false;
+        if (o == null) return false;
+        if (o == this) return true;
         if (o instanceof Pred) {
             Pred p = (Pred) o;
             return super.equals(o) && this.hasSubsetAnnot(p) && p.hasSubsetAnnot(this);

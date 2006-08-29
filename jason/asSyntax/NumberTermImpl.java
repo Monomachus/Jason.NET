@@ -93,7 +93,9 @@ public class NumberTermImpl extends TermImpl implements NumberTerm {
 	}
 	
     @Override
-	public boolean equals(Object o) {
+    public boolean equals(Object o) {
+        if (o == this) return true;
+
         if (o != null && o instanceof NumberTerm) {
             NumberTerm st = (NumberTerm)o;
 			if (st.isVar() || st.isArithExpr()) 

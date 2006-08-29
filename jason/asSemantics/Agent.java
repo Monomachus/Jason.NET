@@ -46,6 +46,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -175,28 +176,28 @@ public class Agent {
         return true;
     }
 
-    public Event selectEvent(List<Event> evList) {
+    public Event selectEvent(Queue<Event> events) {
         // make sure the selected Event is removed from evList
-        return evList.remove(0);
+        return events.poll();
     }
 
-    public Option selectOption(List<Option> optList) {
-        if (optList.size() > 0) {
-            return optList.remove(0);
+    public Option selectOption(List<Option> options) {
+        if (options.size() > 0) {
+            return options.remove(0);
         } else {
             return null;
         }
     }
 
-    public Intention selectIntention(List<Intention> intList) {
+    public Intention selectIntention(Queue<Intention> intentions) {
         // make sure the selected Intention is removed from intList AND
         // make sure no intention will "starve"!!!
-        return intList.remove(0);
+        return intentions.poll();
     }
 
-    public Message selectMessage(List<Message> msgList) {
+    public Message selectMessage(Queue<Message> msgList) {
         // make sure the selected Message is removed from msgList
-        return msgList.remove(0);
+        return msgList.poll();
     }
 
     public ActionExec selectAction(List<ActionExec> actList) {

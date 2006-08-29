@@ -80,9 +80,10 @@ public class ListTermImpl extends TermImpl implements ListTerm {
 	
 
     @Override
-	public boolean equals(Object t) {
-        if (t == null)
-            return false;
+    public boolean equals(Object t) {
+        if (t == null) return false;
+        if (t == this) return true;
+
 		if (t instanceof Term &&  ((Term)t).isVar() )  // unground var is not equals a list
 		    return false;
 		if (t instanceof ListTerm) {

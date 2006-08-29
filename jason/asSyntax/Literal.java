@@ -208,8 +208,9 @@ public class Literal extends Pred implements Cloneable {
 
     @Override
     public boolean equals(Object o) {
-        if (o == null)
-            return false;
+        if (o == null) return false;
+        if (o == this) return true;
+
         if (o instanceof Literal) {
 			Literal l = (Literal) o;
 			return type == l.type && super.equals(l);

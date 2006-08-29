@@ -21,7 +21,7 @@ public class PredicateIndicator {
     }
 
     private void setStr() {
-        asStr = functor + "/" + arity;        
+        asStr = functor + arity;        
     }
 
     public String getFunctor() {
@@ -34,6 +34,7 @@ public class PredicateIndicator {
         
     @Override
     public boolean equals(Object o) {
+        if (o == this) return true;
         if (o != null && o instanceof PredicateIndicator) {
             PredicateIndicator pi = (PredicateIndicator)o;
             return arity == pi.arity && functor.equals(pi.functor);
@@ -48,7 +49,6 @@ public class PredicateIndicator {
     }
 
     public String toString() {
-        if (asStr == null) setStr();
-        return asStr;
+        return functor + "/" + arity;
     }
 }

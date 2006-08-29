@@ -30,11 +30,11 @@ import jason.asSyntax.Term;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * It is a base class for Environment, it is overridden by the user application 
@@ -57,7 +57,7 @@ import java.util.Set;
 public class Environment { 
 
 	private List<Literal> percepts = Collections.synchronizedList(new ArrayList<Literal>());
-	private Map<String,List<Literal>>  agPercepts = Collections.synchronizedMap(new HashMap<String,List<Literal>>());
+	private Map<String,List<Literal>>  agPercepts = new ConcurrentHashMap<String, List<Literal>>();
 	
     /** the infrastructure tier for environment (Centralised, Saci, ...) */
 	private EnvironmentInfraTier environmentInfraTier = null;
@@ -118,10 +118,12 @@ public class Environment {
 		}
 		List<Literal> p = new ArrayList<Literal>(size);
 		
-        synchronized (percepts) {
-            // make a local copy of the environment percepts
-			// Note: a deep copy will be done by BB.add
-			p.addAll(percepts);
+        if (size > 0) {
+            synchronized (percepts) {
+                // make a local copy of the environment percepts
+    			// Note: a deep copy will be done by BB.add
+    			p.addAll(percepts);
+            }
         }
 		if (agl != null) {
 	        synchronized (agl) {

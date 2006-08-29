@@ -33,11 +33,10 @@ import jason.mas2j.ClassParameters;
 import jason.runtime.RuntimeServicesInfraTier;
 
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -48,7 +47,7 @@ import java.util.logging.Logger;
  */
 public class CentralisedEnvironment implements EnvironmentInfraTier {
 
-    private Map<String,List<Message>> mboxes;
+    private Map<String,Queue<Message>> mboxes;
     private Map<String,AgArch> agents;
     
     /** the user customisation class for the environment */
@@ -57,8 +56,8 @@ public class CentralisedEnvironment implements EnvironmentInfraTier {
     static Logger logger = Logger.getLogger(CentralisedEnvironment.class.getName());
 	
     public CentralisedEnvironment(ClassParameters userEnv) throws JasonException {
-        mboxes      = Collections.synchronizedMap(new HashMap<String,List<Message>>());
-        agents      = Collections.synchronizedMap(new HashMap<String,AgArch>());
+        mboxes      = new ConcurrentHashMap<String, Queue<Message>>();
+        agents      = new ConcurrentHashMap<String, AgArch>();
         
         try { 
 			fUserEnv = (Environment) getClass().getClassLoader().loadClass(userEnv.className).newInstance();
@@ -105,7 +104,7 @@ public class CentralisedEnvironment implements EnvironmentInfraTier {
         if (mboxes.get(agent.getAgName()) != null) {
             logger.warning("Warning: adding an agent that already exists: " + agent.getAgName());
         }
-        mboxes.put(agent.getAgName(), new LinkedList<Message>());
+        mboxes.put(agent.getAgName(), new ConcurrentLinkedQueue<Message>());
         agents.put(agent.getAgName(), agent);
     }
 
@@ -114,7 +113,7 @@ public class CentralisedEnvironment implements EnvironmentInfraTier {
         agents.remove(agent.getAgName());
     }
     
-    public List<Message> getAgMbox(String name) {
+    public Queue<Message> getAgMbox(String name) {
         return mboxes.get(name);
     }
     
@@ -131,6 +130,6 @@ public class CentralisedEnvironment implements EnvironmentInfraTier {
     }
 
     public RuntimeServicesInfraTier getRuntimeServices() {
-    	    return new CentralisedRuntimeServices();
+        return new CentralisedRuntimeServices();
     }
 }

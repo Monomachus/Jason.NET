@@ -33,8 +33,10 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.logging.Logger;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -45,15 +47,16 @@ public class Circumstance implements Serializable {
 
 	static Logger                      logger    = Logger.getLogger(Circumstance.class.getName());
 
-    private List<Event>                E;
-    private List<Intention>            I;
+    private Queue<Event>               E;
+    private Queue<Intention>           I;
     protected ActionExec               A;
-    protected List<Message>            MB;
+    protected Queue<Message>           MB;
     protected List<Option>             RP;
     protected List<Option>             AP;
     protected Event                    SE;
     protected Option                   SO;
     protected Intention                SI;
+    private   Intention                AI; // Atomic Intention
 
     // protected Intention AI; 
     private Map<String, ActionExec>    PA;
@@ -67,7 +70,7 @@ public class Circumstance implements Serializable {
     public Circumstance() {
         // use LinkedList since we use a lot of remove(0) in selectEvent
         E = new LinkedList<Event>();
-        I = new LinkedList<Intention>();
+        I = new ConcurrentLinkedQueue<Intention>();
         MB = new LinkedList<Message>();
         PA = new HashMap<String, ActionExec>();
         PI = new HashMap<String, Intention>();
@@ -95,7 +98,7 @@ public class Circumstance implements Serializable {
     /** Events */
 
     public void addEvent(Event ev) {
-        E.add(ev);
+        E.offer(ev);
 
         // notify listeners
         for (CircumstanceListener el : listeners) {
@@ -107,7 +110,7 @@ public class Circumstance implements Serializable {
         E.clear();
     }
 
-    public List<Event> getEvents() {
+    public Queue<Event> getEvents() {
         return E;
     }
 
@@ -131,26 +134,26 @@ public class Circumstance implements Serializable {
     /** Listeners */
 
     public void addEventListener(CircumstanceListener el) {
-            listeners.add(el);
+        listeners.add(el);
     }
 
     public void removeEventListener(CircumstanceListener el) {
-            listeners.remove(el);
+        listeners.remove(el);
     }
 
     public boolean hasListener() {
-        return listeners.size() > 0;
+        return !listeners.isEmpty();
     }
 
     /** Messages */
 
-    public List<Message> getMB() {
+    public Queue<Message> getMailBox() {
         return MB;
     }
 
     /** Intentions */
 
-    public List<Intention> getIntentions() {
+    public Queue<Intention> getIntentions() {
         return I;
     }
 
@@ -159,8 +162,9 @@ public class Circumstance implements Serializable {
     }
 
     public void addIntention(Intention intention) {
-        synchronized (I) {
-            I.add(intention);
+        I.offer(intention);
+        if (intention.isAtomic()) {
+            setAtomicIntention(intention);
         }
 
         // notify listeners
@@ -170,46 +174,32 @@ public class Circumstance implements Serializable {
     }
 
     public boolean removeIntention(Intention i) {
-        synchronized (I) {
-            return I.remove(i);
+        if (i == AI) {
+            setAtomicIntention(null);
         }
+        return I.remove(i);
     }
 
     public void clearIntentions() {
-        synchronized (I) {
-            I.clear();
-        }
+        setAtomicIntention(null);
+        I.clear();
+    }
+    
+    public void setAtomicIntention(Intention i) {
+        AI = i;
     }
 
-    // TODO: improve performance of these methods
     public Intention removeAtomicIntention() {
-        // can not use SI! We really need to check in the list!
-        // if (SI != null && SI.isAtomic()) {
-        // return SI;
-        // }
-        synchronized (I) {
-            for (Intention inte : I) {
-                if (inte.isAtomic()) {
-                    removeIntention(inte);
-                    return inte;
-                }
-            }
+        if (AI != null) {
+            Intention tmp = AI;
+            removeIntention(AI);
+            return tmp;
         }
         return null;
     }
 
     public boolean hasAtomicIntention() {
-        // if (SI != null && SI.isAtomic()) {
-        // return true;
-        // }
-        synchronized (I) {
-            for (Intention inte : I) {
-                if (inte.isAtomic()) {
-                    return true;
-                }
-            }
-        }
-        return false;
+        return AI != null;
     }
 
     public Map<String, Intention> getPendingIntentions() {
@@ -268,9 +258,9 @@ public class Circumstance implements Serializable {
         Iterator i;
 
         // MB
-        if (getMB() != null && !getMB().isEmpty()) {
+        if (getMailBox() != null && !getMailBox().isEmpty()) {
             Element ms = (Element) document.createElement("mailbox");
-            i = getMB().iterator();
+            i = getMailBox().iterator();
             while (i.hasNext()) {
                 e = (Element) document.createElement("message");
                 e.appendChild(document.createTextNode(i.next().toString()));

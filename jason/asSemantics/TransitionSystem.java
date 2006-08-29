@@ -328,50 +328,17 @@ public class TransitionSystem {
     }
 
     private void applySelInt() throws JasonException {
-
-        // TODO we need to have a look if there isn't
-        // a more efficient way of doing the Atomic thing. This adds
-        // a search linear in the size of the set of intentions
-        // at every resoning cycle, right? can't we use a flag
-        // just to remember that there is an atomic to search for?
-
-        // RAFA: see the new imple of selectAtomicIntention below. Does
-        // it do what you want?
-        // If so, remove this "todo".
-        // JOMI: Are you sure you can use the conf.C.SI from the
-        // previous reasoning cycle? I'm not sure this isn't changed
-        // in some of the rules. And even if it works, it still doesn't
-        // do what I mean, but it's not important, doesn't need to be
-        // done now. If there is NOT an atomic intention already
-        // selected, it is still checking every single intention
-        // trying to find an atomic one.
-        // Wouldn't it be more efficient to have a flag which is set
-        // whenever a plan with [atomic] become intended so that we
-        // "remember" that it worth searching for an atomic? Do you
-        // understand what I mean?
-        // RAFA: Yes. But I do not fix it yet. (i've tried, see comments in this
-        // method and ClrInt) Circumstance.AI
-
         confP.step = State.ExecInt; // default next step
 
         // Rule for Atomic Intentions
         confP.C.SI = C.removeAtomicIntention();
         if (confP.C.SI != null) {
-            // if (confP.C.AI != null) {
-            // confP.C.SI = confP.C.AI;
             return;
         }
 
         // Rule SelInt1
         if (conf.C.hasIntention()) {
-            synchronized (conf.C.getIntentions()) {
-                confP.C.SI = conf.ag.selectIntention(conf.C.getIntentions());
-            }
-            /*
-             * the following was not enough to remove selectAtomicIntention 
-             * if (confP.C.SI.isAtomic()) { confP.C.AI = confP.C.SI;
-             * System.out.println("new AI="+confP.C.AI); }
-             */
+            confP.C.SI = conf.ag.selectIntention(conf.C.getIntentions());
             return;
         }
 

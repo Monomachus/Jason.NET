@@ -121,11 +121,9 @@ public final class BDIlogic {
             }
         }
 
-        synchronized (ts.C.getIntentions()) {
-            for (Intention i : ts.C.getIntentions()) {
-                if (i.hasTrigger(g, un))
-                    return true;
-            }
+        for (Intention i : ts.C.getIntentions()) {
+            if (i.hasTrigger(g, un))
+                return true;
         }
 
         return false;
@@ -151,7 +149,6 @@ public final class BDIlogic {
             }
             if (un.unifies(t, e.trigger)) {
                 t.setTrigType(Trigger.TEDel); // Just changing "+!g" to "-!g"
-                                                // !!!
             }
         }
     }
@@ -163,48 +160,48 @@ public final class BDIlogic {
      * suspended in PA, this is bound to create problems at the moment.
      */
     public static final void dropInt(TransitionSystem ts, Literal l, Unifier un) {
+        // TODO: move this method to C
+        
         Trigger g = new Trigger(Trigger.TEAdd, Trigger.TEAchvG, l);
 
-        synchronized (ts.C.getIntentions()) {
-            Iterator j = ts.C.getIntentions().iterator(); 
-            while (j.hasNext()) {
-                Intention i = (Intention) j.next();
-                if (i.hasTrigger(g, un)) {
-                    j.remove();
-                }
+        Iterator<Intention> j = ts.C.getIntentions().iterator(); 
+        while (j.hasNext()) {
+            Intention i = j.next();
+            if (i.hasTrigger(g, un)) {
+                j.remove();
             }
         }
 
         // intention may be suspended in E
-        for (Iterator j = ts.C.getEvents().iterator(); j.hasNext();) {
-            Intention i = ((Event) j.next()).intention;
+        for (Iterator<Event>ie = ts.C.getEvents().iterator(); ie.hasNext();) {
+            Intention i = ie.next().intention;
             if (i != null && i.hasTrigger(g, un)) {
-                j.remove();
+                ie.remove();
             }
         }
         
         // intention may be suspended in PA! (in the new semantics)
         if (ts.C.hasPendingAction()) {
-            Iterator<ActionExec> j = ts.C.getPendingActions().values().iterator();
-            while (j.hasNext()) {
-                Intention i = j.next().getIntention();
+            Iterator<ActionExec> ipa = ts.C.getPendingActions().values().iterator();
+            while (ipa.hasNext()) {
+                Intention i = ipa.next().getIntention();
                 // CAREFUL: The semantics for this isn't well defined yet.
                 // The goal deletion on top of the intention will not get to
                 // know the result of the action, as it is removed from the PA set!
                 // If left in PA, the action won't be the the top of
                 // the stack (that might cause problems?)
                 if (i.hasTrigger(g, un)) {
-                    j.remove();
+                    ipa.remove();
                 }
             }
         }
         // intention may be suspended in PI! (in the new semantics)
         if (ts.C.hasPendingIntention()) {
-            Iterator<Intention> j = ts.C.getPendingIntentions().values().iterator();
-            while (j.hasNext()) {
+            Iterator<Intention> ipi = ts.C.getPendingIntentions().values().iterator();
+            while (ipi.hasNext()) {
                 Intention i = j.next(); 
                 if (i.hasTrigger(g, un)) {
-                    j.remove();
+                    ipi.remove();
                 }
             }
         }

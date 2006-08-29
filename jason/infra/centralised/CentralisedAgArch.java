@@ -36,6 +36,7 @@ import jason.runtime.Settings;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -164,13 +165,13 @@ public class CentralisedAgArch extends Thread implements AgArchInfraTier {
 
         // actually send the message
         m.setSender(getName());
-        List<Message> mbox = infraEnv.getAgMbox(m.getReceiver());
+        Queue<Message> mbox = infraEnv.getAgMbox(m.getReceiver());
         if (mbox == null) {
             throw new JasonException("Receiver '" + m.getReceiver() + "' does not exists! Could not send " + m);
         }
-        synchronized (mbox) {
-            mbox.add(new Message(m));
-        }
+        //synchronized (mbox) {
+            mbox.offer(new Message(m));
+        //}
         infraEnv.getAgent(m.getReceiver()).getTS().newMessageHasArrived();
     }
 
@@ -187,16 +188,13 @@ public class CentralisedAgArch extends Thread implements AgArchInfraTier {
 
     // Deafult procedure for checking messages
     public void checkMail() {
-        List<Message> mbox = infraEnv.getAgMbox(getName());
-        synchronized (mbox) {
-            Iterator<Message> i = mbox.iterator();
-            while (i.hasNext()) {
-                Message im = i.next();
-                fUserAgArh.getTS().getC().getMB().add(im);
-                i.remove();
-                if (logger.isLoggable(Level.FINE)) {
-                    logger.fine("received message: " + im);
-                }
+        Queue<Message> mbox = infraEnv.getAgMbox(getName());
+        Queue<Message> tsmb = fUserAgArh.getTS().getC().getMailBox();
+        while (!mbox.isEmpty()) {
+            Message im = mbox.poll();
+            tsmb.offer(im);
+            if (logger.isLoggable(Level.FINE)) {
+                logger.fine("received message: " + im);
             }
         }
     }
@@ -216,8 +214,7 @@ public class CentralisedAgArch extends Thread implements AgArchInfraTier {
     }
 
     public boolean canSleep() {
-        List mbox = (List) infraEnv.getAgMbox(getName());
-        return mbox.size() == 0;
+        return infraEnv.getAgMbox(getName()).isEmpty();
     }
 
     public void informCycleFinished(boolean breakpoint, int cycle) {

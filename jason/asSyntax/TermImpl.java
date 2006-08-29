@@ -101,7 +101,8 @@ public class TermImpl implements Term, Serializable {
     }
     
     public boolean equals(Object t) {
-        if (t == null)  return false;
+        if (t == null) return false;
+        if (t == this) return true;
         
         // if t is a VarTerm, uses var's equals
         if (t instanceof VarTerm) {

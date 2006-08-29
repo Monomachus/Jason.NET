@@ -181,6 +181,8 @@ public class Plan implements Cloneable, Serializable {
     
     @Override
     public boolean equals(Object o) {
+        if (o == this) return true;
+
         if (o != null && o instanceof Plan) {
             Plan p = (Plan) o;
             if (context == null && p.context != null)

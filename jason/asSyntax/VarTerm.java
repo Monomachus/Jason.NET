@@ -127,8 +127,8 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
 
     @Override
     public boolean equals(Object t) {
-        if (t == null)
-            return false;
+        if (t == null) return false;
+        if (t == this) return true;
         if (t instanceof Term) {
             Term tAsTerm = (Term) t;
             Term vl = getValue();
