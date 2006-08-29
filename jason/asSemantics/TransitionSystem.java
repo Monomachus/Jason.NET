@@ -852,7 +852,7 @@ public class TransitionSystem {
                 } catch (NullPointerException e) {
                     // no problem, the is no sel opt, no plan ....
                 }
-                agArch.getArchInfraTier().informCycleFinished(isBreakPoint);
+                agArch.getArchInfraTier().informCycleFinished(isBreakPoint, agArch.getCycleNumber());
             }
 
         } catch (Exception e) {

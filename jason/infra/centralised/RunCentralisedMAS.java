@@ -332,7 +332,7 @@ public class RunCentralisedMAS {
             // start the execution, if it is controlled
             try {
                 Thread.sleep(500); // gives a time to agents enter in wait
-                control.informAllAgsToPerformCycle();
+                control.informAllAgsToPerformCycle(0);
             } catch (Exception e) {
                 e.printStackTrace();
             }

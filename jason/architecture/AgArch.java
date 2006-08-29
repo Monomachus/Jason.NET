@@ -58,6 +58,9 @@ public class AgArch {
      */
     protected AgArchInfraTier archTier;
 
+    /** the current cycle number, in case of sync execution mode */
+    protected int cycleNumber = 0;
+    
     /**
      * Creates the agent class defined by <i>agClass</i>, default is
      * jason.semantics.Agent.
@@ -136,5 +139,12 @@ public class AgArch {
     /** Checks whether the agent is running */
     public boolean isRunning() {
         return archTier.isRunning();
+    }
+    
+    public void setCycleNumber(int cycle) {
+        cycleNumber = cycle;
+    }
+    public int getCycleNumber() {
+        return cycleNumber;
     }
 }

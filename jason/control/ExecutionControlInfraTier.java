@@ -38,12 +38,12 @@ public interface ExecutionControlInfraTier {
     /**
      * Informs an agent to continue to its next reasoning cycle.
      */
-    public void informAgToPerformCycle(String agName);
+    public void informAgToPerformCycle(String agName, int cycle);
 
     /**
      * Informs all agents to continue to its next reasoning cycle.
      */
-    public void informAllAgsToPerformCycle();
+    public void informAllAgsToPerformCycle(int cycle);
 
     /**
      * Gets the agent state (beliefs, intentions, plans, ...)

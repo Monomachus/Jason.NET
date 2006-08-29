@@ -71,20 +71,23 @@ public class CentralisedExecutionControl implements ExecutionControlInfraTier {
         return infraEnv;
     }
 
-    public void receiveFinishedCycle(String agName, boolean breakpoint) {
+    public void receiveFinishedCycle(String agName, boolean breakpoint, int cycle) {
         // pass to user controller
-        userController.receiveFinishedCycle(agName, breakpoint);
+        userController.receiveFinishedCycle(agName, breakpoint, cycle);
     }
 
-    public void informAgToPerformCycle(String agName) {
+    public void informAgToPerformCycle(String agName, int cycle) {
         // call the agent method to "go on"
-        infraEnv.getAgent(agName).getTS().receiveSyncSignal();
+        AgArch arch = infraEnv.getAgent(agName);
+        arch.setCycleNumber(cycle);
+        arch.getTS().receiveSyncSignal();
     }
 
-    public void informAllAgsToPerformCycle() {
+    public void informAllAgsToPerformCycle(int cycle) {
         synchronized (infraEnv.getAgents()) {
-            for (AgArch ag: infraEnv.getAgents().values()) {
-                ag.getTS().receiveSyncSignal();
+            for (AgArch arch: infraEnv.getAgents().values()) {
+                arch.setCycleNumber(cycle);
+                arch.getTS().receiveSyncSignal();
             }
         }
     }

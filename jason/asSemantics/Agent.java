@@ -102,8 +102,7 @@ public class Agent {
 
     public void setLogger(AgArch arch) {
         if (arch != null) {
-            logger = Logger.getLogger(Agent.class.getName() + "."
-                    + arch.getAgName());
+            logger = Logger.getLogger(Agent.class.getName() + "." + arch.getAgName());
         }
     }
 
@@ -465,6 +464,8 @@ public class Agent {
     public Element getAsDOM(Document document) {
         Element ag = (Element) document.createElement("agent");
         ag.setAttribute("name", fTS.getUserAgArch().getAgName());
+        ag.setAttribute("cycle", ""+fTS.getUserAgArch().getCycleNumber());
+
         ag.appendChild(fBB.getAsDOM(document));
         // ag.appendChild(ps.getAsDOM(document));
         return ag;

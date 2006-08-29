@@ -77,5 +77,5 @@ public interface AgArchInfraTier {
 	 *  <p><i>breakpoint</i> is true in case the agent selected one plan 
 	 *  with the "breakpoint"  annotation.  
 	 */ 
-    public void informCycleFinished(boolean breakpoint);
+    public void informCycleFinished(boolean breakpoint, int cycle);
 }

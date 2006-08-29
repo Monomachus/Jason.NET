@@ -220,8 +220,8 @@ public class CentralisedAgArch extends Thread implements AgArchInfraTier {
         return mbox.size() == 0;
     }
 
-    public void informCycleFinished(boolean breakpoint) {
-        infraControl.receiveFinishedCycle(getName(), breakpoint);
+    public void informCycleFinished(boolean breakpoint, int cycle) {
+        infraControl.receiveFinishedCycle(getName(), breakpoint, cycle);
     }
 
     public RuntimeServicesInfraTier getRuntimeServices() {

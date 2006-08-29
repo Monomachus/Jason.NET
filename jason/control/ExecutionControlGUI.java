@@ -105,7 +105,7 @@ public class ExecutionControlGUI extends ExecutionControl {
 		jBtStep.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				jBtStep.setEnabled(false);
-				infraControl.informAllAgsToPerformCycle();
+				infraControl.informAllAgsToPerformCycle(getCycleNumber());
 			}
 		});
 
@@ -116,7 +116,7 @@ public class ExecutionControlGUI extends ExecutionControl {
 			public void actionPerformed(ActionEvent e) {
 				jBtRun.setEnabled(false);
 				inRunMode = true;
-				infraControl.informAllAgsToPerformCycle();
+				infraControl.informAllAgsToPerformCycle(getCycleNumber());
 				if (RunCentralisedMAS.getRunner() != null && RunCentralisedMAS.getRunner().btDebug != null) {
 					RunCentralisedMAS.getRunner().btDebug.setEnabled(true);
 				}
@@ -252,7 +252,7 @@ public class ExecutionControlGUI extends ExecutionControl {
 			agState = infraControl.getAgState(agName);
             showAgState();
 		} catch (Exception e) {
-			jTA.setText("can not get the state of agent "+agName);
+			jTA.setText("Error getting the state of agent "+agName);
             logger.log(Level.SEVERE,"Error:",e);
 		}
 		
@@ -288,7 +288,7 @@ public class ExecutionControlGUI extends ExecutionControl {
 	 * <i>breakpoint</i> is true in case the agent selected one plan with "breakpoint" 
 	 * annotation. 
 	  */
-	public void receiveFinishedCycle(String agName, boolean breakpoint) {
+	public void receiveFinishedCycle(String agName, boolean breakpoint, int cycle) {
 		if (breakpoint) {
 			inRunMode = false;
 		}
@@ -296,14 +296,14 @@ public class ExecutionControlGUI extends ExecutionControl {
 			logger.fine("New agent "+agName);
 			listModel.addElement(agName);
 		}
-		super.receiveFinishedCycle(agName, breakpoint);
+		super.receiveFinishedCycle(agName, breakpoint, cycle);
 	}
 
 
 	/** called when all agents have finished the current cycle */
 	protected void allAgsFinished() {
 		if (inRunMode) {
-			infraControl.informAllAgsToPerformCycle();
+			infraControl.informAllAgsToPerformCycle(getCycleNumber());
 		} else {
 			inspectAgent(currentAg);
 			jBtStep.setEnabled(true);

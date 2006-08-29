@@ -68,9 +68,9 @@ public class SaciExecutionControl extends saci.Agent implements ExecutionControl
                     if (m.get("breakpoint") != null) {
                         breakpoint = m.get("breakpoint").equals("true");
                     }
-                    fUserControl.receiveFinishedCycle(sender, breakpoint);
-                    return true; // no other message handler gives this
-                                    // message
+                    int cycle = Integer.parseInt(m.get("cycle").toString());
+                    fUserControl.receiveFinishedCycle(sender, breakpoint, cycle);
+                    return true; // no other message handler gives this message
                 }
             });
 
@@ -90,7 +90,7 @@ public class SaciExecutionControl extends saci.Agent implements ExecutionControl
             Thread.sleep(1000); // gives a time to agents enter in wait
         } catch (Exception e) {
         }
-        informAllAgsToPerformCycle();
+        informAllAgsToPerformCycle(0);
     }
 
     public ExecutionControl getUserControl() {
@@ -100,11 +100,12 @@ public class SaciExecutionControl extends saci.Agent implements ExecutionControl
     /**
      * @see jason.control.ExecutionControlInfraTier#informAgToPerformCycle(java.lang.String)
      */
-    public void informAgToPerformCycle(String agName) {
+    public void informAgToPerformCycle(String agName, int cycle) {
         Message m = new Message("(tell)");
         m.put("ontology", "AS-ExecControl");
         m.put("receiver", agName);
         m.put("content", "performCycle");
+        m.put("cycle", String.valueOf(cycle));
         try {
             mbox.sendMsg(m);
         } catch (Exception e) {
@@ -115,10 +116,11 @@ public class SaciExecutionControl extends saci.Agent implements ExecutionControl
     /**
      * @see jason.control.ExecutionControlInfraTier#informAllAgsToPerformCycle()
      */
-    public void informAllAgsToPerformCycle() {
+    public void informAllAgsToPerformCycle(int cycle) {
         Message m = new Message("(tell)");
         m.put("ontology", "AS-ExecControl");
         m.put("content", "performCycle");
+        m.put("cycle", String.valueOf(cycle));
         try {
             mbox.broadcast(m);
         } catch (Exception e) {

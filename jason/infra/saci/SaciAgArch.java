@@ -151,6 +151,8 @@ public class SaciAgArch extends saci.Agent implements AgArchInfraTier {
 
             mboxPercept.addMessageHandler("performCycle", "tell", null, "AS-ExecControl", new MessageHandler() {
                 public boolean processMessage(saci.Message m) {
+                    int cycle = Integer.parseInt(m.get("cycle").toString());
+                    userAgArh.setCycleNumber(cycle);
                     userAgArh.getTS().receiveSyncSignal();
                     return true; // no other message handler gives this
                                     // message
@@ -413,12 +415,13 @@ public class SaciAgArch extends saci.Agent implements AgArchInfraTier {
 
     private static Message cycleFinished = new Message("(tell :receiver controller :ontology AS-ExecControl :content cycleFinished)");
 
-    public void informCycleFinished(boolean breakpoint) {
+    public void informCycleFinished(boolean breakpoint, int cycle) {
         // send a message to the executionControl agent
         Message m = (Message) cycleFinished.clone();
         if (breakpoint) {
             m.put("breakpoint", "true");
         }
+        m.put("cycle", String.valueOf(cycle));
         mboxPercept.sendMsg(m);
     }
 
