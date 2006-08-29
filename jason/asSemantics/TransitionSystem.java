@@ -791,11 +791,11 @@ public class TransitionSystem {
                 // logger.fine("perceiving...");
                 List<Literal> percept = agArch.perceive();
 
-                // logger.fine("checking mail...");
-                agArch.checkMail();
-
                 // logger.fine("doing belief revision...");
                 ag.buf(percept);
+
+                // logger.fine("checking mail...");
+                agArch.checkMail();
             }
 
             do {

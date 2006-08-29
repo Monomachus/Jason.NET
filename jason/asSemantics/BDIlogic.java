@@ -24,18 +24,13 @@
 package jason.asSemantics;
 
 import jason.asSyntax.Literal;
+import jason.asSyntax.Term;
+import jason.asSyntax.TermImpl;
 import jason.asSyntax.Trigger;
 
 import java.util.Iterator;
 
 public final class BDIlogic {
-
-    // static private Logger logger =
-    // Logger.getLogger(BDIlogic.class.getName());
-
-    public static final boolean Bel(TransitionSystem ts, Literal l) {
-        return ts.ag.believes(l, new Unifier()) != null;
-    }
 
     /**
      * Checks if <i>l</i> is a desire: <i>l</i> is a desire either if there is
@@ -129,8 +124,6 @@ public final class BDIlogic {
         return false;
     }
 
-    // Changing the Agent's Circumstance!!!
-
     /**
      * This changes the agent's circumstance. Currently what it does is simply
      * to change all +!l to -!l in events which would give true for Des(l) in
@@ -153,11 +146,11 @@ public final class BDIlogic {
         }
     }
 
+    private static Term waitTerm = new TermImpl(".wait");
+    
     /**
-     * This changes the agent's circumstance. It removes an intention from I, E
-     * or PA and use that intention in a new event that is added to E with
-     * triggering event -!l. This is EXPERIMENTAL, in particular for intentions
-     * suspended in PA, this is bound to create problems at the moment.
+     * This changes the agent's circumstance. It removes an intention from I, E, PI
+     * or PA.
      */
     public static final void dropInt(TransitionSystem ts, Literal l, Unifier un) {
         // TODO: move this method to C
@@ -195,13 +188,22 @@ public final class BDIlogic {
                 }
             }
         }
+        
         // intention may be suspended in PI! (in the new semantics)
         if (ts.C.hasPendingIntention()) {
             Iterator<Intention> ipi = ts.C.getPendingIntentions().values().iterator();
             while (ipi.hasNext()) {
-                Intention i = j.next(); 
+                Intention i = ipi.next(); 
                 if (i.hasTrigger(g, un)) {
                     ipi.remove();
+                }
+                
+                // check in wait internal action
+                try {
+                    jason.stdlib.wait w = (jason.stdlib.wait)ts.getAg().getIA(waitTerm);
+                    w.dropWaitingIntention(i.getId());
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
         }

@@ -43,10 +43,9 @@ public class Intention implements Serializable, Comparable<Intention> {
 	public  static final Intention EmptyInt = null;
     private static int idCount = 0;
 
-    private int id;
-
+    private int     id;
     private boolean isAtomic = false;
-
+    
     Stack<IntendedMeans> fIntendedMeans = new Stack<IntendedMeans>();
 
     // static private Logger logger = Logger.getLogger(intend.class.getName());

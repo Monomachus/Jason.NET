@@ -35,6 +35,8 @@ import jason.asSyntax.StringTerm;
 import jason.asSyntax.Term;
 import jason.asSyntax.Trigger;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 
 public class wait implements InternalAction {
@@ -81,8 +83,19 @@ public class wait implements InternalAction {
         return true;
     }
 
-    private static int contTO = 1;
-
+    // maps os running waits, key is the intention id
+    private Map<Integer,WaitEvent> waits = new HashMap<Integer,WaitEvent>();
+    
+    public boolean dropWaitingIntention(int intentionId) {
+        WaitEvent we = waits.get(intentionId);
+        if (we != null) {
+            we.dropIntention();
+            return true;
+        }
+        return false;
+    }
+    
+    
     class WaitEvent extends Thread implements CircumstanceListener {
         Trigger          te;
         String           sTE; // an string version of TE
@@ -91,6 +104,7 @@ public class wait implements InternalAction {
         TransitionSystem ts;
         Circumstance     c;
         boolean          ok      = false;
+        boolean          drop    = false;
         long             timeout = -1;
         
         WaitEvent(Trigger te, Unifier un, TransitionSystem ts, long to) {
@@ -107,32 +121,37 @@ public class wait implements InternalAction {
             if (te != null) {
                 sTE = te.toString();
             } else {
-                sTE = "time"+(contTO++);
+                sTE = "time"+(timeout);
             }
+            sTE = si.getId()+"/"+sTE;
         }
 
         public void run() {
             try {
+                waits.put(si.getId(), this);
+                
                 waitEvent();
 
                 // unregister (to not receive intentionAdded again)
                 c.removeEventListener(this);
 
-                // add SI again in C.I if it was removed
-                if (!c.getIntentions().contains(si)) {
+                // add SI again in C.I if it was removed and this wait was dropped
+                if (!c.getIntentions().contains(si) && !drop) {
                     c.addIntention(si);
-                    c.getPendingIntentions().remove(sTE);
                 }
+                c.getPendingIntentions().remove(sTE);
 
             } catch (Exception e) {
                 ts.getLogger().log(Level.SEVERE, "Error at .wait thread", e);
+            } finally {
+                waits.remove(si.getId());
             }
         }
 
-        synchronized public boolean waitEvent() {
+        synchronized public void waitEvent() {
             long init = System.currentTimeMillis();
             long pass = 0;
-            while (!ok) {
+            while (!ok || drop) {
                 try {
                     if (timeout == -1) {
                         wait();
@@ -150,7 +169,6 @@ public class wait implements InternalAction {
                     e.printStackTrace();
                 }
             }
-            return ok;
         }
 
         synchronized public void eventAdded(Event e) {
@@ -160,8 +178,14 @@ public class wait implements InternalAction {
             }
         }
 
+        synchronized public void dropIntention() {
+            ok = false;
+            drop = true;
+            notifyAll();
+        }
+
         public void intentionAdded(Intention i) {
-            // if the .wait intention where is being added in C.I, remove it
+            // if the .wait intention is being added in C.I, remove it
             if (i == si) {
                 if (c.removeIntention(si)) {
                     c.getPendingIntentions().put(sTE, si);
@@ -169,6 +193,10 @@ public class wait implements InternalAction {
                     ts.getLogger().warning("The following intentions sould be removed, but wasn't!" + si + "\nWait intention is" + i);
                 }
             }
+        }
+        
+        public String toString() {
+            return sTE;
         }
 
     }
