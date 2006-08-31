@@ -304,10 +304,18 @@ public class VarTermTest extends TestCase {
     }
     
     public void testUnifClone() {
+        VarTerm x1 = new VarTerm("X");
+        VarTerm x2 = new VarTerm("X");
+        assertEquals(x1,x2);
+        
         Unifier u1 = new Unifier();
-        u1.unifies(new VarTerm("X"), new VarTerm("Y"));
-        u1.unifies(new VarTerm("X"), new VarTerm("Z"));
+        u1.unifies(x1, new VarTerm("Y"));
+        u1.unifies(x2, new VarTerm("Z"));
         Unifier u2 = (Unifier)u1.clone();
-        assertEquals(u1.toString(),u2.toString());
+        Object o1 = u1.get("X");
+        Object o2 = u2.get("X");
+        assertEquals(o1,o2);
+        
+        assertEquals(u1,u2);
     }
 }

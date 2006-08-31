@@ -360,6 +360,16 @@ public class Unifier implements Cloneable {
     }
     */
 
+    public boolean equals(Object o) {
+        if (o == null) return false;
+        if (o == this) return true;
+        if (o instanceof Unifier) {
+            return function.equals( ((Unifier)o).function);
+        }
+        return false;
+    }
+    
+    
     /**
      * used to group a set of vars. E.g.: when X = Y = W = Z the function map
      * has X -> { X, Y, W, Z } Y -> { X, Y, W, Z } W -> { X, Y, W, Z } Z -> { X,
@@ -403,6 +413,15 @@ public class Unifier implements Cloneable {
 
         Set<VarTerm> get() {
             return vars;
+        }
+        
+        public boolean equals(Object o) {
+            if (o == null) return false;
+            if (o == this) return true;
+            if (o instanceof VarsCluster) {
+                return vars.equals(((VarsCluster)o).vars);
+            }
+            return false;
         }
         
         boolean hasValue() {
