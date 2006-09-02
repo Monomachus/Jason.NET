@@ -48,6 +48,7 @@ public class TermImpl implements Term, Serializable {
 
 	private String functor = null;
     private List<Term> terms;
+    protected Integer hashCodeCache = null;
 
     static private Logger logger = Logger.getLogger(Term.class.getName());
     
@@ -80,6 +81,7 @@ public class TermImpl implements Term, Serializable {
     public void setFunctor(String fs) {
         functor = fs;
         predicateIndicatorCache = null;
+        hashCodeCache = null;
     }
 
     public String getFunctor() {
@@ -97,7 +99,31 @@ public class TermImpl implements Term, Serializable {
     }
 
     public int hashCode() {
-        return getPredicateIndicator().hashCode();
+        if (hashCodeCache == null) {
+            hashCodeCache = new Integer(calcHashCode());
+        }
+        return hashCodeCache.intValue();
+    }
+    
+    protected int calcHashCode() {
+        final int PRIME = 7;
+        int result = 1;
+        if (functor != null) {
+            result = PRIME * result + functor.hashCode();
+        }
+        final int ts = getTermsSize();
+        if (ts > 0) {
+            result = PRIME * result + getTermsSize();
+            for (int i=0; i<ts; i++) {
+                result = PRIME * result + getTerm(i).hashCode();
+            }
+        }
+        return result;
+    }
+    
+    /** remove the valued cached for hashCode */
+    public void resetHashCodeCache() {
+        hashCodeCache = null;
     }
     
     public boolean equals(Object t) {
@@ -126,11 +152,12 @@ public class TermImpl implements Term, Serializable {
             if (getTerms() == null || tAsTerm.getTerms() == null) {
                 return false;
             }
-            if (getTermsSize() != tAsTerm.getTermsSize()) {
+            final int ts = getTermsSize(); 
+            if (ts != tAsTerm.getTermsSize()) {
                 return false;
             }
 
-            for (int i=0; i<getTermsSize(); i++) {
+            for (int i=0; i<ts; i++) {
                 //System.out.println(" *term "+i+" "+getTerm(i)+getTerm(i).getClass().getName()
                 //      +"="+tAsTerm.getTerm(i)+tAsTerm.getTerm(i).getClass().getName()+" deu "+getTerm(i).equals(tAsTerm.getTerm(i)));             
                 if (!getTerm(i).equals(tAsTerm.getTerm(i))) {
@@ -156,15 +183,16 @@ public class TermImpl implements Term, Serializable {
             if (c != 0)
                 return c;
         }
-        if (getTerms() == null && tAsTerm.getTerms() == null)
+        List<Term> tatt = tAsTerm.getTerms();
+        if (getTerms() == null &&  tatt == null)
             return 0;
         if (getTerms() == null)
             return -1;
-        if (tAsTerm.getTerms() == null)
+        if (tatt == null)
             return 1;
-        if (getTerms().size() < tAsTerm.getTerms().size())
+        if (getTerms().size() < tatt.size())
             return -1;
-        else if (getTerms().size() > tAsTerm.getTerms().size())
+        else if (getTerms().size() > tatt.size())
             return 1;
 
         // same number of terms
@@ -180,6 +208,7 @@ public class TermImpl implements Term, Serializable {
     public Object clone() {
         TermImpl c = new TermImpl(this);
         c.predicateIndicatorCache = this.predicateIndicatorCache;
+        c.hashCodeCache = this.hashCodeCache;
         return c;
     }
 
@@ -213,7 +242,9 @@ public class TermImpl implements Term, Serializable {
             terms = new ArrayList<Term>();
         terms.add(t);
         predicateIndicatorCache = null;
+        hashCodeCache = null;
     }
+    
     public void addTerms(List<Term> l) {
         for (Term t: l) {
             addTerm( t);
@@ -224,10 +255,13 @@ public class TermImpl implements Term, Serializable {
     public void setTerms(List<Term> l) {
         terms = l;
         predicateIndicatorCache = null;
+        hashCodeCache = null;
     }
+    
     public void setTerm(int i, Term t) {
         terms.set(i,t);
         predicateIndicatorCache = null;
+        hashCodeCache = null;
     }
      
     /** returns the i-th term (first term is 0) */
@@ -310,12 +344,14 @@ public class TermImpl implements Term, Serializable {
                 getTerm(i).makeVarsAnnon();
             }
         }
+        hashCodeCache = null;
     }
 
     public void makeTermsAnnon() {
         for (int i=0; i<getTermsSize(); i++) {
             setTerm(i,new UnnamedVar());
         }
+        hashCodeCache = null;
     }
 
     public boolean hasVar(Term t) {

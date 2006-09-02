@@ -204,14 +204,15 @@ public class ArithExprTerm extends VarTerm implements NumberTerm {
 
     @Override
     public int hashCode() {
+        final int PRIME = 31;
         if (hasValue())
             return getValue().hashCode();
         
-        int code = op.hashCode();
+        int code = PRIME * op.hashCode();
         if (lhs != null)
-            code += lhs.hashCode();
+            code = PRIME * code + lhs.hashCode();
         if (rhs != null)
-            code += rhs.hashCode();
+            code = PRIME * code + rhs.hashCode();
         return code;
     }
     

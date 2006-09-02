@@ -43,18 +43,18 @@ import org.w3c.dom.Element;
 
 public class DefaultBeliefBase implements BeliefBase {
 
-    static private Logger                  logger   = Logger.getLogger(DefaultBeliefBase.class.getName());
+    static private Logger logger = Logger.getLogger(DefaultBeliefBase.class.getName());
 
     /**
      * belsMap is a table where the key is the bel.getFunctorArity and the value
      * is a list of literals with the same functorArity.
      */
-    Map<PredicateIndicator, List<Literal>> belsMap  = new HashMap<PredicateIndicator, List<Literal>>();
+    private Map<PredicateIndicator, BelEntry> belsMap  = new HashMap<PredicateIndicator, BelEntry>();
 
-    private int                            size     = 0;
+    private int size = 0;
 
     /** set of beliefs with percept annot, used to improve performance of buf */
-    Set<Literal>                          percepts = new HashSet<Literal>();
+    Set<Literal> percepts = new HashSet<Literal>();
 
     public void init(Agent ag, String[] args) {
     }
@@ -76,14 +76,7 @@ public class DefaultBeliefBase implements BeliefBase {
             return false;
         }
         
-        /*
-        if (!l.isGround() && !l.isRule()) {
-            logger.log(Level.SEVERE, "Error: Literal must be ground!");
-            return false;
-        }
-        */
-        
-        Literal bl = containsAsTerm(l);
+        Literal bl = contains(l);
         if (bl != null && !bl.isRule()) {
             // add only annots
             if (l.hasSubsetAnnot(bl))
@@ -107,12 +100,12 @@ public class DefaultBeliefBase implements BeliefBase {
                 logger.log(Level.SEVERE, "Error trimming literal's terms!", e);
             }
 
-            List<Literal> listFunctor = belsMap.get(l.getPredicateIndicator());
-            if (listFunctor == null) {
-                listFunctor = new ArrayList<Literal>();
-                belsMap.put(l.getPredicateIndicator(), listFunctor);
+            BelEntry entry = belsMap.get(l.getPredicateIndicator());
+            if (entry == null) {
+                entry = new BelEntry();
+                belsMap.put(l.getPredicateIndicator(), entry);
             }
-            listFunctor.add(l);
+            entry.add(l);
             // add it in the percepts list
             if (l.hasAnnot(TPercept)) {
                 percepts.add(l);
@@ -124,14 +117,14 @@ public class DefaultBeliefBase implements BeliefBase {
 
     public Iterator<Literal> getAll() {
         List<Literal> all = new ArrayList<Literal>(size());
-        for (List<Literal> l : belsMap.values()) {
-            all.addAll(l);
+        for (BelEntry be : belsMap.values()) {
+            all.addAll(be.list);
         }
         return all.iterator();
     }
 
     public boolean remove(Literal l) {
-        Literal bl = containsAsTerm(l);
+        Literal bl = contains(l);
         if (bl != null) {
             if (l.hasSubsetAnnot(bl)) {
                 if (l.hasAnnot(TPercept)) {
@@ -140,9 +133,9 @@ public class DefaultBeliefBase implements BeliefBase {
                 bl.delAnnot((Pred) l);
                 if (!bl.hasAnnot()) {
                     PredicateIndicator key = l.getPredicateIndicator();
-                    List<Literal> listFunctor = belsMap.get(key);
-                    listFunctor.remove(bl);
-                    if (listFunctor.isEmpty()) {
+                    BelEntry entry = belsMap.get(key);
+                    entry.remove(bl);
+                    if (entry.isEmpty()) {
                         belsMap.remove(key);
                     }
                     size--;
@@ -164,22 +157,13 @@ public class DefaultBeliefBase implements BeliefBase {
         return belsMap.remove(pi) != null;
     }
 
-    /**
-     * returns the literal l as it is in BB, this method does not consider
-     * annots in the search. e.g. if BB={a(10)[a,b]}, contains(a(10)[d]) returns
-     * a(10)[a,b]
-     */
-    public Literal containsAsTerm(Literal l) {
-        List<Literal> listFunctor = belsMap.get(l.getPredicateIndicator());
-        if (listFunctor == null) {
+    public Literal contains(Literal l) {
+        BelEntry entry = belsMap.get(l.getPredicateIndicator());
+        if (entry == null) {
             return null;
+        } else {
+            return entry.contains(l);
         }
-        for (Literal bl : listFunctor) {
-            if (l.equalsAsTerm(bl)) {
-                return bl;
-            }
-        }
-        return null;
     }
 
     public Iterator<Literal> getRelevant(Literal l) {
@@ -187,9 +171,9 @@ public class DefaultBeliefBase implements BeliefBase {
             // all bels are relevant
             return getAll();
         } else {
-            List<Literal> relList = belsMap.get(l.getPredicateIndicator());
-            if (relList != null) {
-                return relList.iterator();
+            BelEntry entry = belsMap.get(l.getPredicateIndicator());
+            if (entry != null) {
+                return entry.list.iterator();
             } else {
                 return null;
             }
@@ -203,11 +187,58 @@ public class DefaultBeliefBase implements BeliefBase {
     /** get as XML */
     public Element getAsDOM(Document document) {
         Element ebels = (Element) document.createElement("beliefs");
-        for (List<Literal> ll : belsMap.values()) {
-            for (Literal l : ll) {
-                ebels.appendChild(l.getAsDOM(document));
-            }
+        Iterator<Literal> i = getAll();
+        while (i.hasNext()) {
+            ebels.appendChild(i.next().getAsDOM(document));
         }
         return ebels;
+    }
+    
+    /** each predicate indicator has one BelEntry assigned to it */
+    class BelEntry {
+        
+        private List<Literal> list = new ArrayList<Literal>(); // maintains the order of the bels
+        private Map<LiteralWrapper,Integer> map = new HashMap<LiteralWrapper,Integer>(); // to fastly find contents, from literal do list index
+        
+        public void add(Literal l) {
+            map.put(new LiteralWrapper(l), list.size());
+            list.add(l);
+        }
+        
+        public void remove(Literal l) {
+            Integer pos = map.remove(new LiteralWrapper(l));
+            if (pos != null) {
+                list.remove(pos.intValue());
+            }
+        }
+        
+        public boolean isEmpty() {
+            return list.isEmpty();
+        }
+        
+        public Literal contains(Literal l) {
+            Integer pos = map.get(new LiteralWrapper(l));
+            if (pos != null) {
+                return list.get(pos.intValue());
+            }
+            return null;
+        }
+        
+        public List<Literal> get() {
+            return list;
+        }
+        
+        public String toString() {
+            return list.toString();
+        }
+        
+        /** a literal that uses equalsAsTerm for equals */
+        class LiteralWrapper {
+            private Literal l;
+            public LiteralWrapper(Literal l) { this.l = l; }
+            public int hashCode() { return l.hashCode(); }
+            public boolean equals(Object o) { return o instanceof LiteralWrapper && l.equalsAsTerm(((LiteralWrapper)o).l); }
+            public String toString() { return l.toString(); }
+        }
     }
 }

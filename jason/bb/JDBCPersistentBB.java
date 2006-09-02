@@ -115,9 +115,9 @@ public class JDBCPersistentBB extends DefaultBeliefBase {
         return false;
     }
 
-    public Literal containsAsTerm(Literal l) {
+    public Literal contains(Literal l) {
         if (!isDB(l))
-            return super.containsAsTerm(l);
+            return super.contains(l);
 
         Statement stmt = null;
         try {
@@ -142,7 +142,7 @@ public class JDBCPersistentBB extends DefaultBeliefBase {
         if (!isDB(l))
             return super.add(l);
 
-        Literal bl = containsAsTerm(l);
+        Literal bl = contains(l);
         Statement stmt = null;
         try {
             if (bl != null) {
@@ -192,7 +192,7 @@ public class JDBCPersistentBB extends DefaultBeliefBase {
         if (!isDB(l))
             return super.add(l);
 
-        Literal bl = containsAsTerm(l);
+        Literal bl = contains(l);
         if (bl != null) {
             Statement stmt = null;
             try {
@@ -330,8 +330,10 @@ public class JDBCPersistentBB extends DefaultBeliefBase {
 
     public Iterator<Literal> getAll() {
         List<Literal> all = new ArrayList<Literal>(size());
-        for (List<Literal> l : belsMap.values()) {
-            all.addAll(l);
+        
+        Iterator<Literal> i = super.getAll();
+        while (i.hasNext()) {
+            all.add(i.next());
         }
         
         Statement stmt = null;

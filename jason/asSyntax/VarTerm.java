@@ -73,17 +73,17 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
     }
 
     public Object clone() {
-        // do not call constructor with term parameter!
-        VarTerm t = new VarTerm();
-        t.setFunctor(super.getFunctor());
         if (value != null) {
-            t.value = (Term) value.clone();
+            return (Term) value.clone();
         } else {
+            // do not call constructor with term parameter!
+            VarTerm t = new VarTerm();
+            t.setFunctor(super.getFunctor());
             if (getAnnots() != null && !getAnnots().isEmpty()) {
                 t.setAnnots((ListTerm) getAnnots().clone());
             }
+            return t;
         }
-        return t;
     }
 
     @Override
@@ -141,7 +141,7 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
 
             // is t also a var? (its value must also be null)
             if (t instanceof VarTerm) {
-                VarTerm tAsVT = (VarTerm) t;
+                final VarTerm tAsVT = (VarTerm) t;
                 if (tAsVT.getValue() == null) {
                     return getFunctor().equals(tAsTerm.getFunctor());
                 }
@@ -174,10 +174,20 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
 
     @Override
     public PredicateIndicator getPredicateIndicator() {
-        if (value != null)
+        if (value != null) {
             return value.getPredicateIndicator();
+        } else if (predicateIndicatorCache == null) {
+            predicateIndicatorCache = new PredicateIndicator(getFunctor(), 0);
+        }
+        return predicateIndicatorCache;
+    }
+
+    @Override
+    public int hashCode() {
+        if (value != null)
+            return value.hashCode();
         else
-            return super.getPredicateIndicator();
+            return getFunctor().hashCode();
     }
 
     @Override
@@ -194,14 +204,6 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
             return null;
         }
 
-    }
-
-    @Override
-    public int hashCode() {
-        if (value != null)
-            return value.hashCode();
-        else
-            return super.hashCode();
     }
 
     @Override

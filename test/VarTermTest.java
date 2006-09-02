@@ -78,14 +78,18 @@ public class VarTermTest extends TestCase {
         ListTerm lt = ListTermImpl.parseList("[a,B,a(B)]");
         u = new Unifier();
         u.unifies(new VarTerm("B"), new TermImpl("oi"));
-        u.unifies(v1, (Term) lt);
+        u.unifies(v1, lt);
         u.apply(v1);
         lt = (ListTerm) v1.getValue();
         Iterator i = lt.iterator();
         i.next();
         i.next();
         Term third = (Term) i.next();
-        assertTrue(third.equals(TermImpl.parse("a(oi)")));
+        Term toi1 = TermImpl.parse("a(oi)");
+        Term toi2 = TermImpl.parse("a(B)");
+        u.apply(toi2);
+        assertEquals(toi1,toi2);
+        assertTrue(third.equals(toi1));
     }
 
     // test when a var is ground with a Pred
@@ -206,6 +210,7 @@ public class VarTermTest extends TestCase {
         u.unifies(v2, Pred.parsePred("a(4)[b(2)]"));
         u.unifies(v1, v2);
         VarTerm vy = new VarTerm("Y");
+        // Y[b(2)] = Y
         assertEquals(v1.hashCode(),vy.hashCode());
     }
 

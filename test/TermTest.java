@@ -64,7 +64,8 @@ public class TermTest extends TestCase {
 		l4.addAnnot(BeliefBase.TPercept);
 		assertEquals(l3, l4);
 		
-		assertTrue(l3.equals(new TermImpl("pos")));
+        Term tpos = new TermImpl("pos");
+		assertTrue(l3.equals(tpos));
 		assertTrue(new TermImpl("pos").equals(l3));
 		//System.out.println(new Term("pos")+"="+l3+" --> "+new Term("pos").equals(l3));
 
@@ -308,7 +309,22 @@ public class TermTest extends TestCase {
 		assertEquals(u.get("A").toString(),"2");
 		assertEquals(u.get("X").toString(),"3");
 		assertTrue(p3.hasSubsetAnnot(p1,u));
-	}
+        
+        Pred p4 = Pred.parsePred("p1(t1,t2)[a1|T]");
+        u = new Unifier();
+        assertTrue(p1.hasSubsetAnnot(p4, u));
+        assertEquals(u.get("T").toString(), "[a(2,3),a(3)]");
+
+        Pred p5 = Pred.parsePred("p1(t1,t2)[a1|[a(2,3),a(3)]]");
+        u = new Unifier();
+        assertTrue(p1.hasSubsetAnnot(p5, u));
+
+        Pred p6 = Pred.parsePred("p1(t1,t2)[a1|T]");
+        u = new Unifier();
+        assertTrue(p6.hasSubsetAnnot(p1, u));
+        assertEquals(u.get("T").toString(), "[a(2,3),a(3)]");
+        assertTrue(p1.hasSubsetAnnot(p6, u));
+    }
 	
 	public void testAnnotUnifAsList() {
 		Pred p1 = Pred.parsePred("p[b(2),x]");

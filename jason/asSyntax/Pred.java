@@ -297,9 +297,9 @@ public class Pred extends TermImpl {
         // this[a,b,c] = p[x,y|T]
         // T will be [a,b,c]
         VarTerm pTail = null;
-        try {
-            pTail = (VarTerm) p.getAnnots().getTail();
-        } catch (Exception e) {
+        Term tail = p.getAnnots().getTail();
+        if (tail instanceof VarTerm) {
+            pTail = (VarTerm)tail;
         }
         
         for (Term annot : annots) {
@@ -330,13 +330,10 @@ public class Pred extends TermImpl {
         }
 
         // if this Pred has a Tail, unify it with p remaining annots
-        try {
-            VarTerm tail = (VarTerm) annots.getTail();
-            if (tail != null) {
-                // System.out.println("tail="+tail+"/"+p.getAnnots());
-                u.unifies(tail, p.getAnnots());
-            }
-        } catch (Exception e) {
+        tail = annots.getTail();
+        if (tail instanceof VarTerm) {
+            // System.out.println("tail="+tail+"/"+p.getAnnots());
+            u.unifies((VarTerm)tail, p.getAnnots());
         }
 
         return true;
@@ -347,14 +344,28 @@ public class Pred extends TermImpl {
         if (o == null) return false;
         if (o == this) return true;
         if (o instanceof Pred) {
-            Pred p = (Pred) o;
+            final Pred p = (Pred) o;
             return super.equals(o) && this.hasSubsetAnnot(p) && p.hasSubsetAnnot(this);
-        }
-        if (o instanceof Term) 
+        } else if (o instanceof Term) { 
             return super.equals(o);
+        }
         return false;
     }
 
+    /*
+     // BB does not work with this hashvalue, annots are removed while the bel is in BB
+    @Override
+    protected int calcHashCode() {
+        int result = super.calcHashCode();
+        if (getAnnots() != null) {
+            for (Term annot : getAnnots()) {
+                result = 31 * result + annot.hashCode();
+            }
+        }
+        return result;
+    }
+    */
+    
     public boolean equalsAsTerm(Object p) {
         return super.equals((Term) p);
     }

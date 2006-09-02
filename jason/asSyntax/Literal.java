@@ -99,6 +99,7 @@ public class Literal extends Pred implements Cloneable {
     
     public void setNegated(boolean b) {
         type = b;
+        hashCodeCache = null;
     }
 
     /** 
@@ -212,10 +213,9 @@ public class Literal extends Pred implements Cloneable {
         if (o == this) return true;
 
         if (o instanceof Literal) {
-			Literal l = (Literal) o;
-			return type == l.type && super.equals(l);
-		} 
-        if (o instanceof Term) {
+			final Literal l = (Literal) o;
+			return type == l.type && hashCode() == l.hashCode() && super.equals(l);
+		} else if (o instanceof Pred || o instanceof Term) {
 			return super.equals(o);
 		}
         return false;
@@ -224,8 +224,19 @@ public class Literal extends Pred implements Cloneable {
 	public Object clone() {
         Literal c = new Literal(type, (Pred)this);
         c.predicateIndicatorCache = this.predicateIndicatorCache;
+        c.hashCodeCache = this.hashCodeCache;
         return c;
 	}
+
+    
+    @Override
+    protected int calcHashCode() {
+        int result = super.calcHashCode();
+        if (negated()) {
+            result += 3271;
+        }
+        return result;
+    }
 
 	
 	/** return [~] super.getFunctorArity */

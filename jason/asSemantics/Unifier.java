@@ -72,9 +72,11 @@ public class Unifier implements Cloneable {
             return;
         }
         // do not use iterator! (see ListTermImpl class)
-        for (int i = 0; i < t.getTermsSize(); i++) {
+        final int ts = t.getTermsSize();
+        for (int i = 0; i < ts; i++) {
             apply(t.getTerm(i));
         }
+        t.resetHashCodeCache();
     }
 
     public void apply(Pred p) {
@@ -213,7 +215,8 @@ public class Unifier implements Cloneable {
         }
 
         // do not use iterator! (see ListTermImpl class)
-        for (int i = 0; i < t1g.getTermsSize(); i++) {
+        final int ts = t1g.getTermsSize();
+        for (int i = 0; i < ts; i++) {
             Term t1 = t1g.getTerm(i);
             Term t2 = t2g.getTerm(i);
             // if t1 or t2 are var with value, use the value
@@ -237,12 +240,13 @@ public class Unifier implements Cloneable {
         value = (Term) value.clone();
 
         // if the var has a cluster, set value for all cluster
-        try {
-            VarsCluster cluster = (VarsCluster) function.get(vt);
+        Term currentVl = function.get(vt);
+        if (currentVl != null && currentVl instanceof VarsCluster) {
+            VarsCluster cluster = (VarsCluster) currentVl;
             for (VarTerm cvt : cluster.get()) {
                 function.put(cvt, value);
             }
-        } catch (Exception e) {
+        } else {
             // no value in cluster
             function.put((VarTerm) vt.clone(), value);
         }
@@ -255,16 +259,14 @@ public class Unifier implements Cloneable {
      */
     public boolean unifies2(Term t1g, Term t2g) {
         // try to cast both to Literal
-        try {
+        if (t1g instanceof Literal && t2g instanceof Literal) {
             return unifies((Literal) t1g, (Literal) t2g);
-        } catch (Exception e1) {
+        } else if (t1g instanceof Pred && t2g instanceof Pred) {
             // try to cast both to Pred
-            try {
-                return unifies((Pred) t1g, (Pred) t2g);
-            } catch (Exception e2) {
-                // use args as Terms
-                return unifies(t1g, t2g);
-            }
+            return unifies((Pred) t1g, (Pred) t2g);
+        } else {
+            // use args as Terms
+            return unifies(t1g, t2g);
         }
     }
 
@@ -370,6 +372,7 @@ public class Unifier implements Cloneable {
     }
     
     
+    private static int idCount = 0;
     /**
      * used to group a set of vars. E.g.: when X = Y = W = Z the function map
      * has X -> { X, Y, W, Z } Y -> { X, Y, W, Z } W -> { X, Y, W, Z } Z -> { X,
@@ -382,12 +385,14 @@ public class Unifier implements Cloneable {
     class VarsCluster extends TermImpl {
 		private static final long serialVersionUID = 1L;
 
+        int id = 0;
 		Set<VarTerm> vars = null;
 
         // used in clone
         private VarsCluster() { }
         
         VarsCluster(VarTerm v1, VarTerm v2) {
+            id = ++idCount;
             add(v1);
             add(v2);
         }
@@ -438,7 +443,7 @@ public class Unifier implements Cloneable {
         }
         
         public String toString() {
-            return vars.toString();
+            return "_VC"+id;
         }
     }
 

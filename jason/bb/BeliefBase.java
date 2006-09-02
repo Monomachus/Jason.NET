@@ -65,6 +65,13 @@ public interface BeliefBase {
      */
     public Iterator<Literal> getRelevant(Literal l);
 
+    /**
+     * returns the literal l as it is in BB, this method does not consider
+     * annots in the search. e.g. if BB={a(10)[a,b]}, contains(a(10)[d]) returns
+     * a(10)[a,b]
+     */
+    public Literal contains(Literal l);
+    
     public int size();
 
     /** returns all beliefs that have percept as source */

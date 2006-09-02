@@ -71,7 +71,7 @@ public class ListTermTest extends TestCase {
 		// [a,b,c] = [X|[b,c]]
 		ListTerm lt5 = ListTermImpl.parseList("[X|[b,c]]");
 		//System.out.println("lt5="+lt5);
-	    assertTrue(u5.unifies((Term)l1,(Term)lt5));
+	    assertTrue(u5.unifies(l1,lt5));
 		//System.out.println("u5="+u5);
 		
 	}
@@ -169,4 +169,10 @@ public class ListTermTest extends TestCase {
 		//System.out.println(l1);
 		assertTrue(u.unifies((Term)l5,(Term)lf));
 	}
+    
+    public void testTail() {
+        ListTerm lt5 = ListTermImpl.parseList("[a|[b,c]]");
+        assertEquals(lt5.size(),3);
+        assertEquals(lt5.getTail(), null);
+    }
 }

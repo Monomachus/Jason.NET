@@ -33,11 +33,17 @@ public class BeliefBaseTest extends TestCase {
 		assertTrue(bb.add(l1));
 		
 		assertFalse(bb.add(new Literal(true, new Pred("pos"))));
+        assertEquals(bb.size(),1);
 
 		l2 = new Literal(true, new Pred("pos"));
 		l2.addAnnot(new TermImpl("a"));
+        //System.out.println(l1.hashCode()+"/"+l2.hashCode());
+        //System.out.println(bb+"-"+ bb.contains(l2));
+        assertTrue(bb.contains(l2) != null);
 		assertTrue(bb.add(l2));
 		assertFalse(bb.add(l2));
+        //System.out.println(bb+"-"+ bb.contains(l2));
+        assertEquals(bb.contains(l2),l2);
 		assertEquals(bb.size(),1);
 
 		l3 = new Literal(true, new Pred("pos"));
@@ -119,24 +125,32 @@ public class BeliefBaseTest extends TestCase {
 		assertTrue(bb.remove(l4));
 		assertEquals(bb.getRelevant(l4), null);
 		assertEquals(bb.size(), 1);
+        assertEquals(iteratorSize(bb.getPercepts()), 1);
 
 		//System.out.println("remove pos(1,2)");
 		//System.out.println("BB="+bb);
-		//System.out.println("Percepts="+bb.getPercepts());
 		
 		l2 = new Literal(true, new Pred("pos"));
 		l2.addAnnot(new TermImpl("a"));
-		assertTrue(((DefaultBeliefBase)bb).containsAsTerm(l2) != null);
-		assertFalse(((DefaultBeliefBase)bb).containsAsTerm(l2).hasSubsetAnnot(l2)); //
+		assertTrue(bb.contains(l2) != null);
+		assertFalse(bb.contains(l2).hasSubsetAnnot(l2)); //
 		assertTrue(bb.remove(l2));
 
 		l2.addAnnot(new TermImpl("b"));
 		l2.addAnnot(BeliefBase.TPercept);
 		l2.delAnnot(new TermImpl("a"));
+        assertTrue(l2.hasAnnot(BeliefBase.TPercept));
+        Literal l2inBB = ((DefaultBeliefBase)bb).contains(l2);
+        assertTrue(l2inBB != null);
+        //System.out.println("l2 in BB="+l2inBB);
 		assertTrue(bb.remove(l2));
-		//System.out.println("removed "+l2);
+		//System.out.println("removed l2 "+l2);
 		//System.out.println("BB="+bb);
-		//System.out.println("Percepts="+bb.getPercepts());
+		//System.out.print("Percepts=");
+        //Iterator i = bb.getPercepts();
+        //while (i.hasNext()) {
+        //    System.out.print(i.next()+",");
+        //}
 		assertEquals(iteratorSize(bb.getPercepts()), 0);
 		assertEquals(bb.size(), 1);
 		
@@ -334,17 +348,17 @@ public class BeliefBaseTest extends TestCase {
         l = Literal.parseLiteral("test(t1(a(10),b(20)),[v1,30,\"a vl\"])[annot1,source(carlos)]");
         assertTrue(bb.add(l));
         assertFalse(bb.add(l));
-        Literal linbb = ((JDBCPersistentBB)bb).containsAsTerm(l);
+        Literal linbb = ((JDBCPersistentBB)bb).contains(l);
         assertTrue(l.getTerm(0).equals(linbb.getTerm(0)));
         assertTrue(l.getTerm(1).equals(linbb.getTerm(1)));
         assertTrue(l.equals(linbb));
         l = Literal.parseLiteral("test(t1(a(10),b(20)),[v1,30,\"a vl\"])[annot2]");
         assertTrue(bb.add(l));
-        linbb = ((JDBCPersistentBB)bb).containsAsTerm(l);
+        linbb = ((JDBCPersistentBB)bb).contains(l);
         assertEquals(linbb.getAnnots().size(),3);
         l = Literal.parseLiteral("test(t1(a(10),b(20)),[v1,30,\"a vl\"])[annot2]");
         assertFalse(bb.add(l));
-        linbb = ((JDBCPersistentBB)bb).containsAsTerm(l);
+        linbb = ((JDBCPersistentBB)bb).contains(l);
         assertEquals(linbb.getAnnots().size(),3);
 
         // test negated
@@ -369,7 +383,7 @@ public class BeliefBaseTest extends TestCase {
         assertTrue(bb.remove(Literal.parseLiteral("publisher(10,\"Prentice Hall\")")));
         l = Literal.parseLiteral("test(t1(a(10),b(20)),[v1,30,\"a vl\"])[annot2]");
         assertTrue(bb.remove(l));
-        linbb = ((JDBCPersistentBB)bb).containsAsTerm(l);
+        linbb = ((JDBCPersistentBB)bb).contains(l);
         assertEquals(linbb.getAnnots().size(),2);
         assertEquals(bb.size(),size-2);
         

@@ -98,5 +98,8 @@ public interface Term extends Cloneable, Comparable<Term>, Serializable {
 
     public boolean equals(Object o);
 
+    /** remove the valued cached for hashCode */
+    public void resetHashCodeCache();
+
     public Element getAsDOM(Document document);
 }
