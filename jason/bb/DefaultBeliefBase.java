@@ -198,17 +198,17 @@ public class DefaultBeliefBase implements BeliefBase {
     class BelEntry {
         
         private List<Literal> list = new ArrayList<Literal>(); // maintains the order of the bels
-        private Map<LiteralWrapper,Integer> map = new HashMap<LiteralWrapper,Integer>(); // to fastly find contents, from literal do list index
+        private Map<LiteralWrapper,Literal> map = new HashMap<LiteralWrapper,Literal>(); // to fastly find contents, from literal do list index
         
         public void add(Literal l) {
-            map.put(new LiteralWrapper(l), list.size());
+            map.put(new LiteralWrapper(l), l);
             list.add(l);
         }
         
         public void remove(Literal l) {
-            Integer pos = map.remove(new LiteralWrapper(l));
-            if (pos != null) {
-                list.remove(pos.intValue());
+            Literal linmap = map.remove(new LiteralWrapper(l)); 
+            if (linmap != null) {
+                list.remove(linmap);
             }
         }
         
@@ -217,15 +217,7 @@ public class DefaultBeliefBase implements BeliefBase {
         }
         
         public Literal contains(Literal l) {
-            Integer pos = map.get(new LiteralWrapper(l));
-            if (pos != null) {
-                return list.get(pos.intValue());
-            }
-            return null;
-        }
-        
-        public List<Literal> get() {
-            return list;
+            return map.get(new LiteralWrapper(l));
         }
         
         public String toString() {
