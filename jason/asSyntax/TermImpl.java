@@ -129,16 +129,17 @@ public class TermImpl implements Term, Serializable {
     public boolean equals(Object t) {
         if (t == null) return false;
         if (t == this) return true;
-        
-        // if t is a VarTerm, uses var's equals
-        if (t instanceof VarTerm) {
-            VarTerm vt = (VarTerm)t;
-            //System.out.println(this.functor+" equals1 "+vt.getFunctor());
-            return vt.equals(this);
-        }
 
         if (t instanceof Term) {
             Term tAsTerm = (Term)t;
+
+            // if t is a VarTerm, uses var's equals
+            if (tAsTerm.isVar()) { //t instanceof VarTerm) { // tAsTerm.isVar()) { //
+                VarTerm vt = (VarTerm)t;
+                //System.out.println(this.functor+" equals1 "+vt.getFunctor());
+                return vt.equals(this);
+            }
+            
             //System.out.println(this+" equals2 "+tAsTerm);
             if (getFunctor() == null && tAsTerm.getFunctor() != null) {
                 return false;

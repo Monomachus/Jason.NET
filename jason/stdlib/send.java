@@ -31,6 +31,7 @@ import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.ListTerm;
 import jason.asSyntax.Pred;
+import jason.asSyntax.StringTerm;
 import jason.asSyntax.Term;
 
 public class send implements InternalAction {
@@ -108,11 +109,19 @@ public class send implements InternalAction {
         try {
         	if (to.isList()) {
                 for (Term t: (ListTerm)to) {
-            		m.setReceiver(t.toString());
+                    String rec = t.toString();
+                    if (t.isString()) {
+                        rec = ((StringTerm)t).getString();
+                    }
+            		m.setReceiver(rec);
             		ts.getUserAgArch().sendMsg(m);        			
         		}
         	} else {
-        		m.setReceiver(to.toString());
+                String rec = to.toString();
+                if (to.isString()) {
+                    rec = ((StringTerm)to).getString();
+                }
+        		m.setReceiver(rec);
         		ts.getUserAgArch().sendMsg(m);
         	}
             return true;

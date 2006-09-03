@@ -162,6 +162,7 @@ public class DefaultBeliefBase implements BeliefBase {
         if (entry == null) {
             return null;
         } else {
+            //logger.info("*"+l+":"+l.hashCode()+" = "+entry.contains(l)+" in "+this);//+" entry="+entry);
             return entry.contains(l);
         }
     }
@@ -221,7 +222,12 @@ public class DefaultBeliefBase implements BeliefBase {
         }
         
         public String toString() {
-            return list.toString();
+            StringBuffer s = new StringBuffer();
+            for (Literal l: list) {
+                s.append(l+":"+l.hashCode()+",");
+            }
+            return s.toString();
+            //return list.toString();
         }
         
         /** a literal that uses equalsAsTerm for equals */

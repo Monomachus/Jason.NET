@@ -421,6 +421,25 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
     }
 
     @Override
+    public boolean hasSubsetAnnot(Pred p) {
+        if (value != null && value.isPred()) {
+            return ((Pred)value).hasSubsetAnnot(p);
+        } else {
+            return super.hasSubsetAnnot(p);
+        }
+    }
+
+    @Override
+    public boolean hasSubsetAnnot(Pred p, Unifier u) {
+        if (value != null && value.isPred()) {
+            return ((Pred)value).hasSubsetAnnot(p, u);
+        } else {
+            return super.hasSubsetAnnot(p, u);
+        }
+    }
+    
+    
+    @Override
     public ListTerm getAnnots() {
         if (value != null && getValue().isPred())
             return ((Pred) getValue()).getAnnots();

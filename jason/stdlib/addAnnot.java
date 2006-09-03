@@ -74,7 +74,7 @@ public class addAnnot implements InternalAction {
 					result.add(t);
 				}
 			}
-			return (Term)result;
+			return result;
 		} else {
 			try {
 				// if it can be parsed as a literal, OK to add annot

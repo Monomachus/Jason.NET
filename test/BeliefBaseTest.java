@@ -24,7 +24,7 @@ public class BeliefBaseTest extends TestCase {
 	protected void setUp() throws Exception {
 		super.setUp();
 	}
-
+/*
 	public void testAdd() {
 		Literal l1, l2, l3, l4, l5;
 		BeliefBase bb = new DefaultBeliefBase();
@@ -161,7 +161,54 @@ public class BeliefBaseTest extends TestCase {
 		//System.out.println("BB="+bb);
 		assertEquals(bb.size(), 0);
 	}
-	
+
+    */
+    public void testAdd2() {
+        BeliefBase bb = new DefaultBeliefBase();
+        Literal l1 = Literal.parseLiteral("pos[source(ag1)]");
+        assertTrue(bb.add(l1));
+        Literal l2 = Literal.parseLiteral("pos[source(ag2)]");
+        assertTrue(bb.add(l2));
+        assertEquals(bb.size(),1);
+
+        VarTerm c = new VarTerm("C");
+        Unifier u = new Unifier();
+        Literal l3 = Literal.parseLiteral("pos");
+        u.unifies(c, l3);
+        u.apply(c);
+        c.addSource(TermImpl.parse("ag3"));
+        assertTrue(c.hasAnnot(TermImpl.parse("source(ag3)")));
+        Literal inBB = bb.contains(c); 
+        assertTrue(inBB != null);
+        assertFalse(c.hasSubsetAnnot(inBB));
+        assertFalse(c.equals(l1));
+        System.out.println(c+" "+c.getClass().getName());
+        assertTrue(c.equalsAsTerm(l1));
+        assertTrue(l1.equalsAsTerm(c));
+        assertTrue(bb.add(c));
+        assertFalse(bb.add(c));
+        
+        c = new VarTerm("C");
+        VarTerm ca = new VarTerm("CA");
+        u = new Unifier();
+        Literal l4 = Literal.parseLiteral("pos");
+        u.unifies(c, l4);
+        try {
+            new jason.stdlib.addAnnot().execute(null, u, new Term[] { c, TermImpl.parse("source(ag4)"), ca });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        u.apply(ca);
+        assertTrue(bb.add(ca));
+        assertFalse(bb.add(ca));
+
+        //System.out.println(bb);
+        assertEquals(bb.size(),1);
+        assertEquals(inBB.getAnnots().size(),4);
+    }
+    
+    
+    /*
 	public void testRemWithList() {
 		Unifier u = new Unifier();
 		BeliefBase bb = new DefaultBeliefBase();
@@ -358,7 +405,7 @@ public class BeliefBaseTest extends TestCase {
         assertEquals(linbb.getAnnots().size(),3);
         l = Literal.parseLiteral("test(t1(a(10),b(20)),[v1,30,\"a vl\"])[annot2]");
         assertFalse(bb.add(l));
-        linbb = ((JDBCPersistentBB)bb).contains(l);
+        linbb = bb.contains(l);
         assertEquals(linbb.getAnnots().size(),3);
 
         // test negated
@@ -383,7 +430,7 @@ public class BeliefBaseTest extends TestCase {
         assertTrue(bb.remove(Literal.parseLiteral("publisher(10,\"Prentice Hall\")")));
         l = Literal.parseLiteral("test(t1(a(10),b(20)),[v1,30,\"a vl\"])[annot2]");
         assertTrue(bb.remove(l));
-        linbb = ((JDBCPersistentBB)bb).contains(l);
+        linbb = bb.contains(l);
         assertEquals(linbb.getAnnots().size(),2);
         assertEquals(bb.size(),size-2);
         
@@ -396,7 +443,7 @@ public class BeliefBaseTest extends TestCase {
         
         bb.stop();
     }
-    
+    */
     private int iteratorSize(Iterator i) {
         int c = 0;
         while (i.hasNext()) {
