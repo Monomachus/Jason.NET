@@ -450,7 +450,16 @@ public class Unifier implements Cloneable {
     /** get as XML */
     public Element getAsDOM(Document document) {
         Element u = (Element) document.createElement("unifier");
-        u.appendChild(document.createTextNode(this.toString()));
+        for (VarTerm v: function.keySet()) {
+            Element ev = v.getAsDOM(document);
+            Element vl = (Element) document.createElement("value");
+            vl.appendChild( function.get(v).getAsDOM(document));
+            Element map = (Element) document.createElement("map");
+            map.appendChild(ev);
+            map.appendChild(vl);
+            u.appendChild(map);
+        }
+        //u.appendChild(document.createTextNode(this.toString()));
         return u;
     }
 

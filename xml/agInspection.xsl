@@ -344,6 +344,18 @@
         </tr>
     </xsl:template>
 
+    <xsl:template match="unifier">
+	    <xsl:if test="count(map) > 0">
+    		{
+	        <xsl:for-each select="map">
+	        	<xsl:apply-templates select="var-term"/>
+	        	=
+	        	<xsl:apply-templates select="value"/>
+	        	<xsl:if test="not(position()=last())">, </xsl:if>
+	        </xsl:for-each>
+    		}
+    	</xsl:if>
+    </xsl:template>
 
     <xsl:template match="plan">
 	    <xsl:if test="count(label) > 0 and not(starts-with(label/literal/term/@functor,'l__'))">
@@ -451,8 +463,8 @@
     </xsl:template>
     
     <xsl:template match="var-term">
-	    	<span style="color: {$var}">
-	    		<xsl:value-of select="text()"/>
+	   	<span style="color: {$var}">
+	    		<xsl:value-of select="@functor"/>
 		</span>
     </xsl:template>
     <xsl:template match="number-term">

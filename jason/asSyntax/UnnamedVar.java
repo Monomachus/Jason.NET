@@ -57,4 +57,8 @@ public class UnnamedVar extends VarTerm {
         return !hasValue();
     }
 
+    public String toString() {
+        return "_";
+    }
+
 }

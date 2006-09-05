@@ -779,7 +779,7 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
             return value.getAsDOM(document);
         } else {
             Element u = (Element) document.createElement("var-term");
-            u.appendChild(document.createTextNode(toString()));
+            u.setAttribute("functor", toString());
             return u;
         }
     }

@@ -124,6 +124,20 @@ Intention: </xsl:text><xsl:value-of select="@id" />
 		</xsl:if>
     </xsl:template>
 
+    <xsl:template match="unifier">
+	    <xsl:if test="count(map) > 0">
+    		<xsl:text>\{</xsl:text>
+	        <xsl:for-each select="map">
+	        	<xsl:apply-templates select="var-term"/>
+	        	<xsl:text>$\mapsto$</xsl:text>
+	        	<xsl:apply-templates select="value"/>
+	        	<xsl:if test="not(position()=last())">, </xsl:if>
+	        </xsl:for-each>
+    		<xsl:text>\}</xsl:text>
+    	</xsl:if>
+    </xsl:template>
+
+
     <xsl:template match="body">
         <xsl:for-each select="body-literal">
            <xsl:choose>
@@ -205,14 +219,16 @@ Intention: </xsl:text><xsl:value-of select="@id" />
 
     <xsl:template match="var-term">
 		<xsl:text>\aslvar{</xsl:text>
-		<xsl:value-of select="text()"/>
+		<xsl:value-of select="@functor"/>
 		<xsl:text>}</xsl:text>
     </xsl:template>
+    
     <xsl:template match="number-term">
 		<xsl:text>\aslnumber{</xsl:text>
 		<xsl:value-of select="text()"/>
 		<xsl:text>}</xsl:text>
     </xsl:template>
+    
     <xsl:template match="string-term">
 		<xsl:text>\aslstring{</xsl:text>
    		<xsl:value-of select="text()"/>
