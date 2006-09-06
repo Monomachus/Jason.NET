@@ -49,11 +49,15 @@ public class IntendedMeans implements Serializable {
     public IntendedMeans(Option opt) {
     	plan = (Plan)opt.plan.clone();
     	unif = (Unifier)opt.unif.clone();
+        trigger = plan.getTriggerEvent();
     }
 
     /** removes the current action of the IM */
     public BodyLiteral removeCurrentStep() {
-        return plan.getBody().remove(0);
+        if (!plan.getBody().isEmpty())
+            return plan.getBody().remove(0);
+        else
+            return null;
     }
 
     public BodyLiteral getCurrentStep() {

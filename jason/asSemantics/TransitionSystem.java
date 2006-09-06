@@ -136,7 +136,8 @@ public class TransitionSystem {
             applyExecInt();
             break;
         case ClrInt:
-            applyClrInt();
+            confP.step = State.StartRC;
+            applyClrInt(conf.C.SI);
             break;
         }
     }
@@ -498,27 +499,26 @@ public class TransitionSystem {
         }
     }
 
-    private void applyClrInt() throws JasonException {
+    public void applyClrInt(Intention i) throws JasonException {
         // Rule ClrInt
-        confP.step = State.StartRC; // default next step
-        if (conf.C.SI == null) {
+        if (i == null) {
             return;
         }
-        if (conf.C.SI.isFinished()) {
+        if (i.isFinished()) {
             // intention finished, remove it
-            confP.C.removeIntention(conf.C.SI);
-            conf.C.SI = null;
+            confP.C.removeIntention(i);
+            //conf.C.SI = null;
             return;
         }
 
-        IntendedMeans im = conf.C.SI.peek();
+        IntendedMeans im = i.peek();
         if (!im.isFinished()) {
             // nothing todo
             return;
         }
 
         // remove the finished IM from the top of the intention
-        IntendedMeans topIM = confP.C.SI.pop();
+        IntendedMeans topIM = i.pop();
         if (logger.isLoggable(Level.FINE)) logger.fine("Returning from IM "+topIM.getPlan().getLabel());
         
         // if finished a failure handling IM ...
@@ -532,13 +532,13 @@ public class TransitionSystem {
             //   +!s: !b; !z
             // should became
             //   +!s: !z
-            im = conf.C.SI.pop(); // +!c above, old
+            im = i.pop(); // +!c above, old
             while (!im.unif.unifies(topIM.getTrigger().getLiteral(), im.getTrigger().getLiteral())) {
-                im = confP.C.SI.pop();
+                im = i.pop();
             }
         }
-        if (!conf.C.SI.isFinished()) {
-            im = conf.C.SI.peek(); // +!s
+        if (!i.isFinished()) {
+            im = i.peek(); // +!s
             if (!im.isFinished()) {
                 // removes !b
                 BodyLiteral g = im.removeCurrentStep(); 
@@ -552,7 +552,7 @@ public class TransitionSystem {
 
         // the new top may have become
         // empty! need to keep checking.
-        confP.step = State.ClrInt; 
+        applyClrInt(i);
     }
 
     /** ******************************************* */
@@ -683,7 +683,7 @@ public class TransitionSystem {
             logger.warning("Discarding external event: " + ev);
     }
 
-    private Event findEventForFailure(Intention i, Trigger tevent) {
+    public Event findEventForFailure(Intention i, Trigger tevent) {
         Trigger failTrigger = new Trigger(Trigger.TEDel, tevent.getGoal(), tevent.getLiteral());
         ListIterator<IntendedMeans> ii = i.iterator();
         while (!getAg().getPL().isRelevant(failTrigger.getPredicateIndicator()) && ii.hasPrevious()) {

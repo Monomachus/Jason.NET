@@ -25,7 +25,6 @@ package jason.asSemantics;
 
 import jason.asSyntax.ListTerm;
 import jason.asSyntax.ListTermImpl;
-import jason.asSyntax.Literal;
 import jason.asSyntax.NumberTermImpl;
 import jason.asSyntax.Term;
 import jason.asSyntax.TermImpl;
@@ -92,7 +91,7 @@ public class Intention implements Serializable, Comparable<Intention> {
     }
 
     public boolean isFinished() {
-        return fIntendedMeans.size() == 0;
+        return fIntendedMeans.isEmpty();
     }
 
     public int size() {
@@ -113,7 +112,7 @@ public class Intention implements Serializable, Comparable<Intention> {
         for (IntendedMeans im : fIntendedMeans) {
             //Trigger it = (Trigger) im.getPlan().getTriggerEvent().clone();
             //im.unif.apply(it.getLiteral());
-            if (u.unifies(g, im.getPlan().getTriggerEvent())) {
+            if (u.unifies(g, im.getTrigger())) {
                 return im;
             }
         }
@@ -124,7 +123,8 @@ public class Intention implements Serializable, Comparable<Intention> {
         return getIM(g,u) != null;
     }
 
-    public void dropGoal(Trigger te, boolean result, Unifier un) {
+    /** remove all IMss until the IM with trigger te */
+    public boolean dropGoal(Trigger te, Unifier un) {
         IntendedMeans im = getIM(te, un);
         if (im != null) {
             // remove the IMs until im-1
@@ -132,8 +132,9 @@ public class Intention implements Serializable, Comparable<Intention> {
                 pop();
             }
             pop(); // remove im
-            
-        }        
+            return true;
+        }      
+        return false;
     }
     
     public int compareTo(Intention o) {

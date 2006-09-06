@@ -1,35 +1,49 @@
 package test;
 
+import jason.JasonException;
 import jason.asSemantics.Agent;
+import jason.asSemantics.Circumstance;
+import jason.asSemantics.IntendedMeans;
+import jason.asSemantics.Intention;
+import jason.asSemantics.Option;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
-import jason.asSyntax.ListTerm;
-import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Literal;
 import jason.asSyntax.Plan;
-import jason.asSyntax.Pred;
-import jason.asSyntax.StringTerm;
-import jason.asSyntax.StringTermImpl;
-import jason.asSyntax.Term;
-import jason.asSyntax.TermImpl;
-import jason.asSyntax.VarTerm;
-import jason.bb.BeliefBase;
-import jason.stdlib.addAnnot;
-import jason.stdlib.addPlan;
-import jason.stdlib.getRelevantPlans;
-import jason.stdlib.removePlan;
-
-import java.util.Iterator;
-
+import jason.asSyntax.Trigger;
+import jason.stdlib.dropGoal;
 import junit.framework.TestCase;
 
 /** JUnit test case for stdlib package */
 public class StdLibTest extends TestCase {
 
+    Intention intention1 = new Intention();
+    Plan p4, p5;
+    Agent ag;
+    
     protected void setUp() throws Exception {
         super.setUp();
+        
+        intention1 = new Intention();
+        Plan p = Plan.parse("+!g0 : true <- !g1; !g4.");
+        intention1.push(new IntendedMeans(new Option(p,new Unifier())));
+        
+        p = Plan.parse("+!g1 : true <- !g2.");
+        intention1.push(new IntendedMeans(new Option(p,new Unifier())));
+
+        p = Plan.parse("+!g2 : true <- !g4; f;g.");
+        intention1.push(new IntendedMeans(new Option(p,new Unifier())));
+        
+        p4 = Plan.parse("+!g4 : true <- h.");
+        intention1.push(new IntendedMeans(new Option(p4,new Unifier())));
+
+        p5 = Plan.parse("+!g5 : true <- i.");
+        
+        ag = new Agent();
+        ag.getPL().add(Plan.parse("-!g1 : true <- j."));
     }
 
+    /*
     public void testAddAnnot() {
         addAnnot aa = new addAnnot();
         Unifier u = new Unifier();
@@ -202,4 +216,33 @@ public class StdLibTest extends TestCase {
             e.printStackTrace();
         }
     }
+    */
+    
+    public void testDropGoal1() {
+        assertEquals(intention1.size(), 4);
+        Trigger g = Trigger.parseTrigger("+!g1");
+        assertTrue(intention1.dropGoal(g, new Unifier()));
+        assertEquals(intention1.size(), 1);
+    }
+
+    public void testDropGoal2() throws JasonException {
+        Circumstance c = new Circumstance();
+        c.addIntention(intention1);
+        TransitionSystem ts = new TransitionSystem(null, c, null, null);
+        new dropGoal().drop(ts, Literal.parseLiteral("g2"), true, new Unifier());
+        assertEquals(intention1.size(), 1);
+        intention1.push(new IntendedMeans(new Option(p4,new Unifier())));
+        new dropGoal().drop(ts, Literal.parseLiteral("g4"), true, new Unifier());
+        assertTrue(intention1.isFinished());
+    }
+
+    public void testDropGoal3() throws JasonException {
+        Circumstance c = new Circumstance();
+        c.addIntention(intention1);
+        TransitionSystem ts = new TransitionSystem(ag, c, null, null);
+        new dropGoal().drop(ts, Literal.parseLiteral("g2"), false, new Unifier());
+        assertEquals(intention1.size(),2);
+        assertEquals(c.getEvents().size(),1);
+    }
+
 }
