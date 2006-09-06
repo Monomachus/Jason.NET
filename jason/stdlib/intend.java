@@ -24,23 +24,85 @@
 
 package jason.stdlib;
 
-import jason.asSemantics.BDIlogic;
+import jason.JasonException;
+import jason.asSemantics.ActionExec;
+import jason.asSemantics.Circumstance;
+import jason.asSemantics.Event;
+import jason.asSemantics.Intention;
 import jason.asSemantics.InternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.Literal;
 import jason.asSyntax.Term;
+import jason.asSyntax.Trigger;
 
 
 public class intend implements InternalAction {
     
-    //	static private Logger logger = Logger.getLogger(intend.class.getName());
-
 	public boolean execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
-    	
+        try {
     	    Literal l = Literal.parseLiteral(args[0].toString());
-        un.apply(l);
-        //logger.log(Level.SEVERE,"HERE in .intend: "+BDIlogic.Int(ts,l,un));
-        return BDIlogic.Int(ts,l,un);
+    	    un.apply(l);
+    	    return intends(ts.getC(),l,un);
+        } catch (ArrayIndexOutOfBoundsException e) {
+            throw new JasonException("The internal action 'intend' has not received one argument.");
+        } catch (Exception e) {
+            throw new JasonException("Error in internal action 'intend': " + e);
+        }
     }
+    
+    /**
+     * Checks if <i>l</i> is an intention: <i>l</i> is an intention if there
+     * is a trigerring event +!l in any plan within an intention; just note that
+     * intentions can be suspended and appear in E or PA as well.
+     */
+    public boolean intends(Circumstance C, Literal l, Unifier un) {
+        Trigger g = new Trigger(Trigger.TEAdd, Trigger.TEAchvG, l);
+
+        // need to check the intention in the slected event in this cycle!!!
+        // (already removed from E)
+        if (C.getSelectedEvent() != null) {
+            // logger.log(Level.SEVERE,"Int: "+g+" unif "+ts.C.SE);
+            if (C.getSelectedEvent().getIntention() != null)
+                if (C.getSelectedEvent().getIntention().hasTrigger(g, un))
+                    return true;
+        }
+
+        // need to check the slected intention in this cycle!!!
+        if (C.getSelectedIntention() != null) {
+            // logger.log(Level.SEVERE,"Int: "+g+" unif "+ts.C.SI);
+            if (C.getSelectedIntention().hasTrigger(g, un))
+                return true;
+        }
+
+        // intention may be suspended in E
+        for (Event evt : C.getEvents()) {
+            if (evt.getIntention() != null && evt.getIntention().hasTrigger(g, un))
+                return true;
+        }
+
+        // intention may be suspended in PA! (in the new semantics)
+        if (C.hasPendingAction()) {
+            for (ActionExec ac: C.getPendingActions().values()) {
+                Intention intention = ac.getIntention();
+                if (intention.hasTrigger(g, un))
+                    return true;
+            }
+        }
+        // intention may be suspended in PI! (in the new semantics)
+        if (C.hasPendingIntention()) {
+            for (Intention intention: C.getPendingIntentions().values()) {
+                if (intention.hasTrigger(g, un))
+                    return true;
+            }
+        }
+
+        for (Intention i : C.getIntentions()) {
+            if (i.hasTrigger(g, un))
+                return true;
+        }
+
+        return false;
+    }
+    
 }

@@ -459,7 +459,6 @@ public class Unifier implements Cloneable {
             map.appendChild(vl);
             u.appendChild(map);
         }
-        //u.appendChild(document.createTextNode(this.toString()));
         return u;
     }
 

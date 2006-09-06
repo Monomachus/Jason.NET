@@ -23,18 +23,48 @@
 
 package jason.stdlib;
 
+import jason.JasonException;
+import jason.asSemantics.Event;
+import jason.asSemantics.Intention;
 import jason.asSemantics.InternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.Literal;
 import jason.asSyntax.Term;
+import jason.asSyntax.Trigger;
 
+
+/**
+ * This changes the agent's circumstance. Currently what it does is simply
+ * to change all +!l to -!l in events which would give true for Des(l) in
+ * the whole set of events. IMPORTANT: unlike Des() this only alters
+ * literals explicitly desired (rather than intended), that is, it does NOT
+ * consider intentions. You should use both dropDes() AND dropInt() to
+ * remove all desires and intentions of l.
+ */
 public class dropDesire implements InternalAction {
     
     public boolean execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
-        Literal l = Literal.parseLiteral(args[0].toString());
-        un.apply(l);
-        ts.getC().dropDes(l,un);
-        return true;
+        try {
+            Literal l = Literal.parseLiteral(args[0].toString());
+            un.apply(l);
+            
+            Event e = new Event(new Trigger(Trigger.TEAdd, Trigger.TEAchvG, l),Intention.EmptyInt);
+            for (Event ei : ts.getC().getEvents()) {
+                Trigger t = (Trigger) ei.getTrigger();
+                if (ei.getIntention() != Intention.EmptyInt) {
+                    t = (Trigger) t.clone();
+                    ei.getIntention().peek().getUnif().apply(t.getLiteral());
+                }
+                if (un.unifies(t, e.getTrigger())) {
+                    t.setTrigType(Trigger.TEDel); // Just changing "+!g" to "-!g"
+                }
+            }
+            return true;
+        } catch (ArrayIndexOutOfBoundsException e) {
+            throw new JasonException("The internal action 'dropDesire' has not received one argument.");
+        } catch (Exception e) {
+            throw new JasonException("Error in internal action 'dropDesire': " + e);
+        }
     }
 }

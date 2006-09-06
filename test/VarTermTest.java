@@ -284,7 +284,7 @@ public class VarTermTest extends TestCase {
         assertTrue(u.unifies(a1,a2));
         assertFalse(u.unifies(a1,a3));
         u.apply(a1);
-        assertEquals(a1.toString(), "a(10,20)");
+        assertEquals(a1.toString(), TermImpl.parse("a(10,20)").toString());
     }
     
     public void testUnnamedVar2() {

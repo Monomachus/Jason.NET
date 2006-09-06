@@ -29,10 +29,15 @@ import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.Term;
 
+/**
+ * This changes the agent's circumstance by simply emptying the whole set of
+ * events (E). IMPORTANT: note that this is different from droping one
+ * desires, in which case a goal deletion event is generated.
+ */
 public class dropAllDesires implements InternalAction {
     
     public boolean execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
-        ts.getC().dropAllDes();
+        ts.getC().clearEvents();
         return true;
     }
 }

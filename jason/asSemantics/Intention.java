@@ -25,6 +25,7 @@ package jason.asSemantics;
 
 import jason.asSyntax.ListTerm;
 import jason.asSyntax.ListTermImpl;
+import jason.asSyntax.Literal;
 import jason.asSyntax.NumberTermImpl;
 import jason.asSyntax.Term;
 import jason.asSyntax.TermImpl;
@@ -107,17 +108,33 @@ public class Intention implements Serializable, Comparable<Intention> {
     }
     
 
-    public boolean hasTrigger(Trigger g, Unifier u) {
+    /** returns the IntendedMeans with TE = g, returns null otherwise */
+    public IntendedMeans getIM(Trigger g, Unifier u) {
         for (IntendedMeans im : fIntendedMeans) {
-            Trigger it = (Trigger) im.getPlan().getTriggerEvent().clone();
-            im.unif.apply(it.getLiteral());
-            if (u.unifies(g, it)) {
-                return true;
+            //Trigger it = (Trigger) im.getPlan().getTriggerEvent().clone();
+            //im.unif.apply(it.getLiteral());
+            if (u.unifies(g, im.getPlan().getTriggerEvent())) {
+                return im;
             }
         }
-        return false;
+        return null;
+    }
+    
+    public boolean hasTrigger(Trigger g, Unifier u) {
+        return getIM(g,u) != null;
     }
 
+    public void dropGoal(Trigger te, boolean result, Unifier un) {
+        IntendedMeans im = getIM(te, un);
+        if (im != null) {
+            // remove the IMs until im-1
+            while (peek() != im) {
+                pop();
+            }
+            pop(); // remove im
+            
+        }        
+    }
     
     public int compareTo(Intention o) {
         if (o.isAtomic) return 1;

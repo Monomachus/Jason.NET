@@ -109,8 +109,7 @@ public class RuleTest extends TestCase {
         
         iun = cons.logCons(ag, new Unifier());
         u = iun.next();
-        //System.out.println(u);
-        assertEquals(u.get("M").toString(),"1");
+        assertEquals((int)Double.parseDouble(u.get("M").toString()),1);
     }    
     
     

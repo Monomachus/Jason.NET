@@ -24,23 +24,64 @@
 
 package jason.stdlib;
 
-import jason.asSemantics.BDIlogic;
+import jason.JasonException;
+import jason.asSemantics.Circumstance;
+import jason.asSemantics.Event;
+import jason.asSemantics.Intention;
 import jason.asSemantics.InternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.Literal;
 import jason.asSyntax.Term;
-//import java.util.logging.Level;
-//import java.util.logging.Logger;
+import jason.asSyntax.Trigger;
 
-public class desire implements InternalAction {
-
-//	static private Logger logger = Logger.getLogger(desire.class.getName());
+public class desire extends intend implements InternalAction {
 
     public boolean execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
-        Literal l = Literal.parseLiteral(args[0].toString());
-        un.apply(l);
-//logger.log(Level.SEVERE,"HERE in .desire: "+BDIlogic.Des(ts,l,un));
-        return BDIlogic.Des(ts,l,un);
+        try {
+            Literal l = Literal.parseLiteral(args[0].toString());
+            un.apply(l);
+            return desires(ts.getC(),l,un);
+        } catch (ArrayIndexOutOfBoundsException e) {
+            throw new JasonException("The internal action 'desire' has not received one argument.");
+        } catch (Exception e) {
+            throw new JasonException("Error in internal action 'desire': " + e);
+        }
+    }
+    
+    /**
+     * Checks if <i>l</i> is a desire: <i>l</i> is a desire either if there is
+     * an event with +!l as triggering event or it is an Intention.
+     */
+    public boolean desires(Circumstance C, Literal l, Unifier un) {
+        Trigger teFromL = new Trigger(Trigger.TEAdd, Trigger.TEAchvG, l);
+
+        // need to check the slected event in this cycle!!! (already removed
+        // from E)
+        if (C.getSelectedEvent() != null) {
+            Trigger t = C.getSelectedEvent().getTrigger();
+            if (C.getSelectedEvent().getIntention() != Intention.EmptyInt) {
+                t = (Trigger) t.clone();
+                C.getSelectedEvent().getIntention().peek().getUnif().apply(t.getLiteral());
+            }
+            // logger.log(Level.SEVERE,"Des: "+t+" unif "+teFromL);
+            if (un.unifies(t, teFromL)) {
+                return true;
+            }
+        }
+
+        for (Event ei : C.getEvents()) {
+            Trigger t = (Trigger) ei.getTrigger();
+            if (ei.getIntention() != Intention.EmptyInt) {
+                t = (Trigger) t.clone();
+                ei.getIntention().peek().getUnif().apply(t.getLiteral());
+            }
+            // logger.log(Level.SEVERE,"Des: "+t+" unif "+teFromL);
+            if (un.unifies(t, teFromL)) {
+                return true;
+            }
+        }
+
+        return super.intends(C, l, un); // Int subset Des (see formal definitions)
     }
 }
