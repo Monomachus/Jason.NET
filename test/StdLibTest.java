@@ -8,10 +8,26 @@ import jason.asSemantics.Intention;
 import jason.asSemantics.Option;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
+import jason.asSyntax.ListTerm;
+import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Literal;
 import jason.asSyntax.Plan;
+import jason.asSyntax.Pred;
+import jason.asSyntax.StringTerm;
+import jason.asSyntax.StringTermImpl;
+import jason.asSyntax.Term;
+import jason.asSyntax.TermImpl;
 import jason.asSyntax.Trigger;
+import jason.asSyntax.VarTerm;
+import jason.bb.BeliefBase;
+import jason.stdlib.addAnnot;
+import jason.stdlib.addPlan;
 import jason.stdlib.dropGoal;
+import jason.stdlib.getRelevantPlans;
+import jason.stdlib.removePlan;
+
+import java.util.Iterator;
+
 import junit.framework.TestCase;
 
 /** JUnit test case for stdlib package */
@@ -43,7 +59,6 @@ public class StdLibTest extends TestCase {
         ag.getPL().add(Plan.parse("-!g1 : true <- j."));
     }
 
-    /*
     public void testAddAnnot() {
         addAnnot aa = new addAnnot();
         Unifier u = new Unifier();
@@ -216,7 +231,6 @@ public class StdLibTest extends TestCase {
             e.printStackTrace();
         }
     }
-    */
     
     public void testDropGoal1() {
         assertEquals(intention1.size(), 4);

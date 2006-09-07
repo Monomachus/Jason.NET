@@ -24,7 +24,6 @@
 package jason.stdlib;
 
 import jason.JasonException;
-import jason.asSemantics.Circumstance;
 import jason.asSemantics.Event;
 import jason.asSemantics.Intention;
 import jason.asSemantics.InternalAction;
@@ -77,6 +76,8 @@ public class dropGoal implements InternalAction {
             }
         }
 
+        // TODO: drop in SI, E, PI, PA
+        
         // may be the current intention
         
         /*
@@ -93,11 +94,6 @@ public class dropGoal implements InternalAction {
             Iterator<ActionExec> ipa = getPendingActions().values().iterator();
             while (ipa.hasNext()) {
                 Intention i = ipa.next().getIntention();
-                // CAREFUL: The semantics for this isn't well defined yet.
-                // The goal deletion on top of the intention will not get to
-                // know the result of the action, as it is removed from the PA set!
-                // If left in PA, the action won't be the the top of
-                // the stack (that might cause problems?)
                 if (i.hasTrigger(g, un)) {
                     ipa.remove();
                 }
