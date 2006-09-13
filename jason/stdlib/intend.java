@@ -84,11 +84,11 @@ public class intend implements InternalAction {
         // intention may be suspended in PA! (in the new semantics)
         if (C.hasPendingAction()) {
             for (ActionExec ac: C.getPendingActions().values()) {
-                Intention intention = ac.getIntention();
-                if (intention.hasTrigger(g, un))
+                if (ac.getIntention().hasTrigger(g, un))
                     return true;
             }
         }
+
         // intention may be suspended in PI! (in the new semantics)
         if (C.hasPendingIntention()) {
             for (Intention intention: C.getPendingIntentions().values()) {

@@ -24,12 +24,9 @@
 
 package jason.stdlib;
 
-import java.util.Iterator;
-
 import jason.JasonException;
 import jason.asSemantics.ActionExec;
 import jason.asSemantics.Circumstance;
-import jason.asSemantics.CircumstanceListener;
 import jason.asSemantics.Event;
 import jason.asSemantics.Intention;
 import jason.asSemantics.InternalAction;
@@ -61,52 +58,34 @@ public class dropIntention implements InternalAction {
     public void dropInt(Circumstance C, Literal l, Unifier un) {
         Trigger g = new Trigger(Trigger.TEAdd, Trigger.TEAchvG, l);
 
-        Iterator<Intention> j = C.getIntentions().iterator(); 
-        while (j.hasNext()) {
-            Intention i = j.next();
+        for (Intention i: C.getIntentions()) {
             if (i.hasTrigger(g, un)) {
-                j.remove();
+                C.removeIntention(i);
             }
         }
-
+        
         // intention may be suspended in E
-        for (Iterator<Event>ie = C.getEvents().iterator(); ie.hasNext();) {
-            Intention i = ie.next().getIntention();
+        for (Event e: C.getEvents()) {
+            Intention i = e.getIntention();
             if (i != null && i.hasTrigger(g, un)) {
-                ie.remove();
+                C.removeEvent(e);
             }
         }
         
         // intention may be suspended in PA! (in the new semantics)
-        if (C.hasPendingAction()) {
-            Iterator<ActionExec> ipa = C.getPendingActions().values().iterator();
-            while (ipa.hasNext()) {
-                Intention i = ipa.next().getIntention();
-                // CAREFUL: The semantics for this isn't well defined yet.
-                // The goal deletion on top of the intention will not get to
-                // know the result of the action, as it is removed from the PA set!
-                // If left in PA, the action won't be the the top of
-                // the stack (that might cause problems?)
-                if (i.hasTrigger(g, un)) {
-                    ipa.remove();
-                }
+        for (ActionExec a: C.getPendingActions().values()) {
+            Intention i = a.getIntention();
+            if (i.hasTrigger(g, un)) {
+                C.removePendingAction(i);
+            }
+        }
+
+        // intention may be suspended in PI! (in the new semantics)
+        for (Intention i: C.getPendingIntentions().values()) {
+            if (i != null && i.hasTrigger(g, un)) {
+                C.removePendingIntention(i);
             }
         }
         
-        // intention may be suspended in PI! (in the new semantics)
-        if (C.hasPendingIntention()) {
-            Iterator<Intention> ipi = C.getPendingIntentions().values().iterator();
-            while (ipi.hasNext()) {
-                Intention i = ipi.next(); 
-                if (i.hasTrigger(g, un)) {
-                    ipi.remove();
-                }
-                
-                // check in wait internal action
-                for (CircumstanceListener el : C.getListeners()) {
-                    el.intentionDropped(i);
-                }
-            }
-        }
     }
 }

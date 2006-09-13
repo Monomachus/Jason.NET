@@ -29,12 +29,12 @@ import jason.asSyntax.Trigger;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Logger;
@@ -70,11 +70,11 @@ public class Circumstance implements Serializable {
 
     public Circumstance() {
         // use LinkedList since we use a lot of remove(0) in selectEvent
-        E = new LinkedList<Event>();
+        E = new ConcurrentLinkedQueue<Event>();
         I = new ConcurrentLinkedQueue<Intention>();
         MB = new LinkedList<Message>();
-        PA = new HashMap<String, ActionExec>();
-        PI = new HashMap<String, Intention>();
+        PA = new ConcurrentHashMap<String, ActionExec>();
+        PI = new ConcurrentHashMap<String, Intention>();
         FA = new ArrayList<ActionExec>();
         reset();
     }
@@ -107,6 +107,10 @@ public class Circumstance implements Serializable {
         }
     }
 
+    public boolean removeEvent(Event ev) {
+        return E.remove(ev);
+    }
+    
     public void clearEvents() {
         E.clear();
     }
@@ -146,6 +150,10 @@ public class Circumstance implements Serializable {
         return !listeners.isEmpty();
     }
 
+    public Collection<CircumstanceListener> getListeners() {
+        return listeners;
+    }
+    
     /** Messages */
 
     public Queue<Message> getMailBox() {
@@ -178,11 +186,25 @@ public class Circumstance implements Serializable {
         if (i == AI) {
             setAtomicIntention(null);
         }
-        return I.remove(i);
+        boolean removed = I.remove(i);
+
+        // notify listeners
+        for (CircumstanceListener el : listeners) {
+            el.intentionAdded(i);
+        }
+        return removed;
     }
 
+    
     public void clearIntentions() {
         setAtomicIntention(null);
+        
+        for (CircumstanceListener el : listeners) {
+            for (Intention i: I) {
+                el.intentionAdded(i);
+            }            
+        }
+        
         I.clear();
     }
     
@@ -210,6 +232,22 @@ public class Circumstance implements Serializable {
     public boolean hasPendingIntention() {
         return PI != null && PI.size() > 0;
     }
+    
+    public boolean removePendingIntention(Intention i) {
+        Iterator<Intention> it = PI.values().iterator();
+        while (it.hasNext()) {
+            if (it.next().equals(i)) {
+                it.remove();
+                
+                // check in wait internal action
+                for (CircumstanceListener el : listeners) {
+                    el.intentionDropped(i);
+                }
+                return true;
+            }
+        }
+        return false;
+    }
 
     public ActionExec getAction() {
         return A;
@@ -233,6 +271,22 @@ public class Circumstance implements Serializable {
 
     public boolean hasPendingAction() {
         return PA != null && PA.size() > 0;
+    }
+
+    public boolean removePendingAction(Intention i) {
+        Iterator<ActionExec> it = PA.values().iterator();
+        while (it.hasNext()) {
+            if (it.next().getIntention().equals(i)) {
+                it.remove();
+                
+                // check in wait internal action
+                for (CircumstanceListener el : listeners) {
+                    el.intentionDropped(i);
+                }
+                return true;
+            }
+        }
+        return false;
     }
 
     public List getRelevantPlans() {
@@ -414,10 +468,6 @@ public class Circumstance implements Serializable {
         return c;
     }
 
-    public Collection<CircumstanceListener> getListeners() {
-        return listeners;
-    }
-    
     public String toString() {
         return "<" + E + "," + I + "," + A + "," + MB + "," + RP + "," + AP + "," + SE + "," + SO + "," + SI + "," + PA + "," + FA + ">";
     }

@@ -213,7 +213,6 @@ public class TransitionSystem {
         // get all relevant plans for the selected event
         if (conf.C.SE.trigger == null) {
             logger.log(Level.SEVERE, "Event " + C.SE + " has null as trigger! I should not get relevant plan!");
-            // TODO: Rafa, what to do in this case?
             return;
         }
         confP.C.RP = relevantPlans(conf.C.SE.trigger);
@@ -265,7 +264,6 @@ public class TransitionSystem {
             // the programmer just wanted to add the belief and it was
             // relevant by chance, so just carry on instead of dropping the
             // intention
-            // TODO: RECONSIDER THIS PROBLEM IN THE SEMANTICS!
             else if (conf.C.SE.isInternal()) {
                 confP.C.SI = conf.C.SE.intention;
                 updateIntention();

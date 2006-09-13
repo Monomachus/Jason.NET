@@ -170,7 +170,7 @@ public class wait implements InternalAction {
         public void intentionAdded(Intention i) {
             // if the .wait intention is being added in C.I, remove it
             if (i == si) {
-                if (c.removeIntention(si)) {
+                if (c.getIntentions().remove(si)) { // do not call removeIntention to not call this method recursively
                     c.getPendingIntentions().put(sTE, si);
                 } else {
                     ts.getLogger().warning("The following intentions sould be removed, but wasn't!" + si + "\nWait intention is" + i);

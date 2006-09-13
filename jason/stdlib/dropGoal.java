@@ -24,6 +24,8 @@
 package jason.stdlib;
 
 import jason.JasonException;
+import jason.asSemantics.ActionExec;
+import jason.asSemantics.Circumstance;
 import jason.asSemantics.Event;
 import jason.asSemantics.Intention;
 import jason.asSemantics.InternalAction;
@@ -55,66 +57,60 @@ public class dropGoal implements InternalAction {
     
     public void drop(TransitionSystem ts, Literal l, boolean success, Unifier un) throws JasonException{
         Trigger g = new Trigger(Trigger.TEAdd, Trigger.TEAchvG, l);
+        Circumstance C = ts.getC();
+        
+        for (Intention i: C.getIntentions()) {
+            if (dropIntention(i, g, success, ts, un)) {
+                C.removeIntention(i);
+            }
+        }
 
-        for (Intention i: ts.getC().getIntentions()) {
-            if (i.dropGoal(g, un)) {
-                if (success) {
-                    // continue the intention
-                    i.peek().removeCurrentStep();
-                    ts.applyClrInt(i);
+        // dropping the current intention?
+        if (dropIntention(C.getSelectedIntention(), g, success, ts, un)) {
+        }
+            
+        // dropping G in Events
+        for (Event e: C.getEvents()) {
+            Intention i = e.getIntention();
+            if (i != null && dropIntention(i, g, success, ts, un)) {
+                C.removeEvent(e);
+            }
+        }
+        
+        // dropping from Pending Actions
+        for (ActionExec a: C.getPendingActions().values()) {
+            Intention i = a.getIntention();
+            if (i != null && dropIntention(i, g, success, ts, un)) {
+                C.removePendingAction(i);
+            }
+        }
+        
+        // dropping from Pending Intentions
+        for (Intention i: C.getPendingIntentions().values()) {
+            if (i != null && dropIntention(i, g, success, ts, un)) {
+                C.removePendingIntention(i);
+            }
+        }
+    }
+    
+    private boolean dropIntention(Intention i, Trigger g, boolean success, TransitionSystem ts, Unifier un) throws JasonException {
+        if (i.dropGoal(g, un)) {
+            if (success) {
+                // continue the intention
+                i.peek().removeCurrentStep();
+                ts.applyClrInt(i);
+            } else {
+                // generate fail
+                Event failEvent = ts.findEventForFailure(i, i.peek().getTrigger());
+                if (failEvent != null) {
+                    ts.getC().addEvent(failEvent);
+                    ts.getLogger().warning(".dropGoal is generating goal deletion event " + failEvent.getTrigger());
                 } else {
-                    // generate fail
-                    Event failEvent = ts.findEventForFailure(i, i.peek().getTrigger());
-                    if (failEvent != null) {
-                        ts.getC().addEvent(failEvent);
-                        ts.getLogger().warning(".dropGoal is generating goal deletion event " + failEvent.getTrigger());
-                    } else {
-                        ts.getLogger().warning(".dropGoal is removing intention\n" + i);
-                        ts.getC().removeIntention(i);
-                    }
+                    ts.getLogger().warning(".dropGoal is removing intention\n" + i);
+                    return true;
                 }
             }
         }
-
-        // TODO: drop in SI, E, PI, PA
-        
-        // may be the current intention
-        
-        /*
-        // intention may be suspended in E
-        for (Iterator<Event>ie = E.iterator(); ie.hasNext();) {
-            Intention i = ie.next().intention;
-            if (i != null && i.hasTrigger(g, un)) {
-                ie.remove();
-            }
-        }
-        
-        // intention may be suspended in PA! (in the new semantics)
-        if (hasPendingAction()) {
-            Iterator<ActionExec> ipa = getPendingActions().values().iterator();
-            while (ipa.hasNext()) {
-                Intention i = ipa.next().getIntention();
-                if (i.hasTrigger(g, un)) {
-                    ipa.remove();
-                }
-            }
-        }
-        
-        // intention may be suspended in PI! (in the new semantics)
-        if (hasPendingIntention()) {
-            Iterator<Intention> ipi = getPendingIntentions().values().iterator();
-            while (ipi.hasNext()) {
-                Intention i = ipi.next(); 
-                if (i.hasTrigger(g, un)) {
-                    ipi.remove();
-                }
-                
-                // check in wait internal action
-                for (CircumstanceListener el : listeners) {
-                    el.intentionDropped(i);
-                }
-            }
-        }
-        */
-    }        
+        return false;        
+    }
 }
