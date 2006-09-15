@@ -233,7 +233,7 @@ public class Circumstance implements Serializable {
         return PI != null && PI.size() > 0;
     }
     
-    public boolean removePendingIntention(Intention i) {
+    public boolean dropPendingIntention(Intention i) {
         Iterator<Intention> it = PI.values().iterator();
         while (it.hasNext()) {
             if (it.next().equals(i)) {
@@ -273,7 +273,7 @@ public class Circumstance implements Serializable {
         return PA != null && PA.size() > 0;
     }
 
-    public boolean removePendingAction(Intention i) {
+    public boolean dropPendingAction(Intention i) {
         Iterator<ActionExec> it = PA.values().iterator();
         while (it.hasNext()) {
             if (it.next().getIntention().equals(i)) {

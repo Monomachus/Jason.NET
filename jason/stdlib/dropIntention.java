@@ -76,14 +76,14 @@ public class dropIntention implements InternalAction {
         for (ActionExec a: C.getPendingActions().values()) {
             Intention i = a.getIntention();
             if (i.hasTrigger(g, un)) {
-                C.removePendingAction(i);
+                C.dropPendingAction(i);
             }
         }
 
         // intention may be suspended in PI! (in the new semantics)
         for (Intention i: C.getPendingIntentions().values()) {
             if (i != null && i.hasTrigger(g, un)) {
-                C.removePendingIntention(i);
+                C.dropPendingIntention(i);
             }
         }
         

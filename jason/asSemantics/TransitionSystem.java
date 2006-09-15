@@ -152,7 +152,10 @@ public class TransitionSystem {
             Term content = TermImpl.parse(m.getPropCont().toString());
 
             // check if an intention was suspended waiting this message
-            Intention intention = getC().getPendingIntentions().remove(m.getInReplyTo());
+            Intention intention = null;
+            if (m.getInReplyTo() != null) {
+                intention = getC().getPendingIntentions().remove(m.getInReplyTo());
+            }
             // is it a pending intention?
             if (intention != null) {
                 // unify the message answer with the .send fourth parameter

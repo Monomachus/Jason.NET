@@ -153,7 +153,7 @@ public class wait implements InternalAction {
         }
 
         synchronized public void eventAdded(Event e) {
-            if (te != null && un.unifies(te, e.getTrigger())) {
+            if (te != null && !drop && un.unifies(te, e.getTrigger())) {
                 ok = true;
                 notifyAll();
             }
@@ -169,7 +169,7 @@ public class wait implements InternalAction {
 
         public void intentionAdded(Intention i) {
             // if the .wait intention is being added in C.I, remove it
-            if (i == si) {
+            if (i == si && !drop) {
                 if (c.getIntentions().remove(si)) { // do not call removeIntention to not call this method recursively
                     c.getPendingIntentions().put(sTE, si);
                 } else {

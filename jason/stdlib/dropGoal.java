@@ -60,19 +60,18 @@ public class dropGoal implements InternalAction {
         Circumstance C = ts.getC();
         
         for (Intention i: C.getIntentions()) {
-            if (dropIntention(i, g, success, ts, un)) {
+            if (dropIntention(i, g, success, ts, un) == 2) {
                 C.removeIntention(i);
             }
         }
 
         // dropping the current intention?
-        if (dropIntention(C.getSelectedIntention(), g, success, ts, un)) {
-        }
+        dropIntention(C.getSelectedIntention(), g, success, ts, un);
             
         // dropping G in Events
         for (Event e: C.getEvents()) {
             Intention i = e.getIntention();
-            if (i != null && dropIntention(i, g, success, ts, un)) {
+            if (i != null && dropIntention(i, g, success, ts, un) == 2) {
                 C.removeEvent(e);
             }
         }
@@ -80,37 +79,49 @@ public class dropGoal implements InternalAction {
         // dropping from Pending Actions
         for (ActionExec a: C.getPendingActions().values()) {
             Intention i = a.getIntention();
-            if (i != null && dropIntention(i, g, success, ts, un)) {
-                C.removePendingAction(i);
+            if (i != null) {
+                int r = dropIntention(i, g, success, ts, un);
+                if (r > 0) { // i was changed
+                    C.dropPendingIntention(i); // remove i from PI
+                    if (r == 1) { // i must continue running
+                        C.addIntention(i); // and put the intention back in I
+                    }
+                }
             }
         }
         
         // dropping from Pending Intentions
         for (Intention i: C.getPendingIntentions().values()) {
-            if (i != null && dropIntention(i, g, success, ts, un)) {
-                C.removePendingIntention(i);
+            int r = dropIntention(i, g, success, ts, un);
+            if (r > 0) { // i was changed
+                C.dropPendingIntention(i); // remove i from PI
+                if (r == 1) { // i must continue running
+                    C.addIntention(i); // and put the intention back in I
+                }
             }
         }
     }
     
-    private boolean dropIntention(Intention i, Trigger g, boolean success, TransitionSystem ts, Unifier un) throws JasonException {
+    private int dropIntention(Intention i, Trigger g, boolean success, TransitionSystem ts, Unifier un) throws JasonException {
         if (i.dropGoal(g, un)) {
             if (success) {
                 // continue the intention
                 i.peek().removeCurrentStep();
                 ts.applyClrInt(i);
+                return 1;
             } else {
                 // generate fail
                 Event failEvent = ts.findEventForFailure(i, i.peek().getTrigger());
                 if (failEvent != null) {
                     ts.getC().addEvent(failEvent);
                     ts.getLogger().warning(".dropGoal is generating goal deletion event " + failEvent.getTrigger());
+                    return 1;
                 } else {
                     ts.getLogger().warning(".dropGoal is removing intention\n" + i);
-                    return true;
+                    return 2;
                 }
             }
         }
-        return false;        
+        return 0;        
     }
 }
