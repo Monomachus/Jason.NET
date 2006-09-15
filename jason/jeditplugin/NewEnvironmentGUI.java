@@ -75,10 +75,6 @@ public class NewEnvironmentGUI extends NewAgentGUI {
     private String getEnvName() {
         String env = envClass.getText().trim();
         if (env.length() > 0) {
-            // change first letter
-            if (Character.isUpperCase(env.charAt(0))) {
-                env = Character.toLowerCase(env.charAt(0)) + env.substring(1);
-            }
             return env;
         } else {
             return null;

@@ -9,16 +9,19 @@ public class <ENV_NAME> extends jason.environment.Environment {
     private Logger logger = Logger.getLogger("<PROJECT_NAME>."+<ENV_NAME>.class.getName());
 
     /** Called before the MAS execution with the args informed in .mas2j */
+    @Override
     public void init(String[] args) {
         addPercept(Literal.parseLiteral("percept(demo)"));
     }
 
+    @Override
     public boolean executeAction(String ag, Term action) {
         logger.info("executing: "+action+", but not implemented!");
         return true;
     }
 
     /** Called before the end of MAS execution */
+    @Override
     public void stop() {
     }
 }
