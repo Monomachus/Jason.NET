@@ -71,7 +71,7 @@ public class dropGoal implements InternalAction {
         // dropping G in Events
         for (Event e: C.getEvents()) {
             Intention i = e.getIntention();
-            if (i != null && dropIntention(i, g, success, ts, un) == 2) {
+            if (dropIntention(i, g, success, ts, un) == 2) {
                 C.removeEvent(e);
             }
         }
@@ -79,13 +79,11 @@ public class dropGoal implements InternalAction {
         // dropping from Pending Actions
         for (ActionExec a: C.getPendingActions().values()) {
             Intention i = a.getIntention();
-            if (i != null) {
-                int r = dropIntention(i, g, success, ts, un);
-                if (r > 0) { // i was changed
-                    C.dropPendingIntention(i); // remove i from PI
-                    if (r == 1) { // i must continue running
-                        C.addIntention(i); // and put the intention back in I
-                    }
+            int r = dropIntention(i, g, success, ts, un);
+            if (r > 0) { // i was changed
+                C.dropPendingIntention(i); // remove i from PI
+                if (r == 1) { // i must continue running
+                    C.addIntention(i); // and put the intention back in I
                 }
             }
         }
@@ -103,7 +101,7 @@ public class dropGoal implements InternalAction {
     }
     
     private int dropIntention(Intention i, Trigger g, boolean success, TransitionSystem ts, Unifier un) throws JasonException {
-        if (i.dropGoal(g, un)) {
+        if (i != null && i.dropGoal(g, un)) {
             if (success) {
                 // continue the intention
                 i.peek().removeCurrentStep();
