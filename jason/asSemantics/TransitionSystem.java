@@ -228,8 +228,8 @@ public class TransitionSystem {
         // Rule Rel2
         else {
             if (conf.C.SE.trigger.isGoal()) {
-                generateGoalDeletionFromEvent();
                 logger.warning("Found a goal for which there is no relevant plan:" + conf.C.SE);
+                generateGoalDeletionFromEvent();
             }
             // e.g. belief addition as internal event, just go ahead
             else if (conf.C.SE.isInternal()) {
@@ -643,15 +643,12 @@ public class TransitionSystem {
             } else {
                 logger.warning("No fail event was generated for " + im.getTrigger());
             }
-            
-            //confP.C.delGoal(tevent.getGoal(), tevent.getLiteral(), conf.C.SI);
-            // intention will be suspended
         }
         // if "discard" is set, we are deleting the whole intention!
         // it is simply not going back to 'I' nor anywhere else!
         else if (setts.requeue()) {
             // get the external event (or the one that started
-            // the whole focus of attentiont) and requeue it
+            // the whole focus of attention) and requeue it
             im = conf.C.SI.get(0);
             confP.C.addExternalEv(im.getTrigger());
         } else {
@@ -688,7 +685,7 @@ public class TransitionSystem {
         Trigger failTrigger = new Trigger(Trigger.TEDel, tevent.getGoal(), tevent.getLiteral());
         ListIterator<IntendedMeans> ii = i.iterator();
         while (!getAg().getPL().isRelevant(failTrigger.getPredicateIndicator()) && ii.hasPrevious()) {
-            IntendedMeans im = ii.previous(); 
+            IntendedMeans im = ii.previous();
             tevent = im.getTrigger();
             failTrigger = new Trigger(Trigger.TEDel, tevent.getGoal(), tevent.getLiteral());
         }
