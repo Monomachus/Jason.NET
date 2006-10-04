@@ -14,8 +14,7 @@ public class DefaultInternalAction implements InternalAction {
         return false;
     }
 
-    public boolean execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
-        return true;
+    public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
+        return false;
     }
-
 }

@@ -39,7 +39,7 @@ public class createAgent extends DefaultInternalAction {
      * args[0] is the agent name; args[1] is the agent code (as StringTerm)
      */
     @Override
-    public boolean execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
+    public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
 
         try {
             Term name = (Term) args[0].clone();

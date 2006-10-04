@@ -50,7 +50,7 @@ public class wait extends DefaultInternalAction {
      * 
      */
     @Override
-    public boolean execute(final TransitionSystem ts, Unifier un, Term[] args) throws Exception {
+    public Object execute(final TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         long timeout = -1;
         Trigger te = null;
         try {

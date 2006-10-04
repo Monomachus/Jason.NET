@@ -36,7 +36,7 @@ import jason.asSyntax.Term;
 public class dropAllDesires extends DefaultInternalAction {
     
     @Override
-    public boolean execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
+    public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         ts.getC().clearEvents();
         return true;
     }

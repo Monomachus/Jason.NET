@@ -34,7 +34,7 @@ public class abolish extends DefaultInternalAction {
 
     /** .removeBels(gold(_,_)) */
     @Override
-    public boolean execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
+    public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         try {
             ts.getAg().abolish((Literal)args[0], un);
             return true;

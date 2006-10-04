@@ -43,7 +43,7 @@ import jason.asSyntax.Trigger;
 public class dropIntention extends DefaultInternalAction {
     
     @Override
-    public boolean execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
+    public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         try {
             Literal l = Literal.parseLiteral(args[0].toString());
             un.apply(l);

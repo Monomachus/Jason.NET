@@ -110,7 +110,7 @@ public class StdLibTest extends TestCase {
         VarTerm L = new VarTerm("L");
         // System.out.println(ag.getPS().getAllRelevant(Trigger.parseTrigger(ste.getFunctor())));
         try {
-            assertTrue(new jason.stdlib.findall().execute(ts, u, new Term[] { X, c, L }));
+            assertTrue((Boolean)new jason.stdlib.findall().execute(ts, u, new Term[] { X, c, L }));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -188,7 +188,7 @@ public class StdLibTest extends TestCase {
         // remove plan t2,t3 (source = nosource) from PS
         ListTerm llt = ListTermImpl.parseList("[t2,t3]");
         try {
-            assertTrue(new removePlan().execute(ts, new Unifier(), new Term[] { (Term) llt, new TermImpl("nosource") }));
+            assertTrue((Boolean)new removePlan().execute(ts, new Unifier(), new Term[] { (Term) llt, new TermImpl("nosource") }));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -197,7 +197,7 @@ public class StdLibTest extends TestCase {
         // remove plan t2,t3 (source = self) from PS
         llt = ListTermImpl.parseList("[t2,t3]");
         try {
-            assertTrue(new removePlan().execute(ts, new Unifier(), new Term[] { (Term) llt }));
+            assertTrue((Boolean)new removePlan().execute(ts, new Unifier(), new Term[] { (Term) llt }));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -217,7 +217,7 @@ public class StdLibTest extends TestCase {
         Unifier u = new Unifier();
 
         try {
-            assertTrue(new jason.stdlib.concat().execute(null, u, new Term[] { (Term) l1, (Term) l2, X }));
+            assertTrue((Boolean)new jason.stdlib.concat().execute(null, u, new Term[] { (Term) l1, (Term) l2, X }));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -226,7 +226,7 @@ public class StdLibTest extends TestCase {
         assertEquals(((ListTerm) u.get("X")), l3);
 
         try {
-            assertTrue(new jason.stdlib.concat().execute(null, new Unifier(), new Term[] { (Term) l1, (Term) l2, (Term) l3 }));
+            assertTrue((Boolean)new jason.stdlib.concat().execute(null, new Unifier(), new Term[] { l1, l2, l3 }));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -257,6 +257,64 @@ public class StdLibTest extends TestCase {
         new dropGoal().drop(ts, Literal.parseLiteral("g2"), false, new Unifier());
         assertEquals(intention1.size(),2);
         assertEquals(c.getEvents().size(),1);
+    }
+    
+    @SuppressWarnings("unchecked")
+    public void testMembe() throws Exception {
+        ListTerm l1 = ListTermImpl.parseList("[a,b,c]");
+        Term ta = TermImpl.parse("a");
+        Term td = TermImpl.parse("d");
+        
+        // test member(a,[a,b,c])
+        Unifier u = new Unifier();
+        Iterator<Unifier> i = (Iterator<Unifier>)new jason.stdlib.member().execute(null, u, new Term[] { ta, l1});
+        assertTrue(i != null);
+        assertTrue(i.hasNext());
+        assertTrue(i.next().size() == 0);
+
+        // test member(d,[a,b,c])
+        u = new Unifier();
+        i = (Iterator<Unifier>)new jason.stdlib.member().execute(null, u, new Term[] { td, l1});
+        assertFalse(i.hasNext());
+
+        // test member(b(X),[a(1),b(2),c(3)])
+        Term l2 = TermImpl.parse("[a(1),b(2),c(3)]");
+        Term tb = TermImpl.parse("b(X)");
+        u = new Unifier();
+        i = (Iterator<Unifier>)new jason.stdlib.member().execute(null, u, new Term[] { tb, l2});
+        assertTrue(i != null);
+        assertTrue(i.hasNext());
+        Unifier ru = i.next();
+        assertTrue(u.size() == 0); // u should not be changed!
+        assertTrue(ru.size() == 1);
+        assertEquals(ru.get("X").toString(), "2");
+        
+        // test member(X,[a,b,c])
+        Term tx = TermImpl.parse("X");
+        u = new Unifier();
+        i = (Iterator<Unifier>)new jason.stdlib.member().execute(null, u, new Term[] { tx, l1});
+        assertTrue(iteratorSize(i) == 3);
+        i = (Iterator<Unifier>)new jason.stdlib.member().execute(null, u, new Term[] { tx, l1});
+        assertEquals(i.next().get("X").toString(),"a");
+
+        // test member(b(X),[a(1),b(2),c(3),b(4)])
+        l2 = TermImpl.parse("[a(1),b(2),c(3),b(4)]");
+        u = new Unifier();
+        i = (Iterator<Unifier>)new jason.stdlib.member().execute(null, u, new Term[] { tb, l2});
+        assertTrue(i != null);
+        assertTrue(iteratorSize(i) == 2);
+        i = (Iterator<Unifier>)new jason.stdlib.member().execute(null, u, new Term[] { tb, l2});
+        assertEquals(i.next().get("X").toString(),"2");
+        assertEquals(i.next().get("X").toString(),"4");
+    }
+
+    private int iteratorSize(Iterator i) {
+        int c = 0;
+        while (i.hasNext()) {
+            i.next();
+            c++;
+        }
+        return c;
     }
 
 }

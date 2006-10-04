@@ -40,7 +40,7 @@ public class sort extends DefaultInternalAction {
 	 * args[1] = the sorted list
 	 */
     @Override
-    public boolean execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
+    public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         try {
             ListTerm l1 = (ListTerm) args[0].clone();
             ListTerm l2 = (ListTerm) args[1].clone();

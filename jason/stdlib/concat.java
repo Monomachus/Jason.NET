@@ -38,7 +38,7 @@ public class concat extends DefaultInternalAction {
 	 * Concat list args[0] with args[1] and unifies with args[2]
 	 */
     @Override
-	public boolean execute(TransitionSystem ts, Unifier un, Term[] args)	throws Exception {
+	public Object execute(TransitionSystem ts, Unifier un, Term[] args)	throws Exception {
 		Term l1 = (Term)args[0].clone();
 		Term l2 = (Term)args[1].clone();
 		Term l3 = (Term)args[2].clone();

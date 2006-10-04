@@ -38,7 +38,7 @@ public class findall extends DefaultInternalAction {
 
     /** .findall(Var, a(Var), List) */
     @Override
-    public boolean execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
+    public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         try {
             Term var = (Term) args[0].clone();
             Literal bel = Literal.parseLiteral(args[1].toString());

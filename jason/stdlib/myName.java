@@ -33,7 +33,7 @@ import jason.asSyntax.TermImpl;
 public class myName extends DefaultInternalAction {
 
     @Override
-	public boolean execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
+	public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
 		try {
             return un.unifies(args[0], new TermImpl(ts.getUserAgArch().getAgName()));
 		} catch (ArrayIndexOutOfBoundsException e) {

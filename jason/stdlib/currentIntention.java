@@ -32,7 +32,7 @@ import jason.asSyntax.Term;
 public class currentIntention extends DefaultInternalAction {
 
     @Override
-    public boolean execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
+    public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         try {
             return un.unifies(ts.getC().getSelectedIntention().getAsTerm(), args[0]);
         } catch (ArrayIndexOutOfBoundsException e) {

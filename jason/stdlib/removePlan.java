@@ -49,7 +49,7 @@ public class removePlan extends DefaultInternalAction {
 	 *          .removePlan(l1,ag1); // remove the plan l1 sent (tellHow) by agent ag1 
 	 */
     @Override
-    public boolean execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
+    public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         try {
         	Term label = (Term)args[0].clone();
         	un.apply(label);

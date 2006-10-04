@@ -347,6 +347,7 @@ public class TransitionSystem {
         confP.step = State.StartRC;
     }
 
+    @SuppressWarnings("unchecked")
     private void applyExecInt() throws JasonException {
         confP.step = State.ClrInt; // default next stop
         
@@ -378,10 +379,22 @@ public class TransitionSystem {
             break;
 
         case internalAction:
-            boolean ok = true;
+            boolean ok = false;
             try {
                 InternalAction ia = ag.getIA(body);
-                ok = ia.execute(this, u, body.getTermsArray());
+                Object oresult = ia.execute(this, u, body.getTermsArray());
+                if (oresult != null) {
+                    ok = oresult instanceof Boolean && (Boolean)oresult;
+                    if (!ok && oresult instanceof Iterator) { // ia result is an Iterator
+                        Iterator<Unifier> iu = (Iterator<Unifier>)oresult;
+                        if (iu.hasNext()) {
+                            // change the unifier of the current IM to the first returned by the IA
+                            im.unif = iu.next(); 
+                            ok = true;
+                        }
+                    }
+                }
+
                 if (ok && !ia.suspendIntention()) {
                     updateIntention();
                 }

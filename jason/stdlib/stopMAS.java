@@ -32,7 +32,7 @@ import jason.runtime.RuntimeServicesInfraTier;
 public class stopMAS extends DefaultInternalAction {
 
     @Override
-    public boolean execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
+    public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
 
         try {
             RuntimeServicesInfraTier rs = ts.getUserAgArch().getArchInfraTier().getRuntimeServices();

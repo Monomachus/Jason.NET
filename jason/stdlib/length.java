@@ -38,7 +38,7 @@ public class length extends DefaultInternalAction {
      * gets the length of a list or a string
      */
     @Override
-    public boolean execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
+    public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         Term l1 = (Term) args[0].clone();
         Term l2 = (Term) args[1].clone();
         un.apply(l1);

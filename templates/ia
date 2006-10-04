@@ -6,11 +6,12 @@ import jason.asSemantics.*;
 import jason.asSyntax.*;
 import java.util.logging.*;
 
-public class <IA_NAME> implements jason.asSemantics.InternalAction {
+public class <IA_NAME> extends DefaultInternalAction {
 
     private Logger logger = Logger.getLogger("<PROJECT_NAME>."+<IA_NAME>.class.getName());
 
-    public boolean execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
+    @Override
+    public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         logger.info("not implemented!");
         return true;
     }

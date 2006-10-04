@@ -17,7 +17,7 @@ public class random extends DefaultInternalAction {
 	 * args[0] is the variable that unifies the random value (from 0..1)
 	 */
     @Override
-    public boolean execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
+    public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         try {
             if (!args[0].isVar()) {
                 throw new JasonException("The first argument of the internal action 'random' is not a variable.");                

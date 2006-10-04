@@ -5,7 +5,6 @@ import jason.asSemantics.Unifier;
 import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Literal;
 import jason.asSyntax.LogExprTerm;
-import jason.asSyntax.Pred;
 import jason.asSyntax.PredicateIndicator;
 import jason.asSyntax.Term;
 import jason.asSyntax.TermImpl;
@@ -208,7 +207,6 @@ public class BeliefBaseTest extends TestCase {
     }
     
     
-    /*
 	public void testRemWithList() {
 		Unifier u = new Unifier();
 		BeliefBase bb = new DefaultBeliefBase();
@@ -240,6 +238,7 @@ public class BeliefBaseTest extends TestCase {
 		assertTrue(ag.getBB().remove(l));
 	}
     
+    @SuppressWarnings("unused")
     public void testLogCons() {
         Agent ag = new Agent();
         ag.getBB().add(Literal.parseLiteral("a(10)"));
@@ -443,7 +442,7 @@ public class BeliefBaseTest extends TestCase {
         
         bb.stop();
     }
-    */
+
     private int iteratorSize(Iterator i) {
         int c = 0;
         while (i.hasNext()) {

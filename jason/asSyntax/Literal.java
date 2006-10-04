@@ -108,13 +108,17 @@ public class Literal extends Pred implements Cloneable {
      * 
      * Returns an iterator for all unifiers that are logCons.
      */
+    @SuppressWarnings("unchecked")
     @Override
     public Iterator<Unifier> logCons(final Agent ag, final Unifier un) {
         if (isInternalAction()) {
             try {
                 // calls execute
-                if (ag.getIA(this).execute(ag.getTS(), un, getTermsArray())) {
-                     return createUnifIterator(un);
+                Object oresult = ag.getIA(this).execute(ag.getTS(), un, getTermsArray());
+                if (oresult instanceof Boolean && (Boolean)oresult) {
+                    return createUnifIterator(un);
+                } else if (oresult instanceof Iterator) {
+                    return ((Iterator<Unifier>)oresult);
                 }
             } catch (Exception e) {
                 logger.log(Level.SEVERE,"Error in IA ",e);

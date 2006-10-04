@@ -47,7 +47,7 @@ public class getRelevantPlans extends DefaultInternalAction {
 	 *           (the splans'sources in this list are empty)
 	 */
     @Override
-	public boolean execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
+	public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
 		try {
 			StringTerm sTe = (StringTerm) args[0];
 			Trigger te = Trigger.parseTrigger(sTe.getFunctor());

@@ -14,7 +14,7 @@ public class date extends DefaultInternalAction {
 
     /** date(YY,MM,DD) */
     @Override
-    public boolean execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
+    public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         try {
             Calendar now = new GregorianCalendar();
             return un.unifies(args[0], new NumberTermImpl(now.get(Calendar.YEAR))) &&

@@ -45,7 +45,7 @@ public class send extends DefaultInternalAction {
 	 *  
 	 */
     @Override
-    public boolean execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
+    public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         Term to   = null;
         Term ilf  = null;
         Term pcnt = null;

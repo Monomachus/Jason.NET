@@ -41,7 +41,7 @@ import jason.asSyntax.Trigger;
 public class dropGoal extends DefaultInternalAction {
     
     @Override
-    public boolean execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
+    public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         try {
             Literal l = (Literal)args[0].clone();
             un.apply(l);

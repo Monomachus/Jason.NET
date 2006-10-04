@@ -9,7 +9,7 @@ import jason.asSyntax.Term;
 public class var extends DefaultInternalAction {
 
     @Override
-    public boolean execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
+    public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         try {
             Term t = (Term) args[0].clone();
             un.apply(t);

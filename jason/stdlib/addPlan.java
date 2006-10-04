@@ -41,7 +41,7 @@ public class addPlan extends DefaultInternalAction {
      * informed, is "self")
      */
     @Override
-    public boolean execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
+    public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         try {
             Term plans = TermImpl.parse(args[0].toString());
 

@@ -35,7 +35,7 @@ public class killAgent extends DefaultInternalAction {
 
 	/* args[0] the agent name */
     @Override
-	public boolean execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
+	public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
 		
 		try {
             Term name = (Term)args[0].clone();
