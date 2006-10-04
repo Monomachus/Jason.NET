@@ -1,7 +1,7 @@
 package jason.stdlib;
 
 import jason.JasonException;
-import jason.asSemantics.InternalAction;
+import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.NumberTermImpl;
@@ -9,13 +9,14 @@ import jason.asSyntax.Term;
 
 import java.util.Random;
 
-public class random implements InternalAction {
+public class random extends DefaultInternalAction {
     
     private Random random = new Random();    
 	
     /**
 	 * args[0] is the variable that unifies the random value (from 0..1)
 	 */
+    @Override
     public boolean execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         try {
             if (!args[0].isVar()) {

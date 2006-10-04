@@ -25,7 +25,7 @@
 package jason.stdlib;
 
 import jason.JasonException;
-import jason.asSemantics.InternalAction;
+import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.ListTerm;
@@ -34,7 +34,7 @@ import jason.asSyntax.TermImpl;
 
 import java.util.Iterator;
 
-public class removePlan implements InternalAction {
+public class removePlan extends DefaultInternalAction {
 
 	/**
 	 * args[0] = list of plans (a ListTerm) where each element is a plan label 
@@ -48,6 +48,7 @@ public class removePlan implements InternalAction {
 	 *          .removePlan([l1,l2,l3]);
 	 *          .removePlan(l1,ag1); // remove the plan l1 sent (tellHow) by agent ag1 
 	 */
+    @Override
     public boolean execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         try {
         	Term label = (Term)args[0].clone();

@@ -24,23 +24,24 @@
 package jason.stdlib;
 
 import jason.JasonException;
-import jason.asSemantics.InternalAction;
+import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.Literal;
 import jason.asSyntax.Term;
 
-public class abolish implements InternalAction {
+public class abolish extends DefaultInternalAction {
 
     /** .removeBels(gold(_,_)) */
+    @Override
     public boolean execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         try {
             ts.getAg().abolish((Literal)args[0], un);
             return true;
         } catch (ArrayIndexOutOfBoundsException e) {
-            throw new JasonException("The internal action 'removeBels' has not received one arguments");
+            throw new JasonException("The internal action 'abolish' has not received one arguments");
         } catch (Exception e) {
-            throw new JasonException("Error in internal action 'removeBels': " + e);
+            throw new JasonException("Error in internal action 'abolish': " + e);
         }
     }
 }

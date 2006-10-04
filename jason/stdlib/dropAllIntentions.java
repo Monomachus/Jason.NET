@@ -24,18 +24,18 @@
 
 package jason.stdlib;
 
-import jason.asSemantics.InternalAction;
+import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.Term;
 
 /**
  * This changes the agent's circumstance by simply emptying the whole set of
- * intentions (I). IMPORTANT: note that this is different from droping one
- * intention, in which case a goal deletion event is generated.
+ * intentions (I).
  */
-public class dropAllIntentions implements InternalAction {
+public class dropAllIntentions extends DefaultInternalAction {
     
+    @Override
     public boolean execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         ts.getC().clearIntentions();
         return true;

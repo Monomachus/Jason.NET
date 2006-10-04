@@ -24,16 +24,17 @@
 package jason.stdlib;
 
 import jason.JasonException;
-import jason.asSemantics.InternalAction;
+import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.Term;
 
-public class killAgent implements InternalAction {
+public class killAgent extends DefaultInternalAction {
 
     //private static Logger logger = Logger.getLogger(killAgent.class.getName());
 
 	/* args[0] the agent name */
+    @Override
 	public boolean execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
 		
 		try {

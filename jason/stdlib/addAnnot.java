@@ -25,7 +25,7 @@
 package jason.stdlib;
 
 import jason.JasonException;
-import jason.asSemantics.InternalAction;
+import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.ListTerm;
@@ -35,7 +35,7 @@ import jason.asSyntax.Term;
 
 import java.util.Iterator;
 
-public class addAnnot implements InternalAction {
+public class addAnnot extends DefaultInternalAction {
 
 	/**
 	 * Example: .addAnnot(a,source(jomi),B)
@@ -48,6 +48,7 @@ public class addAnnot implements InternalAction {
 	 * args[2] is the result -- does't have to be a var!
 	 */
 	
+    @Override
 	public boolean execute(TransitionSystem ts, Unifier un, Term[] args)
 			throws Exception {
 		try {

@@ -24,7 +24,7 @@
 package jason.stdlib;
 
 import jason.JasonException;
-import jason.asSemantics.InternalAction;
+import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.ListTerm;
@@ -34,9 +34,10 @@ import jason.asSyntax.Term;
 
 import java.util.Iterator;
 
-public class findall implements InternalAction {
+public class findall extends DefaultInternalAction {
 
     /** .findall(Var, a(Var), List) */
+    @Override
     public boolean execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         try {
             Term var = (Term) args[0].clone();

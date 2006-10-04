@@ -302,10 +302,6 @@ public class SaciAgArch extends saci.Agent implements AgArchInfraTier {
     // this is used by the .send internal action in stdlib
     /** the saci implementation of the sendMsg interface */
     public void sendMsg(jason.asSemantics.Message m) throws Exception {
-        // suspend intention if it is an ask
-        if (m.isAsk()) {
-            userAgArh.getTS().getC().getPendingIntentions().put(m.getMsgId(), userAgArh.getTS().getC().getSelectedIntention());
-        }
         saci.Message msaci = new saci.Message("(" + m.getIlForce() + ")");
         msaci.put("receiver", m.getReceiver());
         msaci.put("content", m.getPropCont());

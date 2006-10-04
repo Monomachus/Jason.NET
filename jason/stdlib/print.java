@@ -26,6 +26,8 @@ package jason.stdlib;
 import jason.asSemantics.InternalAction;
 
 public class print extends println implements InternalAction {
+
+    @Override
 	protected String getNewLine() {
 		return "";
 	}

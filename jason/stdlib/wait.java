@@ -25,9 +25,9 @@ package jason.stdlib;
 
 import jason.asSemantics.Circumstance;
 import jason.asSemantics.CircumstanceListener;
+import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.Event;
 import jason.asSemantics.Intention;
-import jason.asSemantics.InternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.NumberTerm;
@@ -37,7 +37,7 @@ import jason.asSyntax.Trigger;
 
 import java.util.logging.Level;
 
-public class wait implements InternalAction {
+public class wait extends DefaultInternalAction {
 
     /**
      * args[0] is either a number or a string, if number it is the time (in ms),
@@ -49,6 +49,7 @@ public class wait implements InternalAction {
      * +!t(50) .wait("+!t(50)", 2000) // waits the event +!t(50) for 2 seconds
      * 
      */
+    @Override
     public boolean execute(final TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         long timeout = -1;
         Trigger te = null;
@@ -80,7 +81,12 @@ public class wait implements InternalAction {
         wet.start();
         return true;
     }    
-    
+
+    @Override
+    public boolean suspendIntention() {
+        return true;
+    }  
+
     class WaitEvent extends Thread implements CircumstanceListener {
         Trigger          te;
         String           sTE; // an string version of TE
@@ -109,6 +115,7 @@ public class wait implements InternalAction {
                 sTE = "time"+(timeout);
             }
             sTE = si.getId()+"/"+sTE;
+            c.getPendingIntentions().put(sTE, si);
         }
 
         public void run() {
@@ -120,6 +127,7 @@ public class wait implements InternalAction {
 
                 // add SI again in C.I if it was removed and this wait was dropped
                 if (!c.getIntentions().contains(si) && !drop) {
+                    si.peek().removeCurrentStep();
                     c.addIntention(si);
                 }
                 c.getPendingIntentions().remove(sTE);
@@ -167,16 +175,7 @@ public class wait implements InternalAction {
             }
         }
 
-        public void intentionAdded(Intention i) {
-            // if the .wait intention is being added in C.I, remove it
-            if (i == si && !drop) {
-                if (c.getIntentions().remove(si)) { // do not call removeIntention to not call this method recursively
-                    c.getPendingIntentions().put(sTE, si);
-                } else {
-                    ts.getLogger().warning("The following intentions sould be removed, but wasn't!" + si + "\nWait intention is" + i);
-                }
-            }
-        }
+        public void intentionAdded(Intention i) {  }
         
         public String toString() {
             return sTE;

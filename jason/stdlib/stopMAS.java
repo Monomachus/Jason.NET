@@ -23,14 +23,15 @@
 
 package jason.stdlib;
 
-import jason.asSemantics.InternalAction;
+import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.Term;
 import jason.runtime.RuntimeServicesInfraTier;
 
-public class stopMAS implements InternalAction {
+public class stopMAS extends DefaultInternalAction {
 
+    @Override
     public boolean execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
 
         try {

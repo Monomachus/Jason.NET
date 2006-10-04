@@ -120,19 +120,6 @@ public class BodyLiteral implements Cloneable {
         return formType.hashCode() + term.hashCode();
     }
 
-    private static final PredicateIndicator SEND_PI = new PredicateIndicator(".send", 4);
-
-    public boolean isAsk() {
-        if (!term.getPredicateIndicator().equals(SEND_PI)) {
-            return false;
-        }
-        if (term.getTerm(1).toString().startsWith("ask")) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
     public Object clone() {
         return new BodyLiteral(formType, term);
     }

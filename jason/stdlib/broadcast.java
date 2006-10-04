@@ -24,39 +24,32 @@
 package jason.stdlib;
 
 import jason.JasonException;
-import jason.asSemantics.InternalAction;
+import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.Message;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.Term;
 
-public class broadcast implements InternalAction {
+public class broadcast extends DefaultInternalAction {
 
-	public boolean execute(TransitionSystem ts, Unifier un, Term[] args)
-			throws Exception {
+    @Override
+	public boolean execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
 		Term ilf = null;
 		Term pcnt = null;
 
 		try {
 			ilf = (Term) args[0].clone();
-			// if (ilf == null) {
-			// throw new JasonException("The Ilf Force parameter of the internal
-			// action 'broadcast' is not a term!");
-			// }
 			if (!ilf.isGround()) {
-				throw new JasonException(
-						"The Ilf Force parameter of the internal action 'broadcast' is not a ground term!");
+				throw new JasonException("The Ilf Force parameter of the internal action 'broadcast' is not a ground term!");
 			}
 
 			pcnt = (Term)args[1].clone();
 		} catch (ArrayIndexOutOfBoundsException e) {
-			throw new JasonException(
-					"The internal action 'broadcast' has not received two arguments");
+			throw new JasonException("The internal action 'broadcast' has not received two arguments");
 		}
 		un.apply(pcnt);
 		if (!pcnt.isGround()) {
-			throw new JasonException("The content of the message '" + pcnt
-					+ "' is not ground!");
+			throw new JasonException("The content of the message '" + pcnt + "' is not ground!");
 		}
 
 		Message m = new Message(ilf.toString(), null, null, pcnt.toString());

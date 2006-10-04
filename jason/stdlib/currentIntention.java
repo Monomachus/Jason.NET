@@ -24,12 +24,14 @@
 package jason.stdlib;
 
 import jason.JasonException;
-import jason.asSemantics.InternalAction;
+import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.Term;
 
-public class currentIntention implements InternalAction {
+public class currentIntention extends DefaultInternalAction {
+
+    @Override
     public boolean execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         try {
             return un.unifies(ts.getC().getSelectedIntention().getAsTerm(), args[0]);

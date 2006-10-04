@@ -26,9 +26,9 @@ package jason.stdlib;
 import jason.JasonException;
 import jason.asSemantics.ActionExec;
 import jason.asSemantics.Circumstance;
+import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.Event;
 import jason.asSemantics.Intention;
-import jason.asSemantics.InternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.Literal;
@@ -38,8 +38,9 @@ import jason.asSyntax.Trigger;
 /**
  * Drop a goal (see DALT 2006 paper)
  */
-public class dropGoal implements InternalAction {
+public class dropGoal extends DefaultInternalAction {
     
+    @Override
     public boolean execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         try {
             Literal l = (Literal)args[0].clone();

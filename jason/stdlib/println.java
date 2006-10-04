@@ -22,7 +22,7 @@
 
 package jason.stdlib;
 
-import jason.asSemantics.InternalAction;
+import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.StringTerm;
@@ -30,16 +30,16 @@ import jason.asSyntax.Term;
 
 import java.util.logging.Level;
 
-public class println implements InternalAction {
+public class println extends DefaultInternalAction {
 
 	protected String getNewLine() {
 		return "\n";
 	}
 	
+    @Override
 	public boolean execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
 		if (args.length == 0) {
 			return true;
-			//throw new JasonException(".print without parameters!");
 		}
 
 		StringBuffer sout = new StringBuffer("");

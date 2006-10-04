@@ -36,7 +36,7 @@ import java.util.List;
 
 /**
  * Base agent architecture class that defines the overall agent architecture;
- * the AS interpreter is only the reasoner (a kind of mind) within this
+ * the AS interpreter is the reasoner (a kind of mind) within this
  * architecture (a kind of body).
  * 
  * <p>
@@ -65,8 +65,7 @@ public class AgArch {
      * Creates the agent class defined by <i>agClass</i>, default is
      * jason.semantics.Agent.
      */
-    public void initAg(String agClass, ClassParameters bbPars, String asSrc,
-            Settings stts) throws JasonException {
+    public void initAg(String agClass, ClassParameters bbPars, String asSrc, Settings stts) throws JasonException {
         // set the agent
         try {
             Agent ag = (Agent) Class.forName(agClass).newInstance();
@@ -128,6 +127,10 @@ public class AgArch {
 
     /** Sends a Jason message */
     public void sendMsg(Message m) throws Exception {
+        // suspend intention if it is an ask
+        if (m.isAsk()) {
+            fTS.getC().getPendingIntentions().put(m.getMsgId(), fTS.getC().getSelectedIntention());
+        }
         archTier.sendMsg(m);
     }
 

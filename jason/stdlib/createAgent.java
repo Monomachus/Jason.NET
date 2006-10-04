@@ -24,7 +24,7 @@
 package jason.stdlib;
 
 import jason.JasonException;
-import jason.asSemantics.InternalAction;
+import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.StringTerm;
@@ -33,11 +33,12 @@ import jason.runtime.RuntimeServicesInfraTier;
 
 import java.io.File;
 
-public class createAgent implements InternalAction {
+public class createAgent extends DefaultInternalAction {
 
     /**
      * args[0] is the agent name; args[1] is the agent code (as StringTerm)
      */
+    @Override
     public boolean execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
 
         try {

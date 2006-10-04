@@ -25,7 +25,7 @@
 package jason.stdlib;
 
 import jason.JasonException;
-import jason.asSemantics.InternalAction;
+import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.ListTerm;
@@ -33,12 +33,13 @@ import jason.asSyntax.Term;
 
 import java.util.Collections;
 
-public class sort implements InternalAction {
+public class sort extends DefaultInternalAction {
     
 	/**
 	 * args[0] = the unsorted list
 	 * args[1] = the sorted list
 	 */
+    @Override
     public boolean execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         try {
             ListTerm l1 = (ListTerm) args[0].clone();

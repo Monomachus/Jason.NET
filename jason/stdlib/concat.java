@@ -24,16 +24,20 @@
 package jason.stdlib;
 
 import jason.JasonException;
-import jason.asSemantics.InternalAction;
+import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
-import jason.asSyntax.*;
+import jason.asSyntax.ListTerm;
+import jason.asSyntax.StringTerm;
+import jason.asSyntax.StringTermImpl;
+import jason.asSyntax.Term;
 
-public class concat implements InternalAction {
+public class concat extends DefaultInternalAction {
 
 	/**
 	 * Concat list args[0] with args[1] and unifies with args[2]
 	 */
+    @Override
 	public boolean execute(TransitionSystem ts, Unifier un, Term[] args)	throws Exception {
 		Term l1 = (Term)args[0].clone();
 		Term l2 = (Term)args[1].clone();

@@ -23,7 +23,7 @@
 
 package jason.stdlib;
 
-import jason.asSemantics.InternalAction;
+import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.ListTerm;
@@ -32,13 +32,13 @@ import jason.asSyntax.NumberTermImpl;
 import jason.asSyntax.StringTerm;
 import jason.asSyntax.Term;
 
-public class length implements InternalAction {
+public class length extends DefaultInternalAction {
 
     /**
      * gets the length of a list or a string
      */
-    public boolean execute(TransitionSystem ts, Unifier un, Term[] args)
-            throws Exception {
+    @Override
+    public boolean execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         Term l1 = (Term) args[0].clone();
         Term l2 = (Term) args[1].clone();
         un.apply(l1);

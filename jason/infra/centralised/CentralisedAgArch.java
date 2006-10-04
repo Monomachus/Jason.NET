@@ -158,11 +158,6 @@ public class CentralisedAgArch extends Thread implements AgArchInfraTier {
 
     // this is used by the .send internal action in stdlib
     public void sendMsg(jason.asSemantics.Message m) throws Exception {
-        // suspend intention if it is an ask
-        if (m.isAsk()) {
-            fUserAgArh.getTS().getC().getPendingIntentions().put(m.getMsgId(), fUserAgArh.getTS().getC().getSelectedIntention());
-        }
-
         // actually send the message
         m.setSender(getName());
         Queue<Message> mbox = infraEnv.getAgMbox(m.getReceiver());

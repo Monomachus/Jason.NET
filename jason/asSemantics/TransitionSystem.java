@@ -163,7 +163,7 @@ public class TransitionSystem {
                 // something like
                 // .send(ask, ag1, value, X)
                 // if the answer was 3, unifies X=3
-                BodyLiteral send = (BodyLiteral) intention.peek().getPlan().getBody().remove(0);
+                BodyLiteral send = intention.peek().removeCurrentStep();
                 intention.peek().getUnif().unifies(send.getTerm().getTerm(3), content);
                 getC().addIntention(intention);
 
@@ -380,8 +380,9 @@ public class TransitionSystem {
         case internalAction:
             boolean ok = true;
             try {
-                ok = ag.getIA(body).execute(this, u, body.getTermsArray());
-                if (ok && !h.isAsk()) {
+                InternalAction ia = ag.getIA(body);
+                ok = ia.execute(this, u, body.getTermsArray());
+                if (ok && !ia.suspendIntention()) {
                     updateIntention();
                 }
             } catch (Exception e) {

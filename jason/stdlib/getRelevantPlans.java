@@ -24,7 +24,7 @@
 package jason.stdlib;
 
 import jason.JasonException;
-import jason.asSemantics.InternalAction;
+import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.Option;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
@@ -38,7 +38,7 @@ import jason.asSyntax.Trigger;
 
 import java.util.Iterator;
 
-public class getRelevantPlans implements InternalAction {
+public class getRelevantPlans extends DefaultInternalAction {
 
 	/**
 	 * args[0] = trigger event (as a StringTerm)
@@ -46,6 +46,7 @@ public class getRelevantPlans implements InternalAction {
 	 *           that contains all plans (as StringTerms)
 	 *           (the splans'sources in this list are empty)
 	 */
+    @Override
 	public boolean execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
 		try {
 			StringTerm sTe = (StringTerm) args[0];
@@ -68,10 +69,6 @@ public class getRelevantPlans implements InternalAction {
 
 			// second arg is a var
 			Term listVar = args[1];
-			//if (listVar == null || !listVar.isVar()) {
-			//	throw new JasonException("The second argument '" + args[1]
-			//			+ "' is not a VAR (getRelevantPlans internal action)");
-			//}
 
 			// un.unifies(new Term(sPlanList.toString()), listVar);
 			return un.unifies(lt, listVar);

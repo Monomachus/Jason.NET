@@ -24,7 +24,7 @@
 package jason.stdlib;
 
 import jason.JasonException;
-import jason.asSemantics.InternalAction;
+import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.ListTerm;
@@ -34,12 +34,13 @@ import jason.asSyntax.TermImpl;
 
 import java.util.Iterator;
 
-public class addPlan implements InternalAction {
+public class addPlan extends DefaultInternalAction {
 
     /**
      * args[0] = plan or list of plans (as StringTerm) args[1] = source (if not
      * informed, is "self")
      */
+    @Override
     public boolean execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         try {
             Term plans = TermImpl.parse(args[0].toString());

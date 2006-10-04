@@ -24,7 +24,7 @@
 package jason.stdlib;
 
 import jason.JasonException;
-import jason.asSemantics.InternalAction;
+import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.Literal;
@@ -33,9 +33,10 @@ import jason.asSyntax.Term;
 
 import java.util.Iterator;
 
-public class count extends findall implements InternalAction {
+public class count extends DefaultInternalAction {
 
     /** .count(a(_), N) */
+    @Override
     public boolean execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         try {
             Literal bel = Literal.parseLiteral(args[0].toString());

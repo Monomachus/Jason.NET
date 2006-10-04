@@ -24,14 +24,15 @@
 package jason.stdlib;
 
 import jason.JasonException;
-import jason.asSemantics.InternalAction;
+import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.Term;
 import jason.asSyntax.TermImpl;
 
-public class myName implements InternalAction {
+public class myName extends DefaultInternalAction {
 
+    @Override
 	public boolean execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
 		try {
             return un.unifies(args[0], new TermImpl(ts.getUserAgArch().getAgName()));

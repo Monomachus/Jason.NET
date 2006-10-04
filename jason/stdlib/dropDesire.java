@@ -24,9 +24,9 @@
 package jason.stdlib;
 
 import jason.JasonException;
+import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.Event;
 import jason.asSemantics.Intention;
-import jason.asSemantics.InternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.Literal;
@@ -42,8 +42,9 @@ import jason.asSyntax.Trigger;
  * consider intentions. You should use both dropDes() AND dropInt() to
  * remove all desires and intentions of l.
  */
-public class dropDesire implements InternalAction {
+public class dropDesire extends DefaultInternalAction {
     
+    @Override
     public boolean execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         try {
             Literal l = Literal.parseLiteral(args[0].toString());

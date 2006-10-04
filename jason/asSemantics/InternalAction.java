@@ -26,5 +26,9 @@ package jason.asSemantics;
 import jason.asSyntax.Term;
 
 public interface InternalAction {
+    /** returns true if the internal action should suspend the intention it is in */
+    boolean suspendIntention();
+    
+    /** execute the internal action */
 	boolean execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception;
 }
