@@ -23,7 +23,7 @@ import jason.bb.BeliefBase;
 import jason.stdlib.addAnnot;
 import jason.stdlib.addPlan;
 import jason.stdlib.dropGoal;
-import jason.stdlib.getRelevantPlans;
+import jason.stdlib.relevantPlans;
 import jason.stdlib.removePlan;
 
 import java.util.Iterator;
@@ -138,7 +138,7 @@ public class StdLibTest extends TestCase {
         VarTerm X = new VarTerm("X");
         // System.out.println(ag.getPS().getAllRelevant(Trigger.parseTrigger(ste.getFunctor())));
         try {
-            new getRelevantPlans().execute(ts, u, new Term[] { (Term) ste, X });
+            new relevantPlans().execute(ts, u, new Term[] { (Term) ste, X });
         } catch (Exception e) {
             e.printStackTrace();
         }

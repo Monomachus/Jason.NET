@@ -52,6 +52,7 @@ public class dropGoal extends DefaultInternalAction {
         } catch (ArrayIndexOutOfBoundsException e) {
             throw new JasonException("The internal action 'dropGoal' has not received two arguments.");
         } catch (Exception e) {
+            e.printStackTrace();
             throw new JasonException("Error in internal action 'dropGoal': " + e);
         }
     }
@@ -110,7 +111,10 @@ public class dropGoal extends DefaultInternalAction {
                 return 1;
             } else {
                 // generate fail
-                Event failEvent = ts.findEventForFailure(i, i.peek().getTrigger());
+                Event failEvent = null;
+                if (!i.isFinished()) {
+                    failEvent = ts.findEventForFailure(i, i.peek().getTrigger());
+                }
                 if (failEvent != null) {
                     ts.getC().addEvent(failEvent);
                     ts.getLogger().warning(".dropGoal is generating goal deletion event " + failEvent.getTrigger());

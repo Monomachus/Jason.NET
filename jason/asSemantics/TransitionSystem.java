@@ -171,7 +171,7 @@ public class TransitionSystem {
             } else if (conf.ag.socAcc(m)) {
 
                 // generate an event
-                Literal received = new Literal(Literal.LPos, "received");
+                Literal received = new Literal(Literal.LPos, "kqmlReceived");
                 received.addTerm(new TermImpl(m.getSender()));
                 received.addTerm(new TermImpl(m.getIlForce()));
                 received.addTerm(content);
