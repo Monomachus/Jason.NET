@@ -38,7 +38,7 @@ import jason.asSyntax.Trigger;
 
 import java.util.Iterator;
 
-public class getRelevantPlans extends DefaultInternalAction {
+public class relevantPlans extends DefaultInternalAction {
 
 	/**
 	 * args[0] = trigger event (as a StringTerm)
