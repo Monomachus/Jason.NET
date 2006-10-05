@@ -27,12 +27,14 @@ import jason.asSyntax.Term;
 
 public interface InternalAction {
     
-    /** returns true if the internal action should suspend the intention it is in */
+    /** returns true if the internal action (IA) should suspend the 
+        intention where the IA is called */
     boolean suspendIntention();
     
-    /** execute the internal action, it shold return a Boolean or
+    /** execute the internal action, it should return a Boolean or
      *  an Iterator<Unifier>. A boolean return means that the IA was
      *  successfuly executed. A Iterator result means that there is 
      *  more than one answer (see member internal action). */
-	Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception;
+    Object execute(TransitionSystem ts, Unifier un, Term[] args) throws 
+Exception;
 }
