@@ -50,16 +50,16 @@ import java.util.List;
  */
 public class AgArch {
 
-    protected TransitionSystem fTS = null;
+    private TransitionSystem fTS = null;
 
     /**
      * The class that implements the architecture tier for the MAS
      * infrastructure
      */
-    protected AgArchInfraTier archTier;
+    private AgArchInfraTier archTier;
 
     /** the current cycle number, in case of sync execution mode */
-    protected int cycleNumber = 0;
+    private int cycleNumber = 0;
     
     /**
      * Creates the agent class defined by <i>agClass</i>, default is

@@ -243,16 +243,20 @@ public class JasonID extends JPanel implements EBComponent, RunProjectListener {
         JPanel p = new JPanel(new BorderLayout());
         p.add(toolBar, BorderLayout.EAST);
 
-        JButton about = createToolBarButton("About Jason", new ImageIcon(JasonID.class.getResource("/images/Jason-GMoreau-Small-Icon.jpg")), new ActionListener() {
+        JButton about = new JButton("<html><center>about<br><i><b>Jason</b></i></center></html>", new ImageIcon(JasonID.class.getResource("/images/Jason-GMoreau-Small-Icon.jpg")));
+        about.setFont(new Font("Arial", Font.PLAIN, 14));
+        about.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
                 AboutGUI.show(view);
             }
         });
+        /*
         JLabel jasonLabel = new JLabel("Jason IDE");
         jasonLabel.setFont(new Font("Times", Font.BOLD | Font.ITALIC, 16));
+        */
         JPanel pAbt = new JPanel();
         pAbt.add(about);
-        pAbt.add(jasonLabel);
+        //pAbt.add(jasonLabel);
         p.add(pAbt, BorderLayout.WEST);
 
         return p;
