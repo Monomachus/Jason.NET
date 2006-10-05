@@ -25,14 +25,19 @@
 package jason.stdlib;
 
 import jason.JasonException;
+import jason.asSemantics.Circumstance;
 import jason.asSemantics.DefaultInternalAction;
+import jason.asSemantics.Intention;
 import jason.asSemantics.Message;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
+import jason.asSyntax.BodyLiteral;
 import jason.asSyntax.ListTerm;
+import jason.asSyntax.NumberTerm;
 import jason.asSyntax.Pred;
 import jason.asSyntax.StringTerm;
 import jason.asSyntax.Term;
+import jason.asSyntax.TermImpl;
 
 public class send extends DefaultInternalAction {
     
@@ -100,14 +105,18 @@ public class send extends DefaultInternalAction {
         
         try {
         	if (to.isList()) {
-                for (Term t: (ListTerm)to) {
-                    String rec = t.toString();
-                    if (t.isString()) {
-                        rec = ((StringTerm)t).getString();
-                    }
-            		m.setReceiver(rec);
-            		ts.getUserAgArch().sendMsg(m);        			
-        		}
+        	    if (m.isAsk()) {
+                    throw new JasonException("Can not send ask to a list of receivers!");                                                   
+                } else {
+                    for (Term t: (ListTerm)to) {
+                        String rec = t.toString();
+                        if (t.isString()) {
+                            rec = ((StringTerm)t).getString();
+                        }
+                		m.setReceiver(rec);
+                		ts.getUserAgArch().sendMsg(m);        			
+            		}
+                }
         	} else {
                 String rec = to.toString();
                 if (to.isString()) {
@@ -116,6 +125,14 @@ public class send extends DefaultInternalAction {
         		m.setReceiver(rec);
         		ts.getUserAgArch().sendMsg(m);
         	}
+
+            if (args.length == 5 && m.isAsk()) {
+                // get the timout
+                NumberTerm tto = (NumberTerm)args[4].clone();
+                un.apply(tto);
+                new CheckTimeout((long)tto.solve(), m.getMsgId(), ts.getC()).start(); 
+            }
+
             return true;
         } catch (Exception e) {
             throw new JasonException("Error sending message " + m + "\nError="+e);
@@ -125,5 +142,39 @@ public class send extends DefaultInternalAction {
     @Override
     public boolean suspendIntention() {
         return lastSendWasAsk;
-    }  
+    }
+    
+    
+    private static Term timeoutTerm = new TermImpl("timeout");
+    
+    class CheckTimeout extends Thread {
+        
+        private long timeout = 0;
+        private String idInPending;
+        private Circumstance c;
+        
+        public CheckTimeout(long to, String rw, Circumstance c) {
+            this.timeout = to;
+            this.idInPending = rw;
+            this.c = c;
+        }
+        
+        public void run() {
+            try {
+                sleep(timeout);
+
+                // if the intention is still in PI, brings it back to C.I
+                Intention intention = c.getPendingIntentions().remove(idInPending);
+                if (intention != null) {
+                    // unify "timeout" with the .send fourth parameter
+                    BodyLiteral send = intention.peek().removeCurrentStep();
+                    intention.peek().getUnif().unifies(send.getTerm().getTerm(3), timeoutTerm);
+                    // add the intention back in the C.I
+                    c.addIntention(intention);
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 }
