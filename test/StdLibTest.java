@@ -42,16 +42,16 @@ public class StdLibTest extends TestCase {
         
         intention1 = new Intention();
         Plan p = Plan.parse("+!g0 : true <- !g1; !g4.");
-        intention1.push(new IntendedMeans(new Option(p,new Unifier())));
+        intention1.push(new IntendedMeans(new Option(p,new Unifier()), null));
         
         p = Plan.parse("+!g1 : true <- !g2.");
-        intention1.push(new IntendedMeans(new Option(p,new Unifier())));
+        intention1.push(new IntendedMeans(new Option(p,new Unifier()), null));
 
         p = Plan.parse("+!g2 : true <- !g4; f;g.");
-        intention1.push(new IntendedMeans(new Option(p,new Unifier())));
+        intention1.push(new IntendedMeans(new Option(p,new Unifier()), null));
         
         p4 = Plan.parse("+!g4 : true <- h.");
-        intention1.push(new IntendedMeans(new Option(p4,new Unifier())));
+        intention1.push(new IntendedMeans(new Option(p4,new Unifier()), null));
 
         p5 = Plan.parse("+!g5 : true <- i.");
         
@@ -245,7 +245,7 @@ public class StdLibTest extends TestCase {
         TransitionSystem ts = new TransitionSystem(null, c, null, null);
         new dropGoal().drop(ts, Literal.parseLiteral("g2"), true, new Unifier());
         assertEquals(intention1.size(), 1);
-        intention1.push(new IntendedMeans(new Option(p4,new Unifier())));
+        intention1.push(new IntendedMeans(new Option(p4,new Unifier()), null));
         new dropGoal().drop(ts, Literal.parseLiteral("g4"), true, new Unifier());
         assertTrue(intention1.isFinished());
     }

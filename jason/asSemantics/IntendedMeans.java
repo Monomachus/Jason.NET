@@ -44,12 +44,20 @@ public class IntendedMeans implements Serializable {
 
 	protected Unifier unif = null;
 	protected Plan plan;
-	protected Trigger trigger;
+	private Trigger trigger; // the trigger that create this IM
     
-    public IntendedMeans(Option opt) {
+    public IntendedMeans(Option opt, Trigger te) {
     	plan = (Plan)opt.plan.clone();
     	unif = (Unifier)opt.unif.clone();
-        trigger = plan.getTriggerEvent();
+        if (te == null) {
+            trigger = plan.getTriggerEvent();
+        } else {
+            trigger = te;
+            // import annots of the trigger into the plan's te
+            // so that the event +!g[source(ag1)] will add source(ag1)
+            // in the TE of the plan
+            plan.getTriggerEvent().getLiteral().importAnnots(trigger.getLiteral());
+        }
     }
 
     /** removes the current action of the IM */

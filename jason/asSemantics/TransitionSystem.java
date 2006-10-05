@@ -297,8 +297,7 @@ public class TransitionSystem {
 
     private void applyAddIM() throws JasonException {
         // create a new intended means
-        IntendedMeans im = new IntendedMeans(conf.C.SO);
-        im.setTrigger((Trigger) conf.C.SE.getTrigger().clone());
+        IntendedMeans im = new IntendedMeans(conf.C.SO, (Trigger)conf.C.SE.getTrigger().clone());
 
         // Rule ExtEv
         if (conf.C.SE.intention == Intention.EmptyInt) {
@@ -583,7 +582,6 @@ public class TransitionSystem {
         for (Plan pl : candidateRPs) {
             Unifier relUn = pl.relevant(te);
             if (relUn != null) {
-                //relUn.removeUngroundVars();
                 rp.add(new Option(pl, relUn));
             }
         }

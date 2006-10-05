@@ -126,7 +126,7 @@ public class wait extends DefaultInternalAction {
                 c.removeEventListener(this);
 
                 // add SI again in C.I if it was not removed and this 
-		// wait was not dropped
+                // wait was not dropped
                 if (!c.getIntentions().contains(si) && !drop) {
                     si.peek().removeCurrentStep();
                     c.addIntention(si);
@@ -176,7 +176,8 @@ public class wait extends DefaultInternalAction {
             }
         }
 
-        public void intentionAdded(Intention i) {  }
+        public void intentionAdded(Intention i) {  
+        }
         
         public String toString() {
             return sTE;

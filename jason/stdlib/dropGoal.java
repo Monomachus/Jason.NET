@@ -62,18 +62,18 @@ public class dropGoal extends DefaultInternalAction {
         Circumstance C = ts.getC();
         
         for (Intention i: C.getIntentions()) {
-            if (dropIntention(i, g, success, ts, un) == 2) {
+            if (dropIntention(i, g, success, ts, un) > 1) {
                 C.removeIntention(i);
             }
         }
-
+        
         // dropping the current intention?
         dropIntention(C.getSelectedIntention(), g, success, ts, un);
             
         // dropping G in Events
         for (Event e: C.getEvents()) {
             Intention i = e.getIntention();
-            if (dropIntention(i, g, success, ts, un) == 2) {
+            if (dropIntention(i, g, success, ts, un) > 1) {
                 C.removeEvent(e);
             }
         }
@@ -95,7 +95,7 @@ public class dropGoal extends DefaultInternalAction {
             int r = dropIntention(i, g, success, ts, un);
             if (r > 0) { // i was changed
                 C.dropPendingIntention(i); // remove i from PI
-                if (r == 1) { // i must continue running
+                if (r == 1) { // intention i must continue running
                     C.addIntention(i); // and put the intention back in I
                 }
             }
@@ -118,10 +118,10 @@ public class dropGoal extends DefaultInternalAction {
                 if (failEvent != null) {
                     ts.getC().addEvent(failEvent);
                     ts.getLogger().warning(".dropGoal is generating goal deletion event " + failEvent.getTrigger());
-                    return 1;
+                    return 2;
                 } else {
                     ts.getLogger().warning(".dropGoal is removing intention\n" + i);
-                    return 2;
+                    return 3;
                 }
             }
         }
