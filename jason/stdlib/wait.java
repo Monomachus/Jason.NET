@@ -44,9 +44,9 @@ public class wait extends DefaultInternalAction {
      * if string it is the trigger event to be waited. this second use also
      * receive the timeout (in ms) as parameter.
      * 
-     * E.g.: .wait(1000) // waits 1 second 
-     * .wait("+!t(50)") // waits the event
-     * +!t(50) .wait("+!t(50)", 2000) // waits the event +!t(50) for 2 seconds
+     * <p>E.g.: .wait(1000) // waits 1 second <br/>
+     * .wait("+!t(50)") // waits the event<br/>
+     * +!t(50) .wait("+!t(50)", 2000) // waits the event +!t(50) for 2 seconds<br/>
      * 
      */
     @Override
@@ -125,7 +125,8 @@ public class wait extends DefaultInternalAction {
                 // unregister (to not receive intentionAdded again)
                 c.removeEventListener(this);
 
-                // add SI again in C.I if it was removed and this wait was dropped
+                // add SI again in C.I if it was not removed and this 
+		// wait was not dropped
                 if (!c.getIntentions().contains(si) && !drop) {
                     si.peek().removeCurrentStep();
                     c.addIntention(si);
