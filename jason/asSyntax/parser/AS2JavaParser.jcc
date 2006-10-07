@@ -33,6 +33,7 @@ PARSER_BEGIN(as2j)
   import java.util.*;
   import java.io.*;
   import jason.asSyntax.*;
+  import jason.asSyntax.directives.*;
   import jason.asSemantics.*;
   import jason.bb.*;
   import jason.*;
@@ -154,25 +155,74 @@ void initial_goals(Agent a) : { Literal g; }
 }
 
 /* Plans */
-PlanLibrary plan_base(List bbl) : { PlanLibrary pp = new PlanLibrary(); Plan pl;  }
+PlanLibrary plan_base(List bbl) : { PlanLibrary pp = new PlanLibrary(); 
+                                    Plan pl;
+                                    Pred dir;
+                                    Pred lastBegin = null;
+                                    List plansForDirective = null;
+                                  }
 {
   ( pl = plan()    { try {
-                       pp.add(pl); 
+                       if (lastBegin == null) {
+                          pp.add(pl); 
+                       } else {
+                          plansForDirective.add(pl);
+                       }
                      } catch (JasonException je) {
                        System.err.println("Error adding plan:"+je);
                      }
-                   } 
-    | directive(bbl,pp)
+                   }
+                   
+    | dir = directive(bbl, pp)
+                   { if (dir != null) {
+                       // it is a begin or end
+                       if (dir.getFunctor().equals("end")) {
+                          DirectiveProcessor.process(lastBegin, plansForDirective, bbl, pp); 
+                          lastBegin = null;
+                       } else {
+                          lastBegin = dir;
+                          plansForDirective = new ArrayList();
+                       }
+                     }      
+                   }
+                   
   )*
-                   { return pp; }
+                   { if (lastBegin != null) {
+                        throw new ParseException("The directive '"+lastBegin+"' does not finish with an 'end'.");
+                     }
+                     return pp; 
+                   }
 }
 
 /* Directive */
-void directive(List bbl, PlanLibrary pp) : { Pred d; }
+Pred directive(List bbl, PlanLibrary pl) : 
+                   { 
+                             Pred d1 = null, d2 = null;
+                             boolean isBegin = false; 
+                             boolean isEnd = false;
+                   }
 {
   "{"
-   d = atom()        { Directives.process(d, bbl, pp); }
+   d1 = atom()     { isBegin = d1.getFunctor().equals("begin");
+                     isEnd = d1.getFunctor().equals("end");
+                   }
+   [ d2 = atom() 
+                   { if (!isBegin) {
+                        throw new ParseException("Directive: a second atom must follow 'begin'.");
+                     }
+                   }
+   ]
   "}"
+                   { if (isBegin) {
+                        return d2;
+                     } else if (isEnd) {
+                        return d1;
+                     } else {
+                        // it is not begin/end directive, process it
+                        DirectiveProcessor.process(d1, null, bbl, pl); 
+                        return null;
+                     }
+                   }
 }
 
 

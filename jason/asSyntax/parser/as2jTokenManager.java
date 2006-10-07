@@ -3,6 +3,7 @@ package jason.asSyntax.parser;
 import java.util.*;
 import java.io.*;
 import jason.asSyntax.*;
+import jason.asSyntax.directives.*;
 import jason.asSemantics.*;
 import jason.bb.*;
 import jason.*;

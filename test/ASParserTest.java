@@ -8,7 +8,10 @@ import jason.asSyntax.NumberTerm;
 import jason.asSyntax.Plan;
 import jason.asSyntax.RelExprTerm;
 import jason.asSyntax.Term;
+import jason.asSyntax.parser.ParseException;
+import jason.asSyntax.parser.as2j;
 
+import java.io.StringReader;
 import java.util.Iterator;
 
 import junit.framework.TestCase;
@@ -100,5 +103,57 @@ public class ASParserTest extends TestCase {
         solve = ((LogExprTerm) t1).logCons(null, new Unifier());
         assertTrue(solve.hasNext());
 
+    }
+
+    public void testDirectives() {
+        String 
+        source =  " b(10). ";
+        source += " { begin bcg(at(X,Y), ebdg(at(X,Y))) } \n";
+        source += "    +!at(X,Y) : b(X) <- go(X). ";
+        source += "    +!at(X,Y) : not b(X) <- go(3). ";
+        source += " { end }";
+
+
+        try {
+            as2j parser = new as2j(new StringReader(source));
+            Agent a = new Agent();
+            parser.agent(a);
+            assertTrue(a.getPL().getPlans().size() == 6);
+
+            source =  " { begin omc(at(X,Y), no_battery, no_beer) } \n";
+            source += "    +!at(X,Y) : b(X) <- go(X). ";
+            source += "    +!at(X,Y) : not b(X) <- go(3). ";
+            source += " { end }";
+            parser = new as2j(new StringReader(source));
+            a = new Agent();
+            parser.agent(a);
+            assertTrue(a.getPL().getPlans().size() == 8);
+
+            source =  " { begin mg(at(10,10)) } \n";
+            source += "    +!at(X,Y) : b(X) <- go(X). ";
+            source += "    +!at(X,Y) : not b(X) <- go(3). ";
+            source += " { end }";
+            parser = new as2j(new StringReader(source));
+            a = new Agent();
+            parser.agent(a);
+            //for (Plan p: a.getPL().getPlans()) {
+            //    System.out.println(p);
+            //}
+            assertTrue(a.getPL().getPlans().size() == 7);
+            assertTrue(a.getBB().size() == 1);
+
+            source =  " { begin sga(\"+go(X,Y)\", \"(at(home) & not c)\", at(X,Y)) } \n";
+            source += " { end }";
+            parser = new as2j(new StringReader(source));
+            a = new Agent();
+            parser.agent(a);
+            //for (Plan p: a.getPL().getPlans()) {
+            //    System.out.println(p);
+            //}
+            assertTrue(a.getPL().getPlans().size() == 5);
+        
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
     }
 }
