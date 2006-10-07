@@ -37,6 +37,8 @@ public class DirectiveProcessor {
     
     // add known directives
     static {
+        addDirective("include", new Include());
+
         addDirective("dg", new DG());
         addDirective("bdg", new BDG());
         addDirective("ebdg", new EBDG());

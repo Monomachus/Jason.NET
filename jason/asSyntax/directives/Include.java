@@ -16,11 +16,6 @@ public class Include implements Directive {
 
     static Logger logger = Logger.getLogger(Include.class.getName());
 
-    static {
-        // "register" in the processor
-        DirectiveProcessor.addDirective("include", new Include());
-    }
-    
     public boolean process(Pred directive, List<Plan> innerPlans, List bels, PlanLibrary pl) {
         return processInclude(((StringTerm)directive.getTerm(0)).getString(), bels, pl);
     }
