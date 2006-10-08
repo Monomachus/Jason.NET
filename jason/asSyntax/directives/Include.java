@@ -4,6 +4,7 @@ import jason.asSyntax.Plan;
 import jason.asSyntax.PlanLibrary;
 import jason.asSyntax.Pred;
 import jason.asSyntax.StringTerm;
+import jason.asSyntax.Literal;
 import jason.asSyntax.parser.as2j;
 
 import java.io.FileInputStream;
@@ -16,7 +17,7 @@ public class Include implements Directive {
 
     static Logger logger = Logger.getLogger(Include.class.getName());
 
-    public boolean process(Pred directive, List<Plan> innerPlans, List bels, PlanLibrary pl) {
+    public boolean process(Pred directive, List<Plan> innerPlans, List<Literal> bels, PlanLibrary pl) {
         return processInclude(((StringTerm)directive.getTerm(0)).getString(), bels, pl);
     }
 
