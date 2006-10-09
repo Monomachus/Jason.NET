@@ -12,10 +12,31 @@
 
 /* ---- tell performatives ---- */ 
 
-@kqmlReceivedTell
-+!kqmlReceived(S, tell, KQMLcontentVar, M) : true 
+@kqmlReceivedTellStructure
++!kqmlReceived(S, tell, KQMLcontentVar, M) 
+   :  .structure(KQMLcontentVar) & 
+      .ground(KQMLcontentVar) & 
+       not .list(KQMLcontentVar)
    <- .addAnnot(KQMLcontentVar, source(S), CA); 
       +CA.
+@kqmlReceivedTellList
++!kqmlReceived(S, tell, KQMLcontentVar, M) 
+   :  .list(KQMLcontentVar)
+   <- !addAllkqmlReceived(S,KQMLcontentVar).
+@kqmlReceivedTellList1
++!addAllkqmlReceived(_,[]).   
+@kqmlReceivedTellList2
++!addAllkqmlReceived(S,[H|T])
+   :  .structure(H) & 
+      .ground(H) & 
+       not .list(H)
+   <- .addAnnot(H, source(S), CA); 
+      +CA;
+      !addAllkqmlReceived(S,T).
+@kqmlReceivedTellList3
++!addAllkqmlReceived(S,[_|T])
+   <- !addAllkqmlReceived(S,T).
+      
 @kqmlReceivedUnTell
 +!kqmlReceived(S, untell, KQMLcontentVar, M) : true 
    <- .addAnnot(KQMLcontentVar, source(S), CA); 

@@ -91,6 +91,11 @@ public class NumberTermImpl extends TermImpl implements NumberTerm {
 	public boolean isNumeric() {
 		return true;
 	}
+
+    @Override
+    public boolean isStructure() {
+        return false;
+    }
 	
     @Override
     public boolean equals(Object o) {

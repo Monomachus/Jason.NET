@@ -76,9 +76,15 @@ public class StringTermImpl extends TermImpl implements StringTerm {
 		}
 	}
 
+    @Override
 	public boolean isString() {
 		return true;
 	}
+
+    @Override
+    public boolean isStructure() {
+        return false;
+    }
 	
 	public int length() {
 		return getString().length();

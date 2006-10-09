@@ -337,6 +337,10 @@ public class TermImpl implements Term, Serializable {
         return true;
     }
 
+    public boolean isStructure() {
+        return true;
+    }
+
     public void makeVarsAnnon() {
         for (int i=0; i<getTermsSize(); i++) {
             if (getTerm(i).isVar()) {

@@ -88,6 +88,8 @@ public interface Term extends Cloneable, Comparable<Term>, Serializable {
 
     public boolean isGround();
 
+    public boolean isStructure();
+
     public boolean hasVar(Term t);
 
     public void makeVarsAnnon();

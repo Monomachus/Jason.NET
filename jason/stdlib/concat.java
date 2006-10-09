@@ -32,45 +32,61 @@ import jason.asSyntax.StringTerm;
 import jason.asSyntax.StringTermImpl;
 import jason.asSyntax.Term;
 
+/**
+<p>Internal action: <b><code>.concat</code></b>.
+
+<p>Description: concatenate string or lists. 
+
+<p>Parameters:<ul>
+<li>+ arg[0] ... + arg[n-1] (string or list): the terms to be concatenated.<br/>
+<li>+- arg[n]: the result of the concatenation. 
+</ul>
+
+<p>Examples:<ul>
+<li> <code>.concat("a","b",X)</code>: X unifies with "ab".
+<li> <code>.concat("a","b","a")</code>: fail.
+<li> <code>.concat("a","b","c", "d", X)</code>: X unifies with "abcd".
+<li> <code>. concat([a,b,c],[d,e],[f,g],X)</code>: X unifies with [a,b,c,d,e,f,g].
+</ul>
+*/
 public class concat extends DefaultInternalAction {
 
-	/**
-	 * Concat list args[0] with args[1] and unifies with args[2]
-	 */
-    @Override
+	@Override
 	public Object execute(TransitionSystem ts, Unifier un, Term[] args)	throws Exception {
-		Term l1 = (Term)args[0].clone();
-		Term l2 = (Term)args[1].clone();
-		Term l3 = (Term)args[2].clone();
-		un.apply(l1);
-		un.apply(l2);
-		un.apply(l3);
+        Term[] clones = new Term[args.length-1];
+        for (int i=0; i < clones.length; i++) {
+            clones[i] = (Term)args[i].clone();
+            un.apply(clones[i]);
+        }
+		Term result = (Term)args[clones.length].clone();
+		un.apply(result);
 		
-		if (l1.isList()) {
-			if (!l2.isList()) {
-				throw new JasonException("arg[1] is not a list (concat)");
+		if (clones[0].isList()) {
+            for (int i=1; i<clones.length; i++) {
+    			if (!clones[i].isList()) {
+    				throw new JasonException("arg["+i+"] is not a list in concat.");
+    			} else {
+    			    ((ListTerm)clones[0]).concat((ListTerm)clones[i]);
+                }
+            }
+			if (!result.isVar() && !result.isList()) {
+				throw new JasonException("last argument of concat is not a list or variable.");
 			}
-			if (!l3.isVar() && !l3.isList()) {
-				throw new JasonException("arg[2] is not a list or variable (concat)");
-			}
-		
-			ListTerm l1l = (ListTerm)l1;
-			l1l.concat((ListTerm)l2);
-			return un.unifies(l3, l1l);
-		} else {
-			String v1 = l1.toString();
-			if (l1.isString()) {
-				v1 = ((StringTerm)l1).getString();
-			}
-			String v2 = l2.toString();
-			if (l2.isString()) {
-				v2 = ((StringTerm)l2).getString();
-			}
-			if (!l3.isVar() && !l3.isString()) {
-				throw new JasonException("arg[2] is not a string or variable (concat)");
-			}
-		
-			return un.unifies(l3, new StringTermImpl(v1+v2));
+			return un.unifies(clones[0], result);
+		} else if (clones[0].isString()) {
+            StringBuffer sr = new StringBuffer(((StringTerm)clones[0]).getString());
+            for (int i=1; i<clones.length; i++) {
+                if (!clones[i].isString()) {
+                    throw new JasonException("arg["+i+"] is not a string (in concat).");
+                } else {
+                    sr.append(((StringTerm)clones[i]).getString());
+                }
+            }
+            if (!result.isVar() && !result.isString()) {
+                throw new JasonException("last argument of concat is not a string or variable.");
+            }
+            return un.unifies(new StringTermImpl(sr.toString()), result);
 		}
+        return false;
 	}
 }

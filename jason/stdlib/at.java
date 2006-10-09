@@ -24,29 +24,49 @@
 
 package jason.stdlib;
 
-import jason.*;
-import jason.asSemantics.*;
-import jason.asSyntax.*;
+import jason.JasonException;
+import jason.asSemantics.Circumstance;
+import jason.asSemantics.DefaultInternalAction;
+import jason.asSemantics.Event;
+import jason.asSemantics.Intention;
+import jason.asSemantics.TransitionSystem;
+import jason.asSemantics.Unifier;
+import jason.asSyntax.StringTerm;
+import jason.asSyntax.Term;
+import jason.asSyntax.Trigger;
 
+/**
+  <p>Internal action: <b><code>.at</code></b>.
+  
+  <p>Description: add an event at some time in future. This command is 
+  based on the unix at command, although not fully implemented yet.
+  
+  <p>Parameters:<ul>
+  <li>+ arg[0] (string): the time for the event to be generated.<br/>
+
+      The syntax of this string in the current implementation has
+      the following format:<br>
+      <blockquote> 
+        <code>now + &lt;number> [&lt;time_unit>]</code>
+      </blockquote > where &lt;time_unit> can be
+      "s" or "second(s)",  "m" or "minute(s)", "h" or "hour(s)", 
+      "d" or "day(s)".
+      The default &lt;time_unit> is miliseconds.<br/><br/>
+
+  <li>+ arg[1] (string): the event. The string of the event will be
+      parsed as a trigger event. (see Jason syntax)
+  </ul>
+  
+  <p>Examples:<ul>
+  <li> <code>.at("now +3 minutes", "+!g")</code>: generate the event <code>+!g</code> 
+       at 1 minute from now.
+  <li> <code>.at("now +1 m", "+!g")</code>
+  <li> <code>.at("now +2 h", "+!g")</code>
+  </ul>
+
+ */
 public class at extends DefaultInternalAction {
      
-   /**
-	 * arg[0] is the time for the event (as string)
-	 * arg[1] is the event (as string).
-	 *
-	 * <p>The current implementation format for the time is (based
-	 * on the unix at command):
-	 * <p><code>"now +" number [time_unit]</code> where time_unit can be
-	 *    s or second(s),
-	 *    m or minute(s),
-	 *    h or hour(s),
-	 *    d or day(s).
-	 * the default time_unit is miliseconds
-	 *
-	 * E.g. at("now +1 minute", "+!g"), 
-	 *      at("now +1 m", "+!g")
-	 *      at("now +2 h", "+!g")
-	 */
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         try {
@@ -118,7 +138,6 @@ public class at extends DefaultInternalAction {
         public void run() {
             try {
                 sleep(deadline);
-
 				// add event in C.Events
 				c.addEvent(event);
             } catch (InterruptedException e) {

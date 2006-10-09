@@ -3,10 +3,12 @@ package jason.asSemantics;
 import jason.asSyntax.Term;
 
 /**
- * Default implementation of the internal action interface. Useful to
- * create new internal actions.
+ * Default implementation of the internal action interface (it simply returns false 
+ * for the interface methods).
  * 
- * @author jomi
+ * Useful to create new internal actions.
+ * 
+ * @author Jomi
  */
 public class DefaultInternalAction implements InternalAction {
     

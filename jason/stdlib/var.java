@@ -6,6 +6,25 @@ import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.Term;
 
+/**
+<p>Internal action: <b><code>.var</code></b>.
+
+<p>Description: check whether the argument is a variable. 
+
+<p>Parameters:<ul>
+<li>+ arg[0] (any term): the term to be checked.<br/>
+</ul>
+
+<p>Examples:<ul>
+<li> <code>.var(X)</code>: success if X is free and fail otherwise.
+<li> <code>.var(b)</code>: fail.
+<li> <code>.var(10)</code>: fail.
+<li> <code>.var("home page")</code>: fail.
+<li> <code>.var(a(X))</code>: fail.
+<li> <code>.var([a,b,c])</code>: fail.
+</ul>
+
+*/
 public class var extends DefaultInternalAction {
 
     @Override
