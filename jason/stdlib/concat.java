@@ -35,16 +35,18 @@ import jason.asSyntax.Term;
 /**
 <p>Internal action: <b><code>.concat</code></b>.
 
-<p>Description: concatenate string or lists. 
+<p>Description: concatenate strings or lists. 
 
 <p>Parameters:<ul>
-<li>+ arg[0] ... + arg[n-1] (string or list): the terms to be concatenated.<br/>
+<li>+ arg[0] ... + arg[n-1] (any term): the terms to be concatenated.<br/>
 <li>+- arg[n]: the result of the concatenation. 
 </ul>
+Parameters that are not string are concatenated using the toString of it.
 
 <p>Examples:<ul>
 <li> <code>.concat("a","b",X)</code>: X unifies with "ab".
 <li> <code>.concat("a","b","a")</code>: fail.
+<li> <code>.concat("a b",1,a,X)</code>: X unifies with "a b1a".
 <li> <code>.concat("a","b","c", "d", X)</code>: X unifies with "abcd".
 <li> <code>. concat([a,b,c],[d,e],[f,g],X)</code>: X unifies with [a,b,c,d,e,f,g].
 </ul>
@@ -73,20 +75,23 @@ public class concat extends DefaultInternalAction {
 				throw new JasonException("last argument of concat is not a list or variable.");
 			}
 			return un.unifies(clones[0], result);
-		} else if (clones[0].isString()) {
-            StringBuffer sr = new StringBuffer(((StringTerm)clones[0]).getString());
+		} else {
+            String vl = clones[0].toString();
+            if (clones[0].isString()) {
+                vl = ((StringTerm)clones[0]).getString();
+            }
+            StringBuffer sr = new StringBuffer(vl);
             for (int i=1; i<clones.length; i++) {
-                if (!clones[i].isString()) {
-                    throw new JasonException("arg["+i+"] is not a string (in concat).");
-                } else {
-                    sr.append(((StringTerm)clones[i]).getString());
+                vl = clones[i].toString();
+                if (clones[i].isString()) {
+                    vl = ((StringTerm)clones[i]).getString();
                 }
+                sr.append(vl);
             }
             if (!result.isVar() && !result.isString()) {
                 throw new JasonException("last argument of concat is not a string or variable.");
             }
             return un.unifies(new StringTermImpl(sr.toString()), result);
 		}
-        return false;
 	}
 }
