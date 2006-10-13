@@ -34,11 +34,6 @@ public class ASParserTest extends TestCase {
         assertEquals(p.getBody().get(0).getType(), BodyLiteral.BodyType.internalAction);
         assertTrue(ag.parseAS("examples/Auction/ag2.asl"));
         assertTrue(ag.parseAS("examples/Auction/ag3.asl"));
-
-        ag = new Agent();
-        ag.setLogger(null);
-        assertTrue(ag.parseAS("examples/Test/as/ag0.asl"));
-        assertTrue(ag.parseAS("examples/Test/as/ag1.asl"));
     }
 
     public void testLogicalExpr() {
