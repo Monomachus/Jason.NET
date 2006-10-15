@@ -40,7 +40,7 @@ import org.w3c.dom.Element;
 /**
  * A Literal is a Pred with strong negation (~).
  */
-public class Literal extends Pred implements Cloneable {
+public class Literal extends Pred implements LogicalFormula {
 
 	private static final long serialVersionUID = 1L;
 
@@ -109,29 +109,28 @@ public class Literal extends Pred implements Cloneable {
      * Returns an iterator for all unifiers that are logCons.
      */
     @SuppressWarnings("unchecked")
-    @Override
-    public Iterator<Unifier> logCons(final Agent ag, final Unifier un) {
+    public Iterator<Unifier> logicalConsequence(final Agent ag, final Unifier un) {
         if (isInternalAction()) {
             try {
                 // calls execute
                 Object oresult = ag.getIA(this).execute(ag.getTS(), un, getTermsArray());
                 if (oresult instanceof Boolean && (Boolean)oresult) {
-                    return createUnifIterator(un);
+                    return LogExpr.createUnifIterator(un);
                 } else if (oresult instanceof Iterator) {
                     return ((Iterator<Unifier>)oresult);
                 }
             } catch (Exception e) {
                 logger.log(Level.SEVERE,"Error in IA ",e);
             }
-            return EMPTY_UNIF_LIST.iterator();  // empty iterator for unifier
+            return LogExpr.EMPTY_UNIF_LIST.iterator();  // empty iterator for unifier
         } else if (this == LTrue) {
-            return createUnifIterator(un);            
+            return LogExpr.createUnifIterator(un);            
         } else if (this == LFalse) {
-            return EMPTY_UNIF_LIST.iterator();            
+            return LogExpr.EMPTY_UNIF_LIST.iterator();            
         } else {
             final Iterator<Literal> il = ag.getBB().getRelevant(this);
             if (il == null)
-                return TermImpl.EMPTY_UNIF_LIST.iterator();
+                return LogExpr.EMPTY_UNIF_LIST.iterator();
 
             return new Iterator<Unifier>() {
                 Unifier current = null;
@@ -188,7 +187,7 @@ public class Literal extends Pred implements Cloneable {
                             Unifier ruleUn = new Unifier();
                             if (ruleUn.unifies(h, rule)) {
                                 //System.out.println("indo com "+h+" rule="+rule+" un="+ruleUn);
-                                ruleIt = rule.getBody().logCons(ag,ruleUn);
+                                ruleIt = rule.getBody().logicalConsequence(ag,ruleUn);
                                 get();
                                 //System.out.println("get="+current+" - "+il.hasNext());
                                 if (current != null) { // if it get a value

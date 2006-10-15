@@ -5,7 +5,6 @@ import jason.asSyntax.Literal;
 import jason.asSyntax.Plan;
 import jason.asSyntax.PlanLibrary;
 import jason.asSyntax.Pred;
-import jason.asSyntax.Term;
 import jason.asSyntax.BodyLiteral.BodyType;
 import jason.asSyntax.directives.Directive;
 
@@ -30,7 +29,7 @@ public class DG implements Directive {
             
             // add all inner plans with ?g in the end
             for (Plan p: innerPlans) {
-                BodyLiteral b = new BodyLiteral(BodyType.test, (Term)goal.clone());
+                BodyLiteral b = new BodyLiteral(BodyType.test, (Literal)goal.clone());
                 p.getBody().add(b);
                 pl.add(p);
             }

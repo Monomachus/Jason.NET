@@ -45,7 +45,7 @@ public class Plan implements Cloneable, Serializable {
 
 	protected Pred              label  = null;
     protected Trigger           tevent = null;
-    protected Term              context;
+    protected LogicalFormula    context;
     protected List<BodyLiteral> body;
     
     private boolean isAtomic = false;
@@ -73,13 +73,13 @@ public class Plan implements Cloneable, Serializable {
     public Plan() {
     }
     
-    public Plan(Trigger te, Term ct, ArrayList<BodyLiteral> bd) {
+    public Plan(Trigger te, LogicalFormula ct, ArrayList<BodyLiteral> bd) {
         tevent = te;
         setContext(ct);
         setBody(bd);
     }
     
-    public Plan(Pred lb, Trigger te, Term ct, ArrayList<BodyLiteral> bd) {
+    public Plan(Pred lb, Trigger te, LogicalFormula ct, ArrayList<BodyLiteral> bd) {
         tevent = te;
         setLabel(lb);
         setContext(ct);
@@ -108,9 +108,9 @@ public class Plan implements Cloneable, Serializable {
         return label;
     }
     
-    public void setContext(Term le) {
+    public void setContext(LogicalFormula le) {
         context = le;
-        if (le != null && le.isLiteral() && ((Literal) le).equals(Literal.LTrue)) {
+        if (le != null && le instanceof Literal && ((Literal) le).equals(Literal.LTrue)) {
             context = null;
         }
     }
@@ -149,7 +149,7 @@ public class Plan implements Cloneable, Serializable {
         return tevent;
     }
     
-    public Term getContext() {
+    public LogicalFormula getContext() {
         return context;
     }
     
@@ -217,7 +217,7 @@ public class Plan implements Cloneable, Serializable {
         p.tevent = (Trigger) tevent.clone();
         
         if (context != null) {
-            p.setContext((Term) context.clone());
+            p.setContext((LogicalFormula) context.clone());
         }
         
         List<BodyLiteral> copy = new LinkedList<BodyLiteral>(); // the plan will be "consumed" by remove(0), so linkedlist

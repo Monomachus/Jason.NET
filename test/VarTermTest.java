@@ -1,7 +1,7 @@
 package test;
 
 import jason.asSemantics.Unifier;
-import jason.asSyntax.ArithExprTerm;
+import jason.asSyntax.ArithExpr;
 import jason.asSyntax.ListTerm;
 import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Literal;
@@ -11,7 +11,7 @@ import jason.asSyntax.Pred;
 import jason.asSyntax.Term;
 import jason.asSyntax.TermImpl;
 import jason.asSyntax.VarTerm;
-import jason.asSyntax.ArithExprTerm.ArithmeticOp;
+import jason.asSyntax.ArithExpr.ArithmeticOp;
 
 import java.util.Iterator;
 
@@ -174,11 +174,11 @@ public class VarTermTest extends TestCase {
         assertTrue(k.isNumeric());
         assertFalse(k.isLiteral());
 
-        ArithExprTerm exp = new ArithExprTerm(k, ArithmeticOp.plus, new NumberTermImpl(20));
+        ArithExpr exp = new ArithExpr(k, ArithmeticOp.plus, new NumberTermImpl(20));
         assertTrue(exp.solve() == 30d);
-        NumberTerm nt = ArithExprTerm.parseExpr("5 div 2");
+        NumberTerm nt = ArithExpr.parseExpr("5 div 2");
         assertTrue(nt.solve() == 2d);
-        nt = ArithExprTerm.parseExpr("5 mod 2");
+        nt = ArithExpr.parseExpr("5 mod 2");
         assertTrue(nt.solve() == 1d);
     }
 
@@ -248,7 +248,7 @@ public class VarTermTest extends TestCase {
     public void testSimple1() {
         Term um = new NumberTermImpl(1);
         Term dois = new NumberTermImpl(2);
-        Term exp = ArithExprTerm.parse("X+1");
+        Term exp = ArithExpr.parse("X+1");
         Unifier u = new Unifier();
         u.unifies(new VarTerm("X"), new NumberTermImpl(1));
         // X+1 not unifies with 1

@@ -30,17 +30,17 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
- * A rule is a Literal (head) with a body, as in a :- b & c.
+ * A rule is a Literal (head) with an optional body, as in "a :- b &amp; c".
  */
 public class Rule extends Literal {
 
 	private static final long serialVersionUID = 1L;
 
-	private Term          body   = null;
+	private LogicalFormula body   = null;
 
-    static private Logger logger = Logger.getLogger(Rule.class.getName());
+    static private Logger  logger = Logger.getLogger(Rule.class.getName());
 
-    public Rule(Literal head, Term body) {
+    public Rule(Literal head, LogicalFormula body) {
         super(head);
         if (isInternalAction()) {
             logger.log(Level.SEVERE,"The rule head ("+head+") can not be an internal action!");
@@ -69,12 +69,12 @@ public class Rule extends Literal {
         return super.hashCode() + body.hashCode();
     }
     
-    public Term getBody() {
+    public LogicalFormula getBody() {
         return body;
     }
     
     public Object clone() {
-        return new Rule(this, (Term)body.clone());
+        return new Rule(this, (LogicalFormula)body.clone());
     }
 
     public Literal headClone() {

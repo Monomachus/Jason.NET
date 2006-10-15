@@ -191,19 +191,18 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
     }
 
     @Override
-    public Iterator<Unifier> logCons(Agent ag, Unifier un) {
-        if (value != null)
-            return value.logCons(ag, un);
+    public Iterator<Unifier> logicalConsequence(Agent ag, Unifier un) {
+        if (value != null && value instanceof LogicalFormula)
+            return ((LogicalFormula)value).logicalConsequence(ag, un);
         else {
             // try to apply
             VarTerm c = (VarTerm) this.clone();
             un.apply(c);
-            if (c.hasValue()) {
-                return c.getValue().logCons(ag, un);
+            if (c.hasValue() && c.getValue() instanceof LogicalFormula) {
+                return ((LogicalFormula)c.getValue()).logicalConsequence(ag, un);
             }
-            return null;
         }
-
+        return null;
     }
 
     @Override

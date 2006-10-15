@@ -28,7 +28,10 @@ import jason.asSemantics.Unifier;
 import jason.asSyntax.parser.as2j;
 
 import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -37,11 +40,13 @@ import org.w3c.dom.Element;
 
 
 /** 
- *  represents a logical expression like [ <le> ] < & | "|" | not > <le>.
+ *  represents a logical formula with some logical operator ("&amp;",  "|", "not").
  */
-public class LogExprTerm extends TermImpl {
+public class LogExpr implements LogicalFormula {
 
 	private static final long serialVersionUID = 1L;
+
+    public static final List<Unifier> EMPTY_UNIF_LIST = Collections.emptyList();
 
 	public enum LogicalOp { 
 		none   { public String toString() { return ""; } }, 
@@ -50,46 +55,39 @@ public class LogExprTerm extends TermImpl {
 		or     { public String toString() { return " | "; } };
 	}
 
-	private  Term lhs, rhs;
-	private  LogicalOp op = LogicalOp.none;
+	private  LogicalFormula lhs, rhs;
+	private  LogicalOp      op = LogicalOp.none;
 
-	static private Logger logger = Logger.getLogger(LogExprTerm.class.getName());
+	static private Logger logger = Logger.getLogger(LogExpr.class.getName());
 	
-	public LogExprTerm() {
+	public LogExpr() {
 		super();
 	}
 	
-	public LogExprTerm(Term t1, LogicalOp oper, Term t2) {
-		lhs = t1;
+	public LogExpr(LogicalFormula f1, LogicalOp oper, LogicalFormula f2) {
+		lhs = f1;
 		op = oper;
-		rhs = t2;
+		rhs = f2;
 	}
 
-	public LogExprTerm(LogicalOp oper, Term t1) {
+	public LogExpr(LogicalOp oper, LogicalFormula f) {
 		op = oper;
-		rhs = t1;
+		rhs = f;
 	}
     
-    /** 
-     * logCons checks whether one particular predicate
-     * is a log(ical)Cons(equence) of the belief base.
-     * 
-     * Returns an iterator for all unifiers that are logCons.
-     */
-    @Override
-    public Iterator<Unifier> logCons(final Agent ag, Unifier un) {
+    public Iterator<Unifier> logicalConsequence(final Agent ag, Unifier un) {
         try {
 	        final Iterator<Unifier> ileft;
 	        switch (op) {
 	        
 	        case not:
-	            if (!rhs.logCons(ag,un).hasNext()) {
+	            if (!rhs.logicalConsequence(ag,un).hasNext()) {
 	                return createUnifIterator(un);
 	            }
 	            break;
 	        
 	        case and:
-	            ileft = lhs.logCons(ag,un);
+	            ileft = lhs.logicalConsequence(ag,un);
 	            return new Iterator<Unifier>() {
 	                Unifier current = null;
 	                Iterator<Unifier> iright = null;
@@ -106,7 +104,7 @@ public class LogExprTerm extends TermImpl {
 	                private void get() {
 	                    current = null;
 	                    while ((iright == null || !iright.hasNext()) && ileft.hasNext()) {
-	                        iright = rhs.logCons(ag, ileft.next());
+	                        iright = rhs.logicalConsequence(ag, ileft.next());
 	                    }
 	                    if (iright != null && iright.hasNext()) {
 	                        current = iright.next();
@@ -116,8 +114,8 @@ public class LogExprTerm extends TermImpl {
 	            };
 	            
 	        case or:
-	            ileft = lhs.logCons(ag,un);
-	            final Iterator<Unifier> iright = rhs.logCons(ag,un);
+	            ileft = lhs.logicalConsequence(ag,un);
+	            final Iterator<Unifier> iright = rhs.logicalConsequence(ag,un);
 	            return new Iterator<Unifier>() {
 	                Unifier current = null;
 	                public boolean hasNext() {
@@ -144,7 +142,7 @@ public class LogExprTerm extends TermImpl {
     	    } catch (Exception e) {
         		String slhs = "is null";
         		if (lhs != null) {
-        			Iterator<Unifier> i = lhs.logCons(ag,un);
+        			Iterator<Unifier> i = lhs.logicalConsequence(ag,un);
         			if (i != null) {
         				slhs = "";
         				while (i.hasNext()) {
@@ -156,7 +154,7 @@ public class LogExprTerm extends TermImpl {
         		} 
         		String srhs = "is null";
         		if (lhs != null) {
-        			Iterator<Unifier> i = rhs.logCons(ag,un);
+        			Iterator<Unifier> i = rhs.logicalConsequence(ag,un);
         			if (i != null) {
         				srhs = "";
         				while (i.hasNext()) {
@@ -172,11 +170,20 @@ public class LogExprTerm extends TermImpl {
         return EMPTY_UNIF_LIST.iterator();  // empty iterator for unifier
     }   
 
-    /** returns some Term that can be evaluated */
-    public static Term parseExpr(String sExpr) {
+    /** create an iterator for a list of unifiers */
+    static public Iterator<Unifier> createUnifIterator(Unifier... unifs) {
+        List<Unifier> r = new ArrayList<Unifier>(unifs.length);
+        for (int i=0; i<unifs.length; i++) {
+            r.add(unifs[i]);
+        }
+        return r.iterator();
+    }
+
+    /** returns some LogicalFormula that can be evaluated */
+    public static LogicalFormula parseExpr(String sExpr) {
         as2j parser = new as2j(new StringReader(sExpr));
         try {
-            return (Term)parser.log_expr();
+            return (LogicalFormula)parser.log_expr();
         } catch (Exception e) {
             logger.log(Level.SEVERE,"Error parsing expression "+sExpr,e);
         }
@@ -186,15 +193,15 @@ public class LogExprTerm extends TermImpl {
 	/** make a hard copy of the terms */
 	public Object clone() {
 		// do not call constructor with term parameter!
-		LogExprTerm t = new LogExprTerm();
+		LogExpr t = new LogExpr();
 		if (lhs != null) {
-			t.lhs = (Term) lhs.clone();
+			t.lhs = (LogicalFormula) lhs.clone();
 		}
 
 		t.op = this.op;
 		
 		if (rhs != null) {
-			t.rhs = (Term) rhs.clone();
+			t.rhs = (LogicalFormula) rhs.clone();
 		}
 		return t;
 	}
@@ -202,8 +209,8 @@ public class LogExprTerm extends TermImpl {
 
     @Override
 	public boolean equals(Object t) {
-		if (t != null && t instanceof LogExprTerm) {
-			LogExprTerm eprt = (LogExprTerm)t;
+		if (t != null && t instanceof LogExpr) {
+			LogExpr eprt = (LogExpr)t;
 			if (lhs == null && eprt.lhs != null) {
 				return false;
 			}
@@ -235,33 +242,26 @@ public class LogExprTerm extends TermImpl {
             code += rhs.hashCode();
         return code;
     }	
+    
 	/** gets the Operation of this Expression */
 	public LogicalOp getOp() {
 		return op;
 	}
 	
 	/** gets the LHS of this Expression */
-	public Term getLHS() {
+	public LogicalFormula getLHS() {
 		return lhs;
 	}
 	
 	/** gets the RHS of this Expression */
-	public Term getRHS() {
+	public LogicalFormula getRHS() {
 		return rhs;
 	}
 	
-	
-	public void addTerm(Term t) {
-		logger.warning("Do not use addTerm in expressions!");
-	}
-
 	public boolean isUnary() {
 		return lhs == null;
 	}
 
-	public boolean isGround() {
-		return lhs.isGround() && rhs.isGround();
-	}
 	
     @Override
     public String toString() {
@@ -273,7 +273,6 @@ public class LogExprTerm extends TermImpl {
 	}
 
     /** get as XML */
-    @Override
     public Element getAsDOM(Document document) {
         Element u = (Element) document.createElement("expression");
         u.setAttribute("type","logical");
@@ -287,7 +286,7 @@ public class LogExprTerm extends TermImpl {
             Element r = (Element) document.createElement("right");
             r.appendChild(rhs.getAsDOM(document));
             u.appendChild(r);
-	}
+        }
         return u;
     }
 }

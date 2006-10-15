@@ -23,7 +23,7 @@
 
 package jason.asSemantics;
 
-import jason.asSyntax.ArithExprTerm;
+import jason.asSyntax.ArithExpr;
 import jason.asSyntax.ListTerm;
 import jason.asSyntax.Literal;
 import jason.asSyntax.NumberTermImpl;
@@ -52,7 +52,7 @@ public class Unifier implements Cloneable {
 
     public void apply(Term t) {
         if (t.isArithExpr()) {
-            ArithExprTerm et = (ArithExprTerm) t;
+            ArithExpr et = (ArithExpr) t;
             // apply values to expression variables
             apply(et.getLHS());
             if (!et.isUnary()) {

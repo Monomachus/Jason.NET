@@ -1,12 +1,12 @@
 package jason.asSyntax.patterns.goal;
 
 import jason.asSyntax.Literal;
-import jason.asSyntax.LogExprTerm;
+import jason.asSyntax.LogExpr;
+import jason.asSyntax.LogicalFormula;
 import jason.asSyntax.Plan;
 import jason.asSyntax.PlanLibrary;
 import jason.asSyntax.Pred;
 import jason.asSyntax.StringTerm;
-import jason.asSyntax.Term;
 import jason.asSyntax.Trigger;
 import jason.asSyntax.directives.Directive;
 
@@ -26,7 +26,7 @@ public class SGA implements Directive {
     public boolean process(Pred directive, List<Plan> innerPlans, List<Literal> bels, PlanLibrary pl) {
         try {
             Trigger trigger = Trigger.parseTrigger(((StringTerm)directive.getTerm(0)).getString());
-            Term context = LogExprTerm.parse(((StringTerm)directive.getTerm(1)).getString());
+            LogicalFormula context = LogExpr.parseExpr(((StringTerm)directive.getTerm(1)).getString());
             Literal goal = (Literal)directive.getTerm(2);
 
             // add t : not f__l(_) & c <- !f__g(g).

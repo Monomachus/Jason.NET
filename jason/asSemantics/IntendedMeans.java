@@ -110,7 +110,7 @@ public class IntendedMeans implements Serializable {
         ListTerm lt = new ListTermImpl();
         for (BodyLiteral bd: plan.getBody()) {
             BodyLiteral c = (BodyLiteral)bd.clone();
-            unif.apply(c.getTerm());
+            unif.apply(c.getLiteralFormula());
             lt.add(new StringTermImpl(c.toString()));
         }
         im.addTerm(lt);

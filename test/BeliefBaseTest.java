@@ -4,7 +4,9 @@ import jason.asSemantics.Agent;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Literal;
-import jason.asSyntax.LogExprTerm;
+import jason.asSyntax.LogExpr;
+import jason.asSyntax.LogicalFormula;
+import jason.asSyntax.Pred;
 import jason.asSyntax.PredicateIndicator;
 import jason.asSyntax.Term;
 import jason.asSyntax.TermImpl;
@@ -23,7 +25,7 @@ public class BeliefBaseTest extends TestCase {
 	protected void setUp() throws Exception {
 		super.setUp();
 	}
-/*
+
 	public void testAdd() {
 		Literal l1, l2, l3, l4, l5;
 		BeliefBase bb = new DefaultBeliefBase();
@@ -161,7 +163,6 @@ public class BeliefBaseTest extends TestCase {
 		assertEquals(bb.size(), 0);
 	}
 
-    */
     public void testAdd2() {
         BeliefBase bb = new DefaultBeliefBase();
         Literal l1 = Literal.parseLiteral("pos[source(ag1)]");
@@ -246,9 +247,9 @@ public class BeliefBaseTest extends TestCase {
         ag.getBB().add(Literal.parseLiteral("b(20,10)"));
         ag.getBB().add(Literal.parseLiteral("c(x)"));
         ag.getBB().add(Literal.parseLiteral("c(y)"));
-        Term texpr;
+        LogicalFormula texpr;
         
-        Iterator<Unifier> iun = Literal.parseLiteral("a(X)").logCons(ag, new Unifier());
+        Iterator<Unifier> iun = Literal.parseLiteral("a(X)").logicalConsequence(ag, new Unifier());
         int c = 0;
         while (iun.hasNext()) {
             iun.next();
@@ -256,22 +257,22 @@ public class BeliefBaseTest extends TestCase {
         }
         assertEquals(c,2);
 
-        iun = Literal.parseLiteral("b(X,_)").logCons(ag, new Unifier());
+        iun = Literal.parseLiteral("b(X,_)").logicalConsequence(ag, new Unifier());
         assertTrue(iun.hasNext());
         Unifier un = iun.next();
         assertTrue(un.get("X").toString().equals("20"));
         
         
         // test not
-        texpr = LogExprTerm.parseExpr("not a(5)");
-        assertTrue(texpr.logCons(ag, new Unifier()).hasNext());
-        texpr = LogExprTerm.parseExpr("not a(10)");
-        assertFalse(texpr.logCons(ag, new Unifier()).hasNext());
+        texpr = LogExpr.parseExpr("not a(5)");
+        assertTrue(texpr.logicalConsequence(ag, new Unifier()).hasNext());
+        texpr = LogExpr.parseExpr("not a(10)");
+        assertFalse(texpr.logicalConsequence(ag, new Unifier()).hasNext());
         
         
         // test and
-        texpr = LogExprTerm.parseExpr("a(X) & c(Y) & a(Z)");
-        iun = texpr.logCons(ag, new Unifier());
+        texpr = LogExpr.parseExpr("a(X) & c(Y) & a(Z)");
+        iun = texpr.logicalConsequence(ag, new Unifier());
         c = 0;
         while (iun.hasNext()) {
             Unifier u = iun.next();
@@ -281,8 +282,8 @@ public class BeliefBaseTest extends TestCase {
         assertEquals(c,8);
         
         // test or
-        texpr = LogExprTerm.parseExpr("a(X) | c(Y)");
-        iun = texpr.logCons(ag, new Unifier());
+        texpr = LogExpr.parseExpr("a(X) | c(Y)");
+        iun = texpr.logicalConsequence(ag, new Unifier());
         c = 0;
         while (iun.hasNext()) {
             Unifier u = iun.next();
@@ -292,8 +293,8 @@ public class BeliefBaseTest extends TestCase {
         assertEquals(c,4);
         
         // test rel
-        texpr = LogExprTerm.parseExpr("a(X) & a(Y) & Y > X");
-        iun = texpr.logCons(ag, new Unifier());
+        texpr = LogExpr.parseExpr("a(X) & a(Y) & Y > X");
+        iun = texpr.logicalConsequence(ag, new Unifier());
         c = 0;
         while (iun.hasNext()) {
             Unifier u = iun.next();
@@ -301,8 +302,8 @@ public class BeliefBaseTest extends TestCase {
         }
         assertEquals(c,1);
 
-        texpr = LogExprTerm.parseExpr("a(X) & a(Y) & X <= Y");
-        iun = texpr.logCons(ag, new Unifier());
+        texpr = LogExpr.parseExpr("a(X) & a(Y) & X <= Y");
+        iun = texpr.logicalConsequence(ag, new Unifier());
         c = 0;
         while (iun.hasNext()) {
             Unifier u = iun.next();

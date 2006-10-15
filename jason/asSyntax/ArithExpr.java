@@ -38,7 +38,7 @@ import org.w3c.dom.Element;
  * It is a var, so unifier.apply(ExprTerm) computes (via solve()) the expression
  * value. The var value has the result of this evaluation.
  */
-public class ArithExprTerm extends VarTerm implements NumberTerm {
+public class ArithExpr extends VarTerm implements NumberTerm {
 
 	private static final long serialVersionUID = 1L;
 
@@ -123,19 +123,19 @@ public class ArithExprTerm extends VarTerm implements NumberTerm {
 
     private ArithmeticOp  op     = ArithmeticOp.none;
 
-    static private Logger logger = Logger.getLogger(ArithExprTerm.class.getName());
+    static private Logger logger = Logger.getLogger(ArithExpr.class.getName());
 
-    public ArithExprTerm() {
+    public ArithExpr() {
         super();
     }
 
-    public ArithExprTerm(NumberTerm t1, ArithmeticOp oper, NumberTerm t2) {
+    public ArithExpr(NumberTerm t1, ArithmeticOp oper, NumberTerm t2) {
         lhs = t1;
         op = oper;
         rhs = t2;
     }
 
-    public ArithExprTerm(ArithmeticOp oper, NumberTerm t1) {
+    public ArithExpr(ArithmeticOp oper, NumberTerm t1) {
         op = oper;
         lhs = t1;
     }
@@ -157,7 +157,7 @@ public class ArithExprTerm extends VarTerm implements NumberTerm {
         if (hasValue()) {
             return getValue().clone();
         } else {
-            ArithExprTerm t = new ArithExprTerm();
+            ArithExpr t = new ArithExpr();
             if (lhs != null) {
                 t.lhs = (NumberTerm) lhs.clone();
             }
@@ -178,8 +178,8 @@ public class ArithExprTerm extends VarTerm implements NumberTerm {
         if (hasValue()) {
             return getValue().equals(t);
         }
-        if (t instanceof ArithExprTerm) {
-            ArithExprTerm eprt = (ArithExprTerm) t;
+        if (t instanceof ArithExpr) {
+            ArithExpr eprt = (ArithExpr) t;
             if (lhs == null && eprt.lhs != null) {
                 return false;
             }

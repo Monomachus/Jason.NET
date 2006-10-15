@@ -37,9 +37,9 @@ PARSER_BEGIN(as2j)
   import jason.asSemantics.*;
   import jason.bb.*;
   import jason.*;
-  import jason.asSyntax.ArithExprTerm.ArithmeticOp;
-  import jason.asSyntax.LogExprTerm.LogicalOp;
-  import jason.asSyntax.RelExprTerm.RelationalOp;
+  import jason.asSyntax.ArithExpr.ArithmeticOp;
+  import jason.asSyntax.LogExpr.LogicalOp;
+  import jason.asSyntax.RelExpr.RelationalOp;
   import jason.asSyntax.BodyLiteral.BodyType;
 
   public class as2j {
@@ -132,13 +132,13 @@ void agent(Agent a) : { List bbl = new LinkedList(); PlanLibrary pp;  }
 
 
 /* Beliefs & Rules */
-void belief_base(List bbl) : { Literal h; Term t; }
+void belief_base(List bbl) : { Literal h; LogicalFormula t; }
 {
   ( h=literal()
     [
-      ":-" t = log_expr()   { h = new Rule(h,t); }
+      ":-" t = log_expr()    { h = new Rule(h,t); }
     ] 
-    "."                     {  bbl.add(h);  } 
+    "."                      { bbl.add(h);  } 
   )*
 }
 
@@ -228,7 +228,7 @@ Pred directive(List bbl, PlanLibrary pl) :
 
 /* Plan */
 Plan plan() :         { Token k; Pred L = null; 
-                        Trigger T; Term C = null; 
+                        Trigger T; LogicalFormula C = null; 
                         ArrayList B = new ArrayList(); 
                         int start = -1, end;}
 {
@@ -280,7 +280,7 @@ Literal literal() :  { Pred F; Token k; boolean type = Literal.LPos; }
 /* Plan body */
 void plan_body(ArrayList bd) : { BodyLiteral F; }
 {
-  F=body_formula()         { if (! F.getTerm().equals(Literal.LTrue)) {
+  F=body_formula()         { if (! F.getLogicalFormula().equals(Literal.LTrue)) {
                                bd.add(F);
                              } 
                            }
@@ -291,7 +291,7 @@ void plan_body(ArrayList bd) : { BodyLiteral F; }
 
 BodyLiteral body_formula() :  { Literal A; Token k;
                                 BodyType formType = BodyType.action;
-                                Term rel; VarTerm v;
+                                LogicalFormula rel; VarTerm v;
                               }
 {
  
@@ -306,16 +306,16 @@ BodyLiteral body_formula() :  { Literal A; Token k;
         ]
       ) 
    )
-   ( A=literal()      { return new BodyLiteral(formType,A); }
+   ( A = literal()    { return new BodyLiteral(formType,A); }
    | v = var()        { return new BodyLiteral(formType,v); } // used in communication "+C"
    )
  |
   // actions or expressions
-  rel = rel_expr() 
-                      { if (rel.isVar() || rel.isLiteral()) {
-                          return new BodyLiteral(formType, rel);
+  rel = rel_expr()
+                      { if (rel instanceof Literal) {
+                          return new BodyLiteral(formType, (Literal)rel);
                         } else {
-                          return new BodyLiteral((RelExprTerm)rel); 
+                          return new BodyLiteral((RelExpr)rel); 
                         }
                       }
  )
@@ -347,11 +347,11 @@ List terms() : { List listTerms = new ArrayList(); Term v; }
 }
 
 
-Term term() :       { Term u; }
+Term term() :       { Term u; Object o; }
 {
   ( u=literal()     
   | u=list()        
-  | u=arithm_expr() 
+  | o=arithm_expr() { return (NumberTerm)o; }
   | u=string()      
   )
   { return u; }
@@ -378,24 +378,27 @@ ListTermImpl list() : { ListTermImpl lt = new ListTermImpl(); ListTerm last;
 
 /* logical expression */
 
-Term log_expr() :        { Term t1, t2; }
+LogicalFormula log_expr() :       
+                         { LogicalFormula t1, t2; }
 {					
    t1 = log_expr_trm()         
-[  "|" t2 = log_expr()   { return new LogExprTerm(t1,LogicalOp.or,t2); } ]
+[  "|" t2 = log_expr()   { return new LogExpr(t1,LogicalOp.or,t2); } ]
                          { return t1; }
 }
 
-Term log_expr_trm() :      { Term t1, t2; }
+LogicalFormula log_expr_trm() : 
+                           { LogicalFormula t1, t2; }
 {
    t1 = log_expr_factor()    
-[  "&" t2 = log_expr_trm() { return new LogExprTerm(t1,LogicalOp.and,t2); } ]
+[  "&" t2 = log_expr_trm() { return new LogExpr(t1,LogicalOp.and,t2); } ]
                            { return t1; }
 }
 
-Term log_expr_factor():             { Term t; }
+LogicalFormula log_expr_factor():             
+                                    { LogicalFormula t; }
 {
 (  
-  <TK_NOT> t = log_expr_factor()    { return new LogExprTerm(LogicalOp.not,t); } 
+  <TK_NOT> t = log_expr_factor()    { return new LogExpr(LogicalOp.not,t); } 
  | 
   t = rel_expr()                    { return t; } 
 )
@@ -407,10 +410,10 @@ Term log_expr_factor():             { Term t; }
    
      <VAR>      [ <OPREL> <EXP> ]  --> this method returns the VarTerm
    | <LITERAL>  [ <OPREL> <EXP> ]  --> returns the Literal
-   | <EXP>      [ <OPREL> <EXP> ]  --> returns the NumberTerm 
+   | <EXP>      [ <OPREL> <EXP> ]  --> returns the ExprTerm 
 */
-Term rel_expr() :                         {  Term op1 = null;
-                                             Term op2 = null;
+LogicalFormula rel_expr() :               {  Object op1 = null;
+                                             Object op2 = null;
                                              RelationalOp operator = RelationalOp.none;
                                            }
 {
@@ -436,31 +439,31 @@ Term rel_expr() :                         {  Term op1 = null;
          | op2 = list()
        )
 
-                                           { return new RelExprTerm(op1, operator, op2); }
+                                           { return new RelExpr((Term)op1, operator, (Term)op2); }
     ]
-                                           { return op1; }
+                                           { return (LogicalFormula)op1; }
 }
 
 
 /* arithmetic expression */
-Term arithm_expr() : { Term t1, t2; ArithmeticOp op;}
+Object arithm_expr() :        { Object t1, t2; ArithmeticOp op;}
 {
    t1 = arithm_expr_trm()     { op = ArithmeticOp.none; }
-[  ( "+"             { op = ArithmeticOp.plus;} 
-   | "-"             { op = ArithmeticOp.minus;}
+[  ( "+"                      { op = ArithmeticOp.plus;} 
+   | "-"                      { op = ArithmeticOp.minus;}
    )
-   t2 = arithm_expr() { if (!t1.isNumeric() && !t1.isVar()) {
-                           throw new ParseException("ArithExpr: first operand is not numeric or variable.");
-                        }
-                        if (!t2.isNumeric() && !t2.isVar()) {
-                           throw new ParseException("ArithExpr: second operand is not numeric or variable.");
-                        }
-                        return new ArithExprTerm((NumberTerm)t1, op, (NumberTerm)t2); 
-                      }
-]                     { return t1; }
+   t2 = arithm_expr()         { if (!(t1 instanceof NumberTerm)) {
+                                   throw new ParseException("ArithExpr: first operand is not numeric or variable.");
+                                }
+                                if (!(t2 instanceof NumberTerm)) {
+                                   throw new ParseException("ArithExpr: second operand is not numeric or variable.");
+                                }
+                                return new ArithExpr((NumberTerm)t1, op, (NumberTerm)t2); 
+                              }
+]                             { return t1; }
 }
 
-Term arithm_expr_trm() :        { Term t1, t2; ArithmeticOp op;}
+Object arithm_expr_trm() :      { Object t1, t2; ArithmeticOp op;}
 {
    t1 = arithm_expr_factor()    { op = ArithmeticOp.none; }
 [  ( "*"                        { op = ArithmeticOp.times; } 
@@ -468,46 +471,49 @@ Term arithm_expr_trm() :        { Term t1, t2; ArithmeticOp op;}
    | <TK_INTDIV>                { op = ArithmeticOp.intdiv; }
    | <TK_INTMOD>                { op = ArithmeticOp.mod; }
    )
-   t2 = arithm_expr_trm()       { if (!t1.isNumeric() && !t1.isVar()) {
+   t2 = arithm_expr_trm()       { if (!(t1 instanceof NumberTerm)) {
                                     throw new ParseException("ArithTerm: first operand is not numeric or variable.");
                                   }
-                                  if (!t2.isNumeric() && !t2.isVar()) {
+                                  if (!(t2 instanceof NumberTerm)) {
                                     throw new ParseException("ArithTerm: second operand is not numeric or variable.");
                                   }
-                                  return new ArithExprTerm((NumberTerm)t1, op, (NumberTerm)t2); 
+                                  return new ArithExpr((NumberTerm)t1, op, (NumberTerm)t2); 
                                 }
 ]                               { return t1; }
 }
 
-Term arithm_expr_factor():   { Term t1, t2; ArithmeticOp op;}
+Object arithm_expr_factor():   
+                                { Object t1, t2; ArithmeticOp op;}
 {
-   t1 = arithm_expr_simple() { op = ArithmeticOp.none; }
-[  ( "**"                    { op = ArithmeticOp.pow; }
+   t1 = arithm_expr_simple()    { op = ArithmeticOp.none; }
+[  ( "**"                       { op = ArithmeticOp.pow; }
    )
-   t2 = arithm_expr_factor() { if (!t1.isNumeric() && !t1.isVar()) {
-                                 throw new ParseException("ArithFactor: first operand is not numeric or variable.");
-                               }
-                               if (!t2.isNumeric() && !t2.isVar()) {
-                                 throw new ParseException("ArithFactor: second operand is not numeric or variable.");
-                               }
-                               return new ArithExprTerm((NumberTerm)t1, op, (NumberTerm)t2); 
-                             }
-]                            { return t1; }
+   t2 = arithm_expr_factor()    { if (!(t1 instanceof NumberTerm)) {
+                                    throw new ParseException("ArithFactor: first operand is not numeric or variable.");
+                                  }
+                                  if (!(t2 instanceof NumberTerm)) {
+                                    throw new ParseException("ArithFactor: second operand is not numeric or variable.");
+                                  }
+                                  return new ArithExpr((NumberTerm)t1, op, (NumberTerm)t2); 
+                                }
+]                               { return t1; }
 }
 
 
-Term arithm_expr_simple(): { Token K; Term t; VarTerm v; }
+Object arithm_expr_simple():    
+                                { Token K; Object t; LogicalFormula f; VarTerm v; }
 {
  ( K = <NUMBER>                 { return new NumberTermImpl(K.image); }
- | "-" t = arithm_expr_simple() { if (!t.isNumeric() && !t.isVar()) {
+ | "-" t = arithm_expr_simple() { if (!(t instanceof NumberTerm)) {
                                     throw new ParseException("operator '-' applied to argument not numeric or variable.");
                                   }
-                                  return new ArithExprTerm(ArithmeticOp.minus, (NumberTerm)t); 
+                                  return new ArithExpr(ArithmeticOp.minus, (NumberTerm)t); 
                                 }
- | "(" t = log_expr() ")"       { return t; }
+ | "(" f = log_expr() ")"       { return f; }
  | v = var()                    { return v; }
  )
 }
+
 
 VarTerm var():      { Token K; VarTerm v; ListTerm lt; }
 {

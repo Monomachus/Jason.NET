@@ -27,13 +27,14 @@ import jason.JasonException;
 import jason.architecture.AgArch;
 import jason.asSyntax.BodyLiteral;
 import jason.asSyntax.Literal;
+import jason.asSyntax.LogicalFormula;
 import jason.asSyntax.Plan;
 import jason.asSyntax.PlanLibrary;
 import jason.asSyntax.Pred;
-import jason.asSyntax.RelExprTerm;
 import jason.asSyntax.Term;
 import jason.asSyntax.TermImpl;
 import jason.asSyntax.Trigger;
+import jason.asSyntax.BodyLiteral.BodyType;
 import jason.bb.BeliefBase;
 import jason.runtime.Settings;
 
@@ -164,7 +165,7 @@ public class TransitionSystem {
                 // .send(ask, ag1, value, X)
                 // if the answer was 3, unifies X=3
                 BodyLiteral send = intention.peek().removeCurrentStep();
-                intention.peek().getUnif().unifies(send.getTerm().getTerm(3), content);
+                intention.peek().getUnif().unifies(send.getLiteralFormula().getTerm(3), content);
                 getC().addIntention(intention);
 
                 // the message is not an ask answer
@@ -367,8 +368,12 @@ public class TransitionSystem {
         Unifier     u = im.unif;
         BodyLiteral h = im.getCurrentStep(); 
 
-        Term body = (Term) h.getTerm().clone();
-        u.apply(body);
+        Literal body = null;
+        
+        if (h.getType() != BodyType.constraint) { // constraint body is not a literal
+            body = (Literal)h.getLiteralFormula().clone();
+            u.apply(body);
+        }
 
         switch (h.getType()) {
 
@@ -407,7 +412,7 @@ public class TransitionSystem {
             break;
 
         case constraint:
-            if (((RelExprTerm) body).logCons(ag, u).hasNext()) {
+            if (((LogicalFormula)h.getLogicalFormula().clone()).logicalConsequence(ag, u).hasNext()) {
                 updateIntention();
             } else {
                 generateGoalDeletion();
@@ -418,24 +423,23 @@ public class TransitionSystem {
         case achieve:
             // free variables in an event cannot conflict with those in the plan
             body.makeVarsAnnon();
-            conf.C.addAchvGoal((Literal) body, conf.C.SI);
+            conf.C.addAchvGoal(body, conf.C.SI);
             break;
 
         // Rule Achieve as a New Focus
         case achieveNF:
-            conf.C.addAchvGoal((Literal) body, Intention.EmptyInt);
+            conf.C.addAchvGoal(body, Intention.EmptyInt);
             updateIntention();
             break;
 
         // Rule Test
         case test:
-            Literal bodyl = (Literal) body;
-            Literal lInBB = conf.ag.believes(bodyl, u);
+            Literal lInBB = conf.ag.believes(body, u);
             if (lInBB != null) {
                 updateIntention();
             } else {
-                bodyl.makeVarsAnnon();
-                Trigger te = new Trigger(Trigger.TEAdd, Trigger.TETestG, bodyl);
+                body.makeVarsAnnon();
+                Trigger te = new Trigger(Trigger.TEAdd, Trigger.TETestG, body);
                 if (ag.getPL().isRelevant(te.getPredicateIndicator())) {
                     Event evt = new Event(te, conf.C.SI);
                     logger.warning("Test Goal '" + h + "' failed as simple query. Generating internal event for it...");
@@ -465,11 +469,10 @@ public class TransitionSystem {
             
         // Rule AddBel
         case addBel:
-            bodyl = (Literal) body;
-            if (!bodyl.hasSource()) {
+            if (!body.hasSource()) {
                 // do not add source(self) in case the
                 // programmer set the source
-                bodyl.addAnnot(BeliefBase.TSelf);
+                body.addAnnot(BeliefBase.TSelf);
             }
 
             // calculate focus
@@ -479,7 +482,7 @@ public class TransitionSystem {
             }
 
             // call BRF
-            result = ag.brf(bodyl,null,conf.C.SI); // the intention is not the new focus
+            result = ag.brf(body,null,conf.C.SI); // the intention is not the new focus
             if (result != null) { // really add something
                 // generate events
                 updateEvents(result,newfocus);
@@ -492,14 +495,13 @@ public class TransitionSystem {
             break;
             
         case delBel:
-            bodyl = (Literal) body;
             newfocus = Intention.EmptyInt;
             if (setts.sameFocus()) {
                 newfocus = conf.C.SI;
             }
 
             // call BRF
-            result = ag.brf(null,bodyl, conf.C.SI); // the intention is not the new focus
+            result = ag.brf(null,body, conf.C.SI); // the intention is not the new focus
             if (result != null) { // really add something
                 // generate events
                 updateEvents(result,newfocus);
@@ -560,7 +562,7 @@ public class TransitionSystem {
                 // with goal in the body
                 Literal tel = topIM.getPlan().getTriggerEvent().getLiteral();
                 topIM.unif.apply(tel);
-                im.unif.unifies(tel, g.getTerm());
+                im.unif.unifies(tel, g.getLiteralFormula());
             }
         }
 
@@ -591,12 +593,12 @@ public class TransitionSystem {
     public List<Option> applicablePlans(List<Option> rp) throws JasonException {
         List<Option> ap = new LinkedList<Option>();
         for (Option opt: rp) {
-            Term context = opt.plan.getContext();
+            LogicalFormula context = opt.plan.getContext();
             if (context == null) { // context is true
                 ap.add(opt);
             } else {
                 boolean allUnifs = opt.getPlan().isAllUnifs();
-                Iterator<Unifier> r = context.logCons(ag, opt.unif);
+                Iterator<Unifier> r = context.logicalConsequence(ag, opt.unif);
                 if (r != null) {
                     while (r.hasNext()) {
                         opt.unif = r.next();

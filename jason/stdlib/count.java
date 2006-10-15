@@ -46,7 +46,7 @@ public class count extends DefaultInternalAction {
             un.apply(bel);
             int n = 0;
             // find all bel in belief base and build a list with them
-            Iterator<Unifier> iu = bel.logCons(ts.getAg(), un);
+            Iterator<Unifier> iu = bel.logicalConsequence(ts.getAg(), un);
             while (iu.hasNext()) {
                 iu.next();
                 n++;

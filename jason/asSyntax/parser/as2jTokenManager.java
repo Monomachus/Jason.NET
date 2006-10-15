@@ -7,9 +7,9 @@ import jason.asSyntax.directives.*;
 import jason.asSemantics.*;
 import jason.bb.*;
 import jason.*;
-import jason.asSyntax.ArithExprTerm.ArithmeticOp;
-import jason.asSyntax.LogExprTerm.LogicalOp;
-import jason.asSyntax.RelExprTerm.RelationalOp;
+import jason.asSyntax.ArithExpr.ArithmeticOp;
+import jason.asSyntax.LogExpr.LogicalOp;
+import jason.asSyntax.RelExpr.RelationalOp;
 import jason.asSyntax.BodyLiteral.BodyType;
 
 public class as2jTokenManager implements as2jConstants

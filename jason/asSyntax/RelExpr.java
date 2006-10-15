@@ -37,24 +37,26 @@ import org.w3c.dom.Element;
 
 
 /** 
- * Represents a relational expression like 10 < 20.
+ * Represents a relational expression like 10 > 20.
  * 
- * Notes about =.. operator
- * 
+ * When the operator is <b>=..</b>, the first argument is a literal and the 
+ * second as list, e.g.:
+ * <code>
  * Literal =.. [functor, list of terms, list of annots]
- * 
- * Example: X =.. [~p, [t1, t2], [a1,a2]]
- *          X is ~p(t1,t2)[a1,a2]
- *          
- *          ~p(t1,t2)[a1,a2] =.. X
- *          X is [~p, [t1, t2], [a1,a2]]
+ * </code>
+ * Examples:
+ * <ul>
+ * <li> X =.. [~p, [t1, t2], [a1,a2]]<br>
+ *      X is ~p(t1,t2)[a1,a2]
+ * <li> ~p(t1,t2)[a1,a2] =.. X<br>
+ *      X is [~p, [t1, t2], [a1,a2]]
+ * </ul>
  * 
  * @author jomi
  */
-public class RelExprTerm extends TermImpl {
+public class RelExpr implements LogicalFormula {
 
 	private static final long serialVersionUID = 1L;
-
 
 	public enum RelationalOp { 
 		none   { public String toString() { return ""; } }, 
@@ -68,29 +70,22 @@ public class RelExprTerm extends TermImpl {
 		literalBuilder { public String toString() { return " =.. "; } };
 	}
 
-    private  Term lhs, rhs;
+    private Term lhs, rhs;
 	private RelationalOp op = RelationalOp.none;
 
-	static private Logger logger = Logger.getLogger(RelExprTerm.class.getName());
+	static private Logger logger = Logger.getLogger(RelExpr.class.getName());
 	
-	public RelExprTerm() {
+	public RelExpr() {
 		super();
 	}
 	
-	public RelExprTerm(Term t1, RelationalOp oper, Term t2) {
+	public RelExpr(Term t1, RelationalOp oper, Term t2) {
 		lhs = t1;
 		op = oper;
 		rhs = t2;
 	}
     
-    /** 
-     * logCons checks whether one particular predicate
-     * is a log(ical)Cons(equence) of the belief base.
-     * 
-     * Returns an iterator for all unifiers that are logCons.
-     */
-    @Override
-    public Iterator<Unifier> logCons(final Agent ag, Unifier un) {
+    public Iterator<Unifier> logicalConsequence(final Agent ag, Unifier un) {
         Term xp = null;
         Term yp = null;
         if (op != RelationalOp.literalBuilder) {
@@ -101,13 +96,13 @@ public class RelExprTerm extends TermImpl {
         }
         switch (op) {
         
-        case gt : if (xp.compareTo(yp)  >  0) return createUnifIterator(un);  break;
-        case gte: if (xp.compareTo(yp)  >= 0) return createUnifIterator(un);  break;
-        case lt : if (xp.compareTo(yp)  <  0) return createUnifIterator(un);  break;
-        case lte: if (xp.compareTo(yp)  <= 0) return createUnifIterator(un);  break;
-        case eq : if (xp.equals(yp))          return createUnifIterator(un);  break;
-        case dif: if (!xp.equals(yp))         return createUnifIterator(un);  break;
-        case unify: if (un.unifies(xp,yp))    return createUnifIterator(un);  break;
+        case gt : if (xp.compareTo(yp)  >  0) return LogExpr.createUnifIterator(un);  break;
+        case gte: if (xp.compareTo(yp)  >= 0) return LogExpr.createUnifIterator(un);  break;
+        case lt : if (xp.compareTo(yp)  <  0) return LogExpr.createUnifIterator(un);  break;
+        case lte: if (xp.compareTo(yp)  <= 0) return LogExpr.createUnifIterator(un);  break;
+        case eq : if (xp.equals(yp))          return LogExpr.createUnifIterator(un);  break;
+        case dif: if (!xp.equals(yp))         return LogExpr.createUnifIterator(un);  break;
+        case unify: if (un.unifies(xp,yp))    return LogExpr.createUnifIterator(un);  break;
 
         case literalBuilder: 
             try {
@@ -116,17 +111,17 @@ public class RelExprTerm extends TermImpl {
                 
                 // both are not vars, using normal unification
                 if (!lhs.isVar() && !rhs.isVar() && un.unifies((Term)p.getAsListOfTerms(), (Term)l)) {
-                    return createUnifIterator(un);
+                    return LogExpr.createUnifIterator(un);
                 }
                 
                 // first is var, second is list, var is assigned to l tranformed in literal
                 if (lhs.isVar() && rhs.isList() && un.unifies(p, Literal.newFromListOfTerms(l))) {
-                    return createUnifIterator(un);
+                    return LogExpr.createUnifIterator(un);
                 }
                 
                 // first is literal, second is var, var is assigned to l tranformed in list
                 if (lhs.isLiteral() && rhs.isVar() && un.unifies((Term)p.getAsListOfTerms(), (Term)l)) {
-                    return createUnifIterator(un);
+                    return LogExpr.createUnifIterator(un);
                 }
             } catch (Exception e) {
                 logger.log(Level.SEVERE, "The arguments of operator =.. are not Literal and List.", e);
@@ -134,14 +129,14 @@ public class RelExprTerm extends TermImpl {
             break;
         }
         
-        return LogExprTerm.EMPTY_UNIF_LIST.iterator();  // empty iterator for unifier
+        return LogExpr.EMPTY_UNIF_LIST.iterator();  // empty iterator for unifier
     }   
 
-    /** returns some Term that can be evaluated */
-    public static Term parseExpr(String sExpr) {
+    /** returns some LogicalFormula that can be evaluated */
+    public static LogicalFormula parseExpr(String sExpr) {
         as2j parser = new as2j(new StringReader(sExpr));
         try {
-            return (Term)parser.rel_expr();
+            return (LogicalFormula)parser.rel_expr();
         } catch (Exception e) {
             logger.log(Level.SEVERE,"Error parsing expression "+sExpr,e);
         }
@@ -151,7 +146,7 @@ public class RelExprTerm extends TermImpl {
 	/** make a hard copy of the terms */
 	public Object clone() {
 		// do not call constructor with term parameter!
-		RelExprTerm t = new RelExprTerm();
+		RelExpr t = new RelExpr();
 		if (lhs != null) {
 			t.lhs = (Term) lhs.clone();
 		}
@@ -167,8 +162,8 @@ public class RelExprTerm extends TermImpl {
 
     @Override
 	public boolean equals(Object t) {
-		if (t != null && t instanceof RelExprTerm) {
-			RelExprTerm eprt = (RelExprTerm)t;
+		if (t != null && t instanceof RelExpr) {
+			RelExpr eprt = (RelExpr)t;
 			if (lhs == null && eprt.lhs != null) {
 				return false;
 			}
@@ -216,22 +211,12 @@ public class RelExprTerm extends TermImpl {
 		return rhs;
 	}
 	
-	
-	public void addTerm(Term t) {
-		logger.warning("Do not use addTerm in expressions!");
-	}
-
-	public boolean isGround() {
-		return lhs.isGround() && rhs.isGround();
-	}
-	
 	public String toString() {
 		return "("+lhs+op+rhs+")";
 	}
     
     
     /** get as XML */
-    @Override
     public Element getAsDOM(Document document) {
         Element u = (Element) document.createElement("expression");
         u.setAttribute("type","relational");

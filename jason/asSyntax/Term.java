@@ -23,33 +23,20 @@
 
 package jason.asSyntax;
 
-import jason.asSemantics.Agent;
-import jason.asSemantics.Unifier;
+import jason.util.ToDOM;
 
 import java.io.Serializable;
-import java.util.Iterator;
 import java.util.List;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 /**
  * Term Interface
  */
-public interface Term extends Cloneable, Comparable<Term>, Serializable {
+public interface Term extends Cloneable, Comparable<Term>, Serializable, ToDOM {
 
     public String getFunctor();
 
     /** returns functor symbol "/" arity */
     public PredicateIndicator getPredicateIndicator();
-
-    /**
-     * logCons checks whether one particular predicate is a
-     * log(ical)Cons(equence) of the belief base.
-     * 
-     * Returns an iterator for all unifiers that are logCons.
-     */
-    public Iterator<Unifier> logCons(Agent ag, Unifier un);
 
     public void addTerm(Term t);
 
@@ -102,6 +89,4 @@ public interface Term extends Cloneable, Comparable<Term>, Serializable {
 
     /** remove the valued cached for hashCode */
     public void resetHashCodeCache();
-
-    public Element getAsDOM(Document document);
 }

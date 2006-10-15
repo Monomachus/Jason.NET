@@ -2,13 +2,12 @@ package jason.asSyntax.patterns.goal;
 
 import jason.asSyntax.BodyLiteral;
 import jason.asSyntax.Literal;
-import jason.asSyntax.LogExprTerm;
+import jason.asSyntax.LogExpr;
 import jason.asSyntax.Plan;
 import jason.asSyntax.PlanLibrary;
 import jason.asSyntax.Pred;
-import jason.asSyntax.Term;
 import jason.asSyntax.BodyLiteral.BodyType;
-import jason.asSyntax.LogExprTerm.LogicalOp;
+import jason.asSyntax.LogExpr.LogicalOp;
 import jason.asSyntax.directives.Directive;
 
 import java.util.ArrayList;
@@ -43,14 +42,14 @@ public class EBDG implements Directive {
                 pis.add(pi);
                 
                 // change context to "not p__i(g) & c"
-                p.setContext(new LogExprTerm(new LogExprTerm(LogicalOp.not, pi), LogicalOp.and, p.getContext()));
+                p.setContext(new LogExpr(new LogExpr(LogicalOp.not, pi), LogicalOp.and, p.getContext()));
                 
                 // change body
                 // add +p__i(g)
                 BodyLiteral b1 = new BodyLiteral(BodyType.addBel, pi);
                 p.getBody().add(0, b1);
                 // add ?g
-                BodyLiteral b2 = new BodyLiteral(BodyType.test, (Term)goal.clone());
+                BodyLiteral b2 = new BodyLiteral(BodyType.test, (Literal)goal.clone());
                 p.getBody().add(b2);
                 pl.add(p);
             }

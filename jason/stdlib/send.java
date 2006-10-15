@@ -168,7 +168,7 @@ public class send extends DefaultInternalAction {
                 if (intention != null) {
                     // unify "timeout" with the .send fourth parameter
                     BodyLiteral send = intention.peek().removeCurrentStep();
-                    intention.peek().getUnif().unifies(send.getTerm().getTerm(3), timeoutTerm);
+                    intention.peek().getUnif().unifies(send.getLiteralFormula().getTerm(3), timeoutTerm);
                     // add the intention back in the C.I
                     c.addIntention(intention);
                 }

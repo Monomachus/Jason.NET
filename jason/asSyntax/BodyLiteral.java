@@ -76,20 +76,19 @@ public class BodyLiteral implements Cloneable {
         }
     }
 
-    Term     term;
+    LogicalFormula  formula;
+    BodyType        formType;
 
-    BodyType formType;
-
-    public BodyLiteral(BodyType t, Term l) {
-        term = (Term) l.clone();
+    public BodyLiteral(BodyType t, Literal l) {
+        formula = (Literal) l.clone();
         formType = t;
         if (l.isInternalAction()) {
             formType = BodyType.internalAction;
         }
     }
 
-    public BodyLiteral(RelExprTerm re) {
-        term = (Term) re.clone();
+    public BodyLiteral(RelExpr re) {
+        formula = (LogicalFormula) re.clone();
         formType = BodyType.constraint;
     }
 
@@ -97,35 +96,46 @@ public class BodyLiteral implements Cloneable {
         return formType;
     }
 
-    public Term getTerm() {
-        return term;
+    public Literal getLiteralFormula() {
+        if (formula instanceof Literal)
+            return (Literal)formula;
+        else 
+            return null;
+    }
+    
+    public LogicalFormula getLogicalFormula() {
+        return formula;
     }
 
     // used with arithmetic expressions
     public void addTerm(Term t) {
-        term.addTerm(t);
+        ((Literal)formula).addTerm(t);
     }
 
     @Override
     public boolean equals(Object o) {
         if (o != null && o instanceof BodyLiteral) {
             BodyLiteral b = (BodyLiteral) o;
-            return formType == b.formType && term.equals(b.term);
+            return formType == b.formType && formula.equals(b.formula);
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return formType.hashCode() + term.hashCode();
+        return formType.hashCode() + formula.hashCode();
     }
 
     public Object clone() {
-        return new BodyLiteral(formType, term);
+        if (formType == BodyType.constraint) {
+            return new BodyLiteral((RelExpr)formula);
+        } else {
+            return new BodyLiteral(formType, (Literal)formula);
+        }
     }
 
     public String toString() {
-        return formType + term.toString();
+        return formType + formula.toString();
     }
 
     /** get as XML */
@@ -134,7 +144,7 @@ public class BodyLiteral implements Cloneable {
         if (formType.toString().length() > 0) {
             u.setAttribute("type", formType.toString());
         }
-        u.appendChild(term.getAsDOM(document));
+        u.appendChild(formula.getAsDOM(document));
         return u;
     }
 }

@@ -8,9 +8,9 @@
   import jason.asSemantics.*;
   import jason.bb.*;
   import jason.*;
-  import jason.asSyntax.ArithExprTerm.ArithmeticOp;
-  import jason.asSyntax.LogExprTerm.LogicalOp;
-  import jason.asSyntax.RelExprTerm.RelationalOp;
+  import jason.asSyntax.ArithExpr.ArithmeticOp;
+  import jason.asSyntax.LogExpr.LogicalOp;
+  import jason.asSyntax.RelExpr.RelationalOp;
   import jason.asSyntax.BodyLiteral.BodyType;
 
   public class as2j implements as2jConstants {
@@ -54,7 +54,7 @@
 
 /* Beliefs & Rules */
   final public void belief_base(List bbl) throws ParseException {
-                               Literal h; Term t;
+                               Literal h; LogicalFormula t;
     label_1:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -73,7 +73,7 @@
       case 25:
         jj_consume_token(25);
         t = log_expr();
-                              h = new Rule(h,t);
+                               h = new Rule(h,t);
         break;
       default:
         jj_la1[1] = jj_gen;
@@ -203,7 +203,7 @@
 /* Plan */
   final public Plan plan() throws ParseException {
                         Token k; Pred L = null;
-                        Trigger T; Term C = null;
+                        Trigger T; LogicalFormula C = null;
                         ArrayList B = new ArrayList();
                         int start = -1, end;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -345,7 +345,7 @@
   final public void plan_body(ArrayList bd) throws ParseException {
                                  BodyLiteral F;
     F = body_formula();
-                             if (! F.getTerm().equals(Literal.LTrue)) {
+                             if (! F.getLogicalFormula().equals(Literal.LTrue)) {
                                bd.add(F);
                              }
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -362,7 +362,7 @@
   final public BodyLiteral body_formula() throws ParseException {
                                 Literal A; Token k;
                                 BodyType formType = BodyType.action;
-                                Term rel; VarTerm v;
+                                LogicalFormula rel; VarTerm v;
     if (jj_2_1(4)) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case 27:
@@ -431,10 +431,10 @@
       case 37:
         // actions or expressions
           rel = rel_expr();
-                        if (rel.isVar() || rel.isLiteral()) {
-                          {if (true) return new BodyLiteral(formType, rel);}
+                        if (rel instanceof Literal) {
+                          {if (true) return new BodyLiteral(formType, (Literal)rel);}
                         } else {
-                          {if (true) return new BodyLiteral((RelExprTerm)rel);}
+                          {if (true) return new BodyLiteral((RelExpr)rel);}
                         }
         break;
       default:
@@ -499,7 +499,7 @@
   }
 
   final public Term term() throws ParseException {
-                      Term u;
+                      Term u; Object o;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case TK_TRUE:
     case TK_FALSE:
@@ -515,7 +515,8 @@
     case UNNAMEDVAR:
     case 33:
     case 37:
-      u = arithm_expr();
+      o = arithm_expr();
+                      {if (true) return (NumberTerm)o;}
       break;
     case STRING:
       u = string();
@@ -598,14 +599,14 @@
   }
 
 /* logical expression */
-  final public Term log_expr() throws ParseException {
-                           Term t1, t2;
+  final public LogicalFormula log_expr() throws ParseException {
+                           LogicalFormula t1, t2;
     t1 = log_expr_trm();
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case 41:
       jj_consume_token(41);
       t2 = log_expr();
-                           {if (true) return new LogExprTerm(t1,LogicalOp.or,t2);}
+                           {if (true) return new LogExpr(t1,LogicalOp.or,t2);}
       break;
     default:
       jj_la1[28] = jj_gen;
@@ -615,14 +616,14 @@
     throw new Error("Missing return statement in function");
   }
 
-  final public Term log_expr_trm() throws ParseException {
-                             Term t1, t2;
+  final public LogicalFormula log_expr_trm() throws ParseException {
+                             LogicalFormula t1, t2;
     t1 = log_expr_factor();
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case 43:
       jj_consume_token(43);
       t2 = log_expr_trm();
-                             {if (true) return new LogExprTerm(t1,LogicalOp.and,t2);}
+                             {if (true) return new LogExpr(t1,LogicalOp.and,t2);}
       break;
     default:
       jj_la1[29] = jj_gen;
@@ -632,13 +633,13 @@
     throw new Error("Missing return statement in function");
   }
 
-  final public Term log_expr_factor() throws ParseException {
-                                      Term t;
+  final public LogicalFormula log_expr_factor() throws ParseException {
+                                      LogicalFormula t;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case TK_NOT:
       jj_consume_token(TK_NOT);
       t = log_expr_factor();
-                                      {if (true) return new LogExprTerm(LogicalOp.not,t);}
+                                      {if (true) return new LogExpr(LogicalOp.not,t);}
       break;
     case TK_TRUE:
     case TK_FALSE:
@@ -666,11 +667,11 @@
    
      <VAR>      [ <OPREL> <EXP> ]  --> this method returns the VarTerm
    | <LITERAL>  [ <OPREL> <EXP> ]  --> returns the Literal
-   | <EXP>      [ <OPREL> <EXP> ]  --> returns the NumberTerm 
+   | <EXP>      [ <OPREL> <EXP> ]  --> returns the ExprTerm 
 */
-  final public Term rel_expr() throws ParseException {
-                                             Term op1 = null;
-                                             Term op2 = null;
+  final public LogicalFormula rel_expr() throws ParseException {
+                                             Object op1 = null;
+                                             Object op2 = null;
                                              RelationalOp operator = RelationalOp.none;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case NUMBER:
@@ -766,19 +767,19 @@
         jj_consume_token(-1);
         throw new ParseException();
       }
-                                             {if (true) return new RelExprTerm(op1, operator, op2);}
+                                             {if (true) return new RelExpr((Term)op1, operator, (Term)op2);}
       break;
     default:
       jj_la1[34] = jj_gen;
       ;
     }
-                                             {if (true) return op1;}
+                                             {if (true) return (LogicalFormula)op1;}
     throw new Error("Missing return statement in function");
   }
 
 /* arithmetic expression */
-  final public Term arithm_expr() throws ParseException {
-                       Term t1, t2; ArithmeticOp op;
+  final public Object arithm_expr() throws ParseException {
+                                Object t1, t2; ArithmeticOp op;
     t1 = arithm_expr_trm();
                                 op = ArithmeticOp.none;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -787,11 +788,11 @@
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case 32:
         jj_consume_token(32);
-                       op = ArithmeticOp.plus;
+                                op = ArithmeticOp.plus;
         break;
       case 33:
         jj_consume_token(33);
-                       op = ArithmeticOp.minus;
+                                op = ArithmeticOp.minus;
         break;
       default:
         jj_la1[35] = jj_gen;
@@ -799,24 +800,24 @@
         throw new ParseException();
       }
       t2 = arithm_expr();
-                        if (!t1.isNumeric() && !t1.isVar()) {
-                           {if (true) throw new ParseException("ArithExpr: first operand is not numeric or variable.");}
-                        }
-                        if (!t2.isNumeric() && !t2.isVar()) {
-                           {if (true) throw new ParseException("ArithExpr: second operand is not numeric or variable.");}
-                        }
-                        {if (true) return new ArithExprTerm((NumberTerm)t1, op, (NumberTerm)t2);}
+                                if (!(t1 instanceof NumberTerm)) {
+                                   {if (true) throw new ParseException("ArithExpr: first operand is not numeric or variable.");}
+                                }
+                                if (!(t2 instanceof NumberTerm)) {
+                                   {if (true) throw new ParseException("ArithExpr: second operand is not numeric or variable.");}
+                                }
+                                {if (true) return new ArithExpr((NumberTerm)t1, op, (NumberTerm)t2);}
       break;
     default:
       jj_la1[36] = jj_gen;
       ;
     }
-                        {if (true) return t1;}
+                                {if (true) return t1;}
     throw new Error("Missing return statement in function");
   }
 
-  final public Term arithm_expr_trm() throws ParseException {
-                                  Term t1, t2; ArithmeticOp op;
+  final public Object arithm_expr_trm() throws ParseException {
+                                  Object t1, t2; ArithmeticOp op;
     t1 = arithm_expr_factor();
                                   op = ArithmeticOp.none;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -847,13 +848,13 @@
         throw new ParseException();
       }
       t2 = arithm_expr_trm();
-                                  if (!t1.isNumeric() && !t1.isVar()) {
+                                  if (!(t1 instanceof NumberTerm)) {
                                     {if (true) throw new ParseException("ArithTerm: first operand is not numeric or variable.");}
                                   }
-                                  if (!t2.isNumeric() && !t2.isVar()) {
+                                  if (!(t2 instanceof NumberTerm)) {
                                     {if (true) throw new ParseException("ArithTerm: second operand is not numeric or variable.");}
                                   }
-                                  {if (true) return new ArithExprTerm((NumberTerm)t1, op, (NumberTerm)t2);}
+                                  {if (true) return new ArithExpr((NumberTerm)t1, op, (NumberTerm)t2);}
       break;
     default:
       jj_la1[38] = jj_gen;
@@ -863,33 +864,33 @@
     throw new Error("Missing return statement in function");
   }
 
-  final public Term arithm_expr_factor() throws ParseException {
-                               Term t1, t2; ArithmeticOp op;
+  final public Object arithm_expr_factor() throws ParseException {
+                                  Object t1, t2; ArithmeticOp op;
     t1 = arithm_expr_simple();
-                               op = ArithmeticOp.none;
+                                  op = ArithmeticOp.none;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case 54:
       jj_consume_token(54);
-                               op = ArithmeticOp.pow;
+                                  op = ArithmeticOp.pow;
       t2 = arithm_expr_factor();
-                               if (!t1.isNumeric() && !t1.isVar()) {
-                                 {if (true) throw new ParseException("ArithFactor: first operand is not numeric or variable.");}
-                               }
-                               if (!t2.isNumeric() && !t2.isVar()) {
-                                 {if (true) throw new ParseException("ArithFactor: second operand is not numeric or variable.");}
-                               }
-                               {if (true) return new ArithExprTerm((NumberTerm)t1, op, (NumberTerm)t2);}
+                                  if (!(t1 instanceof NumberTerm)) {
+                                    {if (true) throw new ParseException("ArithFactor: first operand is not numeric or variable.");}
+                                  }
+                                  if (!(t2 instanceof NumberTerm)) {
+                                    {if (true) throw new ParseException("ArithFactor: second operand is not numeric or variable.");}
+                                  }
+                                  {if (true) return new ArithExpr((NumberTerm)t1, op, (NumberTerm)t2);}
       break;
     default:
       jj_la1[39] = jj_gen;
       ;
     }
-                               {if (true) return t1;}
+                                  {if (true) return t1;}
     throw new Error("Missing return statement in function");
   }
 
-  final public Term arithm_expr_simple() throws ParseException {
-                             Token K; Term t; VarTerm v;
+  final public Object arithm_expr_simple() throws ParseException {
+                                  Token K; Object t; LogicalFormula f; VarTerm v;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case NUMBER:
       K = jj_consume_token(NUMBER);
@@ -898,16 +899,16 @@
     case 33:
       jj_consume_token(33);
       t = arithm_expr_simple();
-                                  if (!t.isNumeric() && !t.isVar()) {
+                                  if (!(t instanceof NumberTerm)) {
                                     {if (true) throw new ParseException("operator '-' applied to argument not numeric or variable.");}
                                   }
-                                  {if (true) return new ArithExprTerm(ArithmeticOp.minus, (NumberTerm)t);}
+                                  {if (true) return new ArithExpr(ArithmeticOp.minus, (NumberTerm)t);}
       break;
     case 37:
       jj_consume_token(37);
-      t = log_expr();
+      f = log_expr();
       jj_consume_token(38);
-                                  {if (true) return t;}
+                                  {if (true) return f;}
       break;
     case VAR:
     case UNNAMEDVAR:
@@ -965,6 +966,11 @@
     finally { jj_save(0, xla); }
   }
 
+  final private boolean jj_3R_36() {
+    if (jj_3R_37()) return true;
+    return false;
+  }
+
   final private boolean jj_3R_18() {
     if (jj_scan_token(TK_FALSE)) return true;
     return false;
@@ -977,11 +983,6 @@
 
   final private boolean jj_3R_22() {
     if (jj_scan_token(TK_NEG)) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_36() {
-    if (jj_3R_37()) return true;
     return false;
   }
 
@@ -1025,6 +1026,11 @@
     return false;
   }
 
+  final private boolean jj_3R_34() {
+    if (jj_3R_36()) return true;
+    return false;
+  }
+
   final private boolean jj_3R_32() {
     if (jj_3R_34()) return true;
     return false;
@@ -1037,11 +1043,6 @@
 
   final private boolean jj_3R_30() {
     if (jj_3R_14()) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_34() {
-    if (jj_3R_36()) return true;
     return false;
   }
 
@@ -1066,19 +1067,13 @@
     return false;
   }
 
-  final private boolean jj_3R_26() {
-    if (jj_3R_24()) return true;
-    return false;
-  }
-
   final private boolean jj_3R_35() {
     if (jj_scan_token(STRING)) return true;
     return false;
   }
 
-  final private boolean jj_3R_25() {
-    if (jj_scan_token(37)) return true;
-    if (jj_3R_28()) return true;
+  final private boolean jj_3R_26() {
+    if (jj_3R_24()) return true;
     return false;
   }
 
@@ -1087,13 +1082,9 @@
     return false;
   }
 
-  final private boolean jj_3R_23() {
-    if (jj_scan_token(ATOM)) return true;
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_25()) jj_scanpos = xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_26()) jj_scanpos = xsp;
+  final private boolean jj_3R_25() {
+    if (jj_scan_token(37)) return true;
+    if (jj_3R_28()) return true;
     return false;
   }
 
@@ -1119,6 +1110,16 @@
     return false;
   }
 
+  final private boolean jj_3R_23() {
+    if (jj_scan_token(ATOM)) return true;
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_25()) jj_scanpos = xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_26()) jj_scanpos = xsp;
+    return false;
+  }
+
   final private boolean jj_3R_42() {
     if (jj_3R_15()) return true;
     return false;
@@ -1131,21 +1132,6 @@
 
   final private boolean jj_3R_40() {
     if (jj_scan_token(33)) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_12() {
-    if (jj_3R_15()) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_13() {
-    if (jj_scan_token(32)) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_11() {
-    if (jj_3R_14()) return true;
     return false;
   }
 
@@ -1167,6 +1153,21 @@
     }
     }
     }
+    return false;
+  }
+
+  final private boolean jj_3R_12() {
+    if (jj_3R_15()) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_13() {
+    if (jj_scan_token(32)) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_11() {
+    if (jj_3R_14()) return true;
     return false;
   }
 

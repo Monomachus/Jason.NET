@@ -1,14 +1,13 @@
 package test;
 
 import jason.asSemantics.Unifier;
-import jason.asSyntax.ArithExprTerm;
+import jason.asSyntax.ArithExpr;
 import jason.asSyntax.ListTerm;
 import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Literal;
 import jason.asSyntax.NumberTerm;
 import jason.asSyntax.NumberTermImpl;
-import jason.asSyntax.RelExprTerm;
-import jason.asSyntax.Term;
+import jason.asSyntax.RelExpr;
 import jason.asSyntax.VarTerm;
 import junit.framework.TestCase;
 
@@ -21,32 +20,32 @@ public class ExprTermTest extends TestCase {
 
     public void testSolve() {
         NumberTerm nb;
-        nb = ArithExprTerm.parseExpr("3");
+        nb = ArithExpr.parseExpr("3");
         assertEquals(nb.solve(),3.0);
 
-        nb = ArithExprTerm.parseExpr("3+2");
+        nb = ArithExpr.parseExpr("3+2");
         assertEquals(nb.solve(),new NumberTermImpl(5).solve());
 
-        nb = ArithExprTerm.parseExpr("3+2*5");
+        nb = ArithExpr.parseExpr("3+2*5");
         assertTrue(nb.solve() == 13);
 
-        nb = ArithExprTerm.parseExpr("(3+2)*5");
+        nb = ArithExpr.parseExpr("(3+2)*5");
         assertTrue(nb.solve() == 25);
 
-        nb = ArithExprTerm.parseExpr("3 - 5");
+        nb = ArithExpr.parseExpr("3 - 5");
         assertTrue(nb.solve() == -2);
                 
-        nb = ArithExprTerm.parseExpr("-(3+5*(4----1))*-1-15");
+        nb = ArithExpr.parseExpr("-(3+5*(4----1))*-1-15");
         // System.out.println(nb+"="+nb.solve());
         assertTrue(nb.solve() == 13d);
 
-        nb = ArithExprTerm.parseExpr("3+5.1*2");
+        nb = ArithExpr.parseExpr("3+5.1*2");
         // System.out.println(nb+"="+nb.solve());
         assertTrue(nb.solve() == 13.2);
     }
 
     public void testApply() {
-        NumberTerm nb = ArithExprTerm.parseExpr("(30-X)/(2*X)");
+        NumberTerm nb = ArithExpr.parseExpr("(30-X)/(2*X)");
         Unifier u = new Unifier();
         u.unifies(new VarTerm("X"), new NumberTermImpl(5));
         u.apply(nb);
@@ -109,21 +108,21 @@ public class ExprTermTest extends TestCase {
             assertFalse(l.equals(Literal.newFromListOfTerms(lt3)));
 
             Unifier u = new Unifier();
-            assertFalse(u.unifies((Term) lt1, (Term) lt2));
+            assertFalse(u.unifies(lt1, lt2));
 
-            assertTrue(new RelExprTerm(l, RelExprTerm.RelationalOp.literalBuilder, (Term) lt1).logCons(null, u).hasNext());
-            assertFalse(new RelExprTerm(l, RelExprTerm.RelationalOp.literalBuilder, (Term) lt2).logCons(null, u).hasNext());
-            assertFalse(new RelExprTerm(l, RelExprTerm.RelationalOp.literalBuilder, (Term) lt3).logCons(null, u).hasNext());
+            assertTrue(new RelExpr(l, RelExpr.RelationalOp.literalBuilder, lt1).logicalConsequence(null, u).hasNext());
+            assertFalse(new RelExpr(l, RelExpr.RelationalOp.literalBuilder, lt2).logicalConsequence(null, u).hasNext());
+            assertFalse(new RelExpr(l, RelExpr.RelationalOp.literalBuilder, lt3).logicalConsequence(null, u).hasNext());
 
             VarTerm v = new VarTerm("X");
             u.clear();
-            assertTrue(new RelExprTerm(v, RelExprTerm.RelationalOp.literalBuilder, (Term) lt1).logCons(null, u).hasNext());
+            assertTrue(new RelExpr(v, RelExpr.RelationalOp.literalBuilder, lt1).logicalConsequence(null, u).hasNext());
             assertEquals(u.get("X").toString(), l.toString());
             assertEquals(u.get("X"), l);
             assertEquals(l, u.get("X"));
 
             u.clear();
-            assertTrue(new RelExprTerm(l, RelExprTerm.RelationalOp.literalBuilder, v).logCons(null, u).hasNext());
+            assertTrue(new RelExpr(l, RelExpr.RelationalOp.literalBuilder, v).logicalConsequence(null, u).hasNext());
             assertEquals(u.get("X").toString(), lt1.toString());
             assertEquals(u.get("X"), lt1);
             assertEquals(lt1, u.get("X"));

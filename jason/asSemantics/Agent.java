@@ -300,7 +300,7 @@ public class Agent {
             }
 
             // try rules
-            Iterator<Unifier> iun = l.logCons(this, un);
+            Iterator<Unifier> iun = l.logicalConsequence(this, un);
             if (iun != null && iun.hasNext()) {
                 Unifier r = iun.next();
                 Literal lc = (Literal) l.clone();

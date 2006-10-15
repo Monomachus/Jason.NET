@@ -23,14 +23,11 @@
 
 package jason.asSyntax;
 
-import jason.asSemantics.Agent;
-import jason.asSemantics.Unifier;
 import jason.asSyntax.parser.as2j;
 
 import java.io.Serializable;
 import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
@@ -175,7 +172,7 @@ public class TermImpl implements Term, Serializable {
     public int compareTo(Term tAsTerm) {
         try {
             // TODO: why overriding in ArithExprTerm is not working and we need this if?
-            return ((ArithExprTerm)this).compareTo(tAsTerm);
+            return ((ArithExpr)this).compareTo(tAsTerm);
         } catch (Exception e) {}
 
         int c;
@@ -220,21 +217,9 @@ public class TermImpl implements Term, Serializable {
      * 
      * Returns an iterator for all unifiers that are logCons.
      */
-    public Iterator<Unifier> logCons(Agent ag, Unifier un) {
-        return null;
-    }   
-
-    public static final List<Unifier> EMPTY_UNIF_LIST = Collections.emptyList();
-
-    /** create an iterator for a list of unifiers */
-    protected Iterator<Unifier> createUnifIterator(Unifier... unifs) {
-        List<Unifier> r = new ArrayList<Unifier>(unifs.length);
-        for (int i=0; i<unifs.length; i++) {
-            r.add(unifs[i]);
-        }
-        return r.iterator();
-    }
-    
+    //public Iterator<Unifier> logCons(Agent ag, Unifier un) {
+    //    return null;
+    //}   
     
     public void addTerm(Term t) {
     	if (t == null)
