@@ -26,7 +26,6 @@ package jason.asSemantics;
 import jason.asSyntax.ArithExpr;
 import jason.asSyntax.ListTerm;
 import jason.asSyntax.Literal;
-import jason.asSyntax.NumberTermImpl;
 import jason.asSyntax.Pred;
 import jason.asSyntax.Term;
 import jason.asSyntax.TermImpl;
@@ -58,7 +57,7 @@ public class Unifier implements Cloneable {
             if (!et.isUnary()) {
                 apply(et.getRHS());
             }
-            et.setValue(new NumberTermImpl(et.solve()));
+            et.evaluate();
         } else if (t.isVar()) {
             VarTerm vt = (VarTerm) t;
             if (!vt.hasValue()) {
@@ -120,10 +119,7 @@ public class Unifier implements Cloneable {
     // ----- Unify for Terms
 
     public boolean unifies(Term t1g, Term t2g) {
-        List t1gts = t1g.getTerms();
-        List t2gts = t2g.getTerms();
-
-        // if args are expressions, apply them to use the values
+        // if args are expressions, apply them to use their values
         if (t1g.isArithExpr()) {
             t1g = (Term) t1g.clone();
             apply(t1g);
@@ -138,24 +134,7 @@ public class Unifier implements Cloneable {
             // System.out.println("Equals." + t1 + "=" + t2 + "...." + this);
             return true;
         }
-
-        // if two atoms or structures
-        if (!t1g.isVar() && !t2g.isVar()) {
-            // different arities
-            if ((t1gts == null && t2gts != null)
-                    || (t1gts != null && t2gts == null)) {
-                return false;
-            }
-            if (t1g.getTermsSize() != t2g.getTermsSize()) {
-                return false;
-            }
-            // different funcSymb in atoms or structures
-            if (t1g.getFunctor() != null
-                    && !t1g.getFunctor().equals(t2g.getFunctor())) {
-                return false;
-            }
-        }
-
+        
         // both are vars
         if (t1g.isVar() && t2g.isVar()) {
             VarTerm t1gv = (VarTerm) t1g;
@@ -199,21 +178,46 @@ public class Unifier implements Cloneable {
         }
 
         // t1 is var that doesn't occur in t2
-        if (t1g.isVar() && !t2g.hasVar(t1g)) {
-            return setVarValue((VarTerm) t1g, t2g);
+        if (t1g.isVar()) {
+            if (!t2g.hasVar(t1g)) {
+                return setVarValue((VarTerm) t1g, t2g);
+            }
+            return false;
         }
 
         // t2 is var that doesn't occur in t1
-        if (t2g.isVar() && !t1g.hasVar(t2g)) {
-            return setVarValue((VarTerm) t2g, t1g);
+        if (t2g.isVar()) {
+            if (!t1g.hasVar(t2g)) {
+                return setVarValue((VarTerm) t2g, t1g);
+            } 
+            return false;
         }
 
-        // both are structures, same funcSymb, same arity
-        if (t1gts == null && t2gts == null && !t1g.isList() && !t2g.isList()) {
-            // lists always have terms == null
-            return true;
+        // both terms are not vars
+        
+        // if any of the terms is number, they must be equal
+        if (t1g.isNumeric() || t2g.isNumeric()) {
+            return t1g.equals(t2g);
         }
 
+        // terms are atoms or structures
+        List t1gts = t1g.getTerms();
+        List t2gts = t2g.getTerms();
+
+        // different arities
+        if ((t1gts == null && t2gts != null) || (t1gts != null && t2gts == null)) {
+            return false;
+        }
+        if (t1g.getTermsSize() != t2g.getTermsSize()) {
+            return false;
+        }
+        
+        // different functor
+        if (t1g.getFunctor() != null && !t1g.getFunctor().equals(t2g.getFunctor())) {
+            return false;
+        }
+    
+        // unify inner terms
         // do not use iterator! (see ListTermImpl class)
         final int ts = t1g.getTermsSize();
         for (int i = 0; i < ts; i++) {

@@ -54,7 +54,7 @@
 
 /* Beliefs & Rules */
   final public void belief_base(List bbl) throws ParseException {
-                               Literal h; LogicalFormula t;
+                               Literal h; Object t;
     label_1:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -73,7 +73,7 @@
       case 25:
         jj_consume_token(25);
         t = log_expr();
-                               h = new Rule(h,t);
+                               h = new Rule(h,(LogicalFormula)t);
         break;
       default:
         jj_la1[1] = jj_gen;
@@ -203,7 +203,7 @@
 /* Plan */
   final public Plan plan() throws ParseException {
                         Token k; Pred L = null;
-                        Trigger T; LogicalFormula C = null;
+                        Trigger T; Object C = null;
                         ArrayList B = new ArrayList();
                         int start = -1, end;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -240,7 +240,7 @@
     k = jj_consume_token(26);
                                    if (start == -1) start = k.beginLine;
                      end = k.beginLine;
-                     Plan p = new Plan(L,T,C,B);
+                     Plan p = new Plan(L,T,(LogicalFormula)C,B);
                      p.setSourceLines(start,end);
                      {if (true) return p;}
     throw new Error("Missing return statement in function");
@@ -362,7 +362,7 @@
   final public BodyLiteral body_formula() throws ParseException {
                                 Literal A; Token k;
                                 BodyType formType = BodyType.action;
-                                LogicalFormula rel; VarTerm v;
+                                Object rel; VarTerm v;
     if (jj_2_1(4)) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case 27:
@@ -599,14 +599,14 @@
   }
 
 /* logical expression */
-  final public LogicalFormula log_expr() throws ParseException {
-                           LogicalFormula t1, t2;
+  final public Object log_expr() throws ParseException {
+                           Object t1, t2;
     t1 = log_expr_trm();
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case 41:
       jj_consume_token(41);
       t2 = log_expr();
-                           {if (true) return new LogExpr(t1,LogicalOp.or,t2);}
+                           {if (true) return new LogExpr((LogicalFormula)t1,LogicalOp.or,(LogicalFormula)t2);}
       break;
     default:
       jj_la1[28] = jj_gen;
@@ -616,14 +616,14 @@
     throw new Error("Missing return statement in function");
   }
 
-  final public LogicalFormula log_expr_trm() throws ParseException {
-                             LogicalFormula t1, t2;
+  final public Object log_expr_trm() throws ParseException {
+                             Object t1, t2;
     t1 = log_expr_factor();
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case 43:
       jj_consume_token(43);
       t2 = log_expr_trm();
-                             {if (true) return new LogExpr(t1,LogicalOp.and,t2);}
+                             {if (true) return new LogExpr((LogicalFormula)t1,LogicalOp.and,(LogicalFormula)t2);}
       break;
     default:
       jj_la1[29] = jj_gen;
@@ -633,13 +633,13 @@
     throw new Error("Missing return statement in function");
   }
 
-  final public LogicalFormula log_expr_factor() throws ParseException {
-                                      LogicalFormula t;
+  final public Object log_expr_factor() throws ParseException {
+                                      Object t;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case TK_NOT:
       jj_consume_token(TK_NOT);
       t = log_expr_factor();
-                                      {if (true) return new LogExpr(LogicalOp.not,t);}
+                                      {if (true) return new LogExpr(LogicalOp.not,(LogicalFormula)t);}
       break;
     case TK_TRUE:
     case TK_FALSE:
@@ -669,7 +669,7 @@
    | <LITERAL>  [ <OPREL> <EXP> ]  --> returns the Literal
    | <EXP>      [ <OPREL> <EXP> ]  --> returns the ExprTerm 
 */
-  final public LogicalFormula rel_expr() throws ParseException {
+  final public Object rel_expr() throws ParseException {
                                              Object op1 = null;
                                              Object op2 = null;
                                              RelationalOp operator = RelationalOp.none;
@@ -773,7 +773,7 @@
       jj_la1[34] = jj_gen;
       ;
     }
-                                             {if (true) return (LogicalFormula)op1;}
+                                             {if (true) return op1;}
     throw new Error("Missing return statement in function");
   }
 
@@ -890,7 +890,7 @@
   }
 
   final public Object arithm_expr_simple() throws ParseException {
-                                  Token K; Object t; LogicalFormula f; VarTerm v;
+                                  Token K; Object t; VarTerm v;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case NUMBER:
       K = jj_consume_token(NUMBER);
@@ -906,9 +906,9 @@
       break;
     case 37:
       jj_consume_token(37);
-      f = log_expr();
+      t = log_expr();
       jj_consume_token(38);
-                                  {if (true) return f;}
+                                  {if (true) return t;}
       break;
     case VAR:
     case UNNAMEDVAR:
@@ -1021,13 +1021,13 @@
     return false;
   }
 
-  final private boolean jj_3R_33() {
-    if (jj_3R_35()) return true;
+  final private boolean jj_3R_34() {
+    if (jj_3R_36()) return true;
     return false;
   }
 
-  final private boolean jj_3R_34() {
-    if (jj_3R_36()) return true;
+  final private boolean jj_3R_33() {
+    if (jj_3R_35()) return true;
     return false;
   }
 
@@ -1199,6 +1199,11 @@
     return false;
   }
 
+  final private boolean jj_3R_37() {
+    if (jj_3R_38()) return true;
+    return false;
+  }
+
   final private boolean jj_3_1() {
     Token xsp;
     xsp = jj_scanpos;
@@ -1220,11 +1225,6 @@
     jj_scanpos = xsp;
     if (jj_3R_12()) return true;
     }
-    return false;
-  }
-
-  final private boolean jj_3R_37() {
-    if (jj_3R_38()) return true;
     return false;
   }
 

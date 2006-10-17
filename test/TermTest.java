@@ -294,6 +294,10 @@ public class TermTest extends TestCase {
 		u.apply(l2);
 		//System.out.println("l2 with apply = "+l2);
 		assertEquals(l1.toString(), l2.toString());
+        
+        assertFalse(new Unifier().unifies(Literal.parseLiteral("c(x)"), Literal.parseLiteral("c(20)")));
+        assertTrue(new Unifier().unifies(Literal.parseLiteral("c(20)"), Literal.parseLiteral("c(20)")));
+        assertTrue(new Unifier().unifies(Literal.parseLiteral("c(X)"), Literal.parseLiteral("c(20)")));
 		
 	}
 	

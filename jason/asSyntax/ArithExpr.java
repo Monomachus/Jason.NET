@@ -33,12 +33,9 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
- * represents an arithmetic expression like [ expr ] <+ | - | * | ...> expr.
- * 
- * It is a var, so unifier.apply(ExprTerm) computes (via solve()) the expression
- * value. The var value has the result of this evaluation.
+ * Represents ans solve arithmetic expressions like "10 < 30".
  */
-public class ArithExpr extends VarTerm implements NumberTerm {
+public class ArithExpr extends NumberTermImpl {
 
 	private static final long serialVersionUID = 1L;
 
@@ -125,7 +122,7 @@ public class ArithExpr extends VarTerm implements NumberTerm {
 
     static private Logger logger = Logger.getLogger(ArithExpr.class.getName());
 
-    public ArithExpr() {
+    private ArithExpr() {
         super();
     }
 
@@ -151,11 +148,25 @@ public class ArithExpr extends VarTerm implements NumberTerm {
         }
     }
 
+    /** returns true if the expression was already evaluated */
+    public boolean isEvaluated() {
+        return lhs == null;
+    }
+    
+    /** Set the value of this expression by calling solve(). After this method execution,
+     *  the object behaviour is like a NumberTerm.
+     */
+    public void evaluate() {
+        super.setValue(solve());
+        lhs = null;
+        rhs = null;
+    }
+    
     /** make a hard copy of the terms */
     public Object clone() {
         // do not call constructor with term parameter!
-        if (hasValue()) {
-            return getValue().clone();
+        if (isEvaluated()) {
+            return super.clone();
         } else {
             ArithExpr t = new ArithExpr();
             if (lhs != null) {
@@ -175,8 +186,8 @@ public class ArithExpr extends VarTerm implements NumberTerm {
     public boolean equals(Object t) {
         if (t == null) 
             return false;
-        if (hasValue()) {
-            return getValue().equals(t);
+        if (isEvaluated()) {
+            return super.equals(t);
         }
         if (t instanceof ArithExpr) {
             ArithExpr eprt = (ArithExpr) t;
@@ -204,10 +215,10 @@ public class ArithExpr extends VarTerm implements NumberTerm {
 
     @Override
     public int hashCode() {
-        final int PRIME = 31;
-        if (hasValue())
-            return getValue().hashCode();
+        if (isEvaluated())
+            return super.hashCode();
         
+        final int PRIME = 31;
         int code = PRIME * op.hashCode();
         if (lhs != null)
             code = PRIME * code + lhs.hashCode();
@@ -232,23 +243,8 @@ public class ArithExpr extends VarTerm implements NumberTerm {
     }
 
     @Override
-    public void addTerm(Term t) {
-        logger.warning("Do not use addTerm in expressions!");
-    }
-
-    @Override
-    public boolean isVar() {
-        return false;
-    }
-
-    @Override
     public boolean isArithExpr() {
-        return !hasValue();
-    }
-
-    @Override
-    public boolean isNumeric() {
-        return true;
+        return !isEvaluated();
     }
 
     public boolean isUnary() {
@@ -257,24 +253,14 @@ public class ArithExpr extends VarTerm implements NumberTerm {
 
     @Override
     public boolean isGround() {
-        return hasValue() || (lhs.isGround() && rhs.isGround());
+        return isEvaluated() || (lhs.isGround() && rhs.isGround());
     }
 
     @Override
-    public int compareTo(Term o) {
-        if (o instanceof NumberTerm) {
-            NumberTerm st = (NumberTerm)o;
-            if (solve() > st.solve()) return 1;
-            if (solve() < st.solve()) return -1;
-        }
-        return 0;    
-    }
-    
-    @Override
     public double solve() {
-        if (hasValue()) {
+        if (isEvaluated()) {
             // this expr already has a value
-            return ((NumberTerm) getValue()).solve();
+            return super.solve();
         }
         double l = lhs.solve();
         if (rhs == null && op == ArithmeticOp.minus) {
@@ -289,8 +275,8 @@ public class ArithExpr extends VarTerm implements NumberTerm {
 
     @Override
     public String toString() {
-        if (hasValue()) {
-            return getValue().toString();
+        if (isEvaluated()) {
+            return super.toString();
         } else {
             if (rhs == null) {
                 return "(" + op + lhs + ")";
@@ -303,8 +289,8 @@ public class ArithExpr extends VarTerm implements NumberTerm {
     /** get as XML */
     @Override
     public Element getAsDOM(Document document) {
-        if (hasValue()) {
-            return getValue().getAsDOM(document);
+        if (isEvaluated()) {
+            return super.getAsDOM(document);
         } else {
             Element u = (Element) document.createElement("expression");
             u.setAttribute("type", "arithmetic");

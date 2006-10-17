@@ -252,6 +252,7 @@ public class VarTermTest extends TestCase {
         Unifier u = new Unifier();
         u.unifies(new VarTerm("X"), new NumberTermImpl(1));
         // X+1 not unifies with 1
+        u.apply(exp);
         assertFalse(u.unifies(exp, um));
         // X+1 unifies with 2
         assertTrue(u.unifies(exp, dois));

@@ -132,11 +132,11 @@ void agent(Agent a) : { List bbl = new LinkedList(); PlanLibrary pp;  }
 
 
 /* Beliefs & Rules */
-void belief_base(List bbl) : { Literal h; LogicalFormula t; }
+void belief_base(List bbl) : { Literal h; Object t; }
 {
   ( h=literal()
     [
-      ":-" t = log_expr()    { h = new Rule(h,t); }
+      ":-" t = log_expr()    { h = new Rule(h,(LogicalFormula)t); }
     ] 
     "."                      { bbl.add(h);  } 
   )*
@@ -228,7 +228,7 @@ Pred directive(List bbl, PlanLibrary pl) :
 
 /* Plan */
 Plan plan() :         { Token k; Pred L = null; 
-                        Trigger T; LogicalFormula C = null; 
+                        Trigger T; Object C = null; 
                         ArrayList B = new ArrayList(); 
                         int start = -1, end;}
 {
@@ -238,7 +238,7 @@ Plan plan() :         { Token k; Pred L = null;
     [ k = "<-" plan_body(B)      { if (start == -1) start = k.beginLine; } ]  
     k = "."                      { if (start == -1) start = k.beginLine; } 
                    { end = k.beginLine;
-                     Plan p = new Plan(L,T,C,B);
+                     Plan p = new Plan(L,T,(LogicalFormula)C,B);
                      p.setSourceLines(start,end);
                      return p;}
                    }
@@ -291,7 +291,7 @@ void plan_body(ArrayList bd) : { BodyLiteral F; }
 
 BodyLiteral body_formula() :  { Literal A; Token k;
                                 BodyType formType = BodyType.action;
-                                LogicalFormula rel; VarTerm v;
+                                Object rel; VarTerm v;
                               }
 {
  
@@ -378,27 +378,27 @@ ListTermImpl list() : { ListTermImpl lt = new ListTermImpl(); ListTerm last;
 
 /* logical expression */
 
-LogicalFormula log_expr() :       
-                         { LogicalFormula t1, t2; }
+Object log_expr() :       
+                         { Object t1, t2; }
 {					
    t1 = log_expr_trm()         
-[  "|" t2 = log_expr()   { return new LogExpr(t1,LogicalOp.or,t2); } ]
+[  "|" t2 = log_expr()   { return new LogExpr((LogicalFormula)t1,LogicalOp.or,(LogicalFormula)t2); } ]
                          { return t1; }
 }
 
-LogicalFormula log_expr_trm() : 
-                           { LogicalFormula t1, t2; }
+Object log_expr_trm() : 
+                           { Object t1, t2; }
 {
    t1 = log_expr_factor()    
-[  "&" t2 = log_expr_trm() { return new LogExpr(t1,LogicalOp.and,t2); } ]
+[  "&" t2 = log_expr_trm() { return new LogExpr((LogicalFormula)t1,LogicalOp.and,(LogicalFormula)t2); } ]
                            { return t1; }
 }
 
-LogicalFormula log_expr_factor():             
-                                    { LogicalFormula t; }
+Object log_expr_factor():             
+                                    { Object t; }
 {
 (  
-  <TK_NOT> t = log_expr_factor()    { return new LogExpr(LogicalOp.not,t); } 
+  <TK_NOT> t = log_expr_factor()    { return new LogExpr(LogicalOp.not,(LogicalFormula)t); } 
  | 
   t = rel_expr()                    { return t; } 
 )
@@ -412,7 +412,8 @@ LogicalFormula log_expr_factor():
    | <LITERAL>  [ <OPREL> <EXP> ]  --> returns the Literal
    | <EXP>      [ <OPREL> <EXP> ]  --> returns the ExprTerm 
 */
-LogicalFormula rel_expr() :               {  Object op1 = null;
+Object rel_expr() :               
+                                          {  Object op1 = null;
                                              Object op2 = null;
                                              RelationalOp operator = RelationalOp.none;
                                            }
@@ -441,7 +442,7 @@ LogicalFormula rel_expr() :               {  Object op1 = null;
 
                                            { return new RelExpr((Term)op1, operator, (Term)op2); }
     ]
-                                           { return (LogicalFormula)op1; }
+                                           { return op1; }
 }
 
 
@@ -501,7 +502,7 @@ Object arithm_expr_factor():
 
 
 Object arithm_expr_simple():    
-                                { Token K; Object t; LogicalFormula f; VarTerm v; }
+                                { Token K; Object t; VarTerm v; }
 {
  ( K = <NUMBER>                 { return new NumberTermImpl(K.image); }
  | "-" t = arithm_expr_simple() { if (!(t instanceof NumberTerm)) {
@@ -509,7 +510,7 @@ Object arithm_expr_simple():
                                   }
                                   return new ArithExpr(ArithmeticOp.minus, (NumberTerm)t); 
                                 }
- | "(" f = log_expr() ")"       { return f; }
+ | "(" t = log_expr() ")"       { return t; }
  | v = var()                    { return v; }
  )
 }

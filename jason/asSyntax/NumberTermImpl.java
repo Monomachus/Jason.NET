@@ -61,9 +61,10 @@ public class NumberTermImpl extends TermImpl implements NumberTerm {
 			logger.log(Level.SEVERE,"Error setting number term value from "+s,e);
 		}
 	}
+    
 	public void setValue(double d) {
 		fValue = d;
-		setFunctor(String.valueOf(d));
+		//setFunctor(String.valueOf(d));
 	}
 	
 	public double solve() {
@@ -74,19 +75,6 @@ public class NumberTermImpl extends TermImpl implements NumberTerm {
 		return new NumberTermImpl(solve());
 	}
 	
-
-	/*
-	public static NumberTermImpl parseString(String sTerm) {
-		as2j parser = new as2j(new StringReader(sTerm));
-		try {
-			return (NumberTermImpl)parser.value();
-		} catch (Exception e) {
-			logger.error("Error parsing number term " + sTerm,e);
-			return null;
-		}
-	}
-	*/
-
 	@Override
 	public boolean isNumeric() {
 		return true;
@@ -136,7 +124,6 @@ public class NumberTermImpl extends TermImpl implements NumberTerm {
 			return String.valueOf(fValue);
 		}
 	}
-    
     
     /** get as XML */
     @Override

@@ -26,6 +26,8 @@ public class RuleTest extends TestCase {
         ag.getBB().add(Literal.parseLiteral("c(x)"));
         ag.getBB().add(Literal.parseLiteral("c(y)"));
         ag.getBB().add(Literal.parseLiteral("c(20)"));
+
+        assertTrue(ag.believes(Literal.parseLiteral("c(30)"), new Unifier()) == null);
         
         // add r(X) :- a(X)
         Rule r = new Rule(Literal.parseLiteral("r(X)"), Literal.parseLiteral("a(X)"));
@@ -38,7 +40,7 @@ public class RuleTest extends TestCase {
         assertEquals(3,iteratorSize(iun));
 
         // add v(X) :- a(X) & X > 15 | c(X)
-        r = new Rule(Literal.parseLiteral("v(X)"), LogExpr.parseExpr("a(X) & X > 15 | c(X)"));
+        r = new Rule(Literal.parseLiteral("v(X)"), LogExpr.parseExpr("a(X) & X > 15 | c(X)"));  
         ag.getBB().add(r);
 
         iun = Literal.parseLiteral("v(30)").logicalConsequence(ag, new Unifier());
