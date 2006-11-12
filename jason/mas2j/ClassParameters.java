@@ -32,7 +32,7 @@ public class ClassParameters {
     
     /** returns parameters with space as separator */
     public String getParametersStr() {
-        StringBuffer out = new StringBuffer();
+        StringBuilder out = new StringBuilder();
         if (parameters.size() > 0) {
             for (String s: parameters) {
                 out.append(s+" ");
@@ -43,7 +43,7 @@ public class ClassParameters {
     }
     
     public String toString() {
-        StringBuffer out = new StringBuffer(className);
+        StringBuilder out = new StringBuilder(className);
         if (parameters.size() > 0) {
             out.append("(");
             Iterator<String> i = parameters.iterator();

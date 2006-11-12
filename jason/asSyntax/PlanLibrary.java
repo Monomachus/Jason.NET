@@ -70,7 +70,7 @@ public class PlanLibrary {
 		String sPlan = stPlan.getString();
 		try {
 			// remove quotes \" -> "
-			StringBuffer sTemp = new StringBuffer();
+            StringBuilder sTemp = new StringBuilder();
 			for (int c=0; c <sPlan.length(); c++) {
 				if (sPlan.charAt(c) != '\\') {
 					sTemp.append(sPlan.charAt(c));

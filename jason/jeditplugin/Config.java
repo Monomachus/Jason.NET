@@ -377,7 +377,7 @@ public class Config extends Properties {
                 }
             }
             
-            StringBuffer scriptBuf = new StringBuffer();
+            StringBuilder scriptBuf = new StringBuilder();
             String line = in.readLine();
             while (line != null) {
                 scriptBuf.append(line + nl);

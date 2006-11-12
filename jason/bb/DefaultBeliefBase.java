@@ -222,7 +222,7 @@ public class DefaultBeliefBase implements BeliefBase {
         }
         
         public String toString() {
-            StringBuffer s = new StringBuffer();
+            StringBuilder s = new StringBuilder();
             for (Literal l: list) {
                 s.append(l+":"+l.hashCode()+",");
             }

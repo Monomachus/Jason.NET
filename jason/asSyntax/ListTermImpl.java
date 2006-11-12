@@ -331,7 +331,7 @@ public class ListTermImpl extends TermImpl implements ListTerm {
 
 	
 	public String toString() {
-		StringBuffer s = new StringBuffer("[");
+        StringBuilder s = new StringBuilder("[");
 		Iterator i = listTermIterator();
 		while (i.hasNext()) {
 			ListTerm lt = (ListTerm)i.next();

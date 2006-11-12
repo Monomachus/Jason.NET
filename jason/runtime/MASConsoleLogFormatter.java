@@ -33,7 +33,7 @@ import java.util.logging.LogRecord;
  */
 public class MASConsoleLogFormatter extends java.util.logging.Formatter {
 	public String format(LogRecord l) {
-		StringBuffer s = new StringBuffer("[");
+        StringBuilder s = new StringBuilder("[");
 		s.append(getAgName(l));
 		s.append("] ");
 		s.append(l.getMessage());

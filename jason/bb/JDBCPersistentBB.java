@@ -69,7 +69,7 @@ public class JDBCPersistentBB extends DefaultBeliefBase {
                     rs = stmt.executeQuery("select * from " + table);
                 } catch (SQLException e) {
                     // create table
-                    StringBuffer ct = new StringBuffer("create table " + table + " (");
+                    StringBuilder ct = new StringBuilder("create table " + table + " (");
                     for (int c = 0; c < arity; c++) {
                         ct.append(COL_PREFIX + c + " varchar, ");
                     }
@@ -407,7 +407,7 @@ public class JDBCPersistentBB extends DefaultBeliefBase {
 
     private String getWhere(Literal l) throws SQLException {
         ResultSetMetaData meta = belsDB.get(l.getPredicateIndicator());
-        StringBuffer q = new StringBuffer(" where ");
+        StringBuilder q = new StringBuilder(" where ");
         String and = "";
         // for all ground terms of l
         for (int i = 0; i < l.getTermsSize(); i++) {
@@ -434,7 +434,7 @@ public class JDBCPersistentBB extends DefaultBeliefBase {
     }
 
     private String getInsert(Literal l) throws SQLException {
-        StringBuffer q = new StringBuffer("insert into ");
+        StringBuilder q = new StringBuilder("insert into ");
         ResultSetMetaData meta = belsDB.get(l.getPredicateIndicator());
         q.append(meta.getTableName(1));
         q.append(" values(");

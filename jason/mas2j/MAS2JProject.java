@@ -199,7 +199,7 @@ public class MAS2JProject {
 	}
 	
 	public String toString() {
-		StringBuffer s = new StringBuffer("MAS " + getSocName() + " {\n");
+        StringBuilder s = new StringBuilder("MAS " + getSocName() + " {\n");
 		s.append("   infrastructure: "+getInfrastructure()+"\n");
 		s.append("   environment: "+getEnvClass());
 		if (envClass.host != null) {

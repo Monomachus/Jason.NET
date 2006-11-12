@@ -42,7 +42,7 @@ public class CheckVersion extends Thread {
 
     String whatsNew() {
         try {
-            StringBuffer out = new StringBuffer();
+            StringBuilder out = new StringBuilder();
             InputStream in = new URL(JasonSite+"/whatsnew.txt").openStream();
             int c = in.read();
             while (c != -1) {

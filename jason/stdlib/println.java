@@ -42,10 +42,10 @@ public class println extends DefaultInternalAction {
 			return true;
 		}
 
-		StringBuffer sout = new StringBuffer("");
+        StringBuilder sout = new StringBuilder();
         try {
     		if (ts.getSettings().logLevel() != Level.WARNING) {
-    			sout = new StringBuffer("saying: ");
+    			sout = new StringBuilder("saying: ");
     		}
         } catch (Exception e) {}
 		

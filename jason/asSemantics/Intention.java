@@ -157,7 +157,7 @@ public class Intention implements Serializable, Comparable<Intention> {
     }
     
     public String toString() {
-        StringBuffer s = new StringBuffer();
+        StringBuilder s = new StringBuilder();
         ListIterator<IntendedMeans> i = fIntendedMeans.listIterator(fIntendedMeans.size());
         while (i.hasPrevious()) {
             s.append("    " + i.previous() + "\n");

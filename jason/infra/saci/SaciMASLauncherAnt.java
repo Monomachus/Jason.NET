@@ -172,7 +172,7 @@ public class SaciMASLauncherAnt extends CentralisedMASLauncherAnt implements MAS
     }
 
     public String getAgSaciXMLScript(AgentParameters agp, boolean debug, boolean forceSync) {
-        StringBuffer s = new StringBuffer("\t<startAgent ");
+        StringBuilder s = new StringBuilder("\t<startAgent ");
         s.append("\n\t\tname=\"" + agp.name + "\" ");
         s.append("\n\t\tsociety.name=\"" + project.getSocName() + "\" ");
 

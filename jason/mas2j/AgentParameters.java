@@ -21,7 +21,7 @@ public class AgentParameters {
 	}
 	
 	public String getAsInMASProject() {
-		StringBuffer s = new StringBuffer(name+" ");
+        StringBuilder s = new StringBuilder(name+" ");
 		if (asSource != null && !asSource.getName().startsWith(name)) {
 			s.append(asSource+" ");
 		}
