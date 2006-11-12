@@ -44,9 +44,10 @@ import java.util.List;
  * methods to get perception, action, and communication.
  * 
  * <p>
- * This class just calls the AgArchInfraTier methods implemented by the
- * infrastructure tier (Centralised, Saci, ...). However, the user can customise
- * this methods overridding some of them in his/her arch. class.
+ * This class normally just calls the AgArchInfraTier methods 
+ * implemented by the infrastructure tier (Centralised, Saci, ...). 
+ * However, the user can customise
+ * these methods overridding some of them in his/her arch. class.
  */
 public class AgArch {
 
@@ -63,7 +64,8 @@ public class AgArch {
     
     /**
      * Creates the agent class defined by <i>agClass</i>, default is
-     * jason.semantics.Agent.
+     * jason.asSemantics.Agent. The agent class will parse the
+     * source code, create the transition system (TS), ...
      */
     public void initAg(String agClass, ClassParameters bbPars, String asSrc, Settings stts) throws JasonException {
         // set the agent
@@ -78,8 +80,8 @@ public class AgArch {
     }
 
     /**
-     * Stops the agent, the user should override this method to do something
-     * before the agent is killed. The default implementation does nothing.
+     * A call-back method called (by the infrasctructure tier) 
+     * when the agent is about to be killed.
      */
     public void stopAg() {
         fTS.getAg().getBB().stop();
@@ -102,7 +104,8 @@ public class AgArch {
         return archTier.perceive();
     }
 
-    /** Reads the agent's mailbox and adds messages into the agent's circumstance */
+    /** Reads the agent's mailbox and adds messages into 
+        the agent's circumstance */
     public void checkMail() {
         archTier.checkMail();
     }

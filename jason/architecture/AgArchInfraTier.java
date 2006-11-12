@@ -56,10 +56,10 @@ public interface AgArchInfraTier {
     public String getAgName();
 
     /** Sends a Jason message in a specific infrastructure */
-    public void   sendMsg(Message m) throws Exception;
+    public void sendMsg(Message m) throws Exception;
 
     /** Broadcasts a Jason message in a specific infrastructure */
-    public void   broadcast(Message m) throws Exception;
+    public void broadcast(Message m) throws Exception;
     
     /** Checks whether the agent is running */
     public boolean isRunning();
@@ -70,12 +70,12 @@ public interface AgArchInfraTier {
     /** Gets an object with infrastructure runtime services */
     public RuntimeServicesInfraTier getRuntimeServices();
     
-	/** 
-	 *  Informs the infrastructure tier controller that the agent 
-	 *  has finished its reasoning cycle (used in sync mode).
-	 *  
-	 *  <p><i>breakpoint</i> is true in case the agent selected one plan 
-	 *  with the "breakpoint"  annotation.  
-	 */ 
+    /** 
+      *  Informs the infrastructure tier controller that the agent 
+      *  has finished its reasoning cycle (used in sync mode).
+      *  
+      *  <p><i>breakpoint</i> is true in case the agent selected one plan 
+      *  with the "breakpoint" annotation.  
+      */ 
     public void informCycleFinished(boolean breakpoint, int cycle);
 }
