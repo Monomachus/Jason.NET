@@ -122,7 +122,6 @@ public class CentralisedAgArch extends Thread implements AgArchInfraTier {
 
     private Object syncStopRun = new Object();
 
-    /** Stops the agent */
     public void stopAg() {
         fUserAgArh.stopAg();
         running = false;
@@ -164,9 +163,7 @@ public class CentralisedAgArch extends Thread implements AgArchInfraTier {
         if (mbox == null) {
             throw new JasonException("Receiver '" + m.getReceiver() + "' does not exists! Could not send " + m);
         }
-        //synchronized (mbox) {
-            mbox.offer(new Message(m));
-        //}
+        mbox.offer(new Message(m));
         infraEnv.getAgent(m.getReceiver()).getTS().newMessageHasArrived();
     }
 
