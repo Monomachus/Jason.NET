@@ -165,8 +165,12 @@ public class TransitionSystem {
                 // .send(ask, ag1, value, X)
                 // if the answer was 3, unifies X=3
                 BodyLiteral send = intention.peek().removeCurrentStep();
-                intention.peek().getUnif().unifies(send.getLiteralFormula().getTerm(3), content);
-                getC().addIntention(intention);
+                if (intention.peek().getUnif().unifies(send.getLiteralFormula().getTerm(3), content)) {
+                    getC().addIntention(intention);
+		} else {
+		    conf.C.SI = intention;
+                    generateGoalDeletion();
+		}
 
                 // the message is not an ask answer
             } else if (conf.ag.socAcc(m)) {
