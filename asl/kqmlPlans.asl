@@ -14,9 +14,8 @@
 
 @kqmlReceivedTellStructure
 +!kqmlReceived(S, tell, KQMLcontentVar, M) 
-   :  .structure(KQMLcontentVar) & 
-      .ground(KQMLcontentVar) & 
-       not .list(KQMLcontentVar)
+   :  .literal(KQMLcontentVar) & 
+      .ground(KQMLcontentVar) 
    <- .addAnnot(KQMLcontentVar, source(S), CA); 
       +CA.
 @kqmlReceivedTellList
@@ -27,9 +26,8 @@
 +!addAllkqmlReceived(_,[]).   
 @kqmlReceivedTellList2
 +!addAllkqmlReceived(S,[H|T])
-   :  .structure(H) & 
-      .ground(H) & 
-       not .list(H)
+   :  .literal(H) & 
+      .ground(H)
    <- .addAnnot(H, source(S), CA); 
       +CA;
       !addAllkqmlReceived(S,T).
