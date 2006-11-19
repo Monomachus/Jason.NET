@@ -36,6 +36,7 @@ import jason.runtime.Settings;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -68,6 +69,17 @@ public class CentralisedAgArch extends Thread implements AgArchInfraTier {
     private boolean                     running      = true;
 
     protected Logger                    logger;
+    
+    private static List<MsgListener> msgListeners = null;
+    public static void addMsgListener(MsgListener l) {
+        if (msgListeners == null) {
+	    msgListeners = new ArrayList<MsgListener>();
+	}
+        msgListeners.add(l);
+    }
+    public static void removeMsgListener(MsgListener l) {
+        msgListeners.remove(l);
+    }
 
     /**
      * Creates the user agent architecture, default architecture is
@@ -165,6 +177,13 @@ public class CentralisedAgArch extends Thread implements AgArchInfraTier {
         }
         mbox.offer(new Message(m));
         infraEnv.getAgent(m.getReceiver()).getTS().newMessageHasArrived();
+	
+	// notify listeners
+	if (msgListeners != null) {
+	    for (MsgListener l: msgListeners) {
+	        l.msgSent(m);
+	    }
+	}
     }
 
     public void broadcast(jason.asSemantics.Message m) throws Exception {
