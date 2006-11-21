@@ -101,8 +101,8 @@ public class NumberTermImpl extends TermImpl implements NumberTerm {
 	}
 
     @Override
-    public int hashCode() {
-        return (int)solve();
+    protected int calcHashCode() {
+        return 37 * (int)solve();
     }
     
     @Override

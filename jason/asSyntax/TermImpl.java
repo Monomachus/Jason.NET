@@ -73,7 +73,6 @@ public class TermImpl implements Term, Serializable {
             return null;
         }
     }
-
     
     public void setFunctor(String fs) {
         functor = fs;
@@ -97,9 +96,9 @@ public class TermImpl implements Term, Serializable {
 
     public int hashCode() {
         if (hashCodeCache == null) {
-            hashCodeCache = new Integer(calcHashCode());
+            hashCodeCache = calcHashCode();
         }
-        return hashCodeCache.intValue();
+        return hashCodeCache;
     }
     
     protected int calcHashCode() {
@@ -210,17 +209,6 @@ public class TermImpl implements Term, Serializable {
         return c;
     }
 
-
-    /** 
-     * logCons checks whether one particular predicate
-     * is a log(ical)Cons(equence) of the belief base.
-     * 
-     * Returns an iterator for all unifiers that are logCons.
-     */
-    //public Iterator<Unifier> logCons(Agent ag, Unifier un) {
-    //    return null;
-    //}   
-    
     public void addTerm(Term t) {
     	if (t == null)
     		return;
@@ -258,7 +246,6 @@ public class TermImpl implements Term, Serializable {
             return null;
         }
     }
-
 
     public int getTermsSize() {
         if (terms != null) {
@@ -312,7 +299,6 @@ public class TermImpl implements Term, Serializable {
         return false;
     }
     
-
     public boolean isGround() {
         for (int i=0; i<getTermsSize(); i++) {
             if (!getTerm(i).isGround()) {

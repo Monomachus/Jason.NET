@@ -44,10 +44,10 @@ public class Literal extends Pred implements LogicalFormula {
 
 	private static final long serialVersionUID = 1L;
 
-	public static final boolean   LPos       = true;
-    public static final boolean   LNeg       = false;
-    public static final Literal   LTrue      = new Literal(LPos, new Pred("true"));
-    public static final Literal   LFalse     = new Literal(LPos, new Pred("false"));
+	public static final boolean LPos   = true;
+    public static final boolean LNeg   = false;
+    public static final Literal LTrue  = new Literal(LPos, new Pred("true"));
+    public static final Literal LFalse = new Literal(LPos, new Pred("false"));
 
     static private Logger logger = Logger.getLogger(Literal.class.getName());
 
@@ -72,7 +72,6 @@ public class Literal extends Pred implements LogicalFormula {
 		super((Pred) l);
 		type = l.type;
 	}
-	
 
 	public static Literal parseLiteral(String sLiteral) {
 		as2j parser = new as2j(new StringReader(sLiteral));

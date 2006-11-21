@@ -65,7 +65,6 @@ public class StringTermImpl extends TermImpl implements StringTerm {
 		return new StringTermImpl(getString());
 	}
 	
-	
 	public static StringTerm parseString(String sTerm) {
 		as2j parser = new as2j(new StringReader(sTerm));
 		try {
@@ -94,15 +93,15 @@ public class StringTermImpl extends TermImpl implements StringTerm {
     public boolean equals(Object t) {
         if (t == this) return true;
 
-	if (t != null && t instanceof StringTerm) {
+        if (t != null && t instanceof StringTerm) {
             StringTerm st = (StringTerm)t;
             return this.getString().equals(st.getString());
-	}
-	return false;
+        }
+        return false;
     }
 
     @Override
-    public int hashCode() {
+    protected int calcHashCode() {
         return getString().hashCode();
     }
 	
