@@ -30,9 +30,25 @@ import jason.asSemantics.Unifier;
 import jason.asSyntax.Literal;
 import jason.asSyntax.Term;
 
+/**
+  <p>Internal action: <b><code>.abolish</code></b>.
+  
+  <p>Description: remove all beliefs that match the argument. As happens with the
+  "-" operator, an event will be generated for each deletion.
+  
+  <p>Parameters:<ul>
+  <li>+ arg[0] (literal): the "pattern" of what will be removed.<br/>
+  </ul>
+  
+  <p>Examples:<ul>
+  <li> <code>.abolish(b(_))</code>: remove all <code>b/1</code> beliefs, despite the argument value.</li>
+  <li> <code>.abolish(c(_,2))</code>: remove all <code>c/2</code> beliefs where the second argument is <code>2</code>.</li>
+  <li> <code>.abolish(c(_,_)[source(ag1)])</code>: remove all <code>c/2</code> beliefs that have <code>ag1</code> as its source.</li>
+  </ul>
+
+ */
 public class abolish extends DefaultInternalAction {
 
-    /** .removeBels(gold(_,_)) */
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         try {
