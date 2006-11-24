@@ -23,12 +23,14 @@
 
 package jason.asSemantics;
 
+import static jason.asSemantics.Unifier.logger;
 import jason.asSyntax.ArithExpr;
 import jason.asSyntax.ListTerm;
 import jason.asSyntax.Literal;
 import jason.asSyntax.Pred;
+import jason.asSyntax.Structure;
 import jason.asSyntax.Term;
-import jason.asSyntax.TermImpl;
+import jason.asSyntax.DefaultTerm;
 import jason.asSyntax.Trigger;
 import jason.asSyntax.VarTerm;
 
@@ -70,10 +72,13 @@ public class Unifier implements Cloneable {
             }
             return;
         }
-        // do not use iterator! (see ListTermImpl class)
-        final int ts = t.getTermsSize();
-        for (int i = 0; i < ts; i++) {
-            apply(t.getTerm(i));
+        if (t.isStructure()) {
+            Structure ts = (Structure)t;
+            // do not use iterator! (see ListTermImpl class)
+            final int tss = ts.getTermsSize();
+            for (int i = 0; i < tss; i++) {
+                apply(ts.getTerm(i));
+            }
         }
         t.resetHashCodeCache();
     }
@@ -201,28 +206,31 @@ public class Unifier implements Cloneable {
         }
 
         // terms are atoms or structures
-        List t1gts = t1g.getTerms();
-        List t2gts = t2g.getTerms();
+        Structure t1s = (Structure)t1g;
+        Structure t2s = (Structure)t2g;
+        
+        List t1gts = t1s.getTerms();
+        List t2gts = t2s.getTerms();
 
         // different arities
         if ((t1gts == null && t2gts != null) || (t1gts != null && t2gts == null)) {
             return false;
         }
-        if (t1g.getTermsSize() != t2g.getTermsSize()) {
+        if (t1s.getTermsSize() != t2s.getTermsSize()) {
             return false;
         }
         
         // different functor
-        if (t1g.getFunctor() != null && !t1g.getFunctor().equals(t2g.getFunctor())) {
+        if (t1s.getFunctor() != null && !t1s.getFunctor().equals(t2s.getFunctor())) {
             return false;
         }
     
         // unify inner terms
         // do not use iterator! (see ListTermImpl class)
-        final int ts = t1g.getTermsSize();
+        final int ts = t1s.getTermsSize();
         for (int i = 0; i < ts; i++) {
-            Term t1 = t1g.getTerm(i);
-            Term t2 = t2g.getTerm(i);
+            Term t1 = t1s.getTerm(i);
+            Term t2 = t2s.getTerm(i);
             // if t1 or t2 are var with value, use the value
             Term t1vl = get(t1);
             if (t1vl != null && !(t1vl instanceof VarsCluster))
@@ -386,7 +394,7 @@ public class Unifier implements Cloneable {
      * @author jomi
      * 
      */
-    class VarsCluster extends TermImpl {
+    class VarsCluster extends DefaultTerm {
 		private static final long serialVersionUID = 1L;
 
         int id = 0;
@@ -444,6 +452,14 @@ public class Unifier implements Cloneable {
                 c.vars.add((VarTerm)vt.clone());
             }
             return c;
+        }
+        
+        protected int calcHashCode() {
+            return vars.hashCode();
+        }
+        
+        public Element getAsDOM(Document document) {
+            return null;
         }
         
         public String toString() {

@@ -27,15 +27,15 @@ import jason.JasonException;
 import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
+import jason.asSyntax.Structure;
 import jason.asSyntax.Term;
-import jason.asSyntax.TermImpl;
 
 public class myName extends DefaultInternalAction {
 
     @Override
 	public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
 		try {
-            return un.unifies(args[0], new TermImpl(ts.getUserAgArch().getAgName()));
+            return un.unifies(args[0], new Structure(ts.getUserAgArch().getAgName()));
 		} catch (ArrayIndexOutOfBoundsException e) {
 			throw new JasonException("The internal action 'myName' has not received one argument");
 		}

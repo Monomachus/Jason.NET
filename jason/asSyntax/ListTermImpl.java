@@ -34,15 +34,20 @@ import java.util.ListIterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
 
 /**
+ * Represents a list node as in prolog .(t1,.(t2,.(t3,.))).
+ * 
  * Each nth-ListTerm has both a term and the next ListTerm.
  * The last ListTem is a emptyListTerm (term==null).
  * In lists with tail ([a|X]), next is the Tail (next=X).
  *
  * @author jomi
  */
-public class ListTermImpl extends TermImpl implements ListTerm {
+public class ListTermImpl extends Structure implements ListTerm {
 	
 	private static final long serialVersionUID = 1L;
 
@@ -106,7 +111,7 @@ public class ListTermImpl extends TermImpl implements ListTerm {
 	}
 	
     @Override
-    public int hashCode() {
+    public int calcHashCode() {
         int code = 37;
         if (term != null) 
             code += term.hashCode();
@@ -181,10 +186,12 @@ public class ListTermImpl extends TermImpl implements ListTerm {
 		}
 	}
 	
-	public boolean isList() {
+    @Override
+    public boolean isList() {
 		return true;
 	}
-	public boolean isEmpty() {
+
+    public boolean isEmpty() {
 		return term == null;
 	}
 	public boolean isEnd() {
@@ -549,4 +556,13 @@ public class ListTermImpl extends TermImpl implements ListTerm {
 	public Object[] toArray(Object[] arg0) {
 		return getAsList().toArray(arg0);
 	}
+    
+    public Element getAsDOM(Document document) {
+        Element u = (Element) document.createElement("list-term");
+        for (Term t: this) {
+            u.appendChild(t.getAsDOM(document));
+        }
+        return u;
+    }
+
 }

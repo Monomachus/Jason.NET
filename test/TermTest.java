@@ -6,8 +6,9 @@ import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Literal;
 import jason.asSyntax.NumberTermImpl;
 import jason.asSyntax.Pred;
+import jason.asSyntax.Structure;
 import jason.asSyntax.Term;
-import jason.asSyntax.TermImpl;
+import jason.asSyntax.DefaultTerm;
 import jason.asSyntax.Trigger;
 import jason.asSyntax.VarTerm;
 import jason.bb.BeliefBase;
@@ -24,37 +25,37 @@ public class TermTest extends TestCase {
 	}
 
 	public void testEquals() {
-		TermImpl t1, t2, t3;
-		t1 = new TermImpl("pos");
-		t2 = new TermImpl((TermImpl)t1);
-		t3 = new TermImpl(); t3.setFunctor("pos");
+        Structure t1, t2, t3;
+		t1 = new Structure("pos");
+		t2 = new Structure(t1);
+		t3 = new Structure(); t3.setFunctor("pos");
 		assertTrue(t1.equals(t2));
 		assertTrue(t1.equals(t3));
 		
-		t1.addTerm(new TermImpl("a"));
+		t1.addTerm(new Structure("a"));
 		assertFalse(t1.equals(t2));
 		
-		t2.addTerm(new TermImpl("a"));
+		t2.addTerm(new Structure("a"));
 		assertTrue(t1.equals(t2));
         assertTrue(t2.equals(t1));
         assertEquals(t1.hashCode(),t2.hashCode());
 
-		Term targ1 = new TermImpl("b");
-		targ1.addTerm(new TermImpl("1"));
-		Term targ2 = new TermImpl("b");
-		targ2.addTerm(new TermImpl("2"));
+        Structure targ1 = new Structure("b");
+		targ1.addTerm(new Structure("1"));
+        Structure targ2 = new Structure("b");
+		targ2.addTerm(new Structure("2"));
 
 		t1.addTerm(targ1);
 		assertFalse(t1.equals(t2));
 		
-		Term targ1a = new TermImpl("b");
-		targ1a.addTerm(new TermImpl("1"));
-		t3.addTerm(new TermImpl("a"));
+        Structure targ1a = new Structure("b");
+		targ1a.addTerm(new Structure("1"));
+		t3.addTerm(new Structure("a"));
 		t3.addTerm(targ1a);
 		assertTrue(t1.equals(t3));
 		
 		// tests with variables
-		t1.addTerm(new TermImpl("c"));
+		t1.addTerm(new Structure("c"));
 		t3.addTerm(new VarTerm("X"));
 		assertFalse(t1.equals(t3));
 		
@@ -64,47 +65,47 @@ public class TermTest extends TestCase {
 		l4.addAnnot(BeliefBase.TPercept);
 		assertEquals(l3, l4);
 		
-        Term tpos = new TermImpl("pos");
+        Term tpos = new Structure("pos");
 		assertTrue(l3.equals(tpos));
-		assertTrue(new TermImpl("pos").equals(l3));
+		assertTrue(new Structure("pos").equals(l3));
 		//System.out.println(new Term("pos")+"="+l3+" --> "+new Term("pos").equals(l3));
 
 		assertFalse(new Pred("pos").equals(l3));
 		assertTrue(new Pred("pos").equalsAsTerm(l3));
 		Pred panot = new Pred("pos");
-		panot.addAnnot(new TermImpl("bla"));
+		panot.addAnnot(new Structure("bla"));
 		assertTrue(l3.equalsAsTerm(panot));
 		
 		// basic VarTerm test
 		assertTrue(new VarTerm("X").equals(new VarTerm("X")));
 		assertFalse(new VarTerm("X").equals(new VarTerm("Y")));
-		assertFalse(new VarTerm("X").equals(new TermImpl("X")));
+		assertFalse(new VarTerm("X").equals(new Structure("X")));
 		
 		VarTerm x1 = new VarTerm("X1");
-		x1.setValue(new TermImpl("a"));
+		x1.setValue(new Structure("a"));
 		assertFalse(x1.equals(new VarTerm("X1")));
 		
 		VarTerm x2 = new VarTerm("X2");
-		x2.setValue(new TermImpl("a"));
+		x2.setValue(new Structure("a"));
 		assertTrue(x1.equals(x2));
         assertTrue(x2.equals(x1));
         assertEquals(x1.hashCode(), x2.hashCode());
         
-        Term ta = new TermImpl("a");
+        Term ta = new Structure("a");
         assertTrue(x1.equals(ta));
         assertTrue(ta.equals(x1));
         assertEquals(x1.hashCode(), ta.hashCode());
 	}
 
 	public void testUnifies() {
-		assertTrue(new Unifier().unifies(new TermImpl("a"), new TermImpl("a")));
-		assertTrue(new Unifier().unifies(new TermImpl("a"), new VarTerm("X")));
+		assertTrue(new Unifier().unifies(new Structure("a"), new Structure("a")));
+		assertTrue(new Unifier().unifies(new Structure("a"), new VarTerm("X")));
 		
 		Unifier u = new Unifier();
 		VarTerm b = new VarTerm("B");
 		VarTerm x = new VarTerm("X");
 		assertTrue(u.unifies(b, x));
-		assertTrue(u.unifies(new TermImpl("a"), x));
+		assertTrue(u.unifies(new Structure("a"), x));
 		//System.out.println("u="+u);
 		assertEquals(u.get(b).toString(), "a");
 		assertEquals(u.get(x).toString(), "a");
@@ -115,14 +116,14 @@ public class TermTest extends TestCase {
 		assertEquals(x.toString(), "X");
 		
 		u = new Unifier();
-		TermImpl t1, t2, t3;
+        Structure t1, t2, t3;
 		
-		t1 = new TermImpl("pos");
-		t2 = new TermImpl(t1);
-		t3 = new TermImpl(t1);
+		t1 = new Structure("pos");
+		t2 = new Structure(t1);
+		t3 = new Structure(t1);
 
-		t1.addTerm(new TermImpl("1"));
-		t1.addTerm(new TermImpl("2"));
+		t1.addTerm(new Structure("1"));
+		t1.addTerm(new Structure("2"));
 
 		t2.addTerm(new VarTerm("X"));
 		t2.addTerm(new VarTerm("X"));
@@ -149,7 +150,7 @@ public class TermTest extends TestCase {
 		assertTrue(z1.isVar()); // z1 is still a var
 		assertTrue(z2.isVar()); // z2 is still a var
 		
-		assertTrue(u.unifies(z2,new TermImpl("a")));
+		assertTrue(u.unifies(z2,new Structure("a")));
 		//System.out.println("u="+u);
 		assertEquals(u.get("Z1").toString(), "a");
 		assertEquals(u.get("Z2").toString(), "a");
@@ -165,10 +166,10 @@ public class TermTest extends TestCase {
 		p1 = new Pred("pos");
 		p2 = new Pred("pos");
 
-		p1.addTerm(new TermImpl("1"));
-		p2.addTerm(new TermImpl("1"));
+		p1.addTerm(new Structure("1"));
+		p2.addTerm(new Structure("1"));
 		
-		p2.addAnnot(new TermImpl("percept"));
+		p2.addAnnot(new Structure("percept"));
 		//System.out.println("p1="+p1+"; p2="+p2);
 		assertTrue(u.unifies(p1, p2));
 	}
@@ -184,16 +185,16 @@ public class TermTest extends TestCase {
 		p1 = new Pred("pos");
 		p2 = new Pred("pos");
 
-		p1.addTerm(new TermImpl("1"));
-		p2.addTerm(new TermImpl("1"));
+		p1.addTerm(new Structure("1"));
+		p2.addTerm(new Structure("1"));
 		
 		p1.addAnnot(new VarTerm("X"));
-		p2.addAnnot(new TermImpl("ag1"));
+		p2.addAnnot(new Structure("ag1"));
 		//System.out.println("p1="+p1+"; p2="+p2);
 		assertTrue(u.unifies(p1, p2));
 		//System.out.println("u="+u);
 		
-		p1.addAnnot(new TermImpl("ag2"));
+		p1.addAnnot(new Structure("ag2"));
 		p2.addAnnot(new VarTerm("Y"));
 		//System.out.println("p1="+p1+"; p2="+p2);
 		u = new Unifier();
@@ -201,8 +202,8 @@ public class TermTest extends TestCase {
 		//System.out.println("u="+u);
 		
 		p1.addAnnot(new VarTerm("Z"));
-		p2.addAnnot(new TermImpl("ag3"));
-		p2.addAnnot(new TermImpl("ag4"));
+		p2.addAnnot(new Structure("ag3"));
+		p2.addAnnot(new Structure("ag4"));
 		//System.out.println("p1="+p1+"; p2="+p2);
 		u = new Unifier();
 		assertTrue(u.unifies(p1, p2));
@@ -217,11 +218,11 @@ public class TermTest extends TestCase {
 		//System.out.println("u="+u);
 
 		p1.clearAnnots();
-		p1.addAnnot(new TermImpl("ag2"));
+		p1.addAnnot(new Structure("ag2"));
 		p2.clearAnnots();
-		p2.addAnnot(new TermImpl("ag1"));
-		p2.addAnnot(new TermImpl("ag2"));
-		p2.addAnnot(new TermImpl("ag3"));
+		p2.addAnnot(new Structure("ag1"));
+		p2.addAnnot(new Structure("ag2"));
+		p2.addAnnot(new Structure("ag3"));
 		//System.out.println("p1="+p1+"; p2="+p2);
 		u = new Unifier();
 		assertTrue(u.unifies(p1, p2));
@@ -241,18 +242,18 @@ public class TermTest extends TestCase {
 	
 	public void testTriggetAnnot() {
 		Literal content = Literal.parseLiteral("~alliance");
-		content.addSource(new TermImpl("ag1"));
+		content.addSource(new Structure("ag1"));
 		Literal received = new Literal(Literal.LPos, new Pred("received"));
-		received.addTerm(new TermImpl("ag1"));
-		received.addTerm(new TermImpl("tell"));
+		received.addTerm(new Structure("ag1"));
+		received.addTerm(new Structure("tell"));
 		received.addTerm(content);
-		received.addTerm(new TermImpl("id1"));
+		received.addTerm(new Structure("id1"));
 		
 		Trigger t1 = new Trigger(Trigger.TEAdd, Trigger.TEBel, received);
 
 		Literal received2 = new Literal(Literal.LPos, new Pred("received"));
 		received2.addTerm(new VarTerm("S"));
-		received2.addTerm(new TermImpl("tell"));
+		received2.addTerm(new Structure("tell"));
 		received2.addTerm(new VarTerm("C"));
 		received2.addTerm(new VarTerm("M"));
 		
@@ -279,12 +280,12 @@ public class TermTest extends TestCase {
 	
 	public void testLiteralUnify() {
 		Literal content = Literal.parseLiteral("~alliance");
-		content.addSource(new TermImpl("ag1"));
+		content.addSource(new Structure("ag1"));
 		Literal l1 = new Literal(Literal.LPos, new Pred("received"));
-		l1.addTerm(new TermImpl("ag1"));
-		l1.addTerm(new TermImpl("tell"));
+		l1.addTerm(new Structure("ag1"));
+		l1.addTerm(new Structure("tell"));
 		l1.addTerm(content);
-		l1.addTerm(new TermImpl("id1"));
+		l1.addTerm(new Structure("id1"));
 
 		
 		Literal l2 = Literal.parseLiteral("received(S,tell,C,M)");
@@ -358,20 +359,36 @@ public class TermTest extends TestCase {
         assertEquals(p2.compareTo(p1), 1);
         assertEquals(p1.compareTo(p1), 0);
         
-        p1 = Pred.parsePred("a(3)");
-        p2 = Pred.parsePred("a(100)");
-        
+        p1 = Pred.parsePred("a(3)[3]");
+        p2 = Pred.parsePred("a(3)[10]");
+        Pred p3 = Pred.parsePred("a(3)[10]");
         assertEquals(p1.compareTo(p2), -1);
         assertEquals(p2.compareTo(p1), 1);
+        assertEquals(p2.compareTo(p3), 0);
+
+        Literal l1 = Literal.parseLiteral("~a(3)");
+        Literal l2 = Literal.parseLiteral("a(3)");
+        Literal l3 = Literal.parseLiteral("a(10)[5]");
+        assertTrue(l1.compareTo(l2) == 1);
+        assertTrue(l1.compareTo(l3) == 1);
+        assertTrue(l2.compareTo(l3) == -1);
         
-        ListTerm l = ListTermImpl.parseList("[b,c,g,casa,f(10),[3,4],[3,1],f(4)]");
+        ListTerm l = ListTermImpl.parseList("[~a(3),a(3),a(10)[30],a(10)[5]]");
         Collections.sort(l);
-        assertEquals(l.toString(), "[b,c,casa,f(4),f(10),g,[3,1],[3,4]]");
+        assertEquals(l.toString(), "[a(3),a(10)[5],a(10)[30],~a(3)]");
+        
+        ListTerm lt1 = ListTermImpl.parseList("[3,10]");
+        ListTerm lt2 = ListTermImpl.parseList("[3,4]");
+        assertTrue(lt1.compareTo(lt2) > 0);
+        
+        l = ListTermImpl.parseList("[b,c,10,g,casa,f(10),[3,4],5,[3,10],f(4)]");
+        Collections.sort(l);
+        assertEquals(l.toString(), "[5,10,b,c,casa,g,[3,4],[3,10],f(4),f(10)]");
     }
     
     public void testUnify4() {
-        Term a1 = TermImpl.parse("a(1)");
-        Term a2 = TermImpl.parse("a(X+1)");
+        Term a1 = DefaultTerm.parse("a(1)");
+        Term a2 = DefaultTerm.parse("a(X+1)");
         Unifier u = new Unifier();
         u.unifies(new VarTerm("X"),new NumberTermImpl(0));
         assertFalse(a1.equals(a2));   

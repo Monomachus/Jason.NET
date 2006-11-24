@@ -29,8 +29,9 @@ import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.ListTerm;
 import jason.asSyntax.StringTerm;
+import jason.asSyntax.Structure;
 import jason.asSyntax.Term;
-import jason.asSyntax.TermImpl;
+import jason.asSyntax.DefaultTerm;
 
 import java.util.Iterator;
 
@@ -43,15 +44,15 @@ public class addPlan extends DefaultInternalAction {
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         try {
-            Term plans = TermImpl.parse(args[0].toString());
+            Term plans = DefaultTerm.parse(args[0].toString());
 
-            Term source = new TermImpl("self");
+            Structure source = new Structure("self");
             if (args.length > 1) {
-                source = (Term) args[1].clone();
+                source = (Structure) args[1].clone();
                 un.apply(source);
             }
 
-            if (plans.isList()) { // if arg[0] is a list
+            if (plans.isList()) { // if arg[0] is a list of strings
                 ListTerm lt = (ListTerm) plans;
                 Iterator i = lt.iterator();
                 while (i.hasNext()) {

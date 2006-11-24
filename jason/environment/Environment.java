@@ -25,7 +25,7 @@
 package jason.environment;
 
 import jason.asSyntax.Literal;
-import jason.asSyntax.Term;
+import jason.asSyntax.Structure;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -65,7 +65,8 @@ public class Environment {
 	// set of agents that already received the last version of perception
 	private Set<String> uptodateAgs = Collections.synchronizedSet(new HashSet<String>());
 	
-	
+	//static private Logger logger = Logger.getLogger(Environment.class.getName());
+
 	/** Called before the MAS execution with the args informed in .mas2j, the user environment could override it */
 	public void init(String[] args) {
 	}
@@ -223,7 +224,7 @@ public class Environment {
     /**
      * Called by the agent architecture to execute an action on the environment.
      */
-    public boolean executeAction(String agName, Term act) {
+    public boolean executeAction(String agName, Structure act) {
         return true;
     }
 }

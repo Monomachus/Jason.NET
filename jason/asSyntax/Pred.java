@@ -36,9 +36,9 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
- * A Pred is a Term with annotations, eg a(1)[an1,an2].
+ * A Pred is a Structure with annotations, eg a(1)[an1,an2].
  */
-public class Pred extends TermImpl {
+public class Pred extends Structure {
 
 	private static final long serialVersionUID = 1L;
 
@@ -53,25 +53,26 @@ public class Pred extends TermImpl {
         super(ps);
     }
 
-    public Pred(TermImpl t) {
+    public Pred(Structure t) {
         super(t);
     }
 
     public Pred(Pred p) {
-        this((TermImpl) p);
+        this((Structure) p);
         copyAnnot(p);
     }
 
     public static Pred parsePred(String sPred) {
         as2j parser = new as2j(new StringReader(sPred));
         try {
-            return parser.atom();
+            return parser.pred();
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error parsing predicate " + sPred, e);
             return null;
         }
     }
 
+    @Override
     public boolean isPred() {
         return true;
     }
@@ -144,20 +145,20 @@ public class Pred extends TermImpl {
     }
 
     /**
-     * Add a source annotation like "source(<i>agName</i>)".
+     * Adds a source annotation like "source(<i>agName</i>)".
      */
-    public void addSource(Term agName) {
+    public void addSource(Structure agName) {
         if (agName != null) {
-            Term ts = new TermImpl("source");
+            Structure ts = new Structure("source");
             ts.addTerm(agName);
             addAnnot(ts);
         }
     }
 
-    /** del "source(<i>agName</i>)" */
-    public boolean delSource(Term agName) {
+    /** deletes "source(<i>agName</i>)" */
+    public boolean delSource(Structure agName) {
         if (annots != null) {
-            Term ts = new TermImpl("source");
+            Structure ts = new Structure("source");
             ts.addTerm(agName);
             return annots.remove(ts);
         }
@@ -165,29 +166,34 @@ public class Pred extends TermImpl {
     }
 
     /**
-     * return the sources of this Pred as a new list. e.g.: from annots
+     * returns the sources of this Pred as a new list. e.g.: from annots
      * [source(a), source(b)], it returns [a,b]
      */
     public ListTerm getSources() {
         ListTerm ls = new ListTermImpl();
         if (annots != null) {
             for (Term ta : annots) {
-                if (ta.getFunctor().equals("source")) {
-                    ls.add(ta.getTerm(0));
+                if (ta.isStructure()) {
+                    Structure tas = (Structure)ta;
+                    if (tas.getFunctor().equals("source")) {
+                        ls.add(tas.getTerm(0));
+                    }
                 }
             }
         }
         return ls;
     }
 
-    /** del all sources annotations */
+    /** deletes all sources annotations */
     public void delSources() {
         if (annots != null) {
             Iterator<Term> i = annots.iterator();
             while (i.hasNext()) {
                 Term t = i.next();
-                if (t.getFunctor().equals("source")) {
-                    i.remove();
+                if (t.isStructure()) {
+                    if (((Structure)t).getFunctor().equals("source")) {
+                        i.remove();
+                    }
                 }
             }
         }
@@ -196,8 +202,10 @@ public class Pred extends TermImpl {
     public boolean hasSource() {
         if (annots != null) {
             for (Term ta : annots) {
-                if (ta.getFunctor().equals("source")) {
-                    return true;
+                if (ta.isStructure()) {
+                    if (((Structure)ta).getFunctor().equals("source")) {
+                        return true;
+                    }
                 }
             }
         }
@@ -205,9 +213,9 @@ public class Pred extends TermImpl {
     }
 
     /** returns true if this pred has a "source(<i>agName</i>)" */
-    public boolean hasSource(Term agName) {
+    public boolean hasSource(Structure agName) {
         if (annots != null) {
-            Term ts = new TermImpl("source");
+            Structure ts = new Structure("source");
             ts.addTerm(agName);
             return annots.contains(ts);
         }
@@ -370,31 +378,36 @@ public class Pred extends TermImpl {
         return super.equals((Term) p);
     }
 
-    public int compareTo(Term p) {
-        int c;
-        c = super.compareTo(p);
+    @Override
+    public int compareTo(Term t) {
+        int c = super.compareTo(t);
         if (c != 0)
             return c;
-        if (getAnnots() == null && ((Pred) p).getAnnots() == null) {
-            return 0;
-        }
-        if (getAnnots() == null) {
-            return -1;
-        }
-        if (((Pred) p).getAnnots() == null) {
-            return 1;
-        }
-        if (getAnnots().size() < ((Pred) p).getAnnots().size())
-            return -1;
-        if (getAnnots().size() > ((Pred) p).getAnnots().size())
-            return 1;
-
-        // same size, compare annots
-        Iterator<Term> pai = ((Pred) p).getAnnots().iterator();
-        for (Term a : getAnnots()) {
-            if (a.compareTo(pai.next()) == 0) {
+        
+        if (t.isPred()) {
+            Pred tAsPred = (Pred)t;
+            if (getAnnots() == null && tAsPred.getAnnots() == null) {
                 return 0;
             }
+            if (getAnnots() == null) {
+                return -1;
+            }
+            if (tAsPred.getAnnots() == null) {
+                return 1;
+            }
+    
+            Iterator<Term> pai = tAsPred.getAnnots().iterator();
+            for (Term a : getAnnots()) {
+                c = a.compareTo(pai.next());
+                if (c != 0) {
+                    return c;
+                }
+            }
+
+            if (getAnnots().size() < tAsPred.getAnnots().size())
+                return -1;
+            if (getAnnots().size() > tAsPred.getAnnots().size())
+                return 1;
         }
         return 0;
     }
@@ -422,12 +435,9 @@ public class Pred extends TermImpl {
         Element u = super.getAsDOM(document);
         if (getAnnots() != null && !getAnnots().isEmpty()) {
             Element ea = document.createElement("annotations");
-            for (Term a : getAnnots()) {
-                ea.appendChild(a.getAsDOM(document));
-            }
+            ea.appendChild(getAnnots().getAsDOM(document));
             u.appendChild(ea);
         }
         return u;
     }
-
 }

@@ -29,10 +29,9 @@ import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.ListTerm;
+import jason.asSyntax.Pred;
+import jason.asSyntax.Structure;
 import jason.asSyntax.Term;
-import jason.asSyntax.TermImpl;
-
-import java.util.Iterator;
 
 public class removePlan extends DefaultInternalAction {
 
@@ -51,26 +50,24 @@ public class removePlan extends DefaultInternalAction {
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         try {
-        	Term label = (Term)args[0].clone();
+            Term label = (Term)args[0].clone();
         	un.apply(label);
 
-        	Term source = new TermImpl("self");
+            Structure source = new Structure("self");
         	if (args.length > 1) {
-        		source = (Term)args[1].clone();
+        		source = (Structure)args[1].clone();
         		un.apply(source);
         	}
         	
         	if (label.isList()) { // if arg[0] is a list
         		boolean r = true;
         		ListTerm lt = (ListTerm)args[0];
-        		Iterator i = lt.iterator();
-        		while (i.hasNext()) {
-        			label = (Term)i.next();
-        			r = r && ts.getAg().getPL().removePlan(label, source);
+                for (Term t: lt) {
+        			r = r && ts.getAg().getPL().removePlan((Pred)t, source);
         		}
         		return r;
         	} else { // args[0] is a plan's label
-        		return ts.getAg().getPL().removePlan(label, source);
+        		return ts.getAg().getPL().removePlan((Pred)label, source);
         	}
         } catch (ArrayIndexOutOfBoundsException e) {
             throw new JasonException("The internal action 'removePlan' has not received the plan's label as argument.");

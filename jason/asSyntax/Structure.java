@@ -25,7 +25,6 @@ package jason.asSyntax;
 
 import jason.asSyntax.parser.as2j;
 
-import java.io.Serializable;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -37,39 +36,39 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
- * Represents a Term (a predicate parameter), e.g.: val(10,x(3)).
+ * Represents a structure: a functor with <i>n</i> arguments, e.g.: val(10,x(3)). <i>n</i> can be
+ * 0, so this class also represents atoms.
  */
-public class TermImpl implements Term, Serializable {
+public class Structure extends DefaultTerm {
 
 	private static final long serialVersionUID = 1L;
 
 	private String functor = null;
     private List<Term> terms;
-    protected Integer hashCodeCache = null;
 
-    static private Logger logger = Logger.getLogger(Term.class.getName());
+    static private Logger logger = Logger.getLogger(Structure.class.getName());
     
-    public TermImpl() {
+    public Structure() {
     }
 
-    public TermImpl(String fs) {
-        if (fs != null && Character.isUpperCase(fs.charAt(0))) {
-            logger.warning("Are you sure you want to create a term that begins with uppercase ("+fs+")? Should it be a VarTerm instead?");
+    public Structure(String functor) {
+        if (functor != null && Character.isUpperCase(functor.charAt(0))) {
+            logger.warning("Are you sure you want to create a structure that begins with uppercase ("+functor+")? Should it be a VarTerm instead?");
         }
-        setFunctor(fs);
+        setFunctor(functor);
     }
 
-    public TermImpl(TermImpl t) {
+    public Structure(Structure t) {
         setFunctor(t.getFunctor());
         setTerms(t.getDeepCopyOfTerms());
     }
 
-    public static Term parse(String sTerm) {
+    public static Structure parse(String sTerm) {
         as2j parser = new as2j(new StringReader(sTerm));
         try {
-            return parser.term();
+            return (Structure)parser.term();
         } catch (Exception e) {
-            logger.log(Level.SEVERE,"Error parsing term " + sTerm,e);
+            logger.log(Level.SEVERE,"Error parsing structure " + sTerm,e);
             return null;
         }
     }
@@ -94,13 +93,6 @@ public class TermImpl implements Term, Serializable {
         return predicateIndicatorCache;
     }
 
-    public int hashCode() {
-        if (hashCodeCache == null) {
-            hashCodeCache = calcHashCode();
-        }
-        return hashCodeCache;
-    }
-    
     protected int calcHashCode() {
         final int PRIME = 7;
         int result = 1;
@@ -117,47 +109,42 @@ public class TermImpl implements Term, Serializable {
         return result;
     }
     
-    /** remove the valued cached for hashCode */
-    public void resetHashCodeCache() {
-        hashCodeCache = null;
-    }
-    
     public boolean equals(Object t) {
         if (t == null) return false;
         if (t == this) return true;
 
-        if (t instanceof Term) {
-            Term tAsTerm = (Term)t;
+        if (t instanceof Structure) {
+            Structure tAsStruct = (Structure)t;
 
             // if t is a VarTerm, uses var's equals
-            if (tAsTerm.isVar()) { //t instanceof VarTerm) { // tAsTerm.isVar()) { //
+            if (tAsStruct.isVar()) {
                 VarTerm vt = (VarTerm)t;
                 //System.out.println(this.functor+" equals1 "+vt.getFunctor());
                 return vt.equals(this);
             }
             
             //System.out.println(this+" equals2 "+tAsTerm);
-            if (getFunctor() == null && tAsTerm.getFunctor() != null) {
+            if (getFunctor() == null && tAsStruct.getFunctor() != null) {
                 return false;
             }
-            if (getFunctor() != null && !getFunctor().equals(tAsTerm.getFunctor())) {
+            if (getFunctor() != null && !getFunctor().equals(tAsStruct.getFunctor())) {
                 return false;
             }
-            if (getTerms() == null && tAsTerm.getTerms() == null) {
+            if (getTerms() == null && tAsStruct.getTerms() == null) {
                 return true;
             }
-            if (getTerms() == null || tAsTerm.getTerms() == null) {
+            if (getTerms() == null || tAsStruct.getTerms() == null) {
                 return false;
             }
             final int ts = getTermsSize(); 
-            if (ts != tAsTerm.getTermsSize()) {
+            if (ts != tAsStruct.getTermsSize()) {
                 return false;
             }
 
             for (int i=0; i<ts; i++) {
                 //System.out.println(" *term "+i+" "+getTerm(i)+getTerm(i).getClass().getName()
                 //      +"="+tAsTerm.getTerm(i)+tAsTerm.getTerm(i).getClass().getName()+" deu "+getTerm(i).equals(tAsTerm.getTerm(i)));             
-                if (!getTerm(i).equals(tAsTerm.getTerm(i))) {
+                if (!getTerm(i).equals(tAsStruct.getTerm(i))) {
                     return false;
                 }
             }
@@ -167,43 +154,43 @@ public class TermImpl implements Term, Serializable {
     }
 
 
-    
-    public int compareTo(Term tAsTerm) {
-        try {
-            // TODO: why overriding in ArithExprTerm is not working and we need this if?
-            return ((ArithExpr)this).compareTo(tAsTerm);
-        } catch (Exception e) {}
+    public int compareTo(Term t) {
+        if (! t.isStructure()) {
+            return super.compareTo(t);
+        }
 
+        Structure tAsStruct = (Structure)t;
         int c;
-        if (getFunctor() != null && tAsTerm.getFunctor() != null) {
-            c = getFunctor().compareTo(tAsTerm.getFunctor());
+        if (getFunctor() != null && tAsStruct.getFunctor() != null) {
+            c = getFunctor().compareTo(tAsStruct.getFunctor());
             if (c != 0)
                 return c;
         }
-        List<Term> tatt = tAsTerm.getTerms();
+        List<Term> tatt = tAsStruct.getTerms();
         if (getTerms() == null &&  tatt == null)
             return 0;
         if (getTerms() == null)
             return -1;
         if (tatt == null)
             return 1;
+
+        for (int i=0; i<getTermsSize() && i<tAsStruct.getTermsSize(); i++) {
+            c = getTerm(i).compareTo(tAsStruct.getTerm(i));
+            if (c != 0)
+                return c;
+        }
+
         if (getTerms().size() < tatt.size())
             return -1;
         else if (getTerms().size() > tatt.size())
             return 1;
 
-        // same number of terms
-        for (int i=0; i<getTermsSize(); i++) {
-            c = getTerm(i).compareTo(tAsTerm.getTerm(i));
-            if (c != 0)
-                return c;
-        }
         return 0;
     }
 
     /** make a deep copy of the terms */
     public Object clone() {
-        TermImpl c = new TermImpl(this);
+        Structure c = new Structure(this);
         c.predicateIndicatorCache = this.predicateIndicatorCache;
         c.hashCodeCache = this.hashCodeCache;
         return c;
@@ -271,34 +258,11 @@ public class TermImpl implements Term, Serializable {
         return ts;
     }
 
-    public boolean isVar() {
-        return false;
+    @Override
+    public boolean isStructure() {
+        return true;
     }
-    public boolean isLiteral() {
-        return false;
-    }
-    public boolean isRule() {
-        return false;
-    }
-    public boolean isList() {
-        return false;
-    }
-    public boolean isString() {
-        return false;
-    }
-    public boolean isInternalAction() {
-        return false;
-    }
-    public boolean isArithExpr() {
-        return false;
-    }
-    public boolean isNumeric() {
-        return false;
-    }
-    public boolean isPred() {
-        return false;
-    }
-    
+
     public boolean isGround() {
         for (int i=0; i<getTermsSize(); i++) {
             if (!getTerm(i).isGround()) {
@@ -308,16 +272,16 @@ public class TermImpl implements Term, Serializable {
         return true;
     }
 
-    public boolean isStructure() {
-        return true;
-    }
-
     public void makeVarsAnnon() {
         for (int i=0; i<getTermsSize(); i++) {
-            if (getTerm(i).isVar()) {
+            Term ti = getTerm(i);
+            if (ti.isVar()) {
                 setTerm(i,new UnnamedVar());
-            } else if (getTerm(i).getTermsSize()>0) {
-                getTerm(i).makeVarsAnnon();
+            } else if (ti.isStructure()) {
+                Structure tis = (Structure)ti;
+                if (tis.getTermsSize()>0) {
+                    tis.makeVarsAnnon();
+                }
             }
         }
         hashCodeCache = null;
@@ -345,15 +309,15 @@ public class TermImpl implements Term, Serializable {
         if (terms == null) {
             return null;
         }
-        List<Term> l = new ArrayList<Term>(getTerms().size());
-        for (Term ti: getTerms()) {
+        List<Term> l = new ArrayList<Term>(terms.size());
+        for (Term ti: terms) {
             l.add((Term)ti.clone());
         }
         return l;
     }
     
     public String toString() {
-        StringBuffer s = new StringBuffer();
+        StringBuilder s = new StringBuilder();
         if (functor != null) {
             s.append(functor);
         }
@@ -372,7 +336,7 @@ public class TermImpl implements Term, Serializable {
    
     /** get as XML */
     public Element getAsDOM(Document document) {
-        Element u = (Element) document.createElement("term");
+        Element u = (Element) document.createElement("structure");
         u.setAttribute("functor",getFunctor());
         //u.appendChild(document.createTextNode(toString()));
         if (getTerms() != null && !getTerms().isEmpty()) {

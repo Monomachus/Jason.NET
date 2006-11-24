@@ -25,7 +25,7 @@
 package jason.asSemantics;
 
 import jason.asSyntax.Pred;
-import jason.asSyntax.Term;
+import jason.asSyntax.Structure;
 
 import java.io.Serializable;
 
@@ -37,7 +37,7 @@ public class ActionExec implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	Term      action;
+    Structure action;
 	Intention intention;
     boolean   result;
     
@@ -61,9 +61,8 @@ public class ActionExec implements Serializable {
     public int hashCode() {
         return action.hashCode();
     }
-    
    
-    public Term getActionTerm() {
+    public Structure getActionTerm() {
     	return action;
     }
     public Intention getIntention() {

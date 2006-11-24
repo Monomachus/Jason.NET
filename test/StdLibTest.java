@@ -15,8 +15,9 @@ import jason.asSyntax.Plan;
 import jason.asSyntax.Pred;
 import jason.asSyntax.StringTerm;
 import jason.asSyntax.StringTermImpl;
+import jason.asSyntax.Structure;
 import jason.asSyntax.Term;
-import jason.asSyntax.TermImpl;
+import jason.asSyntax.DefaultTerm;
 import jason.asSyntax.Trigger;
 import jason.asSyntax.VarTerm;
 import jason.bb.BeliefBase;
@@ -65,7 +66,7 @@ public class StdLibTest extends TestCase {
 
         Literal msg = Literal.parseLiteral("ok(10)");
         VarTerm X = new VarTerm("X");
-        Term annot = TermImpl.parse("source(jomi)");
+        Term annot = DefaultTerm.parse("source(jomi)");
         try {
             aa.execute(null, u, new Term[] { msg, annot, X });
         } catch (Exception e) {
@@ -76,9 +77,9 @@ public class StdLibTest extends TestCase {
         assertTrue(((Pred) u.get("X")).hasAnnot(annot));
 
         // testing addAnnot with list
-        ListTerm msgL = (ListTerm) TermImpl.parse("[ok(10),[ok(20),ok(30),[ok(40)|[ok(50),ok(60)]]]]");
+        ListTerm msgL = (ListTerm) DefaultTerm.parse("[ok(10),[ok(20),ok(30),[ok(40)|[ok(50),ok(60)]]]]");
         VarTerm Y = new VarTerm("Y");
-        Term annotL = TermImpl.parse("source(rafa)");
+        Term annotL = DefaultTerm.parse("source(rafa)");
         assertEquals(msgL.toString(), "[ok(10),[ok(20),ok(30),[ok(40),ok(50),ok(60)]]]");
         try {
             aa.execute(null, u, new Term[] { (Term) msgL, annotL, Y });
@@ -104,7 +105,7 @@ public class StdLibTest extends TestCase {
         TransitionSystem ts = new TransitionSystem(ag, null, null, null);
 
         Unifier u = new Unifier();
-        Term X = TermImpl.parse("f(X)");
+        Term X = DefaultTerm.parse("f(X)");
         Literal c = Literal.parseLiteral("a(X,x)");
         c.addAnnot(BeliefBase.TSelf);
         VarTerm L = new VarTerm("L");
@@ -127,16 +128,16 @@ public class StdLibTest extends TestCase {
         assertTrue(pa != null);
         assertEquals(pa.toASString(),"@t1[source(self)] +a : g(10) <- .print(\"ok 10\").");
 
-        ag.getPL().add(new StringTermImpl("@t2 +a : g(20) <- .print(\"ok 20\")."), new TermImpl("nosource"));
-        ((Plan) ag.getPL().getPlans().get(1)).getLabel().addSource(new TermImpl("ag1"));
+        ag.getPL().add(new StringTermImpl("@t2 +a : g(20) <- .print(\"ok 20\")."), new Structure("nosource"));
+        ((Plan) ag.getPL().getPlans().get(1)).getLabel().addSource(new Structure("ag1"));
         ag.getPL().add(new StringTermImpl("@t3 +b : true <- true."), null);
-        // System.out.println(ag.getPS());
+        //System.out.println(ag.getPL());
         TransitionSystem ts = new TransitionSystem(ag, null, null, null);
 
         Unifier u = new Unifier();
         StringTerm ste = new StringTermImpl("+a");
         VarTerm X = new VarTerm("X");
-        // System.out.println(ag.getPS().getAllRelevant(Trigger.parseTrigger(ste.getFunctor())));
+        //System.out.println(ag.getPL().getAllRelevant(Trigger.parseTrigger(ste.getFunctor()).getPredicateIndicator()));
         try {
             new relevantPlans().execute(ts, u, new Term[] { (Term) ste, X });
         } catch (Exception e) {
@@ -152,7 +153,7 @@ public class StdLibTest extends TestCase {
         assertEquals(ag.getPL().getPlans().size(), 3);
         // remove plan t1 from PS
         try {
-            new removePlan().execute(ts, new Unifier(), new Term[] { new TermImpl("t1") });
+            new removePlan().execute(ts, new Unifier(), new Term[] { new Pred("t1") });
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -165,7 +166,7 @@ public class StdLibTest extends TestCase {
         try {
             while (i.hasNext()) {
                 StringTerm t = (StringTerm) i.next();
-                new addPlan().execute(ts, new Unifier(), new Term[] { t, new TermImpl("fromGR") });
+                new addPlan().execute(ts, new Unifier(), new Term[] { t, new Structure("fromGR") });
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -174,7 +175,7 @@ public class StdLibTest extends TestCase {
         // add again plans returned from getRelevantPlans
         // using IA addPlan receiving a list of plans
         try {
-            new addPlan().execute(ts, new Unifier(), new Term[] { (Term) plans, new TermImpl("fromLT") });
+            new addPlan().execute(ts, new Unifier(), new Term[] { (Term) plans, new Structure("fromLT") });
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -188,7 +189,7 @@ public class StdLibTest extends TestCase {
         // remove plan t2,t3 (source = nosource) from PS
         ListTerm llt = ListTermImpl.parseList("[t2,t3]");
         try {
-            assertTrue((Boolean)new removePlan().execute(ts, new Unifier(), new Term[] { (Term) llt, new TermImpl("nosource") }));
+            assertTrue((Boolean)new removePlan().execute(ts, new Unifier(), new Term[] { (Term) llt, new Pred("nosource") }));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -262,8 +263,8 @@ public class StdLibTest extends TestCase {
     @SuppressWarnings("unchecked")
     public void testMembe() throws Exception {
         ListTerm l1 = ListTermImpl.parseList("[a,b,c]");
-        Term ta = TermImpl.parse("a");
-        Term td = TermImpl.parse("d");
+        Term ta = DefaultTerm.parse("a");
+        Term td = DefaultTerm.parse("d");
         
         // test member(a,[a,b,c])
         Unifier u = new Unifier();
@@ -278,8 +279,8 @@ public class StdLibTest extends TestCase {
         assertFalse(i.hasNext());
 
         // test member(b(X),[a(1),b(2),c(3)])
-        Term l2 = TermImpl.parse("[a(1),b(2),c(3)]");
-        Term tb = TermImpl.parse("b(X)");
+        Term l2 = DefaultTerm.parse("[a(1),b(2),c(3)]");
+        Term tb = DefaultTerm.parse("b(X)");
         u = new Unifier();
         i = (Iterator<Unifier>)new jason.stdlib.member().execute(null, u, new Term[] { tb, l2});
         assertTrue(i != null);
@@ -290,7 +291,7 @@ public class StdLibTest extends TestCase {
         assertEquals(ru.get("X").toString(), "2");
         
         // test member(X,[a,b,c])
-        Term tx = TermImpl.parse("X");
+        Term tx = DefaultTerm.parse("X");
         u = new Unifier();
         i = (Iterator<Unifier>)new jason.stdlib.member().execute(null, u, new Term[] { tx, l1});
         assertTrue(iteratorSize(i) == 3);
@@ -298,7 +299,7 @@ public class StdLibTest extends TestCase {
         assertEquals(i.next().get("X").toString(),"a");
 
         // test member(b(X),[a(1),b(2),c(3),b(4)])
-        l2 = TermImpl.parse("[a(1),b(2),c(3),b(4)]");
+        l2 = DefaultTerm.parse("[a(1),b(2),c(3),b(4)]");
         u = new Unifier();
         i = (Iterator<Unifier>)new jason.stdlib.member().execute(null, u, new Term[] { tb, l2});
         assertTrue(i != null);

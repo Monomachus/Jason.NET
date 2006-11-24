@@ -29,8 +29,8 @@ import jason.asSyntax.ListTerm;
 import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Plan;
 import jason.asSyntax.StringTermImpl;
+import jason.asSyntax.Structure;
 import jason.asSyntax.Term;
-import jason.asSyntax.TermImpl;
 import jason.asSyntax.Trigger;
 
 import java.io.Serializable;
@@ -105,7 +105,7 @@ public class IntendedMeans implements Serializable {
     }
 
     public Term getAsTerm() {
-        Term im = new TermImpl("im");
+        Structure im = new Structure("im");
         im.addTerm(new StringTermImpl(plan.getLabel().toString()));
         ListTerm lt = new ListTermImpl();
         for (BodyLiteral bd: plan.getBody()) {

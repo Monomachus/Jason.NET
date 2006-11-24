@@ -27,7 +27,7 @@ import jason.JasonException;
 import jason.architecture.AgArch;
 import jason.asSyntax.Literal;
 import jason.asSyntax.PlanLibrary;
-import jason.asSyntax.Term;
+import jason.asSyntax.Structure;
 import jason.asSyntax.Trigger;
 import jason.asSyntax.parser.ParseException;
 import jason.asSyntax.parser.as2j;
@@ -156,7 +156,7 @@ public class Agent {
         parser.agent(this);
     }
 
-    public InternalAction getIA(Term action) throws Exception {
+    public InternalAction getIA(Structure action) throws Exception {
         String iaName = action.getFunctor();
         if (iaName.indexOf('.') == 0)
             iaName = "jason.stdlib" + iaName;

@@ -203,12 +203,12 @@ Pred directive(List bbl, PlanLibrary pl) :
                    }
 {
   "{"
-   d1 = atom()     { isBegin = d1.getFunctor().equals("begin");
+   d1 = pred()     { isBegin = d1.getFunctor().equals("begin");
                      isEnd = d1.getFunctor().equals("end");
                    }
-   [ d2 = atom() 
+   [ d2 = pred() 
                    { if (!isBegin) {
-                        throw new ParseException("Directive: a second atom must follow 'begin'.");
+                        throw new ParseException("Directive: a second predicate must follow 'begin'.");
                      }
                    }
    ]
@@ -232,7 +232,7 @@ Plan plan() :         { Token k; Pred L = null;
                         ArrayList B = new ArrayList(); 
                         int start = -1, end;}
 {
-    [ k = <TK_LABEL_AT> L=atom()  { start = k.beginLine; }   ]
+    [ k = <TK_LABEL_AT> L=pred()  { start = k.beginLine; }   ]
     T=trigger()         
     [ k = ":"  C=log_expr()      { if (start == -1) start = k.beginLine; } ] 
     [ k = "<-" plan_body(B)      { if (start == -1) start = k.beginLine; } ]  
@@ -269,7 +269,7 @@ Literal literal() :  { Pred F; Token k; boolean type = Literal.LPos; }
 {
   ( ( [ <TK_NEG>              { type = Literal.LNeg; }
       ]
-      F=atom()                { return new Literal(type,F); }
+      F=pred()                { return new Literal(type,F); }
     )
   | k=<TK_TRUE>               { return Literal.LTrue; } 
   | k=<TK_FALSE>              { return Literal.LFalse; } 
@@ -322,8 +322,8 @@ BodyLiteral body_formula() :  { Literal A; Token k;
 }
 
 
-/* Annotated Atomic Formulae */
-Pred atom() :       { Token K; Pred p = new Pred(); Term t; List l; ListTerm lt;}
+/* Annotated Formulae */
+Pred pred() :       { Token K; Pred p = new Pred(); Term t; List l; ListTerm lt;}
 {
   K=<ATOM>          { p.setFunctor(K.image); } 
   [

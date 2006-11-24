@@ -27,7 +27,7 @@ import jason.asSemantics.Agent;
 import jason.asSyntax.Literal;
 import jason.asSyntax.PredicateIndicator;
 import jason.asSyntax.Term;
-import jason.asSyntax.TermImpl;
+import jason.asSyntax.DefaultTerm;
 
 import java.util.Iterator;
 
@@ -36,8 +36,8 @@ import org.w3c.dom.Element;
 
 public interface BeliefBase {
 
-    public static final Term TPercept = TermImpl.parse("source(percept)");
-    public static final Term TSelf    = TermImpl.parse("source(self)");
+    public static final Term TPercept = DefaultTerm.parse("source(percept)");
+    public static final Term TSelf    = DefaultTerm.parse("source(self)");
 
     /** 
      * Called before the MAS execution with the agent that uses this BB 

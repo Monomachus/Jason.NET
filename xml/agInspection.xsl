@@ -358,7 +358,7 @@
     </xsl:template>
 
     <xsl:template match="plan">
-	    <xsl:if test="count(label) > 0 and not(starts-with(label/literal/term/@functor,'l__'))">
+	    <xsl:if test="count(label) > 0 and not(starts-with(label/literal/structure/@functor,'l__'))">
            <span style="color: rgb(51, 51, 51);">
            @<xsl:apply-templates select="label" />
            </span><br/>
@@ -441,25 +441,32 @@
 
     <xsl:template match="rule">
 	    	<xsl:apply-templates select="head"/>
-	    	<b> :- </b>
-	    	<xsl:apply-templates select="context"/>
+	    	<table>
+	        <tr>
+	        <td width="20" />
+	        <td width="20" style="vertical-align: top"><xsl:text><b>:-</b></xsl:text></td>
+		    <td><xsl:apply-templates select="context" /></td> 
+	    	</tr>
+	        </table>
     </xsl:template>
 
-    <xsl:template match="term">
+    <xsl:template match="structure">
 	    	<xsl:value-of select="@functor"/>
-	    	<xsl:if test="count(arguments) > 0">(<xsl:for-each select="arguments/*">
+	    	<xsl:if test="count(arguments) > 0">
+	    	    <xsl:text>(</xsl:text>
+	    	    <xsl:for-each select="arguments/*">
 		    		<xsl:apply-templates select="." />
-          		<xsl:if test="not(position()=last())">, </xsl:if>
-        		</xsl:for-each>)
-	    </xsl:if>
+          		    <xsl:if test="not(position()=last())"><xsl:text>,</xsl:text></xsl:if>
+        		</xsl:for-each>
+        		<xsl:text>)</xsl:text>
+	        </xsl:if>
 	    	<xsl:if test="count(annotations) > 0">
 	    		<span style="color: rgb(0 ,190, 0)">
-	    			<sub>[<xsl:for-each select="annotations/*">
-		    		<xsl:apply-templates select="." />
-          		<xsl:if test="not(position()=last())">, </xsl:if>
-        		</xsl:for-each>]</sub>
-			</span>
-	    </xsl:if>
+	    			<sub>
+		    		<xsl:apply-templates select="annotations" />
+          		    </sub>
+			    </span>
+	        </xsl:if>
     </xsl:template>
     
     <xsl:template match="var-term">
@@ -471,8 +478,16 @@
 		<i><xsl:value-of select="text()"/></i>
     </xsl:template>
     <xsl:template match="string-term">
-	    	<span style="color: {$string}">
-	    		<xsl:value-of select="text()"/>
+    	<span style="color: {$string}">
+	   		<xsl:value-of select="text()"/>
 		</span>
+    </xsl:template>
+    <xsl:template match="list-term">
+        <xsl:text>[</xsl:text>
+        <xsl:for-each select="*">
+            <xsl:apply-templates select="." />
+            <xsl:if test="not(position()=last())"><xsl:text>,</xsl:text></xsl:if>
+        </xsl:for-each>
+        <xsl:text>]</xsl:text>
     </xsl:template>
 </xsl:stylesheet> 

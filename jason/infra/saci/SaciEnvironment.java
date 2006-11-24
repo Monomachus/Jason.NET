@@ -24,8 +24,7 @@
 package jason.infra.saci;
 
 import jason.JasonException;
-import jason.asSyntax.Term;
-import jason.asSyntax.TermImpl;
+import jason.asSyntax.Structure;
 import jason.environment.Environment;
 import jason.environment.EnvironmentInfraTier;
 import jason.runtime.RuntimeServicesInfraTier;
@@ -141,7 +140,7 @@ public class SaciEnvironment extends saci.Agent implements EnvironmentInfraTier 
                         r.put("in-reply-to", m.get("reply-with"));
                         r.put("ontology", m.get("ontology"));
                         String sender = m.get("sender").toString();
-                        Term action = TermImpl.parse((String) m.get("action"));
+                        Structure action = Structure.parse((String) m.get("action"));
 
                         // logger.info("doing: "+action);
 

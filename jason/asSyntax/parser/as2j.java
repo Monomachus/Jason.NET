@@ -173,14 +173,14 @@
                              boolean isBegin = false;
                              boolean isEnd = false;
     jj_consume_token(28);
-    d1 = atom();
+    d1 = pred();
                      isBegin = d1.getFunctor().equals("begin");
                      isEnd = d1.getFunctor().equals("end");
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case ATOM:
-      d2 = atom();
+      d2 = pred();
                      if (!isBegin) {
-                        {if (true) throw new ParseException("Directive: a second atom must follow 'begin'.");}
+                        {if (true) throw new ParseException("Directive: a second predicate must follow 'begin'.");}
                      }
       break;
     default:
@@ -209,7 +209,7 @@
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case TK_LABEL_AT:
       k = jj_consume_token(TK_LABEL_AT);
-      L = atom();
+      L = pred();
                                     start = k.beginLine;
       break;
     default:
@@ -322,7 +322,7 @@
         jj_la1[13] = jj_gen;
         ;
       }
-      F = atom();
+      F = pred();
                                 {if (true) return new Literal(type,F);}
       break;
     case TK_TRUE:
@@ -446,8 +446,8 @@
     throw new Error("Missing return statement in function");
   }
 
-/* Annotated Atomic Formulae */
-  final public Pred atom() throws ParseException {
+/* Annotated Formulae */
+  final public Pred pred() throws ParseException {
                       Token K; Pred p = new Pred(); Term t; List l; ListTerm lt;
     K = jj_consume_token(ATOM);
                       p.setFunctor(K.image);

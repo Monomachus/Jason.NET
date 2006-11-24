@@ -130,7 +130,6 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
         if (t == null) return false;
         if (t == this) return true;
         if (t instanceof Term) {
-            Term tAsTerm = (Term) t;
             Term vl = getValue();
             // System.out.println("cheking equals form "+tAsTerm.getFunctor()+"
             // and this "+this.getFunctor()+" my value "+vl);
@@ -143,7 +142,7 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
             if (t instanceof VarTerm) {
                 final VarTerm tAsVT = (VarTerm) t;
                 if (tAsVT.getValue() == null) {
-                    return getFunctor().equals(tAsTerm.getFunctor());
+                    return getFunctor().equals(((VarTerm)t).getFunctor());
                 }
             }
         }
@@ -167,15 +166,17 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
     public String getFunctor() {
         if (value == null) {
             return super.getFunctor();
+        } else if (value.isStructure()) {
+            return ((Structure)getValue()).getFunctor();
         } else {
-            return getValue().getFunctor();
+            return null;
         }
     }
 
     @Override
     public PredicateIndicator getPredicateIndicator() {
-        if (value != null) {
-            return value.getPredicateIndicator();
+        if (value != null && value.isStructure()) {
+            return ((Structure)value).getPredicateIndicator();
         } else if (predicateIndicatorCache == null) {
             predicateIndicatorCache = new PredicateIndicator(getFunctor(), 0);
         }
@@ -207,65 +208,65 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
 
     @Override
     public Term getTerm(int i) {
-        if (value == null) {
-            return null;
+        if (value != null && value.isStructure()) {
+            return ((Structure)getValue()).getTerm(i);
         } else {
-            return getValue().getTerm(i);
+            return null;
         }
     }
 
     @Override
     public void addTerm(Term t) {
-        if (value != null) {
-            getValue().addTerm(t);
+        if (value != null && value.isStructure()) {
+            ((Structure)getValue()).addTerm(t);
         }
     }
 
     @Override
     public int getTermsSize() {
-        if (value == null) {
-            return 0;
+        if (value != null && value.isStructure()) {
+            return ((Structure)getValue()).getTermsSize();
         } else {
-            return getValue().getTermsSize();
+            return 0;
         }
     }
 
     @Override
     public List<Term> getTerms() {
-        if (value == null) {
-            return null;
+        if (value != null && value.isStructure()) {
+            return ((Structure)getValue()).getTerms();
         } else {
-            return getValue().getTerms();
+            return null;
         }
     }
 
     @Override
     public void setTerms(List<Term> l) {
-        if (value != null) {
-            value.setTerms(l);
+        if (value != null && value.isStructure()) {
+            ((Structure)getValue()).setTerms(l);
         }
     }
 
     @Override
     public void setTerm(int i, Term t) {
-        if (value != null) {
-            value.setTerm(i,t);
+        if (value != null && value.isStructure()) {
+            ((Structure)getValue()).setTerm(i,t);
         }
     }
 
     @Override
     public void addTerms(List<Term> l) {
-        if (value != null) {
-            value.addTerms(l);
+        if (value != null && value.isStructure()) {
+            ((Structure)getValue()).addTerms(l);
         }
     }
 
     @Override
     public Term[] getTermsArray() {
-        if (value == null) {
-            return null;
+        if (value != null && value.isStructure()) {
+            return ((Structure)getValue()).getTermsArray();
         } else {
-            return value.getTermsArray();
+            return null;
         }
     }
 
@@ -452,7 +453,7 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
     }
 
     @Override
-    public void addSource(Term t) {
+    public void addSource(Structure t) {
         if (value != null && getValue().isPred())
             ((Pred) getValue()).addSource(t);
         else
@@ -461,7 +462,7 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
     }
 
     @Override
-    public boolean delSource(Term s) {
+    public boolean delSource(Structure s) {
         if (value != null && getValue().isPred())
             return ((Pred) getValue()).delSource(s);
         else
@@ -493,7 +494,7 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
     }
 
     @Override
-    public boolean hasSource(Term s) {
+    public boolean hasSource(Structure s) {
         if (value != null && getValue().isPred())
             return ((Pred) getValue()).hasSource(s);
         else

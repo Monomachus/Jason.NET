@@ -52,9 +52,9 @@ public class Plan implements Cloneable, Serializable {
     private boolean isAllUnifs = false;
     private boolean hasBreakpoint = false;
     
-    private static final Term TAtomic         = TermImpl.parse("atomic");
-    private static final Term TBreakPoint     = TermImpl.parse("breakpoint");
-    private static final Term TAllUnifs       = TermImpl.parse("all_unifs");
+    private static final Term TAtomic         = DefaultTerm.parse("atomic");
+    private static final Term TBreakPoint     = DefaultTerm.parse("breakpoint");
+    private static final Term TAllUnifs       = DefaultTerm.parse("all_unifs");
     
     /*
     private enum Annots {

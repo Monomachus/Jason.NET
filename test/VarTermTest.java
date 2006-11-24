@@ -8,8 +8,9 @@ import jason.asSyntax.Literal;
 import jason.asSyntax.NumberTerm;
 import jason.asSyntax.NumberTermImpl;
 import jason.asSyntax.Pred;
+import jason.asSyntax.Structure;
 import jason.asSyntax.Term;
-import jason.asSyntax.TermImpl;
+import jason.asSyntax.DefaultTerm;
 import jason.asSyntax.VarTerm;
 import jason.asSyntax.ArithExpr.ArithmeticOp;
 
@@ -28,12 +29,12 @@ public class VarTermTest extends TestCase {
     public void testVarTermAsTerm() {
         VarTerm k = new VarTerm("K");
         Unifier u = new Unifier();
-        u.unifies(k, new TermImpl("a1"));
+        u.unifies(k, new Structure("a1"));
         assertTrue("K".equals(k.toString()));
         u.apply(k);
         assertTrue("a1".equals(k.toString()));
-        k.addTerm(new TermImpl("p1"));
-        k.addTerm(new TermImpl("p2"));
+        k.addTerm(new Structure("p1"));
+        k.addTerm(new Structure("p2"));
         assertEquals(k.getTermsSize(), 2);
 
         VarTerm x1 = new VarTerm("X1");
@@ -59,7 +60,7 @@ public class VarTermTest extends TestCase {
 
         u.unifies(x7,x4);
         
-        u.unifies(x3,new TermImpl("a"));
+        u.unifies(x3,new Structure("a"));
         assertEquals(u.get(x1).toString(),"a");
         assertEquals(u.get(x2).toString(),"a");
         assertEquals(u.get(x3).toString(),"a");
@@ -77,7 +78,7 @@ public class VarTermTest extends TestCase {
         VarTerm v1 = new VarTerm("L");
         ListTerm lt = ListTermImpl.parseList("[a,B,a(B)]");
         u = new Unifier();
-        u.unifies(new VarTerm("B"), new TermImpl("oi"));
+        u.unifies(new VarTerm("B"), new Structure("oi"));
         u.unifies(v1, lt);
         u.apply(v1);
         lt = (ListTerm) v1.getValue();
@@ -85,8 +86,8 @@ public class VarTermTest extends TestCase {
         i.next();
         i.next();
         Term third = (Term) i.next();
-        Term toi1 = TermImpl.parse("a(oi)");
-        Term toi2 = TermImpl.parse("a(B)");
+        Term toi1 = DefaultTerm.parse("a(oi)");
+        Term toi2 = DefaultTerm.parse("a(B)");
         u.apply(toi2);
         assertEquals(toi1,toi2);
         assertTrue(third.equals(toi1));
@@ -101,10 +102,10 @@ public class VarTermTest extends TestCase {
         u.apply(k);
         assertTrue(k.isPred());
         assertFalse(k.hasAnnot());
-        k.addAnnot(new TermImpl("annot1"));
+        k.addAnnot(new Structure("annot1"));
         assertTrue(k.hasAnnot());
 
-        k.addSource(new TermImpl("marcos"));
+        k.addSource(new Structure("marcos"));
         assertEquals(k.getAnnots().size(), 2);
         k.delSources();
         assertEquals(k.getAnnots().size(), 1);
@@ -113,8 +114,8 @@ public class VarTermTest extends TestCase {
         k = new VarTerm("K");
         u = new Unifier();
         u.unifies(k, Pred.parsePred("p[a]"));
-        k.addAnnot(new TermImpl("annot1"));
-        k.addAnnot(new TermImpl("annot2"));
+        k.addAnnot(new Structure("annot1"));
+        k.addAnnot(new Structure("annot2"));
         assertEquals(k.getAnnots().size(), 2);
     }
 
@@ -218,7 +219,7 @@ public class VarTermTest extends TestCase {
         VarTerm v1 = VarTerm.parseVar("X[a,b,c]");
         VarTerm v2 = VarTerm.parseVar("X[a,b]");
         assertTrue(v1.equals(v2));
-        v2.addAnnot(new TermImpl("c"));
+        v2.addAnnot(new Structure("c"));
         assertTrue(v1.equals(v2));
         assertTrue(v2.equals(v1));
 
@@ -233,8 +234,8 @@ public class VarTermTest extends TestCase {
         assertEquals(p1.toString(),"p(t1,t2)[a,c]");
         assertEquals(u.get("X").toString(), "p(t1,t2)");
 
-        p1.addAnnot(new TermImpl("b"));
-        p1.addAnnot(new TermImpl("d"));
+        p1.addAnnot(new Structure("b"));
+        p1.addAnnot(new Structure("d"));
         u.clear();
         // p[a,c,b,d] = X[a,b,c] nok
         assertFalse(u.unifies(p1, v1));
@@ -259,8 +260,8 @@ public class VarTermTest extends TestCase {
     }
     
     public void testUnify1() {
-        Term a1 = TermImpl.parse("s(1,2)");
-        Term a2 = TermImpl.parse("s(X1,X2)");
+        Term a1 = DefaultTerm.parse("s(1,2)");
+        Term a2 = DefaultTerm.parse("s(X1,X2)");
         Unifier u = new Unifier();
         assertTrue(u.unifies(new VarTerm("X1"),new VarTerm("X3")));
         assertTrue(u.unifies(a1,a2));
@@ -278,20 +279,20 @@ public class VarTermTest extends TestCase {
     }
     
     public void testUnnamedVar1() {
-        Term a1 = TermImpl.parse("a(_,_)");
-        Term a2 = TermImpl.parse("a(10,20)");
-        Term a3 = TermImpl.parse("a(30,40)");
+        Term a1 = DefaultTerm.parse("a(_,_)");
+        Term a2 = DefaultTerm.parse("a(10,20)");
+        Term a3 = DefaultTerm.parse("a(30,40)");
         Unifier u = new Unifier();
         assertTrue(u.unifies(a1,a2));
         assertFalse(u.unifies(a1,a3));
         u.apply(a1);
-        assertEquals(a1.toString(), TermImpl.parse("a(10,20)").toString());
+        assertEquals(a1.toString(), DefaultTerm.parse("a(10,20)").toString());
     }
     
     public void testUnnamedVar2() {
-        Term t1 = TermImpl.parse("a(Y)");
+        Structure t1 = Structure.parse("a(Y)");
         assertFalse(t1.isGround());
-        Term t1c = (Term)t1.clone();
+        Structure t1c = (Structure)t1.clone();
         assertFalse(t1c.isGround());
         t1c.makeVarsAnnon();
         assertFalse(t1c.isGround());

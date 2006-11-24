@@ -30,7 +30,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /** implements a term that represents a number */
-public class NumberTermImpl extends TermImpl implements NumberTerm {
+public class NumberTermImpl extends DefaultTerm implements NumberTerm {
 
 	private static final long serialVersionUID = 1L;
 
@@ -64,7 +64,6 @@ public class NumberTermImpl extends TermImpl implements NumberTerm {
     
 	public void setValue(double d) {
 		fValue = d;
-		//setFunctor(String.valueOf(d));
 	}
 	
 	public double solve() {
@@ -80,11 +79,6 @@ public class NumberTermImpl extends TermImpl implements NumberTerm {
 		return true;
 	}
 
-    @Override
-    public boolean isStructure() {
-        return false;
-    }
-	
     @Override
     public boolean equals(Object o) {
         if (o == this) return true;
@@ -111,8 +105,7 @@ public class NumberTermImpl extends TermImpl implements NumberTerm {
             NumberTerm st = (NumberTerm)o;
             if (solve() > st.solve()) return 1;
             if (solve() < st.solve()) return -1;
-        } catch (Exception e) {
-        }
+        } catch (Exception e) {}
         return 0;    
     }
 
@@ -126,7 +119,6 @@ public class NumberTermImpl extends TermImpl implements NumberTerm {
 	}
     
     /** get as XML */
-    @Override
     public Element getAsDOM(Document document) {
         Element u = (Element) document.createElement("number-term");
         u.appendChild(document.createTextNode(toString()));

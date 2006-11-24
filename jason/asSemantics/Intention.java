@@ -26,8 +26,8 @@ package jason.asSemantics;
 import jason.asSyntax.ListTerm;
 import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.NumberTermImpl;
+import jason.asSyntax.Structure;
 import jason.asSyntax.Term;
-import jason.asSyntax.TermImpl;
 import jason.asSyntax.Trigger;
 
 import java.io.Serializable;
@@ -166,7 +166,7 @@ public class Intention implements Serializable, Comparable<Intention> {
     }
 
     public Term getAsTerm() {
-        Term intention = new TermImpl("intention");
+        Structure intention = new Structure("intention");
         intention.addTerm(new NumberTermImpl(getId()));
         ListTerm lt = new ListTermImpl();
         ListIterator<IntendedMeans> i = fIntendedMeans.listIterator(fIntendedMeans.size());

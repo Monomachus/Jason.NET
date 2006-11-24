@@ -32,9 +32,11 @@ import java.util.logging.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-public class StringTermImpl extends TermImpl implements StringTerm {
+public class StringTermImpl extends DefaultTerm implements StringTerm {
 
 	private static final long serialVersionUID = 1L;
+    
+    private String value = null;
 
 	static private Logger logger = Logger.getLogger(StringTermImpl.class.getName());
 
@@ -54,11 +56,11 @@ public class StringTermImpl extends TermImpl implements StringTerm {
 	    //if (s.startsWith("\"")) {
 		//	s = s.substring(1,s.length()-1);
 		//}
-		setFunctor(s);
+		value = s;
 	}
 	
 	public String getString() {
-		return getFunctor();
+		return value;
 	}
 	
 	public Object clone() {
@@ -80,12 +82,7 @@ public class StringTermImpl extends TermImpl implements StringTerm {
 		return true;
 	}
 
-    @Override
-    public boolean isStructure() {
-        return false;
-    }
-	
-	public int length() {
+ 	public int length() {
 		return getString().length();
 	}
 
@@ -110,7 +107,6 @@ public class StringTermImpl extends TermImpl implements StringTerm {
 	}
 
     /** get as XML */
-    @Override
     public Element getAsDOM(Document document) {
         Element u = (Element) document.createElement("string-term");
         u.appendChild(document.createTextNode(toString()));

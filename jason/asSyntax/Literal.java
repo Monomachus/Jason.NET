@@ -223,6 +223,22 @@ public class Literal extends Pred implements LogicalFormula {
         return false;
 	}
 
+    @Override
+    public int compareTo(Term t) {
+        if (t.isLiteral()) {
+            Literal tl = (Literal)t;
+            if (!negated() && tl.negated()) {
+                return -1;
+            } if (negated() && !tl.negated()) {
+                return 1;
+            }
+        }
+        int c = super.compareTo(t);
+        if (c != 0)
+            return c;
+        return 0;
+    }        
+
 	public Object clone() {
         Literal c = new Literal(type, (Pred)this);
         c.predicateIndicatorCache = this.predicateIndicatorCache;

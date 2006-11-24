@@ -31,8 +31,9 @@ import jason.asSyntax.LogicalFormula;
 import jason.asSyntax.Plan;
 import jason.asSyntax.PlanLibrary;
 import jason.asSyntax.Pred;
+import jason.asSyntax.Structure;
 import jason.asSyntax.Term;
-import jason.asSyntax.TermImpl;
+import jason.asSyntax.DefaultTerm;
 import jason.asSyntax.Trigger;
 import jason.asSyntax.BodyLiteral.BodyType;
 import jason.bb.BeliefBase;
@@ -150,7 +151,7 @@ public class TransitionSystem {
             Message m = conf.ag.selectMessage(conf.C.MB);
             
             // get the content, it can be any term (literal, list, number, ...; see ask)
-            Term content = TermImpl.parse(m.getPropCont().toString());
+            Term content = DefaultTerm.parse(m.getPropCont().toString());
 
             // check if an intention was suspended waiting this message
             Intention intention = null;
@@ -167,20 +168,20 @@ public class TransitionSystem {
                 BodyLiteral send = intention.peek().removeCurrentStep();
                 if (intention.peek().getUnif().unifies(send.getLiteralFormula().getTerm(3), content)) {
                     getC().addIntention(intention);
-		} else {
-		    conf.C.SI = intention;
+                } else {
+                    conf.C.SI = intention;
                     generateGoalDeletion();
-		}
+                }
 
                 // the message is not an ask answer
             } else if (conf.ag.socAcc(m)) {
 
                 // generate an event
                 Literal received = new Literal(Literal.LPos, "kqmlReceived");
-                received.addTerm(new TermImpl(m.getSender()));
-                received.addTerm(new TermImpl(m.getIlForce()));
+                received.addTerm(new Structure(m.getSender()));
+                received.addTerm(new Structure(m.getIlForce()));
                 received.addTerm(content);
-                received.addTerm(new TermImpl(m.getMsgId()));
+                received.addTerm(new Structure(m.getMsgId()));
 
                 updateEvents(new Event(new Trigger(Trigger.TEAdd, Trigger.TEAchvG, received), Intention.EmptyInt));
             }

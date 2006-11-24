@@ -8,8 +8,9 @@ import jason.asSyntax.Pred;
 import jason.asSyntax.PredicateIndicator;
 import jason.asSyntax.StringTerm;
 import jason.asSyntax.StringTermImpl;
+import jason.asSyntax.Structure;
 import jason.asSyntax.Term;
-import jason.asSyntax.TermImpl;
+import jason.asSyntax.DefaultTerm;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -59,8 +60,9 @@ public class JDBCPersistentBB extends DefaultBeliefBase {
             // load tables mapped to DB
             ListTerm lt = ListTermImpl.parseList(args[4]);
             for (Term t : lt) {
-                int arity = Integer.parseInt(t.getTerm(0).toString());
-                String table = t.getTerm(1).toString();
+                Structure ts = (Structure)t;
+                int arity = Integer.parseInt(ts.getTerm(0).toString());
+                String table = ts.getTerm(1).toString();
 
                 // create the table and get its Metadata
                 Statement stmt = conn.createStatement();
@@ -79,8 +81,8 @@ public class JDBCPersistentBB extends DefaultBeliefBase {
                     rs = stmt.executeQuery("select * from " + table);
                 }
                 stmt.close();
-                belsDB.put(new PredicateIndicator(t.getFunctor(), arity), rs.getMetaData());
-                belsDB.put(new PredicateIndicator("~"+t.getFunctor(), arity), rs.getMetaData());
+                belsDB.put(new PredicateIndicator(ts.getFunctor(), arity), rs.getMetaData());
+                belsDB.put(new PredicateIndicator("~"+ts.getFunctor(), arity), rs.getMetaData());
             }
             logger.fine("Map=" + belsDB);
         } catch (ArrayIndexOutOfBoundsException e) {
@@ -377,11 +379,11 @@ public class JDBCPersistentBB extends DefaultBeliefBase {
                 // there no var at BB
                 parsed = new StringTermImpl(sc);
             } else {
-                parsed = TermImpl.parse(sc);
+                parsed = DefaultTerm.parse(sc);
                 
                 // if the parsed term is not equals to sc, try as string
                 if (!parsed.toString().equals(sc)) {
-                    parsed = TermImpl.parse(sc = "\"" + sc + "\"");
+                    parsed = DefaultTerm.parse(sc = "\"" + sc + "\"");
                 }
             }
             ldb.addTerm(parsed);

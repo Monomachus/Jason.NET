@@ -26,34 +26,11 @@ package jason.asSyntax;
 import jason.util.ToDOM;
 
 import java.io.Serializable;
-import java.util.List;
 
 /**
  * Term Interface
  */
 public interface Term extends Cloneable, Comparable<Term>, Serializable, ToDOM {
-
-    public String getFunctor();
-
-    /** returns functor symbol "/" arity */
-    public PredicateIndicator getPredicateIndicator();
-
-    public void addTerm(Term t);
-
-    public void addTerms(List<Term> l);
-
-    public void setTerm(int i, Term t);
-
-    public void setTerms(List<Term> l);
-
-    public int getTermsSize();
-
-    /** returns the i-th term (first term is 0) */
-    public Term getTerm(int i);
-
-    public List<Term> getTerms();
-
-    public Term[] getTermsArray();
 
     public boolean isVar();
 
@@ -78,10 +55,6 @@ public interface Term extends Cloneable, Comparable<Term>, Serializable, ToDOM {
     public boolean isStructure();
 
     public boolean hasVar(Term t);
-
-    public void makeVarsAnnon();
-
-    public void makeTermsAnnon();
 
     public Object clone();
 

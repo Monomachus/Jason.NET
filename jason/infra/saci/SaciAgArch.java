@@ -30,7 +30,7 @@ import jason.asSemantics.ActionExec;
 import jason.asSemantics.TransitionSystem;
 import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Term;
-import jason.asSyntax.TermImpl;
+import jason.asSyntax.DefaultTerm;
 import jason.infra.centralised.RunCentralisedMAS;
 import jason.mas2j.ClassParameters;
 import jason.mas2j.parser.mas2j;
@@ -352,7 +352,7 @@ public class SaciAgArch extends saci.Agent implements AgArchInfraTier {
                     if (sPropCont.startsWith("\"")) { // deal with a term
                                                         // closed by "
                         sPropCont = sPropCont.substring(1, sPropCont.length() - 1);
-                        if (TermImpl.parse(sPropCont) != null) {
+                        if (DefaultTerm.parse(sPropCont) != null) {
                             // it was a term with "
                             propCont = sPropCont.trim();
                         }

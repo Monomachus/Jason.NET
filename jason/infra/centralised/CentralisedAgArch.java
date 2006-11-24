@@ -29,14 +29,14 @@ import jason.architecture.AgArchInfraTier;
 import jason.asSemantics.ActionExec;
 import jason.asSemantics.Message;
 import jason.asSyntax.Literal;
-import jason.asSyntax.Term;
+import jason.asSyntax.Structure;
 import jason.mas2j.ClassParameters;
 import jason.runtime.RuntimeServicesInfraTier;
 import jason.runtime.Settings;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ArrayList;
 import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -213,7 +213,7 @@ public class CentralisedAgArch extends Thread implements AgArchInfraTier {
     // Default acting on the environment
     // it gets action from ts.C.A;
     public void act(ActionExec action, List<ActionExec> feedback) {
-        Term acTerm = action.getActionTerm();
+        Structure acTerm = action.getActionTerm();
         logger.info("doing: " + acTerm);
 
         if (infraEnv.getUserEnvironment().executeAction(getName(), acTerm)) {

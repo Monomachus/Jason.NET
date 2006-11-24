@@ -52,7 +52,6 @@ public class ASParserTest extends TestCase {
         solve = ((RelExpr) t1).logicalConsequence(null, new Unifier());
         assertTrue(solve.hasNext());
 
-        // TODO: fix bug try "(0) > 1"
         t1 = LogExpr.parseExpr("(((((((30) + -5)))))) / 2 > 5+3*8");
         assertTrue(t1 != null);
         solve = ((RelExpr) t1).logicalConsequence(null, new Unifier());

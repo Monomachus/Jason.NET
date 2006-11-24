@@ -50,7 +50,7 @@ public class relevantPlans extends DefaultInternalAction {
 	public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
 		try {
 			StringTerm sTe = (StringTerm) args[0];
-			Trigger te = Trigger.parseTrigger(sTe.getFunctor());
+			Trigger te = Trigger.parseTrigger(sTe.getString());
 			if (te == null) {
 				throw new JasonException("The first argument is not a TE (getRelevantPlans internal action)");
 			}

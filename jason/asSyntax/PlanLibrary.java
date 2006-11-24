@@ -66,7 +66,7 @@ public class PlanLibrary {
      *  
      *   returns the plan added, null if it does not work.
 	 */
-	public Plan add(StringTerm stPlan, Term tSource) {
+	public Plan add(StringTerm stPlan, Structure tSource) {
 		String sPlan = stPlan.getString();
 		try {
 			// remove quotes \" -> "
@@ -164,7 +164,7 @@ public class PlanLibrary {
 	 * Remove a plan represented by the label <i>pLabel</i>.
 	 * In case the plan has many sources, only the plan's source is removed. 
 	 */
-	public boolean removePlan(Term pLabel, Term source) {
+	public boolean removePlan(Pred pLabel, Structure source) {
 		// find the plan
 		Plan p = get(pLabel.getFunctor());
 		if (p != null) {

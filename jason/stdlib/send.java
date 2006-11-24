@@ -36,8 +36,8 @@ import jason.asSyntax.ListTerm;
 import jason.asSyntax.NumberTerm;
 import jason.asSyntax.Pred;
 import jason.asSyntax.StringTerm;
+import jason.asSyntax.Structure;
 import jason.asSyntax.Term;
-import jason.asSyntax.TermImpl;
 
 public class send extends DefaultInternalAction {
     
@@ -145,7 +145,7 @@ public class send extends DefaultInternalAction {
     }
     
     
-    private static Term timeoutTerm = new TermImpl("timeout");
+    private static Structure timeoutTerm = new Structure("timeout");
     
     class CheckTimeout extends Thread {
         

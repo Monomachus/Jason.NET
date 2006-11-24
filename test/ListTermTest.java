@@ -3,8 +3,8 @@ package test;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.ListTerm;
 import jason.asSyntax.ListTermImpl;
+import jason.asSyntax.Structure;
 import jason.asSyntax.Term;
-import jason.asSyntax.TermImpl;
 import jason.asSyntax.VarTerm;
 
 import java.util.ArrayList;
@@ -37,9 +37,9 @@ public class ListTermTest extends TestCase {
 		assertEquals(l5.size(), 1);
 		
 		ListTerm l = new ListTermImpl();
-		l.add(new TermImpl("a"));
-		l.add(new TermImpl("a"));
-		l.add(new TermImpl("a"));
+		l.add(new Structure("a"));
+		l.add(new Structure("a"));
+		l.add(new Structure("a"));
 		assertEquals(l.size(), 3);		
 	}
 
@@ -77,31 +77,31 @@ public class ListTermTest extends TestCase {
 	}
 	
 	public void testAddRemove() {
-		l1.add(new TermImpl("d"));
-		l1.add(0, new TermImpl("a1"));
-		l1.add(1, new TermImpl("a2"));
-		assertEquals(new TermImpl("a2"), l1.get(1));
+		l1.add(new Structure("d"));
+		l1.add(0, new Structure("a1"));
+		l1.add(1, new Structure("a2"));
+		assertEquals(new Structure("a2"), l1.get(1));
 		assertEquals(l1.size(), 6);
 		
 		List<Term> lal = new ArrayList<Term>();
-		lal.add(new TermImpl("b1"));
-		lal.add(new TermImpl("b2"));
+		lal.add(new Structure("b1"));
+		lal.add(new Structure("b2"));
 		l1.addAll(4, lal);
 		assertEquals(l1.size(), 8);
 		
 		//System.out.println(l1);
-		assertEquals(new TermImpl("a1"), l1.remove(0));
-		assertEquals(new TermImpl("b"), l1.remove(2));
-		assertTrue(l1.remove(new TermImpl("b1")));
-		assertTrue(l1.remove(new TermImpl("d")));
-		assertTrue(l1.remove(new TermImpl("a2")));
+		assertEquals(new Structure("a1"), l1.remove(0));
+		assertEquals(new Structure("b"), l1.remove(2));
+		assertTrue(l1.remove(new Structure("b1")));
+		assertTrue(l1.remove(new Structure("d")));
+		assertTrue(l1.remove(new Structure("a2")));
 		assertEquals(l1.size(), 3);
 		
 		Iterator i = l1.iterator();
 		while (i.hasNext()) {
 			Term t = (Term)i.next();
 			//System.out.println("-"+t);
-			if (t.equals(new TermImpl("a"))) {
+			if (t.equals(new Structure("a"))) {
 				i.remove();
 			}
 		}
