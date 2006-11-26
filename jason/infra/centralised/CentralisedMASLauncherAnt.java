@@ -144,8 +144,14 @@ public class CentralisedMASLauncherAnt implements MASLauncherInfraTier {
         // add lib/*.jar
         String lib = "";
         if (new File(dDir + File.separator + "lib").exists()) {
-            lib = "<fileset dir=\"${basedir}/lib\" >  <include name=\"*.jar\" /> </fileset>";
+            lib = "        <fileset dir=\"${basedir}/lib\" >  <include name=\"*.jar\" /> </fileset>\n";
         }
+
+		// add classpath defined in the project .mas2j
+		for (String cp: project.getClassPaths()) {
+			lib += "        <pathelement location=\""+cp+"\"/>\n";
+		}
+
         script = replace(script, "<PATH-LIB>", lib);
 
         script = replace(script, "<PROJECT-RUNNER-CLASS>", jason.infra.centralised.RunCentralisedMAS.class.getName());

@@ -19,47 +19,6 @@
 // http://www.dur.ac.uk/r.bordini
 // http://www.inf.furb.br/~jomi
 //
-// CVS information:
-//   $Date$
-//   $Revision$
-//   $Log$
-//   Revision 1.14  2006/03/02 13:33:41  jomifred
-//   changes in MASLauncher interface
-//
-//   Revision 1.13  2006/03/02 03:30:36  jomifred
-//   no message
-//
-//   Revision 1.12  2006/03/02 02:52:15  jomifred
-//   some changes in MASLauncher
-//
-//   Revision 1.11  2006/03/02 01:42:14  jomifred
-//   the jIDE package was remove, the writeScriptInterface's methods was moved to MASLauncher
-//
-//   Revision 1.10  2006/02/18 15:25:16  jomifred
-//   changes in many files to detach jason kernel from any infrastructure implementation
-//
-//   Revision 1.9  2006/01/16 16:47:35  jomifred
-//   added a new kind of console with one tab for agent
-//
-//   Revision 1.8  2006/01/14 18:23:22  jomifred
-//   centralised infra does not use xml script file anymore
-//
-//   Revision 1.7  2006/01/14 15:25:52  jomifred
-//   Config and some code of RunMAS was moved to package plugin
-//
-//   Revision 1.6  2006/01/04 03:00:46  jomifred
-//   using java log API instead of apache log
-//
-//   Revision 1.1  2005/12/08 20:13:53  jomifred
-//   changes for JasonIDE plugin
-//
-//   Revision 1.2  2005/10/30 18:39:48  jomifred
-//   change in the AgArch customisation  support (the same customisation is used both to Cent and Saci infrastructures0
-//
-//   Revision 1.1  2005/10/29 21:46:22  jomifred
-//   add a new class (MAS2JProject) to store information parsed by the mas2j parser. This new class also create the project scripts
-//
-//
 //----------------------------------------------------------------------------
 
 package jason.mas2j;
@@ -100,7 +59,9 @@ public class MAS2JProject {
 	File   projectFile = null;
 	
 	List<AgentParameters> agents = new ArrayList<AgentParameters>();
-	
+
+    List<String> classpaths = new ArrayList<String>();
+
     
     public static MAS2JProject parse(String file) {
         try {
@@ -197,6 +158,18 @@ public class MAS2JProject {
 		}
 		return files;
 	}
+
+	public void addClassPath(String cp) {
+		if (cp.startsWith("\"")) {
+			cp = cp.substring(1,cp.length()-1);
+		}
+		classpaths.add(cp);
+	}
+
+	public List<String> getClassPaths() {
+		return classpaths;
+	}
+
 	
 	public String toString() {
         StringBuilder s = new StringBuilder("MAS " + getSocName() + " {\n");
@@ -223,6 +196,15 @@ public class MAS2JProject {
 			s.append(";\n");
 		}
 		s.append("}");
+
+		// classpath
+		if (classpaths.size() > 0) {
+			s.append("    classpath:");
+			for (String cp: classpaths) {
+				s.append("\""+cp+"\"; ");
+			}
+		}
+
 		return s.toString();
 	}
 

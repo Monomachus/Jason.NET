@@ -10,27 +10,28 @@ public interface mas2jConstants {
   int CONTROL = 10;
   int AT = 11;
   int INFRA = 12;
-  int ASOEE = 13;
-  int ASOEEV = 14;
-  int ASOIB = 15;
-  int ASOIBV = 16;
-  int ASONRC = 17;
-  int ASOV = 18;
-  int ASOSYNC = 19;
-  int ASOBOOL = 20;
-  int ASAGCLASS = 21;
-  int ASAGARCHCLASS = 22;
-  int BBCLASS = 23;
-  int NUMBER = 24;
-  int STRING = 25;
-  int ASID = 26;
-  int ID = 27;
-  int PATH = 28;
-  int DRIVER = 29;
-  int LETTER = 30;
-  int LC_LETTER = 31;
-  int UP_LETTER = 32;
-  int DIGIT = 33;
+  int CLASSPATH = 13;
+  int ASOEE = 14;
+  int ASOEEV = 15;
+  int ASOIB = 16;
+  int ASOIBV = 17;
+  int ASONRC = 18;
+  int ASOV = 19;
+  int ASOSYNC = 20;
+  int ASOBOOL = 21;
+  int ASAGCLASS = 22;
+  int ASAGARCHCLASS = 23;
+  int BBCLASS = 24;
+  int NUMBER = 25;
+  int STRING = 26;
+  int ASID = 27;
+  int ID = 28;
+  int PATH = 29;
+  int DRIVER = 30;
+  int LETTER = 31;
+  int LC_LETTER = 32;
+  int UP_LETTER = 33;
+  int DIGIT = 34;
 
   int DEFAULT = 0;
 
@@ -48,6 +49,7 @@ public interface mas2jConstants {
     "\"executionControl\"",
     "\"at\"",
     "\"infrastructure\"",
+    "\"classpath\"",
     "\"events\"",
     "<ASOEEV>",
     "\"intBels\"",

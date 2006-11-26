@@ -18,7 +18,7 @@
     <path id="project.classpath">
         <pathelement location="."/>
         <pathelement location="${jasonJar}"/>
-        <PATH-LIB>
+<PATH-LIB>
     </path>
 
     <target name="compile" >
