@@ -25,12 +25,12 @@ package jason.asSemantics;
 
 import static jason.asSemantics.Unifier.logger;
 import jason.asSyntax.ArithExpr;
+import jason.asSyntax.DefaultTerm;
 import jason.asSyntax.ListTerm;
 import jason.asSyntax.Literal;
 import jason.asSyntax.Pred;
 import jason.asSyntax.Structure;
 import jason.asSyntax.Term;
-import jason.asSyntax.DefaultTerm;
 import jason.asSyntax.Trigger;
 import jason.asSyntax.VarTerm;
 
@@ -124,7 +124,7 @@ public class Unifier implements Cloneable {
     // ----- Unify for Terms
 
     public boolean unifies(Term t1g, Term t2g) {
-        // if args are expressions, apply them to use their values
+        // if args are expressions, apply them and use their values
         if (t1g.isArithExpr()) {
             t1g = (Term) t1g.clone();
             apply(t1g);
@@ -136,7 +136,6 @@ public class Unifier implements Cloneable {
 
         // identical variables or constants
         if (t1g.equals(t2g)) {
-            // System.out.println("Equals." + t1 + "=" + t2 + "...." + this);
             return true;
         }
         
@@ -144,6 +143,8 @@ public class Unifier implements Cloneable {
         if (t1g.isVar() && t2g.isVar()) {
             VarTerm t1gv = (VarTerm) t1g;
             VarTerm t2gv = (VarTerm) t2g;
+            
+            // get their values
             Term t1vl = function.get(t1gv);
             Term t2vl = function.get(t2gv);
 
@@ -184,16 +185,26 @@ public class Unifier implements Cloneable {
 
         // t1 is var that doesn't occur in t2
         if (t1g.isVar()) {
-            if (!t2g.hasVar(t1g)) {
-                return setVarValue((VarTerm) t1g, t2g);
+            VarTerm t1gv = (VarTerm) t1g;
+            // if t1g is not free, must unify values
+            Term t1vl = function.get(t1gv);
+            if (t1vl != null && !(t1vl instanceof VarsCluster)) {
+                return unifies(t1vl,t2g);
+            } else if (!t2g.hasVar(t1g)) {
+                return setVarValue(t1gv, t2g);
             }
             return false;
         }
 
         // t2 is var that doesn't occur in t1
         if (t2g.isVar()) {
-            if (!t1g.hasVar(t2g)) {
-                return setVarValue((VarTerm) t2g, t1g);
+            VarTerm t2gv = (VarTerm) t2g;
+            // if t1g is not free, must unify values
+            Term t2vl = function.get(t2gv);
+            if (t2vl != null && !(t2vl instanceof VarsCluster)) {
+                return unifies(t2vl,t1g);
+            } else if (!t1g.hasVar(t2g)) {
+                return setVarValue(t2gv, t1g);
             } 
             return false;
         }
@@ -246,9 +257,6 @@ public class Unifier implements Cloneable {
     }
 
     private boolean setVarValue(VarTerm vt, Term value) {
-        //if (vt.isUnnamedVar())
-        //    return true;
-
         value = (Term) value.clone();
 
         // if the var has a cluster, set value for all cluster
@@ -292,7 +300,6 @@ public class Unifier implements Cloneable {
         if (!np1.isVar() && !np2.isVar() && !np1.hasSubsetAnnot(np2, this)) {
             return false;
         }
-
         // tests when np1 or np2 are Vars with annots
         if ((np1.isVar() && np1.hasAnnot()) || np2.isVar() && np2.hasAnnot()) {
             if (!np1.hasSubsetAnnot(np2, this)) {

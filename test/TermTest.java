@@ -174,10 +174,6 @@ public class TermTest extends TestCase {
 		assertTrue(u.unifies(p1, p2));
 	}
 	
-	public static void main(String[] a) {
-		new TermTest().testAnnotsUnify1();
-	}
-
 	public void testAnnotsUnify2() {
 		Unifier u = new Unifier();
 		Pred p1, p2;
@@ -191,8 +187,10 @@ public class TermTest extends TestCase {
 		p1.addAnnot(new VarTerm("X"));
 		p2.addAnnot(new Structure("ag1"));
 		//System.out.println("p1="+p1+"; p2="+p2);
+        // pos(1)[X]=pos(1)[ag1]
 		assertTrue(u.unifies(p1, p2));
 		//System.out.println("u="+u);
+        assertEquals(u.get("X").toString(),"ag1");
 		
 		p1.addAnnot(new Structure("ag2"));
 		p2.addAnnot(new VarTerm("Y"));
@@ -230,7 +228,15 @@ public class TermTest extends TestCase {
 	}
     
     public void testAnnotsUnify3() {
-        //Pred p1 = Pred.parsePred("p1[a,X")
+        Literal l1 = Literal.parseLiteral("s(tuesday)");
+        Unifier u = new Unifier();
+        u.unifies(l1, Literal.parseLiteral("s(Day)"));
+        assertEquals(u.get("Day").toString(),"tuesday");
+        
+        Literal l2 = Literal.parseLiteral("bel[monday]");
+        Literal l3 = Literal.parseLiteral("bel[Day]");
+        assertFalse(u.unifies(l3, l2));
+        assertEquals(u.get("Day").toString(),"tuesday");
     }
 	
 	public void testTrigger() {

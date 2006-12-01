@@ -321,7 +321,6 @@ public class Pred extends Structure {
                     j.remove();
                 }
             }
-
             // if p has a tail, add annot in p's tail
             if (!ok && pTail != null) {
                 ListTerm pTailAnnots = (ListTerm) u.get(pTail);
