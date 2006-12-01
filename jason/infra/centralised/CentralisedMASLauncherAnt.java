@@ -1,6 +1,7 @@
 package jason.infra.centralised;
 
 import jason.jeditplugin.Config;
+import jason.jeditplugin.JasonID;
 import jason.jeditplugin.MASLauncherInfraTier;
 import jason.jeditplugin.RunProjectListener;
 import jason.mas2j.MAS2JProject;
@@ -10,6 +11,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.util.Properties;
 
 /**
  * Write the ant script to run the MAS in centralised infrastructure and
@@ -127,6 +129,13 @@ public class CentralisedMASLauncherAnt implements MASLauncherInfraTier {
     }
 
     protected String replaceMarks(String script, boolean debug) {
+        String version = "";
+        try {
+            Properties p = new Properties();
+            p.load(CentralisedMASLauncherAnt.class.getResource("/dist.properties").openStream());
+            version = p.get("version") + "." + p.get("release");
+        } catch (Exception ex) { }
+        script = replace(script, "<VERSION>", version);
         script = replace(script, "<PROJECT-ID>", project.getSocName());
 
         String dDir = project.getDirectory();
