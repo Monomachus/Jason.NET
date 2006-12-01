@@ -417,7 +417,9 @@ public class TransitionSystem {
             break;
 
         case constraint:
-            if (((LogicalFormula)h.getLogicalFormula().clone()).logicalConsequence(ag, u).hasNext()) {
+            Iterator<Unifier> iu = ((LogicalFormula)h.getLogicalFormula().clone()).logicalConsequence(ag, u);
+            if (iu.hasNext()) {
+                im.unif = iu.next();
                 updateIntention();
             } else {
                 generateGoalDeletion();

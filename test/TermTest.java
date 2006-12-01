@@ -239,7 +239,15 @@ public class TermTest extends TestCase {
         assertEquals(u.get("Day").toString(),"tuesday");
     }
 	
-	public void testTrigger() {
+    public void testAnnotsUnify4() {
+        Literal l1 = Literal.parseLiteral("s[A]");
+        Literal l2 = Literal.parseLiteral("s[3]");
+        Unifier u = new Unifier();
+        assertTrue(u.unifies(l1, l2));
+        assertEquals(u.get("A").toString(),"3");
+    }
+
+    public void testTrigger() {
 		Pred p1 = new Pred("pos");
 
 		p1.addTerm(new VarTerm("X"));
