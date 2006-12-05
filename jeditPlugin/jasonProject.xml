@@ -47,6 +47,8 @@
  		<MARKUP>environment</MARKUP>
  		<MARKUP>executionControl</MARKUP>
  		<MARKUP>infrastructure</MARKUP>
+ 		<MARKUP>classpath</MARKUP>
+ 		<MARKUP>directives</MARKUP>
 
  		<LITERAL4>at</LITERAL4>
  		<LITERAL4>events</LITERAL4>

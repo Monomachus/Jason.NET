@@ -22,3 +22,5 @@ projectviewer.dock-position=left
 buffer.sidekick.keystroke-parse=true
 sidekick-tree.dock-position=left
 tip.show=false
+buffer.tabSize=4
+buffer.indentSize=4
