@@ -35,19 +35,40 @@ import jason.asSyntax.Term;
 
 import java.util.Iterator;
 
+/**
+  <p>Internal action: <b><code>.addAnnot</code></b>.
+  
+  <p>Description: adds an annotation into a literal.
+  
+  <p>Parameters:<ul>
+  
+  <li>+ arg[0] (literal or list): the literal where the annotation
+  will be added. If this parameter is a list, all literals of the list
+  will have the annotation added.<br/>
+  
+  <li>+ arg[1] (structure): the annotation.<br/>
+
+  <li>+/- arg[2] (variable, literal, or list): this argument unifies
+  with the result of the addition.<br/>
+
+  </ul>
+  
+  <p>Examples:<ul> 
+
+  <li> <code>.addAnnot(a,source(jomi),B)</code>: <code>B</code>
+  unifies with <code>a[source(jomi)]</code>.</li>
+
+  <li> <code>.addAnnot(a,source(jomi),b[jomi])</code>: fail because
+  the result of the addition does not unifies the third argument.</li>
+
+  <li> <code>.addAnnot([a1,a2], source(jomi), B)</code>: <code>B</code>
+  unifies with <code>[a1[source(jomi)], a2[source(jomi)]]</code>.</li>
+
+  </ul>
+
+ */
 public class addAnnot extends DefaultInternalAction {
 
-	/**
-	 * Example: .addAnnot(a,source(jomi),B)
-	 *          B will be a[source(jomi)]
-	 * or       .addAnnot([a1,a2], source(jomi), B)
-	 *          B will be [a1[source(jomi)], a2[source(jomi)]]
-	 *          
-	 * args[0] is the literal to be annotted
-	 * args[1] is the annotation itself
-	 * args[2] is the result -- does't have to be a var!
-	 */
-	
     @Override
 	public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
 		try {
@@ -87,7 +108,5 @@ public class addAnnot extends DefaultInternalAction {
 			}
 		}
 		return null;
-	}
-
-	
+	}	
 }
