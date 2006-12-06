@@ -127,7 +127,7 @@ public class Config extends Properties {
     }
 
     public void fix() {
-        tryToFixJarFileConf(JASON_JAR, "jason.jar", 300000);
+        tryToFixJarFileConf(JASON_JAR, "jason.jar", 500000);
         tryToFixJarFileConf(SACI_JAR, "saci.jar", 300000);
 
         // fix java home
@@ -184,6 +184,10 @@ public class Config extends Properties {
             put(CLOSEALL, "true");
         }
 
+        if (get(CHECK_VERSION) == null) {
+            put(CHECK_VERSION, "true");
+        }
+        
         // Default infrastructures
         put("infrastructure.Centralised", CentralisedFactory.class.getName());
         put("infrastructure.Saci", SaciFactory.class.getName());
@@ -346,7 +350,7 @@ public class Config extends Properties {
         return System.getProperty("os.name").startsWith("Windows");
     }
     
-    static String getJavaHomePathFromClassPath(String file) {
+    static private String getJavaHomePathFromClassPath(String file) {
         StringTokenizer st = new StringTokenizer(System.getProperty("java.class.path"), File.pathSeparator);
         while (st.hasMoreTokens()) {
             String token = st.nextToken();

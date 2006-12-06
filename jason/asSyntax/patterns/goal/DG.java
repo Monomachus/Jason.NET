@@ -27,7 +27,7 @@ public class DG implements Directive {
             // add +!g : g <- true.
             pl.add(Plan.parse("+!"+goal+" : " +goal+"."));
             
-            // add all inner plans with ?g in the end
+            // add ?g in the end of all inner plans
             for (Plan p: innerPlans) {
                 BodyLiteral b = new BodyLiteral(BodyType.test, (Literal)goal.clone());
                 p.getBody().add(b);

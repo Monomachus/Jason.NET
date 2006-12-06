@@ -37,13 +37,16 @@ public class NewAgentGUI extends StartNewAgentGUI {
         try {
             buffer.writeLock();
             String proj = buffer.getText(0, buffer.getLength());
-            int pos = proj.lastIndexOf("}");
-            if (pos > 0) {
-                pos--;
-            } else {
-                pos = buffer.getLength();
+            int pos = buffer.getLength();
+            if (proj.lastIndexOf("directives") > 0) {
+                pos = proj.lastIndexOf("directives");
+            } else if (proj.lastIndexOf("classpath") > 0) {
+                pos = proj.lastIndexOf("classpath");
+            } else if (proj.lastIndexOf("}") > 0) {
+                pos = proj.lastIndexOf("}");
             }
-            buffer.insert(pos, "\n        " + agDecl.getAsInMASProject());
+            pos--;
+            buffer.insert(pos, "\n        " + agDecl.getAsInMASProject()+"\n");
         } finally {
             buffer.writeUnlock();
         }

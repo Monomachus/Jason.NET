@@ -20,6 +20,16 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/** 
+ * This class maintains the set of directives and is used by the
+ * parser to process them.
+ * 
+ * All available directives must be registered in this class using the
+ * addDirective method.
+ * 
+ * @author jomi
+ *
+ */
 public class DirectiveProcessor {
     static Logger logger = Logger.getLogger(DirectiveProcessor.class.getName());
 

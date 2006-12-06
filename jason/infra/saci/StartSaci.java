@@ -114,9 +114,8 @@ class StartSaci extends Thread {
 								null,
 								"Failed to automatically start saci! \nGo to \""
 										+ project.getDirectory()
-										+ "\" directory and run the saci-"
-										+ project.getSocName()
-										+ " script.\n\nClick 'ok' when saci is running.");
+										+ "\" directory and run 'ant saci'"
+										+ " to start saci.\n\nClick 'ok' when saci is running.");
 				wait(1000);
 				if (!saciOk) {
 					JOptionPane

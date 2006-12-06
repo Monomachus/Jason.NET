@@ -108,6 +108,8 @@ public class RunCentralisedMAS {
             jason.mas2j.parser.mas2j parser = new jason.mas2j.parser.mas2j(new FileReader(args[0]));
             project = parser.mas();
 
+            project.registerDirectives();
+            
             runner.createAg(project, debug);
             runner.startAgs();
             runner.startSyncMode();

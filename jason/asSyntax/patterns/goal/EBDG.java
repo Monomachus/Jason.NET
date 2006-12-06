@@ -3,6 +3,7 @@ package jason.asSyntax.patterns.goal;
 import jason.asSyntax.BodyLiteral;
 import jason.asSyntax.Literal;
 import jason.asSyntax.LogExpr;
+import jason.asSyntax.LogicalFormula;
 import jason.asSyntax.Plan;
 import jason.asSyntax.PlanLibrary;
 import jason.asSyntax.Pred;
@@ -42,7 +43,12 @@ public class EBDG implements Directive {
                 pis.add(pi);
                 
                 // change context to "not p__i(g) & c"
-                p.setContext(new LogExpr(new LogExpr(LogicalOp.not, pi), LogicalOp.and, p.getContext()));
+                LogicalFormula context = p.getContext();
+                if (context == null) {
+                    p.setContext(new LogExpr(LogicalOp.not, pi));
+                } else {
+                    p.setContext(new LogExpr(new LogExpr(LogicalOp.not, pi), LogicalOp.and, context));
+                }
                 
                 // change body
                 // add +p__i(g)

@@ -108,12 +108,13 @@ public class SaciAgArch extends saci.Agent implements AgArchInfraTier {
                 agClassName = args[1].trim();
             }
 
-            // TODO: read bb class name from args!
-
             // parse bb class
             mas2j parser = new mas2j(new StringReader(args[2].replace('$','\"')));
             ClassParameters bbPars = parser.classDef();
             
+	    // TODO: get and register user directives
+
+
             String asSource = null;
             if (args.length < 3) { // error
                 throw new JasonException("The AgentSpeak source file was not informed, cannot create the Agent!");
