@@ -118,6 +118,8 @@ TOKEN : {
 
 |  <ASOV:        "verbose" >
 
+|  <DIRECTIVE:   "directives" >
+
 |  <ASOSYNC:     "synchronised" >
 |  <ASOBOOL:     ("true" | "false" ) >
 
@@ -167,6 +169,8 @@ MAS2JProject mas() :           { Token soc; }
   
   agents()
 
+  directives()
+  
   classpath()
 
   "}"
@@ -189,7 +193,7 @@ void agents() :             { project.initAgMap(); }
 
 
 void agent() :              { Token agName; 
-                              Token qty; Token value; 
+                              Token qty; Token value;
                               Token host; 
                               AgentParameters ag = new AgentParameters();
                             }
@@ -269,18 +273,17 @@ Map ASoptions() :          { Map opts = new HashMap(); }
 
 Map procOption(Map opts): { Token opt; Token oval; }
 {
-  ( opt=<ASOEE>   "=" oval=<ASOEEV>  {opts.put(opt.image,oval.image);}
-  | opt=<ASOIB>   "=" oval=<ASOIBV>  {opts.put(opt.image,oval.image);}
-  | opt=<ASOSYNC> "=" oval=<ASOBOOL> {opts.put(opt.image,oval.image);}
-  | opt=<ASONRC>  "=" oval=<NUMBER>  {opts.put(opt.image,oval.image);} 
-  | opt=<ASOV>    "=" oval=<NUMBER>  {opts.put(opt.image,oval.image);} 
-  | opt=<ASID>    "=" 
-    (oval=<STRING>|oval=<ASID>|oval=<NUMBER>|oval=<ID>)
-                                     {opts.put(opt.image,oval.image);} 
+  ( opt=<ASOEE>     "=" oval=<ASOEEV>  {opts.put(opt.image,oval.image);}
+  | opt=<ASOIB>     "=" oval=<ASOIBV>  {opts.put(opt.image,oval.image);}
+  | opt=<ASOSYNC>   "=" oval=<ASOBOOL> {opts.put(opt.image,oval.image);}
+  | opt=<ASONRC>    "=" oval=<NUMBER>  {opts.put(opt.image,oval.image);} 
+  | opt=<ASOV>      "=" oval=<NUMBER>  {opts.put(opt.image,oval.image);} 
+  | opt=<ASID>      "=" (oval=<STRING>|oval=<ASID>|oval=<NUMBER>|oval=<ID>)
+                                       {opts.put(opt.image,oval.image);} 
   )
-                                     { 
-                                       return opts; 
-                                     }
+                                       { 
+                                         return opts; 
+                                       }
 }
 
 
@@ -320,6 +323,20 @@ void classpath() :          { Token cp; }
 
   [ <CLASSPATH> ":" 
     ( cp = <STRING> ";"     { project.addClassPath(cp.image); }
+    )+
+  ]
+
+}
+
+void directives() :         {  Token directiveId; ClassParameters directiveClass = null;  }
+{
+  [ <DIRECTIVE> ":" 
+    ( 
+       directiveId = <ASID> 
+       "=" 
+       directiveClass = classDef()  
+       ";"
+                            { project.addDirectiveClass(directiveId.image, directiveClass); }    
     )+
   ]
 
