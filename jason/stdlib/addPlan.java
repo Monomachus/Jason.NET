@@ -35,12 +35,43 @@ import jason.asSyntax.DefaultTerm;
 
 import java.util.Iterator;
 
+
+/**
+  <p>Internal action: <b><code>.addPlan</code></b>.
+  
+  <p>Description: adds plan(s) into the agent plan library.
+  
+  <p>Parameters:<ul>
+  
+  <li>+ arg[0] (string or list): the string representing the plan to
+  be added. If it is a list, all strings of the list will be added as
+  plans. The syntax of the string is the same as ordinary AgentSpeak
+  code.<br/>
+  
+  <li><i>+ arg[1]</i> (structure - optional): the source of the
+  plan. The default value is <code>self</code>.<br/>
+  
+  </ul>
+  
+  <p>Examples:<ul> 
+
+  <li> <code>.addPlan("+b : true &lt;- .print(b).")</code>: adds the plan
+  <code>+b : true &lt;- .print(b).</code> into the agent's plan library
+  with a plan label annotated with <code>source(self)</code>.</li>
+
+  <li> <code>.addPlan("+b : true &lt;- .print(b).", rafa)</code>: same as
+  the previous example, but the source of the plan is agent
+  "rafa".</li>
+
+  <li> <code>.addPlan(["+b : true &lt;- .print(b).", "+b : bel &lt;-
+  .print(bbel)."], rafa)</code>: adds both plans with "rafa" as they
+  source.</li>
+
+  </ul>
+
+ */
 public class addPlan extends DefaultInternalAction {
 
-    /**
-     * args[0] = plan or list of plans (as StringTerm) args[1] = source (if not
-     * informed, is "self")
-     */
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         try {
