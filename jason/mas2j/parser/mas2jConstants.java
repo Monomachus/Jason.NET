@@ -17,21 +17,22 @@ public interface mas2jConstants {
   int ASOIBV = 17;
   int ASONRC = 18;
   int ASOV = 19;
-  int ASOSYNC = 20;
-  int ASOBOOL = 21;
-  int ASAGCLASS = 22;
-  int ASAGARCHCLASS = 23;
-  int BBCLASS = 24;
-  int NUMBER = 25;
-  int STRING = 26;
-  int ASID = 27;
-  int ID = 28;
-  int PATH = 29;
-  int DRIVER = 30;
-  int LETTER = 31;
-  int LC_LETTER = 32;
-  int UP_LETTER = 33;
-  int DIGIT = 34;
+  int DIRECTIVE = 20;
+  int ASOSYNC = 21;
+  int ASOBOOL = 22;
+  int ASAGCLASS = 23;
+  int ASAGARCHCLASS = 24;
+  int BBCLASS = 25;
+  int NUMBER = 26;
+  int STRING = 27;
+  int ASID = 28;
+  int ID = 29;
+  int PATH = 30;
+  int DRIVER = 31;
+  int LETTER = 32;
+  int LC_LETTER = 33;
+  int UP_LETTER = 34;
+  int DIGIT = 35;
 
   int DEFAULT = 0;
 
@@ -56,6 +57,7 @@ public interface mas2jConstants {
     "<ASOIBV>",
     "\"nrcbp\"",
     "\"verbose\"",
+    "\"directives\"",
     "\"synchronised\"",
     "<ASOBOOL>",
     "\"agentClass\"",

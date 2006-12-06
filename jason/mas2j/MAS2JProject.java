@@ -24,15 +24,19 @@
 package jason.mas2j;
 
 import jason.JasonException;
+import jason.asSyntax.directives.Directive;
+import jason.asSyntax.directives.DirectiveProcessor;
 import jason.infra.InfrastructureFactory;
 import jason.jeditplugin.Config;
 
 import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -61,6 +65,8 @@ public class MAS2JProject {
 	List<AgentParameters> agents = new ArrayList<AgentParameters>();
 
     List<String> classpaths = new ArrayList<String>();
+
+    Map<String,String> directiveClasses = new HashMap<String,String>();
 
     
     public static MAS2JProject parse(String file) {
@@ -170,6 +176,25 @@ public class MAS2JProject {
 		return classpaths;
 	}
 
+    public void addDirectiveClass(String id, ClassParameters classname) {
+        directiveClasses.put(id, classname.className);
+    }
+    
+    public Map<String,String> getDirectiveClasses() {
+        return directiveClasses;
+    }
+    
+    public void registerDirectives() {
+        if (directiveClasses != null) {
+            for (String id: directiveClasses.keySet()) {
+                try {
+                    DirectiveProcessor.addDirective(id, (Directive)Class.forName(directiveClasses.get(id)).newInstance());
+                } catch (Exception e) {
+                    logger.log(Level.SEVERE, "Error registering directives "+directiveClasses,e);                
+                }
+            }
+        }
+    }
 	
 	public String toString() {
         StringBuilder s = new StringBuilder("MAS " + getSocName() + " {\n");
@@ -193,17 +218,28 @@ public class MAS2JProject {
 		Iterator i = agents.iterator();
 		while (i.hasNext()) {
 			s.append("       "+i.next());
-			s.append(";\n");
+			s.append("\n");
 		}
-		s.append("}");
 
+        // directives
+        if (directiveClasses.size() > 0) {
+            s.append("    directives: ");
+            for (String d: directiveClasses.keySet()) {
+                s.append(d+"="+directiveClasses.get(d)+"; ");
+            }
+            s.append("\n");
+        }
+        
 		// classpath
 		if (classpaths.size() > 0) {
-			s.append("    classpath:");
+			s.append("    classpath: ");
 			for (String cp: classpaths) {
 				s.append("\""+cp+"\"; ");
 			}
+            s.append("\n");
 		}
+        
+        s.append("}");
 
 		return s.toString();
 	}

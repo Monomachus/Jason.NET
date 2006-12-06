@@ -6,6 +6,12 @@ import java.io.File;
 import java.util.Iterator;
 import java.util.Map;
 
+/** 
+ * represents the agent declaration in the MAS2J project file. 
+ * The project parser create this object while parsing.
+ * 
+ * @author jomi
+ */
 public class AgentParameters {
 	public String              name      = null;
     public File                asSource  = null;
@@ -50,7 +56,7 @@ public class AgentParameters {
 			s.append("#"+qty+" ");
 		}
 		if (host != null && host.length() > 0) {
-			s.append("at \""+host+"\"");
+			s.append("at "+host);
 		}
 		return s.toString().trim() + ";";
 	}
@@ -76,7 +82,7 @@ public class AgentParameters {
 	    if (forceSync || debug) {
 	    	stts.setSync(true);
 	    }
-		return stts;
-	}
-	
+        
+        return stts;
+	}	
 }
