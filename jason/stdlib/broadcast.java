@@ -30,6 +30,28 @@ import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.Term;
 
+/**
+  <p>Internal action: <b><code>.broadcast</code></b>.
+  
+  <p>Description: broadcasts a message to all agents.
+  
+  <p>Parameters:<ul>
+  
+  <li>+ arg[0] (atom): the illocutionary force of the message (tell,
+  achieve, ...). This internal action does not work for asks.<br/>
+  
+  <li>+ arg[1] (literal): the content of the message.<br/>
+  
+  </ul>
+  
+  <p>Example:<ul> 
+
+  <li> <code>.broadcast(tell,value(10))</code>: sends
+  <code>value(10)</code> to all agents.</li>
+
+  </ul>
+
+*/
 public class broadcast extends DefaultInternalAction {
 
     @Override

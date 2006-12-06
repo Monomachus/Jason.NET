@@ -39,16 +39,59 @@ import jason.asSyntax.StringTerm;
 import jason.asSyntax.Structure;
 import jason.asSyntax.Term;
 
+/**
+  <p>Internal action: <b><code>.send</code></b>.
+  
+  <p>Description: sends a message to an agent.
+  
+  <p>Parameters:<ul>
+  
+  <li>+ arg[0] (atom): the receiver of the message. It is the unique
+  name of the agent that will receive the message.<br/>
+
+  <li>+ arg[1] (atom): the illocutionary force of the message (tell,
+  achieve, ...).<br/>
+  
+  <li>+ arg[2] (literal): the content of the message.<br/>
+  
+  <li><i>+ arg[3]</i> (any term - optional): the answer of an ask
+  message.<br/> 
+  
+  <li><i>+ arg[4]</i> (number - optional): time out (in mili-seconds)
+  for an ask answer.<br/> </ul>
+  
+  <p>Examples (suppose that agent jomi is sending the messages):<ul>
+
+  <li> <code>.send(rafael,tell,value(10))</code>: sends
+  <code>value(10)</code> to the agent named rafael. The literal
+  <code>value(10)[source(jomi)]</code> will be added as a belief in
+  the rafael's belief base.</li>
+
+  <li> <code>.send(rafael,achieve,go(10,30)</code>: sends
+  <code>go(10,30)</code> to the agent named rafael. When rafael
+  receives this message, an event like
+  <code>!go(10,30)[source(jomi)]</code> will be added in his event
+  queue.</li>
+
+  <li> <code>.send(rafael,askOne,value(beer),X)</code>: sends
+  <code>value(beer)</code> to the agent named rafael. This send
+  suspend the jomi's intention until he receives the rafael
+  answer. The answer unifies with <code>X</code>.</li>
+
+  <li> <code>.send(rafael,askOne,value(beer),X,2000)</code>: same as
+  previous example, but agent jomi waits for 2 seconds. If no message
+  is received in this time, <code>X</code> unifies with
+  <code>timeout</code>.</li>
+
+  </ul>
+
+  See the Jason manual for more details about agent communication.
+
+*/
 public class send extends DefaultInternalAction {
     
     private boolean lastSendWasAsk = false; 
     
-	/**
-	 * arg[0] is receiver (an agent name or a list of names)
-	 * arg[1] is illocucionary force
-	 * arg[2] is content
-	 *  
-	 */
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         Term to   = null;
