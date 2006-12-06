@@ -76,8 +76,7 @@ public class Agent {
     private Logger logger = Logger.getLogger(Agent.class.getName());
 
     /** creates the TS of this agent, parse its AS source, and set its Settings */
-    public TransitionSystem initAg(AgArch arch, BeliefBase bb, String asSrc,
-            Settings stts) throws JasonException {
+    public TransitionSystem initAg(AgArch arch, BeliefBase bb, String asSrc, Settings stts) throws JasonException {
         // set the agent
         try {
             setLogger(arch);
@@ -116,20 +115,16 @@ public class Agent {
         return aslSource;
     }
 
-    /** add beliefs and plan form a URL */
+    /** add beliefs and plan form an URL */
     public boolean parseAS(URL asURL) {
         try {
             parseAS(asURL.openStream());
-            logger.fine("as2j: AgentSpeak program '" + asURL
-                    + "' parsed successfully!");
+            logger.fine("as2j: AgentSpeak program '" + asURL + "' parsed successfully!");
             return true;
         } catch (IOException e) {
-            logger.log(Level.SEVERE,
-                    "as2j: the AgentSpeak source file was not found", e);
+            logger.log(Level.SEVERE, "as2j: the AgentSpeak source file was not found", e);
         } catch (ParseException e) {
-            logger
-                    .log(Level.SEVERE, "as2j: error parsing \"" + asURL + "\"",
-                            e);
+            logger.log(Level.SEVERE, "as2j: error parsing \"" + asURL + "\"", e);
         }
         return false;
     }
@@ -138,15 +133,12 @@ public class Agent {
     public boolean parseAS(String asFileName) {
         try {
             parseAS(new FileInputStream(asFileName));
-            logger.fine("as2j: AgentSpeak program '" + asFileName
-                    + "' parsed successfully!");
+            logger.fine("as2j: AgentSpeak program '" + asFileName + "' parsed successfully!");
             return true;
         } catch (FileNotFoundException e) {
-            logger.log(Level.SEVERE,
-                    "as2j: the AgentSpeak source file was not found", e);
+            logger.log(Level.SEVERE, "as2j: the AgentSpeak source file was not found", e);
         } catch (ParseException e) {
-            logger.log(Level.SEVERE, "as2j: error parsing \"" + asFileName
-                    + "\"", e);
+            logger.log(Level.SEVERE, "as2j: error parsing \"" + asFileName + "\"", e);
         }
         return false;
     }
@@ -158,7 +150,7 @@ public class Agent {
 
     public InternalAction getIA(Structure action) throws Exception {
         String iaName = action.getFunctor();
-        if (iaName.indexOf('.') == 0)
+        if (iaName.charAt(0) == '.')
             iaName = "jason.stdlib" + iaName;
         InternalAction objIA = internalActions.get(iaName);
         if (objIA == null) {
@@ -278,8 +270,8 @@ public class Agent {
 
     /**
      * If BB contains l (using unification to test), returns the literal that is
-     * the BB; otherwise, returns null. E.g.: if l is g(_,_) and BB is={....,
-     * g(10,20), ...}, this method returns g(10,20).
+     * in the BB; otherwise, returns null. 
+     * E.g.: if l is g(_,_) and BB is={...., g(10,20), ...}, this method returns g(10,20).
      * 
      * The unifier <i>un</i> is updated by the method.
      * 

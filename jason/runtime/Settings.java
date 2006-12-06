@@ -50,7 +50,7 @@ public class Settings {
     int     nrcbp     = ODefaultNRC;
     int     verbose   = ODefaultVerbose;
     boolean sync      = ODefaultSync; 
-
+    
     Map<String,Object> userParameters = new HashMap<String,Object>();
     
     Logger logger = Logger.getLogger(Settings.class.getName());			
@@ -120,7 +120,8 @@ public class Settings {
 	        }
         }
     }
-    
+
+    /** add user defined option */
     public void addOption(String key, Object value) {
     	userParameters.put(key, value);
     }
