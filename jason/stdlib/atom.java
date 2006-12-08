@@ -4,7 +4,6 @@ import jason.JasonException;
 import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
-import jason.asSyntax.Structure;
 import jason.asSyntax.Term;
 
 /**
@@ -24,6 +23,7 @@ Numbers, strings, and unground variables are not structures.
 <li> <code>.atom("home page")</code>: fail.
 <li> <code>.atom(X)</code>: fail if X is free and success if X is bind with an atom.
 <li> <code>.atom(a(X))</code>: fail.
+<li> <code>.atom(a[X])</code>: fail.
 <li> <code>.atom([a,b,c])</code>: fail.
 <li> <code>.atom([a,b,c(X)])</code>: fail.
 </ul>
@@ -36,7 +36,7 @@ public class atom extends DefaultInternalAction {
         try {
             Term t = (Term) args[0].clone();
             un.apply(t);
-            return t.isStructure() && !t.isList() && ((Structure)t).getTermsSize() == 0;
+            return t.isStructure() && !t.isList() && t.isConstant();
         } catch (ArrayIndexOutOfBoundsException e) {
             throw new JasonException("The internal action 'structure' has not received one argument");
         } catch (Exception e) {

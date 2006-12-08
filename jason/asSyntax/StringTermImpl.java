@@ -82,6 +82,11 @@ public class StringTermImpl extends DefaultTerm implements StringTerm {
 		return true;
 	}
 
+    @Override
+    public boolean isConstant() {
+    	return true;
+    }
+
  	public int length() {
 		return getString().length();
 	}

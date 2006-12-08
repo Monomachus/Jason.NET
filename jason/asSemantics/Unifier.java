@@ -211,9 +211,10 @@ public class Unifier implements Cloneable {
 
         // both terms are not vars
         
-        // if any of the terms is number, they must be equal
-        if (t1g.isNumeric() || t2g.isNumeric()) {
-            return t1g.equals(t2g);
+        // if any of the terms is a constant (number, string, or atom), they must be equal
+        // and returned true in a previous test
+        if (t1g.isConstant() || t2g.isConstant()) {
+            return false;
         }
 
         // terms are atoms or structures

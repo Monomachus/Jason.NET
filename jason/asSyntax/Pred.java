@@ -76,6 +76,13 @@ public class Pred extends Structure {
     public boolean isPred() {
         return true;
     }
+    
+	@Override
+    public boolean isConstant() {
+    	return super.isConstant() && !hasAnnot();
+    }
+    
+    
 
     @Override
     public boolean isGround() {

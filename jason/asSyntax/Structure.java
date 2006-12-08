@@ -262,6 +262,12 @@ public class Structure extends DefaultTerm {
     public boolean isStructure() {
         return true;
     }
+    
+	@Override
+    public boolean isConstant() {
+    	return getTermsSize() == 0;
+    }
+    
 
     public boolean isGround() {
         for (int i=0; i<getTermsSize(); i++) {
