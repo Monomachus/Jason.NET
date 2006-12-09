@@ -305,6 +305,11 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
         return value != null && getValue().isStructure();
     }
 
+	@Override
+    public boolean isConstant() {
+    	return value != null && getValue().isConstant();
+    }
+    
     @Override
     public boolean isRule() {
         return value != null && getValue().isRule();
