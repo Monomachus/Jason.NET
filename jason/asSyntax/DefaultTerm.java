@@ -100,11 +100,14 @@ public abstract class DefaultTerm implements Term, Serializable {
     public boolean isStructure() {
         return false;
     }
+
+	public boolean isAtom() {
+		return isStructure() && !isList() && isConstant();
+	}
     
     public boolean isConstant() {
     	return false;
     }
-
 
     public boolean isGround() {
         return true;

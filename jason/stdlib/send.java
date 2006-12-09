@@ -105,13 +105,13 @@ public class send extends DefaultInternalAction {
 	        
 	        un.apply(to);
 
-	        if (! to.isGround()) {
-                throw new JasonException("The TO parameter ('"+to+"') of the internal action 'send' is not a ground term!");            	
+	        if (! to.isAtom()) {
+                throw new JasonException("The TO parameter ('"+to+"') of the internal action 'send' is not an atom!");
             }
 
 	        un.apply(ilf);
-            if (! ilf.isGround()) {
-                throw new JasonException("The Ilf Force parameter ('"+ilf+"') of the internal action 'send' is not a ground term!");            	            	
+            if (! ilf.isAtom()) {
+                throw new JasonException("The Ilf Force parameter ('"+ilf+"') of the internal action 'send' is not an atom!");
             }
 	        un.apply(pcnt);
 	        
@@ -140,8 +140,8 @@ public class send extends DefaultInternalAction {
             if (mid.isVar()) {
             	un.apply(mid);
             }
-            if (! mid.isGround()) {
-                throw new JasonException("The Message ID parameter of the internal action 'send' is not a ground term!");            	            	
+            if (! mid.isAtom()) {
+                throw new JasonException("The Message ID parameter of the internal action 'send' is not an atom!");            	            	
             }
             m.setInReplyTo(mid.toString());
         }

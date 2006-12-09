@@ -36,7 +36,7 @@ public class atom extends DefaultInternalAction {
         try {
             Term t = (Term) args[0].clone();
             un.apply(t);
-            return t.isStructure() && !t.isList() && t.isConstant();
+            return t.isAtom();
         } catch (ArrayIndexOutOfBoundsException e) {
             throw new JasonException("The internal action 'structure' has not received one argument");
         } catch (Exception e) {
