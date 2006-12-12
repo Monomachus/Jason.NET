@@ -46,8 +46,9 @@ import jason.asSyntax.Term;
   
   <p>Parameters:<ul>
   
-  <li>+ arg[0] (atom): the receiver of the message. It is the unique
-  name of the agent that will receive the message.<br/>
+  <li>+ arg[0] (atom, string, or list): the receiver of the
+  message. It is the unique name of the agent that will receive the
+  message (or list of names).<br/>
 
   <li>+ arg[1] (atom): the illocutionary force of the message (tell,
   achieve, ...).<br/>
@@ -99,27 +100,27 @@ public class send extends DefaultInternalAction {
         Term pcnt = null;
 		// check parameters
         try {
-	        to   = (Term)args[0].clone();
-	        ilf  = (Term)args[1].clone();
-	        pcnt = (Term)args[2].clone();
+            to   = (Term)args[0].clone();
+            ilf  = (Term)args[1].clone();
+            pcnt = (Term)args[2].clone();
 	        
-	        un.apply(to);
-
-	        if (! to.isAtom()) {
-                throw new JasonException("The TO parameter ('"+to+"') of the internal action 'send' is not an atom!");
+            un.apply(to);
+            
+            if (!to.isAtom() && !to.isList() && !to.isString()) {
+                throw new JasonException("The TO parameter ('"+to+"') of the internal action 'send' is not an atom or list of atoms!");
             }
 
-	        un.apply(ilf);
+            un.apply(ilf);
             if (! ilf.isAtom()) {
                 throw new JasonException("The Ilf Force parameter ('"+ilf+"') of the internal action 'send' is not an atom!");
             }
-	        un.apply(pcnt);
+            un.apply(pcnt);
 	        
-	        // remove source annots in the content (in case it is a pred)
-	        try {
-	            ((Pred)pcnt).delSources();
-	        } catch (Exception e) {}
-
+            // remove source annots in the content (in case it is a pred)
+            try {
+                ((Pred)pcnt).delSources();
+            } catch (Exception e) {}
+            
         } catch (ArrayIndexOutOfBoundsException e) {
             throw new JasonException("The internal action 'send' has not received three arguments");
         } 
@@ -133,7 +134,7 @@ public class send extends DefaultInternalAction {
             }
             lastSendWasAsk = true;
         }
-
+        
         // tell with 4 args is a reply to
         if (m.isTell() && args.length > 3) {
             Term mid = (Term)args[3].clone();
@@ -147,35 +148,39 @@ public class send extends DefaultInternalAction {
         }
         
         try {
-        	if (to.isList()) {
-        	    if (m.isAsk()) {
+            if (to.isList()) {
+                if (m.isAsk()) {
                     throw new JasonException("Can not send ask to a list of receivers!");                                                   
                 } else {
                     for (Term t: (ListTerm)to) {
-                        String rec = t.toString();
-                        if (t.isString()) {
-                            rec = ((StringTerm)t).getString();
+                        if (t.isAtom() || t.isString()) {
+                            String rec = t.toString();
+                            if (t.isString()) {
+                                rec = ((StringTerm)t).getString();
+                            }
+                            m.setReceiver(rec);
+                            ts.getUserAgArch().sendMsg(m);
+                        } else {
+                            throw new JasonException("The TO parameter ('"+t+"') of the internal action 'send' is not an atom!");
                         }
-                		m.setReceiver(rec);
-                		ts.getUserAgArch().sendMsg(m);        			
-            		}
+                    }
                 }
-        	} else {
+            } else {
                 String rec = to.toString();
                 if (to.isString()) {
                     rec = ((StringTerm)to).getString();
                 }
-        		m.setReceiver(rec);
-        		ts.getUserAgArch().sendMsg(m);
-        	}
-
+                m.setReceiver(rec);
+                ts.getUserAgArch().sendMsg(m);
+            }
+            
             if (args.length == 5 && m.isAsk()) {
                 // get the timout
                 NumberTerm tto = (NumberTerm)args[4].clone();
                 un.apply(tto);
                 new CheckTimeout((long)tto.solve(), m.getMsgId(), ts.getC()).start(); 
             }
-
+            
             return true;
         } catch (Exception e) {
             throw new JasonException("Error sending message " + m + "\nError="+e);
