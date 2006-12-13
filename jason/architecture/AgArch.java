@@ -130,10 +130,6 @@ public class AgArch {
 
     /** Sends a Jason message */
     public void sendMsg(Message m) throws Exception {
-        // suspend intention if it is an ask
-        if (m.isAsk()) {
-            fTS.getC().getPendingIntentions().put(m.getMsgId(), fTS.getC().getSelectedIntention());
-        }
         archTier.sendMsg(m);
     }
 

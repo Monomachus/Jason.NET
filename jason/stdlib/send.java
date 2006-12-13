@@ -56,10 +56,18 @@ import jason.asSyntax.Term;
   <li>+ arg[2] (literal): the content of the message.<br/>
   
   <li><i>+ arg[3]</i> (any term - optional): the answer of an ask
-  message.<br/> 
+  message (performatives askOne and askAll).<br/> 
   
   <li><i>+ arg[4]</i> (number - optional): time out (in mili-seconds)
-  for an ask answer.<br/> </ul>
+  for an ask answer.<br/> 
+
+  </ul>
+
+  <p>In <b>ask</b> messages, the arguments 3 and 4 are optional. In
+  case they are informed, .send suspends the intention until an answer
+  is received and unified with the arg[3]. Otherwise, the intention is
+  not suspended and the answer (that is a tell message) produces a
+  belief addition event as usual.
   
   <p>Examples (suppose that agent jomi is sending the messages):<ul>
 
@@ -74,14 +82,21 @@ import jason.asSyntax.Term;
   <code>!go(10,30)[source(jomi)]</code> will be added in his event
   queue.</li>
 
-  <li> <code>.send(rafael,askOne,value(beer),X)</code>: sends
-  <code>value(beer)</code> to the agent named rafael. This send
-  suspend the jomi's intention until he receives the rafael
-  answer. The answer unifies with <code>X</code>.</li>
+  <li> <code>.send(rafael,askOne,value(beer,X))</code>: sends
+  <code>value(beer,X)</code> to the agent named rafael. This .send
+  does not suspend the jomi's intention. An event like
+  <code>+value(beer,10)[source(rafael)]</code> is generated in jomi's
+  side when rafael answer the ask.</li>
 
-  <li> <code>.send(rafael,askOne,value(beer),X,2000)</code>: same as
+  <li> <code>.send(rafael,askOne,value(beer,X),A)</code>: sends
+  <code>value(beer,X)</code> to the agent named rafael. This send
+  suspend the jomi's intention until he receives the rafael
+  answer. The answer (something like <code>value(beer,10)</code>)
+  unifies with <code>A</code>.</li>
+
+  <li> <code>.send(rafael,askOne,value(beer,X),A,2000)</code>: same as
   previous example, but agent jomi waits for 2 seconds. If no message
-  is received in this time, <code>X</code> unifies with
+  is received in this time, <code>A</code> unifies with
   <code>timeout</code>.</li>
 
   </ul>
@@ -91,7 +106,7 @@ import jason.asSyntax.Term;
 */
 public class send extends DefaultInternalAction {
     
-    private boolean lastSendWasAsk = false; 
+    private boolean lastSendWasSynAsk = false; 
     
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
@@ -126,15 +141,12 @@ public class send extends DefaultInternalAction {
         } 
         Message m = new Message(ilf.toString(), null, null, pcnt.toString());
 
-        // ask must have a fourth argument
-        lastSendWasAsk = false;
-        if (m.isAsk()) {
-            if (args.length < 4) {
-                throw new JasonException("The internal action 'send-ask' has not received four arguments");
-            }
-            lastSendWasAsk = true;
+        // assync ask have a fourth argument and should suspend the intention
+        lastSendWasSynAsk = m.isAsk() && args.length > 3;
+        if (lastSendWasSynAsk) {
+        	ts.getC().getPendingIntentions().put(m.getMsgId(), ts.getC().getSelectedIntention());
         }
-        
+
         // tell with 4 args is a reply to
         if (m.isTell() && args.length > 3) {
             Term mid = (Term)args[3].clone();
@@ -147,6 +159,7 @@ public class send extends DefaultInternalAction {
             m.setInReplyTo(mid.toString());
         }
         
+        // send the message
         try {
             if (to.isList()) {
                 if (m.isAsk()) {
@@ -174,7 +187,7 @@ public class send extends DefaultInternalAction {
                 ts.getUserAgArch().sendMsg(m);
             }
             
-            if (args.length == 5 && m.isAsk()) {
+            if (lastSendWasSynAsk && args.length == 5) {
                 // get the timout
                 NumberTerm tto = (NumberTerm)args[4].clone();
                 un.apply(tto);
@@ -189,7 +202,7 @@ public class send extends DefaultInternalAction {
 
     @Override
     public boolean suspendIntention() {
-        return lastSendWasAsk;
+        return lastSendWasSynAsk;
     }
     
     

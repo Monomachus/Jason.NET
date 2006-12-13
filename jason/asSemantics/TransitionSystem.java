@@ -160,10 +160,10 @@ public class TransitionSystem {
             }
             // is it a pending intention?
             if (intention != null) {
-                // unify the message answer with the .send fourth parameter
+                // unify the message answer with the .send fourth argument
                 // the send that put the intention in Pending state was
                 // something like
-                // .send(ask, ag1, value, X)
+                //    .send(ag1,askOne, value, X)
                 // if the answer was 3, unifies X=3
                 BodyLiteral send = intention.peek().removeCurrentStep();
                 if (intention.peek().getUnif().unifies(send.getLiteralFormula().getTerm(3), content)) {
@@ -842,7 +842,7 @@ public class TransitionSystem {
             }
 
         } catch (Exception e) {
-            logger.log(Level.SEVERE, "*** ERROR in the transition system. Intention= "+C.SI, e);
+            logger.log(Level.SEVERE, "*** ERROR in the transition system.", e);
         }
     }
 
