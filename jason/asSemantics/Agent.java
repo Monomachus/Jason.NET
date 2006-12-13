@@ -57,8 +57,9 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
- * Agent class has the belief base and plan library of an AgentSpeak agent. It
- * also implements the default selection functions of the AgentSpeak semantics.
+ * The Agent class has the belief base and plan library of an
+ * AgentSpeak agent. It also implements the default selection
+ * functions of the AgentSpeak semantics.
  */
 public class Agent {
 
@@ -75,7 +76,7 @@ public class Agent {
 
     private Logger logger = Logger.getLogger(Agent.class.getName());
 
-    /** creates the TS of this agent, parse its AS source, and set its Settings */
+    /** Creates the TS of this agent, parses its AS source, and sets its Settings */
     public TransitionSystem initAg(AgArch arch, BeliefBase bb, String asSrc, Settings stts) throws JasonException {
         // set the agent
         try {
@@ -110,12 +111,12 @@ public class Agent {
         return logger;
     }
 
-    /** returns the .asl file source used to create this agent */
+    /** Returns the .asl file source used to create this agent */
     public String getASLSource() {
         return aslSource;
     }
 
-    /** add beliefs and plan form an URL */
+    /** Adds beliefs and plans form an URL */
     public boolean parseAS(URL asURL) {
         try {
             parseAS(asURL.openStream());
@@ -129,7 +130,7 @@ public class Agent {
         return false;
     }
 
-    /** add beliefs and plan form a file */
+    /** Adds beliefs and plans form a file */
     public boolean parseAS(String asFileName) {
         try {
             parseAS(new FileInputStream(asFileName));
@@ -215,7 +216,7 @@ public class Agent {
         return fPL;
     }
 
-    /** Belief Update Function: add/remove perceptions into belief base */
+    /** Belief Update Function: adds/removes perceptions into belief base */
     public void buf(List<Literal> percepts) {
         if (percepts == null) {
             return;
@@ -269,9 +270,11 @@ public class Agent {
     }
 
     /**
-     * If BB contains l (using unification to test), returns the literal that is
-     * in the BB; otherwise, returns null. 
-     * E.g.: if l is g(_,_) and BB is={...., g(10,20), ...}, this method returns g(10,20).
+     * If BB contains l (using unification to test), returns the
+     * literal that is in the BB; otherwise, returns null.
+     * <p>Example: if <code>l</code> is <code>g(_,_)</code> and BB
+     * is={...., <code>g(10,20)</code>, ...}, this method returns
+     * <code>g(10,20)</code>.
      * 
      * The unifier <i>un</i> is updated by the method.
      * 
@@ -311,10 +314,10 @@ public class Agent {
      * This function should revise the belief base with the given literal to
      * add, to remove, and the current intention that triggered the operation.
      * 
-     * In its return, List[0] has the list of actual additions to the belief
-     * base, and List[1] has the list of actual deletions; this is used to
-     * generate the appropriate internal events. If nothing change, returns
-     * null.
+     * <p>In its return, List[0] has the list of actual additions to
+     * the belief base, and List[1] has the list of actual deletions;
+     * this is used to generate the appropriate internal events. If
+     * nothing change, returns null.
      */
     @SuppressWarnings("unchecked")
     public List<Literal>[] brf(Literal beliefToAdd, Literal beliefToDel,
@@ -378,8 +381,9 @@ public class Agent {
     }
 
     /**
-     * Adds bel in belief base (calling brf) and generate the events. If bel has
-     * no source, add source(self). (the belief is not cloned!)
+     * Adds <i>bel</i> in belief base (calling brf) and generates the
+     * events. If <i>bel</i> has no source, add
+     * <code>source(self)</code>. (the belief is not cloned!)
      */
     public boolean addBel(Literal bel) {
         if (!bel.hasSource()) {
@@ -397,8 +401,8 @@ public class Agent {
     }
 
     /**
-     * if the agent believes in bel, removes it (calling brf) and generate the
-     * event.
+     * If the agent believes in <i>bel</i>, removes it (calling brf)
+     * and generate the event.
      */
     public boolean delBel(Literal bel) {
         List<Literal>[] result = brf(null, bel, Intention.EmptyInt);
@@ -410,7 +414,7 @@ public class Agent {
         }
     }
     
-    /** remove all ocurrences of bel in BB */
+    /** Removes all occurrences of <i>bel</i> in BB */
     public void abolish(Literal bel, Unifier un) {
         List<Literal> toDel = new ArrayList<Literal>();
         
@@ -435,7 +439,7 @@ public class Agent {
 
     static DocumentBuilder builder = null;
 
-    /** get the agent "mind" (Beliefs, plans and circumstance) as XML */
+    /** Gets the agent "mind" (Beliefs, plans and circumstance) as XML */
     public Document getAgState() {
         if (builder == null) {
             try {
@@ -453,7 +457,7 @@ public class Agent {
         return document;
     }
 
-    /** get the agent "mind" as XML */
+    /** Gets the agent "mind" as XML */
     public Element getAsDOM(Document document) {
         Element ag = (Element) document.createElement("agent");
         ag.setAttribute("name", fTS.getUserAgArch().getAgName());
@@ -464,7 +468,7 @@ public class Agent {
         return ag;
     }
 
-    /** get the agent program (Beliefs and plans) as XML */
+    /** Gets the agent program (Beliefs and plans) as XML */
     public Document getAgProgram() {
         if (builder == null) {
             try {

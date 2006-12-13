@@ -37,8 +37,8 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * It is a base class for Environment, it is overridden by the user application 
- * to define the environment "behaviour".
+ * It is a base class for Environment, it is overridden by the user
+ * application to define the environment "behaviour".
  * 
  * <p>Execution sequence: 	
  *     <ul><li>setEnvironmentInfraTier, 
@@ -47,12 +47,6 @@ import java.util.concurrent.ConcurrentHashMap;
  *         <li>stop.
  *     </ul>
  * 
- * <p>An example of interaction:
- * <img src="../../../uml/environmentInteraction.gif" />
- *
- * <p>The related classes:
- * <img src="../../../uml/jason.environment.gif" />
- *  
  */
 public class Environment { 
 
@@ -67,11 +61,17 @@ public class Environment {
 	
 	//static private Logger logger = Logger.getLogger(Environment.class.getName());
 
-	/** Called before the MAS execution with the args informed in .mas2j, the user environment could override it */
+	/** 
+     * Called before the MAS execution with the args informed in
+     * .mas2j project, the user environment could override it.
+     */
 	public void init(String[] args) {
 	}
 	
-	/** Called before the end of MAS execution, the user environment could override it */
+	/** 
+     * Called just before the end of MAS execution, the user
+     * environment could override it.
+     */
 	public void stop() {
 	}
 	
@@ -100,8 +100,8 @@ public class Environment {
     }
 
 	/**
-	 * Returns perceptions for an agent.
-	 * A full copy of both common and agent perceptions lists is returned.
+	 * Returns perceptions for an agent.  A full copy of both common
+	 * and agent perceptions lists is returned.
 	 */
     public List<Literal> getPercepts(String agName) {
 		
@@ -135,7 +135,7 @@ public class Environment {
         return p;
     }
 
-	/** Add a perception for all agents */
+	/** Adds a perception for all agents */
 	public void addPercept(Literal per) {
 		if (per != null) {
 			if (! percepts.contains(per)) {
@@ -144,7 +144,8 @@ public class Environment {
 			}
 		}
 	}
-	/** Remove a perception in the commom perception list */
+
+	/** Removes a perception in the commom perception list */
 	public boolean removePercept(Literal per) {
 		if (per != null) {
 			uptodateAgs.clear();
@@ -154,7 +155,7 @@ public class Environment {
 	}
 	
 	
-	/** Clear list of global percepts */
+	/** Clears the list of global perceptions */
 	public void clearPercepts() {
 		uptodateAgs.clear();
 		percepts.clear();
@@ -169,7 +170,7 @@ public class Environment {
 	
 	
 	
-	/** Add a perception for a specific agent */
+	/** Adds a perception for a specific agent */
 	public void addPercept(String agName, Literal per) {
 		if (per != null && agName != null) {
 			List<Literal> agl = agPercepts.get(agName);
@@ -187,7 +188,7 @@ public class Environment {
 		}
 	}
 	
-	/** Remove a perception for one agent */
+	/** Removes a perception for one agent */
 	public boolean removePercept(String agName, Literal per) {
 		if (per != null && agName != null) {
 			List<Literal> agl = agPercepts.get(agName);
@@ -209,7 +210,7 @@ public class Environment {
 		return false;
 	}
 
-	/** Clear list of percepts of a specific agent */
+	/** Clears the list of perceptions of a specific agent */
 	public void clearPercepts(String agName) {
 		if (agName != null) {
 			List<Literal> agl = agPercepts.get(agName);
@@ -222,7 +223,8 @@ public class Environment {
 	}
 	
     /**
-     * Called by the agent architecture to execute an action on the environment.
+     * Called by the agent architecture to execute an action on the
+     * environment.
      */
     public boolean executeAction(String agName, Structure act) {
         return true;
