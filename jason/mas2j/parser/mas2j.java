@@ -32,7 +32,7 @@ public class mas2j implements mas2jConstants {
       } else {
                 System.out.println("mas2j: usage must be:");
                 System.out.println("      java mas2j <MASConfFile>");
-                System.out.println("Output to file <MASName>.xml");
+                System.out.println("Output to file build.xml");
         return;
       }
 

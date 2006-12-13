@@ -18,6 +18,10 @@ import java.util.logging.Logger;
 
 import saci.launcher.Launcher;
 
+/**
+ * Creates the scripts to launch the MAS using SACI and starts SACI
+ * before the agents.
+ */
 public class SaciMASLauncherAnt extends CentralisedMASLauncherAnt implements MASLauncherInfraTier {
 
     StartSaci             saciThread;
@@ -241,5 +245,4 @@ public class SaciMASLauncherAnt extends CentralisedMASLauncherAnt implements MAS
             return s;
         }
     }
-
 }

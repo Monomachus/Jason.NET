@@ -52,19 +52,18 @@ import saci.Message;
 import saci.MessageHandler;
 
 /**
- * This class provides an agent architecture when using SACI Infrastructure to
- * run the MAS.
+ * This class provides an agent architecture when using SACI
+ * Infrastructure to run the MAS.
  * 
- * <p>
- * Execution sequence: initAg, run (perceive, checkMail, act), stopAg.
+ * <p> Execution sequence: initAg, run (perceive, checkMail, act),
+ * stopAg.
  */
-
 public class SaciAgArch extends saci.Agent implements AgArchInfraTier {
 
 	private static final long serialVersionUID = 1L;
 
-	// to get the percepts via SACI (the normal mbox is used for inter-agent
-    // com.)
+	// to get the percepts via SACI we need an extra mailbox (the
+	// normal mbox is used for inter-agent communication
     private MBoxSAg  mboxPercept = null;
 
     /** the user implementation of the architecture */
@@ -73,13 +72,13 @@ public class SaciAgArch extends saci.Agent implements AgArchInfraTier {
     private Logger   logger;
 
     /**
-     * Method used by SACI to initialize the agent 
-     * args[0] is the agent architecture class 
-     * args[1] is the user Agent class 
-     * args[2] is the user BB class 
-     * args[3] is the AgentSpeak source file 
-     * args[4] "options" 
-     * args[5] options
+     * Method used by SACI to initialize the agent:
+     * args[0] is the agent architecture class, 
+     * args[1] is the user Agent class,
+     * args[2] is the user BB class,
+     * args[3] is the AgentSpeak source file,
+     * args[4] "options",
+     * args[5] options.
      */
     public void initAg(String[] args) throws JasonException {
         // create a logger
@@ -210,9 +209,7 @@ public class SaciAgArch extends saci.Agent implements AgArchInfraTier {
 
         running = false;
         userAgArh.getTS().receiveSyncSignal(); // in case the agent is wainting
-                                                // .....
-        userAgArh.getTS().newMessageHasArrived(); // in case the agent is
-                                                    // wainting .....
+        userAgArh.getTS().newMessageHasArrived(); // in case the agent is wainting .....
     }
 
     public void run() {
@@ -236,6 +233,7 @@ public class SaciAgArch extends saci.Agent implements AgArchInfraTier {
     // Default perception assumes Complete and Accurate sensing.
     // In the case of the SACI Architecture, the results of requests
     // for action execution is also recieved here.
+
     @SuppressWarnings("unchecked")
     public List perceive() {
         if (!running) {

@@ -97,9 +97,6 @@ public class SaciExecutionControl extends saci.Agent implements ExecutionControl
         return fUserControl;
     }
 
-    /**
-     * @see jason.control.ExecutionControlInfraTier#informAgToPerformCycle(java.lang.String)
-     */
     public void informAgToPerformCycle(String agName, int cycle) {
         Message m = new Message("(tell)");
         m.put("ontology", "AS-ExecControl");
@@ -113,9 +110,6 @@ public class SaciExecutionControl extends saci.Agent implements ExecutionControl
         }
     }
 
-    /**
-     * @see jason.control.ExecutionControlInfraTier#informAllAgsToPerformCycle()
-     */
     public void informAllAgsToPerformCycle(int cycle) {
         Message m = new Message("(tell)");
         m.put("ontology", "AS-ExecControl");
@@ -128,9 +122,6 @@ public class SaciExecutionControl extends saci.Agent implements ExecutionControl
         }
     }
 
-    /**
-     * @see jason.control.ExecutionControlInfraTier#getAgState(java.lang.String)
-     */
     public Document getAgState(String agName) {
         Message m = new Message("(ask)");
         m.put("ontology", "AS-ExecControl");

@@ -38,8 +38,14 @@ import java.util.logging.Logger;
 import saci.MessageHandler;
 
 /**
- * This class implements the saci version of the environment infrastructure
- * tier.
+ * This class implements the saci version of the environment
+ * infrastructure tier. 
+ *
+ * <p>The Environment is implemented as an agent in a second saci
+ * society normally called &lt;MASID&gt;-env. The ordinary agents
+ * enter in two societies: the "normal" (used for inter-agent
+ * communication, and the environment society (used to get
+ * perception). The environment agent enter only in the second.
  */
 public class SaciEnvironment extends saci.Agent implements EnvironmentInfraTier {
 

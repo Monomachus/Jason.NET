@@ -10,6 +10,11 @@ import javax.swing.JOptionPane;
 import saci.launcher.Launcher;
 import saci.launcher.LauncherD;
 
+
+/**
+ * Thread used to start saci (call Ant to run the "saci" task of the
+ * build.xml script).
+ */
 class StartSaci extends Thread {
 
 	boolean saciOk = false;
@@ -23,18 +28,12 @@ class StartSaci extends Thread {
 	}
 
 	Launcher getLauncher() {
-		//PrintStream err = System.err;
 		Launcher l = null;
 		try {
-			//if (jasonID != null) {
-			//	System.setErr(jasonID.myOut.originalErr);
-			//}
 			l = LauncherD.getLauncher();
 			return l;
 		} catch (Exception e) {
 			return null;
-		} finally {
-			//System.setErr(err);
 		}
 	}
 	
@@ -109,18 +108,15 @@ class StartSaci extends Thread {
 		try {
 			wait(20000); // waits 20 seconds
 			if (!saciOk && !stop) {
-				JOptionPane
-						.showMessageDialog(
-								null,
-								"Failed to automatically start saci! \nGo to \""
-										+ project.getDirectory()
-										+ "\" directory and run 'ant saci'"
-										+ " to start saci.\n\nClick 'ok' when saci is running.");
+				JOptionPane.showMessageDialog(null,
+                    "Failed to automatically start saci! \nGo to \""
+                    + project.getDirectory()
+                    + "\" directory and run 'ant saci'"
+                    + " to start saci.\n\nClick 'ok' when saci is running.");
 				wait(1000);
 				if (!saciOk) {
-					JOptionPane
-							.showMessageDialog(null,
-									"Saci might not be properly installed or configure. Use the centralised architecture to run your MAS");
+					JOptionPane.showMessageDialog(null,
+                    "Saci might not be properly installed or configure. Use the centralised architecture to run your MAS");
 				}
 			}
 		} catch (Exception e) {

@@ -14,7 +14,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
- * Write the ant script to run the MAS in centralised infrastructure and
+ * Write the Ant script to run the MAS in centralised infrastructure and
  * start this script.
  *
  * @author Jomi
