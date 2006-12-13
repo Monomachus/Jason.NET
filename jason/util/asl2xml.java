@@ -20,7 +20,7 @@ import org.w3c.dom.Document;
 
 
 /** 
- * Convert an agent asl code to xml
+ * Convert an agent asl code to xml.
  *
  * @author Jomi
  */

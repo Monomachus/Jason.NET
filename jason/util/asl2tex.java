@@ -12,7 +12,7 @@ import org.w3c.dom.Document;
 
 
 /** 
- * Convert an agent asl code to latex 
+ * Convert an agent asl code to LaTeX. 
  *
  * @author Jomi
  */

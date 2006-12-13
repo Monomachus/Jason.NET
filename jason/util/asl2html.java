@@ -6,7 +6,7 @@ import javax.xml.transform.stream.StreamSource;
 
 
 /** 
- * Convert an agent asl code to latex 
+ * Convert an agent asl code to HTML. 
  *
  * @author Jomi
  */

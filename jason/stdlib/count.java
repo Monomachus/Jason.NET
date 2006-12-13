@@ -33,9 +33,34 @@ import jason.asSyntax.Term;
 
 import java.util.Iterator;
 
+/**
+  <p>Internal action: <b><code>.count</code></b>.
+  
+  <p>Description: counts the number of some kind of belief in the
+  agent's belief base.
+  
+  <p>Parameters:<ul>
+  
+  <li>+ arg[0] (literal): the belief to be counted.<br/>
+  
+  <li>+/- arg[1] (number or var): the number of beliefs.<br/>
+  
+  </ul>
+  
+  <p>Examples:<ul> 
+
+  <li> <code>.count(a(2,_),N)</code>: counts the number of beliefs
+  that unifies with <code>a(2,_)</code>, <code>N</code> unifies with
+  this quantity.</li>
+
+  <li> <code>.count(a(2,_),5)</code>: succeed if the BB has exactly 5
+  beliefs that unifies with <code>a(2,_)</code>.</li>
+
+  </ul>
+
+*/
 public class count extends DefaultInternalAction {
 
-    /** .count(a(_), N) */
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         try {
@@ -51,8 +76,7 @@ public class count extends DefaultInternalAction {
                 iu.next();
                 n++;
             }
-            Term var = args[1];
-            return un.unifies(var, new NumberTermImpl(n));
+            return un.unifies(args[1], new NumberTermImpl(n));
         } catch (ArrayIndexOutOfBoundsException e) {
             throw new JasonException("The internal action 'count' has not received two arguments");
         } catch (Exception e) {
