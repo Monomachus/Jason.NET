@@ -37,11 +37,14 @@ import java.util.List;
  *      +g <- -p__1(g); -p__2(g); .dropGoal(g,true). <br>
  * </code></blockquote>
  * 
- * Goal patterns are proposed in the paper:  <br>
- * <blockquote>
- * Jomi Fred Hübner, Rafael H. Bordini, and Michael Wooldridge. <br>
- * Programming declarative goals using plan patterns. <br>
- * In Matteo Baldoni and Ulle Endriss, editors, Proceedings of the Fourth International Workshop on Declarative Agent Languages and Technologies (DALT 2006), held with AAMAS 2006, 8th May, Hakodate, Japan, pages 65-81. Springer, 2006. <br> 
+ * Goal patterns are proposed in the paper: <br> 
+ * <blockquote> 
+ * Jomi Fred Hubner, Rafael H. Bordini, and Michael Wooldridge. <br>
+ * Programming declarative goals using plan patterns. <br> In Matteo
+ * Baldoni and Ulle Endriss, editors, <i>Proceedings of the Fourth
+ * International Workshop on Declarative Agent Languages and
+ * Technologies</i> (DALT 2006), held with AAMAS 2006, 8th May, Hakodate,
+ * Japan, pages 65-81. Springer, 2006. <br> 
  * </blockquote>
  * 
  * @author jomi

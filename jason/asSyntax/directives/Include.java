@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/** Implementation of the <code>include</code> directive. */
 public class Include implements Directive {
 
     static Logger logger = Logger.getLogger(Include.class.getName());

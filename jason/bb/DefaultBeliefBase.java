@@ -41,6 +41,9 @@ import java.util.logging.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+/**
+ * Default implementation of Jason BB.
+ */
 public class DefaultBeliefBase implements BeliefBase {
 
     static private Logger logger = Logger.getLogger(DefaultBeliefBase.class.getName());
@@ -152,7 +155,6 @@ public class DefaultBeliefBase implements BeliefBase {
         }
     }
 
-    /** remove all believes with some functor/arity */
     public boolean abolish(PredicateIndicator pi) {
         return belsMap.remove(pi) != null;
     }
@@ -185,7 +187,6 @@ public class DefaultBeliefBase implements BeliefBase {
         return belsMap.toString();
     }
 
-    /** get as XML */
     public Element getAsDOM(Document document) {
         Element ebels = (Element) document.createElement("beliefs");
         Iterator<Literal> i = getAll();

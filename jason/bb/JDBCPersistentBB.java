@@ -26,6 +26,9 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Implementation of BB that stores some beliefs in a relational data base. 
+ */
 public class JDBCPersistentBB extends DefaultBeliefBase {
     static private Logger                      logger     = Logger.getLogger(JDBCPersistentBB.class.getName());
 
@@ -46,9 +49,10 @@ public class JDBCPersistentBB extends DefaultBeliefBase {
      * args[4] AS list with beliefs mapped to DB, each element is in the form
      * "bel(arity,table_name)".
      * 
-     * Eg. in .mas2j agents: a beliefBaseClass jason.bb.JDBCPersistentBB(
+     * Example in .mas2j project:<br>
+     * <code>agents: a beliefBaseClass jason.bb.JDBCPersistentBB(
      * "org.hsqldb.jdbcDriver", "jdbc:hsqldb:bookstore", "sa", "",
-     * "[book(5,book),author(2,book_author)]")
+     * "[book(5,book),author(2,book_author)]")</code><br>
      */
     public void init(Agent ag, String[] args) {
         try {

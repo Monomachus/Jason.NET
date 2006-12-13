@@ -34,54 +34,65 @@ import java.util.Iterator;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+
+/**
+ * Common interface for all kinds of Jason Belief bases, even those
+ * customised by the user.
+ */
 public interface BeliefBase {
 
     public static final Term TPercept = DefaultTerm.parse("source(percept)");
     public static final Term TSelf    = DefaultTerm.parse("source(self)");
 
     /** 
-     * Called before the MAS execution with the agent that uses this BB 
-     * and the args informed in .mas2j 
-     * E.g. in .mas2j:
-     *     agent BeliefBaseClass(1,bla);
+     * Called before the MAS execution with the agent that uses this
+     * BB and the args informed in .mas2j project.<br>
+     * Example in .mas2j:<br>
+     *     <code>agent BeliefBaseClass(1,bla);</code><br>
      * the init args will be ["1", "bla"].
      */
     public void init(Agent ag, String[] args);
     
-    /** Called before the end of MAS execution */
+    /** Called just before the end of MAS execution */
     public void stop();
     
+    /** Adds a belief in the BB, returns true if succeed */
     public boolean add(Literal l);
 
-    /** returns an iterator for all beliefs. */
+    /** Returns an iterator for all beliefs. */
     public Iterator<Literal> getAll();
 
     /** 
-     * returns an iterator for all literals relevant for l's predicate indicator,
-     * if l is a var, return all beliefs.
-     * E.g.: 
-     * BB={a(10),a(20),a(2,1),b(f)}, getRelecant(a(5)) = {{a(10),a(20)}.
-     * BB={a(10),a(20)}, getRelecant(X) = {{a(10),a(20)}.
+     * Returns an iterator for all literals relevant for l's predicate
+     * indicator, if l is a var, return all beliefs.<br>
+     *
+     * Example, if BB={a(10),a(20),a(2,1),b(f)}, then
+     * <code>getRelevant(a(5))</code> = {{a(10),a(20)}.<br> if
+     * BB={a(10),a(20)}, then <code>getRelevant(X)</code> =
+     * {{a(10),a(20)}.
      */
     public Iterator<Literal> getRelevant(Literal l);
 
     /**
-     * returns the literal l as it is in BB, this method does not consider
-     * annots in the search. e.g. if BB={a(10)[a,b]}, contains(a(10)[d]) returns
-     * a(10)[a,b]
+     * Returns the literal l as it is in BB, this method does not
+     * consider annotations in the search. <br> Example, if
+     * BB={a(10)[a,b]}, <code>contains(a(10)[d])</code> returns
+     * a(10)[a,b].
      */
     public Literal contains(Literal l);
     
+    /** Returns the number of beliefs in BB */
     public int size();
 
-    /** returns all beliefs that have percept as source */
+    /** Returns all beliefs that have percept as source */
     public Iterator<Literal> getPercepts();
 
+    /** Removes a literal from BB, returns true if succeed */
     public boolean remove(Literal l);
 
-    /** remove all believes with some functor/arity */
+    /** Removes all believes with some functor/arity */
     public boolean abolish(PredicateIndicator pi);
 
-    /** get as XML */
+    /** Gets the BB as XML */
     public Element getAsDOM(Document document);
 }
