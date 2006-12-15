@@ -98,6 +98,9 @@ public class AgArch {
     public TransitionSystem getTS() {
         return fTS;
     }
+    protected void setTS(TransitionSystem ts) {
+    	fTS = ts;
+    }
 
     /** Gets the agent's perception as a list of Literals */
     public List<Literal> perceive() {

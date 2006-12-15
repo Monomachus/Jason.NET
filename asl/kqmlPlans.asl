@@ -63,9 +63,13 @@
 -!kqmlReceived(S, askOne, _, M) : true
    <- .send(S, tell, false, M).      
 
-@kqmlReceivedAskAll
+@kqmlReceivedAskAll1
 +!kqmlReceived(S, askAll, value(Var,KQMLcontentVar), M) : true    
    <- .findall(Var, KQMLcontentVar, List); 
+      .send(S, tell, List, M).
+@kqmlReceivedAskAll2
++!kqmlReceived(S, askAll, KQMLcontentVar, M) : true
+   <- .findall(KQMLcontentVar, KQMLcontentVar, List); 
       .send(S, tell, List, M).
 
 
