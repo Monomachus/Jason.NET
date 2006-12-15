@@ -36,7 +36,7 @@ public interface InternalAction {
         intention where the IA is called */
     boolean suspendIntention();
     
-    /** Executes the internal action, it should return a Boolean or
+    /** Executes the internal action. It should return a Boolean or
      *  an Iterator<Unifier>. A true boolean return means that the IA was
      *  successfuly executed. An Iterator result means that there is 
      *  more than one answer for this IA (e.g. see member internal action). */

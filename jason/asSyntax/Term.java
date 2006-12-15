@@ -28,7 +28,7 @@ import jason.util.ToDOM;
 import java.io.Serializable;
 
 /**
- * Term Interface
+ * Common interface for all kind of Terms
  */
 public interface Term extends Cloneable, Comparable<Term>, Serializable, ToDOM {
 
@@ -64,6 +64,6 @@ public interface Term extends Cloneable, Comparable<Term>, Serializable, ToDOM {
 
     public boolean equals(Object o);
 
-    /** remove the valued cached for hashCode */
+    /** Removes the valued cached for hashCode */
     public void resetHashCodeCache();
 }
