@@ -248,6 +248,14 @@ public class TermTest extends TestCase {
         assertEquals(u.get("A").toString(),"3");
     }
 
+    public void testAnnotsUnify5() {
+        Literal l1 = Literal.parseLiteral("s[source(self)]");
+        Literal l2 = Literal.parseLiteral("s");
+        Unifier u = new Unifier();
+        assertFalse(u.unifies(l1, l2));
+        assertTrue(u.unifies(l2, l1));
+    }
+
     public void testTrigger() {
 		Pred p1 = new Pred("pos");
 
