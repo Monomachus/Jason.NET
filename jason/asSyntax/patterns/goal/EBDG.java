@@ -1,6 +1,6 @@
 package jason.asSyntax.patterns.goal;
 
-import jason.asSyntax.BodyLiteral;
+import jason.asSyntax.*;
 import jason.asSyntax.Literal;
 import jason.asSyntax.LogExpr;
 import jason.asSyntax.LogicalFormula;
@@ -33,16 +33,15 @@ public class EBDG implements Directive {
             pl.add(Plan.parse("+!"+goal+" : " +goal+"."));
             
             // change all inner plans
-            List<Literal> pis = new ArrayList<Literal>();
             int i = 0;
             for (Plan p: innerPlans) {
                 i++;
-                // create p__i(g)
-                Literal pi = new Literal(Literal.LPos, "p__"+i);
+                // create p__f(i,g)
+                Literal pi = new Literal(Literal.LPos, "p__f");
+				pi.addTerm(new NumberTermImpl(i));
                 pi.addTerm(goal);
-                pis.add(pi);
                 
-                // change context to "not p__i(g) & c"
+                // change context to "not p__f(i,g) & c"
                 LogicalFormula context = p.getContext();
                 if (context == null) {
                     p.setContext(new LogExpr(LogicalOp.not, pi));
@@ -51,7 +50,7 @@ public class EBDG implements Directive {
                 }
                 
                 // change body
-                // add +p__i(g)
+                // add +p__f(i,g)
                 BodyLiteral b1 = new BodyLiteral(BodyType.addBel, pi);
                 p.getBody().add(0, b1);
                 // add ?g
@@ -60,15 +59,14 @@ public class EBDG implements Directive {
                 pl.add(p);
             }
             
+            // add -!g : p__f(n,g) <- .abolish(p__f(_,g)); !g.
+            pl.add(Plan.parse("-!"+goal+": p__f("+i+","+goal+") <- .abolish(p__f(_,"+goal+")); !"+goal+"."));
+
             // add -!g : true <- !g.
             pl.add(Plan.parse("-!"+goal+" <- !"+goal+"."));
 
-            // add +g : true <- -p__i(g); .dropGoal(g,true).
-            StringBuffer pisrem = new StringBuffer();
-            for (Literal pi: pis) {
-                pisrem.append(" -"+pi+";");
-            }
-            pl.add(Plan.parse("+"+goal+" <- "+pisrem+" .dropGoal("+goal+",true)."));
+            // add +g : true <- .abolish(p__f(_,g)); .dropGoal(g,true).
+            pl.add(Plan.parse("+"+goal+" <- .abolish(p__f(_,"+goal+")); .dropGoal("+goal+",true)."));
             
             return true;
         } catch (Exception e) {

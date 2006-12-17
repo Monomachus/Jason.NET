@@ -118,7 +118,7 @@ public class ASParserTest extends TestCase {
             as2j parser = new as2j(new StringReader(source));
             Agent a = new Agent();
             parser.agent(a);
-            assertTrue(a.getPL().getPlans().size() == 6);
+            assertTrue(a.getPL().getPlans().size() == 7);
 
             source =  " { begin omc(at(X,Y), no_battery, no_beer) } \n";
             source += "    +!at(X,Y) : b(X) <- go(X). ";

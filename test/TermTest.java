@@ -99,6 +99,7 @@ public class TermTest extends TestCase {
 
 	public void testUnifies() {
 		assertTrue(new Unifier().unifies(new Structure("a"), new Structure("a")));
+		assertTrue(new Unifier().unifies(DefaultTerm.parse("a"), DefaultTerm.parse("a")));
 		assertTrue(new Unifier().unifies(new Structure("a"), new VarTerm("X")));
 		
 		Unifier u = new Unifier();
