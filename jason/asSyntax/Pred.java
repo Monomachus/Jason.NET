@@ -77,13 +77,6 @@ public class Pred extends Structure {
         return true;
     }
     
-	@Override
-    public boolean isConstant() {
-    	return super.isConstant() && !hasAnnot();
-    }
-    
-    
-
     @Override
     public boolean isGround() {
         if (annots == null) {

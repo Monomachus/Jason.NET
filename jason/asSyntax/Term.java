@@ -56,8 +56,6 @@ public interface Term extends Cloneable, Comparable<Term>, Serializable, ToDOM {
 
     public boolean isAtom();
 
-    public boolean isConstant();
-
     public boolean hasVar(Term t);
 
     public Object clone();

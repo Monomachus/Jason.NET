@@ -264,10 +264,9 @@ public class Structure extends DefaultTerm {
     }
     
 	@Override
-    public boolean isConstant() {
-    	return getTermsSize() == 0;
-    }
-    
+	public boolean isAtom() {
+		return getTermsSize() == 0 && !isList();
+	}
 
     public boolean isGround() {
         for (int i=0; i<getTermsSize(); i++) {
