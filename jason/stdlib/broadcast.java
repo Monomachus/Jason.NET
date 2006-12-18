@@ -51,6 +51,9 @@ import jason.asSyntax.Term;
 
   </ul>
 
+  @see jason.stdlib.send
+  @see jason.stdlib.myName
+
 */
 public class broadcast extends DefaultInternalAction {
 

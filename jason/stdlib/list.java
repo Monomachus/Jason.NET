@@ -25,6 +25,14 @@ import jason.asSyntax.Term;
 <li> <code>.list(a(X))</code>: fail.
 </ul>
 
+  @see jason.stdlib.atom
+  @see jason.stdlib.literal
+  @see jason.stdlib.number
+  @see jason.stdlib.string
+  @see jason.stdlib.structure
+  @see jason.stdlib.var
+  @see jason.stdlib.ground
+
 */public class list extends DefaultInternalAction {
 
     @Override

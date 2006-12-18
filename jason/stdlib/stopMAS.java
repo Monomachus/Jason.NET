@@ -29,6 +29,21 @@ import jason.asSemantics.Unifier;
 import jason.asSyntax.Term;
 import jason.runtime.RuntimeServicesInfraTier;
 
+/**
+  <p>Internal action: <b><code>.stopMAS</code></b>.
+  
+  <p>Description: stops all agents of the systems.
+  
+  <p>Example:<ul> 
+
+  <li> <code>.stopMAS</code>.</li>
+
+  </ul>
+
+  @see jason.stdlib.createAgent
+  @see jason.stdlib.killAgent
+  @see jason.runtime.RuntimeServicesInfraTier
+ */
 public class stopMAS extends DefaultInternalAction {
 
     @Override

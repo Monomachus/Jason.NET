@@ -33,11 +33,33 @@ import jason.runtime.RuntimeServicesInfraTier;
 
 import java.io.File;
 
+/**
+  <p>Internal action: <b><code>.createAgent</code></b>.
+  
+  <p>Description: creates another agent based on some AgentSpeak
+  source code.
+  
+  <p>Parameters:<ul>
+  
+  <li>+ arg[0] (atom): the agent name.<br/>
+  
+  <li>+ arg[1] (string): path to the file where the AgentSpeak code
+  for that new agent can be found. .<br/>
+
+  </ul>
+  
+  <p>Example:<ul> 
+
+  <li> <code>.createAgent(bob,"/tmp/x.asl")</code>: creates the agent named bob from source file in "/tmp/x.asl".</li>
+
+  </ul>
+
+  @see jason.stdlib.killAgent
+  @see jason.stdlib.stopMAS
+  @see jason.runtime.RuntimeServicesInfraTier
+*/
 public class createAgent extends DefaultInternalAction {
 
-    /**
-     * args[0] is the agent name; args[1] is the agent code (as StringTerm)
-     */
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
 

@@ -9,8 +9,9 @@ import jason.asSyntax.Term;
 /**
 <p>Internal action: <b><code>.atom</code></b>.
 
-<p>Description: check whether the argument is an atom (a structure with arity 0), e.g.: "p". 
-Numbers, strings, and unground variables are not structures.
+<p>Description: check whether the argument is an atom (a structure
+with arity 0), e.g.: "p".  Numbers, strings, and unground variables
+are not structures.
 
 <p>Parameters:<ul>
 <li>+ arg[0] (any term): the term to be checked.<br/>
@@ -27,6 +28,15 @@ Numbers, strings, and unground variables are not structures.
 <li> <code>.atom([a,b,c])</code>: fail.
 <li> <code>.atom([a,b,c(X)])</code>: fail.
 </ul>
+
+  @see jason.stdlib.atom
+  @see jason.stdlib.list
+  @see jason.stdlib.literal
+  @see jason.stdlib.number
+  @see jason.stdlib.string
+  @see jason.stdlib.structure
+  @see jason.stdlib.var
+  @see jason.stdlib.ground
 
 */
 public class atom extends DefaultInternalAction {

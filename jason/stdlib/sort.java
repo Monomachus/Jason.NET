@@ -33,6 +33,38 @@ import jason.asSyntax.Term;
 
 import java.util.Collections;
 
+/**
+
+  <p>Internal action: <b><code>.sort</code></b>.
+
+  <p>Description: sort lists. It is used the "natural" order of the
+  terms. Among different types of terms, the following order is
+  used:<br>
+
+  numbers &lt; atoms &lt; lists &lt; structures
+
+  <p>Parameters:<ul>
+  <li>+   arg[0] (list): the list the be sorted.<br/>
+  <li>+/- arg[1] (list or variable): the sorted list. 
+  </ul>
+
+  <p>Examples:<ul>
+  
+  <li> <code>.sort([c,a,b],X)</code>: <code>X</code> unifies with
+  <code>[a,b,c]</code>.
+
+  <li>
+  <code>.sort([b,c,10,g,casa,f(10),[3,4],5,[3,10],f(4)],X)</code>:
+  <code>X</code> unifies with
+  <code>[5,10,b,c,casa,g,[3,4],[3,10],f(4),f(10)]</code>.
+
+  </ul>
+
+  @see jason.stdlib.concat
+  @see jason.stdlib.length
+  @see jason.stdlib.member
+
+*/
 public class sort extends DefaultInternalAction {
     
 	/**

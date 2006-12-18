@@ -69,6 +69,10 @@ import java.util.Iterator;
 
   </ul>
 
+  @see jason.stdlib.planLabel
+  @see jason.stdlib.relevantPlans
+  @see jason.stdlib.removePlan
+
  */
 public class addPlan extends DefaultInternalAction {
 

@@ -33,6 +33,11 @@ import jason.asSyntax.Pred;
 import jason.asSyntax.Structure;
 import jason.asSyntax.Term;
 
+/**
+  @see jason.stdlib.addPlan
+  @see jason.stdlib.planLabel
+  @see jason.stdlib.relevantPlans
+ */
 public class removePlan extends DefaultInternalAction {
 
 	/**

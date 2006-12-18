@@ -29,6 +29,15 @@ import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.Term;
 
+/**
+  @see jason.stdlib.desire
+  @see jason.stdlib.dropAllDesires
+  @see jason.stdlib.dropDesire
+  @see jason.stdlib.dropAllIntentions
+  @see jason.stdlib.dropIntention
+  @see jason.stdlib.dropGoal
+  @see jason.stdlib.intend
+ */
 public class currentIntention extends DefaultInternalAction {
 
     @Override

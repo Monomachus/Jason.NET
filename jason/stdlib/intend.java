@@ -37,6 +37,15 @@ import jason.asSyntax.Term;
 import jason.asSyntax.Trigger;
 
 
+/**
+  @see jason.stdlib.currentIntention
+  @see jason.stdlib.desire
+  @see jason.stdlib.dropAllDesires
+  @see jason.stdlib.dropDesire
+  @see jason.stdlib.dropAllIntentions
+  @see jason.stdlib.dropIntention
+  @see jason.stdlib.dropGoal
+ */
 public class intend extends DefaultInternalAction {
     
     @Override

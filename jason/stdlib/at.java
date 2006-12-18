@@ -64,6 +64,8 @@ import jason.asSyntax.Trigger;
   <li> <code>.at("now +2 h", "+!g")</code>
   </ul>
 
+  @see jason.stdlib.wait
+
  */
 public class at extends DefaultInternalAction {
      

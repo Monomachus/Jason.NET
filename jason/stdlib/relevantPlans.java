@@ -38,6 +38,11 @@ import jason.asSyntax.Trigger;
 
 import java.util.Iterator;
 
+/**
+  @see jason.stdlib.addPlan
+  @see jason.stdlib.planLabel
+  @see jason.stdlib.removePlan
+ */
 public class relevantPlans extends DefaultInternalAction {
 
 	/**

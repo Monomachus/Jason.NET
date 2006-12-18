@@ -36,7 +36,16 @@ import jason.asSyntax.Term;
 import jason.asSyntax.Trigger;
 
 /**
- * Drop a goal (see DALT 2006 paper)
+  Drop a goal (see DALT 2006 paper)
+
+  @see jason.stdlib.currentIntention
+  @see jason.stdlib.desire
+  @see jason.stdlib.dropAllDesires
+  @see jason.stdlib.dropDesire
+  @see jason.stdlib.dropAllIntentions
+  @see jason.stdlib.dropIntention
+  @see jason.stdlib.intend
+
  */
 public class dropGoal extends DefaultInternalAction {
     

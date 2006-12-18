@@ -23,7 +23,16 @@ import jason.asSyntax.Term;
 <li> <code>.number(X)</code>: fail if X is free and success if X is bind with a number.
 </ul>
 
-*/public class number extends DefaultInternalAction {
+  @see jason.stdlib.atom
+  @see jason.stdlib.list
+  @see jason.stdlib.literal
+  @see jason.stdlib.string
+  @see jason.stdlib.structure
+  @see jason.stdlib.var
+  @see jason.stdlib.ground
+
+*/
+public class number extends DefaultInternalAction {
 
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {

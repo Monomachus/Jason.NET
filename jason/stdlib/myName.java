@@ -30,6 +30,33 @@ import jason.asSemantics.Unifier;
 import jason.asSyntax.Structure;
 import jason.asSyntax.Term;
 
+/**
+  <p>Internal action: <b><code>.myName</code></b>.
+  
+  <p>Description: gets the agent unique identification in the
+  multi-agent system. This identification is given by the runtime
+  infrastructure of the system (centralised, saci, jade, ...).
+  
+  <p>Parameters:<ul>
+  
+  <li>+/- arg[0] (variable or atom): if variable, unifies the agent name
+  and the variable; if atom, succeed if the atom is equals to the
+  agent's name.<br/>
+
+  </ul>
+  
+  <p>Example:<ul> 
+
+  <li> <code>.myName(N)</code>: unifies <code>N</code> with the
+  agent's name.</li>
+
+  </ul>
+
+
+  @see jason.stdlib.send
+  @see jason.stdlib.broadcast
+
+ */
 public class myName extends DefaultInternalAction {
 
     @Override

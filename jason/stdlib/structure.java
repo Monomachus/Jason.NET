@@ -27,6 +27,14 @@ Numbers, strings, and unground variables are not structures.
 <li> <code>.structure([a,b,c(X)])</code>: success.
 </ul>
 
+  @see jason.stdlib.atom
+  @see jason.stdlib.list
+  @see jason.stdlib.literal
+  @see jason.stdlib.number
+  @see jason.stdlib.string
+  @see jason.stdlib.var
+  @see jason.stdlib.ground
+
 */
 public class structure extends DefaultInternalAction {
 

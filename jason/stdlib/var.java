@@ -24,6 +24,14 @@ import jason.asSyntax.Term;
 <li> <code>.var([a,b,c])</code>: fail.
 </ul>
 
+  @see jason.stdlib.atom
+  @see jason.stdlib.list
+  @see jason.stdlib.literal
+  @see jason.stdlib.number
+  @see jason.stdlib.string
+  @see jason.stdlib.structure
+  @see jason.stdlib.ground
+
 */
 public class var extends DefaultInternalAction {
 

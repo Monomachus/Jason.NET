@@ -33,23 +33,28 @@ import jason.asSyntax.StringTermImpl;
 import jason.asSyntax.Term;
 
 /**
-<p>Internal action: <b><code>.concat</code></b>.
+  <p>Internal action: <b><code>.concat</code></b>.
 
-<p>Description: concatenate strings or lists. 
+  <p>Description: concatenate strings or lists. 
 
-<p>Parameters:<ul>
-<li>+ arg[0] ... + arg[n-1] (any term): the terms to be concatenated.<br/>
-<li>+- arg[n]: the result of the concatenation. 
-</ul>
-Parameters that are not string are concatenated using the toString of it.
+  <p>Parameters:<ul>
+  <li>+ arg[0] ... + arg[n-1] (any term): the terms to be concatenated.<br/>
+  <li>+- arg[n]: the result of the concatenation. 
+  </ul>
+  Parameters that are not string are concatenated using the toString of it.
 
-<p>Examples:<ul>
-<li> <code>.concat("a","b",X)</code>: X unifies with "ab".
-<li> <code>.concat("a","b","a")</code>: fail.
-<li> <code>.concat("a b",1,a,X)</code>: X unifies with "a b1a".
-<li> <code>.concat("a","b","c", "d", X)</code>: X unifies with "abcd".
-<li> <code>. concat([a,b,c],[d,e],[f,g],X)</code>: X unifies with [a,b,c,d,e,f,g].
-</ul>
+  <p>Examples:<ul>
+  <li> <code>.concat("a","b",X)</code>: <code>X</code> unifies with "ab".
+  <li> <code>.concat("a","b","a")</code>: fails.
+  <li> <code>.concat("a b",1,a,X)</code>: <code>X</code> unifies with "a b1a".
+  <li> <code>.concat("a","b","c", "d", X)</code>: <code>X</code> unifies with "abcd".
+  <li> <code>. concat([a,b,c],[d,e],[f,g],X)</code>: <code>X</code> unifies with <code>[a,b,c,d,e,f,g]</code>.
+  </ul>
+
+  @see jason.stdlib.length
+  @see jason.stdlib.member
+  @see jason.stdlib.sort
+
 */
 public class concat extends DefaultInternalAction {
 

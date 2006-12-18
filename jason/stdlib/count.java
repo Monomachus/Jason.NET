@@ -58,6 +58,7 @@ import java.util.Iterator;
 
   </ul>
 
+  @see jason.stdlib.findall
 */
 public class count extends DefaultInternalAction {
 

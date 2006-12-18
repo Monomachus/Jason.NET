@@ -35,12 +35,22 @@ import jason.asSyntax.Trigger;
 
 
 /**
- * This changes the agent's circumstance. Currently what it does is simply
- * to change all +!l to -!l in events which would give true for Des(l) in
- * the whole set of events. IMPORTANT: unlike Des() this only alters
- * literals explicitly desired (rather than intended), that is, it does NOT
- * consider intentions. You should use both dropDes() AND dropInt() to
- * remove all desires and intentions of l.
+  This changes the agent's circumstance. Currently what it does is simply
+  to change all +!l to -!l in events which would give true for Des(l) in
+  the whole set of events. IMPORTANT: unlike Des() this only alters
+  literals explicitly desired (rather than intended), that is, it does NOT
+  consider intentions. You should use both dropDes() AND dropInt() to
+  remove all desires and intentions of l.
+
+  @see jason.stdlib.currentIntention
+  @see jason.stdlib.desire
+  @see jason.stdlib.dropAllDesires
+  @see jason.stdlib.dropAllIntentions
+  @see jason.stdlib.dropIntention
+  @see jason.stdlib.dropGoal
+  @see jason.stdlib.intend
+
+
  */
 public class dropDesire extends DefaultInternalAction {
     

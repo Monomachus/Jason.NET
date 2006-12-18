@@ -37,6 +37,9 @@ import jason.asSyntax.Trigger;
 
 import java.util.logging.Level;
 
+/**
+  @see jason.stdlib.at
+ */
 public class wait extends DefaultInternalAction {
 
     /**

@@ -32,11 +32,30 @@ import jason.asSyntax.NumberTermImpl;
 import jason.asSyntax.StringTerm;
 import jason.asSyntax.Term;
 
+/**
+
+  <p>Internal action: <b><code>.length</code></b>.
+
+  <p>Description: get the length of strings or lists. 
+
+  <p>Parameters:<ul>
+  <li>+   arg[0] (string of list): the terms to be sized.<br/>
+  <li>+/- arg[1] (variable or number): the length. 
+  </ul>
+
+  <p>Examples:<ul>
+  <li> <code>.length("abc",X)</code>: <code>X</code> unifies with 3.
+  <li> <code>.length([a,b],X)</code>: <code>X</code> unifies with 2.
+  <li> <code>.length("a",2)</code>: fails.
+  </ul>
+
+  @see jason.stdlib.concat
+  @see jason.stdlib.member
+  @see jason.stdlib.sort
+
+ */
 public class length extends DefaultInternalAction {
 
-    /**
-     * gets the length of a list or a string
-     */
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         Term l1 = (Term) args[0].clone();

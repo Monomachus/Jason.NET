@@ -31,6 +31,13 @@ import jason.asSyntax.Plan;
 import jason.asSyntax.StringTermImpl;
 import jason.asSyntax.Term;
 
+/**
+
+  @see jason.stdlib.addPlan
+  @see jason.stdlib.relevantPlans
+  @see jason.stdlib.removePlan
+
+ */
 public class planLabel extends DefaultInternalAction {
 
     /**

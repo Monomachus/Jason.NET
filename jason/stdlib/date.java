@@ -10,6 +10,9 @@ import jason.asSyntax.Term;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
+/**
+  @see jason.stdlib.time
+ */
 public class date extends DefaultInternalAction {
 
     /** date(YY,MM,DD) */

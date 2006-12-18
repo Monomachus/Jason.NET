@@ -25,6 +25,37 @@ package jason.stdlib;
 
 import jason.asSemantics.InternalAction;
 
+
+/**
+  <p>Internal action: <b><code>.print</code></b>.
+  
+  <p>Description: used for printing messages to the console where the
+  system is running. It receives any number of parameters, which can
+  be not only strings but any AgentSpeak term (including
+  variables). Terms are grounded according to the current unifying
+  function before being printed out. No new line is printed after the
+  parameters.
+
+  <p> The precise format and output device of the message is defined
+  by the Java logging configuration as defined in the
+  <code>logging.properties</code> file in the project directory.
+  
+  <p>Parameters:<ul>
+  
+  <li>+arg[0] ... +arg[n] (any term): the term to be printed.<br/>
+
+  </ul>
+  
+  <p>Example:<ul> 
+
+  <li> <code>.print(1,X,"bla")</code>: prints the number 1, the value
+  of variable X and the string "bla" in the console.</li>
+
+  </ul>
+
+  @see jason.stdlib.println
+
+*/
 public class print extends println implements InternalAction {
 
     @Override

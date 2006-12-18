@@ -30,6 +30,17 @@ import jason.asSyntax.Term;
 
 import java.util.logging.Level;
 
+
+/**
+  <p>Internal action: <b><code>.print</code></b>.
+  
+  <p>Description: used for printing messages to the console. A new
+  line is printed after the parameters.
+
+
+  @see jason.stdlib.print
+
+*/
 public class println extends DefaultInternalAction {
 
     protected String getNewLine() {

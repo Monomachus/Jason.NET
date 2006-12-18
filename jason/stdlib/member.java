@@ -11,10 +11,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * List member implementation
- * 
- * @author jomi
- */
+  List member implementation
+  
+  @see jason.stdlib.concat
+  @see jason.stdlib.length
+  @see jason.stdlib.sort
+
+
+  @author jomi
+
+*/
 public class member extends DefaultInternalAction {
     
     /** .member(X,[a,b,c]), return [{X=a}, {X=b}, {X=c}] */

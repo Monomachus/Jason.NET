@@ -25,6 +25,14 @@ no free variable. Numbers and Strins are always ground.
 <li> <code>.ground([a,b,c(X)])</code>: fail if X is free.
 </ul>
 
+  @see jason.stdlib.atom
+  @see jason.stdlib.list
+  @see jason.stdlib.literal
+  @see jason.stdlib.number
+  @see jason.stdlib.string
+  @see jason.stdlib.structure
+  @see jason.stdlib.var
+
 */
 public class ground extends DefaultInternalAction {
 

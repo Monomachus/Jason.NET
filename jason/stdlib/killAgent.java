@@ -29,11 +29,39 @@ import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.Term;
 
+
+
+
+/**
+  <p>Internal action: <b><code>.killAgent</code></b>.
+  
+  <p>Description: kills the agent whose name is given as
+     parameter. This is a provisional internal action, while we find
+     more adequate mechanisms for creating and killing agents. In
+     particular, note that an agent can kill any other agent, without
+     any consideration on permissions, etc! It is the programmers'
+     responsibility to use this action.
+
+  
+  <p>Parameters:<ul>
+  
+  <li>+ arg[0] (atom): the agent name.<br/>
+
+  </ul>
+  
+  <p>Example:<ul> 
+
+  <li> <code>.killAgent(bob)</code>: kills the agent named bob.</li>
+
+  </ul>
+
+  @see jason.stdlib.createAgent
+  @see jason.stdlib.stopMAS
+  @see jason.runtime.RuntimeServicesInfraTier
+
+*/
 public class killAgent extends DefaultInternalAction {
 
-    //private static Logger logger = Logger.getLogger(killAgent.class.getName());
-
-	/* args[0] the agent name */
     @Override
 	public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
 		
@@ -48,5 +76,4 @@ public class killAgent extends DefaultInternalAction {
 		}
 		return false;
 	}
-
 }

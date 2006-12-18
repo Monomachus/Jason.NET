@@ -34,6 +34,15 @@ import jason.asSyntax.Literal;
 import jason.asSyntax.Term;
 import jason.asSyntax.Trigger;
 
+/**
+  @see jason.stdlib.currentIntention
+  @see jason.stdlib.dropAllDesires
+  @see jason.stdlib.dropDesire
+  @see jason.stdlib.dropAllIntentions
+  @see jason.stdlib.dropIntention
+  @see jason.stdlib.dropGoal
+  @see jason.stdlib.intend
+*/
 public class desire extends intend {
 
     @Override

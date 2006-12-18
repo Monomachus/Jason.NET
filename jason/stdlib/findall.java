@@ -34,6 +34,42 @@ import jason.asSyntax.Term;
 
 import java.util.Iterator;
 
+/**
+
+  <p>Internal action: <b><code>.findall(Var,Literal,List)</code></b>.
+  
+  <p>Description: builds a <i>List</i> of all instantiations of
+  <i>Var</i> which make <i>Literal</i> (which has at least an instance
+  of <i>Var</i>) a logical consequence of the agent's belief base
+  (BB). Unlike Prolog, the second argument can not be a conjunction.
+
+  <p>Parameters:<ul>
+  
+  <li>+ arg[0] (variable or structure): the variable or structure that
+  "populate" the list.<br/>
+  
+  <li>+ arg[1] (litetal): the literal in belief base.<br/>
+
+  <li>+/- arg[2] (list or variable): the resulting list.<br/>
+  
+  </ul>
+  
+  <p>Examples supposing BB as composed by
+  {a(30),a(20),b(1,2),b(3,4),b(5,6)} :
+
+  <ul>
+
+  <li> <code>.findall(X,a(X),L)</code>: <code>L</code> unifies with
+  <code>[30,20]</code>.</li>
+
+  <li> <code>.findall(c(Y,X),b(X,Y),L)</code>: <code>L</code> unifies
+  with <code>c(2,1),c(4,3),c(6,5)</code>.</li>
+
+  </ul>
+
+
+  @see jason.stdlib.count
+*/
 public class findall extends DefaultInternalAction {
 
     /** .findall(Var, a(Var), List) */

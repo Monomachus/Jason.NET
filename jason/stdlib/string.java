@@ -22,6 +22,14 @@ import jason.asSyntax.Term;
 <li> <code>.string(X)</code>: fail if X is free and success if X is bind with a string.
 </ul>
 
+  @see jason.stdlib.atom
+  @see jason.stdlib.list
+  @see jason.stdlib.literal
+  @see jason.stdlib.number
+  @see jason.stdlib.structure
+  @see jason.stdlib.var
+  @see jason.stdlib.ground
+
 */
 public class string extends DefaultInternalAction {
 

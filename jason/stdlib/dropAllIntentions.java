@@ -30,8 +30,18 @@ import jason.asSemantics.Unifier;
 import jason.asSyntax.Term;
 
 /**
- * This changes the agent's circumstance by simply emptying the whole set of
- * intentions (I).
+  This changes the agent's circumstance by simply emptying the whole set of
+  intentions (I).
+
+  @see jason.stdlib.currentIntention
+  @see jason.stdlib.desire
+  @see jason.stdlib.dropAllDesires
+  @see jason.stdlib.dropDesire
+  @see jason.stdlib.dropIntention
+  @see jason.stdlib.dropGoal
+  @see jason.stdlib.intend
+
+
  */
 public class dropAllIntentions extends DefaultInternalAction {
     
