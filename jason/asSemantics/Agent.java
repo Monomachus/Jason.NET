@@ -188,9 +188,9 @@ public class Agent {
         return intentions.poll();
     }
 
-    public Message selectMessage(Queue<Message> msgList) {
+    public Message selectMessage(Queue<Message> messages) {
         // make sure the selected Message is removed from msgList
-        return msgList.poll();
+        return messages.poll();
     }
 
     public ActionExec selectAction(List<ActionExec> actList) {
@@ -320,8 +320,7 @@ public class Agent {
      * nothing change, returns null.
      */
     @SuppressWarnings("unchecked")
-    public List<Literal>[] brf(Literal beliefToAdd, Literal beliefToDel,
-            Intention i) {
+    public List<Literal>[] brf(Literal beliefToAdd, Literal beliefToDel,  Intention i) {
         // This class does not implement belief revision! It
         // is supposed that a subclass will do it.
         // It simply add/del the belief.
