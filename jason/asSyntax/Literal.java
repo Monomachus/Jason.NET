@@ -111,8 +111,15 @@ public class Literal extends Pred implements LogicalFormula {
     public Iterator<Unifier> logicalConsequence(final Agent ag, final Unifier un) {
         if (isInternalAction()) {
             try {
-                // calls execute
-                Object oresult = ag.getIA(this).execute(ag.getTS(), un, getTermsArray());
+            	// clone terms array
+                Term[] current = getTermsArray();
+                Term[] clone = new Term[current.length];
+                for (int i=0; i<clone.length; i++) {
+                    clone[i] = (Term)current[i].clone();
+                }
+
+            	// calls execute
+                Object oresult = ag.getIA(this).execute(ag.getTS(), un, clone);
                 if (oresult instanceof Boolean && (Boolean)oresult) {
                     return LogExpr.createUnifIterator(un);
                 } else if (oresult instanceof Iterator) {
@@ -162,7 +169,6 @@ public class Literal extends Pred implements LogicalFormula {
                         
                         Unifier unC = (Unifier) un.clone();
                         if (unC.unifies(Literal.this, rhead)) {
-                            //System.out.println("retornando com "+Literal.this+"="+rhead+" ruleUn ="+ruleUn+" unC="+unC+" un="+un);
                             current = unC;
                             return;
                         }

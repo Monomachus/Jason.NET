@@ -23,7 +23,6 @@
 
 package jason.asSemantics;
 
-import static jason.asSemantics.Unifier.logger;
 import jason.asSyntax.ArithExpr;
 import jason.asSyntax.DefaultTerm;
 import jason.asSyntax.ListTerm;
