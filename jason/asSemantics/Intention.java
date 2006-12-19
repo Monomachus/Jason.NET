@@ -106,7 +106,10 @@ public class Intention implements Serializable, Comparable<Intention> {
         isAtomic = b;
     }
     
-
+    public Stack<IntendedMeans> getIMs() {
+    	return fIntendedMeans;
+    }
+    
     /** returns the IntendedMeans with TE = g, returns null otherwise */
     public IntendedMeans getIM(Trigger g, Unifier u) {
         for (IntendedMeans im : fIntendedMeans) {
