@@ -54,6 +54,7 @@ public class JDBCPersistentBB extends DefaultBeliefBase {
      * "org.hsqldb.jdbcDriver", "jdbc:hsqldb:bookstore", "sa", "",
      * "[book(5,book),author(2,book_author)]")</code><br>
      */
+    @Override
     public void init(Agent ag, String[] args) {
         try {
             logger.fine("Loading driver " + args[0]);
@@ -98,6 +99,7 @@ public class JDBCPersistentBB extends DefaultBeliefBase {
         }
     }
 
+    @Override
     public void stop() {
         try {
             Statement st = conn.createStatement();
@@ -121,6 +123,7 @@ public class JDBCPersistentBB extends DefaultBeliefBase {
         return false;
     }
 
+    @Override
     public Literal contains(Literal l) {
         if (!isDB(l))
             return super.contains(l);
@@ -144,6 +147,7 @@ public class JDBCPersistentBB extends DefaultBeliefBase {
         return null;
     }
 
+    @Override
     public boolean add(Literal l) {
         if (!isDB(l))
             return super.add(l);
@@ -194,6 +198,7 @@ public class JDBCPersistentBB extends DefaultBeliefBase {
     }
 
     
+    @Override
     public boolean remove(Literal l) {
         if (!isDB(l))
             return super.add(l);
@@ -232,6 +237,7 @@ public class JDBCPersistentBB extends DefaultBeliefBase {
     }
 
     
+    @Override
     public boolean abolish(PredicateIndicator pi) {
         if (belsDB.get(pi) == null)
             return super.abolish(pi);
@@ -251,6 +257,7 @@ public class JDBCPersistentBB extends DefaultBeliefBase {
         return false;
     }
 
+    @Override
     public Iterator<Literal> getRelevant(Literal l) {
         final PredicateIndicator pi = l.getPredicateIndicator();
         if (belsDB.get(pi) == null)
@@ -258,7 +265,7 @@ public class JDBCPersistentBB extends DefaultBeliefBase {
         
         if (l.isVar()) {
             // all bels are relevant
-            return getAll();
+            return iterator();
         } else {
             // get all rows of l's table
             Statement stmt = null;
@@ -309,6 +316,7 @@ public class JDBCPersistentBB extends DefaultBeliefBase {
         return null;
     }
 
+    @Override
     public int size() {
         int count = 0;
         Statement stmt = null;
@@ -334,11 +342,13 @@ public class JDBCPersistentBB extends DefaultBeliefBase {
         return count + super.size();
     }
 
-    public Iterator<Literal> getAll() {
+    @Override
+    public Iterator<Literal> iterator() {
         List<Literal> all = new ArrayList<Literal>(size());
         
-        for (Literal l: this) {
-            all.add(l);
+        Iterator<Literal> is = super.iterator();
+        while (is.hasNext()) {
+            all.add(is.next());
         }
         
         Statement stmt = null;

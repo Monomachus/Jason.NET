@@ -183,7 +183,7 @@ public class BeliefBaseTest extends TestCase {
         assertTrue(inBB != null);
         assertFalse(c.hasSubsetAnnot(inBB));
         assertFalse(c.equals(l1));
-        System.out.println(c+" "+c.getClass().getName());
+        //System.out.println(c+" "+c.getClass().getName());
         assertTrue(c.equalsAsTerm(l1));
         assertTrue(l1.equalsAsTerm(c));
         assertTrue(bb.add(c));
@@ -363,6 +363,7 @@ public class BeliefBaseTest extends TestCase {
         assertTrue(bb.add(Literal.parseLiteral("author(4,\"Amal El Fallah Seghrouchni\")")));
         assertTrue(bb.add(Literal.parseLiteral("author(5,\"Michael Wooldridge\")")));
         assertEquals(bb.size(),6);
+        assertEquals(iteratorSize(bb.iterator()),bb.size());
         
         // add books
         l = Literal.parseLiteral("book(1,\"Multi-Agent Programming : Languages, Platforms and Applications\", \"Springer\", 2005, \"0387245685\")");
@@ -418,7 +419,7 @@ public class BeliefBaseTest extends TestCase {
         assertEquals(bb.size(),size+2);
         
         // test get all
-        //Iterator<Literal> il = bb.getAll();
+        //Iterator<Literal> il = bb.iterator();
         //while (il.hasNext()) {
         //    System.out.println(il.next());
         //}
