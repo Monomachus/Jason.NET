@@ -39,7 +39,7 @@ import org.w3c.dom.Element;
  * Common interface for all kinds of Jason Belief bases, even those
  * customised by the user.
  */
-public interface BeliefBase {
+public interface BeliefBase extends Iterable<Literal> {
 
     public static final Term TPercept = DefaultTerm.parse("source(percept)");
     public static final Term TSelf    = DefaultTerm.parse("source(self)");
@@ -60,7 +60,7 @@ public interface BeliefBase {
     public boolean add(Literal l);
 
     /** Returns an iterator for all beliefs. */
-    public Iterator<Literal> getAll();
+    public Iterator<Literal> iterator();
 
     /** 
      * Returns an iterator for all literals relevant for l's predicate

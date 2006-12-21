@@ -118,13 +118,13 @@ public class DefaultBeliefBase implements BeliefBase {
         }
     }
 
-    public Iterator<Literal> getAll() {
+    public Iterator<Literal> iterator() {
         List<Literal> all = new ArrayList<Literal>(size());
         for (BelEntry be : belsMap.values()) {
             all.addAll(be.list);
         }
         return all.iterator();
-    }
+	}
 
     public boolean remove(Literal l) {
         Literal bl = contains(l);
@@ -172,7 +172,7 @@ public class DefaultBeliefBase implements BeliefBase {
     public Iterator<Literal> getRelevant(Literal l) {
         if (l.isVar()) {
             // all bels are relevant
-            return getAll();
+            return iterator();
         } else {
             BelEntry entry = belsMap.get(l.getPredicateIndicator());
             if (entry != null) {
@@ -189,9 +189,8 @@ public class DefaultBeliefBase implements BeliefBase {
 
     public Element getAsDOM(Document document) {
         Element ebels = (Element) document.createElement("beliefs");
-        Iterator<Literal> i = getAll();
-        while (i.hasNext()) {
-            ebels.appendChild(i.next().getAsDOM(document));
+        for (Literal l: this) {
+            ebels.appendChild(l.getAsDOM(document));
         }
         return ebels;
     }

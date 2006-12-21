@@ -9,6 +9,7 @@ public class Location {
         this.y = y;
     }
     
+	/** calculates the Manhattan distance between two points */
     public int distance(Location l) {
         return Math.abs(x - l.x) + Math.abs(y - l.y);
     }
