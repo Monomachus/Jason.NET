@@ -16,7 +16,7 @@
 +!kqmlReceived(S, tell, KQMLcontentVar, M) 
    :  .literal(KQMLcontentVar) & 
       .ground(KQMLcontentVar) 
-   <- .addAnnot(KQMLcontentVar, source(S), CA); 
+   <- .add_annot(KQMLcontentVar, source(S), CA); 
       +CA.
 @kqmlReceivedTellList
 +!kqmlReceived(S, tell, KQMLcontentVar, M) 
@@ -28,7 +28,7 @@
 +!addAllkqmlReceived(S,[H|T])
    :  .literal(H) & 
       .ground(H)
-   <- .addAnnot(H, source(S), CA); 
+   <- .add_annot(H, source(S), CA); 
       +CA;
       !addAllkqmlReceived(S,T).
 @kqmlReceivedTellList3
@@ -37,7 +37,7 @@
       
 @kqmlReceivedUnTell
 +!kqmlReceived(S, untell, KQMLcontentVar, M) : true 
-   <- .addAnnot(KQMLcontentVar, source(S), CA); 
+   <- .add_annot(KQMLcontentVar, source(S), CA); 
       -CA.
 
 
@@ -45,11 +45,11 @@
 
 @kqmlReceivedAchieve
 +!kqmlReceived(S, achieve, KQMLcontentVar, M) : true 
-   <- .addAnnot(KQMLcontentVar, source(S), CA); 
+   <- .add_annot(KQMLcontentVar, source(S), CA); 
       !CA.
 @kqmlReceivedUnAchieve
 +!kqmlReceived(S, unachieve, KQMLcontentVar, M) : true 
-   <- .addAnnot(KQMLcontentVar, source(S), CA);
+   <- .add_annot(KQMLcontentVar, source(S), CA);
       .dropGoal(CA, false).
 
 

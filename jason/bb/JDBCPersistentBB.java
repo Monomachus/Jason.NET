@@ -337,9 +337,8 @@ public class JDBCPersistentBB extends DefaultBeliefBase {
     public Iterator<Literal> getAll() {
         List<Literal> all = new ArrayList<Literal>(size());
         
-        Iterator<Literal> i = super.getAll();
-        while (i.hasNext()) {
-            all.add(i.next());
+        for (Literal l: this) {
+            all.add(l);
         }
         
         Statement stmt = null;

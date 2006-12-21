@@ -30,6 +30,7 @@ import jason.bb.BeliefBase;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -38,7 +39,7 @@ import java.util.logging.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-public class PlanLibrary {
+public class PlanLibrary implements Iterable<Plan> {
 
 	/** a MAP from TE to a list of relevant plans */
     Map<PredicateIndicator,List<Plan>> relPlans = new HashMap<PredicateIndicator,List<Plan>>();
@@ -145,7 +146,7 @@ public class PlanLibrary {
     }
 
 	public void addAll(PlanLibrary pl) throws JasonException {
-		for (Plan p: pl.getPlans()) { 
+		for (Plan p: pl) { 
 			add(p);
 		}
 	}
@@ -157,6 +158,10 @@ public class PlanLibrary {
     
     public List<Plan> getPlans() {
     	    return plans;
+    }
+    
+    public Iterator<Plan> iterator() {
+    	return plans.iterator();
     }
 
 

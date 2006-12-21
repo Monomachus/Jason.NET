@@ -21,7 +21,7 @@ import jason.asSyntax.DefaultTerm;
 import jason.asSyntax.Trigger;
 import jason.asSyntax.VarTerm;
 import jason.bb.BeliefBase;
-import jason.stdlib.addAnnot;
+import jason.stdlib.add_annot;
 import jason.stdlib.addPlan;
 import jason.stdlib.dropGoal;
 import jason.stdlib.relevantPlans;
@@ -61,7 +61,7 @@ public class StdLibTest extends TestCase {
     }
 
     public void testAddAnnot() {
-        addAnnot aa = new addAnnot();
+        add_annot aa = new add_annot();
         Unifier u = new Unifier();
 
         Literal msg = Literal.parseLiteral("ok(10)");

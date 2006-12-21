@@ -6,7 +6,6 @@ import jason.asSyntax.Literal;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.PrintWriter;
-import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -32,9 +31,7 @@ public class TextPersistentBB extends DefaultBeliefBase {
         try {
             logger.fine("writting to file " + file);
             PrintWriter out = new PrintWriter(new FileWriter(file));
-            Iterator<Literal> i = getAll();
-            while (i.hasNext()) {
-                Literal b = i.next();
+            for (Literal b: this) {
                 out.println(b.toString()+".");
             }
             out.close();

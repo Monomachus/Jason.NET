@@ -4,7 +4,6 @@ import jason.asSemantics.Agent;
 import jason.asSyntax.Plan;
 
 import java.io.StringReader;
-import java.util.Iterator;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -42,9 +41,7 @@ public class AgentSpeakSideKickParser extends sidekick.SideKickParser {
             	
             	// create nodes 
             	SideKickParsedData pd = new SideKickParsedData(buf.getName());
-            	Iterator i = ag.getPL().getPlans().iterator();
-            	while (i.hasNext()) {
-            		Plan p = (Plan)i.next();
+            	for (Plan p: ag.getPL()) {
             		DefaultMutableTreeNode node = new PlanAsset(p, buf).createTreeNode();
             	    pd.root.add(node);
             	}          

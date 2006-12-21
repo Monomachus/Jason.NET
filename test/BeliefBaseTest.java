@@ -195,7 +195,7 @@ public class BeliefBaseTest extends TestCase {
         Literal l4 = Literal.parseLiteral("pos");
         u.unifies(c, l4);
         try {
-            new jason.stdlib.addAnnot().execute(null, u, new Term[] { c, DefaultTerm.parse("source(ag4)"), ca });
+            new jason.stdlib.add_annot().execute(null, u, new Term[] { c, DefaultTerm.parse("source(ag4)"), ca });
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -422,7 +422,7 @@ public class BeliefBaseTest extends TestCase {
         //while (il.hasNext()) {
         //    System.out.println(il.next());
         //}
-        assertEquals(iteratorSize(bb.getAll()),size+2);
+        assertEquals(iteratorSize(bb.iterator()),size+2);
 
         // test remove
         size = bb.size();
