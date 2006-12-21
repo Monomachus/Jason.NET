@@ -34,7 +34,7 @@ import jason.asSyntax.Structure;
 import jason.asSyntax.Term;
 
 /**
-  @see jason.stdlib.addPlan
+  @see jason.stdlib.add_plan
   @see jason.stdlib.planLabel
   @see jason.stdlib.relevantPlans
  */

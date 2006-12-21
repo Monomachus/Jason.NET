@@ -78,7 +78,7 @@
 // In tellHow, KQMLcontentVar must be a string representation of the plan 
 // (or a list of strings)
 @kqmlReceivedTellHow
-+!kqmlReceived(S, tellHow, KQMLcontentVar, M) : true <- .addPlan(KQMLcontentVar, S).
++!kqmlReceived(S, tellHow, KQMLcontentVar, M) : true <- .add_plan(KQMLcontentVar, S).
 
 // In untellHow, KQMLcontentVar must be a plan's label (or a list of labels)
 @kqmlReceivedUnTellHow

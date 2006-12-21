@@ -37,7 +37,7 @@ import java.util.Iterator;
 
 
 /**
-  <p>Internal action: <b><code>.addPlan</code></b>.
+  <p>Internal action: <b><code>.add_plan</code></b>.
   
   <p>Description: adds plan(s) into the agent plan library.
   
@@ -55,15 +55,15 @@ import java.util.Iterator;
   
   <p>Examples:<ul> 
 
-  <li> <code>.addPlan("+b : true &lt;- .print(b).")</code>: adds the plan
+  <li> <code>.add_plan("+b : true &lt;- .print(b).")</code>: adds the plan
   <code>+b : true &lt;- .print(b).</code> into the agent's plan library
   with a plan label annotated with <code>source(self)</code>.</li>
 
-  <li> <code>.addPlan("+b : true &lt;- .print(b).", rafa)</code>: same as
+  <li> <code>.add_plan("+b : true &lt;- .print(b).", rafa)</code>: same as
   the previous example, but the source of the plan is agent
   "rafa".</li>
 
-  <li> <code>.addPlan(["+b : true &lt;- .print(b).", "+b : bel &lt;-
+  <li> <code>.add_plan(["+b : true &lt;- .print(b).", "+b : bel &lt;-
   .print(bbel)."], rafa)</code>: adds both plans with "rafa" as they
   source.</li>
 
@@ -74,7 +74,7 @@ import java.util.Iterator;
   @see jason.stdlib.removePlan
 
  */
-public class addPlan extends DefaultInternalAction {
+public class add_plan extends DefaultInternalAction {
 
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {

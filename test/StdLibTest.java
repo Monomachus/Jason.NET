@@ -22,7 +22,7 @@ import jason.asSyntax.Trigger;
 import jason.asSyntax.VarTerm;
 import jason.bb.BeliefBase;
 import jason.stdlib.add_annot;
-import jason.stdlib.addPlan;
+import jason.stdlib.add_plan;
 import jason.stdlib.dropGoal;
 import jason.stdlib.relevantPlans;
 import jason.stdlib.removePlan;
@@ -166,7 +166,7 @@ public class StdLibTest extends TestCase {
         try {
             while (i.hasNext()) {
                 StringTerm t = (StringTerm) i.next();
-                new addPlan().execute(ts, new Unifier(), new Term[] { t, new Structure("fromGR") });
+                new add_plan().execute(ts, new Unifier(), new Term[] { t, new Structure("fromGR") });
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -175,7 +175,7 @@ public class StdLibTest extends TestCase {
         // add again plans returned from getRelevantPlans
         // using IA addPlan receiving a list of plans
         try {
-            new addPlan().execute(ts, new Unifier(), new Term[] { (Term) plans, new Structure("fromLT") });
+            new add_plan().execute(ts, new Unifier(), new Term[] { (Term) plans, new Structure("fromLT") });
         } catch (Exception e) {
             e.printStackTrace();
         }
