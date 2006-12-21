@@ -69,9 +69,9 @@ import java.util.Iterator;
 
   </ul>
 
-  @see jason.stdlib.planLabel
-  @see jason.stdlib.relevantPlans
-  @see jason.stdlib.removePlan
+  @see jason.stdlib.plan_label
+  @see jason.stdlib.relevant_plans
+  @see jason.stdlib.remove_plan
 
  */
 public class add_plan extends DefaultInternalAction {
@@ -98,9 +98,9 @@ public class add_plan extends DefaultInternalAction {
             }
             return true;
         } catch (ArrayIndexOutOfBoundsException e) {
-            throw new JasonException("The internal action 'addPlan' has not received two arguments (plan's string and source)");
+            throw new JasonException("The internal action 'add_plan' has not received two arguments (plan's string and source)");
         } catch (Exception e) {
-            throw new JasonException("Error in internal action 'addPlan': " + e);
+            throw new JasonException("Error in internal action 'add_plan': " + e);
         }
     }
 }

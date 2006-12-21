@@ -38,16 +38,16 @@ import jason.asSyntax.Trigger;
 /**
   Drop a goal (see DALT 2006 paper)
 
-  @see jason.stdlib.currentIntention
+  @see jason.stdlib.current_intention
   @see jason.stdlib.desire
-  @see jason.stdlib.dropAllDesires
-  @see jason.stdlib.dropDesire
-  @see jason.stdlib.dropAllIntentions
-  @see jason.stdlib.dropIntention
+  @see jason.stdlib.drop_all_desires
+  @see jason.stdlib.drop_desire
+  @see jason.stdlib.drop_all_intentions
+  @see jason.stdlib.drop_intention
   @see jason.stdlib.intend
 
  */
-public class dropGoal extends DefaultInternalAction {
+public class drop_goal extends DefaultInternalAction {
     
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
@@ -59,10 +59,10 @@ public class dropGoal extends DefaultInternalAction {
             drop(ts, l, success.equals(Literal.LTrue), un);
             return true;
         } catch (ArrayIndexOutOfBoundsException e) {
-            throw new JasonException("The internal action 'dropGoal' has not received two arguments.");
+            throw new JasonException("The internal action 'drop_goal' has not received two arguments.");
         } catch (Exception e) {
             e.printStackTrace();
-            throw new JasonException("Error in internal action 'dropGoal': " + e);
+            throw new JasonException("Error in internal action 'drop_goal': " + e);
         }
     }
     

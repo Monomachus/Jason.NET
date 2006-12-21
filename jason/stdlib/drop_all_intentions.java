@@ -33,17 +33,17 @@ import jason.asSyntax.Term;
   This changes the agent's circumstance by simply emptying the whole set of
   intentions (I).
 
-  @see jason.stdlib.currentIntention
+  @see jason.stdlib.current_intention
   @see jason.stdlib.desire
-  @see jason.stdlib.dropAllDesires
-  @see jason.stdlib.dropDesire
-  @see jason.stdlib.dropIntention
-  @see jason.stdlib.dropGoal
+  @see jason.stdlib.drop_all_desires
+  @see jason.stdlib.drop_desire
+  @see jason.stdlib.drop_intention
+  @see jason.stdlib.drop_goal
   @see jason.stdlib.intend
 
 
  */
-public class dropAllIntentions extends DefaultInternalAction {
+public class drop_all_intentions extends DefaultInternalAction {
     
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {

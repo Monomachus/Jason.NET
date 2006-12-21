@@ -75,7 +75,7 @@ public class add_annot extends DefaultInternalAction {
 			Term result = addAnnotToList(un, (Term)args[0].clone(), args[1]);
 			return un.unifies(result,args[2]);
 		} catch (ArrayIndexOutOfBoundsException e) {
-			throw new JasonException("The internal action 'addAnnot' requires three arguments.");
+			throw new JasonException("The internal action 'add_annot' requires three arguments.");
 		} //finally {
 			//System.out.println("annot result = "+un);			
 		//}

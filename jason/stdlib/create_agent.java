@@ -23,36 +23,63 @@
 
 package jason.stdlib;
 
+import jason.JasonException;
 import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
+import jason.asSyntax.StringTerm;
 import jason.asSyntax.Term;
 import jason.runtime.RuntimeServicesInfraTier;
 
+import java.io.File;
+
 /**
-  <p>Internal action: <b><code>.stopMAS</code></b>.
+  <p>Internal action: <b><code>.create_agent</code></b>.
   
-  <p>Description: stops all agents of the systems.
+  <p>Description: creates another agent based on some AgentSpeak
+  source code.
+  
+  <p>Parameters:<ul>
+  
+  <li>+ arg[0] (atom): the agent name.<br/>
+  
+  <li>+ arg[1] (string): path to the file where the AgentSpeak code
+  for that new agent can be found. .<br/>
+
+  </ul>
   
   <p>Example:<ul> 
 
-  <li> <code>.stopMAS</code>.</li>
+  <li> <code>.create_agent(bob,"/tmp/x.asl")</code>: creates the agent named bob from source file in "/tmp/x.asl".</li>
 
   </ul>
 
-  @see jason.stdlib.create_agent
   @see jason.stdlib.kill_agent
+  @see jason.stdlib.stopMAS
   @see jason.runtime.RuntimeServicesInfraTier
- */
-public class stopMAS extends DefaultInternalAction {
+*/
+public class create_agent extends DefaultInternalAction {
 
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
 
         try {
+            Term name = (Term) args[0].clone();
+            un.apply(name);
+
+            StringTerm source = (StringTerm) args[1].clone();
+            un.apply((Term) source);
+
+            File fSource = new File(source.getString());
+            if (!fSource.exists()) {
+                throw new JasonException("The file source " + source + " was not found!");
+            }
+
             RuntimeServicesInfraTier rs = ts.getUserAgArch().getArchInfraTier().getRuntimeServices();
-            rs.stopMAS();
-            return true;
+            return rs.createAgent(name.toString(), fSource.getAbsolutePath(), null, null, null, ts.getSettings());
+
+        } catch (IndexOutOfBoundsException e) {
+            throw new JasonException("The internal action 'create_agent' received a wrong number of arguments");
         } catch (Exception e) {
             e.printStackTrace();
         }

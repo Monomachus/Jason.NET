@@ -21,33 +21,34 @@
 //
 //----------------------------------------------------------------------------
 
+
 package jason.stdlib;
 
-import jason.JasonException;
 import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.Term;
 
 /**
-  @see jason.stdlib.desire
-  @see jason.stdlib.dropAllDesires
-  @see jason.stdlib.dropDesire
-  @see jason.stdlib.dropAllIntentions
-  @see jason.stdlib.dropIntention
-  @see jason.stdlib.dropGoal
-  @see jason.stdlib.intend
- */
-public class currentIntention extends DefaultInternalAction {
+  This changes the agent's circumstance by simply emptying the whole set of
+  events (E).
 
+
+
+  @see jason.stdlib.current_intention
+  @see jason.stdlib.desire
+  @see jason.stdlib.drop_desire
+  @see jason.stdlib.drop_all_intentions
+  @see jason.stdlib.drop_intention
+  @see jason.stdlib.drop_goal
+  @see jason.stdlib.intend
+
+ */
+public class drop_all_desires extends DefaultInternalAction {
+    
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
-        try {
-            return un.unifies(ts.getC().getSelectedIntention().getAsTerm(), args[0]);
-        } catch (ArrayIndexOutOfBoundsException e) {
-            throw new JasonException("The internal action 'currentIntention' has not received one arguments");
-        } catch (Exception e) {
-            throw new JasonException("Error in internal action 'currentIntention': " + e);
-        }    
+        ts.getC().clearEvents();
+        return true;
     }
 }

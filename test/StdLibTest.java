@@ -23,9 +23,9 @@ import jason.asSyntax.VarTerm;
 import jason.bb.BeliefBase;
 import jason.stdlib.add_annot;
 import jason.stdlib.add_plan;
-import jason.stdlib.dropGoal;
-import jason.stdlib.relevantPlans;
-import jason.stdlib.removePlan;
+import jason.stdlib.drop_goal;
+import jason.stdlib.relevant_plans;
+import jason.stdlib.remove_plan;
 
 import java.util.Iterator;
 
@@ -139,7 +139,7 @@ public class StdLibTest extends TestCase {
         VarTerm X = new VarTerm("X");
         //System.out.println(ag.getPL().getAllRelevant(Trigger.parseTrigger(ste.getFunctor()).getPredicateIndicator()));
         try {
-            new relevantPlans().execute(ts, u, new Term[] { (Term) ste, X });
+            new relevant_plans().execute(ts, u, new Term[] { (Term) ste, X });
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -153,7 +153,7 @@ public class StdLibTest extends TestCase {
         assertEquals(ag.getPL().getPlans().size(), 3);
         // remove plan t1 from PS
         try {
-            new removePlan().execute(ts, new Unifier(), new Term[] { new Pred("t1") });
+            new remove_plan().execute(ts, new Unifier(), new Term[] { new Pred("t1") });
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -189,7 +189,7 @@ public class StdLibTest extends TestCase {
         // remove plan t2,t3 (source = nosource) from PS
         ListTerm llt = ListTermImpl.parseList("[t2,t3]");
         try {
-            assertTrue((Boolean)new removePlan().execute(ts, new Unifier(), new Term[] { (Term) llt, new Pred("nosource") }));
+            assertTrue((Boolean)new remove_plan().execute(ts, new Unifier(), new Term[] { (Term) llt, new Pred("nosource") }));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -198,7 +198,7 @@ public class StdLibTest extends TestCase {
         // remove plan t2,t3 (source = self) from PS
         llt = ListTermImpl.parseList("[t2,t3]");
         try {
-            assertTrue((Boolean)new removePlan().execute(ts, new Unifier(), new Term[] { (Term) llt }));
+            assertTrue((Boolean)new remove_plan().execute(ts, new Unifier(), new Term[] { (Term) llt }));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -244,10 +244,10 @@ public class StdLibTest extends TestCase {
         Circumstance c = new Circumstance();
         c.addIntention(intention1);
         TransitionSystem ts = new TransitionSystem(null, c, null, null);
-        new dropGoal().drop(ts, Literal.parseLiteral("g2"), true, new Unifier());
+        new drop_goal().drop(ts, Literal.parseLiteral("g2"), true, new Unifier());
         assertEquals(intention1.size(), 1);
         intention1.push(new IntendedMeans(new Option(p4,new Unifier()), null));
-        new dropGoal().drop(ts, Literal.parseLiteral("g4"), true, new Unifier());
+        new drop_goal().drop(ts, Literal.parseLiteral("g4"), true, new Unifier());
         assertTrue(intention1.isFinished());
     }
 
@@ -255,7 +255,7 @@ public class StdLibTest extends TestCase {
         Circumstance c = new Circumstance();
         c.addIntention(intention1);
         TransitionSystem ts = new TransitionSystem(ag, c, null, null);
-        new dropGoal().drop(ts, Literal.parseLiteral("g2"), false, new Unifier());
+        new drop_goal().drop(ts, Literal.parseLiteral("g2"), false, new Unifier());
         assertEquals(intention1.size(),2);
         assertEquals(c.getEvents().size(),1);
     }

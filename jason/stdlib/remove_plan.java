@@ -35,10 +35,10 @@ import jason.asSyntax.Term;
 
 /**
   @see jason.stdlib.add_plan
-  @see jason.stdlib.planLabel
-  @see jason.stdlib.relevantPlans
+  @see jason.stdlib.plan_label
+  @see jason.stdlib.relevant_plans
  */
-public class removePlan extends DefaultInternalAction {
+public class remove_plan extends DefaultInternalAction {
 
 	/**
 	 * args[0] = list of plans (a ListTerm) where each element is a plan label 
@@ -47,10 +47,10 @@ public class removePlan extends DefaultInternalAction {
 	 * args[1] = source (the name of the agent, for instance),
 	 *           if not informed, source is "self"
 	 *           
-	 * Example: .removePlan(l1);
-	 *          .removePlan(X); // X is unified with a plan's label 
-	 *          .removePlan([l1,l2,l3]);
-	 *          .removePlan(l1,ag1); // remove the plan l1 sent (tellHow) by agent ag1 
+	 * Example: .remove_lan(l1);
+	 *          .remove_plan(X); // X is unified with a plan's label 
+	 *          .remove_plan([l1,l2,l3]);
+	 *          .remove_plan(l1,ag1); // remove the plan l1 sent (tellHow) by agent ag1 
 	 */
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
@@ -75,7 +75,7 @@ public class removePlan extends DefaultInternalAction {
         		return ts.getAg().getPL().removePlan((Pred)label, source);
         	}
         } catch (ArrayIndexOutOfBoundsException e) {
-            throw new JasonException("The internal action 'removePlan' has not received the plan's label as argument.");
+            throw new JasonException("The internal action 'remove_plan' has not received the plan's label as argument.");
         } 
     }
 }

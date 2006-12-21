@@ -27,62 +27,53 @@ import jason.JasonException;
 import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
-import jason.asSyntax.StringTerm;
 import jason.asSyntax.Term;
-import jason.runtime.RuntimeServicesInfraTier;
 
-import java.io.File;
+
+
 
 /**
-  <p>Internal action: <b><code>.createAgent</code></b>.
+  <p>Internal action: <b><code>.kill_agent</code></b>.
   
-  <p>Description: creates another agent based on some AgentSpeak
-  source code.
+  <p>Description: kills the agent whose name is given as
+     parameter. This is a provisional internal action, while we find
+     more adequate mechanisms for creating and killing agents. In
+     particular, note that an agent can kill any other agent, without
+     any consideration on permissions, etc! It is the programmers'
+     responsibility to use this action.
+
   
   <p>Parameters:<ul>
   
   <li>+ arg[0] (atom): the agent name.<br/>
-  
-  <li>+ arg[1] (string): path to the file where the AgentSpeak code
-  for that new agent can be found. .<br/>
 
   </ul>
   
   <p>Example:<ul> 
 
-  <li> <code>.createAgent(bob,"/tmp/x.asl")</code>: creates the agent named bob from source file in "/tmp/x.asl".</li>
+  <li> <code>.kill_agent(bob)</code>: kills the agent named bob.</li>
 
   </ul>
 
-  @see jason.stdlib.killAgent
+  @see jason.stdlib.create_agent
   @see jason.stdlib.stopMAS
   @see jason.runtime.RuntimeServicesInfraTier
+
 */
-public class createAgent extends DefaultInternalAction {
+public class kill_agent extends DefaultInternalAction {
 
     @Override
-    public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
-
-        try {
-            Term name = (Term) args[0].clone();
+	public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
+		
+		try {
+            Term name = (Term)args[0].clone();
             un.apply(name);
-
-            StringTerm source = (StringTerm) args[1].clone();
-            un.apply((Term) source);
-
-            File fSource = new File(source.getString());
-            if (!fSource.exists()) {
-                throw new JasonException("The file source " + source + " was not found!");
-            }
-
-            RuntimeServicesInfraTier rs = ts.getUserAgArch().getArchInfraTier().getRuntimeServices();
-            return rs.createAgent(name.toString(), fSource.getAbsolutePath(), null, null, null, ts.getSettings());
-
-        } catch (IndexOutOfBoundsException e) {
-            throw new JasonException("The internal action 'createAgent' received a wrong number of arguments");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
+            return ts.getUserAgArch().getArchInfraTier().getRuntimeServices().killAgent(name.toString());
+		} catch (IndexOutOfBoundsException e) {
+			throw new JasonException("The internal action 'kill_agent' received a wrong number of arguments");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
 }

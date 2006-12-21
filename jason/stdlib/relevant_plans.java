@@ -40,10 +40,10 @@ import java.util.Iterator;
 
 /**
   @see jason.stdlib.add_plan
-  @see jason.stdlib.planLabel
-  @see jason.stdlib.removePlan
+  @see jason.stdlib.plan_label
+  @see jason.stdlib.remove_plan
  */
-public class relevantPlans extends DefaultInternalAction {
+public class relevant_plans extends DefaultInternalAction {
 
 	/**
 	 * args[0] = trigger event (as a StringTerm)
@@ -79,10 +79,9 @@ public class relevantPlans extends DefaultInternalAction {
 			return un.unifies(lt, listVar);
 			// System.out.println("*** un = "+un);
 		} catch (ArrayIndexOutOfBoundsException e) {
-			throw new JasonException("The internal action 'getRelevantPlans' has not received two arguments (TE and a VAR)");
+			throw new JasonException("The internal action 'relevant_plans' has not received two arguments (TE and a VAR)");
 		} catch (Exception e) {
-			throw new JasonException("Error in internal action 'getRelevantPlans': " + e);
+			throw new JasonException("Error in internal action 'relevant_plans': " + e);
 		}
 	}
-
 }

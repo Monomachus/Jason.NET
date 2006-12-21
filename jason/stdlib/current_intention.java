@@ -29,51 +29,25 @@ import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.Term;
 
-
-
-
 /**
-  <p>Internal action: <b><code>.killAgent</code></b>.
-  
-  <p>Description: kills the agent whose name is given as
-     parameter. This is a provisional internal action, while we find
-     more adequate mechanisms for creating and killing agents. In
-     particular, note that an agent can kill any other agent, without
-     any consideration on permissions, etc! It is the programmers'
-     responsibility to use this action.
-
-  
-  <p>Parameters:<ul>
-  
-  <li>+ arg[0] (atom): the agent name.<br/>
-
-  </ul>
-  
-  <p>Example:<ul> 
-
-  <li> <code>.killAgent(bob)</code>: kills the agent named bob.</li>
-
-  </ul>
-
-  @see jason.stdlib.createAgent
-  @see jason.stdlib.stopMAS
-  @see jason.runtime.RuntimeServicesInfraTier
-
-*/
-public class killAgent extends DefaultInternalAction {
+  @see jason.stdlib.desire
+  @see jason.stdlib.drop_all_desires
+  @see jason.stdlib.drop_desire
+  @see jason.stdlib.drop_all_intentions
+  @see jason.stdlib.drop_intention
+  @see jason.stdlib.drop_goal
+  @see jason.stdlib.intend
+ */
+public class current_intention extends DefaultInternalAction {
 
     @Override
-	public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
-		
-		try {
-            Term name = (Term)args[0].clone();
-            un.apply(name);
-            return ts.getUserAgArch().getArchInfraTier().getRuntimeServices().killAgent(name.toString());
-		} catch (IndexOutOfBoundsException e) {
-			throw new JasonException("The internal action 'killAgent' received a wrong number of arguments");
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return false;
-	}
+    public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
+        try {
+            return un.unifies(ts.getC().getSelectedIntention().getAsTerm(), args[0]);
+        } catch (ArrayIndexOutOfBoundsException e) {
+            throw new JasonException("The internal action 'current_intention' has not received one arguments");
+        } catch (Exception e) {
+            throw new JasonException("Error in internal action 'current_intention': " + e);
+        }    
+    }
 }

@@ -21,34 +21,40 @@
 //
 //----------------------------------------------------------------------------
 
-
 package jason.stdlib;
 
+import jason.JasonException;
 import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
+import jason.asSyntax.Plan;
+import jason.asSyntax.StringTermImpl;
 import jason.asSyntax.Term;
 
 /**
-  This changes the agent's circumstance by simply emptying the whole set of
-  events (E).
 
-
-
-  @see jason.stdlib.currentIntention
-  @see jason.stdlib.desire
-  @see jason.stdlib.dropDesire
-  @see jason.stdlib.dropAllIntentions
-  @see jason.stdlib.dropIntention
-  @see jason.stdlib.dropGoal
-  @see jason.stdlib.intend
+  @see jason.stdlib.add_plan
+  @see jason.stdlib.relevant_plans
+  @see jason.stdlib.remove_plan
 
  */
-public class dropAllDesires extends DefaultInternalAction {
-    
+public class plan_label extends DefaultInternalAction {
+
+    /**
+     * args[0] = -plan as string,
+     * args[1] = +label as term
+     */
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
-        ts.getC().clearEvents();
-        return true;
+        try {
+            Term label = (Term)args[1].clone();
+            un.apply(label);
+            Plan p = ts.getAg().getPL().get(label.toString());
+            return un.unifies(new StringTermImpl(p.toASString()), args[0]);
+        } catch (ArrayIndexOutOfBoundsException e) {
+            throw new JasonException("The internal action 'plan_label' has not received two arguments!");
+        } catch (Exception e) {
+            throw new JasonException("Error in internal action 'plan_label': " + e);
+        }
     }
 }

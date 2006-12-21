@@ -40,16 +40,16 @@ import jason.asSyntax.Trigger;
   This changes the agent's circumstance. It removes an intention from
   I, E, PI or PA.  (no event is generated)
 
-  @see jason.stdlib.currentIntention
+  @see jason.stdlib.current_intention
   @see jason.stdlib.desire
-  @see jason.stdlib.dropAllDesires
-  @see jason.stdlib.dropDesire
-  @see jason.stdlib.dropAllIntentions
-  @see jason.stdlib.dropGoal
+  @see jason.stdlib.drop_all_desires
+  @see jason.stdlib.drop_desire
+  @see jason.stdlib.drop_all_intentions
+  @see jason.stdlib.drop_goal
   @see jason.stdlib.intend
 
  */
-public class dropIntention extends DefaultInternalAction {
+public class drop_intention extends DefaultInternalAction {
     
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
@@ -59,9 +59,9 @@ public class dropIntention extends DefaultInternalAction {
             dropInt(ts.getC(),l,un);
             return true;
         } catch (ArrayIndexOutOfBoundsException e) {
-            throw new JasonException("The internal action 'dropIntention' has not received one argument.");
+            throw new JasonException("The internal action 'drop_intention' has not received one argument.");
         } catch (Exception e) {
-            throw new JasonException("Error in internal action 'dropIntention': " + e);
+            throw new JasonException("Error in internal action 'drop_intention': " + e);
         }
     }
     

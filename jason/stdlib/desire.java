@@ -35,12 +35,12 @@ import jason.asSyntax.Term;
 import jason.asSyntax.Trigger;
 
 /**
-  @see jason.stdlib.currentIntention
-  @see jason.stdlib.dropAllDesires
-  @see jason.stdlib.dropDesire
-  @see jason.stdlib.dropAllIntentions
-  @see jason.stdlib.dropIntention
-  @see jason.stdlib.dropGoal
+  @see jason.stdlib.current_intention
+  @see jason.stdlib.drop_all_desires
+  @see jason.stdlib.drop_desire
+  @see jason.stdlib.drop_all_intentions
+  @see jason.stdlib.drop_intention
+  @see jason.stdlib.drop_goal
   @see jason.stdlib.intend
 */
 public class desire extends intend {
