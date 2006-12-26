@@ -4,13 +4,13 @@ import jason.asSyntax.Literal;
 import jason.asSyntax.Plan;
 import jason.asSyntax.PlanLibrary;
 import jason.asSyntax.Pred;
-import jason.asSyntax.patterns.goal.BCG;
+import jason.asSyntax.patterns.goal.BC;
 import jason.asSyntax.patterns.goal.BDG;
 import jason.asSyntax.patterns.goal.DG;
 import jason.asSyntax.patterns.goal.EBDG;
 import jason.asSyntax.patterns.goal.MG;
 import jason.asSyntax.patterns.goal.OMC;
-import jason.asSyntax.patterns.goal.RCG;
+import jason.asSyntax.patterns.goal.RC;
 import jason.asSyntax.patterns.goal.SGA;
 import jason.asSyntax.patterns.goal.SMC;
 
@@ -52,9 +52,9 @@ public class DirectiveProcessor {
         addDirective("dg", new DG());
         addDirective("bdg", new BDG());
         addDirective("ebdg", new EBDG());
-        addDirective("bcg", new BCG());
+        addDirective("bc", new BC());
         addDirective("smc", new SMC());
-        addDirective("rcg", new RCG());
+        addDirective("rc", new RC());
         addDirective("omc", new OMC());
         addDirective("mg", new MG());
         addDirective("sga", new SGA());
