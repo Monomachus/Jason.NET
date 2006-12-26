@@ -104,7 +104,7 @@ import jason.asSyntax.Term;
   See the Jason manual for more details about agent communication.
 
   @see jason.stdlib.broadcast
-  @see jason.stdlib.myName
+  @see jason.stdlib.my_name
 
 */
 public class send extends DefaultInternalAction {

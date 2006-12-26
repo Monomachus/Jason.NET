@@ -25,8 +25,8 @@ public class BDG extends DG {
 
                 Literal goal = (Literal)directive.getTerm(0);
     
-                // add -!g : true <- !g.
-                pl.add(Plan.parse("-!"+goal+" <- !"+goal+"."));
+                // add -!g : true <- !!g.
+                pl.add(Plan.parse("-!"+goal+" <- !!"+goal+"."));
                 
                 return true;
             }

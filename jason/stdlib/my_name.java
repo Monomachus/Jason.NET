@@ -25,66 +25,46 @@ package jason.stdlib;
 
 import jason.JasonException;
 import jason.asSemantics.DefaultInternalAction;
-import jason.asSemantics.Message;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
+import jason.asSyntax.Structure;
 import jason.asSyntax.Term;
 
 /**
-  <p>Internal action: <b><code>.broadcast</code></b>.
+  <p>Internal action: <b><code>.my_name</code></b>.
   
-  <p>Description: broadcasts a message to all agents.
+  <p>Description: gets the agent unique identification in the
+  multi-agent system. This identification is given by the runtime
+  infrastructure of the system (centralised, saci, jade, ...).
   
   <p>Parameters:<ul>
   
-  <li>+ arg[0] (atom): the illocutionary force of the message (tell,
-  achieve, ...). This internal action does not work for asks.<br/>
-  
-  <li>+ arg[1] (literal): the content of the message.<br/>
-  
+  <li>+/- arg[0] (variable or atom): if variable, unifies the agent name
+  and the variable; if atom, succeed if the atom is equals to the
+  agent's name.<br/>
+
   </ul>
   
   <p>Example:<ul> 
 
-  <li> <code>.broadcast(tell,value(10))</code>: sends
-  <code>value(10)</code> to all agents.</li>
+  <li> <code>.my_name(N)</code>: unifies <code>N</code> with the
+  agent's name.</li>
 
   </ul>
 
-  @see jason.stdlib.send
-  @see jason.stdlib.my_name
 
-*/
-public class broadcast extends DefaultInternalAction {
+  @see jason.stdlib.send
+  @see jason.stdlib.broadcast
+
+ */
+public class my_name extends DefaultInternalAction {
 
     @Override
 	public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
-		Term ilf = null;
-		Term pcnt = null;
-
 		try {
-			ilf = (Term) args[0].clone();
-			if (!ilf.isGround()) {
-				throw new JasonException("The Ilf Force parameter of the internal action 'broadcast' is not a ground term!");
-			}
-
-			pcnt = (Term)args[1].clone();
+            return un.unifies(args[0], new Structure(ts.getUserAgArch().getAgName()));
 		} catch (ArrayIndexOutOfBoundsException e) {
-			throw new JasonException("The internal action 'broadcast' has not received two arguments");
-		}
-		un.apply(pcnt);
-		if (!pcnt.isGround()) {
-			throw new JasonException("The content of the message '" + pcnt + "' is not ground!");
-		}
-
-		Message m = new Message(ilf.toString(), null, null, pcnt.toString());
-
-		try {
-			ts.getUserAgArch().broadcast(m);
-			return true;
-		} catch (Exception e) {
-			throw new JasonException("Error broadcasting message " + pcnt);
+			throw new JasonException("The internal action 'my_name' has not received one argument");
 		}
 	}
-
 }

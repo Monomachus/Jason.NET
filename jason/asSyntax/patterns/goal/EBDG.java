@@ -59,14 +59,15 @@ public class EBDG implements Directive {
                 pl.add(p);
             }
             
-            // add -!g : p__f(n,g) <- .abolish(p__f(_,g)); !g.
-            pl.add(Plan.parse("-!"+goal+": p__f("+i+","+goal+") <- .abolish(p__f(_,"+goal+")); !"+goal+"."));
 
-            // add -!g : true <- !g.
-            pl.add(Plan.parse("-!"+goal+" <- !"+goal+"."));
+            // add -!g : true <- !!g.
+            pl.add(Plan.parse("-!"+goal+" <- !!"+goal+"."));
 
             // add +g : true <- .abolish(p__f(_,g)); .dropGoal(g,true).
-            pl.add(Plan.parse("+"+goal+" <- .abolish(p__f(_,"+goal+")); .dropGoal("+goal+",true)."));
+            pl.add(Plan.parse("+"+goal+" <- .abolish(p__f(_,"+goal+")); .drop_goal("+goal+",true)."));
+
+            // add -g <- .abolish(p__f(_,g)).
+            pl.add(Plan.parse("-"+goal+" <- .abolish(p__f(_,"+goal+"))."));
             
             return true;
         } catch (Exception e) {

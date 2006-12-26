@@ -35,7 +35,7 @@ public class DG implements Directive {
             }
             
             // add +g : true <- .dropGoal(g,true).
-            pl.add(Plan.parse("+"+goal+" <- .dropGoal("+goal+",true)."));
+            pl.add(Plan.parse("+"+goal+" <- .drop_goal("+goal+",true)."));
             
             return true;
         } catch (Exception e) {

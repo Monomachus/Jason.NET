@@ -31,8 +31,8 @@ public class SMC implements Directive {
             // apply sub directive
             if (sd.process(subDir, innerPlans, bels, pl)) {
 
-                // add +f : true <- .dropGoal(g,false).
-                pl.add(Plan.parse("+"+fail+" <- .dropGoal("+goal+",false)."));
+                // add +f : true <- .drop_goal(g,false).
+                pl.add(Plan.parse("+"+fail+" <- .drop_goal("+goal+",false)."));
                 
                 return true;
             }

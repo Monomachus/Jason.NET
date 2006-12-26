@@ -56,12 +56,15 @@ import jason.asSyntax.Term;
   @see jason.stdlib.send
   @see jason.stdlib.broadcast
 
+  @deprecated use .my_name instead
+
  */
 public class myName extends DefaultInternalAction {
 
     @Override
 	public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
 		try {
+			ts.getLogger().info("use .my_name instead of .myName");
             return un.unifies(args[0], new Structure(ts.getUserAgArch().getAgName()));
 		} catch (ArrayIndexOutOfBoundsException e) {
 			throw new JasonException("The internal action 'myName' has not received one argument");
