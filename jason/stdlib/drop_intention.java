@@ -37,8 +37,17 @@ import jason.asSyntax.Term;
 import jason.asSyntax.Trigger;
 
 /**
-  This changes the agent's circumstance. It removes an intention from
-  I, E, PI or PA.  (no event is generated)
+  <p>Internal action: <b><code>.drop_intention(<i>I</i>)</code></b>.
+  
+  <p>Description: removes the intention <i>I</i> from the set of
+  intention of the agent. No event is produced.
+
+  <p>Example:<ul> 
+
+  <li> <code>.drop_intention(go(1,3))</code>: removes the intention
+  <code>go(1,3)</code> of the agent.
+
+  </ul>
 
   @see jason.stdlib.current_intention
   @see jason.stdlib.desire

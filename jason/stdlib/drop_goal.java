@@ -36,7 +36,30 @@ import jason.asSyntax.Term;
 import jason.asSyntax.Trigger;
 
 /**
-  Drop a goal (see DALT 2006 paper)
+  <p>Internal action:
+  <b><code>.drop_goal(<i>G</i>,<i>R</i>)</code></b>.
+  
+  <p>Description: removes the goal <i>G</i> of the agent. <i>G</i> is
+  a goal if there is a trigerring event <code>+!G</code> in any plan
+  within an intention; just note that intentions can be suspended and
+  appear in E or PA as well. 
+
+  <p>If <i>R</i> is <code>true</code>, the intention pursuing it is
+  updated as if it was successfuly achieved.  If <i>R</i> is
+  <code>false</code>, the intention pursuing it is updated as if it
+  was failed, and an event like <code>-!G</code> is generated.
+
+  <p>Example:<ul> 
+
+  <li> <code>.drop_goal(go(1,3),true)</code>: stops achieving
+  <code>go(1,3)</code> as it was achieved.
+
+  <li> <code>.drop_goal(go(1,3),false)</code>: stops achieving
+  <code>go(1,3)</code> as it was failed.
+
+  </ul>
+
+  (Note: this internal action is prposed in the DALT 2006 paper)
 
   @see jason.stdlib.current_intention
   @see jason.stdlib.desire
@@ -45,6 +68,8 @@ import jason.asSyntax.Trigger;
   @see jason.stdlib.drop_all_intentions
   @see jason.stdlib.drop_intention
   @see jason.stdlib.intend
+
+  @author Jomi
 
  */
 public class drop_goal extends DefaultInternalAction {

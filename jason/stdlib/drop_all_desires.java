@@ -30,10 +30,20 @@ import jason.asSemantics.Unifier;
 import jason.asSyntax.Term;
 
 /**
-  This changes the agent's circumstance by simply emptying the whole set of
-  events (E).
 
+  <p>Internal action: <b><code>.drop_all_desires</code></b>.
+  
+  <p>Description: removes all desires of the agent. No event is
+  produced.
 
+  <p>This changes the agent's circumstance by simply emptying the
+  whole set of events (E).
+
+  <p>Example:<ul> 
+
+  <li> <code>.drop_all_desires</code>.
+
+  </ul>
 
   @see jason.stdlib.current_intention
   @see jason.stdlib.desire

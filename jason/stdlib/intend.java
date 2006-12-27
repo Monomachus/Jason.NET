@@ -38,6 +38,21 @@ import jason.asSyntax.Trigger;
 
 
 /**
+  <p>Internal action: <b><code>.intend(<i>I</i>)</code></b>.
+  
+  <p>Description: checks if <i>I</i> is an intention: <i>I</i> is an
+  intention if there is a trigerring event <code>+!I</code> in any
+  plan within an intention; just note that intentions can be suspended
+  and appear in E or PA as well.
+  
+  <p>Example:<ul> 
+
+  <li> <code>.intend(go(1,3))</code>: succeed if
+  <code>go(1,3)</code> is an intention of the agent.
+
+  </ul>
+
+
   @see jason.stdlib.current_intention
   @see jason.stdlib.desire
   @see jason.stdlib.drop_all_desires
@@ -45,6 +60,9 @@ import jason.asSyntax.Trigger;
   @see jason.stdlib.drop_all_intentions
   @see jason.stdlib.drop_intention
   @see jason.stdlib.drop_goal
+
+  @author Rafael
+
  */
 public class intend extends DefaultInternalAction {
     
@@ -61,11 +79,6 @@ public class intend extends DefaultInternalAction {
         }
     }
     
-    /**
-     * Checks if <i>l</i> is an intention: <i>l</i> is an intention if there
-     * is a trigerring event +!l in any plan within an intention; just note that
-     * intentions can be suspended and appear in E or PA as well.
-     */
     public boolean intends(Circumstance C, Literal l, Unifier un) {
         Trigger g = new Trigger(Trigger.TEAdd, Trigger.TEAchvG, l);
 

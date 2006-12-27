@@ -35,6 +35,19 @@ import jason.asSyntax.Term;
 import jason.asSyntax.Trigger;
 
 /**
+  <p>Internal action: <b><code>.desire(<i>D</i>)</code></b>.
+  
+  <p>Description: checks if <i>D</i> is a desire: <i>D</i> is a desire
+  either if there is an event with <code>+!D</code> as triggering
+  event or it is an intention.
+  
+  <p>Example:<ul> 
+
+  <li> <code>.desire(go(1,3))</code>: succeed if <code>go(1,3)</code>
+  is a desire of the agent.
+
+  </ul>
+
   @see jason.stdlib.current_intention
   @see jason.stdlib.drop_all_desires
   @see jason.stdlib.drop_desire
@@ -42,6 +55,8 @@ import jason.asSyntax.Trigger;
   @see jason.stdlib.drop_intention
   @see jason.stdlib.drop_goal
   @see jason.stdlib.intend
+
+  @author Rafael
 */
 public class desire extends intend {
 
@@ -58,10 +73,6 @@ public class desire extends intend {
         }
     }
     
-    /**
-     * Checks if <i>l</i> is a desire: <i>l</i> is a desire either if there is
-     * an event with +!l as triggering event or it is an Intention.
-     */
     public boolean desires(Circumstance C, Literal l, Unifier un) {
         Trigger teFromL = new Trigger(Trigger.TEAdd, Trigger.TEAchvG, l);
 

@@ -30,8 +30,20 @@ import jason.asSemantics.Unifier;
 import jason.asSyntax.Term;
 
 /**
-  This changes the agent's circumstance by simply emptying the whole set of
-  intentions (I).
+
+  <p>Internal action: <b><code>.drop_all_intentions</code></b>.
+  
+  <p>Description: removes all intentions from the set of intention of
+  the agent. No event is produced.
+
+  <p>This changes the agent's circumstance by simply emptying the
+  whole set of intentions (I).
+
+  <p>Example:<ul> 
+
+  <li> <code>.drop_all_intentions</code>.
+
+  </ul>
 
   @see jason.stdlib.current_intention
   @see jason.stdlib.desire
