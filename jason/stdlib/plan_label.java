@@ -32,6 +32,25 @@ import jason.asSyntax.StringTermImpl;
 import jason.asSyntax.Term;
 
 /**
+  <p>Internal action: <b><code>.plan_label(<i>P</i>,<i>L</i>)</code></b>.
+  
+  <p>Description: unifies in <i>P</i> the plan with label <i>L</i> in
+  the agent's plan library (PL).
+  
+  <p>Parameters:<ul>
+  
+  <li>- arg[0] (string): the string representing the plan in the PL.<br/>
+  
+  <li>+ arg[1] (structure): the label of the plan.<br/>
+  
+  </ul>
+  
+  <p>Example:<ul> 
+
+  <li> <code>.plan_label(P,p1)</code>: unifies in P the plan with
+  label <code>p1</code>.</li>
+
+  </ul>
 
   @see jason.stdlib.add_plan
   @see jason.stdlib.relevant_plans
@@ -40,14 +59,10 @@ import jason.asSyntax.Term;
  */
 public class plan_label extends DefaultInternalAction {
 
-    /**
-     * args[0] = -plan as string,
-     * args[1] = +label as term
-     */
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         try {
-            Term label = (Term)args[1].clone();
+            Term label = args[1];
             un.apply(label);
             Plan p = ts.getAg().getPL().get(label.toString());
             return un.unifies(new StringTermImpl(p.toASString()), args[0]);

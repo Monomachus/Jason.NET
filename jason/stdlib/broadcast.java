@@ -63,12 +63,13 @@ public class broadcast extends DefaultInternalAction {
 		Term pcnt = null;
 
 		try {
-			ilf = (Term) args[0].clone();
-			if (!ilf.isGround()) {
-				throw new JasonException("The Ilf Force parameter of the internal action 'broadcast' is not a ground term!");
+			ilf = args[0];
+            un.apply(ilf);
+			if (!ilf.isAtom()) {
+				throw new JasonException("The Ilf Force parameter of the internal action 'broadcast' is not an atom!");
 			}
 
-			pcnt = (Term)args[1].clone();
+			pcnt = args[1];
 		} catch (ArrayIndexOutOfBoundsException e) {
 			throw new JasonException("The internal action 'broadcast' has not received two arguments");
 		}

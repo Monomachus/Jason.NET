@@ -48,7 +48,7 @@ public class desire extends intend {
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         try {
-            Literal l = Literal.parseLiteral(args[0].toString());
+            Literal l = (Literal)args[0]; //Literal.parseLiteral(args[0].toString());
             un.apply(l);
             return desires(ts.getC(),l,un);
         } catch (ArrayIndexOutOfBoundsException e) {
@@ -65,15 +65,14 @@ public class desire extends intend {
     public boolean desires(Circumstance C, Literal l, Unifier un) {
         Trigger teFromL = new Trigger(Trigger.TEAdd, Trigger.TEAchvG, l);
 
-        // need to check the slected event in this cycle!!! (already removed
-        // from E)
+        // need to check the slected event in this cycle!!! (already
+        // removed from E)
         if (C.getSelectedEvent() != null) {
             Trigger t = C.getSelectedEvent().getTrigger();
             if (C.getSelectedEvent().getIntention() != Intention.EmptyInt) {
                 t = (Trigger) t.clone();
                 C.getSelectedEvent().getIntention().peek().getUnif().apply(t.getLiteral());
             }
-            // logger.log(Level.SEVERE,"Des: "+t+" unif "+teFromL);
             if (un.unifies(t, teFromL)) {
                 return true;
             }
@@ -85,7 +84,6 @@ public class desire extends intend {
                 t = (Trigger) t.clone();
                 ei.getIntention().peek().getUnif().apply(t.getLiteral());
             }
-            // logger.log(Level.SEVERE,"Des: "+t+" unif "+teFromL);
             if (un.unifies(t, teFromL)) {
                 return true;
             }

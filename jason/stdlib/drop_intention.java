@@ -54,7 +54,7 @@ public class drop_intention extends DefaultInternalAction {
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         try {
-            Literal l = Literal.parseLiteral(args[0].toString());
+            Literal l = (Literal)args[0];
             un.apply(l);
             dropInt(ts.getC(),l,un);
             return true;

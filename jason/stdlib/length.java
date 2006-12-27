@@ -40,7 +40,7 @@ import jason.asSyntax.Term;
 
   <p>Parameters:<ul>
   <li>+   arg[0] (string of list): the terms to be sized.<br/>
-  <li>+/- arg[1] (variable or number): the length. 
+  <li>+/- arg[1] (number): the length. 
   </ul>
 
   <p>Examples:<ul>
@@ -58,8 +58,8 @@ public class length extends DefaultInternalAction {
 
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
-        Term l1 = (Term) args[0].clone();
-        Term l2 = (Term) args[1].clone();
+        Term l1 = args[0];
+        Term l2 = args[1];
         un.apply(l1);
         un.apply(l2);
         NumberTerm size = null;

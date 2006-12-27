@@ -11,6 +11,29 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 /**
+  <p>Internal action: <b><code>.date(YY,MM,DD)</code></b>.
+  
+  <p>Description: gets the current date (year, month, and day of the
+  month).
+
+  <p>Parameters:<ul>
+  
+  <li>+/- arg[0] (number): the year.</li/>
+  <li>+/- arg[1] (number): the month (1--12).</li>
+  <li>+/- arg[2] (number): the day (1--31).</li>
+  
+  </ul>
+  
+  <p>Examples:<ul> 
+
+  <li> <code>.date(Y,M,D)</code>: unifies Y with the current year, M
+  with the current month, and D with the current day.</li>
+
+  <li> <code>.date(2007,12,30)</code>: succeed with today is
+  30/12/2007 and fails otherwise.</li>
+
+  </ul>
+
   @see jason.stdlib.time
  */
 public class date extends DefaultInternalAction {

@@ -57,7 +57,7 @@ public class drop_desire extends DefaultInternalAction {
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         try {
-            Literal l = Literal.parseLiteral(args[0].toString());
+            Literal l = (Literal)args[0]; //Literal.parseLiteral(args[0].toString());
             un.apply(l);
             
             Event e = new Event(new Trigger(Trigger.TEAdd, Trigger.TEAchvG, l),Intention.EmptyInt);

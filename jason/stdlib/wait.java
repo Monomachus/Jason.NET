@@ -38,20 +38,31 @@ import jason.asSyntax.Trigger;
 import java.util.logging.Level;
 
 /**
+  <p>Internal action: <b><code>.wait(<i>E</i>,<i>T</i>)</code></b>.
+  
+  <p>Description: suspend the intention for some time <i>T</i> (in
+  miliseconds) or until some event <i>E</i> happens. The events are
+  strings in the AgentSpeak syntax, e.g. <code>+bel(33)</code>,
+  <code>+!go</code>.
+  
+  <p>Examples:<ul>
+  <li> <code>.wait(1000)</code>: suspend the intention for 1 second.
+
+  <li> <code>.wait("+b(1)")</code>: suspend the intention until the
+  belief <code>b(1)</code> is added in the belief base.
+
+  <li> <code>.wait("+!g", 2000)</code>: suspend the intention until
+  the goal <code>g</code> is triggered or 2 seconds have passed.
+
+  </ul>
+
   @see jason.stdlib.at
+
+  @author Jomi
+
  */
 public class wait extends DefaultInternalAction {
 
-    /**
-     * args[0] is either a number or a string, if number it is the time (in ms),
-     * if string it is the trigger event to be waited. this second use also
-     * receive the timeout (in ms) as parameter.
-     * 
-     * <p>E.g.: .wait(1000) // waits 1 second <br/>
-     * .wait("+!t(50)") // waits the event<br/>
-     * +!t(50) .wait("+!t(50)", 2000) // waits the event +!t(50) for 2 seconds<br/>
-     * 
-     */
     @Override
     public Object execute(final TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         long timeout = -1;
@@ -59,7 +70,7 @@ public class wait extends DefaultInternalAction {
         try {
             if (args[0].isNumeric()) {
                 // time in mile seconds
-                NumberTerm time = (NumberTerm) args[0].clone();
+                NumberTerm time = (NumberTerm)args[0];
                 un.apply(time);
                 timeout = (long) time.solve();
                 // Thread.sleep((long) time.solve());
@@ -70,7 +81,7 @@ public class wait extends DefaultInternalAction {
                 te = Trigger.parseTrigger(st.getString());
 
                 if (args.length == 2) {
-                    NumberTerm tot = (NumberTerm) args[1].clone();
+                    NumberTerm tot = (NumberTerm) args[1];
                     un.apply(tot);
                     timeout = (long) tot.solve();
                 }

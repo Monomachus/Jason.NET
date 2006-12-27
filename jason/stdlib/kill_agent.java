@@ -66,7 +66,7 @@ public class kill_agent extends DefaultInternalAction {
 	public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
 		
 		try {
-            Term name = (Term)args[0].clone();
+            Term name = args[0];
             un.apply(name);
             return ts.getUserAgArch().getArchInfraTier().getRuntimeServices().killAgent(name.toString());
 		} catch (IndexOutOfBoundsException e) {

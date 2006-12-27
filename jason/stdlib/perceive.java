@@ -29,6 +29,21 @@ import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.Term;
 
+/**
+  <p>Internal action: <b><code>.perceive</code></b>.
+  
+  <p>Description: explicitly do perception. It is normally used when
+  the number of cycles for perception was changed.
+
+  <p>Example:<ul> 
+
+  <li> <code>.perceive</code>.</li>
+
+  </ul>
+
+  @author Rafael
+
+*/
 public class perceive extends DefaultInternalAction {
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {

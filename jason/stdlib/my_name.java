@@ -39,9 +39,9 @@ import jason.asSyntax.Term;
   
   <p>Parameters:<ul>
   
-  <li>+/- arg[0] (variable or atom): if variable, unifies the agent name
-  and the variable; if atom, succeed if the atom is equals to the
-  agent's name.<br/>
+  <li>+/- arg[0] (atom): if variable, unifies the agent name and the
+  variable; if atom, succeed if the atom is equals to the agent's
+  name.<br/>
 
   </ul>
   

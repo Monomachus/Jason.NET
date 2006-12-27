@@ -43,7 +43,7 @@ import java.util.Iterator;
   
   <li>+ arg[0] (literal): the belief to be counted.<br/>
   
-  <li>+/- arg[1] (number or var): the number of beliefs.<br/>
+  <li>+/- arg[1] (number): the number of beliefs.<br/>
   
   </ul>
   
@@ -65,10 +65,7 @@ public class count extends DefaultInternalAction {
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         try {
-            Literal bel = Literal.parseLiteral(args[0].toString());
-            if (bel == null) {
-                throw new JasonException("The first parameter ('" + args[1] + "') of the internal action 'count' is not a literal!");
-            }
+            Literal bel = (Literal)args[0]; //Literal.parseLiteral(args[0].toString());
             un.apply(bel);
             int n = 0;
             // find all bel in belief base and build a list with them

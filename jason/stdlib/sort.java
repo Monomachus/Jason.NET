@@ -45,7 +45,7 @@ import java.util.Collections;
 
   <p>Parameters:<ul>
   <li>+   arg[0] (list): the list the be sorted.<br/>
-  <li>+/- arg[1] (list or variable): the sorted list. 
+  <li>+/- arg[1] (list): the sorted list. 
   </ul>
 
   <p>Examples:<ul>
@@ -67,21 +67,17 @@ import java.util.Collections;
 */
 public class sort extends DefaultInternalAction {
     
-	/**
-	 * args[0] = the unsorted list
-	 * args[1] = the sorted list
-	 */
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         try {
-            ListTerm l1 = (ListTerm) args[0].clone();
-            ListTerm l2 = (ListTerm) args[1].clone();
+            ListTerm l1 = (ListTerm) args[0];
+            ListTerm l2 = (ListTerm) args[1];
             Collections.sort(l1);
             return un.unifies(l1, l2);
         } catch (ArrayIndexOutOfBoundsException e) {
             throw new JasonException("The internal action 'sort' has not received two arguments");
         } catch (Exception e) {
-            throw new JasonException("Error in internal action 'sorts': " + e);
+            throw new JasonException("Error in internal action 'sort': " + e);
         }    
     }
 }

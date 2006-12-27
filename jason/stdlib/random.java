@@ -9,13 +9,28 @@ import jason.asSyntax.Term;
 
 import java.util.Random;
 
+/**
+  <p>Internal action: <b><code>.random(<i>N</i>)</code></b>.
+  
+  <p>Description: unifies in <i>N</i> a random number between 0 and 1.
+  
+  <p>Parameters:<ul>
+  
+  <li>- arg[0] (number): the variable that receives the random value<br/>
+  
+  </ul>
+  
+  <p>Example:<ul> 
+
+  <li><code>.random(X)</code>.</li>
+
+  </ul>
+
+*/
 public class random extends DefaultInternalAction {
     
     private Random random = new Random();    
 	
-    /**
-	 * args[0] is the variable that unifies the random value (from 0..1)
-	 */
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         try {

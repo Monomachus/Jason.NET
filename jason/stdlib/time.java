@@ -11,11 +11,33 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 /**
+
+  <p>Internal action: <b><code>.time(HH,MM,SS)</code></b>.
+  
+  <p>Description: gets the current time (hour, minute, and seconds).
+
+  <p>Parameters:<ul>
+  
+  <li>+/- arg[0] (number): the hour (0--23).</li>
+  <li>+/- arg[1] (number): the minutes (0--59).</li>
+  <li>+/- arg[2] (number): the seconds (0--59).</li>
+  
+  </ul>
+  
+  <p>Examples:<ul> 
+
+  <li> <code>.time(H,M,S)</code>: unifies H with the current hour, M
+  with the current minutes, and S with the current seconds.</li>
+
+  <li> <code>.time(15,_,_)</code>: succeed if now is 3pm.</li>
+
+  </ul>
+
   @see jason.stdlib.date
+  
  */
 public class time extends DefaultInternalAction {
 
-    /** time(HH,MM,SS) */
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         try {

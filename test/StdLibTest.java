@@ -209,6 +209,10 @@ public class StdLibTest extends TestCase {
 
     }
 
+    public static void main(String[] a) {
+        new StdLibTest().testConcat();
+    }
+
     public void testConcat() {
         ListTerm l1 = ListTermImpl.parseList("[a,b,c]");
         ListTerm l2 = ListTermImpl.parseList("[d,e,f]");
@@ -218,13 +222,17 @@ public class StdLibTest extends TestCase {
         Unifier u = new Unifier();
 
         try {
-            assertTrue((Boolean)new jason.stdlib.concat().execute(null, u, new Term[] { (Term) l1, (Term) l2, X }));
+            assertTrue((Boolean)new jason.stdlib.concat().execute(null, u, new Term[] { l1, l2, X }));
         } catch (Exception e) {
             e.printStackTrace();
         }
         // System.out.println("u="+u);
         assertEquals(((ListTerm) u.get("X")).size(), 6);
         assertEquals(((ListTerm) u.get("X")), l3);
+
+        l1 = ListTermImpl.parseList("[a,b,c]");
+        l2 = ListTermImpl.parseList("[d,e,f]");
+        l3 = ListTermImpl.parseList("[a,b,c,d,e,f]");
 
         try {
             assertTrue((Boolean)new jason.stdlib.concat().execute(null, new Unifier(), new Term[] { l1, l2, l3 }));

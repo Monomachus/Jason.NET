@@ -48,8 +48,8 @@ import java.util.Iterator;
   
   <li>+ arg[1] (structure): the annotation.<br/>
 
-  <li>+/- arg[2] (variable, literal, or list): this argument unifies
-  with the result of the addition.<br/>
+  <li>+/- arg[2] (literal, or list): this argument unifies with the
+  result of the addition.<br/>
 
   </ul>
   

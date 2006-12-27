@@ -39,18 +39,37 @@ import jason.asSyntax.Trigger;
 import java.util.Iterator;
 
 /**
+  <p>Internal action: <b><code>.relevant_plans</code></b>.
+  
+  <p>Description: gets all relevant plans for some trigger event. This
+  internal action is used, for example, to answer askHow.
+
+  <p>Parameters:<ul>
+  
+  <li>+ arg[0] (string): the string representing the trigger event.</li>
+  
+  <li>- arg[1] (list): the list of strings with the code of relevant
+  plans.</li>
+  
+  </ul>
+  
+  <p>Example:<ul> 
+
+  <li> <code>.relevant_plans("+!go",L)</code>: unifies in L all plans
+  in the agent's plan library that are relevant for events like
+  <code>+!go</code>.</li>
+
+  </ul>
+
   @see jason.stdlib.add_plan
   @see jason.stdlib.plan_label
   @see jason.stdlib.remove_plan
+  
+  @author Jomi
+
  */
 public class relevant_plans extends DefaultInternalAction {
 
-	/**
-	 * args[0] = trigger event (as a StringTerm)
-	 * args[1] = variable or list (Term) that will be unified with a ListTerm
-	 *           that contains all plans (as StringTerms)
-	 *           (the splans'sources in this list are empty)
-	 */
     @Override
 	public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
 		try {

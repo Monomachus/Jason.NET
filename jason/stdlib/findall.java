@@ -50,7 +50,7 @@ import java.util.Iterator;
   
   <li>+ arg[1] (litetal): the literal in belief base.<br/>
 
-  <li>+/- arg[2] (list or variable): the resulting list.<br/>
+  <li>+/- arg[2] (list): the resulting list.<br/>
   
   </ul>
   
@@ -72,15 +72,11 @@ import java.util.Iterator;
 */
 public class findall extends DefaultInternalAction {
 
-    /** .findall(Var, a(Var), List) */
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         try {
-            Term var = (Term) args[0].clone();
-            Literal bel = Literal.parseLiteral(args[1].toString());
-            if (bel == null) {
-                throw new JasonException("The second parameter ('" + args[1] + "') of the internal action 'findAll' is not a literal!");
-            }
+            Term var = args[0];
+            Literal bel = (Literal)args[1];
             un.apply(bel);
             // find all bel in belief base and build a list with them
             ListTerm all = new ListTermImpl();

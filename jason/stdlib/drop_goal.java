@@ -52,9 +52,9 @@ public class drop_goal extends DefaultInternalAction {
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         try {
-            Literal l = (Literal)args[0].clone();
+            Literal l = (Literal)args[0];
             un.apply(l);
-            Term success = (Term)args[1].clone();
+            Term success = (Term)args[1];
             un.apply(success);
             drop(ts, l, success.equals(Literal.LTrue), un);
             return true;

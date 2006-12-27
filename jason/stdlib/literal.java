@@ -40,9 +40,9 @@ public class literal extends DefaultInternalAction {
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         try {
-            Term t = (Term) args[0].clone();
+            Term t = args[0];
             un.apply(t);
-            return t.isStructure() && !t.isList();
+            return t.isLiteral();
         } catch (ArrayIndexOutOfBoundsException e) {
             throw new JasonException("The internal action 'literal' has not received one argument");
         } catch (Exception e) {

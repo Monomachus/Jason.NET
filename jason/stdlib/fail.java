@@ -28,6 +28,19 @@ import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.Term;
 
+/**
+
+  <p>Internal action: <b><code>.fail</code></b>.
+  
+  <p>Description: fails the intention. 
+
+  <p>Example:<ul> 
+
+  <li> <code>.fail</code>.</li>
+
+  </ul>
+  
+ */
 public class fail extends DefaultInternalAction{
 
     @Override

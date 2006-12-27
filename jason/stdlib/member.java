@@ -11,19 +11,37 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
-  List member implementation
+
+  <p>Internal action: <b><code>.member(<i>T</i>,<i>L</i>)</code></b>.
   
+  <p>Description: test if some term <i>T</i> is in a list <i>L</i>. If
+  <i>T</i> is a free variable, this internal action backtracks all
+  possible values for <i>T</i>.
+
+  <p>Parameters:<ul>
+  
+  <li>+/- arg[0] (term): the term to be checked.</li>
+  <li>+ arg[1] (list): the list where the term should be in.</li>
+  
+  </ul>
+  
+  <p>Examples:<ul> 
+
+  <li> <code>.member(c,[a,b,c])</code>: succeed.</li>
+  <li> <code>.member(3,[a,b,c])</code>: fail.</li>
+  <li> <code>.member(X,[a,b,c])</code>: unifies X with any value of the list.</li>
+
+  </ul>
+
   @see jason.stdlib.concat
   @see jason.stdlib.length
   @see jason.stdlib.sort
-
 
   @author jomi
 
 */
 public class member extends DefaultInternalAction {
     
-    /** .member(X,[a,b,c]), return [{X=a}, {X=b}, {X=c}] */
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         try {

@@ -72,8 +72,8 @@ public class at extends DefaultInternalAction {
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         try {
-	        StringTerm time  = (StringTerm)args[0].clone();
-	        StringTerm sevent = (StringTerm)args[1].clone();
+	        StringTerm time  = (StringTerm)args[0];
+	        StringTerm sevent = (StringTerm)args[1];
 	        un.apply(time);
             un.apply(sevent);
 			Trigger te = Trigger.parseTrigger(sevent.getString());

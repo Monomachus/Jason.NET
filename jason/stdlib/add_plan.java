@@ -30,6 +30,7 @@ import jason.asSemantics.Unifier;
 import jason.asSyntax.ListTerm;
 import jason.asSyntax.StringTerm;
 import jason.asSyntax.Structure;
+import jason.asSyntax.Atom;
 import jason.asSyntax.Term;
 import jason.asSyntax.DefaultTerm;
 
@@ -81,9 +82,9 @@ public class add_plan extends DefaultInternalAction {
         try {
             Term plans = DefaultTerm.parse(args[0].toString());
 
-            Structure source = new Structure("self");
+            Structure source = new Atom("self");
             if (args.length > 1) {
-                source = (Structure) args[1].clone();
+                source = (Structure) args[1];
                 un.apply(source);
             }
 

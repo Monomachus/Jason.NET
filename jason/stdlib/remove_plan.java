@@ -35,24 +35,51 @@ import jason.asSyntax.Atom;
 import jason.asSyntax.Term;
 
 /**
+  <p>Internal action: <b><code>.remove_plan</code></b>.
+  
+  <p>Description: remove plans from the agent's plan library (PL).
+
+  <p>Parameters:<ul>
+  
+  <li>+ arg[0] (structure or list of structures): the label of the
+  plan to be removed. If this parameter is a list of labels, all plans
+  of this list are removed.</li>
+  
+  <li><i>+ arg[1]</i> (structure -- optional): the source of the
+  plan to be removed. The default value if <code>self</code>.</li>
+  
+  </ul>
+  
+  <p>Examples:<ul> 
+
+  <li> <code>.remove_plan(l1)</code>: removes the plan identified by
+  label <code>l1[source(self)]</code>.</li>
+
+  <li> <code>.remove_plan(l1,bob)</code>: removes the plan identified
+  by label <code>l1[source(bob)]</code>. Note that a plan with a
+  source like that was probably added in the PL by tellHow
+  messages.</li>
+
+  <li> <code>.remove_plan([l1,l2,l3])</code>: removes plans identified
+  by labels <code>l1[source(self)], l2[source(self)]</code>, and
+  <code>l3[source(self)]</code>.</li>
+
+  <li> <code>.remove_plan([l1,l2,l3],bib)</code>: removes plans identified
+  by labels <code>l1[source(bob)], l2[source(bob)]</code>, and
+  <code>l3[source(bob)]</code>.</li>
+
+  </ul>
+
+
   @see jason.stdlib.add_plan
   @see jason.stdlib.plan_label
   @see jason.stdlib.relevant_plans
+
+  @author Jomi
+
  */
 public class remove_plan extends DefaultInternalAction {
 
-	/**
-	 * args[0] = list of plans (a ListTerm) where each element is a plan label 
-	 *                 that represent a plan to be removed
-	 *           or only one plan's label
-	 * args[1] = source (the name of the agent, for instance),
-	 *           if not informed, source is "self"
-	 *           
-	 * Example: .remove_lan(l1);
-	 *          .remove_plan(X); // X is unified with a plan's label 
-	 *          .remove_plan([l1,l2,l3]);
-	 *          .remove_plan(l1,ag1); // remove the plan l1 sent (tellHow) by agent ag1 
-	 */
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         try {

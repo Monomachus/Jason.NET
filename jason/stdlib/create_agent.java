@@ -64,11 +64,11 @@ public class create_agent extends DefaultInternalAction {
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
 
         try {
-            Term name = (Term) args[0].clone();
+            Term name = args[0];
             un.apply(name);
 
-            StringTerm source = (StringTerm) args[1].clone();
-            un.apply((Term) source);
+            StringTerm source = (StringTerm)args[1];
+            un.apply(source);
 
             File fSource = new File(source.getString());
             if (!fSource.exists()) {

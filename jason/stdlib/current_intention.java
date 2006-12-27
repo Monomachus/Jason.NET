@@ -30,6 +30,42 @@ import jason.asSemantics.Unifier;
 import jason.asSyntax.Term;
 
 /**
+  <p>Internal action: <b><code>.current_intention</code></b>.
+  
+  <p>Description: gets a description of the current intention. It is
+  useful for plans that needs to inpect the current intention. The
+  description of the intention has the following form:<br><br>
+
+  <code>intention(<i>id</i>,<i>stack of intended means</i>)</code><br><br>
+
+  where each intended means has the form:<br><br>
+
+  <code>im(<i>plan label</i>,<i>list of body literals</i>)</code><br><br>
+
+  For example:<br><br>
+
+  <blockquote>
+  <code>intention(1,<br>
+  [<br>
+  im("l__6[source(self)]",[".current_intention(I)"]),<br>
+  im("l__5[source(self)]",[".fail"]),<br>
+  im("l__4[source(self)]",["!g5(X)",".print(endg4)"]),<br>
+  ...<br>
+  ])</code>
+  </blockquote>
+
+  <p>Parameters:<ul>
+  
+  <li>- arg[0] (structure): the variable that unifies with the intention description.</li>
+  
+  </ul>
+  
+  <p>Example:<ul> 
+
+  <li> <code>.current_intention(X)</code>: unifies X with the current intention description.</li>
+
+  </ul>
+
   @see jason.stdlib.desire
   @see jason.stdlib.drop_all_desires
   @see jason.stdlib.drop_desire

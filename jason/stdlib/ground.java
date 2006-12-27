@@ -39,7 +39,7 @@ public class ground extends DefaultInternalAction {
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         try {
-            Term t = (Term) args[0].clone();
+            Term t = args[0];
             un.apply(t);
             return t.isGround();
         } catch (ArrayIndexOutOfBoundsException e) {
