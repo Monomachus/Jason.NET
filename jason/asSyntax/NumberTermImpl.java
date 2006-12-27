@@ -29,49 +29,45 @@ import java.util.logging.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-/** implements a term that represents a number */
-public class NumberTermImpl extends DefaultTerm implements NumberTerm {
+/** Immutable class that implements a term that represents a number */
+public final class NumberTermImpl extends DefaultTerm implements NumberTerm {
 
 	private static final long serialVersionUID = 1L;
 
 	static private Logger logger = Logger.getLogger(NumberTermImpl.class.getName());
 
-	private double fValue;
+	private final double fValue;
 	
 	public NumberTermImpl() {
 		super();
+		fValue = 0;
 	}
 	
-	public NumberTermImpl(String fs) {
-		setValue(fs);
+	public NumberTermImpl(String sn) {
+		double t = 0;
+		try {
+			t = Double.parseDouble(sn);
+		} catch (Exception e) {
+			logger.log(Level.SEVERE,"Error setting number term value from "+sn,e);
+		}
+		fValue = t;
 	}
 	
 	public NumberTermImpl(double vl) {
-		setValue(vl);
+		fValue = vl;
 	}
 	
 	public NumberTermImpl(NumberTermImpl t) {
-		setValue(t.solve());
+		fValue = t.solve();
 	}
 
-	public void setValue(String s) {
-		try {
-			setValue(Double.parseDouble(s));
-		} catch (Exception e) {
-			logger.log(Level.SEVERE,"Error setting number term value from "+s,e);
-		}
-	}
-    
-	public void setValue(double d) {
-		fValue = d;
-	}
-	
 	public double solve() {
 		return fValue;
 	}
 
 	public Object clone() {
-		return new NumberTermImpl(solve());
+		//return new NumberTermImpl(solve());
+		return this;
 	}
 	
 	@Override

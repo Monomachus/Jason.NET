@@ -27,7 +27,7 @@ public class MG implements Directive {
             if (directive.getTermsSize() > 1) {
                 subDir = (Literal)directive.getTerm(1);
             } else {
-                subDir = Literal.parseLiteral("bcg("+goal+")");
+                subDir = Literal.parseLiteral("bc("+goal+")");
             }
             Directive sd = DirectiveProcessor.getDirective(subDir.getFunctor());
 

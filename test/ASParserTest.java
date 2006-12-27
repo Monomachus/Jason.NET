@@ -108,7 +108,7 @@ public class ASParserTest extends TestCase {
     public void testDirectives() {
         String 
         source =  " b(10). ";
-        source += " { begin bcg(at(X,Y), ebdg(at(X,Y))) } \n";
+        source += " { begin bc(at(X,Y), ebdg(at(X,Y))) } \n";
         source += "    +!at(X,Y) : b(X) <- go(X). ";
         source += "    +!at(X,Y) : not b(X) <- go(3). ";
         source += " { end }";
@@ -118,7 +118,7 @@ public class ASParserTest extends TestCase {
             as2j parser = new as2j(new StringReader(source));
             Agent a = new Agent();
             parser.agent(a);
-            assertTrue(a.getPL().getPlans().size() == 7);
+            assertEquals(a.getPL().getPlans().size(), 7);
 
             source =  " { begin omc(at(X,Y), no_battery, no_beer) } \n";
             source += "    +!at(X,Y) : b(X) <- go(X). ";

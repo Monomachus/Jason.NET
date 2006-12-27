@@ -1,9 +1,10 @@
 package jason.asSyntax.patterns.goal;
 
-import jason.asSyntax.*;
+import jason.asSyntax.BodyLiteral;
 import jason.asSyntax.Literal;
 import jason.asSyntax.LogExpr;
 import jason.asSyntax.LogicalFormula;
+import jason.asSyntax.NumberTermImpl;
 import jason.asSyntax.Plan;
 import jason.asSyntax.PlanLibrary;
 import jason.asSyntax.Pred;
@@ -11,7 +12,6 @@ import jason.asSyntax.BodyLiteral.BodyType;
 import jason.asSyntax.LogExpr.LogicalOp;
 import jason.asSyntax.directives.Directive;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;

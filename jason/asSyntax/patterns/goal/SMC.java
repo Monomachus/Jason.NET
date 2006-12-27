@@ -24,7 +24,7 @@ public class SMC implements Directive {
         try {
             Literal goal = (Literal)directive.getTerm(0);
             Literal fail = (Literal)directive.getTerm(1);
-            Literal subDir = Literal.parseLiteral("bcg("+goal+")");
+            Literal subDir = Literal.parseLiteral("bc("+goal+")");
             logger.fine("parameters="+goal+","+fail+","+subDir);
             Directive sd = DirectiveProcessor.getDirective(subDir.getFunctor());
 

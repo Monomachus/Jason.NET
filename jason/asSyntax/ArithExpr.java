@@ -33,12 +33,12 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
- * Represents ans solve arithmetic expressions like "10 < 30".
+ * Represents and solve arithmetic expressions like "10 < 30".
  */
-public class ArithExpr extends NumberTermImpl {
+public class ArithExpr extends DefaultTerm implements NumberTerm {
 
 	private static final long serialVersionUID = 1L;
-
+	
 	public enum ArithmeticOp {
         none {
             double eval(double x, double y) {
@@ -120,6 +120,8 @@ public class ArithExpr extends NumberTermImpl {
 
     private ArithmeticOp  op     = ArithmeticOp.none;
 
+    private NumberTerm fValue = null; // value, when evaluated	
+
     static private Logger logger = Logger.getLogger(ArithExpr.class.getName());
 
     private ArithExpr() {
@@ -153,20 +155,21 @@ public class ArithExpr extends NumberTermImpl {
         return lhs == null;
     }
     
-    /** Set the value of this expression by calling solve(). After this method execution,
-     *  the object behaviour is like a NumberTerm.
+    /** 
+     *  Set the value of this expression by calling solve(). After this method execution,
+     *  the object behaviour is like a contant number.
      */
     public void evaluate() {
-        super.setValue(solve());
+    	fValue = new NumberTermImpl(solve());
         lhs = null;
         rhs = null;
+        super.resetHashCodeCache();
     }
     
     /** make a hard copy of the terms */
     public Object clone() {
-        // do not call constructor with term parameter!
         if (isEvaluated()) {
-            return super.clone();
+            return fValue;
         } else {
             ArithExpr t = new ArithExpr();
             if (lhs != null) {
@@ -187,7 +190,7 @@ public class ArithExpr extends NumberTermImpl {
         if (t == null) 
             return false;
         if (isEvaluated()) {
-            return super.equals(t);
+            return fValue.equals(t);
         }
         if (t instanceof ArithExpr) {
             ArithExpr eprt = (ArithExpr) t;
@@ -214,9 +217,19 @@ public class ArithExpr extends NumberTermImpl {
     }
 
     @Override
-    public int hashCode() {
+    public int compareTo(Term o) {
+        try {
+            NumberTerm st = (NumberTerm)o;
+            if (solve() > st.solve()) return 1;
+            if (solve() < st.solve()) return -1;
+        } catch (Exception e) {}
+        return 0;    
+    }
+
+    @Override
+    protected int calcHashCode() {
         if (isEvaluated())
-            return super.hashCode();
+            return fValue.hashCode();
         
         final int PRIME = 31;
         int code = PRIME * op.hashCode();
@@ -226,6 +239,7 @@ public class ArithExpr extends NumberTermImpl {
             code = PRIME * code + rhs.hashCode();
         return code;
     }
+    
     
     /** gets the Operation of this Expression */
     public ArithmeticOp getOp() {
@@ -242,6 +256,11 @@ public class ArithExpr extends NumberTermImpl {
         return rhs;
     }
 
+	@Override
+	public boolean isNumeric() {
+		return true;
+	}
+
     @Override
     public boolean isArithExpr() {
         return !isEvaluated();
@@ -256,11 +275,10 @@ public class ArithExpr extends NumberTermImpl {
         return isEvaluated() || (lhs.isGround() && rhs.isGround());
     }
 
-    @Override
     public double solve() {
         if (isEvaluated()) {
             // this expr already has a value
-            return super.solve();
+            return fValue.solve();
         }
         double l = lhs.solve();
         if (rhs == null && op == ArithmeticOp.minus) {
@@ -276,7 +294,7 @@ public class ArithExpr extends NumberTermImpl {
     @Override
     public String toString() {
         if (isEvaluated()) {
-            return super.toString();
+            return fValue.toString();
         } else {
             if (rhs == null) {
                 return "(" + op + lhs + ")";
@@ -287,10 +305,9 @@ public class ArithExpr extends NumberTermImpl {
     }
 
     /** get as XML */
-    @Override
     public Element getAsDOM(Document document) {
         if (isEvaluated()) {
-            return super.getAsDOM(document);
+            return fValue.getAsDOM(document);
         } else {
             Element u = (Element) document.createElement("expression");
             u.setAttribute("type", "arithmetic");

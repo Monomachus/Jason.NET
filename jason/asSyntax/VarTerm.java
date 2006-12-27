@@ -759,11 +759,6 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
     // StringTerm interface implementation
     // -----------------------
 
-    public void setString(String s) {
-        if (value != null && getValue().isString())
-            ((StringTerm) getValue()).setString(s);
-    }
-
     public String getString() {
         if (value != null && getValue().isString())
             return ((StringTerm) getValue()).getString();

@@ -25,7 +25,6 @@ package jason.asSyntax;
 
 
 public interface StringTerm extends Term {
-	public void setString(String s);
 	public String getString();
 	public int length();
 }

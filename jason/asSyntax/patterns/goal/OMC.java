@@ -25,7 +25,7 @@ public class OMC implements Directive {
             Literal goal = (Literal)directive.getTerm(0);
             Literal fail = (Literal)directive.getTerm(1);
             Literal motivation = (Literal)directive.getTerm(2);
-            Literal subDir = Literal.parseLiteral("bcg("+goal+")");
+            Literal subDir = Literal.parseLiteral("bc("+goal+")");
             Directive sd = DirectiveProcessor.getDirective(subDir.getFunctor());
 
             // apply sub directive

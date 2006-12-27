@@ -18,7 +18,7 @@ import java.util.logging.Logger;
  */
 public class BC implements Directive {
 
-    static Logger logger = Logger.getLogger(BCG.class.getName());
+    static Logger logger = Logger.getLogger(BC.class.getName());
     
     public boolean process(Pred directive, List<Plan> innerPlans, List<Literal> bels, PlanLibrary pl) {
         try {

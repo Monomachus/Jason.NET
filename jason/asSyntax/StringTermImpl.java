@@ -32,39 +32,39 @@ import java.util.logging.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-public class StringTermImpl extends DefaultTerm implements StringTerm {
+/** 
+ * Immutable class fot string terms.
+ * 
+ * @author jomi
+ */
+public final class StringTermImpl extends DefaultTerm implements StringTerm {
 
 	private static final long serialVersionUID = 1L;
     
-    private String value = null;
+    private final String fValue;
 
 	static private Logger logger = Logger.getLogger(StringTermImpl.class.getName());
 
 	public StringTermImpl() {
 		super();
+		fValue = null;
 	}
 	
 	public StringTermImpl(String fs) {
-		setString(fs);
+		fValue = fs;
 	}
 	
 	public StringTermImpl(StringTermImpl t) {
-		setString(t.getString());
+		fValue = t.getString();
 	}
 
-	public void setString(String s) {
-	    //if (s.startsWith("\"")) {
-		//	s = s.substring(1,s.length()-1);
-		//}
-		value = s;
-	}
-	
 	public String getString() {
-		return value;
+		return fValue;
 	}
 	
 	public Object clone() {
-		return new StringTermImpl(getString());
+		//return new StringTermImpl(getString());
+		return this;
 	}
 	
 	public static StringTerm parseString(String sTerm) {
@@ -83,7 +83,7 @@ public class StringTermImpl extends DefaultTerm implements StringTerm {
 	}
 
  	public int length() {
-		return getString().length();
+		return fValue.length();
 	}
 
     @Override
@@ -92,18 +92,18 @@ public class StringTermImpl extends DefaultTerm implements StringTerm {
 
         if (t != null && t instanceof StringTerm) {
             StringTerm st = (StringTerm)t;
-            return this.getString().equals(st.getString());
+            return fValue.equals(st.getString());
         }
         return false;
     }
 
     @Override
     protected int calcHashCode() {
-        return getString().hashCode();
+        return fValue.hashCode();
     }
 	
 	public String toString() {
-		return "\""+getString()+"\"";
+		return "\""+fValue+"\"";
 	}
 
     /** get as XML */

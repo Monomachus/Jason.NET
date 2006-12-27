@@ -18,13 +18,13 @@ import java.util.logging.Logger;
  */
 public class RC implements Directive {
 
-    static Logger logger = Logger.getLogger(RCG.class.getName());
+    static Logger logger = Logger.getLogger(RC.class.getName());
     
     public boolean process(Pred directive, List<Plan> innerPlans, List<Literal> bels, PlanLibrary pl) {
         try {
             Literal goal = (Literal)directive.getTerm(0);
             Literal motivation = (Literal)directive.getTerm(1);
-            Literal subDir = Literal.parseLiteral("bcg("+goal+")");
+            Literal subDir = Literal.parseLiteral("bc("+goal+")");
             logger.fine("parameters="+goal+","+motivation+","+subDir);
             Directive sd = DirectiveProcessor.getDirective(subDir.getFunctor());
 
