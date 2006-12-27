@@ -35,13 +35,11 @@ public class UnnamedVar extends VarTerm {
 	private static int varCont = 1;
 
     public UnnamedVar() {
-        super();
-        setFunctor("_" + (varCont++));
+        super("_" + (varCont++));
     }
 
     private UnnamedVar(String name) {
-        super();
-        setFunctor(name);
+        super(name);
     }
 
     public Object clone() {

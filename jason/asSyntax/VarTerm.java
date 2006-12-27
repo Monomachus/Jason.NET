@@ -49,17 +49,13 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
 
 	static private Logger logger = Logger.getLogger(VarTerm.class.getName());
 
-    private Term          value  = null;
-
-    public VarTerm() {
-        super();
-    }
+    private Term value  = null;
 
     public VarTerm(String s) {
+        super(s);
         if (s != null && Character.isLowerCase(s.charAt(0))) {
             logger.warning("Are you sure you want to create a VarTerm that begins with lowercase (" + s + ")? Should it be a Term instead?");
         }
-        setFunctor(s);
     }
 
     public static VarTerm parseVar(String sVar) {
@@ -77,8 +73,7 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
             return (Term) value.clone();
         } else {
             // do not call constructor with term parameter!
-            VarTerm t = new VarTerm();
-            t.setFunctor(super.getFunctor());
+            VarTerm t = new VarTerm(super.getFunctor());
             if (getAnnots() != null && !getAnnots().isEmpty()) {
                 t.setAnnots((ListTerm) getAnnots().clone());
             }
@@ -303,6 +298,11 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
     @Override
     public boolean isStructure() {
         return value != null && getValue().isStructure();
+    }
+
+    @Override
+    public boolean isAtom() {
+        return value != null && getValue().isAtom();
     }
 
     @Override

@@ -1,13 +1,6 @@
 package jason.asSyntax.patterns.goal;
 
-import jason.asSyntax.Literal;
-import jason.asSyntax.LogExpr;
-import jason.asSyntax.LogicalFormula;
-import jason.asSyntax.Plan;
-import jason.asSyntax.PlanLibrary;
-import jason.asSyntax.Pred;
-import jason.asSyntax.StringTerm;
-import jason.asSyntax.Trigger;
+import jason.asSyntax.*;
 import jason.asSyntax.directives.Directive;
 
 import java.util.List;
@@ -27,7 +20,7 @@ public class SGA implements Directive {
         try {
             Trigger trigger = Trigger.parseTrigger(((StringTerm)directive.getTerm(0)).getString());
             LogicalFormula context = LogExpr.parseExpr(((StringTerm)directive.getTerm(1)).getString());
-            Literal goal = (Literal)directive.getTerm(2);
+            Term goal = directive.getTerm(2);
 
             // add t : not f__l(_) & c <- !f__g(g).
             pl.add(Plan.parse(trigger+" : not f__l(_) & " +context +" <- !f__g("+goal+")."));

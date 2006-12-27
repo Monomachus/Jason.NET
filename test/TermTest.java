@@ -7,6 +7,7 @@ import jason.asSyntax.Literal;
 import jason.asSyntax.NumberTermImpl;
 import jason.asSyntax.Pred;
 import jason.asSyntax.Structure;
+import jason.asSyntax.Atom;
 import jason.asSyntax.Term;
 import jason.asSyntax.DefaultTerm;
 import jason.asSyntax.Trigger;
@@ -28,22 +29,22 @@ public class TermTest extends TestCase {
         Structure t1, t2, t3;
 		t1 = new Structure("pos");
 		t2 = new Structure(t1);
-		t3 = new Structure(); t3.setFunctor("pos");
+		t3 = new Structure("pos");
 		assertTrue(t1.equals(t2));
 		assertTrue(t1.equals(t3));
 		
-		t1.addTerm(new Structure("a"));
+		t1.addTerm(new Atom("a"));
 		assertFalse(t1.equals(t2));
 		
-		t2.addTerm(new Structure("a"));
+		t2.addTerm(new Atom("a"));
 		assertTrue(t1.equals(t2));
         assertTrue(t2.equals(t1));
         assertEquals(t1.hashCode(),t2.hashCode());
 
         Structure targ1 = new Structure("b");
-		targ1.addTerm(new Structure("1"));
+		targ1.addTerm(new Atom("1"));
         Structure targ2 = new Structure("b");
-		targ2.addTerm(new Structure("2"));
+		targ2.addTerm(new Atom("2"));
 
 		t1.addTerm(targ1);
 		assertFalse(t1.equals(t2));
@@ -395,6 +396,11 @@ public class TermTest extends TestCase {
         assertTrue(l1.compareTo(l2) == 1);
         assertTrue(l1.compareTo(l3) == 1);
         assertTrue(l2.compareTo(l3) == -1);
+
+        assertTrue(l2.compareTo(new Atom("g")) > 0);
+        assertTrue(new Atom("g").compareTo(l2) < 0);
+        assertTrue(new Atom("g").compareTo(new Atom("g")) == 0);
+
         
         ListTerm l = ListTermImpl.parseList("[~a(3),a(3),a(10)[30],a(10)[5]]");
         Collections.sort(l);
@@ -402,11 +408,15 @@ public class TermTest extends TestCase {
         
         ListTerm lt1 = ListTermImpl.parseList("[3,10]");
         ListTerm lt2 = ListTermImpl.parseList("[3,4]");
+        ListTerm lt3 = ListTermImpl.parseList("[1,1,1]");
         assertTrue(lt1.compareTo(lt2) > 0);
+        assertTrue(lt1.compareTo(lt3) < 0);
+
+        assertTrue(lt1.compareTo(p1) > 0);
         
-        l = ListTermImpl.parseList("[b,c,10,g,casa,f(10),[3,4],5,[3,10],f(4)]");
+        l = ListTermImpl.parseList("[b,[1,1,1],c,10,g,casa,f(10),5,[3,10],f(4),[3,4]]");
         Collections.sort(l);
-        assertEquals(l.toString(), "[5,10,b,c,casa,g,[3,4],[3,10],f(4),f(10)]");
+        assertEquals("[5,10,b,c,casa,g,f(4),f(10),[3,4],[3,10],[1,1,1]]",l.toString());
     }
     
     public void testUnify4() {
@@ -416,4 +426,8 @@ public class TermTest extends TestCase {
         u.unifies(new VarTerm("X"),new NumberTermImpl(0));
         assertFalse(a1.equals(a2));   
     }
+
+	public static void main(String[] a) {
+		new TermTest().testCompare();
+	}
 }

@@ -1,9 +1,6 @@
 package jason.asSyntax.patterns.goal;
 
-import jason.asSyntax.Literal;
-import jason.asSyntax.Plan;
-import jason.asSyntax.PlanLibrary;
-import jason.asSyntax.Pred;
+import jason.asSyntax.*;
 
 import java.util.List;
 import java.util.logging.Level;
@@ -23,7 +20,7 @@ public class BDG extends DG {
             // apply DG in the inner plans
             if (super.process(directive, innerPlans, bels, pl)) {
 
-                Literal goal = (Literal)directive.getTerm(0);
+                Term goal = directive.getTerm(0);
     
                 // add -!g : true <- !!g.
                 pl.add(Plan.parse("-!"+goal+" <- !!"+goal+"."));

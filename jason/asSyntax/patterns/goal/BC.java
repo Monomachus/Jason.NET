@@ -1,9 +1,6 @@
 package jason.asSyntax.patterns.goal;
 
-import jason.asSyntax.Literal;
-import jason.asSyntax.Plan;
-import jason.asSyntax.PlanLibrary;
-import jason.asSyntax.Pred;
+import jason.asSyntax.*;
 import jason.asSyntax.directives.Directive;
 import jason.asSyntax.directives.DirectiveProcessor;
 
@@ -22,10 +19,10 @@ public class BC implements Directive {
     
     public boolean process(Pred directive, List<Plan> innerPlans, List<Literal> bels, PlanLibrary pl) {
         try {
-            Literal goal = (Literal)directive.getTerm(0);
+            Term goal = directive.getTerm(0);
             Literal subDir;
             if (directive.getTermsSize() > 1) {
-                subDir = (Literal)directive.getTerm(1);
+                subDir = Literal.parseLiteral(directive.getTerm(1).toString());
             } else {
                 subDir = Literal.parseLiteral("bdg("+goal+")");
             }

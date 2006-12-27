@@ -323,9 +323,9 @@ BodyLiteral body_formula() :  { Literal A; Token k;
 
 
 /* Annotated Formulae */
-Pred pred() :       { Token K; Pred p = new Pred(); Term t; List l; ListTerm lt;}
+Pred pred() :       { Token K; Pred p; Term t; List l; ListTerm lt;}
 {
-  K=<ATOM>          { p.setFunctor(K.image); } 
+  K=<ATOM>          { p = new Pred(K.image); } 
   [
       "(" l = terms() 
       ")"           { p.addTerms(l); }
@@ -349,7 +349,10 @@ List terms() : { List listTerms = new ArrayList(); Term v; }
 
 Term term() :       { Term u; Object o; }
 {
-  ( u=literal()     
+  ( u=literal()     { if (u.isAtom() && !((Literal)u).negated()) {
+                         return new Atom(((Literal)u).getFunctor());
+                      }
+                    }
   | u=list()        
   | o=arithm_expr() { return (NumberTerm)o; }
   | u=string()      

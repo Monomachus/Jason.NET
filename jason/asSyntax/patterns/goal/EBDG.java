@@ -1,13 +1,6 @@
 package jason.asSyntax.patterns.goal;
 
-import jason.asSyntax.BodyLiteral;
-import jason.asSyntax.Literal;
-import jason.asSyntax.LogExpr;
-import jason.asSyntax.LogicalFormula;
-import jason.asSyntax.NumberTermImpl;
-import jason.asSyntax.Plan;
-import jason.asSyntax.PlanLibrary;
-import jason.asSyntax.Pred;
+import jason.asSyntax.*;
 import jason.asSyntax.BodyLiteral.BodyType;
 import jason.asSyntax.LogExpr.LogicalOp;
 import jason.asSyntax.directives.Directive;
@@ -27,7 +20,7 @@ public class EBDG implements Directive {
     
     public boolean process(Pred directive, List<Plan> innerPlans, List<Literal> bels, PlanLibrary pl) {
         try {
-            Literal goal = (Literal)directive.getTerm(0);
+            Literal goal = Literal.parseLiteral(directive.getTerm(0).toString());
 
             // add +!g : g <- true.
             pl.add(Plan.parse("+!"+goal+" : " +goal+"."));
@@ -37,7 +30,7 @@ public class EBDG implements Directive {
             for (Plan p: innerPlans) {
                 i++;
                 // create p__f(i,g)
-                Literal pi = new Literal(Literal.LPos, "p__f");
+                Literal pi = new Literal("p__f");
 				pi.addTerm(new NumberTermImpl(i));
                 pi.addTerm(goal);
                 
@@ -63,7 +56,7 @@ public class EBDG implements Directive {
             // add -!g : true <- !!g.
             pl.add(Plan.parse("-!"+goal+" <- !!"+goal+"."));
 
-            // add +g : true <- .abolish(p__f(_,g)); .dropGoal(g,true).
+            // add +g : true <- .abolish(p__f(_,g)); .drop_goal(g,true).
             pl.add(Plan.parse("+"+goal+" <- .abolish(p__f(_,"+goal+")); .drop_goal("+goal+",true)."));
 
             // add -g <- .abolish(p__f(_,g)).

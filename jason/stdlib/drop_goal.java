@@ -126,10 +126,10 @@ public class drop_goal extends DefaultInternalAction {
                 }
                 if (failEvent != null) {
                     ts.getC().addEvent(failEvent);
-                    ts.getLogger().warning(".dropGoal is generating goal deletion event " + failEvent.getTrigger());
+                    ts.getLogger().warning(".drop_goal is generating goal deletion event " + failEvent.getTrigger());
                     return 2;
                 } else {
-                    ts.getLogger().warning(".dropGoal is removing intention\n" + i);
+                    ts.getLogger().warning(".drop_goal is removing intention\n" + i);
                     return 3;
                 }
             }

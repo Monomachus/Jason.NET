@@ -378,8 +378,7 @@ public class JDBCPersistentBB extends DefaultBeliefBase {
     protected Literal resultSetToLiteral(ResultSet rs, PredicateIndicator pi) throws SQLException {
         ResultSetMetaData meta = belsDB.get(pi);
         boolean isJasonTable = isCreatedByJason(pi);
-        Literal ldb = new Literal();
-        ldb.setFunctor(pi.getFunctor());
+        Literal ldb = new Literal(pi.getFunctor());
         int end = meta.getColumnCount();
         if (isJasonTable)
             end = end - 2;

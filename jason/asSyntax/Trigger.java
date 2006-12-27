@@ -43,7 +43,6 @@ public class Trigger implements Cloneable {
     public static final boolean   TEDel      = true;
 	
 	static private Logger logger = Logger.getLogger(Trigger.class.getName());
-    
   
 	boolean trigType = TEAdd;
 	byte goal = TEBel;
@@ -67,7 +66,7 @@ public class Trigger implements Cloneable {
 
 	public void setTrigType(boolean t) {
 		trigType = t;
-                piCache = null;
+        piCache = null;
 	}
 
 	public boolean sameType(Trigger e) {

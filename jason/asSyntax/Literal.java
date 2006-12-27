@@ -53,12 +53,15 @@ public class Literal extends Pred implements LogicalFormula {
 
 	boolean type = LPos;
 
-	public Literal() {
+
+	/** creates a positive literal */
+	public Literal(String functor) {
+		super(functor);
 	}
 
 	/** if pos == true, the literal is positive, otherwise it is negative */
 	public Literal(boolean pos, String functor) {
-		setFunctor(functor);
+		super(functor);
 		type = pos;
 	}
 
@@ -72,6 +75,7 @@ public class Literal extends Pred implements LogicalFormula {
 		super((Pred) l);
 		type = l.type;
 	}
+
 
 	public static Literal parseLiteral(String sLiteral) {
 		as2j parser = new as2j(new StringReader(sLiteral));
@@ -292,10 +296,19 @@ public class Literal extends Pred implements LogicalFormula {
 	/** creates a literal from a list [<functor>, <list of terms>, <list of annots>] */
 	public static Literal newFromListOfTerms(ListTerm lt) throws JasonException {
 		try {
-			Iterator i = lt.iterator();
-			Literal l = (Literal)((Literal)i.next()).clone();
+			Iterator<Term> i = lt.iterator();
+			
+			Term tfunctor = i.next();
+
+			boolean pos = Literal.LPos;
+			if (tfunctor.isLiteral() && ((Literal)tfunctor).negated()) {
+				pos = Literal.LNeg;
+			}
+
+			Literal l = new Literal(pos,((Structure)tfunctor).getFunctor());
+
 			if (i.hasNext()) {
-				l.addTerms((ListTerm)((ListTerm)i.next()).clone());
+				l.setTerms((ListTerm)((ListTerm)i.next()).clone());
 			}
 			if (i.hasNext()) {
 				l.setAnnots((ListTerm)((ListTerm)i.next()).clone());

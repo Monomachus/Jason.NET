@@ -56,12 +56,12 @@ public class println extends DefaultInternalAction {
     	    }
         } catch (Exception e) {}
 		
-	for (int i = 0; i < args.length; i++) {
+        for (int i = 0; i < args.length; i++) {
 			if (args[i].isString()) {
 				StringTerm st = (StringTerm)args[i];
 				sout.append(st.getString());
 			} else {
-				Term t = (Term)args[i].clone();
+				Term t = args[i];
 				un.apply(t);
 				if (! t.isVar()) {
 					sout.append(t);
@@ -69,14 +69,14 @@ public class println extends DefaultInternalAction {
 					sout.append(t+"<no-value>");
 				}
 			}
-	}
-
+        }
+        
         if (ts != null && ts.getSettings().logLevel() != Level.WARNING) {
             ts.getLogger().info(sout.toString());
         } else {
             System.out.print(sout.toString() + getNewLine());
         }
-
+        
         return true;
     }
 }

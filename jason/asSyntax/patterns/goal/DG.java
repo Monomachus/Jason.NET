@@ -1,10 +1,6 @@
 package jason.asSyntax.patterns.goal;
 
-import jason.asSyntax.BodyLiteral;
-import jason.asSyntax.Literal;
-import jason.asSyntax.Plan;
-import jason.asSyntax.PlanLibrary;
-import jason.asSyntax.Pred;
+import jason.asSyntax.*;
 import jason.asSyntax.BodyLiteral.BodyType;
 import jason.asSyntax.directives.Directive;
 
@@ -23,7 +19,7 @@ public class DG implements Directive {
 
     public boolean process(Pred directive, List<Plan> innerPlans, List<Literal> bels, PlanLibrary pl) {
         try {
-            Literal goal = (Literal)directive.getTerm(0);
+            Literal goal = Literal.parseLiteral(directive.getTerm(0).toString());
             // add +!g : g <- true.
             pl.add(Plan.parse("+!"+goal+" : " +goal+"."));
             

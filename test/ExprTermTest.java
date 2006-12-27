@@ -95,6 +95,10 @@ public class ExprTermTest extends TestCase {
         assertEquals(t1.toString(), "p(3)");
     }
 
+	public static void main(String[] a) {
+		new ExprTermTest().testLiteralBuilder();
+	}
+
     public void testLiteralBuilder() {
         try {
             Literal l = Literal.parseLiteral("~p(t1,t2)[a1,a2]");

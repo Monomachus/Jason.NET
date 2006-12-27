@@ -72,7 +72,7 @@ public class add_annot extends DefaultInternalAction {
     @Override
 	public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
 		try {
-			Term result = addAnnotToList(un, (Term)args[0].clone(), args[1]);
+			Term result = addAnnotToList(un, args[0], args[1]);
 			return un.unifies(result,args[2]);
 		} catch (ArrayIndexOutOfBoundsException e) {
 			throw new JasonException("The internal action 'add_annot' requires three arguments.");
@@ -100,7 +100,7 @@ public class add_annot extends DefaultInternalAction {
 			try {
 				// if it can be parsed as a literal, OK to add annot
 				Literal result = Literal.parseLiteral(l.toString());
-				result.addAnnot( (Term)annot.clone());
+				result.addAnnot(annot);
 				return result;
 			} catch (Exception e) {
 				// no problem, the content is not a pred (is a number,

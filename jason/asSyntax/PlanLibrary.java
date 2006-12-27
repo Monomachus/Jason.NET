@@ -169,7 +169,7 @@ public class PlanLibrary implements Iterable<Plan> {
 	 * Remove a plan represented by the label <i>pLabel</i>.
 	 * In case the plan has many sources, only the plan's source is removed. 
 	 */
-	public boolean removePlan(Pred pLabel, Structure source) {
+	public boolean removePlan(Structure pLabel, Structure source) {
 		// find the plan
 		Plan p = get(pLabel.getFunctor());
 		if (p != null) {

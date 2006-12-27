@@ -41,7 +41,7 @@ import java.util.Collections;
   terms. Among different types of terms, the following order is
   used:<br>
 
-  numbers &lt; atoms &lt; lists &lt; structures
+  numbers &lt; atoms &lt; structures &lt; lists 
 
   <p>Parameters:<ul>
   <li>+   arg[0] (list): the list the be sorted.<br/>
@@ -56,7 +56,7 @@ import java.util.Collections;
   <li>
   <code>.sort([b,c,10,g,casa,f(10),[3,4],5,[3,10],f(4)],X)</code>:
   <code>X</code> unifies with
-  <code>[5,10,b,c,casa,g,[3,4],[3,10],f(4),f(10)]</code>.
+  <code>[5,10,b,c,casa,g,f(4),f(10),[3,4],[3,10]]</code>.
 
   </ul>
 

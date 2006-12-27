@@ -57,7 +57,7 @@ public class ListTermImpl extends Structure implements ListTerm {
 	static private Logger logger = Logger.getLogger(ListTermImpl.class.getName());
 	
 	public ListTermImpl() {
-		super();
+		super((String)null);
 	}
 
     public static ListTerm parseList(String sList) {
@@ -72,7 +72,6 @@ public class ListTermImpl extends Structure implements ListTerm {
 	
 	/** make a hard copy of the terms */
 	public Object clone() {
-		// do not call constructor with term parameter!
 		ListTermImpl t = new ListTermImpl();
 		if (term != null) {
 			t.term = (Term)this.term.clone();

@@ -46,9 +46,6 @@ public class Pred extends Structure {
 
     static private Logger logger = Logger.getLogger(Pred.class.getName());
 
-    public Pred() {
-    }
-
     public Pred(String ps) {
         super(ps);
     }
@@ -76,6 +73,11 @@ public class Pred extends Structure {
     public boolean isPred() {
         return true;
     }
+
+	@Override
+	public boolean isAtom() {
+		return super.isAtom() && !hasAnnot();
+	}
     
     @Override
     public boolean isGround() {
@@ -125,8 +127,7 @@ public class Pred extends Structure {
     }
 
     public void clearAnnots() {
-        if (annots != null)
-            annots = null;
+		annots = null;
     }
 
     public ListTerm getAnnots() {

@@ -118,9 +118,9 @@ public class send extends DefaultInternalAction {
         Term pcnt = null;
 		// check parameters
         try {
-            to   = (Term)args[0].clone();
-            ilf  = (Term)args[1].clone();
-            pcnt = (Term)args[2].clone();
+            to   = args[0];
+            ilf  = args[1];
+            pcnt = args[2];
 	        
             un.apply(to);
             
@@ -152,7 +152,7 @@ public class send extends DefaultInternalAction {
 
         // tell with 4 args is a reply to
         if (m.isTell() && args.length > 3) {
-            Term mid = (Term)args[3].clone();
+            Term mid = args[3];
             if (mid.isVar()) {
             	un.apply(mid);
             }
@@ -192,7 +192,7 @@ public class send extends DefaultInternalAction {
             
             if (lastSendWasSynAsk && args.length == 5) {
                 // get the timout
-                NumberTerm tto = (NumberTerm)args[4].clone();
+                NumberTerm tto = (NumberTerm)args[4];
                 un.apply(tto);
                 new CheckTimeout((long)tto.solve(), m.getMsgId(), ts.getC()).start(); 
             }

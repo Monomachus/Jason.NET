@@ -1,9 +1,6 @@
 package jason.asSyntax.patterns.goal;
 
-import jason.asSyntax.Literal;
-import jason.asSyntax.Plan;
-import jason.asSyntax.PlanLibrary;
-import jason.asSyntax.Pred;
+import jason.asSyntax.*;
 import jason.asSyntax.directives.Directive;
 import jason.asSyntax.directives.DirectiveProcessor;
 
@@ -22,9 +19,9 @@ public class OMC implements Directive {
     
     public boolean process(Pred directive, List<Plan> innerPlans, List<Literal> bels, PlanLibrary pl) {
         try {
-            Literal goal = (Literal)directive.getTerm(0);
-            Literal fail = (Literal)directive.getTerm(1);
-            Literal motivation = (Literal)directive.getTerm(2);
+            Term goal = directive.getTerm(0);
+            Term fail = directive.getTerm(1);
+            Term motivation = directive.getTerm(2);
             Literal subDir = Literal.parseLiteral("bc("+goal+")");
             Directive sd = DirectiveProcessor.getDirective(subDir.getFunctor());
 

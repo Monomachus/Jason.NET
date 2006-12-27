@@ -31,6 +31,7 @@ import jason.asSemantics.Unifier;
 import jason.asSyntax.ListTerm;
 import jason.asSyntax.Pred;
 import jason.asSyntax.Structure;
+import jason.asSyntax.Atom;
 import jason.asSyntax.Term;
 
 /**
@@ -55,12 +56,12 @@ public class remove_plan extends DefaultInternalAction {
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         try {
-            Term label = (Term)args[0].clone();
+            Term label = args[0];
         	un.apply(label);
 
-            Structure source = new Structure("self");
+            Structure source = new Atom("self");
         	if (args.length > 1) {
-        		source = (Structure)args[1].clone();
+				source = (Structure)args[1];
         		un.apply(source);
         	}
         	
@@ -68,11 +69,11 @@ public class remove_plan extends DefaultInternalAction {
         		boolean r = true;
         		ListTerm lt = (ListTerm)args[0];
                 for (Term t: lt) {
-        			r = r && ts.getAg().getPL().removePlan((Pred)t, source);
+        			r = r && ts.getAg().getPL().removePlan((Structure)t, source);
         		}
         		return r;
         	} else { // args[0] is a plan's label
-        		return ts.getAg().getPL().removePlan((Pred)label, source);
+        		return ts.getAg().getPL().removePlan((Structure)label, source);
         	}
         } catch (ArrayIndexOutOfBoundsException e) {
             throw new JasonException("The internal action 'remove_plan' has not received the plan's label as argument.");

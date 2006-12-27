@@ -43,23 +43,23 @@ public class Structure extends DefaultTerm {
 
 	private static final long serialVersionUID = 1L;
 
-	private String functor = null;
-    private List<Term> terms;
+	private final String functor; // immutable field
+    private List<Term> terms = null;
 
     static private Logger logger = Logger.getLogger(Structure.class.getName());
     
-    public Structure() {
-    }
-
     public Structure(String functor) {
-        if (functor != null && Character.isUpperCase(functor.charAt(0))) {
-            logger.warning("Are you sure you want to create a structure that begins with uppercase ("+functor+")? Should it be a VarTerm instead?");
+        //if (functor != null && Character.isUpperCase(functor.charAt(0))) {
+        //    logger.warning("Are you sure you want to create a structure that begins with uppercase ("+functor+")? Should it be a VarTerm instead?");
+        //}
+        if (functor != null && functor.charAt(0) == '~') {
+            logger.warning("A functor should not start with ~ ("+functor+")!");
         }
-        setFunctor(functor);
+        this.functor = functor;
     }
 
     public Structure(Structure t) {
-        setFunctor(t.getFunctor());
+        functor = t.getFunctor();
         setTerms(t.getDeepCopyOfTerms());
     }
 
@@ -73,12 +73,6 @@ public class Structure extends DefaultTerm {
         }
     }
     
-    public void setFunctor(String fs) {
-        functor = fs;
-        predicateIndicatorCache = null;
-        hashCodeCache = null;
-    }
-
     public String getFunctor() {
         return functor;
     }
@@ -159,31 +153,46 @@ public class Structure extends DefaultTerm {
             return super.compareTo(t);
         }
 
+		// this is a list and the other not
+		if (isList() && !t.isList()) 
+			return 1;
+
+		// this is not a list and the other is
+		if (!isList() && t.isList()) 
+			return -1;
+
+		// both are lists, check the size
+		if (isList() && t.isList()) {
+			ListTerm l1 = (ListTerm)this;
+			ListTerm l2 = (ListTerm)t;
+			if (l1.size() > l2.size()) 
+				return 1;
+			if (l2.size() > l1.size())
+				return -1;
+		}
+
+		// both are list with same size,
+		// or none are list
+
         Structure tAsStruct = (Structure)t;
+
+        if (getTermsSize() < tAsStruct.getTermsSize())
+            return -1;
+        else if (getTermsSize() > tAsStruct.getTermsSize())
+            return 1;
+
         int c;
         if (getFunctor() != null && tAsStruct.getFunctor() != null) {
             c = getFunctor().compareTo(tAsStruct.getFunctor());
             if (c != 0)
                 return c;
         }
-        List<Term> tatt = tAsStruct.getTerms();
-        if (getTerms() == null &&  tatt == null)
-            return 0;
-        if (getTerms() == null)
-            return -1;
-        if (tatt == null)
-            return 1;
 
         for (int i=0; i<getTermsSize() && i<tAsStruct.getTermsSize(); i++) {
             c = getTerm(i).compareTo(tAsStruct.getTerm(i));
             if (c != 0)
                 return c;
         }
-
-        if (getTerms().size() < tatt.size())
-            return -1;
-        else if (getTerms().size() > tatt.size())
-            return 1;
 
         return 0;
     }
