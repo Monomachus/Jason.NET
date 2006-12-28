@@ -2,6 +2,8 @@ package test;
 
 import jason.asSemantics.Agent;
 import jason.asSemantics.Unifier;
+import jason.asSyntax.Atom;
+import jason.asSyntax.DefaultTerm;
 import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Literal;
 import jason.asSyntax.LogExpr;
@@ -10,7 +12,6 @@ import jason.asSyntax.Pred;
 import jason.asSyntax.PredicateIndicator;
 import jason.asSyntax.Structure;
 import jason.asSyntax.Term;
-import jason.asSyntax.DefaultTerm;
 import jason.asSyntax.VarTerm;
 import jason.bb.BeliefBase;
 import jason.bb.DefaultBeliefBase;
@@ -37,8 +38,8 @@ public class BeliefBaseTest extends TestCase {
 		assertFalse(bb.add(new Literal(true, new Pred("pos"))));
         assertEquals(bb.size(),1);
 
-		l2 = new Literal(true, new Pred("pos"));
-		l2.addAnnot(new Structure("a"));
+		l2 = new Literal("pos");
+		l2.addAnnot(new Atom("a"));
         //System.out.println(l1.hashCode()+"/"+l2.hashCode());
         //System.out.println(bb+"-"+ bb.contains(l2));
         assertTrue(bb.contains(l2) != null);
@@ -61,18 +62,18 @@ public class BeliefBaseTest extends TestCase {
 
 		// same as above, must not insert
 		l3 = new Literal(true, new Pred("pos"));
-		l3.addSource(new Structure("ag1"));
+		l3.addSource(new Atom("ag1"));
 		assertFalse(bb.add(l3));
 		
 		l4 = new Literal(true, new Pred("pos"));
-		l4.addTerm(new Structure("1"));
-		l4.addTerm(new Structure("2"));
+		l4.addTerm(new Atom("1"));
+		l4.addTerm(new Atom("2"));
 		l4.addAnnot(BeliefBase.TPercept);
 		assertTrue(bb.add(l4));
 
 		l4 = new Literal(true, new Pred("pos"));
-		l4.addTerm(new Structure("1"));
-		l4.addTerm(new Structure("2"));
+		l4.addTerm(new Atom("1"));
+		l4.addTerm(new Atom("2"));
 		l4.addAnnot(BeliefBase.TPercept);
 		assertFalse(bb.add(l4));
 		assertEquals(bb.size(),2);

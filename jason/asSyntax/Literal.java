@@ -46,8 +46,8 @@ public class Literal extends Pred implements LogicalFormula {
 
 	public static final boolean LPos   = true;
     public static final boolean LNeg   = false;
-    public static final Literal LTrue  = new Literal(LPos, new Pred("true"));
-    public static final Literal LFalse = new Literal(LPos, new Pred("false"));
+    public static final Literal LTrue  = new Atom("true");
+    public static final Literal LFalse = new Atom("false");
 
     static private Logger logger = Logger.getLogger(Literal.class.getName());
 
@@ -250,7 +250,7 @@ public class Literal extends Pred implements LogicalFormula {
     }        
 
 	public Object clone() {
-        Literal c = new Literal(type, (Pred)this);
+        Literal c = new Literal(this);
         c.predicateIndicatorCache = this.predicateIndicatorCache;
         c.hashCodeCache = this.hashCodeCache;
         return c;

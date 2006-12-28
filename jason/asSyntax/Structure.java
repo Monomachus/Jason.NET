@@ -52,9 +52,9 @@ public class Structure extends DefaultTerm {
         //if (functor != null && Character.isUpperCase(functor.charAt(0))) {
         //    logger.warning("Are you sure you want to create a structure that begins with uppercase ("+functor+")? Should it be a VarTerm instead?");
         //}
-        if (functor != null && functor.charAt(0) == '~') {
-            logger.warning("A functor should not start with ~ ("+functor+")!");
-        }
+        //if (functor != null && functor.charAt(0) == '~') {
+        //    logger.warning("A functor should not start with ~ ("+functor+")!");
+        //}
         this.functor = functor;
     }
 

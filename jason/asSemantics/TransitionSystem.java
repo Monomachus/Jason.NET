@@ -25,15 +25,15 @@ package jason.asSemantics;
 
 import jason.JasonException;
 import jason.architecture.AgArch;
+import jason.asSyntax.Atom;
 import jason.asSyntax.BodyLiteral;
+import jason.asSyntax.DefaultTerm;
 import jason.asSyntax.Literal;
 import jason.asSyntax.LogicalFormula;
 import jason.asSyntax.Plan;
 import jason.asSyntax.PlanLibrary;
 import jason.asSyntax.Pred;
-import jason.asSyntax.Structure;
 import jason.asSyntax.Term;
-import jason.asSyntax.DefaultTerm;
 import jason.asSyntax.Trigger;
 import jason.asSyntax.BodyLiteral.BodyType;
 import jason.bb.BeliefBase;
@@ -177,11 +177,11 @@ public class TransitionSystem {
             } else if (conf.ag.socAcc(m)) {
 
                 // generate an event
-                Literal received = new Literal(Literal.LPos, "kqml_received");
-                received.addTerm(new Structure(m.getSender()));
-                received.addTerm(new Structure(m.getIlForce()));
+                Literal received = new Literal("kqml_received");
+                received.addTerm(new Atom(m.getSender()));
+                received.addTerm(new Atom(m.getIlForce()));
                 received.addTerm(content);
-                received.addTerm(new Structure(m.getMsgId()));
+                received.addTerm(new Atom(m.getMsgId()));
 
                 updateEvents(new Event(new Trigger(Trigger.TEAdd, Trigger.TEAchvG, received), Intention.EmptyInt));
             }
