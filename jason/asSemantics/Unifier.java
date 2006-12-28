@@ -134,9 +134,11 @@ public class Unifier implements Cloneable {
         }
 
         // identical variables or constants
+        /*
         if (t1g.equals(t2g)) {
             return true;
         }
+		*/
         
         // both are vars
         if (t1g.isVar() && t2g.isVar()) {
@@ -211,13 +213,32 @@ public class Unifier implements Cloneable {
         // both terms are not vars
         
         // if any of the terms is not a structure (is a number or a
-        // string), they must be equal and returned true in a previous
-        // test
+        // string), they must be equal
         if (!t1g.isStructure() || !t2g.isStructure()) {
-            return false;
+        	//return false;
+        	return t1g.equals(t2g);
         }
 
-        // terms are atoms or structures
+        // terms are structures
+
+        // if both are literal, they must have the same negated
+        if (t1g.isLiteral() && t2g.isLiteral() && ((Literal)t1g).negated() != ((Literal)t2g).negated()) {
+        	return false;
+        }
+        	
+        // if one term is literal and the other not, the literal should not be negated
+        if (t1g.isLiteral() && !t2g.isLiteral() && ((Literal)t1g).negated()) {
+        	return false;
+        }
+        if (t2g.isLiteral() && !t1g.isLiteral() && ((Literal)t2g).negated()) {
+        	return false;
+        }
+        
+        // if the first term is a predicate and the second not, the first should not have annots 
+        if (t1g.isPred() && !t2g.isPred() && ((Pred)t1g).hasAnnot()) {
+        	return false;
+        }
+        
         Structure t1s = (Structure)t1g;
         Structure t2s = (Structure)t2g;
         
@@ -293,10 +314,11 @@ public class Unifier implements Cloneable {
 
     // ----- Pred
 
+    /**
+     * unification with annotation:
+     * terms unify and annotations of np1 are subset of annotations of np2.
+     */
     public boolean unifies(Pred np1, Pred np2) {
-        // unification with annotation:
-        // terms unify and annotations are subset
-
         // test sub set annots
         if (!np1.isVar() && !np2.isVar() && !np1.hasSubsetAnnot(np2, this)) {
             return false;
@@ -311,7 +333,7 @@ public class Unifier implements Cloneable {
         // unify as Term
         boolean ok = unifies((Term) np1, (Term) np2);
 
-        // if np1 is a var that unified, clear its annots
+        // if np1 is a var that was unified, clear its annots
         if (ok && np1.isVar() && np1.hasAnnot()) {
             ((Pred) function.get((VarTerm) np1)).setAnnots(null);
         }
@@ -324,7 +346,6 @@ public class Unifier implements Cloneable {
     // ----- Literal
 
     public boolean unifies(Literal l1, Literal l2) {
-
         // if l1 and l2 are vars with values, compare using their values
         Term l1vl = get(l1);
         if (l1vl != null && l1vl.isLiteral())
@@ -333,10 +354,6 @@ public class Unifier implements Cloneable {
         if (l2vl != null && l2vl.isLiteral())
             l2 = (Literal) l2vl;
 
-        if (!l1.isVar() && !l2.isVar() && l1.negated() != l2.negated()) {
-            return false;
-        }
-        //System.out.println(l1+"="+l2);
         return unifies((Pred) l1, (Pred) l2);
     }
 

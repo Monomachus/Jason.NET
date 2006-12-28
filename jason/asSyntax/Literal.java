@@ -46,8 +46,8 @@ public class Literal extends Pred implements LogicalFormula {
 
 	public static final boolean LPos   = true;
     public static final boolean LNeg   = false;
-    public static final Literal LTrue  = new Atom("true");
-    public static final Literal LFalse = new Atom("false");
+    public static final Literal LTrue  = new Literal("true");
+    public static final Literal LFalse = new Literal("false");
 
     static private Logger logger = Logger.getLogger(Literal.class.getName());
 
@@ -96,6 +96,11 @@ public class Literal extends Pred implements LogicalFormula {
 		return true;
 	}
 
+	@Override
+	public boolean isAtom() {
+		return super.isAtom() && !negated();
+	}
+	
 	public boolean negated() {
 		return (type == LNeg);
 	}
@@ -227,8 +232,8 @@ public class Literal extends Pred implements LogicalFormula {
         if (o instanceof Literal) {
 			final Literal l = (Literal) o;
 			return type == l.type && hashCode() == l.hashCode() && super.equals(l);
-		} else if (o instanceof Pred || o instanceof Term) {
-			return super.equals(o);
+		} else if (o instanceof Structure) {
+			return !negated() && super.equals(o);
 		}
         return false;
 	}

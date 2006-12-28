@@ -66,9 +66,10 @@ public class TermTest extends TestCase {
 		l4.addAnnot(BeliefBase.TPercept);
 		assertEquals(l3, l4);
 		
-        Term tpos = new Structure("pos");
-		assertTrue(l3.equals(tpos));
-		assertTrue(new Structure("pos").equals(l3));
+        Term tpos = new Atom("pos");
+		assertFalse(l3.equals(tpos));
+		assertTrue(tpos.equals(l3));
+		assertTrue(new Atom("pos").equals(l3));
 		//System.out.println(new Term("pos")+"="+l3+" --> "+new Term("pos").equals(l3));
 
 		assertFalse(new Pred("pos").equals(l3));
@@ -257,6 +258,53 @@ public class TermTest extends TestCase {
         assertTrue(u.unifies(l2, l1));
     }
 
+    public void testAnnotsUnify6() {
+        Literal lp = Literal.parseLiteral("s(1)[b]");
+        Literal ln = Literal.parseLiteral("~s(1)[b]");
+        assertTrue(lp.isLiteral());
+        assertTrue(ln.isLiteral());
+        assertFalse(lp.negated());
+        assertTrue(ln.negated());
+        
+        Unifier u = new Unifier();
+
+        // Literal and literal
+        assertFalse(u.unifies(lp, ln));
+        
+        // Literal and predicate
+        Pred p = Pred.parsePred("s(1)[b]");
+        assertFalse(p.isLiteral());
+        assertTrue(u.unifies(lp, p));
+        assertFalse(u.unifies((Term)ln, (Term)p));
+        assertTrue(u.unifies(Literal.parseLiteral("s(1)"), p));
+        assertFalse(u.unifies(p,Literal.parseLiteral("s(1)")));
+        
+        // Literal and structure
+        Structure s = new Structure("s");
+        s.addTerm(new NumberTermImpl(1));
+        assertTrue(u.unifies(s,lp));
+        assertFalse(u.unifies(lp,s));
+        assertFalse(u.unifies(ln, s));
+        assertFalse(u.unifies(s,ln));
+        
+        // Literal and Atom
+        Atom a = new Atom("s");
+        assertFalse(u.unifies(lp, a));
+        assertFalse(u.unifies(ln, a));
+        assertTrue(u.unifies(Literal.parseLiteral("s"), a));
+        assertFalse(u.unifies(Literal.parseLiteral("~s"), a));
+     
+        // Predicate and structure
+        assertTrue(u.unifies(s, p));
+        assertFalse(u.unifies(p,s));
+        
+        // Predicate and atom
+        assertFalse(u.unifies(a, p));
+        assertFalse(u.unifies(p, a));
+        assertTrue(u.unifies(Pred.parsePred("s"), a));
+        assertTrue(u.unifies(a,Pred.parsePred("s[b]")));
+    }
+
     public void testTrigger() {
 		Pred p1 = new Pred("pos");
 
@@ -430,4 +478,5 @@ public class TermTest extends TestCase {
 	public static void main(String[] a) {
 		new TermTest().testCompare();
 	}
+
 }

@@ -354,8 +354,8 @@ public class Pred extends Structure {
         if (o instanceof Pred) {
             final Pred p = (Pred) o;
             return super.equals(o) && this.hasSubsetAnnot(p) && p.hasSubsetAnnot(this);
-        } else if (o instanceof Term) { 
-            return super.equals(o);
+        } else if (o instanceof Structure) {
+            return !hasAnnot() && super.equals(o);
         }
         return false;
     }

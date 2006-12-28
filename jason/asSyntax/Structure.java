@@ -112,12 +112,9 @@ public class Structure extends DefaultTerm {
 
             // if t is a VarTerm, uses var's equals
             if (tAsStruct.isVar()) {
-                VarTerm vt = (VarTerm)t;
-                //System.out.println(this.functor+" equals1 "+vt.getFunctor());
-                return vt.equals(this);
+                return ((VarTerm)t).equals(this);
             }
             
-            //System.out.println(this+" equals2 "+tAsTerm);
             if (getFunctor() == null && tAsStruct.getFunctor() != null) {
                 return false;
             }

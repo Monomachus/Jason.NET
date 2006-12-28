@@ -26,7 +26,6 @@ package jason.asSemantics;
 import jason.JasonException;
 import jason.architecture.AgArch;
 import jason.asSyntax.Literal;
-import jason.asSyntax.Atom;
 import jason.asSyntax.PlanLibrary;
 import jason.asSyntax.Structure;
 import jason.asSyntax.Trigger;
@@ -386,9 +385,6 @@ public class Agent {
      * <code>source(self)</code>. (the belief is not cloned!)
      */
     public boolean addBel(Literal bel) {
-		if (bel instanceof Atom) {
-			bel = new Literal(bel.getFunctor());
-		}
         if (!bel.hasSource()) {
             // do not add source(self) in case the
             // programmer set the source

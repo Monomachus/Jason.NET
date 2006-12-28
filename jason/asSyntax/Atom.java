@@ -29,10 +29,10 @@ import java.util.logging.*;
 
 /**
  * Represents an atom (a structure with no arguments), it is an
- * immutable object.  It extends Literal, so can be used in place of a
- * Literal, but does not allow operations on terms and annotations.
+ * immutable object.  It extends Structure, so can be used in place of a
+ * Structure, but does not allow operations on terms and annotations.
  */
-public final class Atom extends Literal {
+public final class Atom extends Structure {
 
     private static final long serialVersionUID = 1L;
 
@@ -102,44 +102,4 @@ public final class Atom extends Literal {
         }
         return false;
     }
-
-
-	//
-	// override pred methods
-	//
-	
-	@Override
-    public void setAnnots(ListTerm l) {
-		logger.log(Level.SEVERE, "atom has no annots!",new JasonException("atom has no annots!"));
-    }
-
-	@Override
-    public boolean addAnnot(Term t) {
-		logger.log(Level.SEVERE, "atom has no annots!",new JasonException("atom has no annots!"));
-        return false;
-    }
-
-	@Override
-    public void addAnnots(List<Term> l) {
-		logger.log(Level.SEVERE, "atom has no annots!",new JasonException("atom has no annots!"));
-    }
-
-	@Override
-    public void addAnnot(int index, Term t) {
-		logger.log(Level.SEVERE, "atom has no annots!",new JasonException("atom has no annots!"));
-	}
-
-	@Override
-    public void copyAnnot(Pred p) {
-		logger.log(Level.SEVERE, "atom has no annots!",new JasonException("atom has no annots!"));
-	}
-
-	//
-	// override literal methods
-	//
-
-	@Override
-    public void setNegated(boolean b) {
-		logger.log(Level.SEVERE, "atom error",new JasonException("atom may not be negated!"));
-    }	
 }
