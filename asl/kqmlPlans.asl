@@ -14,29 +14,30 @@
 
 @kqmlReceivedTellStructure
 +!kqml_received(S, tell, KQMLcontentVar, M) 
-   :  .literal(KQMLcontentVar) & 
-      .ground(KQMLcontentVar) 
+   :  .structure(KQMLcontentVar) & 
+      .ground(KQMLcontentVar) &
+      not .list(KQMLcontentVar)
    <- .add_annot(KQMLcontentVar, source(S), CA); 
       +CA.
 @kqmlReceivedTellList
 +!kqml_received(S, tell, KQMLcontentVar, M) 
    :  .list(KQMLcontentVar)
-   <- !addAllkqmlReceived(S,KQMLcontentVar).
+   <- !add_all_kqml_received(S,KQMLcontentVar).
 
 @kqmlReceivedTellList1
-+!addAllkqmlReceived(_,[]).   
++!add_all_kqml_received(_,[]).   
 
 @kqmlReceivedTellList2
-+!addAllkqmlReceived(S,[H|T])
++!add_all_kqml_received(S,[H|T])
    :  .literal(H) & 
       .ground(H)
    <- .add_annot(H, source(S), CA); 
       +CA;
-      !addAllkqmlReceived(S,T).
+      !add_all_kqml_received(S,T).
 
 @kqmlReceivedTellList3
-+!addAllkqmlReceived(S,[_|T])
-   <- !addAllkqmlReceived(S,T).
++!add_all_kqml_received(S,[_|T])
+   <- !add_all_kqml_received(S,T).
       
 @kqmlReceivedUnTell
 +!kqml_received(S, untell, KQMLcontentVar, M) : true 

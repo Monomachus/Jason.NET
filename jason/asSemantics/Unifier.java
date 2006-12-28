@@ -133,13 +133,6 @@ public class Unifier implements Cloneable {
             apply(t2g);
         }
 
-        // identical variables or constants
-        /*
-        if (t1g.equals(t2g)) {
-            return true;
-        }
-		*/
-        
         // both are vars
         if (t1g.isVar() && t2g.isVar()) {
             VarTerm t1gv = (VarTerm) t1g;
@@ -386,19 +379,6 @@ public class Unifier implements Cloneable {
         }
     }
     
-    /*
-    public void removeUngroundVars() {
-        Iterator<VarTerm> ik = function.keySet().iterator();
-        while (ik.hasNext()) {
-            VarTerm k = ik.next();
-            Term vl = function.get(k); 
-            if (!vl.isGround() || vl instanceof VarsCluster) {
-                ik.remove();
-            }
-        }        
-    }
-    */
-
     public boolean equals(Object o) {
         if (o == null) return false;
         if (o == this) return true;
