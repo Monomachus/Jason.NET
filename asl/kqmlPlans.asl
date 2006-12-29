@@ -1,12 +1,10 @@
 // Default plans to handle KQML performatives
 // Users can override them in their own AS code
 // 
-// Do not change this file!
-//
 // Variables:
-// S:   the sender
-// M:   message id
-// KQMLcontentVar: content (using a strange var name so as not to conflict with user's vars)
+//   S:   the sender (an atom)
+//   M:   message id (an atom)
+//   KQMLcontentVar: content (a literal)
 //
 
 
@@ -29,7 +27,7 @@
 
 @kqmlReceivedTellList2
 +!add_all_kqml_received(S,[H|T])
-   :  .literal(H) & 
+   :  .structure(H) & 
       .ground(H)
    <- .add_annot(H, source(S), CA); 
       +CA;
@@ -40,7 +38,7 @@
    <- !add_all_kqml_received(S,T).
       
 @kqmlReceivedUnTell
-+!kqml_received(S, untell, KQMLcontentVar, M) : true 
++!kqml_received(S, untell, KQMLcontentVar, M)
    <- .add_annot(KQMLcontentVar, source(S), CA); 
       -CA.
 
@@ -48,11 +46,12 @@
 /* ---- achieve performatives ---- */ 
 
 @kqmlReceivedAchieve
-+!kqml_received(S, achieve, KQMLcontentVar, M) : true 
++!kqml_received(S, achieve, KQMLcontentVar, M)
    <- .add_annot(KQMLcontentVar, source(S), CA); 
       !CA.
+
 @kqmlReceivedUnAchieve
-+!kqml_received(S, unachieve, KQMLcontentVar, M) : true 
++!kqml_received(S, unachieve, KQMLcontentVar, M)
    <- .add_annot(KQMLcontentVar, source(S), CA);
       .drop_goal(CA, false).
 
@@ -60,36 +59,36 @@
 /* ---- ask performatives ---- */ 
 
 @kqmlReceivedAskOne1
-+!kqml_received(S, askOne, KQMLcontentVar, M) : true
++!kqml_received(S, askOne, KQMLcontentVar, M) 
    <- ?KQMLcontentVar;
       .send(S, tell, KQMLcontentVar, M).
-@kqmlReceivedAskOne2 // error in askOne
--!kqml_received(S, askOne, _, M) : true
+
+@kqmlReceivedAskOne2 // error in askOne, send false
+-!kqml_received(S, askOne, _, M)
    <- .send(S, tell, false, M).      
 
-@kqmlReceivedAskAll1
-+!kqml_received(S, askAll, value(Var,KQMLcontentVar), M) : true    
-   <- .findall(Var, KQMLcontentVar, List); 
-      .send(S, tell, List, M).
-@kqmlReceivedAskAll2
-+!kqml_received(S, askAll, KQMLcontentVar, M) : true
+@kqmlReceivedAskAll
++!kqml_received(S, askAll, KQMLcontentVar, M)
    <- .findall(KQMLcontentVar, KQMLcontentVar, List); 
       .send(S, tell, List, M).
 
 
 /* ---- tell how performatives ---- */ 
 
-// In tellHow, KQMLcontentVar must be a string representation of the plan 
-// (or a list of strings)
+// In tellHow, content must be a string representation
+// of the plan (or a list of strings)
+
 @kqmlReceivedTellHow
-+!kqml_received(S, tellHow, KQMLcontentVar, M) : true <- .add_plan(KQMLcontentVar, S).
++!kqml_received(S, tellHow, KQMLcontentVar, M)
+   <- .add_plan(KQMLcontentVar, S).
 
-// In untellHow, KQMLcontentVar must be a plan's label (or a list of labels)
+// In untellHow, content must be a plan's label (or a list of labels)
 @kqmlReceivedUnTellHow
-+!kqml_received(S, untellHow, KQMLcontentVar, M) : true <- .remove_plan(KQMLcontentVar, S).
++!kqml_received(S, untellHow, KQMLcontentVar, M)
+   <- .remove_plan(KQMLcontentVar, S).
 
-// In askHow, KQMLcontentVar must be a string representation of the trigger event
+// In askHow, content must be a string representing the trigger event
 @kqmlReceivedAskHow
-+!kqml_received(S, askHow, KQMLcontentVar, M) : true    
-   <- .relevant_plans(KQMLcontentVar, ListAsString); 
++!kqml_received(S, askHow, KQMLcontentVar, M)
+   <- .relevant_plans(KQMLcontentVar, ListAsString);
       .send(S, tellHow, ListAsString, M).
