@@ -36,8 +36,11 @@ import jason.asSyntax.Term;
   <p>Description: removes all desires of the agent. No event is
   produced.
 
-  <p>This changes the agent's circumstance by simply emptying the
-  whole set of events (E).
+  <p>This action changes the agent's circumstance structure by simply emptying
+  the whole set of events (E). Note that, contrary to the <code>.desire</code>
+  definition, this action does not change the set of intentions; see
+  <code>.drop_all_intentions</code> to be used in combination with this
+  action.
 
   <p>Example:<ul> 
 

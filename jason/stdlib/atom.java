@@ -9,25 +9,24 @@ import jason.asSyntax.Term;
 /**
 <p>Internal action: <b><code>.atom</code></b>.
 
-<p>Description: check whether the argument is an atom (a structure
-with arity 0), e.g.: "p".  Numbers, strings, and unground variables
-are not structures.
+<p>Description: checks whether the argument is an atom (a structure with arity
+0), for example "p".  Numbers, strings, and free variables are not structures.
 
 <p>Parameters:<ul>
 <li>+ arg[0] (any term): the term to be checked.<br/>
 </ul>
 
 <p>Examples:<ul>
-<li> <code>.atom(b(10))</code>: fail.
-<li> <code>.atom(b)</code>: success.
-<li> <code>.atom(~b)</code>: fail.
-<li> <code>.atom(10)</code>: fail.
-<li> <code>.atom("home page")</code>: fail.
-<li> <code>.atom(X)</code>: fail if X is free and success if X is bind with an atom.
-<li> <code>.atom(a(X))</code>: fail.
-<li> <code>.atom(a[X])</code>: fail.
-<li> <code>.atom([a,b,c])</code>: fail.
-<li> <code>.atom([a,b,c(X)])</code>: fail.
+<li> <code>.atom(b(10))</code>: false.
+<li> <code>.atom(b)</code>: true.
+<li> <code>.atom(~b)</code>: false.
+<li> <code>.atom(10)</code>: false.
+<li> <code>.atom("home page")</code>: false.
+<li> <code>.atom(X)</code>: false if X is free and true if X is bound to an atom.
+<li> <code>.atom(a(X))</code>: false.
+<li> <code>.atom(a[X])</code>: false.
+<li> <code>.atom([a,b,c])</code>: false.
+<li> <code>.atom([a,b,c(X)])</code>: false.
 </ul>
 
   @see jason.stdlib.atom
@@ -36,7 +35,6 @@ are not structures.
   @see jason.stdlib.number
   @see jason.stdlib.string
   @see jason.stdlib.structure
-  @see jason.stdlib.var
   @see jason.stdlib.ground
 
 */
@@ -48,7 +46,7 @@ public class atom extends DefaultInternalAction {
             un.apply(args[0]);
             return args[0].isAtom();
         } catch (ArrayIndexOutOfBoundsException e) {
-            throw new JasonException("The internal action 'atom' has not received one argument");
+            throw new JasonException("The internal action 'atom' has not received the required argument.");
         } catch (Exception e) {
             throw new JasonException("Error in internal action 'atom': " + e);
         }

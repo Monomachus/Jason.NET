@@ -36,10 +36,10 @@ import jason.asSyntax.Term;
 
   <p>Internal action: <b><code>.length</code></b>.
 
-  <p>Description: get the length of strings or lists. 
+  <p>Description: gets the length of strings or lists. 
 
   <p>Parameters:<ul>
-  <li>+   arg[0] (string of list): the terms to be sized.<br/>
+  <li>+   arg[0] (string or list): the term whose length is to be determined.<br/>
   <li>+/- arg[1] (number): the length. 
   </ul>
 

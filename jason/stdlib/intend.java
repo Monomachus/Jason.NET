@@ -40,15 +40,15 @@ import jason.asSyntax.Trigger;
 /**
   <p>Internal action: <b><code>.intend(<i>I</i>)</code></b>.
   
-  <p>Description: checks if <i>I</i> is an intention: <i>I</i> is an
-  intention if there is a trigerring event <code>+!I</code> in any
-  plan within an intention; just note that intentions can be suspended
-  and appear in E or PA as well.
+  <p>Description: checks if <i>I</i> is an intention: <i>I</i> is an intention
+  if there is a trigerring event <code>+!I</code> in any plan within an
+  intention; just note that intentions can be suspended and appear in E, PA,
+  and PI as well.
   
   <p>Example:<ul> 
 
-  <li> <code>.intend(go(1,3))</code>: succeed if
-  <code>go(1,3)</code> is an intention of the agent.
+  <li> <code>.intend(go(1,3))</code>: succeeds if a plan for goal
+  <code>!go(1,3)</code> appears in an intention of the agent.
 
   </ul>
 
@@ -61,8 +61,6 @@ import jason.asSyntax.Trigger;
   @see jason.stdlib.drop_intention
   @see jason.stdlib.drop_goal
 
-  @author Rafael
-
  */
 public class intend extends DefaultInternalAction {
     
@@ -73,7 +71,7 @@ public class intend extends DefaultInternalAction {
     	    un.apply(l);
     	    return intends(ts.getC(),l,un);
         } catch (ArrayIndexOutOfBoundsException e) {
-            throw new JasonException("The internal action 'intend' has not received one argument.");
+            throw new JasonException("The internal action 'intend' has not received the required argument.");
         } catch (Exception e) {
             throw new JasonException("Error in internal action 'intend': " + e);
         }
@@ -82,8 +80,8 @@ public class intend extends DefaultInternalAction {
     public boolean intends(Circumstance C, Literal l, Unifier un) {
         Trigger g = new Trigger(Trigger.TEAdd, Trigger.TEAchvG, l);
 
-        // need to check the intention in the slected event in this cycle!!!
-        // (already removed from E)
+        // we need to check the intention in the selected event in this cycle!!!
+        // (as it was already removed from E)
         if (C.getSelectedEvent() != null) {
             // logger.log(Level.SEVERE,"Int: "+g+" unif "+ts.C.SE);
             if (C.getSelectedEvent().getIntention() != null)
@@ -91,7 +89,7 @@ public class intend extends DefaultInternalAction {
                     return true;
         }
 
-        // need to check the slected intention in this cycle!!!
+        // we need to check the slected intention in this cycle too!!!
         if (C.getSelectedIntention() != null) {
             // logger.log(Level.SEVERE,"Int: "+g+" unif "+ts.C.SI);
             if (C.getSelectedIntention().hasTrigger(g, un))

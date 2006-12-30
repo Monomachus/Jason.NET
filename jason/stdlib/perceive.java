@@ -32,17 +32,16 @@ import jason.asSyntax.Term;
 /**
   <p>Internal action: <b><code>.perceive</code></b>.
   
-  <p>Description: explicitly do perception. It is normally used when
-  the number of cycles for perception was changed.
+  <p>Description: forces the agent architecture to do perception of the
+  environment immediately. It is normally used when the number of reasoning
+  cycles before perception takes place was changed (this is normally at every
+  cycle).
 
   <p>Example:<ul> 
 
   <li> <code>.perceive</code>.</li>
 
   </ul>
-
-  @author Rafael
-
 */
 public class perceive extends DefaultInternalAction {
     @Override

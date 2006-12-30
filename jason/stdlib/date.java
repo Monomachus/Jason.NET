@@ -29,8 +29,8 @@ import java.util.GregorianCalendar;
   <li> <code>.date(Y,M,D)</code>: unifies Y with the current year, M
   with the current month, and D with the current day.</li>
 
-  <li> <code>.date(2007,12,30)</code>: succeed with today is
-  30/12/2007 and fails otherwise.</li>
+  <li> <code>.date(2006,12,30)</code>: succeeds if the action is run on
+  30/Dec/2006 and fails otherwise.</li>
 
   </ul>
 
@@ -47,7 +47,7 @@ public class date extends DefaultInternalAction {
                    un.unifies(args[1], new NumberTermImpl(now.get(Calendar.MONTH))) &&
                    un.unifies(args[2], new NumberTermImpl(now.get(Calendar.DAY_OF_MONTH)));
         } catch (ArrayIndexOutOfBoundsException e) {
-            throw new JasonException("The internal action 'date' has not received three arguments");
+            throw new JasonException("The internal action 'date' has not received three arguments.");
         } catch (Exception e) {
             throw new JasonException("Error in internal action 'date': " + e);
         }

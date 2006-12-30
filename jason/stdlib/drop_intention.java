@@ -40,12 +40,13 @@ import jason.asSyntax.Trigger;
   <p>Internal action: <b><code>.drop_intention(<i>I</i>)</code></b>.
   
   <p>Description: removes the intention <i>I</i> from the set of
-  intention of the agent. No event is produced.
+  intention of the agent (suspended intetions are also considered).
+  No event is produced.
 
   <p>Example:<ul> 
 
-  <li> <code>.drop_intention(go(1,3))</code>: removes the intention
-  <code>go(1,3)</code> of the agent.
+  <li> <code>.drop_intention(go(1,3))</code>: removes an intention with goal
+  <code>!go(1,3)</code> in the agent's current circumstance.
 
   </ul>
 
@@ -68,7 +69,7 @@ public class drop_intention extends DefaultInternalAction {
             dropInt(ts.getC(),l,un);
             return true;
         } catch (ArrayIndexOutOfBoundsException e) {
-            throw new JasonException("The internal action 'drop_intention' has not received one argument.");
+            throw new JasonException("The internal action 'drop_intention' has not received the required argument.");
         } catch (Exception e) {
             throw new JasonException("Error in internal action 'drop_intention': " + e);
         }

@@ -12,11 +12,11 @@ import java.util.Random;
 /**
   <p>Internal action: <b><code>.random(<i>N</i>)</code></b>.
   
-  <p>Description: unifies in <i>N</i> a random number between 0 and 1.
+  <p>Description: unifies <i>N</i> with a random number between 0 and 1.
   
-  <p>Parameters:<ul>
+  <p>Parameter:<ul>
   
-  <li>- arg[0] (number): the variable that receives the random value<br/>
+  <li>- arg[0] (number): the variable to receive the random value<br/>
   
   </ul>
   
@@ -39,7 +39,7 @@ public class random extends DefaultInternalAction {
             }
             return un.unifies(args[0], new NumberTermImpl(random.nextDouble()));
         } catch (ArrayIndexOutOfBoundsException e) {
-            throw new JasonException("The internal action 'random' has not received one argument.");
+            throw new JasonException("The internal action 'random' has not received the required argument.");
         } catch (Exception e) {
             throw new JasonException("Error in internal action 'random': " + e);
         }    

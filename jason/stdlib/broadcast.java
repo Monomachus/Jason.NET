@@ -33,7 +33,7 @@ import jason.asSyntax.Term;
 /**
   <p>Internal action: <b><code>.broadcast</code></b>.
   
-  <p>Description: broadcasts a message to all agents.
+  <p>Description: broadcasts a message to all known agents.
   
   <p>Parameters:<ul>
   
@@ -46,8 +46,8 @@ import jason.asSyntax.Term;
   
   <p>Example:<ul> 
 
-  <li> <code>.broadcast(tell,value(10))</code>: sends
-  <code>value(10)</code> to all agents.</li>
+  <li> <code>.broadcast(tell,value(10))</code>: sends <code>value(10)</code>
+  as a "tell" message to all known agents in the society.</li>
 
   </ul>
 
@@ -66,12 +66,12 @@ public class broadcast extends DefaultInternalAction {
 			ilf = args[0];
             un.apply(ilf);
 			if (!ilf.isAtom()) {
-				throw new JasonException("The Ilf Force parameter of the internal action 'broadcast' is not an atom!");
+				throw new JasonException("The illocutionary force parameter of the internal action 'broadcast' is not an atom!");
 			}
 
 			pcnt = args[1];
 		} catch (ArrayIndexOutOfBoundsException e) {
-			throw new JasonException("The internal action 'broadcast' has not received two arguments");
+			throw new JasonException("The internal action 'broadcast' has not received two arguments.");
 		}
 		un.apply(pcnt);
 		if (!pcnt.isGround()) {

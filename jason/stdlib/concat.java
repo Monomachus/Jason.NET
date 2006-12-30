@@ -35,19 +35,20 @@ import jason.asSyntax.Term;
 /**
   <p>Internal action: <b><code>.concat</code></b>.
 
-  <p>Description: concatenate strings or lists. 
+  <p>Description: concatenates strings or lists. 
 
   <p>Parameters:<ul>
   <li>+ arg[0] ... + arg[n-1] (any term): the terms to be concatenated.<br/>
   <li>+- arg[n]: the result of the concatenation. 
   </ul>
-  Parameters that are not string are concatenated using the toString of them.
+  Parameters that are not string are concatenated using the toString method of
+  their class.
 
   <p>Examples:<ul>
   <li> <code>.concat("a","b",X)</code>: <code>X</code> unifies with "ab".
   <li> <code>.concat("a","b","a")</code>: fails.
   <li> <code>.concat("a b",1,a,X)</code>: <code>X</code> unifies with "a b1a".
-  <li> <code>.concat("a","b","c", "d", X)</code>: <code>X</code> unifies with "abcd".
+  <li> <code>.concat("a", "b", "c", "d", X)</code>: <code>X</code> unifies with "abcd".
   <li> <code>.concat([a,b,c],[d,e],[f,g],X)</code>: <code>X</code> unifies with <code>[a,b,c,d,e,f,g]</code>.
   </ul>
 
@@ -64,10 +65,10 @@ public class concat extends DefaultInternalAction {
             un.apply(args[i]);
         }
 		
-		if (args[0].isList()) {
+	    if (args[0].isList()) {
             // list concat
 			if (!args[args.length-1].isVar() && !args[args.length-1].isList()) {
-				throw new JasonException("last argument of concat is not a list or variable.");
+				throw new JasonException("Last argument of concat is not a list nor a variable.");
 			}
             ListTerm result = (ListTerm)args[0];
             for (int i=1; i<args.length-1; i++) {
@@ -79,11 +80,11 @@ public class concat extends DefaultInternalAction {
 			return un.unifies(result, args[args.length-1]);
 
         
-		} else {
+	    } else {
             // string concat
 
             if (!args[args.length-1].isVar() && !args[args.length-1].isString()) {
-                throw new JasonException("last argument of concat is not a string or variable.");
+                throw new JasonException("Last argument of concat is not a string nor a variable.");
             }
             String vl = args[0].toString();
             if (args[0].isString()) {

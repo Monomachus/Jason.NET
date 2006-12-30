@@ -32,7 +32,8 @@ import jason.runtime.RuntimeServicesInfraTier;
 /**
   <p>Internal action: <b><code>.stopMAS</code></b>.
   
-  <p>Description: stops all agents of the systems.
+  <p>Description: aborts the execution of all agents in the multi-agent system
+  (and any simulated environment too).
   
   <p>Example:<ul> 
 

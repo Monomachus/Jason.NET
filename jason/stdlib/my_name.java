@@ -27,7 +27,7 @@ import jason.JasonException;
 import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
-import jason.asSyntax.Atom;
+import jason.asSyntax.Structure;
 import jason.asSyntax.Term;
 
 /**
@@ -37,11 +37,11 @@ import jason.asSyntax.Term;
   multi-agent system. This identification is given by the runtime
   infrastructure of the system (centralised, saci, jade, ...).
   
-  <p>Parameters:<ul>
+  <p>Parameter:<ul>
   
-  <li>+/- arg[0] (atom): if variable, unifies the agent name and the
-  variable; if atom, succeed if the atom is equals to the agent's
-  name.<br/>
+  <li>+/- arg[0] (atom): if this is a variable, unifies the agent
+  name and the variable; if it is an atom, succeeds if the atom is equal to
+  the agent's name.<br/>
 
   </ul>
   
@@ -52,7 +52,6 @@ import jason.asSyntax.Term;
 
   </ul>
 
-
   @see jason.stdlib.send
   @see jason.stdlib.broadcast
 
@@ -62,9 +61,9 @@ public class my_name extends DefaultInternalAction {
     @Override
 	public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
 		try {
-            return un.unifies(args[0], new Atom(ts.getUserAgArch().getAgName()));
+            return un.unifies(args[0], new Structure(ts.getUserAgArch().getAgName()));
 		} catch (ArrayIndexOutOfBoundsException e) {
-			throw new JasonException("The internal action 'my_name' has not received one argument");
+			throw new JasonException("The internal action 'my_name' has not received the required argument.");
 		}
 	}
 }

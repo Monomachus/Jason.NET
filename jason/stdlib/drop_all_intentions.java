@@ -33,11 +33,12 @@ import jason.asSyntax.Term;
 
   <p>Internal action: <b><code>.drop_all_intentions</code></b>.
   
-  <p>Description: removes all intentions from the set of intention of
-  the agent. No event is produced.
+  <p>Description: removes all intentions from the agent's set of
+  intentions (event suspended intentions are removed). 
+  No event is produced.
 
-  <p>This changes the agent's circumstance by simply emptying the
-  whole set of intentions (I).
+  <p>This action changes the agent's circumstance structure by simply emptying
+  the whole set of intentions (I), pending actions (PA), and pending intentions (PI).
 
   <p>Example:<ul> 
 
@@ -60,6 +61,8 @@ public class drop_all_intentions extends DefaultInternalAction {
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         ts.getC().clearIntentions();
+        ts.getC().clearPendingIntentions();
+        ts.getC().clearPendingActions();
         return true;
     }
 }

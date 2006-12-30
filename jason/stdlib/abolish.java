@@ -33,17 +33,17 @@ import jason.asSyntax.Term;
 /**
   <p>Internal action: <b><code>.abolish</code></b>.
   
-  <p>Description: remove all beliefs that match the argument. As happens with the
+  <p>Description: remove all beliefs that match the argument. As for the
   "-" operator, an event will be generated for each deletion.
   
   <p>Parameters:<ul>
-  <li>+ arg[0] (literal): the "pattern" of what will be removed.<br/>
+  <li>+ arg[0] (literal): the "pattern" for what should be removed.<br/>
   </ul>
   
   <p>Examples:<ul>
-  <li> <code>.abolish(b(_))</code>: remove all <code>b/1</code> beliefs, despite the argument value.</li>
+  <li> <code>.abolish(b(_))</code>: remove all <code>b/1</code> beliefs, regardless of the argument value.</li>
   <li> <code>.abolish(c(_,2))</code>: remove all <code>c/2</code> beliefs where the second argument is <code>2</code>.</li>
-  <li> <code>.abolish(c(_,_)[source(ag1)])</code>: remove all <code>c/2</code> beliefs that have <code>ag1</code> as its source.</li>
+  <li> <code>.abolish(c(_,_)[source(ag1)])</code>: remove all <code>c/2</code> beliefs that have <code>ag1</code> as source.</li>
   </ul>
 
  */
@@ -55,7 +55,7 @@ public class abolish extends DefaultInternalAction {
             ts.getAg().abolish((Literal)args[0], un);
             return true;
         } catch (ArrayIndexOutOfBoundsException e) {
-            throw new JasonException("The internal action 'abolish' has not received one arguments");
+            throw new JasonException("The internal action 'abolish' has not received the required argument.");
         } catch (Exception e) {
             throw new JasonException("Error in internal action 'abolish': " + e);
         }

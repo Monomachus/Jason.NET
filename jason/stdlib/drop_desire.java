@@ -37,21 +37,22 @@ import jason.asSyntax.Trigger;
 /**
   <p>Internal action: <b><code>.drop_desire(<i>D</i>)</code></b>.
   
-  <p>Description: removes the desire <i>D</i> of the agent. No event
-  is produced.  Currently what it does is simply to change all
-  <i>+!D</i> to <i>-!D</i> in events which would give true for
-  <code>.desire(D)</code> in the whole set of events. 
+  <p>Description: removes desire <i>D</i> in the agent circumstance. Currently
+  what it does is to change <i>+!D</i> to <i>-!D</i> for all events
+  which would give true for <code>.desire(D)</code> in the whole set of
+  events.
 
-  <p><b>Important</b>: unlike <code>.desire</code> this only alters
-  literals explicitly desired (rather than intended), that is, it does
-  NOT consider intentions. You should use both
-  <code>.drop_desire</code> AND <code>drop_intention</code> to remove
-  all desires and intentions of <i>D</i>.
+  <p><b>Important</b>: unlike <code>.desire</code> this only alters literals
+  explicitly desired (rather than intended), that is, it does NOT consider
+  intentions. You should use both <code>.drop_desire</code> AND
+  <code>drop_intention</code> to remove all desires and intentions matching
+  <i>D</i>.
 
   <p>Example:<ul> 
 
-  <li> <code>.drop_desire(go(1,3))</code>: removes the desire
-  <code>go(1,3)</code> of the agent.
+  <li> <code>.drop_desire(go(1,3))</code>: changes a desire
+  <code>&lt;+!go(1,3),_&gt;</code> in the set of events to
+  <code>&lt;-!go(1,3),_&gt;</code>.
 
   </ul>
 
@@ -71,7 +72,7 @@ public class drop_desire extends DefaultInternalAction {
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         try {
-            Literal l = (Literal)args[0]; //Literal.parseLiteral(args[0].toString());
+            Literal l = (Literal)args[0]; // Literal.parseLiteral(args[0].toString());
             un.apply(l);
             
             Event e = new Event(new Trigger(Trigger.TEAdd, Trigger.TEAchvG, l),Intention.EmptyInt);
@@ -87,7 +88,7 @@ public class drop_desire extends DefaultInternalAction {
             }
             return true;
         } catch (ArrayIndexOutOfBoundsException e) {
-            throw new JasonException("The internal action 'drop_desire' has not received one argument.");
+            throw new JasonException("The internal action 'drop_desire' has not received the required argument.");
         } catch (Exception e) {
             throw new JasonException("Error in internal action 'drop_desire': " + e);
         }

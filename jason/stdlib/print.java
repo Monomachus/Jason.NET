@@ -29,12 +29,11 @@ import jason.asSemantics.InternalAction;
 /**
   <p>Internal action: <b><code>.print</code></b>.
   
-  <p>Description: used for printing messages to the console where the
-  system is running. It receives any number of parameters, which can
-  be not only strings but any AgentSpeak term (including
-  variables). Terms are grounded according to the current unifying
-  function before being printed out. No new line is printed after the
-  parameters.
+  <p>Description: used for printing messages to the console where the system
+  is running. It receives any number of parameters, which can be not only
+  strings but also any AgentSpeak term (including variables). Terms are made
+  ground according to the current unifying function before being printed
+  out. No new line is printed after the parameters.
 
   <p> The precise format and output device of the message is defined
   by the Java logging configuration as defined in the
@@ -42,14 +41,15 @@ import jason.asSemantics.InternalAction;
   
   <p>Parameters:<ul>
   
-  <li>+arg[0] ... +arg[n] (any term): the term to be printed.<br/>
+  <li>+arg[0] ... +arg[n] (any term): the terms to be printed out.<br/>
 
   </ul>
   
   <p>Example:<ul> 
 
-  <li> <code>.print(1,X,"bla")</code>: prints the number 1, the value
-  of variable X and the string "bla" in the console.</li>
+  <li> <code>.print(1,X,"bla")</code>: prints out to the console the
+  concatenation of the string representatons of the number 1, of the value of
+  variable X, and the string "bla".</li>
 
   </ul>
 

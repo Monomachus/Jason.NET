@@ -32,10 +32,10 @@ import java.util.logging.Level;
 
 
 /**
-  <p>Internal action: <b><code>.print</code></b>.
+  <p>Internal action: <b><code>.println</code></b>.
   
-  <p>Description: used for printing messages to the console. A new
-  line is printed after the parameters.
+  <p>Description: used for printing messages to the console. Exactly as for
+  <code>.print</code> except that a new line is printed after the parameters.
 
 
   @see jason.stdlib.print

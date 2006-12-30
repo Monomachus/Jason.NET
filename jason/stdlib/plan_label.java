@@ -34,21 +34,21 @@ import jason.asSyntax.Term;
 /**
   <p>Internal action: <b><code>.plan_label(<i>P</i>,<i>L</i>)</code></b>.
   
-  <p>Description: unifies in <i>P</i> the plan with label <i>L</i> in
-  the agent's plan library (PL).
+  <p>Description: unifies <i>P</i> with a string representing the plan
+  labelled with the term <i>L</i> within the agent's plan library.
   
   <p>Parameters:<ul>
   
-  <li>- arg[0] (string): the string representing the plan in the PL.<br/>
+  <li>- arg[0] (string): the string representing the plan.<br/>
   
-  <li>+ arg[1] (structure): the label of the plan.<br/>
+  <li>+ arg[1] (structure): the label of that plan.<br/>
   
   </ul>
   
   <p>Example:<ul> 
 
-  <li> <code>.plan_label(P,p1)</code>: unifies in P the plan with
-  label <code>p1</code>.</li>
+  <li> <code>.plan_label(P,p1)</code>: unifies P with the string
+  representation of the plan with label <code>p1</code>.</li>
 
   </ul>
 
@@ -67,7 +67,7 @@ public class plan_label extends DefaultInternalAction {
             Plan p = ts.getAg().getPL().get(label.toString());
             return un.unifies(new StringTermImpl(p.toASString()), args[0]);
         } catch (ArrayIndexOutOfBoundsException e) {
-            throw new JasonException("The internal action 'plan_label' has not received two arguments!");
+            throw new JasonException("The internal action 'plan_label' has not received two arguments.");
         } catch (Exception e) {
             throw new JasonException("Error in internal action 'plan_label': " + e);
         }

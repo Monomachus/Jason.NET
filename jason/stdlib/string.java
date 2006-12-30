@@ -7,27 +7,26 @@ import jason.asSemantics.Unifier;
 import jason.asSyntax.Term;
 
 /**
-<p>Internal action: <b><code>.string</code></b>.
+  <p>Internal action: <b><code>.string</code></b>.
 
-<p>Description: check whether the argument is a string, e.g.: "a". 
+  <p>Description: checks whether the argument is a string, e.g.: "a". 
 
-<p>Parameters:<ul>
-<li>+ arg[0] (any term): the term to be checked.<br/>
-</ul>
+  <p>Parameter:<ul>
+  <li>+ arg[0] (any term): the term to be checked.<br/>
+  </ul>
 
-<p>Examples:<ul>
-<li> <code>.string("home page")</code>: success.
-<li> <code>.string(b(10))</code>: fail.
-<li> <code>.string(b)</code>: fail.
-<li> <code>.string(X)</code>: fail if X is free and success if X is bind with a string.
-</ul>
+  <p>Examples:<ul>
+  <li> <code>.string("home page")</code>: true.
+  <li> <code>.string(b(10))</code>: false.
+  <li> <code>.string(b)</code>: false.
+  <li> <code>.string(X)</code>: false if X is free, true if X is bound to a string.
+  </ul>
 
   @see jason.stdlib.atom
   @see jason.stdlib.list
   @see jason.stdlib.literal
   @see jason.stdlib.number
   @see jason.stdlib.structure
-  @see jason.stdlib.var
   @see jason.stdlib.ground
 
 */
@@ -40,7 +39,7 @@ public class string extends DefaultInternalAction {
             un.apply(t);
             return t.isString();
         } catch (ArrayIndexOutOfBoundsException e) {
-            throw new JasonException("The internal action 'string' has not received one argument");
+            throw new JasonException("The internal action 'string' has not received the required argument.");
         } catch (Exception e) {
             throw new JasonException("Error in internal action 'string': " + e);
         }

@@ -38,8 +38,8 @@ import jason.asSyntax.Trigger;
 /**
   <p>Internal action: <b><code>.at</code></b>.
   
-  <p>Description: add an event at some time in future. This command is 
-  based on the unix at command, although not fully implemented yet.
+  <p>Description: creates an event at some time in the future. This command is
+  based on the unix "at" command, although not fully implemented yet.
   
   <p>Parameters:<ul>
   <li>+ arg[0] (string): the time for the event to be generated.<br/>
@@ -51,15 +51,14 @@ import jason.asSyntax.Trigger;
       </blockquote > where &lt;time_unit> can be
       "s" or "second(s)",  "m" or "minute(s)", "h" or "hour(s)", 
       "d" or "day(s)".
-      The default &lt;time_unit> is miliseconds.<br/><br/>
+      The default &lt;time_unit> is milliseconds.<br/><br/>
 
-  <li>+ arg[1] (string): the event. The string of the event will be
-      parsed as a trigger event. (see Jason syntax)
-  </ul>
+  <li>+ arg[1] (string): the event to be created. The string of the event will
+      be parsed as a triggering event (see the <b><i>Jason</i></b> syntax).
+      </ul>
   
   <p>Examples:<ul>
-  <li> <code>.at("now +3 minutes", "+!g")</code>: generate the event <code>+!g</code> 
-       at 1 minute from now.
+  <li> <code>.at("now +3 minutes", "+!g")</code>: generates the event <code>+!g</code> 3 minutes from now.
   <li> <code>.at("now +1 m", "+!g")</code>
   <li> <code>.at("now +2 h", "+!g")</code>
   </ul>
@@ -86,7 +85,7 @@ public class at extends DefaultInternalAction {
 			if (stime.startsWith("now")) {
 				// it is something like "now +3 minutes"
 				stime = stime.substring(3).trim();
-				// get time amount
+				// get the amount of time
 				if (stime.startsWith("+")) {
 					stime = stime.substring(1).trim();
 					int pos = stime.indexOf(" ");
@@ -114,14 +113,14 @@ public class at extends DefaultInternalAction {
             }
 
 			if (deadline == -1) {
-                throw new JasonException("The time parameter ('"+time+"') of the internal action 'at' is not correctly parsed!");            	
+                throw new JasonException("The time parameter ('"+time+"') of the internal action 'at' did not parse correctly!");            	
 			}
 
 			new CheckDeadline(deadline, te, ts.getC()).start(); 
 
 			return true;
         } catch (ArrayIndexOutOfBoundsException e) {
-            throw new JasonException("The internal action 'at' has not received two arguments");
+            throw new JasonException("The internal action 'at' has not received two arguments.");
         } 
     }
 	
@@ -140,7 +139,7 @@ public class at extends DefaultInternalAction {
         public void run() {
             try {
                 sleep(deadline);
-				// add event in C.Events
+				// add event to Circumstance.Events
 				c.addEvent(event);
             } catch (InterruptedException e) {
                 e.printStackTrace();

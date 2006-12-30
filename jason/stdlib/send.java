@@ -55,32 +55,34 @@ import jason.asSyntax.Term;
   
   <li>+ arg[2] (literal): the content of the message.<br/>
   
-  <li><i>+ arg[3]</i> (any term - optional): the answer of an ask
-  message (performatives askOne and askAll).<br/> 
+  <li><i>+ arg[3]</i> (any term [optional]): the answer of an ask
+  message (for performatives askOne and askAll).<br/> 
   
-  <li><i>+ arg[4]</i> (number - optional): time out (in mili-seconds)
-  for an ask answer.<br/> 
+  <li><i>+ arg[4]</i> (number [optional]): timeout (in milliseconds)
+  when waiting for an ask answer.<br/> 
 
   </ul>
 
-  <p>In <b>ask</b> messages, the arguments 3 and 4 are optional. In
-  case they are informed, .send suspends the intention until an answer
-  is received and unified with the arg[3]. Otherwise, the intention is
-  not suspended and the answer (that is a tell message) produces a
-  belief addition event as usual.
+  <p>Messages with an <b>ask</b> illocutionary force can optionally have
+  arguments 3 and 4. In case they are given, <code>.send</code> suspends the
+  intention until an answer is received and unified with <code>arg[3]</code>,
+  or the message request times out as specified by
+  <code>arg[4]</code>. Otherwise, the intention is not suspended and the
+  answer (which is a tell message) produces a belief addition event as usual.
   
-  <p>Examples (suppose that agent jomi is sending the messages):<ul>
+  <p>Examples (suppose that agent <code>jomi</code> is sending the
+  messages):<ul>
 
-  <li> <code>.send(rafael,tell,value(10))</code>: sends
-  <code>value(10)</code> to the agent named rafael. The literal
+  <li> <code>.send(rafael,tell,value(10))</code>: sends <code>value(10)</code>
+  to the agent named <code>rafael</code>. The literal
   <code>value(10)[source(jomi)]</code> will be added as a belief in
-  the rafael's belief base.</li>
+  <code>rafael</code>'s belief base.</li>
 
   <li> <code>.send(rafael,achieve,go(10,30)</code>: sends
-  <code>go(10,30)</code> to the agent named rafael. When rafael
-  receives this message, an event like
-  <code>!go(10,30)[source(jomi)]</code> will be added in his event
-  queue.</li>
+  <code>go(10,30)</code> to the agent named <code>rafael</code>. When
+  <code>rafael</code> receives this message, an event
+  <code>&lt;+!go(10,30)[source(jomi)],T&gt;</code> will be added in
+  <code>rafael</code>'s event queue.</li>
 
   <li> <code>.send(rafael,askOne,value(beer,X))</code>: sends
   <code>value(beer,X)</code> to the agent named rafael. This .send
@@ -89,19 +91,17 @@ import jason.asSyntax.Term;
   side when rafael answer the ask.</li>
 
   <li> <code>.send(rafael,askOne,value(beer,X),A)</code>: sends
-  <code>value(beer,X)</code> to the agent named rafael. This send
-  suspend the jomi's intention until he receives the rafael
-  answer. The answer (something like <code>value(beer,10)</code>)
+  <code>value(beer,X)</code> to the agent named <code>rafael</code>. This
+  action suspends <code>jomi</code>'s intention until <code>rafael</code>'s
+  answer is received. The answer (something like <code>value(beer,10)</code>)
   unifies with <code>A</code>.</li>
 
-  <li> <code>.send(rafael,askOne,value(beer,X),A,2000)</code>: same as
-  previous example, but agent jomi waits for 2 seconds. If no message
-  is received in this time, <code>A</code> unifies with
+  <li> <code>.send(rafael,askOne,value(beer,X),A,2000)</code>: as in the
+  previous example, but agent <code>jomi</code> waits for 2 seconds. If no
+  message is received by then, <code>A</code> unifies with
   <code>timeout</code>.</li>
 
   </ul>
-
-  See the Jason manual for more details about agent communication.
 
   @see jason.stdlib.broadcast
   @see jason.stdlib.my_name
@@ -116,7 +116,7 @@ public class send extends DefaultInternalAction {
         Term to   = null;
         Term ilf  = null;
         Term pcnt = null;
-		// check parameters
+	// check parameters
         try {
             to   = args[0];
             ilf  = args[1];
@@ -130,7 +130,7 @@ public class send extends DefaultInternalAction {
 
             un.apply(ilf);
             if (! ilf.isAtom()) {
-                throw new JasonException("The Ilf Force parameter ('"+ilf+"') of the internal action 'send' is not an atom!");
+                throw new JasonException("The illocutionary force parameter ('"+ilf+"') of the internal action 'send' is not an atom!");
             }
             un.apply(pcnt);
 	        
@@ -140,11 +140,11 @@ public class send extends DefaultInternalAction {
             } catch (Exception e) {}
             
         } catch (ArrayIndexOutOfBoundsException e) {
-            throw new JasonException("The internal action 'send' has not received three arguments");
+            throw new JasonException("The internal action 'send' has not received three arguments.");
         } 
         Message m = new Message(ilf.toString(), null, null, pcnt.toString());
 
-        // assync ask have a fourth argument and should suspend the intention
+        // async ask has a fourth argument and should suspend the intention
         lastSendWasSynAsk = m.isAsk() && args.length > 3;
         if (lastSendWasSynAsk) {
         	ts.getC().getPendingIntentions().put(m.getMsgId(), ts.getC().getSelectedIntention());
@@ -166,7 +166,7 @@ public class send extends DefaultInternalAction {
         try {
             if (to.isList()) {
                 if (m.isAsk()) {
-                    throw new JasonException("Can not send ask to a list of receivers!");                                                   
+                    throw new JasonException("Cannot send 'ask' to a list of receivers!");                                                   
                 } else {
                     for (Term t: (ListTerm)to) {
                         if (t.isAtom() || t.isString()) {
@@ -191,7 +191,7 @@ public class send extends DefaultInternalAction {
             }
             
             if (lastSendWasSynAsk && args.length == 5) {
-                // get the timout
+                // get the timeout deadline
                 NumberTerm tto = (NumberTerm)args[4];
                 un.apply(tto);
                 new CheckTimeout((long)tto.solve(), m.getMsgId(), ts.getC()).start(); 
@@ -199,7 +199,7 @@ public class send extends DefaultInternalAction {
             
             return true;
         } catch (Exception e) {
-            throw new JasonException("Error sending message " + m + "\nError="+e);
+            throw new JasonException("Error sending message " + m + "\nError: "+e);
         }
     }
 
@@ -230,10 +230,10 @@ public class send extends DefaultInternalAction {
                 // if the intention is still in PI, brings it back to C.I
                 Intention intention = c.getPendingIntentions().remove(idInPending);
                 if (intention != null) {
-                    // unify "timeout" with the .send fourth parameter
+                    // unify "timeout" with the fourth parameter of .send
                     BodyLiteral send = intention.peek().removeCurrentStep();
                     intention.peek().getUnif().unifies(send.getLiteralFormula().getTerm(3), timeoutTerm);
-                    // add the intention back in the C.I
+                    // add the intention back in C.I
                     c.addIntention(intention);
                 }
             } catch (InterruptedException e) {

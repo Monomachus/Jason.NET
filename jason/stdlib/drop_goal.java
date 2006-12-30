@@ -39,27 +39,27 @@ import jason.asSyntax.Trigger;
   <p>Internal action:
   <b><code>.drop_goal(<i>G</i>,<i>R</i>)</code></b>.
   
-  <p>Description: removes the goal <i>G</i> of the agent. <i>G</i> is
-  a goal if there is a trigerring event <code>+!G</code> in any plan
-  within an intention; just note that intentions can be suspended and
-  appear in E or PA as well. 
+  <p>Description: removes the goal <i>G</i> of the agent. <i>G</i> is a goal
+  if there is a trigerring event <code>+!G</code> in any plan within an
+  intention; just note that intentions can be suspended hence appearing
+  in E, PA, or PI as well.
 
-  <p>If <i>R</i> is <code>true</code>, the intention pursuing it is
-  updated as if it was successfuly achieved.  If <i>R</i> is
-  <code>false</code>, the intention pursuing it is updated as if it
-  was failed, and an event like <code>-!G</code> is generated.
+  <p>If <i>R</i> is <code>true</code>, the intention where the goal appears is
+  updated as if the goal had already been successfuly achieved.  If <i>R</i>
+  is <code>false</code>, the intention is updated as if the plan for that goal
+  had failed, and an event <code>-!G</code> is generated.
 
   <p>Example:<ul> 
 
-  <li> <code>.drop_goal(go(1,3),true)</code>: stops achieving
-  <code>go(1,3)</code> as it was achieved.
+  <li> <code>.drop_goal(go(1,3), true)</code>: stops any attempt to achieve
+  <code>!go(1,3)</code> as if it had already been achieved.
 
-  <li> <code>.drop_goal(go(1,3),false)</code>: stops achieving
-  <code>go(1,3)</code> as it was failed.
+  <li> <code>.drop_goal(go(1,3), false)</code>: stops any attempt to achieve
+  <code>!go(1,3)</code> as if it had failed.
 
   </ul>
 
-  (Note: this internal action is prposed in the DALT 2006 paper)
+  (Note: this internal action was introduced in a DALT 2006 paper)
 
   @see jason.stdlib.current_intention
   @see jason.stdlib.desire
@@ -144,17 +144,17 @@ public class drop_goal extends DefaultInternalAction {
                 ts.applyClrInt(i);
                 return 1;
             } else {
-                // generate fail
+                // generate failure event
                 Event failEvent = null;
                 if (!i.isFinished()) {
                     failEvent = ts.findEventForFailure(i, i.peek().getTrigger());
                 }
                 if (failEvent != null) {
                     ts.getC().addEvent(failEvent);
-                    ts.getLogger().warning(".drop_goal is generating goal deletion event " + failEvent.getTrigger());
+                    ts.getLogger().warning("'.drop_goal' is generating a goal deletion event: " + failEvent.getTrigger());
                     return 2;
                 } else {
-                    ts.getLogger().warning(".drop_goal is removing intention\n" + i);
+                    ts.getLogger().warning("'.drop_goal' is removing an intention:\n" + i);
                     return 3;
                 }
             }

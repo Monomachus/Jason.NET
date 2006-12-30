@@ -36,21 +36,21 @@ import java.io.File;
 /**
   <p>Internal action: <b><code>.create_agent</code></b>.
   
-  <p>Description: creates another agent based on some AgentSpeak
-  source code.
+  <p>Description: creates another agent using the referred AgentSpeak source
+  code.
   
   <p>Parameters:<ul>
   
-  <li>+ arg[0] (atom): the agent name.<br/>
+  <li>+ arg[0] (atom): the name for the new agent.<br/>
   
   <li>+ arg[1] (string): path to the file where the AgentSpeak code
-  for that new agent can be found. .<br/>
+  for that new agent can be found.<br/>
 
   </ul>
   
   <p>Example:<ul> 
 
-  <li> <code>.create_agent(bob,"/tmp/x.asl")</code>: creates the agent named bob from source file in "/tmp/x.asl".</li>
+  <li> <code>.create_agent(bob,"/tmp/x.asl")</code>: creates the agent named "bob" from the source file in "/tmp/x.asl".</li>
 
   </ul>
 
@@ -72,14 +72,14 @@ public class create_agent extends DefaultInternalAction {
 
             File fSource = new File(source.getString());
             if (!fSource.exists()) {
-                throw new JasonException("The file source " + source + " was not found!");
+                throw new JasonException("The source file " + source + " was not found!");
             }
 
             RuntimeServicesInfraTier rs = ts.getUserAgArch().getArchInfraTier().getRuntimeServices();
             return rs.createAgent(name.toString(), fSource.getAbsolutePath(), null, null, null, ts.getSettings());
 
         } catch (IndexOutOfBoundsException e) {
-            throw new JasonException("The internal action 'create_agent' received a wrong number of arguments");
+            throw new JasonException("The internal action 'create_agent' received a wrong number of arguments.");
         } catch (Exception e) {
             e.printStackTrace();
         }

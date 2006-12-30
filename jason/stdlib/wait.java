@@ -40,25 +40,24 @@ import java.util.logging.Level;
 /**
   <p>Internal action: <b><code>.wait(<i>E</i>,<i>T</i>)</code></b>.
   
-  <p>Description: suspend the intention for some time <i>T</i> (in
-  miliseconds) or until some event <i>E</i> happens. The events are
-  strings in the AgentSpeak syntax, e.g. <code>+bel(33)</code>,
-  <code>+!go</code>.
+  <p>Description: suspend the intention for the time specified by <i>T</i> (in
+  milliseconds) or until some event <i>E</i> happens. The events are
+  strings in AgentSpeak syntax, e.g. <code>+bel(33)</code>,
+  <code>+!go(X,Y)</code>.
   
   <p>Examples:<ul>
   <li> <code>.wait(1000)</code>: suspend the intention for 1 second.
 
-  <li> <code>.wait("+b(1)")</code>: suspend the intention until the
-  belief <code>b(1)</code> is added in the belief base.
+  <li> <code>.wait("+b(1)")</code>: suspend the intention until the belief
+  <code>b(1)</code> is added in the belief base.
 
-  <li> <code>.wait("+!g", 2000)</code>: suspend the intention until
-  the goal <code>g</code> is triggered or 2 seconds have passed.
+  <li> <code>.wait("+!g", 2000)</code>: suspend the intention until the goal
+  <code>g</code> is triggered or 2 seconds have passed, whatever happens
+  first.
 
   </ul>
 
   @see jason.stdlib.at
-
-  @author Jomi
 
  */
 public class wait extends DefaultInternalAction {
@@ -69,13 +68,13 @@ public class wait extends DefaultInternalAction {
         Trigger te = null;
         try {
             if (args[0].isNumeric()) {
-                // time in mile seconds
+                // time in milliseconds
                 NumberTerm time = (NumberTerm)args[0];
                 un.apply(time);
                 timeout = (long) time.solve();
                 // Thread.sleep((long) time.solve());
             } else if (args[0].isString()) {
-                // wait event
+                // wait for event
                 StringTerm st = (StringTerm) args[0];
                 un.apply((Term) st);
                 te = Trigger.parseTrigger(st.getString());
@@ -103,7 +102,7 @@ public class wait extends DefaultInternalAction {
 
     class WaitEvent extends Thread implements CircumstanceListener {
         Trigger          te;
-        String           sTE; // an string version of TE
+        String           sTE; // a string version of TE
         Unifier          un;
         Intention        si;
         TransitionSystem ts;
@@ -136,16 +135,15 @@ public class wait extends DefaultInternalAction {
             try {
                 waitEvent();
 
-                // unregister (to not receive intentionAdded again)
+                // unregister (for not to receive intentionAdded again)
                 c.removeEventListener(this);
 
                 // add SI again in C.I if it was not removed and this 
                 // wait was not dropped
-                if (!c.getIntentions().contains(si) && !drop) {
+                if (c.getPendingIntentions().remove(sTE) == si && !c.getIntentions().contains(si) && !drop) {
                     si.peek().removeCurrentStep();
                     c.addIntention(si);
                 }
-                c.getPendingIntentions().remove(sTE);
 
             } catch (Exception e) {
                 ts.getLogger().log(Level.SEVERE, "Error at .wait thread", e);

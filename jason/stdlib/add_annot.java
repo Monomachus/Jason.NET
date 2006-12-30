@@ -33,21 +33,23 @@ import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Literal;
 import jason.asSyntax.Term;
 
+import java.util.Iterator;
+
 /**
   <p>Internal action: <b><code>.add_annot</code></b>.
   
-  <p>Description: adds an annotation into a literal.
+  <p>Description: adds an annotation to a literal.
   
   <p>Parameters:<ul>
   
   <li>+ arg[0] (literal or list): the literal where the annotation
-  will be added. If this parameter is a list, all literals of the list
+  is to be added. If this parameter is a list, all literals in the list
   will have the annotation added.<br/>
   
   <li>+ arg[1] (structure): the annotation.<br/>
 
-  <li>+/- arg[2] (literal, or list): this argument unifies with the
-  result of the addition.<br/>
+  <li>+/- arg[2] (literal or list): this argument unifies with the
+  result of the annotation addition.<br/>
 
   </ul>
   
@@ -56,8 +58,8 @@ import jason.asSyntax.Term;
   <li> <code>.add_annot(a,source(jomi),B)</code>: <code>B</code>
   unifies with <code>a[source(jomi)]</code>.</li>
 
-  <li> <code>.add_annot(a,source(jomi),b[jomi])</code>: fail because
-  the result of the addition does not unifies the third argument.</li>
+  <li> <code>.add_annot(a,source(jomi),b[jomi])</code>: fails because
+  the result of the addition does not unify with the third argument.</li>
 
   <li> <code>.add_annot([a1,a2], source(jomi), B)</code>: <code>B</code>
   unifies with <code>[a1[source(jomi)], a2[source(jomi)]]</code>.</li>
@@ -74,7 +76,9 @@ public class add_annot extends DefaultInternalAction {
 			return un.unifies(result,args[2]);
 		} catch (ArrayIndexOutOfBoundsException e) {
 			throw new JasonException("The internal action 'add_annot' requires three arguments.");
-		}
+		} //finally {
+			//System.out.println("annot result = "+un);			
+		//}
 	}
 
 	public Term addAnnotToList(Unifier unif, Term l, Term annot) {
@@ -83,8 +87,10 @@ public class add_annot extends DefaultInternalAction {
 		}
 		if (l.isList()) {
 			ListTerm result = new ListTermImpl();
-			for (Term t: (ListTerm)l) {
-				t = addAnnotToList( unif, t, annot);
+			ListTerm lt = (ListTerm)l;
+			Iterator i = lt.iterator();
+			while (i.hasNext()) {
+				Term t = addAnnotToList( unif, (Term)i.next(), annot);
 				if (t != null) {
 					result.add(t);
 				}
@@ -97,7 +103,7 @@ public class add_annot extends DefaultInternalAction {
 				result.addAnnot(annot);
 				return result;
 			} catch (Exception e) {
-				// no problem, the content is not a pred (is a number,
+				// no problem, the content is not a pred (it is a number,
 				// string, ....) received in a message, for instance
 			}
 		}

@@ -9,20 +9,20 @@ import jason.asSyntax.Term;
 /**
 <p>Internal action: <b><code>.ground</code></b>.
 
-<p>Description: check whether the argument is ground, i.e., has
-no free variable. Numbers and Strins are always ground.
+<p>Description: checks whether the argument is ground, i.e., it has no free
+variables. Numbers, Strings, and Atoms are always ground.
 
 <p>Parameters:<ul>
 <li>+ arg[0] (any term): the term to be checked.<br/>
 </ul>
 
 <p>Examples:<ul>
-<li> <code>.ground(b(10))</code>: success.
-<li> <code>.ground(10)</code>: success.
-<li> <code>.ground(X)</code>: fail if X is free.
-<li> <code>.ground(a(X))</code>: fail if X is free.
-<li> <code>.ground([a,b,c])</code>: success.
-<li> <code>.ground([a,b,c(X)])</code>: fail if X is free.
+<li> <code>.ground(b(10))</code>: true.
+<li> <code>.ground(10)</code>: true.
+<li> <code>.ground(X)</code>: false only if X is free.
+<li> <code>.ground(a(X))</code>: false only if X is free.
+<li> <code>.ground([a,b,c])</code>: true.
+<li> <code>.ground([a,b,c(X)])</code>: false only if X is free.
 </ul>
 
   @see jason.stdlib.atom
@@ -31,7 +31,6 @@ no free variable. Numbers and Strins are always ground.
   @see jason.stdlib.number
   @see jason.stdlib.string
   @see jason.stdlib.structure
-  @see jason.stdlib.var
 
 */
 public class ground extends DefaultInternalAction {
@@ -43,7 +42,7 @@ public class ground extends DefaultInternalAction {
             un.apply(t);
             return t.isGround();
         } catch (ArrayIndexOutOfBoundsException e) {
-            throw new JasonException("The internal action 'ground' has not received one argument");
+            throw new JasonException("The internal action 'ground' has not received the required argument.");
         } catch (Exception e) {
             throw new JasonException("Error in internal action 'ground': " + e);
         }

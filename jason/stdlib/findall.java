@@ -38,24 +38,24 @@ import java.util.Iterator;
 
   <p>Internal action: <b><code>.findall(Var,Literal,List)</code></b>.
   
-  <p>Description: builds a <i>List</i> of all instantiations of
-  <i>Var</i> which make <i>Literal</i> (which has at least an instance
-  of <i>Var</i>) a logical consequence of the agent's belief base
-  (BB). Unlike Prolog, the second argument can not be a conjunction.
+  <p>Description: builds a <i>List</i> of all instantiations of <i>Var</i>
+  which make <i>Literal</i> (which has at least one instance of (variables in)
+  <i>Var</i>) a logical consequence of the agent's BB. Unlike in Prolog, the
+  second argument cannot be a conjunction.
 
   <p>Parameters:<ul>
   
-  <li>+ arg[0] (variable or structure): the variable or structure that
-  "populate" the list.<br/>
+  <li>+ arg[0] (variable or structure): the variable or structure whose
+  instances will "populate" the list.<br/>
   
-  <li>+ arg[1] (litetal): the literal in belief base.<br/>
+  <li>+ arg[1] (literal): the literal to match against the belief base.<br/>
 
-  <li>+/- arg[2] (list): the resulting list.<br/>
+  <li>+/- arg[2] (list): the resulting populated list.<br/>
   
   </ul>
   
-  <p>Examples supposing BB as composed by
-  {a(30),a(20),b(1,2),b(3,4),b(5,6)} :
+  <p>Examples supposing the BB is currently
+  {a(30),a(20),b(1,2),b(3,4),b(5,6)}:
 
   <ul>
 
@@ -78,7 +78,7 @@ public class findall extends DefaultInternalAction {
             Term var = args[0];
             Literal bel = (Literal)args[1];
             un.apply(bel);
-            // find all bel in belief base and build a list with them
+            // find all 'bel' entries in the belief base and builds up a list with them
             ListTerm all = new ListTermImpl();
             Iterator<Unifier> iu = bel.logicalConsequence(ts.getAg(), un);
             while (iu.hasNext()) {
@@ -90,7 +90,7 @@ public class findall extends DefaultInternalAction {
             Term list = args[2];
             return un.unifies(list, all);
         } catch (ArrayIndexOutOfBoundsException e) {
-            throw new JasonException("The internal action 'findall' has not received three arguments");
+            throw new JasonException("The internal action 'findall' has not received three arguments.");
         } catch (Exception e) {
             throw new JasonException("Error in internal action 'findall': " + e);
         }

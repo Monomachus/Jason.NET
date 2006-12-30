@@ -32,9 +32,9 @@ import jason.asSyntax.Term;
 /**
   <p>Internal action: <b><code>.current_intention</code></b>.
   
-  <p>Description: gets a description of the current intention. It is
-  useful for plans that needs to inpect the current intention. The
-  description of the intention has the following form:<br><br>
+  <p>Description: returns a description of the current intention. It is useful
+  for plans that need to inspect the current intention. The description of the
+  intention has the following form:<br><br>
 
   <code>intention(<i>id</i>,<i>stack of intended means</i>)</code><br><br>
 
@@ -56,13 +56,16 @@ import jason.asSyntax.Term;
 
   <p>Parameters:<ul>
   
-  <li>- arg[0] (structure): the variable that unifies with the intention description.</li>
+  <li>- arg[0] (structure): the variable that unifies with the intention
+  description.</li>
   
   </ul>
   
   <p>Example:<ul> 
 
-  <li> <code>.current_intention(X)</code>: unifies X with the current intention description.</li>
+  <li> <code>.current_intention(X)</code>: <code>X</code> unifies with the
+  descriptions of the current intention (i.e. the intention that executed this
+  internal action).</li>
 
   </ul>
 
@@ -81,7 +84,7 @@ public class current_intention extends DefaultInternalAction {
         try {
             return un.unifies(ts.getC().getSelectedIntention().getAsTerm(), args[0]);
         } catch (ArrayIndexOutOfBoundsException e) {
-            throw new JasonException("The internal action 'current_intention' has not received one arguments");
+            throw new JasonException("The internal action 'current_intention' has not received the required argument.");
         } catch (Exception e) {
             throw new JasonException("Error in internal action 'current_intention': " + e);
         }    

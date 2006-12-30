@@ -30,22 +30,20 @@ import jason.asSemantics.Unifier;
 import jason.asSyntax.Term;
 
 
-
-
 /**
   <p>Internal action: <b><code>.kill_agent</code></b>.
   
-  <p>Description: kills the agent whose name is given as
-     parameter. This is a provisional internal action, while we find
-     more adequate mechanisms for creating and killing agents. In
-     particular, note that an agent can kill any other agent, without
-     any consideration on permissions, etc! It is the programmers'
-     responsibility to use this action.
+  <p>Description: kills the agent whose name is given as parameter. This is a
+     provisional internal action to be used while more adequate mechanisms for
+     creating and killing agents are being developed. In particular, note that
+     an agent can kill any other agent, without any consideration on
+     permissions, etc.! It is the programmers' responsibility to use this
+     action.
 
   
   <p>Parameters:<ul>
   
-  <li>+ arg[0] (atom): the agent name.<br/>
+  <li>+ arg[0] (atom): the name of the agent to be killed.<br/>
 
   </ul>
   
@@ -70,7 +68,7 @@ public class kill_agent extends DefaultInternalAction {
             un.apply(name);
             return ts.getUserAgArch().getArchInfraTier().getRuntimeServices().killAgent(name.toString());
 		} catch (IndexOutOfBoundsException e) {
-			throw new JasonException("The internal action 'kill_agent' received a wrong number of arguments");
+			throw new JasonException("The internal action 'kill_agent' received a wrong number of arguments.");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

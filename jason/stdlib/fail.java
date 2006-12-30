@@ -32,7 +32,8 @@ import jason.asSyntax.Term;
 
   <p>Internal action: <b><code>.fail</code></b>.
   
-  <p>Description: fails the intention. 
+  <p>Description: fails the intention where it is run (an internal action that
+  always returns false).
 
   <p>Example:<ul> 
 
@@ -41,7 +42,7 @@ import jason.asSyntax.Term;
   </ul>
   
  */
-public class fail extends DefaultInternalAction{
+public class fail extends DefaultInternalAction {
 
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {

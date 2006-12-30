@@ -40,24 +40,24 @@ import java.util.Iterator;
 /**
   <p>Internal action: <b><code>.add_plan</code></b>.
   
-  <p>Description: adds plan(s) into the agent plan library.
+  <p>Description: adds plan(s) to the agent's plan library.
   
   <p>Parameters:<ul>
   
-  <li>+ arg[0] (string or list): the string representing the plan to
-  be added. If it is a list, all strings of the list will be added as
-  plans. The syntax of the string is the same as ordinary AgentSpeak
-  code.<br/>
+  <li>+ arg[0] (string or list): the string representing the plan to be
+  added. If it is a list, each string in the list will be parsed into an
+  AgentSpeak plan and added to the plan library. The syntax of the code within
+  the string is the same as ordinary AgentSpeak code.<br/>
   
-  <li><i>+ arg[1]</i> (structure - optional): the source of the
-  plan. The default value is <code>self</code>.<br/>
+  <li><i>+ arg[1]</i> (structure [optional]): the source of the plan. The
+  default value for the source is <code>self</code>.<br/>
   
   </ul>
   
   <p>Examples:<ul> 
 
   <li> <code>.add_plan("+b : true &lt;- .print(b).")</code>: adds the plan
-  <code>+b : true &lt;- .print(b).</code> into the agent's plan library
+  <code>+b : true &lt;- .print(b).</code> to the agent's plan library
   with a plan label annotated with <code>source(self)</code>.</li>
 
   <li> <code>.add_plan("+b : true &lt;- .print(b).", rafa)</code>: same as
@@ -65,8 +65,8 @@ import java.util.Iterator;
   "rafa".</li>
 
   <li> <code>.add_plan(["+b : true &lt;- .print(b).", "+b : bel &lt;-
-  .print(bbel)."], rafa)</code>: adds both plans with "rafa" as they
-  source.</li>
+  .print(b,bel)."], rafa)</code>: adds both plans with "rafa" as their
+  sources.</li>
 
   </ul>
 
@@ -88,7 +88,7 @@ public class add_plan extends DefaultInternalAction {
                 un.apply(source);
             }
 
-            if (plans.isList()) { // if arg[0] is a list of strings
+            if (plans.isList()) { // arg[0] is a list of strings
                 ListTerm lt = (ListTerm) plans;
                 Iterator i = lt.iterator();
                 while (i.hasNext()) {
@@ -99,7 +99,7 @@ public class add_plan extends DefaultInternalAction {
             }
             return true;
         } catch (ArrayIndexOutOfBoundsException e) {
-            throw new JasonException("The internal action 'add_plan' has not received two arguments (plan's string and source)");
+            throw new JasonException("The internal action 'add_plan' has not received two arguments (a plan as a string and the source).");
         } catch (Exception e) {
             throw new JasonException("Error in internal action 'add_plan': " + e);
         }

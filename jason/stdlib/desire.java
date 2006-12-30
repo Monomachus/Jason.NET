@@ -37,9 +37,9 @@ import jason.asSyntax.Trigger;
 /**
   <p>Internal action: <b><code>.desire(<i>D</i>)</code></b>.
   
-  <p>Description: checks if <i>D</i> is a desire: <i>D</i> is a desire
+  <p>Description: checks whether <i>D</i> is a desire: <i>D</i> is a desire
   either if there is an event with <code>+!D</code> as triggering
-  event or it is an intention.
+  event or it is a goal in one of the agent's intentions.
   
   <p>Example:<ul> 
 
@@ -67,7 +67,7 @@ public class desire extends intend {
             un.apply(l);
             return desires(ts.getC(),l,un);
         } catch (ArrayIndexOutOfBoundsException e) {
-            throw new JasonException("The internal action 'desire' has not received one argument.");
+            throw new JasonException("The internal action 'desire' has not received the required argument.");
         } catch (Exception e) {
             throw new JasonException("Error in internal action 'desire': " + e);
         }
@@ -76,7 +76,7 @@ public class desire extends intend {
     public boolean desires(Circumstance C, Literal l, Unifier un) {
         Trigger teFromL = new Trigger(Trigger.TEAdd, Trigger.TEAchvG, l);
 
-        // need to check the slected event in this cycle!!! (already
+        // we need to check the slected event in this cycle!!! (already
         // removed from E)
         if (C.getSelectedEvent() != null) {
             Trigger t = C.getSelectedEvent().getTrigger();
@@ -100,6 +100,6 @@ public class desire extends intend {
             }
         }
 
-        return super.intends(C, l, un); // Int subset Des (see formal definitions)
+        return super.intends(C, l, un); // Int subset Des (see the formal definitions)
     }
 }

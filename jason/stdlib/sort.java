@@ -37,8 +37,8 @@ import java.util.Collections;
 
   <p>Internal action: <b><code>.sort</code></b>.
 
-  <p>Description: sort lists. It is used the "natural" order of the
-  terms. Among different types of terms, the following order is
+  <p>Description: sorts a list of terms. The "natural" order for each type of
+  terms is used. Between different types of terms, the following order is
   used:<br>
 
   numbers &lt; atoms &lt; structures &lt; lists 
@@ -58,6 +58,12 @@ import java.util.Collections;
   <code>X</code> unifies with
   <code>[5,10,b,c,casa,g,f(4),f(10),[3,4],[3,10]]</code>.
 
+  <li>
+  <code>.sort([3,2,5],[2,3,5])</code>: true.
+
+  <li>
+  <code>.sort([3,2,5],[a,b,c])</code>: false.
+
   </ul>
 
   @see jason.stdlib.concat
@@ -75,7 +81,7 @@ public class sort extends DefaultInternalAction {
             Collections.sort(l1);
             return un.unifies(l1, l2);
         } catch (ArrayIndexOutOfBoundsException e) {
-            throw new JasonException("The internal action 'sort' has not received two arguments");
+            throw new JasonException("The internal action 'sort' has not received two arguments.");
         } catch (Exception e) {
             throw new JasonException("Error in internal action 'sort': " + e);
         }    

@@ -28,16 +28,15 @@ import jason.JasonException;
 import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
-import jason.asSyntax.ListTerm;
-import jason.asSyntax.Pred;
-import jason.asSyntax.Structure;
 import jason.asSyntax.Atom;
+import jason.asSyntax.ListTerm;
+import jason.asSyntax.Structure;
 import jason.asSyntax.Term;
 
 /**
   <p>Internal action: <b><code>.remove_plan</code></b>.
   
-  <p>Description: remove plans from the agent's plan library (PL).
+  <p>Description: remove plans from the agent's plan library.
 
   <p>Parameters:<ul>
   
@@ -45,8 +44,8 @@ import jason.asSyntax.Term;
   plan to be removed. If this parameter is a list of labels, all plans
   of this list are removed.</li>
   
-  <li><i>+ arg[1]</i> (structure -- optional): the source of the
-  plan to be removed. The default value if <code>self</code>.</li>
+  <li><i>+ arg[1]</i> (structure [optional]): the source of the
+  plan to be removed. The default value is <code>self</code>.</li>
   
   </ul>
   
@@ -57,15 +56,15 @@ import jason.asSyntax.Term;
 
   <li> <code>.remove_plan(l1,bob)</code>: removes the plan identified
   by label <code>l1[source(bob)]</code>. Note that a plan with a
-  source like that was probably added in the PL by tellHow
-  messages.</li>
+  source like that was probably added to the plan library by a tellHow
+  message.</li>
 
-  <li> <code>.remove_plan([l1,l2,l3])</code>: removes plans identified
-  by labels <code>l1[source(self)], l2[source(self)]</code>, and
+  <li> <code>.remove_plan([l1,l2,l3])</code>: removes the plans identified
+  by labels <code>l1[source(self)]</code>, <code>l2[source(self)]</code>, and
   <code>l3[source(self)]</code>.</li>
 
-  <li> <code>.remove_plan([l1,l2,l3],bib)</code>: removes plans identified
-  by labels <code>l1[source(bob)], l2[source(bob)]</code>, and
+  <li> <code>.remove_plan([l1,l2,l3],bob)</code>: removes the plans identified
+  by labels <code>l1[source(bob)]</code>, <code>l2[source(bob)]</code>, and
   <code>l3[source(bob)]</code>.</li>
 
   </ul>
@@ -74,8 +73,6 @@ import jason.asSyntax.Term;
   @see jason.stdlib.add_plan
   @see jason.stdlib.plan_label
   @see jason.stdlib.relevant_plans
-
-  @author Jomi
 
  */
 public class remove_plan extends DefaultInternalAction {
@@ -92,18 +89,18 @@ public class remove_plan extends DefaultInternalAction {
         		un.apply(source);
         	}
         	
-        	if (label.isList()) { // if arg[0] is a list
+        	if (label.isList()) { // arg[0] is a list
         		boolean r = true;
         		ListTerm lt = (ListTerm)args[0];
                 for (Term t: lt) {
         			r = r && ts.getAg().getPL().removePlan((Structure)t, source);
         		}
         		return r;
-        	} else { // args[0] is a plan's label
+        	} else { // args[0] is a plan label
         		return ts.getAg().getPL().removePlan((Structure)label, source);
         	}
         } catch (ArrayIndexOutOfBoundsException e) {
-            throw new JasonException("The internal action 'remove_plan' has not received the plan's label as argument.");
+            throw new JasonException("The internal action 'remove_plan' has not received the required argument (a plan label or list of labels).");
         } 
     }
 }

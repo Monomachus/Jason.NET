@@ -39,9 +39,9 @@ import jason.asSyntax.Term;
   
   <p>Parameters:<ul>
   
-  <li>+/- arg[0] (variable or atom): if variable, unifies the agent name
-  and the variable; if atom, succeed if the atom is equals to the
-  agent's name.<br/>
+  <li>+/- arg[0] (variable or atom): if this is a variable, unifies the agent
+  name and the variable; if is is an atom, succeeds if the atom is equal to
+  the agent's name.<br/>
 
   </ul>
   
@@ -64,10 +64,10 @@ public class myName extends DefaultInternalAction {
     @Override
 	public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
 		try {
-			ts.getLogger().info("use .my_name instead of .myName");
+			ts.getLogger().info("Deprecated: use .my_name instead of .myName.");
             return un.unifies(args[0], new Structure(ts.getUserAgArch().getAgName()));
 		} catch (ArrayIndexOutOfBoundsException e) {
-			throw new JasonException("The internal action 'myName' has not received one argument");
+			throw new JasonException("The internal action 'myName' has not received the required argument.");
 		}
 	}
 }

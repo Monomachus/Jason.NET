@@ -18,7 +18,7 @@ import java.util.GregorianCalendar;
 
   <p>Parameters:<ul>
   
-  <li>+/- arg[0] (number): the hour (0--23).</li>
+  <li>+/- arg[0] (number): the hours (0--23).</li>
   <li>+/- arg[1] (number): the minutes (0--59).</li>
   <li>+/- arg[2] (number): the seconds (0--59).</li>
   
@@ -29,7 +29,8 @@ import java.util.GregorianCalendar;
   <li> <code>.time(H,M,S)</code>: unifies H with the current hour, M
   with the current minutes, and S with the current seconds.</li>
 
-  <li> <code>.time(15,_,_)</code>: succeed if now is 3pm.</li>
+  <li> <code>.time(15,_,_)</code>: succeeds if it is now 3pm or a bit later
+  but not yet 4pm.</li>
 
   </ul>
 
@@ -46,7 +47,7 @@ public class time extends DefaultInternalAction {
                    un.unifies(args[1], new NumberTermImpl(now.get(Calendar.MINUTE))) &&
                    un.unifies(args[2], new NumberTermImpl(now.get(Calendar.SECOND)));
         } catch (ArrayIndexOutOfBoundsException e) {
-            throw new JasonException("The internal action 'time' has not received three arguments");
+            throw new JasonException("The internal action 'time' has not received three arguments.");
         } catch (Exception e) {
             throw new JasonException("Error in internal action 'time': " + e);
         }

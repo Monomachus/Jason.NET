@@ -7,28 +7,27 @@ import jason.asSemantics.Unifier;
 import jason.asSyntax.Term;
 
 /**
-<p>Internal action: <b><code>.number</code></b>.
+  <p>Internal action: <b><code>.number</code></b>.
 
-<p>Description: check whether the argument is a number. 
+  <p>Description: checks whether the argument is a number. 
 
-<p>Parameters:<ul>
-<li>+ arg[0] (any term): the term to be checked.<br/>
-</ul>
+  <p>Parameter:<ul>
+  <li>+ arg[0] (any term): the term to be checked.<br/>
+  </ul>
 
-<p>Examples:<ul>
-<li> <code>.number(10)</code>: success.
-<li> <code>.number(10.34)</code>: success.
-<li> <code>.number(b(10))</code>: fail.
-<li> <code>.number("home page")</code>: fail.
-<li> <code>.number(X)</code>: fail if X is free and success if X is bind with a number.
-</ul>
+  <p>Examples:<ul>
+  <li> <code>.number(10)</code>: true.
+  <li> <code>.number(10.34)</code>: true.
+  <li> <code>.number(b(10))</code>: false.
+  <li> <code>.number("home page")</code>: false.
+  <li> <code>.number(X)</code>: false if X is free, true if X is bound to a number.
+  </ul>
 
   @see jason.stdlib.atom
   @see jason.stdlib.list
   @see jason.stdlib.literal
   @see jason.stdlib.string
   @see jason.stdlib.structure
-  @see jason.stdlib.var
   @see jason.stdlib.ground
 
 */
@@ -41,7 +40,7 @@ public class number extends DefaultInternalAction {
             un.apply(t);
             return t.isNumeric();
         } catch (ArrayIndexOutOfBoundsException e) {
-            throw new JasonException("The internal action 'number' has not received one argument");
+            throw new JasonException("The internal action 'number' has not received the required argument.");
         } catch (Exception e) {
             throw new JasonException("Error in internal action 'number': " + e);
         }

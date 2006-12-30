@@ -7,32 +7,31 @@ import jason.asSemantics.Unifier;
 import jason.asSyntax.Term;
 
 /**
-<p>Internal action: <b><code>.literal</code></b>.
+  <p>Internal action: <b><code>.literal</code></b>.
 
-<p>Description: check whether the argument is a literal (a structure and not a list),
- e.g.: "p", "p(1)", "p(1)[a,b]", "~p(1)[a,b]". 
+  <p>Description: checks whether the argument is a literal,
+  e.g.: "p", "p(1)", "p(1)[a,b]", "~p(1)[a,b]". 
 
-<p>Parameters:<ul>
-<li>+ arg[0] (any term): the term to be checked.<br/>
-</ul>
+  <p>Parameter:<ul>
+  <li>+ arg[0] (any term): the term to be checked.<br/>
+  </ul>
 
-<p>Examples:<ul>
-<li> <code>.literal(b(10))</code>: success.
-<li> <code>.literal(b)</code>: success.
-<li> <code>.literal(10)</code>: fail.
-<li> <code>.literal("Jason")</code>: fail.
-<li> <code>.literal(X)</code>: fail if X is free and success if X is bind with a literal.
-<li> <code>.literal(a(X))</code>: success.
-<li> <code>.literal([a,b,c])</code>: fail.
-<li> <code>.literal([a,b,c(X)])</code>: fail.
-</ul>
+  <p>Examples:<ul>
+  <li> <code>.literal(b(10))</code>: true.
+  <li> <code>.literal(b)</code>: true.
+  <li> <code>.literal(10)</code>: false.
+  <li> <code>.literal("Jason")</code>: false.
+  <li> <code>.literal(X)</code>: false if X is free, true if X is bount to a literal.
+  <li> <code>.literal(a(X))</code>: true.
+  <li> <code>.literal([a,b,c])</code>: false.
+  <li> <code>.literal([a,b,c(X)])</code>: false.
+  </ul>
 
   @see jason.stdlib.atom
   @see jason.stdlib.list
   @see jason.stdlib.number
   @see jason.stdlib.string
   @see jason.stdlib.structure
-  @see jason.stdlib.var
   @see jason.stdlib.ground
 */
 public class literal extends DefaultInternalAction {
@@ -44,7 +43,7 @@ public class literal extends DefaultInternalAction {
             un.apply(t);
             return t.isLiteral();
         } catch (ArrayIndexOutOfBoundsException e) {
-            throw new JasonException("The internal action 'literal' has not received one argument");
+            throw new JasonException("The internal action 'literal' has not received the required argument.");
         } catch (Exception e) {
             throw new JasonException("Error in internal action 'literal': " + e);
         }
