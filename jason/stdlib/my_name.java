@@ -27,7 +27,7 @@ import jason.JasonException;
 import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
-import jason.asSyntax.Structure;
+import jason.asSyntax.Atom;
 import jason.asSyntax.Term;
 
 /**
@@ -61,7 +61,7 @@ public class my_name extends DefaultInternalAction {
     @Override
 	public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
 		try {
-            return un.unifies(args[0], new Structure(ts.getUserAgArch().getAgName()));
+            return un.unifies(args[0], new Atom(ts.getUserAgArch().getAgName()));
 		} catch (ArrayIndexOutOfBoundsException e) {
 			throw new JasonException("The internal action 'my_name' has not received the required argument.");
 		}

@@ -233,6 +233,10 @@ public class Circumstance implements Serializable {
         return PI != null && PI.size() > 0;
     }
     
+    public void clearPendingIntentions() {
+    	PI.clear();
+    }
+    
     public boolean dropPendingIntention(Intention i) {
         Iterator<Intention> it = PI.values().iterator();
         while (it.hasNext()) {
@@ -267,6 +271,10 @@ public class Circumstance implements Serializable {
 
     public Map<String, ActionExec> getPendingActions() {
         return PA;
+    }
+    
+    public void clearPendingActions() {
+    	PA.clear();
     }
 
     public boolean hasPendingAction() {

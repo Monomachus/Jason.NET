@@ -227,9 +227,8 @@ public class Agent {
 
         // deleting percepts in the BB that is not perceived anymore
         Iterator<Literal> perceptsInBB = getBB().getPercepts();
-        while (perceptsInBB.hasNext()) { // for (int i = 0; i <
-            // perceptsInBB.size(); i++) {
-            Literal l = perceptsInBB.next(); // get(i);
+        while (perceptsInBB.hasNext()) { 
+            Literal l = perceptsInBB.next();
 
             // could not use percepts.contains(l), since equalsAsTerm must be
             // used (to ignore annotations)
@@ -350,8 +349,7 @@ public class Agent {
             }
 
             if (logger.isLoggable(Level.FINE)) {
-                logger.fine("doing brf for " + beliefToDel + " in BB="
-                        + believes(beliefToDel, u));
+                logger.fine("doing brf for " + beliefToDel + " in BB=" + believes(beliefToDel, u));
             }
             Literal inBB = believes(beliefToDel, u);
             if (inBB != null) {
