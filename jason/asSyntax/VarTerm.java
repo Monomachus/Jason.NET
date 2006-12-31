@@ -192,10 +192,13 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
             return ((LogicalFormula)value).logicalConsequence(ag, un);
         else {
             // try to apply
-            VarTerm c = (VarTerm) this.clone();
-            un.apply(c);
-            if (c.hasValue() && c.getValue() instanceof LogicalFormula) {
-                return ((LogicalFormula)c.getValue()).logicalConsequence(ag, un);
+            Term t = (Term) this.clone();
+            if (t instanceof VarTerm) { // the clone is still a var
+                VarTerm c = (VarTerm)t;
+                un.apply(c);
+                if (c.hasValue() && c.getValue() instanceof LogicalFormula) {
+                    return ((LogicalFormula)c.getValue()).logicalConsequence(ag, un);
+                }
             }
         }
         return null;

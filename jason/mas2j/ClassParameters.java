@@ -3,11 +3,14 @@ package jason.mas2j;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import jason.asSyntax.*;
 
 /** 
  * Used to store class parameters in .mas2j file, e.g. 
  *      environment: Mars(a,b,c); 
- * this class stores "Mars(a,b,c)"
+ * this class stores 
+ *   className  = Mars,
+ *   parameters = {a,b,c}
  * 
  * @author jomi
  */
@@ -19,6 +22,14 @@ public class ClassParameters {
     public ClassParameters() {}
     public ClassParameters(String className) {
         this.className = className;
+    }
+    public ClassParameters(Structure s) {
+        className = s.getFunctor();
+        if (s.getTermsSize() > 0) {
+            for (Term t: s.getTerms()) {
+                parameters.add(t.toString());
+            }
+        }
     }
     
     public String[] getParametersArray() {        

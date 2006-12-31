@@ -27,9 +27,9 @@ import jason.JasonException;
 import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
-import jason.asSyntax.StringTerm;
-import jason.asSyntax.Term;
+import jason.asSyntax.*;
 import jason.runtime.RuntimeServicesInfraTier;
+import jason.mas2j.ClassParameters;
 
 import java.io.File;
 
@@ -46,11 +46,33 @@ import java.io.File;
   <li>+ arg[1] (string): path to the file where the AgentSpeak code
   for that new agent can be found.<br/>
 
+  <li><i>+ arg[2]</i> (list -- optional): list of optional parameters
+  as agent class, architecture and belief base.<br/>
+
   </ul>
   
-  <p>Example:<ul> 
+  <p>Examples:<ul> 
 
   <li> <code>.create_agent(bob,"/tmp/x.asl")</code>: creates the agent named "bob" from the source file in "/tmp/x.asl".</li>
+
+  <li>
+  <code>.create_agent(bob,"x.asl", [agentClass(myp.MyAgent)])</code>:
+  creates the agent with customised agent class
+  <code>myp.MyAgent</code>.</li>
+
+  <code>.create_agent(bob,"x.asl", [agentArchClass(myp.MyArch)])</code>:
+  creates the agent with customised architecture class
+  <code>myp.MyArch</code>.</li>
+
+  <code>.create_agent(bob,"x.asl", [beliefBaseClass(jason.bb.TextPersistentBB)])</code>:
+  creates the agent with customised belief base
+  <code>jason.bb.TextPersistentBB</code>.</li>
+
+  <code>.create_agent(bob,"x.asl", [agentClass(myp.MyAgent),
+  agentArchClass(myp.MyArch),
+  beliefBaseClass(jason.bb.TextPersistentBB)])</code>: creates the
+  agent with agent, acrchitecture and belief base customised.</li>
+
 
   </ul>
 
@@ -75,8 +97,28 @@ public class create_agent extends DefaultInternalAction {
                 throw new JasonException("The source file " + source + " was not found!");
             }
 
+            String agClass = null;
+            String agArchClass = null;
+            ClassParameters bbPars = null;
+            if (args.length > 2) { // optional parameter
+                // get the parameters
+                for (Term t: (ListTerm)args[2]) {
+                    if (t.isStructure()) {
+                        Structure s = (Structure)t;
+                        if (s.getFunctor().equals("beliefBaseClass")) {
+                            bbPars = new ClassParameters((Structure)s.getTerm(0));
+                        } else if (s.getFunctor().equals("agentClass")) {
+                            agClass = s.getTerm(0).toString();
+                        } else if (s.getFunctor().equals("agentArchClass")) {
+                            agArchClass = s.getTerm(0).toString();
+                        }
+                    }
+                }
+
+            }
+
             RuntimeServicesInfraTier rs = ts.getUserAgArch().getArchInfraTier().getRuntimeServices();
-            return rs.createAgent(name.toString(), fSource.getAbsolutePath(), null, null, null, ts.getSettings());
+            return rs.createAgent(name.toString(), fSource.getAbsolutePath(), agClass, agArchClass, bbPars, ts.getSettings());
 
         } catch (IndexOutOfBoundsException e) {
             throw new JasonException("The internal action 'create_agent' received a wrong number of arguments.");
