@@ -116,7 +116,7 @@ public class send extends DefaultInternalAction {
         Term to   = null;
         Term ilf  = null;
         Term pcnt = null;
-	// check parameters
+        // check parameters
         try {
             to   = args[0];
             ilf  = args[1];
@@ -194,7 +194,11 @@ public class send extends DefaultInternalAction {
                 // get the timeout deadline
                 NumberTerm tto = (NumberTerm)args[4];
                 un.apply(tto);
-                new CheckTimeout((long)tto.solve(), m.getMsgId(), ts.getC()).start(); 
+                if (tto.isNumeric()) {
+                    new CheckTimeout((long)tto.solve(), m.getMsgId(), ts.getC()).start(); 
+                } else {
+                    throw new JasonException("The 5th parameter of send must be a number (timeout)!");
+                }
             }
             
             return true;
