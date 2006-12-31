@@ -31,8 +31,11 @@ public class TextPersistentBB extends DefaultBeliefBase {
         try {
             logger.fine("writting to file " + file);
             PrintWriter out = new PrintWriter(new FileWriter(file));
+            out.println("// BB stored by TextPersistentBB\n");
             for (Literal b: this) {
-                out.println(b.toString()+".");
+                if (! b.isRule()) {
+                    out.println(b.toString()+".");
+                }
             }
             out.close();
         } catch (Exception e) {
