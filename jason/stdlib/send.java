@@ -140,7 +140,7 @@ public class send extends DefaultInternalAction {
             } catch (Exception e) {}
             
         } catch (ArrayIndexOutOfBoundsException e) {
-            throw new JasonException("The internal action 'send' has not received three arguments.");
+            throw new JasonException("The internal action 'send' to '"+to+"' has not received three arguments.");
         } 
         Message m = new Message(ilf.toString(), null, null, pcnt.toString());
 
@@ -153,11 +153,9 @@ public class send extends DefaultInternalAction {
         // tell with 4 args is a reply to
         if (m.isTell() && args.length > 3) {
             Term mid = args[3];
-            if (mid.isVar()) {
-            	un.apply(mid);
-            }
+            un.apply(mid);
             if (! mid.isAtom()) {
-                throw new JasonException("The Message ID parameter of the internal action 'send' is not an atom!");            	            	
+                throw new JasonException("The Message ID ('"+mid+"') parameter of the internal action 'send' is not an atom!");
             }
             m.setInReplyTo(mid.toString());
         }
@@ -192,12 +190,12 @@ public class send extends DefaultInternalAction {
             
             if (lastSendWasSynAsk && args.length == 5) {
                 // get the timeout deadline
-                NumberTerm tto = (NumberTerm)args[4];
+                Term tto = (Term)args[4];
                 un.apply(tto);
                 if (tto.isNumeric()) {
-                    new CheckTimeout((long)tto.solve(), m.getMsgId(), ts.getC()).start(); 
+                    new CheckTimeout((long)((NumberTerm)tto).solve(), m.getMsgId(), ts.getC()).start(); 
                 } else {
-                    throw new JasonException("The 5th parameter of send must be a number (timeout)!");
+                    throw new JasonException("The 5th parameter of send must be a number (timeout) and not '"+tto+"'!");
                 }
             }
             
