@@ -11,7 +11,7 @@ public class CentralisedFactory implements InfrastructureFactory {
 	}
 	
 	public RuntimeServicesInfraTier createRuntimeServices() {
-		return new CentralisedRuntimeServices();
+		return new CentralisedRuntimeServices(RunCentralisedMAS.getRunner());
 	}
 
 }

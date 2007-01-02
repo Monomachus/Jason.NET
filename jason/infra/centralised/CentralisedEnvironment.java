@@ -25,40 +25,30 @@
 package jason.infra.centralised;
 
 import jason.JasonException;
-import jason.architecture.AgArch;
-import jason.asSemantics.Message;
 import jason.environment.Environment;
 import jason.environment.EnvironmentInfraTier;
 import jason.mas2j.ClassParameters;
 import jason.runtime.RuntimeServicesInfraTier;
 
 import java.util.Collection;
-import java.util.Map;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
 /**
  * This class implements the centralised version of the environment infrastructure tier.
- * It also manages the current agents inside the MAS, their mailboxes, etc.
  */
 public class CentralisedEnvironment implements EnvironmentInfraTier {
 
-    private Map<String,Queue<Message>> mboxes;
-    private Map<String,AgArch> agents;
-    
     /** the user customisation class for the environment */
 	private Environment fUserEnv;
+
+	private RunCentralisedMAS masRunner = null;
     
     static Logger logger = Logger.getLogger(CentralisedEnvironment.class.getName());
 	
-    public CentralisedEnvironment(ClassParameters userEnv) throws JasonException {
-        mboxes      = new ConcurrentHashMap<String, Queue<Message>>();
-        agents      = new ConcurrentHashMap<String, AgArch>();
-        
+    public CentralisedEnvironment(ClassParameters userEnv, RunCentralisedMAS masRunner) throws JasonException {
+        this.masRunner = masRunner;
         try { 
 			fUserEnv = (Environment) getClass().getClassLoader().loadClass(userEnv.className).newInstance();
 			fUserEnv.setEnvironmentInfraTier(this);
@@ -79,8 +69,8 @@ public class CentralisedEnvironment implements EnvironmentInfraTier {
     }
 
     public void informAgsEnvironmentChanged() {
-        for (AgArch agArch: agents.values()) {
-            agArch.getTS().newMessageHasArrived();
+        for (CentralisedAgArch ag: masRunner.getAgs().values()) {
+            ag.getUserAgArch().getTS().newMessageHasArrived();
         }
     }
 
@@ -89,9 +79,9 @@ public class CentralisedEnvironment implements EnvironmentInfraTier {
             informAgsEnvironmentChanged();
         } else {
             for (String agName: agentsToNotify) {
-                AgArch agArch = getAgent(agName);
-                if (agArch != null) {
-                    agArch.getTS().newMessageHasArrived();
+            	CentralisedAgArch ag = masRunner.getAg(agName);
+                if (ag != null) {
+                    ag.getUserAgArch().getTS().newMessageHasArrived();
                 } else {
                     logger.log(Level.SEVERE, "Error sending message notification: agent " + agName + " does not exist!");
                 }
@@ -99,37 +89,7 @@ public class CentralisedEnvironment implements EnvironmentInfraTier {
         }
     }
 
-    
-    public void addAgent(AgArch agent) {
-        if (mboxes.get(agent.getAgName()) != null) {
-            logger.warning("Warning: adding an agent that already exists: " + agent.getAgName());
-        }
-        mboxes.put(agent.getAgName(), new ConcurrentLinkedQueue<Message>());
-        agents.put(agent.getAgName(), agent);
-    }
-
-    public void delAgent(AgArch agent) {
-        mboxes.remove(agent.getAgName());
-        agents.remove(agent.getAgName());
-    }
-    
-    public Queue<Message> getAgMbox(String name) {
-        return mboxes.get(name);
-    }
-    
-    /** 
-     * Returns the agents map, key is the agent name (String) and value 
-     * is the AgArch agent object.
-     */
-    public Map<String,AgArch> getAgents() {
-    	    return agents;
-    }
-        
-    public AgArch getAgent(String name) {
-        return agents.get(name);
-    }
-
     public RuntimeServicesInfraTier getRuntimeServices() {
-        return new CentralisedRuntimeServices();
+        return new CentralisedRuntimeServices(masRunner);
     }
 }

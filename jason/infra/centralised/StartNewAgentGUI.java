@@ -24,7 +24,9 @@ import javax.swing.filechooser.FileFilter;
 
 public class StartNewAgentGUI extends BaseDialogGUI {
 
-    protected JTextField agName;
+	private static final long serialVersionUID = 1L;
+
+	protected JTextField agName;
     protected JTextField agSource;
     protected JTextField archClass;
     protected JTextField agClass;

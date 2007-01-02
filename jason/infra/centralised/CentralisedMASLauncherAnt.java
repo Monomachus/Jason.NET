@@ -55,11 +55,11 @@ public class CentralisedMASLauncherAnt implements MASLauncherInfraTier {
             Thread.sleep(300);
             stop = false;
 			// read the program output and print it out
-            while (!stop) {// || saciProcess!=null) {
-                while (!stop && in.ready()) {
+            while (!stop) {
+                while (in.ready()) {
                     System.out.println(in.readLine());
                 }
-                while (!stop && err.ready()) {
+                while (err.ready()) {
                     System.out.println(err.readLine());
                 }
                 Thread.sleep(250); // to not consume cpu
@@ -71,6 +71,13 @@ public class CentralisedMASLauncherAnt implements MASLauncherInfraTier {
                 } catch (Exception e) {
                 }
             }
+            while (in.ready()) {
+                System.out.println(in.readLine());
+            }
+            while (err.ready()) {
+                System.out.println(err.readLine());
+            }
+            System.out.flush();
         } catch (Exception e) {
             System.err.println("Execution error: " + e);
             e.printStackTrace();

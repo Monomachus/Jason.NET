@@ -41,8 +41,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
@@ -64,7 +64,7 @@ public class RunCentralisedMAS {
 
     public JButton                   btDebug;
 
-    List<CentralisedAgArch>          ags         = new ArrayList<CentralisedAgArch>();
+    private Map<String,CentralisedAgArch> ags    = new ConcurrentHashMap<String,CentralisedAgArch>();
 
     private static Logger            logger      = Logger.getLogger(RunCentralisedMAS.class.getName());
 
@@ -260,7 +260,7 @@ public class RunCentralisedMAS {
             envClass = new ClassParameters(jason.environment.Environment.class.getName());
         }
         logger.fine("Creating environment " + envClass);
-        env = new CentralisedEnvironment(envClass);
+        env = new CentralisedEnvironment(envClass, this);
 
         // create the agents
         for (AgentParameters ap : project.getAgents()) {
@@ -294,9 +294,8 @@ public class RunCentralisedMAS {
                     CentralisedAgArch agArch = new CentralisedAgArch();
                     agArch.setAgName(numberedAg);
                     agArch.setEnvInfraTier(env);
-                    agArch.initAg(tmpAgArchClass.className, tmpAgClass.className, tmpBBClass, tmpAsSrc, ap.getAsSetts(debug, project.getControlClass() != null));
-                    env.addAgent(agArch.getUserAgArch());
-                    ags.add(agArch);
+                    agArch.initAg(tmpAgArchClass.className, tmpAgClass.className, tmpBBClass, tmpAsSrc, ap.getAsSetts(debug, project.getControlClass() != null), this);
+                    addAg(agArch);
                 }
             } catch (Exception e) {
                 logger.log(Level.SEVERE, "Error creating agent " + ap.name, e);
@@ -310,13 +309,48 @@ public class RunCentralisedMAS {
         }
         if (controlClass != null) {
             logger.fine("Creating controller " + controlClass);
-            control = new CentralisedExecutionControl(env, controlClass);
+            control = new CentralisedExecutionControl(controlClass, this);
         }
     }
 
+    /** change the current running MAS to debug mode */
+    void changeToDebugMode() {
+        try {
+            if (control == null) {
+                control = new CentralisedExecutionControl(new ClassParameters(ExecutionControlGUI.class.getName()), this);
+                for (CentralisedAgArch ag : ags.values()) {
+                    ag.setControlInfraTier(control);
+                    Settings stts = ag.getUserAgArch().getTS().getSettings();
+                    stts.setVerbose(2);
+                    stts.setSync(true);
+                    ag.getLogger().setLevel(Level.FINE);
+                    ag.getUserAgArch().getTS().getLogger().setLevel(Level.FINE);
+                    ag.getUserAgArch().getTS().getAg().getLogger().setLevel(Level.FINE);
+                }
+            }
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Error entering in debug mode", e);
+        }
+    }
+
+    public void addAg(CentralisedAgArch ag) {
+    	ags.put(ag.getAgName(), ag);
+    }
+    public CentralisedAgArch delAg(String agName) {
+    	return ags.remove(agName);
+    }
+    
+    public CentralisedAgArch getAg(String agName) {
+    	return ags.get(agName);
+    }
+    
+    protected Map<String,CentralisedAgArch> getAgs() {
+    	return ags;
+    }
+    
     void startAgs() {
         // run the agents
-        for (CentralisedAgArch ag : ags) {
+        for (CentralisedAgArch ag : ags.values()) {
             ag.setControlInfraTier(control);
             ag.start();
         }
@@ -324,7 +358,7 @@ public class RunCentralisedMAS {
 
     void stopAgs() {
         // run the agents
-        for (CentralisedAgArch ag : ags) {
+        for (CentralisedAgArch ag : ags.values()) {
             ag.stopAg();
         }
     }
@@ -338,26 +372,6 @@ public class RunCentralisedMAS {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }
-    }
-
-    /** change the current running MAS to debug mode */
-    void changeToDebugMode() {
-        try {
-            if (control == null) {
-                control = new CentralisedExecutionControl(env, new ClassParameters(ExecutionControlGUI.class.getName()));
-                for (CentralisedAgArch ag : ags) {
-                    ag.setControlInfraTier(control);
-                    Settings stts = ag.getUserAgArch().getTS().getSettings();
-                    stts.setVerbose(2);
-                    stts.setSync(true);
-                    ag.getLogger().setLevel(Level.FINE);
-                    ag.getUserAgArch().getTS().getLogger().setLevel(Level.FINE);
-                    ag.getUserAgArch().getTS().getAg().getLogger().setLevel(Level.FINE);
-                }
-            }
-        } catch (Exception e) {
-            logger.log(Level.SEVERE, "Error entering in debug mode", e);
         }
     }
 

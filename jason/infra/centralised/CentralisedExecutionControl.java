@@ -41,17 +41,17 @@ import org.w3c.dom.Document;
  */
 public class CentralisedExecutionControl implements ExecutionControlInfraTier {
 
-    private CentralisedEnvironment infraEnv;
-    private ExecutionControl       userController;
+    private ExecutionControl userController;
 
-    static Logger                  logger = Logger.getLogger(CentralisedExecutionControl.class.getName());
+    private RunCentralisedMAS masRunner = null;
 
-    public CentralisedExecutionControl(CentralisedEnvironment envInfraTier, ClassParameters userControlClass) throws JasonException {
-        infraEnv = envInfraTier;
+    static Logger logger = Logger.getLogger(CentralisedExecutionControl.class.getName());
+
+    public CentralisedExecutionControl(ClassParameters userControlClass, RunCentralisedMAS masRunner) throws JasonException {
+        this.masRunner = masRunner;
         try {
             userController = (ExecutionControl) Class.forName(userControlClass.className).newInstance();
             userController.setExecutionControlInfraTier(this);
-            // fUserControl.setJasonDir(jasonDir);
             userController.init(userControlClass.getParametersArray());
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error ", e);
@@ -67,10 +67,6 @@ public class CentralisedExecutionControl implements ExecutionControlInfraTier {
         return userController;
     }
 
-    public CentralisedEnvironment getEnvInfraTier() {
-        return infraEnv;
-    }
-
     public void receiveFinishedCycle(String agName, boolean breakpoint, int cycle) {
         // pass to user controller
         userController.receiveFinishedCycle(agName, breakpoint, cycle);
@@ -78,14 +74,15 @@ public class CentralisedExecutionControl implements ExecutionControlInfraTier {
 
     public void informAgToPerformCycle(String agName, int cycle) {
         // call the agent method to "go on"
-        AgArch arch = infraEnv.getAgent(agName);
+        AgArch arch = masRunner.getAg(agName).getUserAgArch();
         arch.setCycleNumber(cycle);
         arch.getTS().receiveSyncSignal();
     }
 
     public void informAllAgsToPerformCycle(int cycle) {
-        synchronized (infraEnv.getAgents()) {
-            for (AgArch arch: infraEnv.getAgents().values()) {
+        synchronized (masRunner.getAgs()) {
+            for (CentralisedAgArch ag: masRunner.getAgs().values()) {
+            	AgArch arch = ag.getUserAgArch();
                 arch.setCycleNumber(cycle);
                 arch.getTS().receiveSyncSignal();
             }
@@ -93,7 +90,7 @@ public class CentralisedExecutionControl implements ExecutionControlInfraTier {
     }
 
     public Document getAgState(String agName) {
-        AgArch arch = infraEnv.getAgent(agName);
+        AgArch arch = masRunner.getAg(agName).getUserAgArch();
         if (arch != null) { // the agent exists ?
             return arch.getTS().getAg().getAgState();
         } else {
@@ -102,6 +99,6 @@ public class CentralisedExecutionControl implements ExecutionControlInfraTier {
     }
 
     public RuntimeServicesInfraTier getRuntimeServices() {
-        return new CentralisedRuntimeServices();
+        return new CentralisedRuntimeServices(masRunner);
     }
 }

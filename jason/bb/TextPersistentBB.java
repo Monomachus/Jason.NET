@@ -13,6 +13,7 @@ import java.util.logging.Logger;
  * Implementation of BB that stores the agent BB in text files. This
  * implementation is very simple: when the agent starts, load the
  * beliefs in the file; when the agent stops, save the BB in the file.
+ * The file name is the agent's name + ".bb".
  */
 public class TextPersistentBB extends DefaultBeliefBase {
     static private Logger logger = Logger.getLogger(TextPersistentBB.class.getName());
@@ -20,7 +21,7 @@ public class TextPersistentBB extends DefaultBeliefBase {
     File file = null;
 
     public void init(Agent ag, String[] args) {
-        file = new File(ag.getASLSource().replace(".asl", ".bb"));
+        file = new File(ag.getTS().getUserAgArch().getAgName() + ".bb");
         logger.fine("reading from file " + file);
         if (file.exists()) {
             ag.parseAS(file.getAbsolutePath());

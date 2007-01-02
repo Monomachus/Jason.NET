@@ -35,9 +35,9 @@ import jason.runtime.RuntimeServicesInfraTier;
 import jason.runtime.Settings;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -57,24 +57,23 @@ import java.util.logging.Logger;
  */
 public class CentralisedAgArch extends Thread implements AgArchInfraTier {
 
-    protected CentralisedEnvironment    infraEnv     = null;
-
+	protected CentralisedEnvironment    infraEnv     = null;
     private CentralisedExecutionControl infraControl = null;
+    private RunCentralisedMAS		    masRunner    = null;
 
     /** The user implementation of the architecture */
-    protected AgArch                    fUserAgArh;
+    protected AgArch        fUserAgArh;
 
-    private String                      agName       = "";
-
-    private boolean                     running      = true;
-
-    protected Logger                    logger;
+    private String          agName  = "";
+    private boolean         running = true;
+    private Queue<Message>  mbox    = new ConcurrentLinkedQueue<Message>();	
+    protected Logger        logger;
     
     private static List<MsgListener> msgListeners = null;
     public static void addMsgListener(MsgListener l) {
         if (msgListeners == null) {
-	    msgListeners = new ArrayList<MsgListener>();
-	}
+        	msgListeners = new ArrayList<MsgListener>();
+        }
         msgListeners.add(l);
     }
     public static void removeMsgListener(MsgListener l) {
@@ -86,9 +85,10 @@ public class CentralisedAgArch extends Thread implements AgArchInfraTier {
      * jason.architecture.AgArch. The arch will create the agent that creates
      * the TS.
      */
-    public void initAg(String agArchClass, String agClass, ClassParameters bbPars, String asSrc, Settings stts) throws JasonException {
+    public void initAg(String agArchClass, String agClass, ClassParameters bbPars, String asSrc, Settings stts, RunCentralisedMAS masRunner) throws JasonException {
         logger = Logger.getLogger(CentralisedAgArch.class.getName() + "." + getAgName());
         try {
+        	this.masRunner = masRunner; 
             fUserAgArh = (AgArch) Class.forName(agArchClass).newInstance();
             fUserAgArh.setArchInfraTier(this);
             fUserAgArh.initAg(agClass, bbPars, asSrc, stts);
@@ -142,7 +142,8 @@ public class CentralisedAgArch extends Thread implements AgArchInfraTier {
         fUserAgArh.getTS().newMessageHasArrived(); // in case the agent is
         // wainting .....
         synchronized (syncStopRun) {
-            infraEnv.delAgent(fUserAgArh);
+            //infraEnv.delAgent(fUserAgArh);
+        	masRunner.delAg(agName);
         }
     }
 
@@ -168,45 +169,45 @@ public class CentralisedAgArch extends Thread implements AgArchInfraTier {
     }
 
     // this is used by the .send internal action in stdlib
-    public void sendMsg(jason.asSemantics.Message m) throws Exception {
+    public void sendMsg(Message m) throws Exception {
         // actually send the message
         m.setSender(getName());
-        Queue<Message> mbox = infraEnv.getAgMbox(m.getReceiver());
-        if (mbox == null) {
+        CentralisedAgArch rec = masRunner.getAg(m.getReceiver());
+        
+        if (rec == null) {
             throw new JasonException("Receiver '" + m.getReceiver() + "' does not exists! Could not send " + m);
         }
-        mbox.offer(new Message(m));
-        infraEnv.getAgent(m.getReceiver()).getTS().newMessageHasArrived();
+        rec.receiveMsg(new Message(m)); // send a cloned message
 	
-	// notify listeners
-	if (msgListeners != null) {
-	    for (MsgListener l: msgListeners) {
-	        l.msgSent(m);
-	    }
-	}
+        // notify listeners
+        if (msgListeners != null) {
+        	for (MsgListener l: msgListeners) {
+        		l.msgSent(m);
+        	}
+        }
+    }
+    
+    public void receiveMsg(Message m) {
+        mbox.offer(m);
+        fUserAgArh.getTS().newMessageHasArrived();    	
     }
 
     public void broadcast(jason.asSemantics.Message m) throws Exception {
-        Iterator i = infraEnv.getAgents().values().iterator();
-        while (i.hasNext()) {
-            AgArch ag = (AgArch) i.next();
-            if (!ag.getAgName().equals(this.getAgName())) {
-                m.setReceiver(ag.getAgName());
+    	for (String agName: masRunner.getAgs().keySet()) {
+            if (!agName.equals(this.getAgName())) {
+                m.setReceiver(agName);
                 sendMsg(m);
             }
         }
     }
 
-    // Deafult procedure for checking messages
+    // Deafult procedure for checking messages, move message from local mbox to C.mbox
     public void checkMail() {
-        Queue<Message> mbox = infraEnv.getAgMbox(getName());
         Queue<Message> tsmb = fUserAgArh.getTS().getC().getMailBox();
         while (!mbox.isEmpty()) {
             Message im = mbox.poll();
             tsmb.offer(im);
-            if (logger.isLoggable(Level.FINE)) {
-                logger.fine("received message: " + im);
-            }
+            if (logger.isLoggable(Level.FINE)) logger.fine("received message: " + im);
         }
     }
 
@@ -225,7 +226,7 @@ public class CentralisedAgArch extends Thread implements AgArchInfraTier {
     }
 
     public boolean canSleep() {
-        return infraEnv.getAgMbox(getName()).isEmpty();
+        return mbox.isEmpty();
     }
 
     public void informCycleFinished(boolean breakpoint, int cycle) {
@@ -233,6 +234,6 @@ public class CentralisedAgArch extends Thread implements AgArchInfraTier {
     }
 
     public RuntimeServicesInfraTier getRuntimeServices() {
-        return new CentralisedRuntimeServices();
+        return new CentralisedRuntimeServices(masRunner);
     }
 }

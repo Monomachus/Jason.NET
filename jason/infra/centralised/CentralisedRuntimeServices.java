@@ -15,7 +15,13 @@ import java.util.logging.Logger;
 public class CentralisedRuntimeServices implements RuntimeServicesInfraTier {
 
     private static Logger logger = Logger.getLogger(CentralisedRuntimeServices.class.getName());
-
+    
+    private RunCentralisedMAS masRunner;
+    
+    public CentralisedRuntimeServices(RunCentralisedMAS masRunner) {
+    	this.masRunner = masRunner;
+    }
+    
     public boolean createAgent(String agName, String agSource, String agClass, String archClass, ClassParameters bbPars, Settings stts) throws Exception {
         if (logger.isLoggable(Level.FINE)) {
             logger.fine("Creating centralised agent " + agName + "from source " + agSource + "(agClass=" + agClass + ", archClass=" + archClass + ", settings=" + stts);
@@ -31,39 +37,41 @@ public class CentralisedRuntimeServices implements RuntimeServicesInfraTier {
         if (bbPars == null) {
             bbPars = new ClassParameters(DefaultBeliefBase.class.getName());
         }
-        while (RunCentralisedMAS.getRunner().getEnvironmentInfraTier().getAgent(agName) != null) {
+        while (masRunner.getAg(agName) != null) {
             agName += "_a";
         }
 
         CentralisedAgArch agArch = new CentralisedAgArch();
         agArch.setAgName(agName);
-        agArch.initAg(archClass, agClass, bbPars, agSource, stts);
+        agArch.initAg(archClass, agClass, bbPars, agSource, stts, masRunner);
         agArch.setEnvInfraTier(RunCentralisedMAS.getRunner().getEnvironmentInfraTier());
         agArch.setControlInfraTier(RunCentralisedMAS.getRunner().getControllerInfraTier());
-        agArch.getEnvInfraTier().addAgent(agArch.getUserAgArch());
+        masRunner.addAg(agArch);
         agArch.start();
         logger.fine("Agent " + agName + " created!");
         return true;
     }
 
     public Set<String> getAgentsName() {
-        return RunCentralisedMAS.getRunner().getEnvironmentInfraTier().getAgents().keySet();
+        return masRunner.getAgs().keySet();
     }
 
     public int getAgentsQty() {
-        return RunCentralisedMAS.getRunner().getEnvironmentInfraTier().getAgents().size();
+        return masRunner.getAgs().keySet().size();
     }
 
     public boolean killAgent(String agName) {
         logger.fine("Killing centralised agent " + agName);
-        CentralisedEnvironment env = RunCentralisedMAS.getRunner().getEnvironmentInfraTier();
-        AgArch aa = env.getAgent(agName);
-        aa.getArchInfraTier().stopAg();
-        env.delAgent(aa);
-        return true;
+        CentralisedAgArch ag = masRunner.getAg(agName);
+        if (ag != null) {
+        	ag.stopAg();
+        	return true;
+        } else {
+        	return false;
+        }
     }
 
     public void stopMAS() throws Exception {
-        RunCentralisedMAS.getRunner().finish();
+        masRunner.finish();
     }
 }
