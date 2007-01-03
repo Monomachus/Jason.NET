@@ -18,9 +18,9 @@ import java.util.GregorianCalendar;
 
   <p>Parameters:<ul>
   
-  <li>+/- arg[0] (number): the hours (0--23).</li>
-  <li>+/- arg[1] (number): the minutes (0--59).</li>
-  <li>+/- arg[2] (number): the seconds (0--59).</li>
+  <li>+/- hours (number): the hours (0--23).</li>
+  <li>+/- minutes (number): the minutes (0--59).</li>
+  <li>+/- seconds (number): the seconds (0--59).</li>
   
   </ul>
   

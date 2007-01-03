@@ -18,9 +18,9 @@ import java.util.GregorianCalendar;
 
   <p>Parameters:<ul>
   
-  <li>+/- arg[0] (number): the year.</li/>
-  <li>+/- arg[1] (number): the month (1--12).</li>
-  <li>+/- arg[2] (number): the day (1--31).</li>
+  <li>+/- year (number): the year.</li/>
+  <li>+/- month (number): the month (1--12).</li>
+  <li>+/- day (number): the day (1--31).</li>
   
   </ul>
   

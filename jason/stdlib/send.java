@@ -46,19 +46,19 @@ import jason.asSyntax.Term;
   
   <p>Parameters:<ul>
   
-  <li>+ arg[0] (atom, string, or list): the receiver of the
+  <li>+ receiver (atom, string, or list): the receiver of the
   message. It is the unique name of the agent that will receive the
   message (or list of names).<br/>
 
-  <li>+ arg[1] (atom): the illocutionary force of the message (tell,
+  <li>+ ilf (atom): the illocutionary force of the message (tell,
   achieve, ...).<br/>
   
-  <li>+ arg[2] (literal): the content of the message.<br/>
+  <li>+ message (literal): the content of the message.<br/>
   
-  <li><i>+ arg[3]</i> (any term [optional]): the answer of an ask
+  <li><i>+ answer</i> (any term [optional]): the answer of an ask
   message (for performatives askOne and askAll).<br/> 
   
-  <li><i>+ arg[4]</i> (number [optional]): timeout (in milliseconds)
+  <li><i>+ timeout</i> (number [optional]): timeout (in milliseconds)
   when waiting for an ask answer.<br/> 
 
   </ul>

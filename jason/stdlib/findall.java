@@ -38,19 +38,19 @@ import java.util.Iterator;
 
   <p>Internal action: <b><code>.findall(Var,Literal,List)</code></b>.
   
-  <p>Description: builds a <i>List</i> of all instantiations of <i>Var</i>
-  which make <i>Literal</i> (which has at least one instance of (variables in)
-  <i>Var</i>) a logical consequence of the agent's BB. Unlike in Prolog, the
-  second argument cannot be a conjunction.
+  <p>Description: builds a <i>List</i> of all instantiations of
+  <i>term</i> which make <i>query</i> a logical consequence of the
+  agent's BB. Unlike in Prolog, the second argument cannot be a
+  conjunction.
 
   <p>Parameters:<ul>
   
-  <li>+ arg[0] (variable or structure): the variable or structure whose
+  <li>+ term (variable or structure): the variable or structure whose
   instances will "populate" the list.<br/>
   
-  <li>+ arg[1] (literal): the literal to match against the belief base.<br/>
+  <li>+ query (literal): the literal to match against the belief base.<br/>
 
-  <li>+/- arg[2] (list): the resulting populated list.<br/>
+  <li>+/- result (list): the resulting populated list.<br/>
   
   </ul>
   
@@ -63,7 +63,7 @@ import java.util.Iterator;
   <code>[30,20]</code>.</li>
 
   <li> <code>.findall(c(Y,X),b(X,Y),L)</code>: <code>L</code> unifies
-  with <code>c(2,1),c(4,3),c(6,5)</code>.</li>
+  with <code>[c(2,1),c(4,3),c(6,5)]</code>.</li>
 
   </ul>
 

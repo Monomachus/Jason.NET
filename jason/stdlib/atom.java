@@ -10,10 +10,10 @@ import jason.asSyntax.Term;
 <p>Internal action: <b><code>.atom</code></b>.
 
 <p>Description: checks whether the argument is an atom (a structure with arity
-0), for example "p".  Numbers, strings, and free variables are not structures.
+0), for example "p".  Numbers, strings, and free variables are not atoms.
 
 <p>Parameters:<ul>
-<li>+ arg[0] (any term): the term to be checked.<br/>
+<li>+ arg (any term): the term to be checked.<br/>
 </ul>
 
 <p>Examples:<ul>

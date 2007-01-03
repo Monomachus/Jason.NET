@@ -43,7 +43,7 @@ import jason.asSyntax.Term;
   
   <p>Parameters:<ul>
   
-  <li>+ arg[0] (atom): the name of the agent to be killed.<br/>
+  <li>+ name (atom): the name of the agent to be killed.<br/>
 
   </ul>
   

@@ -13,7 +13,7 @@ import jason.asSyntax.Term;
 variables. Numbers, Strings, and Atoms are always ground.
 
 <p>Parameters:<ul>
-<li>+ arg[0] (any term): the term to be checked.<br/>
+<li>+ argument (any term): the term to be checked.<br/>
 </ul>
 
 <p>Examples:<ul>

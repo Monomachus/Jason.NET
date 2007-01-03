@@ -56,7 +56,7 @@ import jason.asSyntax.Term;
 
   <p>Parameters:<ul>
   
-  <li>- arg[0] (structure): the variable that unifies with the intention
+  <li>- intention (structure): the variable that unifies with the intention
   description.</li>
   
   </ul>

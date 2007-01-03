@@ -46,7 +46,7 @@ import jason.asSyntax.Term;
 
   <p>Examples:<ul>
   <li> <code>.concat("a","b",X)</code>: <code>X</code> unifies with "ab".
-  <li> <code>.concat("a","b","a")</code>: fails.
+  <li> <code>.concat("a","b","a")</code>: false.
   <li> <code>.concat("a b",1,a,X)</code>: <code>X</code> unifies with "a b1a".
   <li> <code>.concat("a", "b", "c", "d", X)</code>: <code>X</code> unifies with "abcd".
   <li> <code>.concat([a,b,c],[d,e],[f,g],X)</code>: <code>X</code> unifies with <code>[a,b,c,d,e,f,g]</code>.

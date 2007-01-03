@@ -44,13 +44,13 @@ import java.util.Iterator;
   
   <p>Parameters:<ul>
   
-  <li>+ arg[0] (string or list): the string representing the plan to be
+  <li>+ plan(s) (string or list): the string representing the plan to be
   added. If it is a list, each string in the list will be parsed into an
   AgentSpeak plan and added to the plan library. The syntax of the code within
   the string is the same as ordinary AgentSpeak code.<br/>
   
-  <li><i>+ arg[1]</i> (structure [optional]): the source of the plan. The
-  default value for the source is <code>self</code>.<br/>
+  <li><i>+ source</i> (atom [optional]): the source of the
+  plan(s). The default value for the source is <code>self</code>.<br/>
   
   </ul>
   
@@ -65,7 +65,7 @@ import java.util.Iterator;
   "rafa".</li>
 
   <li> <code>.add_plan(["+b : true &lt;- .print(b).", "+b : bel &lt;-
-  .print(b,bel)."], rafa)</code>: adds both plans with "rafa" as their
+  .print(bel)."], rafa)</code>: adds both plans with "rafa" as their
   sources.</li>
 
   </ul>

@@ -44,8 +44,8 @@ import java.util.Collections;
   numbers &lt; atoms &lt; structures &lt; lists 
 
   <p>Parameters:<ul>
-  <li>+   arg[0] (list): the list the be sorted.<br/>
-  <li>+/- arg[1] (list): the sorted list. 
+  <li>+   unordered list (list): the list the be sorted.<br/>
+  <li>+/- ordered list (list): the sorted list. 
   </ul>
 
   <p>Examples:<ul>

@@ -39,7 +39,7 @@ import jason.asSyntax.Term;
   
   <p>Parameter:<ul>
   
-  <li>+/- arg[0] (atom): if this is a variable, unifies the agent
+  <li>+/- name (atom): if this is a variable, unifies the agent
   name and the variable; if it is an atom, succeeds if the atom is equal to
   the agent's name.<br/>
 

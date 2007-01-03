@@ -41,12 +41,12 @@ import java.io.File;
   
   <p>Parameters:<ul>
   
-  <li>+ arg[0] (atom): the name for the new agent.<br/>
+  <li>+ name (atom): the name for the new agent.<br/>
   
-  <li>+ arg[1] (string): path to the file where the AgentSpeak code
+  <li>+ source (string): path to the file where the AgentSpeak code
   for that new agent can be found.<br/>
 
-  <li><i>+ arg[2]</i> (list -- optional): list of optional parameters
+  <li><i>+ customisations</i> (list -- optional): list of optional parameters
   as agent class, architecture and belief base.<br/>
 
   </ul>

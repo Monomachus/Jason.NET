@@ -33,11 +33,11 @@ import jason.asSyntax.Term;
 /**
   <p>Internal action: <b><code>.abolish</code></b>.
   
-  <p>Description: remove all beliefs that match the argument. As for the
+  <p>Description: removes all beliefs that match the argument. As for the
   "-" operator, an event will be generated for each deletion.
   
   <p>Parameters:<ul>
-  <li>+ arg[0] (literal): the "pattern" for what should be removed.<br/>
+  <li>+ pattern (literal): the "pattern" for what should be removed.<br/>
   </ul>
   
   <p>Examples:<ul>

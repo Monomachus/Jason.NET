@@ -20,8 +20,8 @@ import java.util.List;
 
   <p>Parameters:<ul>
   
-  <li>+/- arg[0] (term): the term to be checked.</li>
-  <li>+ arg[1] (list): the list where the term should be in.</li>
+  <li>+/- member (term): the term to be checked.</li>
+  <li>+ list (list): the list where the term should be in.</li>
   
   </ul>
   

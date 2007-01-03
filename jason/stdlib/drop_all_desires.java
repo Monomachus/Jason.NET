@@ -38,9 +38,9 @@ import jason.asSyntax.Term;
 
   <p>This action changes the agent's circumstance structure by simply emptying
   the whole set of events (E). Note that, contrary to the <code>.desire</code>
-  definition, this action does not change the set of intentions; see
-  <code>.drop_all_intentions</code> to be used in combination with this
-  action.
+  definition, this action does not change the set of intentions; 
+  <code>.drop_all_intentions</code> should be used in combination with this
+  action to remove all intentions also.
 
   <p>Example:<ul> 
 

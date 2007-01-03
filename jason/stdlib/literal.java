@@ -13,7 +13,7 @@ import jason.asSyntax.Term;
   e.g.: "p", "p(1)", "p(1)[a,b]", "~p(1)[a,b]". 
 
   <p>Parameter:<ul>
-  <li>+ arg[0] (any term): the term to be checked.<br/>
+  <li>+ argument (any term): the term to be checked.<br/>
   </ul>
 
   <p>Examples:<ul>

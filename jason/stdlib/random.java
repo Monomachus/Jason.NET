@@ -16,7 +16,7 @@ import java.util.Random;
   
   <p>Parameter:<ul>
   
-  <li>- arg[0] (number): the variable to receive the random value<br/>
+  <li>- value (number): the variable to receive the random value<br/>
   
   </ul>
   

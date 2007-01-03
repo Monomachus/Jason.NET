@@ -39,14 +39,14 @@ import jason.asSyntax.Term;
   <p>Description: gets the length of strings or lists. 
 
   <p>Parameters:<ul>
-  <li>+   arg[0] (string or list): the term whose length is to be determined.<br/>
-  <li>+/- arg[1] (number): the length. 
+  <li>+ argument (string or list): the term whose length is to be determined.<br/>
+  <li>+/- length (number). 
   </ul>
 
   <p>Examples:<ul>
   <li> <code>.length("abc",X)</code>: <code>X</code> unifies with 3.
   <li> <code>.length([a,b],X)</code>: <code>X</code> unifies with 2.
-  <li> <code>.length("a",2)</code>: fails.
+  <li> <code>.length("a",2)</code>: false.
   </ul>
 
   @see jason.stdlib.concat

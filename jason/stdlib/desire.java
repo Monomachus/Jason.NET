@@ -43,7 +43,7 @@ import jason.asSyntax.Trigger;
   
   <p>Example:<ul> 
 
-  <li> <code>.desire(go(1,3))</code>: succeed if <code>go(1,3)</code>
+  <li> <code>.desire(go(1,3))</code>: is true if <code>go(1,3)</code>
   is a desire of the agent.
 
   </ul>
@@ -56,7 +56,6 @@ import jason.asSyntax.Trigger;
   @see jason.stdlib.drop_goal
   @see jason.stdlib.intend
 
-  @author Rafael
 */
 public class desire extends intend {
 

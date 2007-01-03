@@ -12,7 +12,7 @@ import jason.asSyntax.Term;
   <p>Description: checks whether the argument is a list, e.g.: "[a,b]", "[]". 
 
   <p>Parameter:<ul>
-  <li>+ arg[0] (any term): the term to be checked.<br/>
+  <li>+ argument (any term): the term to be checked.<br/>
   </ul>
 
   <p>Examples:<ul>

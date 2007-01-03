@@ -41,9 +41,9 @@ import java.util.Iterator;
   
   <p>Parameters:<ul>
   
-  <li>+ arg[0] (literal): the belief to be counted.<br/>
+  <li>+ belief (literal): the belief to be counted.<br/>
   
-  <li>+/- arg[1] (number): the number of occurrences of the belief.<br/>
+  <li>+/- quantity (number): the number of occurrences of the belief.<br/>
   
   </ul>
   

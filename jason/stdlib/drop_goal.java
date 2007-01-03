@@ -69,8 +69,6 @@ import jason.asSyntax.Trigger;
   @see jason.stdlib.drop_intention
   @see jason.stdlib.intend
 
-  @author Jomi
-
  */
 public class drop_goal extends DefaultInternalAction {
     

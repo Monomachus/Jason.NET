@@ -46,9 +46,9 @@ import java.util.Iterator;
 
   <p>Parameters:<ul>
   
-  <li>+ arg[0] (string): the string representing the triggering event.</li>
+  <li>+ trigger (string): the string representing the triggering event.</li>
   
-  <li>- arg[1] (list): the list of strings with the code of the relevant
+  <li>- plans (list): the list of strings with the code of the relevant
   plans.</li>
   
   </ul>

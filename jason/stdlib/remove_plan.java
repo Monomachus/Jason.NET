@@ -36,15 +36,15 @@ import jason.asSyntax.Term;
 /**
   <p>Internal action: <b><code>.remove_plan</code></b>.
   
-  <p>Description: remove plans from the agent's plan library.
+  <p>Description: removes plans from the agent's plan library.
 
   <p>Parameters:<ul>
   
-  <li>+ arg[0] (structure or list of structures): the label of the
+  <li>+ label(s) (structure or list of structures): the label of the
   plan to be removed. If this parameter is a list of labels, all plans
   of this list are removed.</li>
   
-  <li><i>+ arg[1]</i> (structure [optional]): the source of the
+  <li><i>+ source</i> (atom [optional]): the source of the
   plan to be removed. The default value is <code>self</code>.</li>
   
   </ul>

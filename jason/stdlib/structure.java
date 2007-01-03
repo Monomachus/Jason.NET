@@ -13,7 +13,7 @@ import jason.asSyntax.Term;
   "[a,b]".  Numbers, strings and free variables are not structures.
 
   <p>Parameter:<ul>
-  <li>+ arg[0] (any term): the term to be checked.<br/>
+  <li>+ argument (any term): the term to be checked.<br/>
   </ul>
 
   <p>Examples:<ul>

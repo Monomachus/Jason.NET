@@ -44,6 +44,12 @@ import java.util.logging.Level;
   milliseconds) or until some event <i>E</i> happens. The events are
   strings in AgentSpeak syntax, e.g. <code>+bel(33)</code>,
   <code>+!go(X,Y)</code>.
+
+  <p>Parameters:<ul>
+  <li><i>+ event</i> (string): the waited event.<br/>
+  <li>+ timeout (number).<br/>
+  </ul>
+  
   
   <p>Examples:<ul>
   <li> <code>.wait(1000)</code>: suspend the intention for 1 second.

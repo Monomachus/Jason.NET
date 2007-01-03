@@ -47,7 +47,7 @@ import jason.asSyntax.Trigger;
   
   <p>Example:<ul> 
 
-  <li> <code>.intend(go(1,3))</code>: succeeds if a plan for goal
+  <li> <code>.intend(go(1,3))</code>: is true if a plan for goal
   <code>!go(1,3)</code> appears in an intention of the agent.
 
   </ul>

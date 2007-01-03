@@ -42,14 +42,14 @@ import java.util.Iterator;
   
   <p>Parameters:<ul>
   
-  <li>+ arg[0] (literal or list): the literal where the annotation
+  <li>+ belief(s) (literal or list): the literal where the annotation
   is to be added. If this parameter is a list, all literals in the list
   will have the annotation added.<br/>
   
-  <li>+ arg[1] (structure): the annotation.<br/>
+  <li>+ annotation (structure): the annotation.<br/>
 
-  <li>+/- arg[2] (literal or list): this argument unifies with the
-  result of the annotation addition.<br/>
+  <li>+/- annotated beliefs(s) (literal or list): this argument
+  unifies with the result of the annotation addition.<br/>
 
   </ul>
   

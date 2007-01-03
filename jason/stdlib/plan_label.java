@@ -39,9 +39,9 @@ import jason.asSyntax.Term;
   
   <p>Parameters:<ul>
   
-  <li>- arg[0] (string): the string representing the plan.<br/>
+  <li>- plan (string): the string representing the plan.<br/>
   
-  <li>+ arg[1] (structure): the label of that plan.<br/>
+  <li>+ label (structure): the label of that plan.<br/>
   
   </ul>
   

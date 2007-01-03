@@ -42,7 +42,7 @@ import jason.asSyntax.Trigger;
   based on the unix "at" command, although not fully implemented yet.
   
   <p>Parameters:<ul>
-  <li>+ arg[0] (string): the time for the event to be generated.<br/>
+  <li>+ when (string): the time for the event to be generated.<br/>
 
       The syntax of this string in the current implementation has
       the following format:<br>
@@ -53,7 +53,7 @@ import jason.asSyntax.Trigger;
       "d" or "day(s)".
       The default &lt;time_unit> is milliseconds.<br/><br/>
 
-  <li>+ arg[1] (string): the event to be created. The string of the event will
+  <li>+ event (string): the event to be created. The string of the event will
       be parsed as a triggering event (see the <b><i>Jason</i></b> syntax).
       </ul>
   
