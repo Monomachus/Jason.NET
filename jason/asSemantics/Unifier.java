@@ -120,9 +120,52 @@ public class Unifier implements Cloneable {
         }
     }
 
+    // ----- Unify for Predicates/Literals
+    
+    public boolean unifies(Term t1g, Term t2g) {
+
+		Pred np1 = null;
+		Pred np2 = null;
+		
+    	if (t1g instanceof Pred && t2g instanceof Pred) {
+    		np1 = (Pred)t1g;
+    		np2 = (Pred)t2g;
+        
+    		// tests when np1 or np2 are Vars with annots
+	        if ((np1.isVar() && np1.hasAnnot()) || np2.isVar() && np2.hasAnnot()) {
+	            if (!np1.hasSubsetAnnot(np2, this)) {
+	                return false;
+	            }
+	        }
+    	}
+    	
+        // unify as Term
+        boolean ok = unifyTerms(t1g, t2g);
+
+        // if np1 is a var that was unified, clear its annots, as in
+        //      X[An] = p(1)[a]
+        // X is mapped to p(1) and not p(1)[a]
+        if (ok && np1 != null) { // they are predicates
+	        if (np1.isVar() && np1.hasAnnot()) {
+	        	Term np1vl = function.get((VarTerm) np1);
+	        	if (np1vl.isPred()) {
+	        		((Pred) np1vl).setAnnots(null);
+	        	}
+	        }
+	        if (np2.isVar() && np2.hasAnnot()) {
+	        	Term np2vl = function.get((VarTerm) np2);
+	        	if (np2vl.isPred()) {
+	        		((Pred)np2vl).setAnnots(null);
+	        	}
+	        }
+        }
+        return ok;
+    }
+
+    
     // ----- Unify for Terms
 
-    public boolean unifies(Term t1g, Term t2g) {
+    private boolean unifyTerms(Term t1g, Term t2g) {
         // if args are expressions, apply them and use their values
         if (t1g.isArithExpr()) {
             t1g = (Term) t1g.clone();
@@ -156,7 +199,7 @@ public class Unifier implements Cloneable {
             if (t1vl != null) {
                 return unifies(t2gv, t1vl);
             }
-            // only t2 has value, t2's value should unify with var t2
+            // only t2 has value, t2's value should unify with var t1
             if (t2vl != null) {
                 return unifies(t1gv, t2vl);
             }
@@ -232,6 +275,13 @@ public class Unifier implements Cloneable {
         	return false;
         }
         
+        // if both are predicates, the first's annots must be subset of the second's annots
+        if (t1g.isPred() && t2g.isPred()) {
+        	if ( ! ((Pred)t1g).hasSubsetAnnot((Pred)t2g, this)) {
+        		return false;
+        	}
+        }
+        
         Structure t1s = (Structure)t1g;
         Structure t2s = (Structure)t2g;
         
@@ -264,7 +314,7 @@ public class Unifier implements Cloneable {
             Term t2vl = get(t2);
             if (t2vl != null && !(t2vl instanceof VarsCluster))
                 t2 = t2vl;
-            if (!unifies2(t1, t2)) {
+            if (!unifies(t1, t2)) {
                 return false;
             }
         }
@@ -286,68 +336,6 @@ public class Unifier implements Cloneable {
             function.put((VarTerm) vt.clone(), value);
         }
         return true;
-    }
-
-    /**
-     * this version of unify tries to call the appropriate unify method
-     * (Literal, Pred, or Term versions)
-     */
-    public boolean unifies2(Term t1g, Term t2g) {
-        // try to cast both to Literal
-        if (t1g instanceof Literal && t2g instanceof Literal) {
-            return unifies((Literal) t1g, (Literal) t2g);
-        } else if (t1g instanceof Pred && t2g instanceof Pred) {
-            // try to cast both to Pred
-            return unifies((Pred) t1g, (Pred) t2g);
-        } else {
-            // use args as Terms
-            return unifies(t1g, t2g);
-        }
-    }
-
-    // ----- Pred
-
-    /**
-     * unification with annotation:
-     * terms unify and annotations of np1 are subset of annotations of np2.
-     */
-    public boolean unifies(Pred np1, Pred np2) {
-        // test sub set annots
-        if (!np1.isVar() && !np2.isVar() && !np1.hasSubsetAnnot(np2, this)) {
-            return false;
-        }
-        // tests when np1 or np2 are Vars with annots
-        if ((np1.isVar() && np1.hasAnnot()) || np2.isVar() && np2.hasAnnot()) {
-            if (!np1.hasSubsetAnnot(np2, this)) {
-                return false;
-            }
-        }
-
-        // unify as Term
-        boolean ok = unifies((Term) np1, (Term) np2);
-
-        // if np1 is a var that was unified, clear its annots
-        if (ok && np1.isVar() && np1.hasAnnot()) {
-            ((Pred) function.get((VarTerm) np1)).setAnnots(null);
-        }
-        if (ok && np2.isVar() && np2.hasAnnot()) {
-            ((Pred) function.get((VarTerm) np2)).setAnnots(null);
-        }
-        return ok;
-    }
-
-    // ----- Literal
-
-    public boolean unifies(Literal l1, Literal l2) {
-        // if l1 and l2 are vars with values, compare using their values
-        Term l1vl = get(l1);
-        if (l1vl != null && l1vl.isLiteral())
-            l1 = (Literal) l1vl;
-        Term l2vl = get(l2);
-        if (l2vl != null && l2vl.isLiteral())
-            l2 = (Literal) l2vl;
-
-        return unifies((Pred) l1, (Pred) l2);
     }
 
     public boolean unifies(Trigger te1, Trigger te2) {
@@ -486,5 +474,4 @@ public class Unifier implements Cloneable {
         }
         return u;
     }
-
 }

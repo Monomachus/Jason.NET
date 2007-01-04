@@ -190,10 +190,10 @@ public class TermTest extends TestCase {
 		p1.addAnnot(new VarTerm("X"));
 		p2.addAnnot(new Structure("ag1"));
 		//System.out.println("p1="+p1+"; p2="+p2);
+		
         // pos(1)[X]=pos(1)[ag1]
 		assertTrue(u.unifies(p1, p2));
-		//System.out.println("u="+u);
-        assertEquals(u.get("X").toString(),"ag1");
+		assertEquals(u.get("X").toString(),"ag1");
 		
 		p1.addAnnot(new Structure("ag2"));
 		p2.addAnnot(new VarTerm("Y"));
@@ -303,6 +303,21 @@ public class TermTest extends TestCase {
         assertFalse(u.unifies(p, a));
         assertTrue(u.unifies(Pred.parsePred("s"), a));
         assertTrue(u.unifies(a,Pred.parsePred("s[b]")));
+    }
+    
+    
+    public void testAnnotsUnify7() {
+    	// test vars annots
+    	
+    	// X[a] = Y[a,b] - ok
+    	VarTerm v1 = VarTerm.parseVar("X[a]");
+    	VarTerm v2 = VarTerm.parseVar("X[a,b]");
+    	Unifier u = new Unifier();
+    	assertTrue(u.unifies(v1, v2));
+
+    	// X[a,b] = Y[a] - not ok
+    	u = new Unifier();
+    	assertFalse(u.unifies(v2, v1));    
     }
 
     public void testTrigger() {
@@ -418,7 +433,7 @@ public class TermTest extends TestCase {
 		
 		u = new Unifier();
 		assertTrue(u.unifies(p1,p2));
-		
+		//System.out.println(u+"-"+p2);
 		u.apply(p2);
 		assertEquals(p2.toString(),"p(t1,t2)[a(1),z,a(2,3),a(3)]");
 	}

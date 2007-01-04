@@ -46,7 +46,7 @@ import org.w3c.dom.Element;
  */
 public class DefaultBeliefBase implements BeliefBase {
 
-    static private Logger logger = Logger.getLogger(DefaultBeliefBase.class.getName());
+    static private Logger logger;
 
     /**
      * belsMap is a table where the key is the bel.getFunctorArity and the value
@@ -60,6 +60,7 @@ public class DefaultBeliefBase implements BeliefBase {
     Set<Literal> percepts = new HashSet<Literal>();
 
     public void init(Agent ag, String[] args) {
+    	logger = Logger.getLogger(ag.getTS().getUserAgArch().getAgName() + "-"+DefaultBeliefBase.class.getSimpleName());
     }
 
     public void stop() {

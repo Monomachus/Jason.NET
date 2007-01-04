@@ -219,9 +219,9 @@ public class SaciAgArch extends saci.Agent implements AgArchInfraTier {
 
         super.stopAg();
         mboxPercept.disconnect();
-        if (MASConsoleGUI.hasConsole()) { // the logger created the MASConsole
-            MASConsoleGUI.get().close();
-        }
+        //if (MASConsoleGUI.hasConsole()) { // the logger created the MASConsole
+        //    MASConsoleGUI.get().close();
+        //}
 
         logger.fine("finished running.\n");
     }

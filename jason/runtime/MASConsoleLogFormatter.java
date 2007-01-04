@@ -53,6 +53,6 @@ public class MASConsoleLogFormatter extends java.util.logging.Formatter {
 		if (posd > 0) {
 			return lname.substring(posd+1);
 		}
-		return null;
+		return lname;
 	}
 }

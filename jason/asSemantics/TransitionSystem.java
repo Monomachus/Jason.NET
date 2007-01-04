@@ -166,7 +166,7 @@ public class TransitionSystem {
                 //    .send(ag1,askOne, value, X)
                 // if the answer was 3, unifies X=3
                 BodyLiteral send = intention.peek().removeCurrentStep();
-                if (intention.peek().getUnif().unifies2(send.getLiteralFormula().getTerm(3), content)) {
+                if (intention.peek().getUnif().unifies(send.getLiteralFormula().getTerm(3), content)) {
                     getC().addIntention(intention);
                 } else {
                     conf.C.SI = intention;
