@@ -62,6 +62,9 @@ public interface BeliefBase extends Iterable<Literal> {
     /** Returns an iterator for all beliefs. */
     public Iterator<Literal> iterator();
 
+    /** @deprecated use iterator() instead of getAll */
+    public Iterator<Literal> getAll();
+    
     /** 
      * Returns an iterator for all literals relevant for l's predicate
      * indicator, if l is a var, return all beliefs.<br>

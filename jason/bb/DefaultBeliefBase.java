@@ -126,6 +126,12 @@ public class DefaultBeliefBase implements BeliefBase {
         }
         return all.iterator();
 	}
+    
+    /** @deprecated use iterator() instead of getAll */
+    public Iterator<Literal> getAll() {
+    	return iterator();
+    }
+    
 
     public boolean remove(Literal l) {
         Literal bl = contains(l);
