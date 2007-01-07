@@ -215,7 +215,7 @@ public class VarTermTest extends TestCase {
         assertEquals(v1.hashCode(),vy.hashCode());
     }
 
-    public void testVarWithAnnots() {
+    public void testVarWithAnnots1() {
         VarTerm v1 = VarTerm.parseVar("X[a,b,c]");
         VarTerm v2 = VarTerm.parseVar("X[a,b]");
         assertTrue(v1.equals(v2));
@@ -244,6 +244,33 @@ public class VarTermTest extends TestCase {
         // X[a,b,c] = p[a,c,b,d] ok (X is p)
         assertTrue(u.unifies(v1, p1));
         assertEquals(u.get("X").toString(), "p(t1,t2)");
+    }
+
+    public void testVarWithAnnots2() {
+    	// test vars annots
+    	
+    	// X[a] = Y[a,b] - ok
+    	VarTerm v1 = VarTerm.parseVar("X[a]");
+    	VarTerm v2 = VarTerm.parseVar("Y[a,b]");
+    	Unifier u = new Unifier();
+    	assertTrue(u.unifies(v1, v2));
+
+    	// X[a,b] = Y[a] - not ok
+    	u = new Unifier();
+    	assertFalse(u.unifies(v2, v1));
+    }
+
+    public void testVarWithAnnots3() {
+    	// X[a,b,c,d] = Y[a,c|R] - ok and R=[b,d]
+    	VarTerm v1 = VarTerm.parseVar("X[a,b,c,d]");
+    	VarTerm v2 = VarTerm.parseVar("Y[a,c|R]");
+    	Unifier u = new Unifier();
+    	assertTrue(u.unifies(v1, v2));
+        assertEquals(u.get("R").toString(),"[b,d]");
+    }
+
+    public static void main(String[] a) {
+        new VarTermTest().testVarWithAnnots3();
     }
 
     public void testSimple1() {

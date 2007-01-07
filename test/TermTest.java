@@ -304,22 +304,28 @@ public class TermTest extends TestCase {
         assertTrue(u.unifies(Pred.parsePred("s"), a));
         assertTrue(u.unifies(a,Pred.parsePred("s[b]")));
     }
-    
-    
+
     public void testAnnotsUnify7() {
-    	// test vars annots
-    	
-    	// X[a] = Y[a,b] - ok
-    	VarTerm v1 = VarTerm.parseVar("X[a]");
-    	VarTerm v2 = VarTerm.parseVar("X[a,b]");
+    	// p[a,b,c,d] = p[a,c|R] - ok and R=[b,d]
+    	Term t1 = DefaultTerm.parse("p[a,b,c,d]");
+    	Term t2 = DefaultTerm.parse("p[a,c|R]");
     	Unifier u = new Unifier();
-    	assertTrue(u.unifies(v1, v2));
+    	assertTrue(u.unifies(t1, t2));
+        assertEquals(u.get("R").toString(),"[b,d]");
+        
+    	// p[a,c|R] = p[a,b,c,d] - ok and R=[b,d]
+        u = new Unifier();
+    	assertTrue(u.unifies(t2, t1));
+        assertEquals(u.get("R").toString(),"[b,d]");
 
-    	// X[a,b] = Y[a] - not ok
-    	u = new Unifier();
-    	assertFalse(u.unifies(v2, v1));    
-    }
-
+    	// p[H|R] = p[a,b,c,d] - ok and R=[b,c,d], H=a
+    	Term t3 = DefaultTerm.parse("p[H|R]");
+        u = new Unifier();
+    	assertTrue(u.unifies(t1, t3));
+        assertEquals(u.get("H").toString(),"a");
+        assertEquals(u.get("R").toString(),"[b,c,d]");
+    }    
+    
     public void testTrigger() {
 		Pred p1 = new Pred("pos");
 
@@ -491,7 +497,7 @@ public class TermTest extends TestCase {
     }
 
 	public static void main(String[] a) {
-		new TermTest().testCompare();
+		new TermTest().testAnnotsUnify7();
 	}
 
 }
