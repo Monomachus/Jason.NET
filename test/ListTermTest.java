@@ -161,7 +161,7 @@ public class ListTermTest extends TestCase {
 		// L6 = L5 concat [d]
 		VarTerm l6 = new VarTerm("L6");
 		u.unifies(l5, l6);
-		u.apply(l6);
+		l6.apply(u);
 		l6.concat(ListTermImpl.parseList("[d]"));
 
 		ListTerm lf = ListTermImpl.parseList("[c,b,a,x,y,d]");

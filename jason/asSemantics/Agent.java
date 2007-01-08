@@ -298,7 +298,7 @@ public class Agent {
             if (iun != null && iun.hasNext()) {
                 Unifier r = iun.next();
                 Literal lc = (Literal) l.clone();
-                r.apply(lc);
+                lc.apply(r);
                 // update the unifier with the l in BB
                 un.unifies(l, lc);
                 return lc;

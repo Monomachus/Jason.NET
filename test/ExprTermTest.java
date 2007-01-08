@@ -48,7 +48,7 @@ public class ExprTermTest extends TestCase {
         NumberTerm nb = ArithExpr.parseExpr("(30-X)/(2*X)");
         Unifier u = new Unifier();
         u.unifies(new VarTerm("X"), new NumberTermImpl(5));
-        u.apply(nb);
+        nb.apply(u);
         //System.out.println(nb+"="+nb.solve());
         assertEquals(nb, new NumberTermImpl(2.5));
         assertEquals(new NumberTermImpl(2.5), nb);
@@ -62,14 +62,14 @@ public class ExprTermTest extends TestCase {
         u.unifies(new VarTerm("H"), new NumberTermImpl(5));
         u.unifies(new VarTerm("X"), new VarTerm("H"));
         assertTrue(u.unifies(t1, t2));
-        u.apply(t1);
+        t1.apply(u);
         t1 = (Literal)t1.clone();
         assertEquals(t1.toString(), "p(10)");
         assertTrue(t1.getTerm(0).isNumeric());
         VarTerm yvl = new VarTerm("Y");
-        u.apply(yvl);
+        yvl.apply(u);
         assertEquals(yvl, new NumberTermImpl(10));
-        u.apply(t2);
+        t2.apply(u);
         assertEquals(t2.toString(), "p(10)");
     }
 
@@ -77,20 +77,20 @@ public class ExprTermTest extends TestCase {
         Literal t1 = Literal.parseLiteral("p(X+1)");
         Unifier u = new Unifier();
         u.unifies(new VarTerm("X"), new NumberTermImpl(0));
-        u.apply(t1);
+        t1.apply(u);
         assertEquals(t1.toString(),"p(1)");
 
         u = new Unifier();
         u.unifies(Literal.parseLiteral("p(CurVl)"), t1);
         u.unifies(new VarTerm("CurVl"), new VarTerm("X"));
         t1 = Literal.parseLiteral("p(X+1)");
-        u.apply(t1);
+        t1.apply(u);
 
         u = new Unifier();
         u.unifies(Literal.parseLiteral("p(CurVl)"), t1);
         u.unifies(new VarTerm("CurVl"), new VarTerm("X"));
         t1 = Literal.parseLiteral("p(X+1)");
-        u.apply(t1);
+        t1.apply(u);
 
         assertEquals(t1.toString(), "p(3)");
     }

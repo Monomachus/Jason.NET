@@ -76,18 +76,18 @@ public class wait extends DefaultInternalAction {
             if (args[0].isNumeric()) {
                 // time in milliseconds
                 NumberTerm time = (NumberTerm)args[0];
-                un.apply(time);
+                time.apply(un);
                 timeout = (long) time.solve();
                 // Thread.sleep((long) time.solve());
             } else if (args[0].isString()) {
                 // wait for event
                 StringTerm st = (StringTerm) args[0];
-                un.apply((Term) st);
+                st.apply(un);
                 te = Trigger.parseTrigger(st.getString());
 
                 if (args.length == 2) {
                     NumberTerm tot = (NumberTerm) args[1];
-                    un.apply(tot);
+                    tot.apply(un);
                     timeout = (long) tot.solve();
                 }
 

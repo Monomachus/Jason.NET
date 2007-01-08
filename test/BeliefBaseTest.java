@@ -177,7 +177,7 @@ public class BeliefBaseTest extends TestCase {
         Unifier u = new Unifier();
         Literal l3 = Literal.parseLiteral("pos");
         u.unifies(c, l3);
-        u.apply(c);
+        c.apply(u);
         c.addSource(Structure.parse("ag3"));
         assertTrue(c.hasAnnot(DefaultTerm.parse("source(ag3)")));
         Literal inBB = bb.contains(c); 
@@ -200,7 +200,7 @@ public class BeliefBaseTest extends TestCase {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        u.apply(ca);
+        ca.apply(u);
         assertTrue(bb.add(ca));
         assertFalse(bb.add(ca));
 
@@ -216,12 +216,12 @@ public class BeliefBaseTest extends TestCase {
 		Literal s = Literal.parseLiteral("seen(L)");
 		assertTrue(u.unifies(new VarTerm("L"), (Term)ListTermImpl.parseList("[a,b]")));
 		//System.out.println("u="+u);
-		u.apply(s);
+		s.apply(u);
 		bb.add(s);
 
 		VarTerm b1 = new VarTerm("B1");
 		u.unifies(b1, Literal.parseLiteral("seen([a,b])"));
-		u.apply(b1);
+		b1.apply(u);
 		//System.out.println("b1="+b1);
 		//System.out.println("test 1");
 		assertTrue(b1.equalsAsTerm(Literal.parseLiteral("seen([a,b])")));

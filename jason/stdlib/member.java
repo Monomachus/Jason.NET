@@ -43,10 +43,10 @@ public class member extends DefaultInternalAction {
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         try {
-            un.apply(args[0]);
+			args[0].apply(un);
             Term member = args[0];
 
-            un.apply(args[1]);
+			args[1].apply(un);
             if (!args[1].isList()) {
                 throw new JasonException("The second parameter ('" + args[1] + "') to the internal action 'member' is not a list!");
             }

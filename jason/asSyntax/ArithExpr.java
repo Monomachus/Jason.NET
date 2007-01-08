@@ -23,6 +23,7 @@
 
 package jason.asSyntax;
 
+import jason.asSemantics.Unifier;
 import jason.asSyntax.parser.as2j;
 
 import java.io.StringReader;
@@ -165,6 +166,19 @@ public class ArithExpr extends DefaultTerm implements NumberTerm {
         rhs = null;
         super.resetHashCodeCache();
     }
+    
+    public boolean apply(Unifier u) {
+    	if (isEvaluated()) return false;
+    	
+        getLHS().apply(u);
+        if (!isUnary()) {
+            getRHS().apply(u);
+        }
+        evaluate();
+        
+    	return true;
+    }
+    
     
     /** make a hard copy of the terms */
     public Object clone() {

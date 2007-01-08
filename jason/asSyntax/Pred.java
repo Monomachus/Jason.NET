@@ -88,6 +88,22 @@ public class Pred extends Structure {
         }
     }
 
+    @Override    	
+    public boolean apply(Unifier u) {
+    	boolean r = super.apply(u);
+        if (annots != null) {
+            Iterator<ListTerm> i = annots.listTermIterator();
+            while (i.hasNext()) {
+                ListTerm lt = i.next();
+                lt.getTerm().apply(u);
+                if (lt.isTail()) {
+                    lt.getNext().apply(u);
+                }
+            }
+        }
+        return r;
+    }
+    
     public void setAnnots(ListTerm l) {
         annots = l;
         if (annots != null && annots.isEmpty()) {
@@ -360,19 +376,6 @@ public class Pred extends Structure {
         return false;
     }
 
-    /*
-     // BB does not work with this hashvalue, annots are removed while the bel is in BB
-    @Override
-    protected int calcHashCode() {
-        int result = super.calcHashCode();
-        if (getAnnots() != null) {
-            for (Term annot : getAnnots()) {
-                result = 31 * result + annot.hashCode();
-            }
-        }
-        return result;
-    }
-    */
     
     public boolean equalsAsTerm(Object p) {
         return super.equals((Term) p);

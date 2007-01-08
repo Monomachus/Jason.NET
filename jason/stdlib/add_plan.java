@@ -85,7 +85,7 @@ public class add_plan extends DefaultInternalAction {
             Structure source = new Atom("self");
             if (args.length > 1) {
                 source = (Structure) args[1];
-                un.apply(source);
+                source.apply(un);
             }
 
             if (plans.isList()) { // arg[0] is a list of strings

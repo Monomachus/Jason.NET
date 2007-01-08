@@ -67,9 +67,8 @@ public class intend extends DefaultInternalAction {
     @Override
 	public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         try {
-    	    Literal l = (Literal)args[0];
-    	    un.apply(l);
-    	    return intends(ts.getC(),l,un);
+        	args[0].apply(un);
+    	    return intends(ts.getC(),(Literal)args[0],un);
         } catch (ArrayIndexOutOfBoundsException e) {
             throw new JasonException("The internal action 'intend' has not received the required argument.");
         } catch (Exception e) {

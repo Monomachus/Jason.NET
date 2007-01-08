@@ -87,10 +87,10 @@ public class create_agent extends DefaultInternalAction {
 
         try {
             Term name = args[0];
-            un.apply(name);
+            name.apply(un);
 
             StringTerm source = (StringTerm)args[1];
-            un.apply(source);
+            source.apply(un);
 
             File fSource = new File(source.getString());
             if (!fSource.exists()) {

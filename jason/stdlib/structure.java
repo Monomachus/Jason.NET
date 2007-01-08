@@ -40,9 +40,8 @@ public class structure extends DefaultInternalAction {
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         try {
-            Term t = args[0];
-            un.apply(t);
-            return t.isStructure();
+            args[0].apply(un);
+            return args[0].isStructure();
         } catch (ArrayIndexOutOfBoundsException e) {
             throw new JasonException("The internal action 'structure' has not received the required argument.");
         } catch (Exception e) {

@@ -81,12 +81,12 @@ public class remove_plan extends DefaultInternalAction {
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         try {
             Term label = args[0];
-        	un.apply(label);
+        	label.apply(un);
 
             Structure source = new Atom("self");
         	if (args.length > 1) {
 				source = (Structure)args[1];
-        		un.apply(source);
+				source.apply(un);
         	}
         	
         	if (label.isList()) { // arg[0] is a list

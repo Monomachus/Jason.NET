@@ -73,8 +73,8 @@ public class at extends DefaultInternalAction {
         try {
 	        StringTerm time  = (StringTerm)args[0];
 	        StringTerm sevent = (StringTerm)args[1];
-	        un.apply(time);
-            un.apply(sevent);
+	        time.apply(un);
+            sevent.apply(un);
 			Trigger te = Trigger.parseTrigger(sevent.getString());
 			String  stime = time.getString();
 

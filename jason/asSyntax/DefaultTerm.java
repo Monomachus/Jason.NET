@@ -23,6 +23,7 @@
 
 package jason.asSyntax;
 
+import jason.asSemantics.Unifier;
 import jason.asSyntax.parser.as2j;
 
 import java.io.Serializable;
@@ -114,5 +115,9 @@ public abstract class DefaultTerm implements Term, Serializable {
     }
 
     abstract public Object clone();
+    
+    public boolean apply(Unifier u) {
+    	return false;
+    }
 
 }

@@ -64,8 +64,8 @@ public class kill_agent extends DefaultInternalAction {
 	public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
 		
 		try {
+			args[0].apply(un);
             Term name = args[0];
-            un.apply(name);
             return ts.getUserAgArch().getArchInfraTier().getRuntimeServices().killAgent(name.toString());
 		} catch (IndexOutOfBoundsException e) {
 			throw new JasonException("The internal action 'kill_agent' received a wrong number of arguments.");

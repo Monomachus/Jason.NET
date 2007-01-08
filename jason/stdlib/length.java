@@ -58,10 +58,12 @@ public class length extends DefaultInternalAction {
 
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
+		args[0].apply(un);
+		args[1].apply(un);
+		
         Term l1 = args[0];
         Term l2 = args[1];
-        un.apply(l1);
-        un.apply(l2);
+
         NumberTerm size = null;
         if (l1.isList()) {
             ListTerm lt = (ListTerm) l1;

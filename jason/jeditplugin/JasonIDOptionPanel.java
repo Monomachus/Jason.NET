@@ -45,6 +45,8 @@ import org.gjt.sp.jedit.AbstractOptionPane;
 
 public class JasonIDOptionPanel extends AbstractOptionPane  {
 	
+	private static final long serialVersionUID = 1L;
+
 	JTextField saciTF;
 	JTextField jasonTF;
 	JTextField javaTF;

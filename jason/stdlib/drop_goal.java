@@ -76,9 +76,9 @@ public class drop_goal extends DefaultInternalAction {
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         try {
             Literal l = (Literal)args[0];
-            un.apply(l);
+            l.apply(un);
             Term success = (Term)args[1];
-            un.apply(success);
+            success.apply(un);
             drop(ts, l, success.equals(Literal.LTrue), un);
             return true;
         } catch (ArrayIndexOutOfBoundsException e) {

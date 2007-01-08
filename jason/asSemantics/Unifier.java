@@ -23,9 +23,6 @@
 
 package jason.asSemantics;
 
-import jason.asSyntax.ArithExpr;
-import jason.asSyntax.DefaultTerm;
-import jason.asSyntax.ListTerm;
 import jason.asSyntax.Literal;
 import jason.asSyntax.Pred;
 import jason.asSyntax.Structure;
@@ -34,10 +31,7 @@ import jason.asSyntax.Trigger;
 import jason.asSyntax.VarTerm;
 
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -50,49 +44,18 @@ public class Unifier implements Cloneable {
 
     private HashMap<VarTerm, Term> function = new HashMap<VarTerm, Term>();
 
-    // TODO: move this method to syntax classes to avoid the ifs and simplify new classes constructions without changing the unifier
+    /** 
+     * @deprecated use t.apply(un) instead.
+     */
     public void apply(Term t) {
-        if (t.isArithExpr()) {
-            ArithExpr et = (ArithExpr) t;
-            // apply values to expression variables
-            apply(et.getLHS());
-            if (!et.isUnary()) {
-                apply(et.getRHS());
-            }
-            et.evaluate();
-        } else if (t.isVar()) {
-            VarTerm vt = (VarTerm) t;
-            if (!vt.hasValue()) {
-                Term vl = get(vt);
-                // System.out.println("appling="+t+"="+vl+" un="+this);
-                if (vl != null && !(vl instanceof VarsCluster)) {
-                    vt.setValue(vl);
-                    apply(vt); // in case t has var args
-                }
-            }
-        } else if (t.isStructure()) {
-            Structure ts = (Structure)t;
-            // do not use iterator! (see ListTermImpl class)
-            final int tss = ts.getTermsSize();
-            for (int i = 0; i < tss; i++) {
-                apply(ts.getTerm(i));
-            }
-        }
-        t.resetHashCodeCache();
+    	t.apply(this);
     }
 
+    /** 
+     * @deprecated use t.apply(un) instead.
+     */
     public void apply(Pred p) {
-        apply((Term) p);
-        if (p.getAnnots() != null) {
-            Iterator<ListTerm> i = p.getAnnots().listTermIterator();
-            while (i.hasNext()) {
-                ListTerm lt = i.next();
-                apply(lt.getTerm());
-                if (lt.isTail()) {
-                    apply((Term) lt.getNext());
-                }
-            }
-        }
+    	p.apply(this);
     }
 
     /**
@@ -168,11 +131,11 @@ public class Unifier implements Cloneable {
         // if args are expressions, apply them and use their values
         if (t1g.isArithExpr()) {
             t1g = (Term) t1g.clone();
-            apply(t1g);
+            t1g.apply(this);
         }
         if (t2g.isArithExpr()) {
             t2g = (Term) t2g.clone();
-            apply(t2g);
+            t2g.apply(this);
         }
 
         // both are vars
@@ -208,10 +171,10 @@ public class Unifier implements Cloneable {
             if (! t1gv.isUnnamedVar() && ! t2gv.isUnnamedVar()) {
                 VarTerm t1c = (VarTerm) t1gv.clone();
                 VarTerm t2c = (VarTerm) t2gv.clone();
-                VarsCluster cluster = new VarsCluster(t1c, t2c);
+                VarsCluster cluster = new VarsCluster(t1c, t2c, this);
                 if (cluster.hasValue()) {
                     // all vars of the cluster should have the same value
-                    for (VarTerm vtc : cluster.get()) {
+                    for (VarTerm vtc : cluster) {
                         function.put(vtc, cluster);
                     }
                 }
@@ -317,7 +280,7 @@ public class Unifier implements Cloneable {
         Term currentVl = function.get(vt);
         if (currentVl != null && currentVl instanceof VarsCluster) {
             VarsCluster cluster = (VarsCluster) currentVl;
-            for (VarTerm cvt : cluster.get()) {
+            for (VarTerm cvt : cluster) {
                 function.put(cvt, value);
             }
         } else {
@@ -365,95 +328,6 @@ public class Unifier implements Cloneable {
         return false;
     }
     
-    
-    private static int idCount = 0;
-    /**
-     * used to group a set of vars. E.g.: when X = Y = W = Z the function map
-     * has X -> { X, Y, W, Z } 
-     *     Y -> { X, Y, W, Z } 
-     *     W -> { X, Y, W, Z } 
-     *     Z -> { X, Y, W, Z } 
-     * where { X, Y, W, Z } is a VarsCluster instance.
-     *
-     * So when one var is assigned to a value, all vars gives this
-     * value.
-     * 
-     * @author jomi
-     * 
-     */
-    class VarsCluster extends DefaultTerm {
-		private static final long serialVersionUID = 1L;
-
-        int id = 0;
-		Set<VarTerm> vars = null;
-
-        // used in clone
-        private VarsCluster() { }
-        
-        VarsCluster(VarTerm v1, VarTerm v2) {
-            id = ++idCount;
-            add(v1);
-            add(v2);
-        }
-
-        void add(VarTerm vt) {
-            Term vl = function.get(vt);
-            if (vl == null) {
-                // v1 has no value
-                if (vars == null) {
-                    vars = new HashSet<VarTerm>();
-                }
-                vars.add(vt);
-            } else if (vl instanceof VarsCluster) {
-                if (vars == null) {
-                    vars = ((VarsCluster) vl).get();
-                } else {
-                    vars.addAll(((VarsCluster) vl).get());
-                }
-            } else {
-                logger.warning("joining var that has value!");
-            }
-        }
-
-        Set<VarTerm> get() {
-            return vars;
-        }
-        
-        public boolean equals(Object o) {
-            if (o == null) return false;
-            if (o == this) return true;
-            if (o instanceof VarsCluster) {
-                return vars.equals(((VarsCluster)o).vars);
-            }
-            return false;
-        }
-        
-        boolean hasValue() {
-            return vars != null && !vars.isEmpty();
-        }
-
-        public Object clone() {
-            VarsCluster c = new VarsCluster();
-            c.vars = new HashSet<VarTerm>();
-            for (VarTerm vt: this.vars) {
-                c.vars.add((VarTerm)vt.clone());
-            }
-            return c;
-        }
-        
-        protected int calcHashCode() {
-            return vars.hashCode();
-        }
-        
-        public Element getAsDOM(Document document) {
-            return null;
-        }
-        
-        public String toString() {
-            return "_VC"+id;
-        }
-    }
-
     /** get as XML */
     public Element getAsDOM(Document document) {
         Element u = (Element) document.createElement("unifier");

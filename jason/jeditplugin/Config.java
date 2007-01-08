@@ -43,7 +43,9 @@ import java.util.StringTokenizer;
  */
 public class Config extends Properties {
 
-    public static final String JASON_JAR     = "jasonJar";
+	private static final long  serialVersionUID = 1L;
+
+	public static final String JASON_JAR     = "jasonJar";
     public static final String SACI_JAR      = "saciJar";
     public static final String ANT_LIB       = "antLib";
 

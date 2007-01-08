@@ -77,14 +77,14 @@ public class findall extends DefaultInternalAction {
         try {
             Term var = args[0];
             Literal bel = (Literal)args[1];
-            un.apply(bel);
+            bel.apply(un);
             // find all 'bel' entries in the belief base and builds up a list with them
             ListTerm all = new ListTermImpl();
             Iterator<Unifier> iu = bel.logicalConsequence(ts.getAg(), un);
             while (iu.hasNext()) {
                 Unifier nu = iu.next();
                 Term vl = (Term) var.clone();
-                nu.apply(vl);
+                vl.apply(nu);
                 all.add(vl);
             }
             Term list = args[2];

@@ -23,6 +23,7 @@
 
 package jason.asSyntax;
 
+import jason.asSemantics.Unifier;
 import jason.asSyntax.parser.as2j;
 
 import java.io.StringReader;
@@ -192,6 +193,18 @@ public class Structure extends DefaultTerm {
         }
 
         return 0;
+    }
+
+    public boolean apply(Unifier u) {
+    	boolean r = false;
+        // do not use iterator! (see ListTermImpl class)
+        final int tss = getTermsSize();
+        for (int i = 0; i < tss; i++) {
+        	boolean tr = getTerm(i).apply(u); 
+            r = r || tr;
+        }
+        resetHashCodeCache();
+        return r;
     }
 
     /** make a deep copy of the terms */

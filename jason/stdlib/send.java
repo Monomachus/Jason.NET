@@ -122,17 +122,17 @@ public class send extends DefaultInternalAction {
             ilf  = args[1];
             pcnt = args[2];
 	        
-            un.apply(to);
+            to.apply(un);
             
             if (!to.isAtom() && !to.isList() && !to.isString()) {
                 throw new JasonException("The TO parameter ('"+to+"') of the internal action 'send' is not an atom or list of atoms!");
             }
 
-            un.apply(ilf);
+            ilf.apply(un);
             if (! ilf.isAtom()) {
                 throw new JasonException("The illocutionary force parameter ('"+ilf+"') of the internal action 'send' is not an atom!");
             }
-            un.apply(pcnt);
+            pcnt.apply(un);
 	        
             // remove source annots in the content (in case it is a pred)
             try {
@@ -153,7 +153,7 @@ public class send extends DefaultInternalAction {
         // tell with 4 args is a reply to
         if (m.isTell() && args.length > 3) {
             Term mid = args[3];
-            un.apply(mid);
+            mid.apply(un);
             if (! mid.isAtom()) {
                 throw new JasonException("The Message ID ('"+mid+"') parameter of the internal action 'send' is not an atom!");
             }
@@ -191,7 +191,7 @@ public class send extends DefaultInternalAction {
             if (lastSendWasSynAsk && args.length == 5) {
                 // get the timeout deadline
                 Term tto = (Term)args[4];
-                un.apply(tto);
+                tto.apply(un);
                 if (tto.isNumeric()) {
                     new CheckTimeout((long)((NumberTerm)tto).solve(), m.getMsgId(), ts.getC()).start(); 
                 } else {

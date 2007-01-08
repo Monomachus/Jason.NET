@@ -25,6 +25,7 @@ package jason.asSyntax;
 
 import jason.asSemantics.Agent;
 import jason.asSemantics.Unifier;
+import jason.asSemantics.VarsCluster;
 import jason.asSyntax.parser.as2j;
 
 import java.io.StringReader;
@@ -105,6 +106,7 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
             return false;
         }
         value = vl;
+        resetHashCodeCache();
         return true;
     }
 
@@ -112,6 +114,21 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
     public boolean hasValue() {
         return value != null;
     }
+
+    public boolean apply(Unifier u) {
+        if (!hasValue()) {
+            Term vl = u.get(this);
+            // System.out.println("appling="+t+"="+vl+" un="+this);
+            if (vl != null && !(vl instanceof VarsCluster)) {
+                setValue(vl);
+                vl.apply(u); // in case t has var args
+                return true;
+            }
+        } else {
+        	return getValue().apply(u);
+        }
+        return false;            	
+    }    
 
     /**
      * returns the value of this var. 
@@ -195,7 +212,7 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
             Term t = (Term) this.clone();
             if (t instanceof VarTerm) { // the clone is still a var
                 VarTerm c = (VarTerm)t;
-                un.apply(c);
+                c.apply(un);
                 if (c.hasValue() && c.getValue() instanceof LogicalFormula) {
                     return ((LogicalFormula)c.getValue()).logicalConsequence(ag, un);
                 }

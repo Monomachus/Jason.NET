@@ -79,7 +79,9 @@ import jason.util.*;
 
 public class JasonID extends JPanel implements EBComponent, RunProjectListener {
 
-    View                 view;
+	private static final long serialVersionUID = 1L;
+
+	View                 view;
 
     OutputStreamAdapter  myOut;
 

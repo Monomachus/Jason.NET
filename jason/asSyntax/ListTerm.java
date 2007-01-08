@@ -38,8 +38,6 @@ public interface ListTerm extends java.util.List<Term>, Term {
 	public void setNext(Term l);
 	public ListTerm getNext();
 	
-	public int size();
-	public boolean isEmpty();
 	public boolean isEnd();
 	
 	public boolean isTail();

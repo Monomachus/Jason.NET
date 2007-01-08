@@ -62,7 +62,7 @@ public class concat extends DefaultInternalAction {
 	@Override
 	public Object execute(TransitionSystem ts, Unifier un, Term[] args)	throws Exception {
         for (int i=0; i < args.length; i++) {
-            un.apply(args[i]);
+            args[i].apply(un);
         }
 		
 	    if (args[0].isList()) {

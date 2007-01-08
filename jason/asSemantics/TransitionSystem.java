@@ -377,7 +377,7 @@ public class TransitionSystem {
         
         if (h.getType() != BodyType.constraint) { // constraint body is not a literal
             body = (Literal)h.getLiteralFormula().clone();
-            u.apply(body);
+            body.apply(u);
         }
 
         switch (h.getType()) {
@@ -568,7 +568,7 @@ public class TransitionSystem {
                 // make the TE of finished plan ground and unify that
                 // with goal in the body
                 Literal tel = topIM.getPlan().getTriggerEvent().getLiteral();
-                topIM.unif.apply(tel);
+                tel.apply(topIM.unif);
                 im.unif.unifies(tel, g.getLiteralFormula());
             }
         }

@@ -72,15 +72,15 @@ public class drop_desire extends DefaultInternalAction {
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         try {
-            Literal l = (Literal)args[0]; // Literal.parseLiteral(args[0].toString());
-            un.apply(l);
+            Literal l = (Literal)args[0]; 
+            l.apply(un);
             
             Event e = new Event(new Trigger(Trigger.TEAdd, Trigger.TEAchvG, l),Intention.EmptyInt);
             for (Event ei : ts.getC().getEvents()) {
                 Trigger t = (Trigger) ei.getTrigger();
                 if (ei.getIntention() != Intention.EmptyInt) {
                     t = (Trigger) t.clone();
-                    ei.getIntention().peek().getUnif().apply(t.getLiteral());
+                    t.getLiteral().apply(ei.getIntention().peek().getUnif());
                 }
                 if (un.unifies(t, e.getTrigger())) {
                     t.setTrigType(Trigger.TEDel); // Just changing "+!g" to "-!g"

@@ -82,9 +82,7 @@ public class add_annot extends DefaultInternalAction {
 	}
 
 	public Term addAnnotToList(Unifier unif, Term l, Term annot) {
-		if (l.isVar()) {
-			unif.apply(l);
-		}
+		l.apply(unif);
 		if (l.isList()) {
 			ListTerm result = new ListTermImpl();
 			ListTerm lt = (ListTerm)l;

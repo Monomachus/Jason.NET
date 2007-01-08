@@ -64,7 +64,7 @@ public class broadcast extends DefaultInternalAction {
 
 		try {
 			ilf = args[0];
-            un.apply(ilf);
+            ilf.apply(un);
 			if (!ilf.isAtom()) {
 				throw new JasonException("The illocutionary force parameter of the internal action 'broadcast' is not an atom!");
 			}
@@ -73,7 +73,7 @@ public class broadcast extends DefaultInternalAction {
 		} catch (ArrayIndexOutOfBoundsException e) {
 			throw new JasonException("The internal action 'broadcast' has not received two arguments.");
 		}
-		un.apply(pcnt);
+		pcnt.apply(un);
 		if (!pcnt.isGround()) {
 			throw new JasonException("The content of the message '" + pcnt + "' is not ground!");
 		}

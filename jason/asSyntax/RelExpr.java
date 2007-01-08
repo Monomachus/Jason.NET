@@ -91,8 +91,8 @@ public class RelExpr implements LogicalFormula {
         if (op != RelationalOp.literalBuilder) {
             xp = (Term)lhs.clone();
             yp = (Term)rhs.clone();
-            un.apply(xp);
-            un.apply(yp);
+            xp.apply(un);
+            yp.apply(un);
         }
         switch (op) {
         

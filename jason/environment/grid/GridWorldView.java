@@ -16,7 +16,9 @@ import javax.swing.JFrame;
  */
 public class GridWorldView extends JFrame {
 
-    protected int cellSizeW = 0;
+	private static final long serialVersionUID = 1L;
+
+	protected int cellSizeW = 0;
     protected int cellSizeH = 0;
 
     protected GridCanvas     drawArea;
@@ -118,7 +120,9 @@ public class GridWorldView extends JFrame {
     
     class GridCanvas extends Canvas {
         
-        public void paint(Graphics g) {
+		private static final long serialVersionUID = 1L;
+
+		public void paint(Graphics g) {
             cellSizeW = drawArea.getWidth() / model.getWidth();
             cellSizeH = drawArea.getHeight() / model.getHeight();
             int mwidth = model.getWidth();

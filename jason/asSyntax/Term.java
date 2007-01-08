@@ -23,6 +23,7 @@
 
 package jason.asSyntax;
 
+import jason.asSemantics.Unifier;
 import jason.util.ToDOM;
 
 import java.io.Serializable;
@@ -61,6 +62,12 @@ public interface Term extends Cloneable, Comparable<Term>, Serializable, ToDOM {
     public Object clone();
 
     public boolean equals(Object o);
+    
+    /** 
+     *  Applies variables's values in an unifier to the variables in the term.
+     *  Returns true if some variable was applied.  
+     */
+    public boolean apply(Unifier u);
 
     /** Removes the valued cached for hashCode */
     public void resetHashCodeCache();

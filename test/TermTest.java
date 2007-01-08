@@ -1,15 +1,15 @@
 package test;
 
 import jason.asSemantics.Unifier;
+import jason.asSyntax.Atom;
+import jason.asSyntax.DefaultTerm;
 import jason.asSyntax.ListTerm;
 import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Literal;
 import jason.asSyntax.NumberTermImpl;
 import jason.asSyntax.Pred;
 import jason.asSyntax.Structure;
-import jason.asSyntax.Atom;
 import jason.asSyntax.Term;
-import jason.asSyntax.DefaultTerm;
 import jason.asSyntax.Trigger;
 import jason.asSyntax.VarTerm;
 import jason.bb.BeliefBase;
@@ -112,7 +112,7 @@ public class TermTest extends TestCase {
 		//System.out.println("u="+u);
 		assertEquals(u.get(b).toString(), "a");
 		assertEquals(u.get(x).toString(), "a");
-		u.apply(b);
+		b.apply(u);
 		//System.out.println("x="+x);
 		//System.out.println("b="+b);
 		assertEquals(b.toString(), "a");
@@ -357,7 +357,7 @@ public class TermTest extends TestCase {
 		Unifier u = new Unifier();
 		assertTrue(u.unifies(t1,t2));
 		//System.out.println(u);
-		u.apply(t2.getLiteral());
+		t2.getLiteral().apply(u);
 		//System.out.println("t2 with apply = "+t2);
 		
 		assertEquals(t1.toString(), t2.toString());
@@ -385,7 +385,7 @@ public class TermTest extends TestCase {
 		Unifier u = new Unifier();
 		assertTrue(u.unifies(l1,l2));
 		//System.out.println(u);
-		u.apply(l2);
+		l2.apply(u);
 		//System.out.println("l2 with apply = "+l2);
 		assertEquals(l1.toString(), l2.toString());
         
@@ -440,7 +440,7 @@ public class TermTest extends TestCase {
 		u = new Unifier();
 		assertTrue(u.unifies(p1,p2));
 		//System.out.println(u+"-"+p2);
-		u.apply(p2);
+		p2.apply(u);
 		assertEquals(p2.toString(),"p(t1,t2)[a(1),z,a(2,3),a(3)]");
 	}
     

@@ -62,9 +62,8 @@ public class desire extends intend {
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         try {
-            Literal l = (Literal)args[0]; //Literal.parseLiteral(args[0].toString());
-            un.apply(l);
-            return desires(ts.getC(),l,un);
+            args[0].apply(un); 
+            return desires(ts.getC(),(Literal)args[0],un);
         } catch (ArrayIndexOutOfBoundsException e) {
             throw new JasonException("The internal action 'desire' has not received the required argument.");
         } catch (Exception e) {
@@ -81,7 +80,7 @@ public class desire extends intend {
             Trigger t = C.getSelectedEvent().getTrigger();
             if (C.getSelectedEvent().getIntention() != Intention.EmptyInt) {
                 t = (Trigger) t.clone();
-                C.getSelectedEvent().getIntention().peek().getUnif().apply(t.getLiteral());
+                t.getLiteral().apply(C.getSelectedEvent().getIntention().peek().getUnif());
             }
             if (un.unifies(t, teFromL)) {
                 return true;
@@ -92,7 +91,7 @@ public class desire extends intend {
             Trigger t = (Trigger) ei.getTrigger();
             if (ei.getIntention() != Intention.EmptyInt) {
                 t = (Trigger) t.clone();
-                ei.getIntention().peek().getUnif().apply(t.getLiteral());
+                t.getLiteral().apply(ei.getIntention().peek().getUnif());
             }
             if (un.unifies(t, teFromL)) {
                 return true;

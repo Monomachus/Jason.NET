@@ -31,7 +31,7 @@ public class VarTermTest extends TestCase {
         Unifier u = new Unifier();
         u.unifies(k, new Structure("a1"));
         assertTrue("K".equals(k.toString()));
-        u.apply(k);
+        k.apply(u);
         assertTrue("a1".equals(k.toString()));
         k.addTerm(new Structure("p1"));
         k.addTerm(new Structure("p2"));
@@ -71,7 +71,7 @@ public class VarTermTest extends TestCase {
         assertEquals(u.get(x8).toString(),"a");
         assertEquals(u.get(x9).toString(),"a");
         
-        u.apply(x1);
+        x1.apply(u);
         assertEquals(x1.toString(),"a");
 
         // unification with lists
@@ -80,7 +80,7 @@ public class VarTermTest extends TestCase {
         u = new Unifier();
         u.unifies(new VarTerm("B"), new Structure("oi"));
         u.unifies(v1, lt);
-        u.apply(v1);
+        v1.apply(u);
         lt = (ListTerm) v1.getValue();
         Iterator i = lt.iterator();
         i.next();
@@ -88,7 +88,7 @@ public class VarTermTest extends TestCase {
         Term third = (Term) i.next();
         Term toi1 = DefaultTerm.parse("a(oi)");
         Term toi2 = DefaultTerm.parse("a(B)");
-        u.apply(toi2);
+        toi2.apply(u);
         assertEquals(toi1,toi2);
         assertTrue(third.equals(toi1));
     }
@@ -99,7 +99,7 @@ public class VarTermTest extends TestCase {
         Unifier u = new Unifier();
         u.unifies(k, new Pred("p"));
         assertFalse(k.isPred());
-        u.apply(k);
+        k.apply(u);
         assertTrue(k.isPred());
         assertFalse(k.hasAnnot());
         k.addAnnot(new Structure("annot1"));
@@ -130,7 +130,7 @@ public class VarTermTest extends TestCase {
         assertTrue(l.negated());
         assertTrue(u.unifies(k, l));
         assertFalse(k.isLiteral());
-        u.apply(k);
+        k.apply(u);
         // System.out.println(k+" u="+u);
         assertFalse(k.isVar());
         assertTrue(k.isLiteral());
@@ -153,11 +153,11 @@ public class VarTermTest extends TestCase {
         // System.out.println("l2="+l2);
         VarTerm nl = new VarTerm("NK");
         u.unifies(nl, (Term) l2);
-        u.apply(nl);
+        nl.apply(u);
         // System.out.println(nl+ " un="+u);
         assertEquals(nl.size(), 5);
 
-        u.apply((Term) l2);
+        l2.apply(u);
         assertEquals(l2.size(), 5);
         assertEquals(l2.toString(), "[d,e,a,b,c]");
     }
@@ -170,7 +170,7 @@ public class VarTermTest extends TestCase {
         assertTrue(n.isNumeric());
         assertFalse(n.isVar());
         assertTrue(u.unifies(k, n));
-        u.apply(k);
+        k.apply(u);
         // System.out.println(k+" u="+u);
         assertTrue(k.isNumeric());
         assertFalse(k.isLiteral());
@@ -280,7 +280,7 @@ public class VarTermTest extends TestCase {
         Unifier u = new Unifier();
         u.unifies(new VarTerm("X"), new NumberTermImpl(1));
         // X+1 not unifies with 1
-        u.apply(exp);
+        exp.apply(u);
         assertFalse(u.unifies(exp, um));
         // X+1 unifies with 2
         assertTrue(u.unifies(exp, dois));
@@ -300,7 +300,7 @@ public class VarTermTest extends TestCase {
         Literal l = Literal.parseLiteral("op(X)");
         u.unifies(new VarTerm("M"), l);
         u.unifies(new VarTerm("M"), Literal.parseLiteral("op(1)"));
-        u.apply(l);
+        l.apply(u);
         //assertEquals(u.get("M").toString(),"op(1)");
         assertEquals(l.toString(),"op(1)");
     }
@@ -312,7 +312,7 @@ public class VarTermTest extends TestCase {
         Unifier u = new Unifier();
         assertTrue(u.unifies(a1,a2));
         assertFalse(u.unifies(a1,a3));
-        u.apply(a1);
+        a1.apply(u);
         assertEquals(a1.toString(), DefaultTerm.parse("a(10,20)").toString());
     }
     
@@ -332,7 +332,7 @@ public class VarTermTest extends TestCase {
         u.unifies(v, t1cc);
         assertTrue(v.isVar());
         assertFalse(v.isGround());
-        u.apply(v);
+        v.apply(u);
         assertFalse(v.isVar());
         assertFalse(v.isGround());        
     }
