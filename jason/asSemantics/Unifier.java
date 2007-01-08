@@ -50,6 +50,7 @@ public class Unifier implements Cloneable {
 
     private HashMap<VarTerm, Term> function = new HashMap<VarTerm, Term>();
 
+    // TODO: move this method to syntax classes to avoid the ifs and simplify new classes constructions without changing the unifier
     public void apply(Term t) {
         if (t.isArithExpr()) {
             ArithExpr et = (ArithExpr) t;
@@ -69,9 +70,7 @@ public class Unifier implements Cloneable {
                     apply(vt); // in case t has var args
                 }
             }
-            return;
-        }
-        if (t.isStructure()) {
+        } else if (t.isStructure()) {
             Structure ts = (Structure)t;
             // do not use iterator! (see ListTermImpl class)
             final int tss = ts.getTermsSize();
@@ -251,11 +250,10 @@ public class Unifier implements Cloneable {
         // if any of the terms is not a structure (is a number or a
         // string), they must be equal
         if (!t1g.isStructure() || !t2g.isStructure()) {
-        	//return false;
         	return t1g.equals(t2g);
         }
 
-        // terms are structures
+        // both terms are structures
 
         // if both are literal, they must have the same negated
         if (t1g.isLiteral() && t2g.isLiteral() && ((Literal)t1g).negated() != ((Literal)t2g).negated()) {
@@ -305,16 +303,7 @@ public class Unifier implements Cloneable {
         // do not use iterator! (see ListTermImpl class)
         final int ts = t1s.getTermsSize();
         for (int i = 0; i < ts; i++) {
-            Term t1 = t1s.getTerm(i);
-            Term t2 = t2s.getTerm(i);
-            // if t1 or t2 are var with value, use the value
-            Term t1vl = get(t1);
-            if (t1vl != null && !(t1vl instanceof VarsCluster))
-                t1 = t1vl;
-            Term t2vl = get(t2);
-            if (t2vl != null && !(t2vl instanceof VarsCluster))
-                t2 = t2vl;
-            if (!unifies(t1, t2)) {
+            if (!unifies(t1s.getTerm(i), t2s.getTerm(i))) {
                 return false;
             }
         }
@@ -380,8 +369,13 @@ public class Unifier implements Cloneable {
     private static int idCount = 0;
     /**
      * used to group a set of vars. E.g.: when X = Y = W = Z the function map
-     * has X -> { X, Y, W, Z } Y -> { X, Y, W, Z } W -> { X, Y, W, Z } Z -> { X,
-     * Y, W, Z } So when one var is assigned to a value, all var gives this
+     * has X -> { X, Y, W, Z } 
+     *     Y -> { X, Y, W, Z } 
+     *     W -> { X, Y, W, Z } 
+     *     Z -> { X, Y, W, Z } 
+     * where { X, Y, W, Z } is a VarsCluster instance.
+     *
+     * So when one var is assigned to a value, all vars gives this
      * value.
      * 
      * @author jomi
