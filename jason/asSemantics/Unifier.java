@@ -52,7 +52,7 @@ public class Unifier implements Cloneable {
     }
 
     /** 
-     * @deprecated use t.apply(un) instead.
+     * @deprecated use p.apply(un) instead.
      */
     public void apply(Pred p) {
     	p.apply(this);
@@ -274,18 +274,16 @@ public class Unifier implements Cloneable {
     }
 
     private boolean setVarValue(VarTerm vt, Term value) {
-        value = (Term) value.clone();
-
         // if the var has a cluster, set value for all cluster
         Term currentVl = function.get(vt);
         if (currentVl != null && currentVl instanceof VarsCluster) {
             VarsCluster cluster = (VarsCluster) currentVl;
             for (VarTerm cvt : cluster) {
-                function.put(cvt, value);
+                function.put(cvt, (Term) value.clone());
             }
         } else {
             // no value in cluster
-            function.put((VarTerm) vt.clone(), value);
+            function.put((VarTerm) vt.clone(), (Term) value.clone());
         }
         return true;
     }
