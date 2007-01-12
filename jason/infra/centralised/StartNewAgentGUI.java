@@ -113,13 +113,21 @@ public class StartNewAgentGUI extends BaseDialogGUI {
                 boolean fs = RunCentralisedMAS.getRunner().getControllerInfraTier() != null;
                 RuntimeServicesInfraTier services = RunCentralisedMAS.getRunner().getEnvironmentInfraTier().getRuntimeServices();
                 try {
+                	String agClass = null;
+                	if (ap.agClass != null) {
+                		agClass = ap.agClass.className;
+                	}
+                	String archClass = null;
+                	if (ap.archClass != null) {
+                		archClass = ap.archClass.className;
+                	}
                     for (int i = 0; i < ap.qty; i++) {
                         String name = ap.name;
                         if (ap.qty > 1) {
                             name = name + (i + 1);
                         }
                         // TODO: implements bb class
-                        services.createAgent(name, ap.asSource.getAbsolutePath(), ap.agClass.className, ap.archClass.className, null, ap.getAsSetts(debug, fs));
+                        services.createAgent(name, ap.asSource.getAbsolutePath(), agClass, archClass, null, ap.getAsSetts(debug, fs));
                     }
                 } catch (Exception e) {
                     e.printStackTrace();

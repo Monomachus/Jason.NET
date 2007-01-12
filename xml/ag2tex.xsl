@@ -35,6 +35,7 @@
 \newcommand{\aslstring}[1]{\textsf{#1}}
 \newcommand{\aslvar}[1]{\textit{#1}}
 \newcommand{\asllabel}[1]{\textbf{#1}}
+\newcommand{\rulebody}[1]{\mbox{\hspace{.05\linewidth}}\begin{minipage}[t]{0.95\linewidth}#1.\end{minipage}}
 </xsl:text>
     </xsl:template>
     
@@ -48,7 +49,7 @@
 </xsl:text>
         <xsl:for-each select="literal|rule">
             <xsl:apply-templates select="." />
-			<xsl:text>\\
+			<xsl:text>.\\
 </xsl:text>
 	    </xsl:for-each>
 		<xsl:text>
@@ -64,7 +65,6 @@
 
 	        <xsl:apply-templates />
     </xsl:template>
-
 
 
     <xsl:template match="intention">
@@ -195,9 +195,17 @@ Intention: </xsl:text><xsl:value-of select="@id" />
     </xsl:template>
 
 
+    <xsl:template match="rule">
+	    	<xsl:apply-templates select="head"/> 
+	    	<xsl:text>~:-\\\rulebody{
+</xsl:text>
+		    <xsl:apply-templates select="context" />
+		    <xsl:text>}</xsl:text>
+    </xsl:template>
+
 
         
-    <xsl:template match="term">
+    <xsl:template match="structure">
 		<xsl:text/><xsl:value-of select="@functor"/><xsl:text/>
 		<xsl:if test="count(arguments) > 0">
 			<xsl:text>(</xsl:text>

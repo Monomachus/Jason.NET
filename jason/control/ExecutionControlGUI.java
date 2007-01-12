@@ -54,6 +54,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextPane;
+import javax.swing.SwingUtilities;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
@@ -68,13 +69,14 @@ public class ExecutionControlGUI extends ExecutionControl {
 	boolean inRunMode = false;
 	
 	// xml components
-    asl2xml  agTransformerXML = new asl2xml();
-    asl2tex  agTransformerTex = new asl2tex("/xml/ag2tex.xsl");
+    asl2xml  agTransformerXML  = new asl2xml();
+    asl2tex  agTransformerTex  = new asl2tex("/xml/ag2tex.xsl");
     asl2html agTransformerHtml = new asl2html("/xml/agInspection.xsl");
-    asl2xml  agTransformer = agTransformerHtml;
+    asl2xml  agTransformer     = null;
      
 
 	public ExecutionControlGUI() {
+		agTransformer = agTransformerHtml;
 		initComponents();
 	}
 
@@ -94,6 +96,7 @@ public class ExecutionControlGUI extends ExecutionControl {
     // what to show
     Document agState = null;
 
+    // Which item is to be shown in HTML interface
     Map<String,Boolean> show = new HashMap<String,Boolean>();
 
 	void initComponents() {
@@ -182,7 +185,11 @@ public class ExecutionControlGUI extends ExecutionControl {
 				String ag = jList.getSelectedValue().toString();
 				if (!ag.equals(currentAg)) {
                     currentAg = ag;
-					inspectAgent(ag);
+                    SwingUtilities.invokeLater(new Runnable() {
+                    	public void run() {
+                    		inspectAgent(currentAg);
+                    	}
+                    });
 				}
 			}
 
@@ -262,7 +269,8 @@ public class ExecutionControlGUI extends ExecutionControl {
     /** show current agent state */
     void showAgState() {
         if (agState != null) {
-            try {
+        	String sMind = null;
+        	try {
                 // set parameters
                 if (jCbViewAs.getSelectedItem().toString().equals("html")) {
                     // as HTML
@@ -270,14 +278,14 @@ public class ExecutionControlGUI extends ExecutionControl {
                         agTransformer.getTransformer().setParameter("show-"+p, show.get(p)+"");
                     }
                 }
-                String sMind = agTransformer.transform(agState);
+                sMind = agTransformer.transform(agState);
 
                 if (!sMind.equals(previousMind)) {
                     jTA.setText(sMind);
                 }
                 previousMind = sMind;
             } catch (Exception e) {
-                jTA.setText("Error in XML transformation!" + e + "\n");
+                jTA.setText("Error in XML transformation!" + e + "\nText="+sMind);
                 e.printStackTrace();
             }
         }        

@@ -109,7 +109,7 @@
         <tr style="{$trh-style}">
         <xsl:call-template name="hideshow">
         	<xsl:with-param name="show" select="$show-mb" />
-        	<xsl:with-param name="item" select="'mv'" />
+        	<xsl:with-param name="item" select="'mb'" />
         	<xsl:with-param name="ds" select="'MailBox'" />
         </xsl:call-template>
         <xsl:if test="$show-mb='true'">
