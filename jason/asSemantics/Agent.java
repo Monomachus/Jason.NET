@@ -411,7 +411,9 @@ public class Agent {
         }
     }
     
-    /** Removes all occurrences of <i>bel</i> in BB */
+    /** Removes all occurrences of <i>bel</i> in BB. 
+        If <i>un</i> is null, an empty Unifier is used. 
+     */
     public void abolish(Literal bel, Unifier un) {
         List<Literal> toDel = new ArrayList<Literal>();
         
@@ -421,7 +423,7 @@ public class Agent {
                 Literal inBB = il.next();
                 if (!inBB.isRule()) {
                     // need to clone unifier since it is changed in previous iteration
-                    Unifier unC = (Unifier)un.clone();
+                    Unifier unC = (un == null ? new Unifier() : (Unifier)un.clone());
                     if (unC.unifies(bel, inBB)) {
                         toDel.add(inBB);
                     }
