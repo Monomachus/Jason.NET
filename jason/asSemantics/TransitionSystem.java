@@ -502,6 +502,12 @@ public class TransitionSystem {
             break;
             
         case delBel:
+            if (!body.hasSource()) {
+                // do not add source(self) in case the
+                // programmer set the source
+                body.addAnnot(BeliefBase.TSelf);
+            }
+
             newfocus = Intention.EmptyInt;
             if (setts.sameFocus()) {
                 newfocus = conf.C.SI;
@@ -509,7 +515,7 @@ public class TransitionSystem {
 
             // call BRF
             result = ag.brf(null,body, conf.C.SI); // the intention is not the new focus
-            if (result != null) { // really add something
+            if (result != null) { // really change something
                 // generate events
                 updateEvents(result,newfocus);
                 if (!setts.sameFocus()) {

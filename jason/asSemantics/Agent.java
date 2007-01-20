@@ -353,8 +353,8 @@ public class Agent {
             }
             Literal inBB = believes(beliefToDel, u);
             if (inBB != null) {
-                // lInBB is l unified in BB
-                // we can not use l for delBel in case l is g(_,_)
+                // inBB is l unified in BB
+                // we can not use beliefToDel for delBel in case it is g(_,_)
                 if (beliefToDel.hasAnnot()) {
                     // if belief has annots, use them
                     inBB = (Literal) inBB.clone();
@@ -363,8 +363,7 @@ public class Agent {
                 }
 
                 if (getBB().remove(inBB)) {
-                    if (logger.isLoggable(Level.FINE))
-                        logger.fine("Removed:" + inBB);
+                    if (logger.isLoggable(Level.FINE)) logger.fine("Removed:" + inBB);
                     result[1] = Collections.singletonList(inBB);
                     changed = true;
                 }
