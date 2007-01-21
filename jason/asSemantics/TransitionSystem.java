@@ -461,13 +461,18 @@ public class TransitionSystem {
         case delAddBel: 
             // -+a(1,X) ===> remove a(_,_), add a(1,X)
             // change all vars to anon vars to remove it
+            if (!body.hasSource()) {
+                // do not add source(self) in case the
+                // programmer set the source
+                body.addAnnot(BeliefBase.TSelf);
+            }
             Literal bc = (Literal)body.clone();
             bc.makeTermsAnnon();
             // to delete, create events as external to avoid that
             // remove/add create two events for the same intention
 
             List<Literal>[] result = ag.brf(null, bc, conf.C.SI); // the intention is not the new focus
-            if (result != null) { // really add something
+            if (result != null) { // really delete something
                 // generate events
                 updateEvents(result,Intention.EmptyInt);
             }
