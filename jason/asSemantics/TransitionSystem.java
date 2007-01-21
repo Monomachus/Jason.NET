@@ -227,42 +227,45 @@ public class TransitionSystem {
         confP.C.RP = relevantPlans(conf.C.SE.trigger);
 
         // Rule Rel1
-        if (!confP.C.RP.isEmpty() || setts.retrieve()) { 
+        if (confP.C.RP != null || setts.retrieve()) { 
             // retrieve is mainly for Coo-AgentSpeak
             confP.step = State.ApplPl;
         }
         // Rule Rel2
         else {
+            confP.step = State.ProcAct; // default next step
             if (conf.C.SE.trigger.isGoal()) {
                 logger.warning("Found a goal for which there is no relevant plan:" + conf.C.SE);
                 generateGoalDeletionFromEvent();
+            } else {
+                if (conf.C.SE.isInternal()) {
+                    // e.g. belief addition as internal event, just go ahead
+                    confP.C.SI = conf.C.SE.intention;
+                    updateIntention();
+                } else {
+                    // current event is external and irrelevant,
+                    // select another event
+                    confP.step = State.SelEv;
+                }
             }
-            // e.g. belief addition as internal event, just go ahead
-            else if (conf.C.SE.isInternal()) {
-                confP.C.SI = conf.C.SE.intention;
-                updateIntention();
-            }
-            // if external, then needs to check settings
-            else if (setts.requeue()) {
-                confP.C.addEvent(conf.C.SE);
-            }
-            confP.step = State.ProcAct;
         }
     }
 
     private void applyApplPl() throws JasonException {
         if (confP.C.RP == null) {
-            logger.warning("applyPl was called even when RP is null!");
+            logger.warning("ApplyPl was called even when RP is null!");
             confP.step = State.ProcAct;
             return;
         }
         confP.C.AP = applicablePlans(confP.C.RP);
 
         // Rule Appl1
-        if (!confP.C.AP.isEmpty() || setts.retrieve()) { 
+        if (confP.C.AP != null || setts.retrieve()) { 
             // retrieve is mainly for Coo-AgentSpeak
             confP.step = State.SelAppl;
-        } else { // Rule Appl2
+        } else { 
+
+            // Rule Appl2
             if (conf.C.SE.trigger.isGoal()) {
                 // can't carry on, no applicable plan.
                 logger.warning("Found a goal for which there is no applicable plan:\n" + conf.C.SE);
@@ -354,7 +357,7 @@ public class TransitionSystem {
 
     @SuppressWarnings("unchecked")
     private void applyExecInt() throws JasonException {
-        confP.step = State.ClrInt; // default next stop
+        confP.step = State.ClrInt; // default next step
         
         if (conf.C.SI.isFinished()) {
             return;
@@ -426,14 +429,14 @@ public class TransitionSystem {
             }
             break;
 
-        // Rule Achieve
+        // Rule Achieve (
         case achieve:
             // free variables in an event cannot conflict with those in the plan
             body.makeVarsAnnon();
             conf.C.addAchvGoal(body, conf.C.SI);
             break;
 
-        // Rule Achieve as a New Focus
+        // Rule Achieve as a New Focus (the !! operator)
         case achieveNF:
             conf.C.addAchvGoal(body, Intention.EmptyInt);
             updateIntention();
@@ -589,42 +592,49 @@ public class TransitionSystem {
         applyClrInt(i);
     }
 
-    /** ******************************************* */
+    /**********************************************/
     /* auxiliary functions for the semantic rules */
-    /** ******************************************* */
+    /**********************************************/
 
     public List<Option> relevantPlans(Trigger teP) throws JasonException {
         Trigger te = (Trigger) teP.clone();
-        List<Option> rp = new LinkedList<Option>();
+        List<Option> rp = null;
         List<Plan> candidateRPs = conf.ag.fPL.getAllRelevant(te.getPredicateIndicator());
-        if (candidateRPs == null)
-            return rp;
-        for (Plan pl : candidateRPs) {
-            Unifier relUn = pl.relevant(te);
-            if (relUn != null) {
-                rp.add(new Option(pl, relUn));
+        if (candidateRPs != null) {
+            for (Plan pl : candidateRPs) {
+                Unifier relUn = pl.relevant(te);
+                if (relUn != null) {
+                    if (rp == null) rp = new LinkedList<Option>();
+                    rp.add(new Option(pl, relUn));
+                }
             }
         }
         return rp;
     }
 
     public List<Option> applicablePlans(List<Option> rp) throws JasonException {
-        List<Option> ap = new LinkedList<Option>();
-        for (Option opt: rp) {
-            LogicalFormula context = opt.plan.getContext();
-            if (context == null) { // context is true
-                ap.add(opt);
-            } else {
-                boolean allUnifs = opt.getPlan().isAllUnifs();
-                Iterator<Unifier> r = context.logicalConsequence(ag, opt.unif);
-                if (r != null) {
-                    while (r.hasNext()) {
-                        opt.unif = r.next();
-                        ap.add(opt);
-                        if (!allUnifs) break; // returns only one unification
-                        if (r.hasNext()) {
-                            // create a new option
-                            opt = new Option((Plan)opt.plan.clone(), null);
+        List<Option> ap = null;
+        if (rp != null) {
+            for (Option opt: rp) {
+                LogicalFormula context = opt.plan.getContext();
+                if (context == null) { // context is true
+                    if (ap == null) ap = new LinkedList<Option>();
+                    ap.add(opt);
+                } else {
+                    boolean allUnifs = opt.getPlan().isAllUnifs();
+                    Iterator<Unifier> r = context.logicalConsequence(ag, opt.unif);
+                    if (r != null) {
+                        while (r.hasNext()) {
+                            opt.unif = r.next();
+                            
+                            if (ap == null) ap = new LinkedList<Option>();
+                            ap.add(opt);
+                            
+                            if (!allUnifs) break; // returns only the first unification
+                            if (r.hasNext()) {
+                                // create a new option for the next loop step
+                                opt = new Option((Plan)opt.plan.clone(), null);
+                            }
                         }
                     }
                 }
@@ -728,8 +738,6 @@ public class TransitionSystem {
         return null;
     }
     
-    /** ********************************************************************* */
-
     boolean canSleep() {
         return !conf.C.hasEvent() && !conf.C.hasIntention() && conf.C.MB.isEmpty() && conf.C.FA.isEmpty() && agArch.canSleep();
     }
@@ -790,13 +798,13 @@ public class TransitionSystem {
         }
     }
 
-    /** ******************************************************************* */
+    /**********************************************************************/
     /* MAIN LOOP */
-    /** ******************************************************************* */
-    /* infinite loop on one reasoning cycle */
-    /* plus the other parts of the agent architecture besides */
-    /* the actual transition system of the AS interpreter */
-    /** ******************************************************************* */
+    /**********************************************************************/
+    /* infinite loop on one reasoning cycle                               */
+    /* plus the other parts of the agent architecture besides             */
+    /* the actual transition system of the AS interpreter                 */
+    /**********************************************************************/
     public void reasoningCycle() {
         try {
 

@@ -36,7 +36,7 @@ import jason.asSyntax.StringTermImpl;
 import jason.asSyntax.Term;
 import jason.asSyntax.Trigger;
 
-import java.util.Iterator;
+import java.util.List;
 
 /**
   <p>Internal action: <b><code>.relevant_plans</code></b>.
@@ -78,24 +78,23 @@ public class relevant_plans extends DefaultInternalAction {
 				throw new JasonException("The first argument of the 'relevant_plans' internal action is not a triggering event.");
 			}
 			ListTerm lt = new ListTermImpl();
-			Iterator i = ts.relevantPlans(te).iterator();
-			while (i.hasNext()) {
-				Option opt = (Option) i.next();
-				// remove sources (this IA is used for communication)
-				Plan np = (Plan)opt.getPlan().clone();
-				if (np.getLabel() != null) {
-					np.getLabel().delSources();
-				}
-				StringTerm stplan = new StringTermImpl(np.toASString().replaceAll("\\\"", "\\\\\""));
-				lt.add(stplan);
+            List<Option> rp = ts.relevantPlans(te);
+            if (rp != null) {
+                for (Option opt: rp) {
+                    // remove sources (this IA is used for communication)
+                    Plan np = (Plan)opt.getPlan().clone();
+                    if (np.getLabel() != null) {
+                        np.getLabel().delSources();
+                    }
+                    StringTerm stplan = new StringTermImpl(np.toASString().replaceAll("\\\"", "\\\\\""));
+                    lt.add(stplan);
+                }
 			}
 
 			// second arg is a var
 			Term listVar = args[1];
 
-			// un.unifies(new Term(sPlanList.toString()), listVar);
 			return un.unifies(lt, listVar);
-			// System.out.println("*** un = "+un);
 		} catch (ArrayIndexOutOfBoundsException e) {
 			throw new JasonException("The internal action 'relevant_plans' has not received two arguments (TE and VAR).");
 		} catch (Exception e) {
