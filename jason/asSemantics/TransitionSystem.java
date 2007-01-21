@@ -244,8 +244,8 @@ public class TransitionSystem {
                     updateIntention();
                 } else {
                     // current event is external and irrelevant,
-                    // select another event
-                    confP.step = State.SelEv;
+                	// discart that event and select another one
+                	confP.step = State.SelEv;
                 }
             }
         }
@@ -434,6 +434,7 @@ public class TransitionSystem {
             // free variables in an event cannot conflict with those in the plan
             body.makeVarsAnnon();
             conf.C.addAchvGoal(body, conf.C.SI);
+            confP.step = State.StartRC;
             break;
 
         // Rule Achieve as a New Focus (the !! operator)
@@ -454,6 +455,7 @@ public class TransitionSystem {
                     Event evt = new Event(te, conf.C.SI);
                     logger.warning("Test Goal '" + h + "' failed as simple query. Generating internal event for it...");
                     conf.C.addEvent(evt);
+                    confP.step = State.StartRC;
                 } else {
                     generateGoalDeletion();
                 }

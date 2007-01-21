@@ -29,6 +29,7 @@ import jason.asSyntax.Pred;
 import jason.asSyntax.PredicateIndicator;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -52,12 +53,12 @@ public class DefaultBeliefBase implements BeliefBase {
      * belsMap is a table where the key is the bel.getFunctorArity and the value
      * is a list of literals with the same functorArity.
      */
-    private Map<PredicateIndicator, BelEntry> belsMap  = new HashMap<PredicateIndicator, BelEntry>();
+    private Map<PredicateIndicator, BelEntry> belsMap = new HashMap<PredicateIndicator, BelEntry>();
 
     private int size = 0;
 
     /** set of beliefs with percept annot, used to improve performance of buf */
-    Set<Literal> percepts = new HashSet<Literal>();
+    HashSet<Literal> percepts = new HashSet<Literal>();
 
     public void init(Agent ag, String[] args) {
     	logger = Logger.getLogger(ag.getTS().getUserAgArch().getAgName() + "-"+DefaultBeliefBase.class.getSimpleName());
@@ -70,8 +71,10 @@ public class DefaultBeliefBase implements BeliefBase {
         return size;
     }
 
-    public Iterator<Literal> getPercepts() {
-        return percepts.iterator();
+    @SuppressWarnings("unchecked")
+	public Iterator<Literal> getPercepts() {
+    	// returns a clone so that the caller can not change the perceptions
+        return ((Set<Literal>)percepts.clone()).iterator();
     }
 
     public boolean add(Literal l) {
@@ -183,7 +186,7 @@ public class DefaultBeliefBase implements BeliefBase {
         } else {
             BelEntry entry = belsMap.get(l.getPredicateIndicator());
             if (entry != null) {
-                return entry.list.iterator();
+                return Collections.unmodifiableList(entry.list).iterator();
             } else {
                 return null;
             }
@@ -203,10 +206,10 @@ public class DefaultBeliefBase implements BeliefBase {
     }
     
     /** each predicate indicator has one BelEntry assigned to it */
-    class BelEntry {
+    final class BelEntry {
         
-        private List<Literal> list = new ArrayList<Literal>(); // maintains the order of the bels
-        private Map<LiteralWrapper,Literal> map = new HashMap<LiteralWrapper,Literal>(); // to fastly find contents, from literal do list index
+        final private List<Literal> list = new ArrayList<Literal>(); // maintains the order of the bels
+        final private Map<LiteralWrapper,Literal> map = new HashMap<LiteralWrapper,Literal>(); // to fastly find contents, from literal do list index
         
         public void add(Literal l) {
             map.put(new LiteralWrapper(l), l);
@@ -234,12 +237,11 @@ public class DefaultBeliefBase implements BeliefBase {
                 s.append(l+":"+l.hashCode()+",");
             }
             return s.toString();
-            //return list.toString();
         }
         
         /** a literal that uses equalsAsTerm for equals */
-        class LiteralWrapper {
-            private Literal l;
+        final class LiteralWrapper {
+            final private Literal l;
             public LiteralWrapper(Literal l) { this.l = l; }
             public int hashCode() { return l.hashCode(); }
             public boolean equals(Object o) { return o instanceof LiteralWrapper && l.equalsAsTerm(((LiteralWrapper)o).l); }

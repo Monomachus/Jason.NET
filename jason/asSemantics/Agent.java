@@ -222,9 +222,6 @@ public class Agent {
             return;
         }
 
-        // List<Literal> added = new ArrayList<Literal>();
-        List<Literal> removed = new ArrayList<Literal>();
-
         // deleting percepts in the BB that is not perceived anymore
         Iterator<Literal> perceptsInBB = getBB().getPercepts();
         while (perceptsInBB.hasNext()) { 
@@ -241,14 +238,9 @@ public class Agent {
                 }
             }
             if (!wasPerceived) {
-                removed.add(l); // do not remove using the iterator here,
-                                // concurrent modification!
-            }
-        }
-
-        for (Literal lr : removed) {
-            if (fBB.remove(lr)) {
-                fTS.updateEvents(new Event(new Trigger(Trigger.TEDel,Trigger.TEBel, lr), Intention.EmptyInt));
+	            if (fBB.remove(l)) {
+	                fTS.updateEvents(new Event(new Trigger(Trigger.TEDel,Trigger.TEBel, l), Intention.EmptyInt));
+	            }
             }
         }
 
@@ -331,9 +323,8 @@ public class Agent {
         boolean changed = false; // if the BB is changed
 
         if (beliefToAdd != null) {
-            if (logger.isLoggable(Level.FINE)) {
-                logger.fine("adding " + beliefToAdd);
-            }
+            if (logger.isLoggable(Level.FINE)) logger.fine("adding " + beliefToAdd);
+            
             if (getBB().add(beliefToAdd)) {
                 result[0] = Collections.singletonList(beliefToAdd);
                 changed = true;
@@ -348,12 +339,11 @@ public class Agent {
                 u = new Unifier();
             }
 
-            if (logger.isLoggable(Level.FINE)) {
-                logger.fine("doing brf for " + beliefToDel + " in BB=" + believes(beliefToDel, u));
-            }
+            if (logger.isLoggable(Level.FINE)) logger.fine("doing brf for " + beliefToDel + " in BB=" + believes(beliefToDel, u));
+            
             Literal inBB = believes(beliefToDel, u);
             if (inBB != null) {
-                // inBB is l unified in BB
+                // inBB is beliefToDel unified in BB
                 // we can not use beliefToDel for delBel in case it is g(_,_)
                 if (beliefToDel.hasAnnot()) {
                     // if belief has annots, use them
@@ -383,8 +373,6 @@ public class Agent {
      */
     public boolean addBel(Literal bel) {
         if (!bel.hasSource()) {
-            // do not add source(self) in case the
-            // programmer set the source
             bel.addAnnot(BeliefBase.TSelf);
         }
         List<Literal>[] result = brf(bel, null, Intention.EmptyInt);
