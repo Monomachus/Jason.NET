@@ -304,9 +304,11 @@ public class Unifier implements Cloneable {
         return function.size();
     }
 
-    /** add all unification from u */
+    /** add all unifications from u */
     public void compose(Unifier u) {
-    	function.putAll(u.function);
+        for (VarTerm k: u.function.keySet()) {
+            function.put( (VarTerm)k.clone(), (Term)u.function.get(k).clone());
+        }
     }
     
     public Object clone() {
