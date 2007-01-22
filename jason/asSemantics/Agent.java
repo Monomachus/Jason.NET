@@ -272,28 +272,12 @@ public class Agent {
      */
     public Literal believes(Literal l, Unifier un) {
         try {
-            // tries simple beliefs first
-            Iterator<Literal> relB = fBB.getRelevant(l);
-            if (relB != null) {
-                while (relB.hasNext()) {
-                    Literal b = relB.next();
-
-                    // recall that order is important because of annotations!
-                    if (!b.isRule() && un.unifies(l, b)) {
-                        return b;
-                    }
-                }
-            }
-
-            // try rules
             Iterator<Unifier> iun = l.logicalConsequence(this, un);
             if (iun != null && iun.hasNext()) {
                 Unifier r = iun.next();
-                Literal lc = (Literal) l.clone();
-                lc.apply(r);
-                // update the unifier with the l in BB
-                un.unifies(l, lc);
-                return lc;
+                l.apply(r);
+                un.compose(r);
+                return l;
             }
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error in believe("+l+","+un+").",e);

@@ -446,7 +446,38 @@ public class BeliefBaseTest extends TestCase {
         
         bb.stop();
     }
+    
+    public void testBel() {
+        Agent ag = new Agent();
+        ag.getBB().add(Literal.parseLiteral("a(10)"));
+        ag.getBB().add(Literal.parseLiteral("a(20)[a]"));
+        ag.getBB().add(Literal.parseLiteral("a(30)[a,b]"));
+        ag.getBB().add(Literal.parseLiteral("b(20,10)[source(ag)]"));
+        ag.getBB().add(Literal.parseLiteral("c(x)"));
+        ag.getBB().add(Literal.parseLiteral("c(y)"));
+        ag.getBB().add(Literal.parseLiteral("c(20)"));
 
+        assertTrue(ag.believes(Literal.parseLiteral("c(30)"), new Unifier()) == null);
+        assertEquals(ag.believes(Literal.parseLiteral("c(20)"), new Unifier()).toString(),"c(20)");
+        Unifier u = new Unifier();
+        assertEquals(ag.believes(Literal.parseLiteral("c(X)"), u).toString(),"c(x)");
+        assertEquals(u.get("X").toString(),"x");
+        assertEquals(ag.believes(Literal.parseLiteral("c(_)"), new Unifier()).toString(),"c(x)");
+    	
+        
+        assertTrue(ag.believes(Literal.parseLiteral("a(300)"), new Unifier()) == null);
+        assertTrue(ag.believes(Literal.parseLiteral("a(30)"), new Unifier()) != null);
+        assertTrue(ag.believes(Literal.parseLiteral("a(30)[a]"), new Unifier()) != null);
+        assertTrue(ag.believes(Literal.parseLiteral("a(30)[b,a]"), new Unifier()) != null);
+        assertTrue(ag.believes(Literal.parseLiteral("a(30)[b,a,c]"), new Unifier()) == null);
+
+        u = new Unifier();
+        assertEquals(ag.believes(Literal.parseLiteral("b(X,Y)[source(A)]"), u).toString(),"b(20,10)[source(ag)]");
+        assertEquals(u.get("X").toString(),"20");
+        assertEquals(u.get("Y").toString(),"10");
+        assertEquals(u.get("A").toString(),"ag");
+    }
+    
     private int iteratorSize(Iterator i) {
         int c = 0;
         while (i.hasNext()) {
