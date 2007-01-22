@@ -1,6 +1,7 @@
 package test;
 
 import jason.asSemantics.Agent;
+import jason.asSemantics.Intention;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.Atom;
 import jason.asSyntax.DefaultTerm;
@@ -18,6 +19,7 @@ import jason.bb.DefaultBeliefBase;
 import jason.bb.JDBCPersistentBB;
 
 import java.util.Iterator;
+import java.util.List;
 
 import junit.framework.TestCase;
 
@@ -234,8 +236,9 @@ public class BeliefBaseTest extends TestCase {
 		ag.getBB().add(Literal.parseLiteral("pos(2,3)"));
 		Unifier u = new Unifier();
 
-		Literal l = ag.believes(Literal.parseLiteral("pos(_,_)"), u);
-		assertTrue(l != null);
+		Literal l = Literal.parseLiteral("pos(_,_)");
+		assertTrue(ag.believes(l, u));
+		l.apply(u);
 		assertEquals(l, Literal.parseLiteral("pos(2,3)"));
 		
 		assertTrue(ag.getBB().remove(l));
@@ -336,6 +339,7 @@ public class BeliefBaseTest extends TestCase {
         assertEquals(iteratorSize(bb.getPercepts()),0);
     }
     
+    
     public void testJDBCBB() {
         BeliefBase bb = new JDBCPersistentBB();
         bb.init(null, new String[] {
@@ -420,12 +424,12 @@ public class BeliefBaseTest extends TestCase {
         assertEquals(bb.size(),size+2);
         
         // test get all
-        //Iterator<Literal> il = bb.iterator();
-        //while (il.hasNext()) {
-        //    System.out.println(il.next());
-        //}
         assertEquals(iteratorSize(bb.iterator()),size+2);
 
+        //for (Literal l2: bb) {
+        //	System.out.println(l2);
+        //}
+        
         // test remove
         size = bb.size();
         assertTrue(bb.remove(Literal.parseLiteral("test(a,b)")));
@@ -447,7 +451,8 @@ public class BeliefBaseTest extends TestCase {
         bb.stop();
     }
     
-    public void testBel() {
+    
+    public void testBelBRF() {
         Agent ag = new Agent();
         ag.getBB().add(Literal.parseLiteral("a(10)"));
         ag.getBB().add(Literal.parseLiteral("a(20)[a]"));
@@ -457,25 +462,57 @@ public class BeliefBaseTest extends TestCase {
         ag.getBB().add(Literal.parseLiteral("c(y)"));
         ag.getBB().add(Literal.parseLiteral("c(20)"));
 
-        assertTrue(ag.believes(Literal.parseLiteral("c(30)"), new Unifier()) == null);
-        assertEquals(ag.believes(Literal.parseLiteral("c(20)"), new Unifier()).toString(),"c(20)");
+        assertFalse(ag.believes(Literal.parseLiteral("c(30)"), new Unifier()));
+        assertTrue(ag.believes(Literal.parseLiteral("c(20)"), new Unifier()));
         Unifier u = new Unifier();
-        assertEquals(ag.believes(Literal.parseLiteral("c(X)"), u).toString(),"c(x)");
+        assertTrue(ag.believes(Literal.parseLiteral("c(X)"), u));
         assertEquals(u.get("X").toString(),"x");
-        assertEquals(ag.believes(Literal.parseLiteral("c(_)"), new Unifier()).toString(),"c(x)");
-    	
         
-        assertTrue(ag.believes(Literal.parseLiteral("a(300)"), new Unifier()) == null);
-        assertTrue(ag.believes(Literal.parseLiteral("a(30)"), new Unifier()) != null);
-        assertTrue(ag.believes(Literal.parseLiteral("a(30)[a]"), new Unifier()) != null);
-        assertTrue(ag.believes(Literal.parseLiteral("a(30)[b,a]"), new Unifier()) != null);
-        assertTrue(ag.believes(Literal.parseLiteral("a(30)[b,a,c]"), new Unifier()) == null);
+        Literal l = Literal.parseLiteral("c(_)");
+        u = new Unifier();
+        assertTrue(ag.believes(l, u));
+        l.apply(u);
+        assertEquals(l.toString(),"c(x)");
+        
+        assertFalse(ag.believes(Literal.parseLiteral("a(300)"), new Unifier()));
+        assertTrue(ag.believes(Literal.parseLiteral("a(30)"), new Unifier()));
+        assertTrue(ag.believes(Literal.parseLiteral("a(30)[a]"), new Unifier()));
+        assertTrue(ag.believes(Literal.parseLiteral("a(30)[b,a]"), new Unifier()));
+        assertFalse(ag.believes(Literal.parseLiteral("a(30)[b,a,c]"), new Unifier()));
+
+        l = Literal.parseLiteral("a(X)[A,B|RA]");
+        u = new Unifier();
+        assertTrue(ag.believes(l,u));
+        l.apply(u);
+        assertEquals(l.toString(),"a(30)[a,b]");
+        assertEquals(u.get("RA").toString(),"[]");
 
         u = new Unifier();
-        assertEquals(ag.believes(Literal.parseLiteral("b(X,Y)[source(A)]"), u).toString(),"b(20,10)[source(ag)]");
+        assertTrue(ag.believes(Literal.parseLiteral("b(X,Y)[source(A)]"), u));
         assertEquals(u.get("X").toString(),"20");
         assertEquals(u.get("Y").toString(),"10");
         assertEquals(u.get("A").toString(),"ag");
+        
+        List[] rbrf = ag.brf(null, Literal.parseLiteral("c(20)"), Intention.EmptyInt);
+        assertTrue(rbrf[0].size() == 0);
+        assertTrue(rbrf[1].size() == 1);
+        assertEquals(rbrf[1].toString(), "[c(20)]");
+
+        rbrf = ag.brf(null, Literal.parseLiteral("c(_)"), Intention.EmptyInt);
+        assertTrue(rbrf[1].size() == 1);
+        assertEquals(rbrf[1].toString(), "[c(x)]");
+
+        // can not remove b without source
+        rbrf = ag.brf(null, Literal.parseLiteral("b(_,_)"), Intention.EmptyInt);
+        assertEquals(rbrf,null);
+
+        // remove b with source
+        rbrf = ag.brf(null, Literal.parseLiteral("b(_,_)[source(_)]"), Intention.EmptyInt);
+        assertEquals(rbrf[1].toString(), "[b(20,10)[source(ag)]]");
+        assertEquals(ag.getBB().size(),4);
+        
+        ag.abolish(Literal.parseLiteral("a(_)"), null);
+        assertEquals(ag.getBB().size(),1);
     }
     
     private int iteratorSize(Iterator i) {

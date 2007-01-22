@@ -261,26 +261,30 @@ public class Pred extends Structure {
     }
 
     /**
-     * removes all annots in this pred that are in <i>p</i> p will only contain
-     * the annots actually deleted (for Event)
+     * removes all annots in this pred that are in <i>p</i>.
+     * After the return, p will only contain
+     * the annots actually deleted (for Event).
+     * @return true if some annot was removed.
      */
-    public void delAnnot(Pred p) {
-        if (p.getAnnots() == null) {
-            return;
+    public boolean delAnnot(Pred p) {
+    	boolean removed = false;
+        if (p.hasAnnot()) {
+	        if (!hasAnnot()) {
+	            p.clearAnnots();
+	        } else {
+	            Iterator<Term> i = p.getAnnots().iterator();
+	            while (i.hasNext()) {
+	                Term t = i.next();
+	                if (hasAnnot(t)) {
+	                    annots.remove(t);
+	                    removed = true;
+	                } else {
+	                    i.remove();
+	                }
+	            }
+	        }
         }
-        if (!hasAnnot()) {
-            p.clearAnnots();
-        } else {
-            Iterator<Term> i = p.getAnnots().iterator();
-            while (i.hasNext()) {
-                Term t = i.next();
-                if (hasAnnot(t)) {
-                    annots.remove(t);
-                } else {
-                    i.remove();
-                }
-            }
-        }
+        return removed;
     }
 
     public void copyAnnot(Pred p) {

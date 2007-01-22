@@ -235,13 +235,12 @@ public class Structure extends DefaultTerm {
     public void setTerms(List<Term> l) {
         terms = l;
         predicateIndicatorCache = null;
-        hashCodeCache = null;
+        resetHashCodeCache();
     }
     
     public void setTerm(int i, Term t) {
         terms.set(i,t);
-        predicateIndicatorCache = null;
-        hashCodeCache = null;
+        resetHashCodeCache();
     }
      
     /** returns the i-th term (first term is 0) */

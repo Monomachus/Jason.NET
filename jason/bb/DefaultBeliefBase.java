@@ -122,6 +122,34 @@ public class DefaultBeliefBase implements BeliefBase {
         }
     }
 
+    
+    public boolean remove(Literal l) {
+        Literal bl = contains(l);
+        if (bl != null) {
+            if (l.hasSubsetAnnot(bl)) {
+                if (l.hasAnnot(TPercept)) {
+                    percepts.remove(bl);
+                }
+                boolean result = bl.delAnnot((Pred) l);
+                if (!bl.hasAnnot()) {
+                    PredicateIndicator key = l.getPredicateIndicator();
+                    BelEntry entry = belsMap.get(key);
+                    entry.remove(bl);
+                    if (entry.isEmpty()) {
+                        belsMap.remove(key);
+                    }
+                    size--;
+                    result = true;
+                }
+                return result;
+            }
+        } else {
+            if (logger.isLoggable(Level.FINE)) logger.fine("Does not contain " + l + " in " + belsMap);
+        }
+        return false;
+    }
+
+
     public Iterator<Literal> iterator() {
         List<Literal> all = new ArrayList<Literal>(size());
         for (BelEntry be : belsMap.values()) {
@@ -135,35 +163,6 @@ public class DefaultBeliefBase implements BeliefBase {
     	return iterator();
     }
     
-
-    public boolean remove(Literal l) {
-        Literal bl = contains(l);
-        if (bl != null) {
-            if (l.hasSubsetAnnot(bl)) {
-                if (l.hasAnnot(TPercept)) {
-                    percepts.remove(bl);
-                }
-                bl.delAnnot((Pred) l);
-                if (!bl.hasAnnot()) {
-                    PredicateIndicator key = l.getPredicateIndicator();
-                    BelEntry entry = belsMap.get(key);
-                    entry.remove(bl);
-                    if (entry.isEmpty()) {
-                        belsMap.remove(key);
-                    }
-                    size--;
-                }
-                return true;
-            } else {
-                return false;
-            }
-        } else {
-            if (logger.isLoggable(Level.FINE)) {
-                logger.fine("Does not contain " + l + " in " + belsMap);
-            }
-            return false;
-        }
-    }
 
     public boolean abolish(PredicateIndicator pi) {
         return belsMap.remove(pi) != null;
@@ -212,6 +211,7 @@ public class DefaultBeliefBase implements BeliefBase {
         final private Map<LiteralWrapper,Literal> map = new HashMap<LiteralWrapper,Literal>(); // to fastly find contents, from literal do list index
         
         public void add(Literal l) {
+        	// TODO: wrap the literal l so that it can not be changed!
             map.put(new LiteralWrapper(l), l);
             list.add(l);
         }

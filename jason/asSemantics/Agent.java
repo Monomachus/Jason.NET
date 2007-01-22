@@ -261,30 +261,46 @@ public class Agent {
     }
 
     /**
-     * If BB contains l (using unification to test), returns the
-     * literal that is in the BB; otherwise, returns null.
-     * <p>Example: if <code>l</code> is <code>g(_,_)</code> and BB
-     * is={...., <code>g(10,20)</code>, ...}, this method returns
-     * <code>g(10,20)</code>.
-     * 
+     * Returns true if BB contains the literal (using unification to test).
      * The unifier <i>un</i> is updated by the method.
-     * 
      */
-    public Literal believes(Literal l, Unifier un) {
+    public boolean believes(Literal bel, Unifier un) {
         try {
-            Iterator<Unifier> iun = l.logicalConsequence(this, un);
+            Iterator<Unifier> iun = bel.logicalConsequence(this, un);
             if (iun != null && iun.hasNext()) {
-                Unifier r = iun.next();
-                l.apply(r);
-                un.compose(r);
-                return l;
+                un.compose(iun.next());
+                return true;
             }
         } catch (Exception e) {
-            logger.log(Level.SEVERE, "Error in believe("+l+","+un+").",e);
+            logger.log(Level.SEVERE, "Error in believe("+bel+","+un+").",e);
         }
+        return false;
+    }
+
+    /**
+     * Find a literal in BB using unification to test.
+     * 
+     * Returns the belief as it is in BB, e.g. findBel(a(_),...) 
+     * may returns a(10)[source(ag)].
+     *   
+     * The unifier <i>un</i> is updated by the method.
+     */
+    public Literal findBel(Literal bel, Unifier un) {
+        Iterator<Literal> relB = fBB.getRelevant(bel);
+        if (relB != null) {
+            while (relB.hasNext()) {
+                Literal b = relB.next();
+
+                // recall that order is important because of annotations!
+                if (!b.isRule() && un.unifies(bel, b)) {
+                    return b;
+                }
+            }
+        } 
         return null;
     }
 
+    
     /**
      * This function should revise the belief base with the given literal to
      * add, to remove, and the current intention that triggered the operation.
@@ -300,18 +316,15 @@ public class Agent {
         // is supposed that a subclass will do it.
         // It simply add/del the belief.
 
-        List<Literal>[] result = new List[2];
-        result[0] = Collections.emptyList();
-        result[1] = Collections.emptyList();
-
-        boolean changed = false; // if the BB is changed
+        List<Literal>[] result = null;
 
         if (beliefToAdd != null) {
-            if (logger.isLoggable(Level.FINE)) logger.fine("adding " + beliefToAdd);
+        	if (logger.isLoggable(Level.FINE)) logger.fine("adding " + beliefToAdd);
             
             if (getBB().add(beliefToAdd)) {
+            	result = new List[2];
                 result[0] = Collections.singletonList(beliefToAdd);
-                changed = true;
+                result[1] = Collections.emptyList();
             }
         }
 
@@ -325,29 +338,20 @@ public class Agent {
 
             if (logger.isLoggable(Level.FINE)) logger.fine("doing brf for " + beliefToDel + " in BB=" + believes(beliefToDel, u));
             
-            Literal inBB = believes(beliefToDel, u);
-            if (inBB != null) {
-                // inBB is beliefToDel unified in BB
-                // we can not use beliefToDel for delBel in case it is g(_,_)
-                if (beliefToDel.hasAnnot()) {
-                    // if belief has annots, use them
-                    inBB = (Literal) inBB.clone();
-                    inBB.clearAnnots();
-                    inBB.addAnnots(beliefToDel.getAnnots());
-                }
-
-                if (getBB().remove(inBB)) {
-                    if (logger.isLoggable(Level.FINE)) logger.fine("Removed:" + inBB);
-                    result[1] = Collections.singletonList(inBB);
-                    changed = true;
+            if (believes(beliefToDel, u)) {
+            	beliefToDel.apply(u);
+                if (getBB().remove(beliefToDel)) {
+                    if (logger.isLoggable(Level.FINE)) logger.fine("Removed:" + beliefToDel);
+                    if (result == null) {
+                    	result = new List[2];
+                        result[0] = Collections.emptyList();
+                    }
+                    result[1] = Collections.singletonList(beliefToDel);
                 }
             }
+
         }
-        if (changed) {
-            return result;
-        } else {
-            return null;
-        }
+        return result;
     }
 
     /**
@@ -374,7 +378,7 @@ public class Agent {
      */
     public boolean delBel(Literal bel) {
         List<Literal>[] result = brf(null, bel, Intention.EmptyInt);
-        if (result != null) {
+        if (result != null && fTS != null) {
             fTS.updateEvents(result, Intention.EmptyInt);
             return true;
         } else {

@@ -27,8 +27,6 @@ public class RuleTest extends TestCase {
         ag.getBB().add(Literal.parseLiteral("c(y)"));
         ag.getBB().add(Literal.parseLiteral("c(20)"));
 
-        assertTrue(ag.believes(Literal.parseLiteral("c(30)"), new Unifier()) == null);
-        
         // add r(X) :- a(X)
         Rule r = new Rule(Literal.parseLiteral("r(X)"), Literal.parseLiteral("a(X)"));
         ag.getBB().add(r);

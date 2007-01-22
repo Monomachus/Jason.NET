@@ -43,11 +43,19 @@ public class UnnamedVar extends VarTerm {
     }
 
     public Object clone() {
+        if (hasValue()) {
+            return getValue().clone();
+        } else {
+        	return new UnnamedVar(getFunctor());
+        }
+
+        /*
         UnnamedVar v = new UnnamedVar(getFunctor());
         if (hasValue()) {
             v.setValue((Term) getValue().clone());
         }
         return v;
+        */
     }
 
     @Override

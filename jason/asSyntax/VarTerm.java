@@ -56,6 +56,8 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
         super(s);
         if (s != null && Character.isLowerCase(s.charAt(0))) {
             logger.warning("Are you sure you want to create a VarTerm that begins with lowercase (" + s + ")? Should it be a Term instead?");
+        	Exception e = new Exception("stack");
+        	e.printStackTrace();
         }
     }
 
@@ -414,11 +416,11 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
     }
 
     @Override
-    public void delAnnot(Pred p) {
+    public boolean delAnnot(Pred p) {
         if (value != null && getValue().isPred())
-            ((Pred) getValue()).delAnnot(p);
+            return ((Pred) getValue()).delAnnot(p);
         else
-            super.delAnnot(p);
+            return super.delAnnot(p);
     }
 
     @Override

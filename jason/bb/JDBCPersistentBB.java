@@ -211,7 +211,7 @@ public class JDBCPersistentBB extends DefaultBeliefBase {
                     if (l.hasAnnot(TPercept)) {
                         percepts.remove(bl);
                     }
-                    bl.delAnnot((Pred) l);
+                    boolean result = bl.delAnnot((Pred) l) || !bl.hasAnnot();
                     stmt = conn.createStatement();
                     if (bl.hasAnnot() && isCreatedByJason(l.getPredicateIndicator())) {
                         // store new bl annots
@@ -220,17 +220,14 @@ public class JDBCPersistentBB extends DefaultBeliefBase {
                         // remove from DB
                         stmt.executeUpdate("delete from "+getTableName(bl)+getWhere(bl));                        
                     }
-                    return true;
-                } else {
-                    return false;
+                    return result;                    
                 }
             } catch (SQLException e) {
                 logger.log(Level.SEVERE, "SQL Error", e);
             } finally {
                 try {
                     stmt.close();
-                } catch (Exception e) {
-                }
+                } catch (Exception e) {}
             }
         }
         return false;

@@ -5,21 +5,21 @@ package jason.asSyntax;
  * 
  * @author jomi
  */
-public class PredicateIndicator {
+public final class PredicateIndicator {
 
-    private String functor;
-    private int    arity;
-    private int    hash = 1;
+    private final String functor;
+    private final int    arity;
+    private final int    hash;
     
     public PredicateIndicator(String functor, int arity) {
         this.functor = functor;
-        this.arity = arity;
-        calcHash();
+        this.arity   = arity;
+        hash         = calcHash();
     }
     public PredicateIndicator(String prefix, PredicateIndicator pi) {
         this.functor = prefix + pi.functor;
-        this.arity = pi.arity;
-        calcHash();
+        this.arity   = pi.arity;
+        hash         = calcHash();
     }
 
     public String getFunctor() {
@@ -45,12 +45,13 @@ public class PredicateIndicator {
         return hash;
     }
     
-    private void calcHash() {
+    private int calcHash() {
         final int PRIME = 31;
-        hash = PRIME * hash + arity;
+        int t  = PRIME * arity;
         if (functor != null) {
-            hash = PRIME * hash + functor.hashCode();
+            t = PRIME * t + functor.hashCode();
         }
+        return t;
     }
       
     public String toString() {

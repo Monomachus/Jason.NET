@@ -323,18 +323,17 @@ public class TransitionSystem {
     }
 
     private void applyProcAct() throws JasonException {
-        if (conf.C.FA.isEmpty()) {
-            confP.step = State.SelInt;
-        } else {
+        if (!conf.C.FA.isEmpty()) {
             ActionExec a = conf.ag.selectAction(conf.C.FA);
             confP.C.SI = a.getIntention();
             if (a.getResult()) {
                 updateIntention();
+            	applyClrInt(confP.C.SI);
             } else {
                 generateGoalDeletion();
             }
-            confP.step = State.ClrInt;
         }
+        confP.step = State.SelInt;
     }
 
     private void applySelInt() throws JasonException {
@@ -445,15 +444,14 @@ public class TransitionSystem {
 
         // Rule Test
         case test:
-            Literal lInBB = conf.ag.believes(body, u);
-            if (lInBB != null) {
+            if (conf.ag.believes(body, u)) {
                 updateIntention();
             } else {
                 body.makeVarsAnnon();
                 Trigger te = new Trigger(Trigger.TEAdd, Trigger.TETestG, body);
                 if (ag.getPL().isRelevant(te.getPredicateIndicator())) {
                     Event evt = new Event(te, conf.C.SI);
-                    logger.warning("Test Goal '" + h + "' failed as simple query. Generating internal event for it...");
+                    logger.warning("Test Goal '" + h + "' failed as simple query. Generating internal event for it: "+te);
                     conf.C.addEvent(evt);
                     confP.step = State.StartRC;
                 } else {
@@ -670,10 +668,7 @@ public class TransitionSystem {
     /** remove the top action and requeue the current intention */
     private void updateIntention() {
         IntendedMeans im = conf.C.SI.peek();
-        if (!im.getPlan().getBody().isEmpty()) { 
-            // maybe it had an empty plan body
-            im.getPlan().getBody().remove(0);
-        }
+        im.removeCurrentStep();
         confP.C.addIntention(conf.C.SI);
     }
 
