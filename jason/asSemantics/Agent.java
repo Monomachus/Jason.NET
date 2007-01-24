@@ -238,6 +238,10 @@ public class Agent {
                 }
             }
             if (!wasPerceived) {
+                // can not delete l, but l[source(percept)]
+                l = (Literal)l.clone();
+                l.clearAnnots();
+                l.addAnnot(BeliefBase.TPercept);
 	            if (fBB.remove(l)) {
 	                fTS.updateEvents(new Event(new Trigger(Trigger.TEDel,Trigger.TEBel, l), Intention.EmptyInt));
 	            }
