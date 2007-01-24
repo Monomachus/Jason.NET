@@ -9,17 +9,16 @@ import java.util.logging.*;
   <p>Internal action: <b><code>.substring</code></b>.
 
   <p>Description: checks if a string is sub-string of another
-  string. The arguments can be any kind of term indeed, in this case 
-  case, the toString() of the term is used.
-  If the position is a
-  free variable, this internal action backtracks all possible values
-  for the position where the sub-string start in the string.
+    string. The arguments can be other kinds of terms, in which case
+    the toString() of the term is used. If "position" is a
+    free variable, the internal action backtracks all possible values
+    for the positions where the sub-string occurs in the string.
 
   <p>Parameters:<ul>
   <li>+ substring (any term).<br/>
   <li>+ string (any term).<br/>
-  <li>+- position (optional -- integer): the position where the sub-string 
-      starts in the string. 
+  <li>+- position (optional -- integer): the position of
+  the string where the sub-string occurs. 
   </ul>
 
   <p>Examples:<ul>
