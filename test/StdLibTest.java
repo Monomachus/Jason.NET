@@ -210,7 +210,7 @@ public class StdLibTest extends TestCase {
     }
 
     public static void main(String[] a) {
-        new StdLibTest().testConcat();
+        new StdLibTest().testSubString();
     }
 
     public void testConcat() {
@@ -236,6 +236,31 @@ public class StdLibTest extends TestCase {
 
         try {
             assertTrue((Boolean)new jason.stdlib.concat().execute(null, new Unifier(), new Term[] { l1, l2, l3 }));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void testSubString() {
+        StringTerm s1 = new StringTermImpl("a");
+        StringTerm s2 = new StringTermImpl("bbacc");
+
+        Term t1 = DefaultTerm.parse("a(10)");
+        Term t2 = DefaultTerm.parse("[1,b(xxx,a(10))]");
+
+        VarTerm X = new VarTerm("X");
+
+        Unifier u = new Unifier();
+        try {
+            assertTrue((Boolean)new jason.stdlib.substring().execute(null, u, new Term[] { s1, s2 }));
+            assertTrue((Boolean)new jason.stdlib.substring().execute(null, u, new Term[] { s1, s2 , X}));
+            assertEquals(u.get("X").toString(), "2");
+
+            assertTrue((Boolean)new jason.stdlib.substring().execute(null, u, new Term[] { t1, t2}));
+            u = new Unifier();
+            assertTrue((Boolean)new jason.stdlib.substring().execute(null, u, new Term[] { t1, t2, X}));
+            assertEquals(u.get("X").toString(), "9");
+
         } catch (Exception e) {
             e.printStackTrace();
         }
