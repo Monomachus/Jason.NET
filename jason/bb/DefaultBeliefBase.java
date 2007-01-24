@@ -131,7 +131,7 @@ public class DefaultBeliefBase implements BeliefBase {
                     percepts.remove(bl);
                 }
                 boolean result = bl.delAnnot((Pred) l);
-                if (!bl.hasAnnot()) {
+                if (!bl.hasSource()) {
                     PredicateIndicator key = l.getPredicateIndicator();
                     BelEntry entry = belsMap.get(key);
                     entry.remove(bl);
