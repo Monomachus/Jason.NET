@@ -29,10 +29,10 @@ import java.util.logging.*;
 
 /**
  * Represents an atom (a structure with no arguments), it is an
- * immutable object.  It extends Structure, so can be used in place of a
- * Structure, but does not allow operations on terms and annotations.
+ * immutable object.  It extends Literal, so can be used in place of a
+ * Literal, but does not allow operations on terms and annotations.
  */
-public final class Atom extends Structure {
+public final class Atom extends Literal {
 
     private static final long serialVersionUID = 1L;
 

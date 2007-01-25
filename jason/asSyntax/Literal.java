@@ -51,7 +51,7 @@ public class Literal extends Pred implements LogicalFormula {
 
     static private Logger logger = Logger.getLogger(Literal.class.getName());
 
-	boolean type = LPos;
+	private boolean type = LPos;
 
 
 	/** creates a positive literal */

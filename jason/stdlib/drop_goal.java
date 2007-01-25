@@ -76,19 +76,9 @@ public class drop_goal extends DefaultInternalAction {
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         try {
         	args[0].apply(un);
-            Literal l = null;
-            if (args[0].isLiteral()) {
-            	l = (Literal)args[0];
-            } else if (args[0].isAtom()) {
-            	l = new Literal(Literal.LPos, args[0].toString());
-            } else {
-            	l = Literal.parseLiteral(args[0].toString());
-            }
+        	args[1].apply(un);
 
-            Term success = args[1];
-            success.apply(un);
-
-            drop(ts, l, success.equals(Literal.LTrue), un);
+            drop(ts, (Literal)args[0], args[1].equals(Literal.LTrue), un);
             return true;
         } catch (ArrayIndexOutOfBoundsException e) {
             throw new JasonException("The internal action 'drop_goal' has not received two arguments.");
