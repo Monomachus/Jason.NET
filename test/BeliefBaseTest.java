@@ -45,10 +45,17 @@ public class BeliefBaseTest extends TestCase {
         //System.out.println(l1.hashCode()+"/"+l2.hashCode());
         //System.out.println(bb+"-"+ bb.contains(l2));
         assertTrue(bb.contains(l2) != null);
+        
 		assertTrue(bb.add(l2));
+		// the add should maintain the annots
+		assertEquals(1,l2.getAnnots().size());
+		
 		assertFalse(bb.add(l2));
-        //System.out.println(bb+"-"+ bb.contains(l2));
-        assertEquals(bb.contains(l2),l2);
+		// the add should remove the annots
+		assertEquals(0,l2.getAnnots().size());
+
+		//System.out.println(bb+" "+ bb.contains(l2)+" l2="+l2);
+        assertEquals(bb.contains(l2).toString(),"pos[a]");
 		assertEquals(bb.size(),1);
 
 		l3 = new Literal(true, new Pred("pos"));
@@ -335,7 +342,8 @@ public class BeliefBaseTest extends TestCase {
         assertTrue(bb.add(Literal.parseLiteral("a[source(percept)]")));
         assertTrue(bb.add(Literal.parseLiteral("a[ag1]")));
         assertTrue(bb.remove(Literal.parseLiteral("a[source(percept)]")));
-        assertEquals(bb.size(),1);
+        // to remove the only source, should remove all belief
+        assertEquals(bb.size(),0);
         assertEquals(iteratorSize(bb.getPercepts()),0);
     }
     

@@ -230,10 +230,14 @@ public class Agent {
             // could not use percepts.contains(l), since equalsAsTerm must be
             // used (to ignore annotations)
             boolean wasPerceived = false;
-            for (Literal t : percepts) {
+            Iterator<Literal> ip = percepts.iterator();
+            while (ip.hasNext()) {
+            	Literal t = ip.next();
+            	
                 // if percept t is already in BB
                 if (l.equalsAsTerm(t) && l.negated() == t.negated()) {
                     wasPerceived = true;
+                    ip.remove(); // remove in percepts, since it already is in BB
                     break;
                 }
             }

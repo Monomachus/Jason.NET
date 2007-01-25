@@ -25,7 +25,6 @@ package jason.bb;
 
 import jason.asSemantics.Agent;
 import jason.asSyntax.Literal;
-import jason.asSyntax.Pred;
 import jason.asSyntax.PredicateIndicator;
 
 import java.util.ArrayList;
@@ -86,12 +85,7 @@ public class DefaultBeliefBase implements BeliefBase {
         Literal bl = contains(l);
         if (bl != null && !bl.isRule()) {
             // add only annots
-            if (l.hasSubsetAnnot(bl))
-                // the current bel bl already has l's annots
-                return false;
-            else {
-                // "import" annots from the new bel
-                bl.importAnnots((Pred) l);
+            if (bl.importAnnots(l)) {
                 // check if it needs to be added in the percepts list
                 if (l.hasAnnot(TPercept)) {
                     percepts.add(bl);
@@ -120,17 +114,19 @@ public class DefaultBeliefBase implements BeliefBase {
             size++;
             return true;
         }
+        return false;
     }
 
     
     public boolean remove(Literal l) {
         Literal bl = contains(l);
         if (bl != null) {
-            if (l.hasSubsetAnnot(bl)) {
+            if (l.hasSubsetAnnot(bl)) { // e.g. removing b[a] or b[a,d] from BB b[a,b,c]
+            		                    // second case fails
                 if (l.hasAnnot(TPercept)) {
                     percepts.remove(bl);
                 }
-                boolean result = bl.delAnnot((Pred) l);
+                boolean result = bl.delAnnot(l); // note that l annots can be empty, in this case, nothing is deleted!
                 if (!bl.hasSource()) {
                     PredicateIndicator key = l.getPredicateIndicator();
                     BelEntry entry = belsMap.get(key);

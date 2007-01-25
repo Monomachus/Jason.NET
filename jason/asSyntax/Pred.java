@@ -162,126 +162,41 @@ public class Pred extends Structure {
     }
 
     /**
-     * Adds a source annotation like "source(<i>agName</i>)".
-     */
-    public void addSource(Structure agName) {
-        if (agName != null) {
-            Structure ts = new Structure("source");
-            ts.addTerm(agName);
-            addAnnot(ts);
-        }
-    }
-
-    /** deletes "source(<i>agName</i>)" */
-    public boolean delSource(Structure agName) {
-        if (annots != null) {
-            Structure ts = new Structure("source");
-            ts.addTerm(agName);
-            return annots.remove(ts);
-        }
-        return false;
-    }
-
-    /**
-     * returns the sources of this Pred as a new list. e.g.: from annots
-     * [source(a), source(b)], it returns [a,b]
-     */
-    public ListTerm getSources() {
-        ListTerm ls = new ListTermImpl();
-        if (annots != null) {
-            for (Term ta : annots) {
-                if (ta.isStructure()) {
-                    Structure tas = (Structure)ta;
-                    if (tas.getFunctor().equals("source")) {
-                        ls.add(tas.getTerm(0));
-                    }
-                }
-            }
-        }
-        return ls;
-    }
-
-    /** deletes all sources annotations */
-    public void delSources() {
-        if (annots != null) {
-            Iterator<Term> i = annots.iterator();
-            while (i.hasNext()) {
-                Term t = i.next();
-                if (t.isStructure()) {
-                    if (((Structure)t).getFunctor().equals("source")) {
-                        i.remove();
-                    }
-                }
-            }
-        }
-    }
-
-    public boolean hasSource() {
-        if (annots != null) {
-            for (Term ta : annots) {
-                if (ta.isStructure()) {
-                    if (((Structure)ta).getFunctor().equals("source")) {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
-    }
-
-    /** returns true if this pred has a "source(<i>agName</i>)" */
-    public boolean hasSource(Structure agName) {
-        if (annots != null) {
-            Structure ts = new Structure("source");
-            ts.addTerm(agName);
-            return annots.contains(ts);
-        }
-        return false;
-    }
-
-    /**
      * "import" Annotations from another Predicate <i>p</i>. p will only
-     * contain the annots actually imported (for Event)
+     * contain the annots actually imported (for Event), for example:
+     * +b[a,b] in BB +b[b,c] will generate event <+b[a]>.
+     * 
+     * @return true if some annot was imported.
      */
-    public void importAnnots(Pred p) {
-        if (!p.hasAnnot()) {
-            return;
+    public boolean importAnnots(Pred p) {
+    	boolean imported = false;
+        if (p.hasAnnot()) {
+	        Iterator<Term> i = p.getAnnots().iterator();
+	        while (i.hasNext()) {
+	            Term t = i.next();
+	            // p will only contain the annots actually added (for Event)
+	            if (!hasAnnot(t)) {
+	                addAnnot((Term) t.clone());
+	                imported = true;
+	            } else {
+	                // Remove what is not new from p
+	                i.remove();
+	            }
+	        }
         }
-        Iterator<Term> i = p.getAnnots().iterator();
-        while (i.hasNext()) {
-            Term t = i.next();
-            // p will only contain the annots actually added (for Event)
-            if (!hasAnnot(t)) {
-                addAnnot((Term) t.clone());
-            } else {
-                // Remove what is not new from p
-                i.remove();
-            }
-        }
+        return imported;
     }
 
     /**
      * removes all annots in this pred that are in <i>p</i>.
-     * After the return, p will only contain
-     * the annots actually deleted (for Event).
      * @return true if some annot was removed.
      */
     public boolean delAnnot(Pred p) {
     	boolean removed = false;
-        if (p.hasAnnot()) {
-	        if (!hasAnnot()) {
-	            p.clearAnnots();
-	        } else {
-	            Iterator<Term> i = p.getAnnots().iterator();
-	            while (i.hasNext()) {
-	                Term t = i.next();
-	                if (hasAnnot(t)) {
-	                    annots.remove(t);
-	                    removed = true;
-	                } else {
-	                    i.remove();
-	                }
-	            }
+        if (p.hasAnnot() && this.hasAnnot()) {
+        	for (Term t: p.getAnnots()) { 
+        		boolean r = annots.remove(t);
+	            removed = removed || r;
 	        }
         }
         return removed;
@@ -365,6 +280,84 @@ public class Pred extends Structure {
         }
 
         return true;
+    }
+
+    /**
+     * Adds a source annotation like "source(<i>agName</i>)".
+     */
+    public void addSource(Structure agName) {
+        if (agName != null) {
+            Structure ts = new Structure("source");
+            ts.addTerm(agName);
+            addAnnot(ts);
+        }
+    }
+
+    /** deletes "source(<i>agName</i>)" */
+    public boolean delSource(Structure agName) {
+        if (annots != null) {
+            Structure ts = new Structure("source");
+            ts.addTerm(agName);
+            return annots.remove(ts);
+        }
+        return false;
+    }
+
+    /**
+     * returns the sources of this Pred as a new list. e.g.: from annots
+     * [source(a), source(b)], it returns [a,b]
+     */
+    public ListTerm getSources() {
+        ListTerm ls = new ListTermImpl();
+        if (annots != null) {
+            for (Term ta : annots) {
+                if (ta.isStructure()) {
+                    Structure tas = (Structure)ta;
+                    if (tas.getFunctor().equals("source")) {
+                        ls.add(tas.getTerm(0));
+                    }
+                }
+            }
+        }
+        return ls;
+    }
+
+    /** deletes all sources annotations */
+    public void delSources() {
+        if (annots != null) {
+            Iterator<Term> i = annots.iterator();
+            while (i.hasNext()) {
+                Term t = i.next();
+                if (t.isStructure()) {
+                    if (((Structure)t).getFunctor().equals("source")) {
+                        i.remove();
+                    }
+                }
+            }
+        }
+    }
+
+    public boolean hasSource() {
+        if (annots != null) {
+            for (Term ta : annots) {
+                if (ta.isStructure()) {
+                    if (((Structure)ta).getFunctor().equals("source")) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    /** returns true if this pred has a "source(<i>agName</i>)" */
+    public boolean hasSource(Structure agName) {
+        if (annots != null) {
+            Structure ts = new Structure("source");
+            ts.addTerm(agName);
+            return annots.contains(ts);
+        }
+        return false;
     }
 
     @Override

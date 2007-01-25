@@ -464,9 +464,9 @@ public class TransitionSystem {
         case delAddBel: 
             // -+a(1,X) ===> remove a(_,_), add a(1,X)
             // change all vars to anon vars to remove it
-            if (!body.hasSource()) {
+            if (!body.hasAnnot()) {
                 // do not add source(self) in case the
-                // programmer set the source
+                // programmer set some annotation
                 body.addAnnot(BeliefBase.TSelf);
             }
             Literal bc = (Literal)body.clone();
@@ -510,9 +510,9 @@ public class TransitionSystem {
             break;
             
         case delBel:
-            if (!body.hasSource()) {
+            if (!body.hasAnnot()) {
                 // do not add source(self) in case the
-                // programmer set the source
+                // programmer set some annotation
                 body.addAnnot(BeliefBase.TSelf);
             }
 

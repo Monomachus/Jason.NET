@@ -1,16 +1,15 @@
 package jason.bb;
 
 import jason.asSemantics.Agent;
+import jason.asSyntax.DefaultTerm;
 import jason.asSyntax.ListTerm;
 import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Literal;
-import jason.asSyntax.Pred;
 import jason.asSyntax.PredicateIndicator;
 import jason.asSyntax.StringTerm;
 import jason.asSyntax.StringTermImpl;
 import jason.asSyntax.Structure;
 import jason.asSyntax.Term;
-import jason.asSyntax.DefaultTerm;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -163,7 +162,7 @@ public class JDBCPersistentBB extends DefaultBeliefBase {
                         return false;
                     else {
                         // "import" annots from the new bel
-                        bl.importAnnots((Pred) l);
+                        bl.importAnnots(l);
                         
                         // check if it needs to be added in the percepts list
                         if (l.hasAnnot(TPercept)) {
@@ -211,7 +210,7 @@ public class JDBCPersistentBB extends DefaultBeliefBase {
                     if (l.hasAnnot(TPercept)) {
                         percepts.remove(bl);
                     }
-                    boolean result = bl.delAnnot((Pred) l) || !bl.hasAnnot();
+                    boolean result = bl.delAnnot(l) || !bl.hasAnnot();
                     stmt = conn.createStatement();
                     if (bl.hasAnnot() && isCreatedByJason(l.getPredicateIndicator())) {
                         // store new bl annots

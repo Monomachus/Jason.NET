@@ -384,11 +384,11 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
     }
 
     @Override
-    public void importAnnots(Pred p) {
+    public boolean importAnnots(Pred p) {
         if (value != null && getValue().isPred())
-            ((Pred) getValue()).importAnnots(p);
+            return ((Pred) getValue()).importAnnots(p);
         else
-            super.importAnnots(p);
+            return super.importAnnots(p);
     }
 
     @Override
