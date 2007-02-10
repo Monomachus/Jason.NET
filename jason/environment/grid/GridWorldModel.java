@@ -34,7 +34,6 @@ public class GridWorldModel {
         for (int i = 0; i < agPos.length; i++) {
             agPos[i] = new Location(-1, -1);
         }
-
     }
 
     public void setView(GridWorldView v) {
@@ -64,6 +63,20 @@ public class GridWorldModel {
         return inGrid(x, y) && (data[x][y] & obj) != 0;
     }
 
+    // gets how many objects of some kind are in the grid
+    public int countObjects(int obj) {
+    	int c = 0;
+        for (int i = 0; i < width; i++) {
+            for (int j = 0; j < height; j++) {
+                if (hasObject(obj,i,j)) {
+                	c++;
+                }
+            }
+        }
+        return c;
+    }
+    
+    
     public void add(int value, Location l) {
         add(value, l.x, l.y);
     }
@@ -90,17 +103,21 @@ public class GridWorldModel {
         if (view != null) view.update(x,y);
     }
 
-    public void setAgPos(int ag, Location l) {
+    public void setAgPos(int ag, Location l) throws Exception {
         setAgPos(ag, l.x, l.y);
     }
 
-    public void setAgPos(int ag, int x, int y) {
-        Location oldLoc = getAgPos(ag);
-        if (oldLoc != null) {
-            remove(AGENT, oldLoc.x, oldLoc.y);
-        }
-        agPos[ag] = new Location(x, y);
-        add(AGENT, x, y);
+    public void setAgPos(int ag, int x, int y) throws Exception {
+    	if (isFree(x,y)) {
+	        Location oldLoc = getAgPos(ag);
+	        if (oldLoc != null) {
+	            remove(AGENT, oldLoc.x, oldLoc.y);
+	        }
+	        agPos[ag] = new Location(x, y);
+	        add(AGENT, x, y);
+    	} else {
+    		throw new Exception("can not place the agent "+ag+" in "+x+","+y+" because it is not a free location.");
+    	}
     }
 
     public Location getAgPos(int ag) {

@@ -37,6 +37,7 @@ import jason.asSyntax.Trigger;
 /**
   <p>Internal action: <b><code>.drop_desire(<i>D</i>)</code></b>.
   
+  // TODO: discuss it with Rafael!
   <p>Description: removes desire <i>D</i> in the agent circumstance. Currently
   what it does is to change <i>+!D</i> to <i>-!D</i> for all events
   which would give true for <code>.desire(D)</code> in the whole set of

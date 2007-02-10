@@ -550,7 +550,7 @@ public class TransitionSystem {
 
         IntendedMeans im = i.peek();
         if (!im.isFinished()) {
-            // nothing todo
+            // nothing to do
             return;
         }
 
@@ -559,7 +559,7 @@ public class TransitionSystem {
         if (logger.isLoggable(Level.FINE)) logger.fine("Returning from IM "+topIM.getPlan().getLabel());
         
         // if finished a failure handling IM ...
-        if (im.getTrigger().isGoal() && !im.getTrigger().isAddition()) {
+        if (im.getTrigger().isGoal() && !im.getTrigger().isAddition() && i.size() > 0) {
             // needs to get rid of the IM until a goal that
             // has failure handling. E.g,
             //   -!b
@@ -570,7 +570,7 @@ public class TransitionSystem {
             // should became
             //   +!s: !z
             im = i.pop(); // +!c above, old
-            while (!im.unif.unifies(topIM.getTrigger().getLiteral(), im.getTrigger().getLiteral())) {
+            while (!im.unif.unifies(topIM.getTrigger().getLiteral(), im.getTrigger().getLiteral()) && i.size() > 0) {
                 im = i.pop();
             }
         }
