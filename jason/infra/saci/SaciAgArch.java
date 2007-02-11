@@ -305,6 +305,7 @@ public class SaciAgArch extends saci.Agent implements AgArchInfraTier {
         msaci.put("receiver", m.getReceiver());
         msaci.put("content", m.getPropCont());
         msaci.put("reply-with", m.getMsgId());
+        msaci.put("language", "AgentSpeak");
         if (m.getInReplyTo() != null) {
             msaci.put("in-reply-to", m.getInReplyTo());
         }

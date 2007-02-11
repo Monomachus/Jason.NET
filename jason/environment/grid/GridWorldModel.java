@@ -19,7 +19,7 @@ public class GridWorldModel {
     protected GridWorldView       view;
 
     protected GridWorldModel(int w, int h, int nbAgs) {
-        width = w;
+        width  = w;
         height = h;
 
         // int data
@@ -52,6 +52,10 @@ public class GridWorldModel {
         return agPos.length;
     }
 
+    public boolean inGrid(Location l) {
+        return inGrid(l.x, l.y);
+    }
+    
     public boolean inGrid(int x, int y) {
         return y >= 0 && y < height && x >= 0 && x < width;
     }
@@ -108,14 +112,14 @@ public class GridWorldModel {
     }
 
     public void setAgPos(int ag, int x, int y) throws Exception {
+        Location oldLoc = getAgPos(ag);
     	if (isFree(x,y)) {
-	        Location oldLoc = getAgPos(ag);
 	        if (oldLoc != null) {
 	            remove(AGENT, oldLoc.x, oldLoc.y);
 	        }
 	        agPos[ag] = new Location(x, y);
 	        add(AGENT, x, y);
-    	} else {
+    	} else if (oldLoc != null  && !oldLoc.equals(new Location(x,y))) { // just warns if the new location is different
     		throw new Exception("can not place the agent "+ag+" in "+x+","+y+" because it is not a free location.");
     	}
     }
