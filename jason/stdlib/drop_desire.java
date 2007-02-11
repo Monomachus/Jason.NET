@@ -33,15 +33,15 @@ import jason.asSyntax.Literal;
 import jason.asSyntax.Term;
 import jason.asSyntax.Trigger;
 
+import java.util.Iterator;
+
 
 /**
   <p>Internal action: <b><code>.drop_desire(<i>D</i>)</code></b>.
   
-  // TODO: discuss it with Rafael!
   <p>Description: removes desire <i>D</i> in the agent circumstance. Currently
-  what it does is to change <i>+!D</i> to <i>-!D</i> for all events
-  which would give true for <code>.desire(D)</code> in the whole set of
-  events.
+  what it does is to remove <i>+!D</i> from the whole set of events. No event is
+  produced.
 
   <p><b>Important</b>: unlike <code>.desire</code> this only alters literals
   explicitly desired (rather than intended), that is, it does NOT consider
@@ -77,14 +77,18 @@ public class drop_desire extends DefaultInternalAction {
             l.apply(un);
             
             Event e = new Event(new Trigger(Trigger.TEAdd, Trigger.TEAchvG, l),Intention.EmptyInt);
-            for (Event ei : ts.getC().getEvents()) {
-                Trigger t = (Trigger) ei.getTrigger();
+            Iterator<Event> ie = ts.getC().getEvents().iterator();
+            while (ie.hasNext()) {
+            //for (Event ei : ts.getC().getEvents()) {
+            	Event ei = ie.next();
+                Trigger t = ei.getTrigger();
                 if (ei.getIntention() != Intention.EmptyInt) {
                     t = (Trigger) t.clone();
                     t.getLiteral().apply(ei.getIntention().peek().getUnif());
                 }
                 if (un.unifies(t, e.getTrigger())) {
-                    t.setTrigType(Trigger.TEDel); // Just changing "+!g" to "-!g"
+                    // old implementation: t.setTrigType(Trigger.TEDel); // Just changing "+!g" to "-!g"
+                	ie.remove();
                 }
             }
             return true;
