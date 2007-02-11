@@ -1,8 +1,7 @@
 package jason.environment.grid;
 
-public class Location {
-    public int x = -1,
-               y = -1;
+public final class Location {
+    public int x, y;
     
     public Location(int x, int y) {
         this.x = x;

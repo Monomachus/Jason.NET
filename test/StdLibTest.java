@@ -8,6 +8,7 @@ import jason.asSemantics.Intention;
 import jason.asSemantics.Option;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
+import jason.asSyntax.DefaultTerm;
 import jason.asSyntax.ListTerm;
 import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Literal;
@@ -17,15 +18,15 @@ import jason.asSyntax.StringTerm;
 import jason.asSyntax.StringTermImpl;
 import jason.asSyntax.Structure;
 import jason.asSyntax.Term;
-import jason.asSyntax.DefaultTerm;
 import jason.asSyntax.Trigger;
 import jason.asSyntax.VarTerm;
 import jason.bb.BeliefBase;
 import jason.stdlib.add_annot;
 import jason.stdlib.add_plan;
-import jason.stdlib.drop_goal;
 import jason.stdlib.relevant_plans;
 import jason.stdlib.remove_plan;
+import jason.stdlib.succeed_goal;
+import jason.stdlib.fail_goal;
 
 import java.util.Iterator;
 
@@ -277,10 +278,10 @@ public class StdLibTest extends TestCase {
         Circumstance c = new Circumstance();
         c.addIntention(intention1);
         TransitionSystem ts = new TransitionSystem(null, c, null, null);
-        new drop_goal().drop(ts, Literal.parseLiteral("g2"), true, new Unifier());
+        new succeed_goal().drop(ts, Literal.parseLiteral("g2"), new Unifier());
         assertEquals(intention1.size(), 1);
         intention1.push(new IntendedMeans(new Option(p4,new Unifier()), null));
-        new drop_goal().drop(ts, Literal.parseLiteral("g4"), true, new Unifier());
+        new succeed_goal().drop(ts, Literal.parseLiteral("g4"), new Unifier());
         assertTrue(intention1.isFinished());
     }
 
@@ -288,7 +289,7 @@ public class StdLibTest extends TestCase {
         Circumstance c = new Circumstance();
         c.addIntention(intention1);
         TransitionSystem ts = new TransitionSystem(ag, c, null, null);
-        new drop_goal().drop(ts, Literal.parseLiteral("g2"), false, new Unifier());
+        new fail_goal().drop(ts, Literal.parseLiteral("g2"), new Unifier());
         assertEquals(intention1.size(),2);
         assertEquals(c.getEvents().size(),1);
     }

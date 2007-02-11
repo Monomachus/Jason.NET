@@ -28,8 +28,8 @@ public class RC implements Directive {
             // apply sub directive
             if (sd.process(subDir, innerPlans, bels, pl)) {
 
-                // add -m : true <- .drop_goal(g,true).
-                pl.add(Plan.parse("-"+motivation+" <- .drop_goal("+goal+",true)."));
+                // add -m : true <- .succeed_goal(g).
+                pl.add(Plan.parse("-"+motivation+" <- .succeed_goal("+goal+")."));
                 
                 return true;
             }

@@ -18,16 +18,12 @@
 // To contact the authors:
 // http://www.dur.ac.uk/r.bordini
 // http://www.inf.furb.br/~jomi
-//
 //----------------------------------------------------------------------------
 
 
 package jason.stdlib;
 
 import jason.JasonException;
-import jason.asSemantics.ActionExec;
-import jason.asSemantics.Circumstance;
-import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.Event;
 import jason.asSemantics.Intention;
 import jason.asSemantics.TransitionSystem;
@@ -37,75 +33,70 @@ import jason.asSyntax.Term;
 import jason.asSyntax.Trigger;
 
 /**
-  <p>Internal action: <b><code>.drop_intention(<i>I</i>)</code></b>.
+  <p>Internal action:
+  <b><code>.fail_goal(<i>G</i>,<i>R</i>)</code></b>.
   
-  <p>Description: removes the intention <i>I</i> from the set of
-  intention of the agent (suspended intetions are also considered).
-  No event is produced.
+  <p>Description: removes the goal <i>G</i> of the agent. <i>G</i> is a goal
+  if there is a trigerring event <code>+!G</code> in any plan within an
+  intention; just note that intentions can be suspended hence appearing
+  in E, PA, or PI as well.
+
+  <p>The intention is updated as if the plan for that goal
+  had failed, and an event <code>-!G</code> is generated.
 
   <p>Example:<ul> 
 
-  <li> <code>.drop_intention(go(1,3))</code>: removes an intention with goal
-  <code>!go(1,3)</code> in the agent's current circumstance.
+  <li> <code>.fail_goal(go(1,3))</code>: stops any attempt to achieve
+  <code>!go(1,3)</code> as if it had failed.
 
   </ul>
+
+  (Note: this internal action was introduced in a DALT 2006 paper)
 
   @see jason.stdlib.current_intention
   @see jason.stdlib.desire
   @see jason.stdlib.drop_all_desires
   @see jason.stdlib.drop_desire
   @see jason.stdlib.drop_all_intentions
-  @see jason.stdlib.succeed_goal
-  @see jason.stdlib.fail_goal
+  @see jason.stdlib.drop_intention
   @see jason.stdlib.intend
-
+  @see jason.stdlib.succeed_goal
+  
  */
-public class drop_intention extends DefaultInternalAction {
+public class fail_goal extends succeed_goal {
     
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         try {
         	args[0].apply(un);
-            dropInt(ts.getC(),(Literal)args[0],un);
+
+            drop(ts, (Literal)args[0], un);
             return true;
         } catch (ArrayIndexOutOfBoundsException e) {
-            throw new JasonException("The internal action 'drop_intention' has not received the required argument.");
+            throw new JasonException("The internal action 'fail_goal' has not received one argument.");
         } catch (Exception e) {
-            throw new JasonException("Error in internal action 'drop_intention': " + e);
+            e.printStackTrace();
+            throw new JasonException("Error in internal action 'fail_goal': " + e);
         }
     }
     
-    public void dropInt(Circumstance C, Literal l, Unifier un) {
-        Trigger g = new Trigger(Trigger.TEAdd, Trigger.TEAchvG, l);
-
-        for (Intention i: C.getIntentions()) {
-            if (i.hasTrigger(g, un)) {
-                C.removeIntention(i);
+    @Override
+    int dropIntention(Intention i, Trigger g, TransitionSystem ts, Unifier un) throws JasonException {
+        if (i != null && i.dropGoal(g, un)) {
+            // generate failure event
+            Event failEvent = null;
+            if (!i.isFinished()) {
+                failEvent = ts.findEventForFailure(i, i.peek().getTrigger());
+            }
+            if (failEvent != null) {
+                ts.getC().addEvent(failEvent);
+                ts.getLogger().warning("'.fail_goal' is generating a goal deletion event: " + failEvent.getTrigger());
+                return 2;
+            } else {
+                ts.getLogger().warning("'.fail_goal' is removing an intention:\n" + i);
+                return 3;
             }
         }
-        
-        // intention may be suspended in E
-        for (Event e: C.getEvents()) {
-            Intention i = e.getIntention();
-            if (i != null && i.hasTrigger(g, un)) {
-                C.removeEvent(e);
-            }
-        }
-        
-        // intention may be suspended in PA! (in the new semantics)
-        for (ActionExec a: C.getPendingActions().values()) {
-            Intention i = a.getIntention();
-            if (i.hasTrigger(g, un)) {
-                C.dropPendingAction(i);
-            }
-        }
-
-        // intention may be suspended in PI! (in the new semantics)
-        for (Intention i: C.getPendingIntentions().values()) {
-            if (i != null && i.hasTrigger(g, un)) {
-                C.dropPendingIntention(i);
-            }
-        }
-        
+        return 0;        
     }
 }

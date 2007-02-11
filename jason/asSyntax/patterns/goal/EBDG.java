@@ -56,8 +56,8 @@ public class EBDG implements Directive {
             // add -!g : true <- !!g.
             pl.add(Plan.parse("-!"+goal+" <- !!"+goal+"."));
 
-            // add +g : true <- .abolish(p__f(_,g)); .drop_goal(g,true).
-            pl.add(Plan.parse("+"+goal+" <- .abolish(p__f(_,"+goal+")); .drop_goal("+goal+",true)."));
+            // add +g : true <- .abolish(p__f(_,g)); .succeed_goal(g).
+            pl.add(Plan.parse("+"+goal+" <- .abolish(p__f(_,"+goal+")); .succeed_goal("+goal+")."));
 
             // add -g <- .abolish(p__f(_,g)).
             pl.add(Plan.parse("-"+goal+" <- .abolish(p__f(_,"+goal+"))."));

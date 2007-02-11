@@ -30,8 +30,8 @@ public class DG implements Directive {
                 pl.add(p);
             }
             
-            // add +g : true <- .drop_goal(g,true).
-            pl.add(Plan.parse("+"+goal+" <- .drop_goal("+goal+",true)."));
+            // add +g : true <- .succeed_goal(g).
+            pl.add(Plan.parse("+"+goal+" <- .succeed_goal("+goal+")."));
             
             return true;
         } catch (Exception e) {

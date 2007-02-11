@@ -28,8 +28,8 @@ public class SMC implements Directive {
             // apply sub directive
             if (sd.process(subDir, innerPlans, bels, pl)) {
 
-                // add +f : true <- .drop_goal(g,false).
-                pl.add(Plan.parse("+"+fail+" <- .drop_goal("+goal+",false)."));
+                // add +f : true <- .fail_goal(g).
+                pl.add(Plan.parse("+"+fail+" <- .fail_goal("+goal+")."));
                 
                 return true;
             }

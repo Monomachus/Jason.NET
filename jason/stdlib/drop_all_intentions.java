@@ -51,9 +51,9 @@ import jason.asSyntax.Term;
   @see jason.stdlib.drop_all_desires
   @see jason.stdlib.drop_desire
   @see jason.stdlib.drop_intention
-  @see jason.stdlib.drop_goal
+  @see jason.stdlib.succeed_goal
+  @see jason.stdlib.fail_goal
   @see jason.stdlib.intend
-
 
  */
 public class drop_all_intentions extends DefaultInternalAction {

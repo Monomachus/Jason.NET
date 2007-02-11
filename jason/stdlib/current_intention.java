@@ -74,9 +74,10 @@ import jason.asSyntax.Term;
   @see jason.stdlib.drop_desire
   @see jason.stdlib.drop_all_intentions
   @see jason.stdlib.drop_intention
-  @see jason.stdlib.drop_goal
   @see jason.stdlib.intend
- */
+  @see jason.stdlib.succeed_goal
+  @see jason.stdlib.fail_goal
+*/
 public class current_intention extends DefaultInternalAction {
 
     @Override

@@ -28,11 +28,11 @@ public class OMC implements Directive {
             // apply sub directive
             if (sd.process(subDir, innerPlans, bels, pl)) {
 
-                // add +f : true <- .drop_goal(g,false).
-                pl.add(Plan.parse("+"+fail+" <- .drop_goal("+goal+",false)."));
+                // add +f : true <- .fail_goal(g).
+                pl.add(Plan.parse("+"+fail+" <- .fail_goal("+goal+")."));
 
-                // add -m : true <- .drop_goal(g,true).
-                pl.add(Plan.parse("-"+motivation+" <- .drop_goal("+goal+",true)."));
+                // add -m : true <- .succeed_goal(g).
+                pl.add(Plan.parse("-"+motivation+" <- .succeed_goal("+goal+")."));
                 
                 return true;
             }

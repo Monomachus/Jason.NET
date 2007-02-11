@@ -18,7 +18,6 @@
 // To contact the authors:
 // http://www.dur.ac.uk/r.bordini
 // http://www.inf.furb.br/~jomi
-//
 //----------------------------------------------------------------------------
 
 
@@ -37,75 +36,105 @@ import jason.asSyntax.Term;
 import jason.asSyntax.Trigger;
 
 /**
-  <p>Internal action: <b><code>.drop_intention(<i>I</i>)</code></b>.
+  <p>Internal action:
+  <b><code>.succeed_goal(<i>G</i>)</code></b>.
   
-  <p>Description: removes the intention <i>I</i> from the set of
-  intention of the agent (suspended intetions are also considered).
-  No event is produced.
+  <p>Description: removes the goal <i>G</i> of the agent. <i>G</i> is a goal
+  if there is a trigerring event <code>+!G</code> in any plan within an
+  intention; just note that intentions can be suspended hence appearing
+  in E, PA, or PI as well.
 
+  <p>The intention where the goal appears is
+  updated as if the goal had already been successfuly achieved.
+  
   <p>Example:<ul> 
 
-  <li> <code>.drop_intention(go(1,3))</code>: removes an intention with goal
-  <code>!go(1,3)</code> in the agent's current circumstance.
+  <li> <code>.succeed_goal(go(1,3))</code>: stops any attempt to achieve
+  <code>!go(1,3)</code> as if it had already been achieved.
 
   </ul>
+
+  (Note: this internal action was introduced in a DALT 2006 paper)
 
   @see jason.stdlib.current_intention
   @see jason.stdlib.desire
   @see jason.stdlib.drop_all_desires
   @see jason.stdlib.drop_desire
   @see jason.stdlib.drop_all_intentions
-  @see jason.stdlib.succeed_goal
-  @see jason.stdlib.fail_goal
+  @see jason.stdlib.drop_intention
   @see jason.stdlib.intend
+  @see jason.stdlib.fail_goal
 
  */
-public class drop_intention extends DefaultInternalAction {
+public class succeed_goal extends DefaultInternalAction {
     
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         try {
         	args[0].apply(un);
-            dropInt(ts.getC(),(Literal)args[0],un);
+
+            drop(ts, (Literal)args[0], un);
             return true;
         } catch (ArrayIndexOutOfBoundsException e) {
-            throw new JasonException("The internal action 'drop_intention' has not received the required argument.");
+            throw new JasonException("The internal action 'succeed_goal' has not received one argument.");
         } catch (Exception e) {
-            throw new JasonException("Error in internal action 'drop_intention': " + e);
+            e.printStackTrace();
+            throw new JasonException("Error in internal action 'succeed_goal': " + e);
         }
     }
     
-    public void dropInt(Circumstance C, Literal l, Unifier un) {
+    public void drop(TransitionSystem ts, Literal l, Unifier un) throws JasonException{
         Trigger g = new Trigger(Trigger.TEAdd, Trigger.TEAchvG, l);
-
+        Circumstance C = ts.getC();
+        
         for (Intention i: C.getIntentions()) {
-            if (i.hasTrigger(g, un)) {
+            if (dropIntention(i, g, ts, un) > 1) {
                 C.removeIntention(i);
             }
         }
         
-        // intention may be suspended in E
+        // dropping the current intention?
+        dropIntention(C.getSelectedIntention(), g, ts, un);
+            
+        // dropping G in Events
         for (Event e: C.getEvents()) {
             Intention i = e.getIntention();
-            if (i != null && i.hasTrigger(g, un)) {
+            if (dropIntention(i, g, ts, un) > 1) {
                 C.removeEvent(e);
             }
         }
         
-        // intention may be suspended in PA! (in the new semantics)
+        // dropping from Pending Actions
         for (ActionExec a: C.getPendingActions().values()) {
             Intention i = a.getIntention();
-            if (i.hasTrigger(g, un)) {
-                C.dropPendingAction(i);
-            }
-        }
-
-        // intention may be suspended in PI! (in the new semantics)
-        for (Intention i: C.getPendingIntentions().values()) {
-            if (i != null && i.hasTrigger(g, un)) {
-                C.dropPendingIntention(i);
+            int r = dropIntention(i, g, ts, un);
+            if (r > 0) { // i was changed
+                C.dropPendingIntention(i); // remove i from PI
+                if (r == 1) { // i must continue running
+                    C.addIntention(i); // and put the intention back in I
+                }
             }
         }
         
+        // dropping from Pending Intentions
+        for (Intention i: C.getPendingIntentions().values()) {
+            int r = dropIntention(i, g, ts, un);
+            if (r > 0) { // i was changed
+                C.dropPendingIntention(i); // remove i from PI
+                if (r == 1) { // intention i must continue running
+                    C.addIntention(i); // and put the intention back in I
+                }
+            }
+        }
+    }
+    
+    int dropIntention(Intention i, Trigger g, TransitionSystem ts, Unifier un) throws JasonException {
+        if (i != null && i.dropGoal(g, un)) {
+        	// continue the intention
+        	i.peek().removeCurrentStep();
+        	ts.applyClrInt(i);
+        	return 1;
+        }
+        return 0;        
     }
 }
