@@ -39,22 +39,20 @@ import jason.asSyntax.Trigger;
   <p>Internal action:
   <b><code>.succeed_goal(<i>G</i>)</code></b>.
   
-  <p>Description: removes the goal <i>G</i> of the agent. <i>G</i> is a goal
-  if there is a trigerring event <code>+!G</code> in any plan within an
-  intention; just note that intentions can be suspended hence appearing
+  <p>Description: remove goals <i>G</i> from the agent circumstance as if a plan
+  for such goal had successfully finished. <i>G</i>
+  is a goal if there is a trigerring event <code>+!G</code> in any plan within any
+  intention; also note that intentions can be suspended hence appearing
   in E, PA, or PI as well.
 
-  <p>The intention where the goal appears is
-  updated as if the goal had already been successfuly achieved.
-  
   <p>Example:<ul> 
 
-  <li> <code>.succeed_goal(go(1,3))</code>: stops any attempt to achieve
+  <li> <code>.succeed_goal(go(X,3))</code>: stops any attempt to achieve goals such as
   <code>!go(1,3)</code> as if it had already been achieved.
 
   </ul>
 
-  (Note: this internal action was introduced in a DALT 2006 paper)
+  (Note: this internal action was introduced in a DALT 2006 paper, where it was called .dropGoal(G,true).)
 
   @see jason.stdlib.current_intention
   @see jason.stdlib.desire

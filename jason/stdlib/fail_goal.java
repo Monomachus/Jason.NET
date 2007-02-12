@@ -34,24 +34,23 @@ import jason.asSyntax.Trigger;
 
 /**
   <p>Internal action:
-  <b><code>.fail_goal(<i>G</i>,<i>R</i>)</code></b>.
+  <b><code>.fail_goal(<i>G</i>)</code></b>.
   
-  <p>Description: removes the goal <i>G</i> of the agent. <i>G</i> is a goal
-  if there is a trigerring event <code>+!G</code> in any plan within an
-  intention; just note that intentions can be suspended hence appearing
+  <p>Description: aborts goals <i>G</i> in the agent circumstance as if a plan
+  for such goal had failed, and an event <code>-!G</code> is generated. <i>G</i>
+  is a goal if there is a trigerring event <code>+!G</code> in any plan within
+  any intention; also note that intentions can be suspended hence appearing
   in E, PA, or PI as well.
-
-  <p>The intention is updated as if the plan for that goal
-  had failed, and an event <code>-!G</code> is generated.
 
   <p>Example:<ul> 
 
-  <li> <code>.fail_goal(go(1,3))</code>: stops any attempt to achieve
-  <code>!go(1,3)</code> as if it had failed.
+  <li> <code>.fail_goal(go(1,3))</code>: aborts any attempt to achieve
+  goals such as <code>!go(1,3)</code> as if a plan for it had failed, thus
+  generating an event <code>-!g(1,3)</code>.
 
   </ul>
 
-  (Note: this internal action was introduced in a DALT 2006 paper)
+  (Note: this internal action was introduced in a DALT 2006 paper, where it was called .dropGoal(G,false).)
 
   @see jason.stdlib.current_intention
   @see jason.stdlib.desire
