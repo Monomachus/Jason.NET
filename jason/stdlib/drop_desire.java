@@ -40,20 +40,19 @@ import java.util.Iterator;
   <p>Internal action: <b><code>.drop_desire(<i>D</i>)</code></b>.
   
   <p>Description: removes desire <i>D</i> in the agent circumstance. Currently
-  what it does is to remove <i>+!D</i> from the whole set of events. No event is
-  produced.
+  what it does is to remove all <i>+!D</i> entries in the set of events.
+  No event is produced.
 
   <p><b>Important</b>: unlike <code>.desire</code> this only alters literals
-  explicitly desired (rather than intended), that is, it does NOT consider
+  explicitly desired (rather than intended); that is, it does NOT consider
   intentions. You should use both <code>.drop_desire</code> AND
   <code>drop_intention</code> to remove all desires and intentions matching
   <i>D</i>.
 
   <p>Example:<ul> 
 
-  <li> <code>.drop_desire(go(1,3))</code>: changes a desire
-  <code>&lt;+!go(1,3),_&gt;</code> in the set of events to
-  <code>&lt;-!go(1,3),_&gt;</code>.
+  <li> <code>.drop_desire(go(X,Y))</code>: remove desires such as
+  <code>&lt;+!go(1,3),_&gt;</code> from the set of events.
 
   </ul>
 
