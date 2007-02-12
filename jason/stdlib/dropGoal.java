@@ -37,7 +37,7 @@ import jason.asSyntax.Trigger;
 
 /**
 
-@deprecated use fail_goal or succeed_goal.
+@deprecated use fail_goal or succeed_goal accordingly.
  */
 public class dropGoal extends DefaultInternalAction {
     
