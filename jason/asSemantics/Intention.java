@@ -48,7 +48,7 @@ public class Intention implements Serializable, Comparable<Intention> {
     
     Stack<IntendedMeans> fIntendedMeans = new Stack<IntendedMeans>();
 
-    // static private Logger logger = Logger.getLogger(intend.class.getName());
+    // static private Logger logger = Logger.getLogger(Intention.class.getName());
 
     public Intention() {
         id = ++idCount;
@@ -113,8 +113,6 @@ public class Intention implements Serializable, Comparable<Intention> {
     /** returns the IntendedMeans with TE = g, returns null otherwise */
     public IntendedMeans getIM(Trigger g, Unifier u) {
         for (IntendedMeans im : fIntendedMeans) {
-            //Trigger it = (Trigger) im.getPlan().getTriggerEvent().clone();
-            //im.unif.apply(it.getLiteral());
             if (u.unifies(g, im.getTrigger())) {
                 return im;
             }

@@ -59,12 +59,11 @@ public class Circumstance implements Serializable {
     protected Intention                SI;
     private   Intention                AI; // Atomic Intention
 
-    // protected Intention AI; 
-    private Map<String, ActionExec>    PA;
-    // pending intentions
-    private Map<String, Intention>     PI;                                                        
+    private Map<Integer, ActionExec>   PA; // Pending actions, waiting action execution (key is the intention id)
+    protected List<ActionExec>         FA; // Feedback actions, those that are already executed
+    
+    private Map<String, Intention>     PI; // pending intentions, intentions suspended by any other reason                                                        
 
-    protected List<ActionExec>         FA;
 
     private List<CircumstanceListener> listeners = new CopyOnWriteArrayList<CircumstanceListener>();
 
@@ -73,7 +72,7 @@ public class Circumstance implements Serializable {
         E = new ConcurrentLinkedQueue<Event>();
         I = new ConcurrentLinkedQueue<Intention>();
         MB = new LinkedList<Message>();
-        PA = new ConcurrentHashMap<String, ActionExec>();
+        PA = new ConcurrentHashMap<Integer, ActionExec>();
         PI = new ConcurrentHashMap<String, Intention>();
         FA = new ArrayList<ActionExec>();
         reset();
@@ -269,7 +268,7 @@ public class Circumstance implements Serializable {
         return FA;
     }
 
-    public Map<String, ActionExec> getPendingActions() {
+    public Map<Integer, ActionExec> getPendingActions() {
         return PA;
     }
     
@@ -440,11 +439,11 @@ public class Circumstance implements Serializable {
 
         // pending actions
         if (hasPendingAction()) {
-            for (String key : getPendingActions().keySet()) {// .iterator();
+            for (int key : getPendingActions().keySet()) {// .iterator();
                 ActionExec ac = getPendingActions().get(key);
                 if (!alreadyIn.contains(ac)) {
                     e = ac.getAsDOM(document);
-                    e.setAttribute("pending", key.toString());
+                    e.setAttribute("pending", key+"");
                     acts.appendChild(e);
                     alreadyIn.add(ac);
                 }

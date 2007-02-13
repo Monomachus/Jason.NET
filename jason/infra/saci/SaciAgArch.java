@@ -28,9 +28,9 @@ import jason.architecture.AgArch;
 import jason.architecture.AgArchInfraTier;
 import jason.asSemantics.ActionExec;
 import jason.asSemantics.TransitionSystem;
+import jason.asSyntax.DefaultTerm;
 import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Term;
-import jason.asSyntax.DefaultTerm;
 import jason.infra.centralised.RunCentralisedMAS;
 import jason.mas2j.ClassParameters;
 import jason.mas2j.parser.mas2j;
@@ -39,7 +39,9 @@ import jason.runtime.RuntimeServicesInfraTier;
 import jason.runtime.Settings;
 
 import java.io.StringReader;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -69,6 +71,8 @@ public class SaciAgArch extends saci.Agent implements AgArchInfraTier {
     /** the user implementation of the architecture */
     protected AgArch userAgArh;
 
+    private Map<String,ActionExec> myPA = new HashMap<String,ActionExec>();
+    
     private Logger   logger;
 
     /**
@@ -273,7 +277,7 @@ public class SaciAgArch extends saci.Agent implements AgArchInfraTier {
                         if (((String) m.get("ontology")).equals("AS-Action")) {
                             String irt = (String) m.get("in-reply-to");
                             if (irt != null) {
-                                ActionExec a = userAgArh.getTS().getC().getPendingActions().remove(irt);
+                                ActionExec a = myPA.remove(irt); //userAgArh.getTS().getC().getPendingActions().remove(irt);
                                 // was it a pending action?
                                 if (a != null) {
                                     if (((String) m.get("content")).equals("ok")) {
@@ -395,7 +399,7 @@ public class SaciAgArch extends saci.Agent implements AgArchInfraTier {
 
             mboxPercept.sendMsg(m);
 
-            ts.getC().getPendingActions().put(rw, ts.getC().getAction());
+            myPA.put(rw, action); //ts.getC().getPendingActions().put(rw, action);
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error sending action " + ts.getC().getAction(), e);
         }

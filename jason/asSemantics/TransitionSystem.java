@@ -327,6 +327,10 @@ public class TransitionSystem {
             ActionExec a = conf.ag.selectAction(conf.C.FA);
             confP.C.SI = a.getIntention();
             if (a.getResult()) {
+                // remove the intention from PA
+                C.getPendingActions().remove(a.getIntention().getId());
+                
+                // add it back in I
                 updateIntention();
             	applyClrInt(confP.C.SI);
             } else {
@@ -837,8 +841,10 @@ public class TransitionSystem {
                 applySemanticRule();
             } while (step != State.StartRC); // finished a reasoning cycle
 
-            if (C.getAction() != null) {
-                agArch.act(C.getAction(), C.getFeedbackActions());
+            ActionExec action = C.getAction(); 
+            if (action != null) {
+            	C.getPendingActions().put(action.getIntention().getId(), action);
+                agArch.act(action, C.getFeedbackActions());
             }
 
             // counting number of cycles since last belief revision
