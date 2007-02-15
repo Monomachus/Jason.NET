@@ -326,15 +326,18 @@ public class TransitionSystem {
         if (!conf.C.FA.isEmpty()) {
             ActionExec a = conf.ag.selectAction(conf.C.FA);
             confP.C.SI = a.getIntention();
-            if (a.getResult()) {
-                // remove the intention from PA
-                C.getPendingActions().remove(a.getIntention().getId());
-                
-                // add it back in I
-                updateIntention();
-            	applyClrInt(confP.C.SI);
-            } else {
-                generateGoalDeletion();
+
+            // remove the intention from PA (PA has all pending action, including those in FA;
+            // but, if the intention is not in PA, it means that the intention was dropped
+            // and should not return to I)
+            if (C.getPendingActions().remove(a.getIntention().getId()) != null) {
+	            if (a.getResult()) {
+	                // add it back in I
+	                updateIntention();
+	            	applyClrInt(confP.C.SI);
+	            } else {
+	                generateGoalDeletion();
+	            }
             }
         }
         confP.step = State.SelInt;
@@ -740,7 +743,9 @@ public class TransitionSystem {
     }
     
     boolean canSleep() {
-        return !conf.C.hasEvent() && !conf.C.hasIntention() && conf.C.MB.isEmpty() && conf.C.FA.isEmpty() && agArch.canSleep() && !conf.C.getFeedbackActions().isEmpty();
+        return !conf.C.hasEvent() && !conf.C.hasIntention() && 
+               conf.C.MB.isEmpty() && conf.C.FA.isEmpty() && 
+               agArch.canSleep();
     }
 
     /** waits for a new message */
