@@ -108,20 +108,20 @@ public class GridWorldModel {
     }
 
     public void setAgPos(int ag, Location l) throws Exception {
-        setAgPos(ag, l.x, l.y);
+        Location oldLoc = getAgPos(ag);
+    	//if (isFree(l)) {
+        if (oldLoc != null) {
+            remove(AGENT, oldLoc.x, oldLoc.y);
+        }
+        agPos[ag] = l;
+        add(AGENT, l);
+    	//} else if (oldLoc != null  && !oldLoc.equals(l)) { // just warns if the new location is different
+    	//	throw new Exception("can not place the agent "+ag+" in "+l+" because it is not a free location.");
+    	//}
     }
 
     public void setAgPos(int ag, int x, int y) throws Exception {
-        Location oldLoc = getAgPos(ag);
-    	if (isFree(x,y)) {
-	        if (oldLoc != null) {
-	            remove(AGENT, oldLoc.x, oldLoc.y);
-	        }
-	        agPos[ag] = new Location(x, y);
-	        add(AGENT, x, y);
-    	} else if (oldLoc != null  && !oldLoc.equals(new Location(x,y))) { // just warns if the new location is different
-    		throw new Exception("can not place the agent "+ag+" in "+x+","+y+" because it is not a free location.");
-    	}
+        setAgPos(ag, new Location(x, y));
     }
 
     public Location getAgPos(int ag) {

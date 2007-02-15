@@ -740,7 +740,7 @@ public class TransitionSystem {
     }
     
     boolean canSleep() {
-        return !conf.C.hasEvent() && !conf.C.hasIntention() && conf.C.MB.isEmpty() && conf.C.FA.isEmpty() && agArch.canSleep();
+        return !conf.C.hasEvent() && !conf.C.hasIntention() && conf.C.MB.isEmpty() && conf.C.FA.isEmpty() && agArch.canSleep() && !conf.C.getFeedbackActions().isEmpty();
     }
 
     /** waits for a new message */

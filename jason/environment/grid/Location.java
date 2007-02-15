@@ -20,13 +20,24 @@ public final class Location {
             Math.abs(x - l.x) == 1 && Math.abs(y - l.y) == 1;
     }
     
-    public boolean equals(Object o) {
-        try {
-            Location l = (Location)o;
-            return l.x == x && l.y == y;
-        } catch (Exception e) {  }
-        return false;
-    }
+    @Override
+	public int hashCode() {
+		final int PRIME = 31;
+		int result = 1;
+		result = PRIME * result + x;
+		result = PRIME * result + y;
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) return true;
+		if (getClass() != obj.getClass()) return false;
+		final Location other = (Location) obj;
+		if (x != other.x) return false;
+		if (y != other.y) return false;
+		return true;
+	}
     
     public Object clone() {
         return new Location(x,y);
