@@ -323,6 +323,7 @@ public class TransitionSystem {
     }
 
     private void applyProcAct() throws JasonException {
+        confP.step = State.SelInt; // default next step
         if (!conf.C.FA.isEmpty()) {
             ActionExec a = conf.ag.selectAction(conf.C.FA);
             confP.C.SI = a.getIntention();
@@ -338,9 +339,10 @@ public class TransitionSystem {
 	            } else {
 	                generateGoalDeletion();
 	            }
+            } else {
+                    applyProcAct(); // get next action
             }
         }
-        confP.step = State.SelInt;
     }
 
     private void applySelInt() throws JasonException {
@@ -458,7 +460,9 @@ public class TransitionSystem {
                 Trigger te = new Trigger(Trigger.TEAdd, Trigger.TETestG, body);
                 if (ag.getPL().isRelevant(te.getPredicateIndicator())) {
                     Event evt = new Event(te, conf.C.SI);
-                    logger.warning("Test Goal '" + h + "' failed as simple query. Generating internal event for it: "+te);
+                    if (logger.isLoggable(Level.FINE)) {
+                        logger.fine("Test Goal '" + h + "' failed as simple query. Generating internal event for it: "+te);
+                    }
                     conf.C.addEvent(evt);
                     confP.step = State.StartRC;
                 } else {
