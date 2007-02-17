@@ -34,6 +34,7 @@ import jason.asSyntax.Plan;
 import jason.asSyntax.PlanLibrary;
 import jason.asSyntax.Pred;
 import jason.asSyntax.Term;
+import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Trigger;
 import jason.asSyntax.BodyLiteral.BodyType;
 import jason.bb.BeliefBase;
@@ -160,12 +161,20 @@ public class TransitionSystem {
             }
             // is it a pending intention?
             if (intention != null) {
-                // unify the message answer with the .send fourth argument
+                // unify the message answer with the .send fourth argument.
                 // the send that put the intention in Pending state was
                 // something like
                 //    .send(ag1,askOne, value, X)
-                // if the answer was 3, unifies X=3
+                // if the answer was tell 3, unifies X=3
+                // if the answer was untell 3, unifies X=false
                 BodyLiteral send = intention.peek().removeCurrentStep();
+                if (m.isUnTell()) {
+                    if (send.getLiteralFormula().getTerm(1).toString().equals("askOne")) {
+                        content = Literal.LFalse;
+                    } else { // the .send is askAll
+                        content = new ListTermImpl(); // the answer is an empty list
+                    }
+                }
                 if (intention.peek().getUnif().unifies(send.getLiteralFormula().getTerm(3), content)) {
                     getC().addIntention(intention);
                 } else {
@@ -437,7 +446,7 @@ public class TransitionSystem {
             }
             break;
 
-        // Rule Achieve (
+        // Rule Achieve
         case achieve:
             // free variables in an event cannot conflict with those in the plan
             body.makeVarsAnnon();
@@ -689,7 +698,7 @@ public class TransitionSystem {
             Event failEvent = findEventForFailure(conf.C.SI, im.getTrigger());
             if (failEvent != null) {
                 confP.C.addEvent(failEvent);
-                logger.warning("Generating goal deletion " + failEvent.getTrigger() + " from goal: " + im.getTrigger());
+                if (logger.isLoggable(Level.FINE)) logger.fine("Generating goal deletion " + failEvent.getTrigger() + " from goal: " + im.getTrigger());
             } else {
                 logger.warning("No fail event was generated for " + im.getTrigger());
             }

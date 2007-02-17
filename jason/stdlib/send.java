@@ -150,8 +150,8 @@ public class send extends DefaultInternalAction {
         	ts.getC().getPendingIntentions().put(m.getMsgId(), ts.getC().getSelectedIntention());
         }
 
-        // tell with 4 args is a reply to
-        if (m.isTell() && args.length > 3) {
+        // (un)tell with 4 args is a reply to
+        if ( (m.isTell() || m.isUnTell()) && args.length > 3) {
             Term mid = args[3];
             mid.apply(un);
             if (! mid.isAtom()) {

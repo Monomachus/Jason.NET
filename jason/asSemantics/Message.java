@@ -72,6 +72,9 @@ public class Message {
 	public boolean isTell() {
 		return ilForce.equals("tell");
 	}
+	public boolean isUnTell() {
+		return ilForce.equals("untell");
+	}
 
 	public void setPropCont(Object o) {
 		propCont = o;

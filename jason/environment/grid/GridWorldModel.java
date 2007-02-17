@@ -135,7 +135,12 @@ public class GridWorldModel {
         }
     }
 
-    /** return the agent at x,y */
+    /** returns the agent at location l */
+    public int getAgAtPos(Location l) {
+        return getAgAtPos(l.x, l.y);
+    }
+
+    /** returns the agent at x,y */
     public int getAgAtPos(int x, int y) {
         for (int i=0; i<agPos.length; i++) {
             if (agPos[i].x == x && agPos[i].y == y) {

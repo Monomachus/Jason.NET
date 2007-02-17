@@ -50,10 +50,10 @@
    <- .add_annot(KQMLcontentVar, source(S), CA); 
       !CA.
 
-@kqmlReceivedUnAchieve
+@kqmlReceivedUnAchieve[atomic]
 +!kqml_received(S, unachieve, KQMLcontentVar, M)
-   <- .add_annot(KQMLcontentVar, source(S), CA);
-      .drop_goal(CA, false).
+   <- .drop_desire(KQMLcontentVar);
+      .drop_intention(KQMLcontentVar).
 
 
 /* ---- ask performatives ---- */ 
@@ -63,11 +63,16 @@
    <- ?KQMLcontentVar;
       .send(S, tell, KQMLcontentVar, M).
 
-@kqmlReceivedAskOne2 // error in askOne, send false
--!kqml_received(S, askOne, _, M)
-   <- .send(S, tell, false, M).      
+@kqmlReceivedAskOne2 // error in askOne, send untell
+-!kqml_received(S, askOne, KQMLcontentVar, M)
+   <- .send(S, untell, KQMLcontentVar, M).      
 
-@kqmlReceivedAskAll
+@kqmlReceivedAskAll1
++!kqml_received(S, askAll, KQMLcontentVar, M)
+   :  not KQMLcontentVar
+   <- .send(S, untell, KQMLcontentVar, M).
+
+@kqmlReceivedAskAll2
 +!kqml_received(S, askAll, KQMLcontentVar, M)
    <- .findall(KQMLcontentVar, KQMLcontentVar, List); 
       .send(S, tell, List, M).
