@@ -170,7 +170,7 @@ public class Agent {
     }
 
     public Event selectEvent(Queue<Event> events) {
-        // make sure the selected Event is removed from evList
+        // make sure the selected Event is removed from 'events' queue
         return events.poll();
     }
 
@@ -183,13 +183,13 @@ public class Agent {
     }
 
     public Intention selectIntention(Queue<Intention> intentions) {
-        // make sure the selected Intention is removed from intList AND
-        // make sure no intention will "starve"!!!
+        // make sure the selected Intention is removed from 'intentions'
+        // and make sure no intention will "starve"!!!
         return intentions.poll();
     }
 
     public Message selectMessage(Queue<Message> messages) {
-        // make sure the selected Message is removed from msgList
+        // make sure the selected Message is removed from 'messages'
         return messages.poll();
     }
 
