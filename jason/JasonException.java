@@ -32,10 +32,10 @@
 
 package jason;
 
+
 public class JasonException extends java.lang.Exception {
     
 	private static final long serialVersionUID = 1L;
-
 
 	/**
      * Creates a new instance of <code>JasonException</code> without detail message.
@@ -51,4 +51,10 @@ public class JasonException extends java.lang.Exception {
     public JasonException(String msg) {
         super(msg);
     }
+
+    public JasonException(String msg, Exception cause) {
+        super(msg);
+        initCause(cause);
+    }
+    
 }

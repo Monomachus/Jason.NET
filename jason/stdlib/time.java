@@ -49,7 +49,7 @@ public class time extends DefaultInternalAction {
         } catch (ArrayIndexOutOfBoundsException e) {
             throw new JasonException("The internal action 'time' has not received three arguments.");
         } catch (Exception e) {
-            throw new JasonException("Error in internal action 'time': " + e);
+            throw new JasonException("Error in internal action 'time': " + e, e);
         }
     }
 }

@@ -68,20 +68,20 @@ public class desire extends intend {
         } catch (ArrayIndexOutOfBoundsException e) {
             throw new JasonException("The internal action 'desire' has not received the required argument.");
         } catch (Exception e) {
-            throw new JasonException("Error in internal action 'desire': " + e);
+            throw new JasonException("Error in internal action 'desire': " + e, e);
         }
     }
     
     public boolean desires(Circumstance C, Literal l, Unifier un) {
         Trigger teFromL = new Trigger(Trigger.TEAdd, Trigger.TEAchvG, l);
 
-        // we need to check the slected event in this cycle!!! (already
-        // removed from E)
+        // we need to check the slected event in this cycle (already removed from E)
         if (C.getSelectedEvent() != null) {
             Trigger t = C.getSelectedEvent().getTrigger();
-            if (C.getSelectedEvent().getIntention() != Intention.EmptyInt) {
+            Intention i = C.getSelectedEvent().getIntention(); 
+            if (i != Intention.EmptyInt && i.size() > 0) {
                 t = (Trigger) t.clone();
-                t.getLiteral().apply(C.getSelectedEvent().getIntention().peek().getUnif());
+                t.getLiteral().apply(i.peek().getUnif());
             }
             if (un.unifies(t, teFromL)) {
                 return true;
@@ -90,9 +90,10 @@ public class desire extends intend {
 
         for (Event ei : C.getEvents()) {
             Trigger t = (Trigger) ei.getTrigger();
-            if (ei.getIntention() != Intention.EmptyInt) {
+            Intention i = ei.getIntention(); 
+            if (i != Intention.EmptyInt && i.size() > 0) {
                 t = (Trigger) t.clone();
-                t.getLiteral().apply(ei.getIntention().peek().getUnif());
+                t.getLiteral().apply(i.peek().getUnif());
             }
             if (un.unifies(t, teFromL)) {
                 return true;

@@ -80,7 +80,6 @@ public class drop_desire extends DefaultInternalAction {
             Event e = new Event(new Trigger(Trigger.TEAdd, Trigger.TEAchvG, l),Intention.EmptyInt);
             Iterator<Event> ie = ts.getC().getEvents().iterator();
             while (ie.hasNext()) {
-            //for (Event ei : ts.getC().getEvents()) {
             	Event ei = ie.next();
                 Trigger t = ei.getTrigger();
                 if (ei.getIntention() != Intention.EmptyInt) {
@@ -96,7 +95,7 @@ public class drop_desire extends DefaultInternalAction {
         } catch (ArrayIndexOutOfBoundsException e) {
             throw new JasonException("The internal action 'drop_desire' has not received the required argument.");
         } catch (Exception e) {
-            throw new JasonException("Error in internal action 'drop_desire': " + e);
+            throw new JasonException("Error in internal action 'drop_desire': " + e, e);
         }
     }
 }

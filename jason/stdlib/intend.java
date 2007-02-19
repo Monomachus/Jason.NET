@@ -72,7 +72,7 @@ public class intend extends DefaultInternalAction {
         } catch (ArrayIndexOutOfBoundsException e) {
             throw new JasonException("The internal action 'intend' has not received the required argument.");
         } catch (Exception e) {
-            throw new JasonException("Error in internal action 'intend': " + e);
+            throw new JasonException("Error in internal action 'intend': " + e, e);
         }
     }
     

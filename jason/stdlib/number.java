@@ -41,7 +41,7 @@ public class number extends DefaultInternalAction {
         } catch (ArrayIndexOutOfBoundsException e) {
             throw new JasonException("The internal action 'number' has not received the required argument.");
         } catch (Exception e) {
-            throw new JasonException("Error in internal action 'number': " + e);
+            throw new JasonException("Error in internal action 'number': " + e, e);
         }
     }
 }

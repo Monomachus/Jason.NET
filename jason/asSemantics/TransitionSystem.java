@@ -687,9 +687,13 @@ public class TransitionSystem {
     
     /** remove the top action and requeue the current intention */
     private void updateIntention() {
-        IntendedMeans im = conf.C.SI.peek();
-        im.removeCurrentStep();
-        confP.C.addIntention(conf.C.SI);
+    	if (!conf.C.SI.isFinished()) {
+	        IntendedMeans im = conf.C.SI.peek();
+	        im.removeCurrentStep();
+	        confP.C.addIntention(conf.C.SI);
+    	} else {
+    		logger.fine("trying to update a finished intention!");
+    	}
     }
 
     private void generateGoalDeletion() throws JasonException {

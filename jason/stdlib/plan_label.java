@@ -69,7 +69,7 @@ public class plan_label extends DefaultInternalAction {
         } catch (ArrayIndexOutOfBoundsException e) {
             throw new JasonException("The internal action 'plan_label' has not received two arguments.");
         } catch (Exception e) {
-            throw new JasonException("Error in internal action 'plan_label': " + e);
+            throw new JasonException("Error in internal action 'plan_label': " + e, e);
         }
     }
 }

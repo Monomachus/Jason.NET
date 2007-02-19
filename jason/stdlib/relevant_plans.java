@@ -98,7 +98,7 @@ public class relevant_plans extends DefaultInternalAction {
 		} catch (ArrayIndexOutOfBoundsException e) {
 			throw new JasonException("The internal action 'relevant_plans' has not received two arguments (TE and VAR).");
 		} catch (Exception e) {
-			throw new JasonException("Error in internal action 'relevant_plans': " + e);
+			throw new JasonException("Error in internal action 'relevant_plans': " + e, e);
 		}
 	}
 }

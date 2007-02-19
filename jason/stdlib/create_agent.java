@@ -123,8 +123,7 @@ public class create_agent extends DefaultInternalAction {
         } catch (IndexOutOfBoundsException e) {
             throw new JasonException("The internal action 'create_agent' received a wrong number of arguments.");
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new JasonException("Error in internal action 'create_agent': " + e, e);
         }
-        return false;
     }
 }

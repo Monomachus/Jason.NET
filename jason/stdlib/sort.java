@@ -83,7 +83,7 @@ public class sort extends DefaultInternalAction {
         } catch (ArrayIndexOutOfBoundsException e) {
             throw new JasonException("The internal action 'sort' has not received two arguments.");
         } catch (Exception e) {
-            throw new JasonException("Error in internal action 'sort': " + e);
+            throw new JasonException("Error in internal action 'sort': " + e, e);
         }    
     }
 }

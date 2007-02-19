@@ -78,7 +78,7 @@ public class count extends DefaultInternalAction {
         } catch (ArrayIndexOutOfBoundsException e) {
             throw new JasonException("The internal action 'count' has not received two arguments.");
         } catch (Exception e) {
-            throw new JasonException("Error in internal action 'count': " + e);
+            throw new JasonException("Error in internal action 'count': " + e, e);
         }
     }
 }

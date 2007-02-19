@@ -41,7 +41,7 @@ public class random extends DefaultInternalAction {
         } catch (ArrayIndexOutOfBoundsException e) {
             throw new JasonException("The internal action 'random' has not received the required argument.");
         } catch (Exception e) {
-            throw new JasonException("Error in internal action 'random': " + e);
+            throw new JasonException("Error in internal action 'random': " + e, e);
         }    
     }
 }

@@ -44,7 +44,7 @@ public class list extends DefaultInternalAction {
         } catch (ArrayIndexOutOfBoundsException e) {
             throw new JasonException("The internal action 'list' has not received the required argument.");
         } catch (Exception e) {
-            throw new JasonException("Error in internal action 'list': " + e);
+            throw new JasonException("Error in internal action 'list': " + e, e);
         }
     }
 }

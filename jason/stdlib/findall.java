@@ -92,7 +92,7 @@ public class findall extends DefaultInternalAction {
         } catch (ArrayIndexOutOfBoundsException e) {
             throw new JasonException("The internal action 'findall' has not received three arguments.");
         } catch (Exception e) {
-            throw new JasonException("Error in internal action 'findall': " + e);
+            throw new JasonException("Error in internal action 'findall': " + e, e);
         }
     }
 }

@@ -71,7 +71,7 @@ public class drop_intention extends DefaultInternalAction {
         } catch (ArrayIndexOutOfBoundsException e) {
             throw new JasonException("The internal action 'drop_intention' has not received the required argument.");
         } catch (Exception e) {
-            throw new JasonException("Error in internal action 'drop_intention': " + e);
+            throw new JasonException("Error in internal action 'drop_intention': " + e, e);
         }
     }
     

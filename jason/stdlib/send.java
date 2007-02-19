@@ -201,7 +201,7 @@ public class send extends DefaultInternalAction {
             
             return true;
         } catch (Exception e) {
-            throw new JasonException("Error sending message " + m + "\nError: "+e);
+            throw new JasonException("Error sending message " + m + "\nError: "+e, e);
         }
     }
 

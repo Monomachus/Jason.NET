@@ -101,7 +101,7 @@ public class add_plan extends DefaultInternalAction {
         } catch (ArrayIndexOutOfBoundsException e) {
             throw new JasonException("The internal action 'add_plan' has not received two arguments (a plan as a string and the source).");
         } catch (Exception e) {
-            throw new JasonException("Error in internal action 'add_plan': " + e);
+            throw new JasonException("Error in internal action 'add_plan': " + e, e);
         }
     }
 }

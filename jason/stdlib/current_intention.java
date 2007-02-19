@@ -87,7 +87,7 @@ public class current_intention extends DefaultInternalAction {
         } catch (ArrayIndexOutOfBoundsException e) {
             throw new JasonException("The internal action 'current_intention' has not received the required argument.");
         } catch (Exception e) {
-            throw new JasonException("Error in internal action 'current_intention': " + e);
+            throw new JasonException("Error in internal action 'current_intention': " + e, e);
         }    
     }
 }

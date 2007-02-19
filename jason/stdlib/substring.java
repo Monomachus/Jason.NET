@@ -1,9 +1,12 @@
 
 package jason.stdlib;
 
-import jason.asSemantics.*;
-import jason.asSyntax.*;
-import java.util.logging.*;
+import jason.asSemantics.DefaultInternalAction;
+import jason.asSemantics.TransitionSystem;
+import jason.asSemantics.Unifier;
+import jason.asSyntax.NumberTermImpl;
+import jason.asSyntax.StringTerm;
+import jason.asSyntax.Term;
 
 /**
   <p>Internal action: <b><code>.substring</code></b>.

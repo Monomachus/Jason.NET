@@ -65,7 +65,7 @@ public class member extends DefaultInternalAction {
         } catch (ArrayIndexOutOfBoundsException e) {
             throw new JasonException("The internal action 'member' has not received two arguments.");
         } catch (Exception e) {
-            throw new JasonException("Error in internal action 'member': " + e);
+            throw new JasonException("Error in internal action 'member': " + e, e);
         }
     }
 }

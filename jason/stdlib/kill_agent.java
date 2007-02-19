@@ -70,8 +70,7 @@ public class kill_agent extends DefaultInternalAction {
 		} catch (IndexOutOfBoundsException e) {
 			throw new JasonException("The internal action 'kill_agent' received a wrong number of arguments.");
 		} catch (Exception e) {
-			e.printStackTrace();
+            throw new JasonException("Error in internal action 'kill_agent': " + e, e);
 		}
-		return false;
 	}
 }

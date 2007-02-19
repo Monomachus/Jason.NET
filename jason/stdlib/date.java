@@ -49,7 +49,7 @@ public class date extends DefaultInternalAction {
         } catch (ArrayIndexOutOfBoundsException e) {
             throw new JasonException("The internal action 'date' has not received three arguments.");
         } catch (Exception e) {
-            throw new JasonException("Error in internal action 'date': " + e);
+            throw new JasonException("Error in internal action 'date': " + e, e);
         }
     }
 }

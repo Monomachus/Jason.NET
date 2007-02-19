@@ -37,7 +37,10 @@ import jason.asSyntax.Trigger;
   <b><code>.fail_goal(<i>G</i>)</code></b>.
   
   <p>Description: aborts goals <i>G</i> in the agent circumstance as if a plan
-  for such goal had failed, and an event <code>-!G</code> is generated. <i>G</i>
+  for such goal had failed. Supposing that <i>G</i> is in a plan like 
+  <code>G0 &lt;- !G; ...</code>, an event <code>-!G0</code> is generated. In
+  case <i>G</i> was triggered by <code>!!G</code> (ant thus it was not a sub-goal), 
+  the generated event is <code>-!G0</code>.  <i>G</i>
   is a goal if there is a trigerring event <code>+!G</code> in any plan within
   any intention; also note that intentions can be suspended hence appearing
   in E, PA, or PI as well.
@@ -45,8 +48,9 @@ import jason.asSyntax.Trigger;
   <p>Example:<ul> 
 
   <li> <code>.fail_goal(go(1,3))</code>: aborts any attempt to achieve
-  goals such as <code>!go(1,3)</code> as if a plan for it had failed, thus
-  generating an event <code>-!g(1,3)</code>.
+  goals such as <code>!go(1,3)</code> as if a plan for it had failed. Supposing that
+  it is a sub-goal in the plan <code>get_gold(X,Y) &lt;- go(X,Y); pick.</code>, the
+  generated event is <code>-!get_gold(1,3)</code>.
 
   </ul>
 
@@ -75,26 +79,30 @@ public class fail_goal extends succeed_goal {
             throw new JasonException("The internal action 'fail_goal' has not received one argument.");
         } catch (Exception e) {
             e.printStackTrace();
-            throw new JasonException("Error in internal action 'fail_goal': " + e);
+            throw new JasonException("Error in internal action 'fail_goal': " + e, e);
         }
     }
     
     @Override
     int dropIntention(Intention i, Trigger g, TransitionSystem ts, Unifier un) throws JasonException {
-        if (i != null && i.dropGoal(g, un)) {
-            // generate failure event
-            Event failEvent = null;
-            if (!i.isFinished()) {
-                failEvent = ts.findEventForFailure(i, i.peek().getTrigger());
-            }
-            if (failEvent != null) {
-                ts.getC().addEvent(failEvent);
-                ts.getLogger().warning("'.fail_goal' is generating a goal deletion event: " + failEvent.getTrigger());
-                return 2;
-            } else {
-                ts.getLogger().warning("'.fail_goal' is removing an intention:\n" + i);
-                return 3;
-            }
+        if (i != null) {
+        	if (i.dropGoal(g, un)) {
+                // generate failure event
+	            Event failEvent = null;
+	            if (!i.isFinished()) {
+	                failEvent = ts.findEventForFailure(i, i.peek().getTrigger());
+	            } else { // it was a intention with g as the only IM (that was dropped), normally when !! is used
+	                failEvent = ts.findEventForFailure(i, g); // find fail event for the goal just dropped	            	
+	            }
+	            if (failEvent != null) {
+	                ts.getC().addEvent(failEvent);
+	                ts.getLogger().info("'.fail_goal("+g+")' is generating a goal deletion event: " + failEvent.getTrigger());
+	                return 2;
+	            } else { // i is finished or without failure plan
+	                ts.getLogger().info("'.fail_goal("+g+")' is removing the intention without event:\n" + i);
+	                return 3;
+	            }
+        	}
         }
         return 0;        
     }

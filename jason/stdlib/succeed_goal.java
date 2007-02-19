@@ -77,7 +77,7 @@ public class succeed_goal extends DefaultInternalAction {
             throw new JasonException("The internal action 'succeed_goal' has not received one argument.");
         } catch (Exception e) {
             e.printStackTrace();
-            throw new JasonException("Error in internal action 'succeed_goal': " + e);
+            throw new JasonException("Error in internal action 'succeed_goal': " + e, e);
         }
     }
     
@@ -107,25 +107,30 @@ public class succeed_goal extends DefaultInternalAction {
             Intention i = a.getIntention();
             int r = dropIntention(i, g, ts, un);
             if (r > 0) { // i was changed
-                C.dropPendingIntention(i); // remove i from PI
-                if (r == 1) { // i must continue running
-                    C.addIntention(i); // and put the intention back in I
-                }
+                C.dropPendingAction(i); // remove i from PA
+                if (r == 1) {           // i must continue running
+                    C.addIntention(i);  // and put the intention back in I
+                }                       // if r > 1, the event was generated and i will be back soon
             }
         }
         
         // dropping from Pending Intentions
         for (Intention i: C.getPendingIntentions().values()) {
             int r = dropIntention(i, g, ts, un);
-            if (r > 0) { // i was changed
-                C.dropPendingIntention(i); // remove i from PI
-                if (r == 1) { // intention i must continue running
-                    C.addIntention(i); // and put the intention back in I
+            if (r > 0) { 
+                C.dropPendingIntention(i); 
+                if (r == 1) { 
+                    C.addIntention(i); 
                 }
             }
         }
     }
     
+    /* returns: >0 the intention was changed
+     *           1 = intention must continue running
+     *           2 = fail event was generated and added in C.E
+     *           3 = simply removed without event
+     */
     int dropIntention(Intention i, Trigger g, TransitionSystem ts, Unifier un) throws JasonException {
         if (i != null && i.dropGoal(g, un)) {
         	// continue the intention
