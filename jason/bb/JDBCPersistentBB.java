@@ -32,9 +32,7 @@ public class JDBCPersistentBB extends DefaultBeliefBase {
     static private Logger                      logger     = Logger.getLogger(JDBCPersistentBB.class.getName());
 
     static final String                        COL_PREFIX = "term";
-
     static final String                        COL_NEG    = "j_negated";
-
     static final String                        COL_ANNOT  = "j_annots";
 
     Connection                                 conn;
@@ -46,12 +44,12 @@ public class JDBCPersistentBB extends DefaultBeliefBase {
      * args[0] is the Database Engine JDBC drive. args[1] is the JDBC URL
      * connection string, args[2] is the username, args[3] is the password,
      * args[4] AS list with beliefs mapped to DB, each element is in the form
-     * "bel(arity,table_name)".
+     * "bel(arity[,table_name])".
      * 
      * Example in .mas2j project:<br>
      * <code>agents: a beliefBaseClass jason.bb.JDBCPersistentBB(
      * "org.hsqldb.jdbcDriver", "jdbc:hsqldb:bookstore", "sa", "",
-     * "[book(5,book),author(2,book_author)]")</code><br>
+     * "[book(5,author(2,book_author)]")</code><br>
      */
     @Override
     public void init(Agent ag, String[] args) {
@@ -65,8 +63,11 @@ public class JDBCPersistentBB extends DefaultBeliefBase {
             ListTerm lt = ListTermImpl.parseList(args[4]);
             for (Term t : lt) {
                 Structure ts = (Structure)t;
-                int arity = Integer.parseInt(ts.getTerm(0).toString());
-                String table = ts.getTerm(1).toString();
+                int arity    = Integer.parseInt(ts.getTerm(0).toString());
+            	String table = ts.getFunctor();
+                if (ts.getTermsSize() >= 2) {
+                	table = ts.getTerm(1).toString();
+                }
 
                 // create the table and get its Metadata
                 Statement stmt = conn.createStatement();
