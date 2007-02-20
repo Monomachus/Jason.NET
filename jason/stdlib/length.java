@@ -52,6 +52,7 @@ import jason.asSyntax.Term;
   @see jason.stdlib.concat
   @see jason.stdlib.member
   @see jason.stdlib.sort
+  @see jason.stdlib.nth
 
  */
 public class length extends DefaultInternalAction {

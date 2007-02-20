@@ -69,6 +69,7 @@ import java.util.Collections;
   @see jason.stdlib.concat
   @see jason.stdlib.length
   @see jason.stdlib.member
+  @see jason.stdlib.nth
 
 */
 public class sort extends DefaultInternalAction {

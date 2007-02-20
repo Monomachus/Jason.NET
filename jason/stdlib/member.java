@@ -36,6 +36,7 @@ import java.util.List;
   @see jason.stdlib.concat
   @see jason.stdlib.length
   @see jason.stdlib.sort
+  @see jason.stdlib.nth
 
 */
 public class member extends DefaultInternalAction {
