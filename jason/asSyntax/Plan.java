@@ -225,6 +225,10 @@ public class Plan implements Cloneable, Serializable {
             copy.add((BodyLiteral) l.clone());
         }
         p.setBody(copy);
+        
+        p.startSourceLine = startSourceLine;
+        p.endSourceLine   = endSourceLine;
+
         return p;
     }
     

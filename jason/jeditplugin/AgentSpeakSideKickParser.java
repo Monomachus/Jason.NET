@@ -20,6 +20,8 @@ import errorlist.ErrorSource;
 public class AgentSpeakSideKickParser extends sidekick.SideKickParser {
 	public static final String ID = "as_parser";
 	
+	SideKickParsedData pd = null;
+
 	public AgentSpeakSideKickParser() {
 		super(ID);
 	}
@@ -40,19 +42,18 @@ public class AgentSpeakSideKickParser extends sidekick.SideKickParser {
             	parser.agent(ag);
             	
             	// create nodes 
-            	SideKickParsedData pd = new SideKickParsedData(buf.getName());
+            	pd = new SideKickParsedData(buf.getName());
             	for (Plan p: ag.getPL()) {
             		DefaultMutableTreeNode node = new PlanAsset(p, buf).createTreeNode();
             	    pd.root.add(node);
             	}          
-        		return pd;
         		
         } catch (jason.asSyntax.parser.ParseException ex) {
         	addError(ex, errorSource, buf.getPath());
         } catch (Exception e) {
         	e.printStackTrace();
         }
-    	return null;		
+      		return pd;
 	}
 
 	public static void addError(jason.asSyntax.parser.ParseException ex, DefaultErrorSource errorSource, String path) {

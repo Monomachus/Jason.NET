@@ -349,7 +349,7 @@ public class TransitionSystem {
 	                generateGoalDeletion();
 	            }
             } else {
-                    applyProcAct(); // get next action
+                applyProcAct(); // get next action
             }
         }
     }
@@ -428,7 +428,7 @@ public class TransitionSystem {
                     updateIntention();
                 }
             } catch (Exception e) {
-                logger.log(Level.SEVERE, "Error in IA ", e);
+                logger.log(Level.SEVERE, "Error in IA "+body+". Used in the plan that starst at line "+im.getPlan().getStartSourceLine()+" of "+getAg().getASLSource()+".", e);
                 ok = false;
             }
             if (!ok) {

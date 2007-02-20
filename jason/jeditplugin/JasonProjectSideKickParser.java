@@ -26,6 +26,8 @@ public class JasonProjectSideKickParser extends sidekick.SideKickParser {
 
 	List<JasonID> jasonPluginInstance = new ArrayList<JasonID>();
 	
+	SideKickParsedData pd = null;
+	
 	public JasonProjectSideKickParser() {
 		super(ID);
 	}
@@ -48,7 +50,7 @@ public class JasonProjectSideKickParser extends sidekick.SideKickParser {
             	MAS2JProject project = parser.mas();
             	
             	// create nodes 
-            	SideKickParsedData pd = new SideKickParsedData(buf.getName());
+            	pd = new SideKickParsedData(buf.getName());
             	
             	pd.root.add(new ProjectAsset("Infrastructure: ",project.getInfrastructure(), buf, INFRA_TYPE).createTreeNode());
             	if (project.getEnvClass() != null) {
@@ -67,14 +69,13 @@ public class JasonProjectSideKickParser extends sidekick.SideKickParser {
                 		jid.listModel.addElement(ap);
                 	}
             	}
-        		return pd;
         		
         } catch (jason.mas2j.parser.ParseException ex) {
         	addError(ex, errorSource, buf.getPath());
         } catch (Exception e) {
         	e.printStackTrace();
         }
-    	return null;		
+		return pd;
 	}
 
 	public static void addError(jason.mas2j.parser.ParseException ex, DefaultErrorSource errorSource, String path) {
