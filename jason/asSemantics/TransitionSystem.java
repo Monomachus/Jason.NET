@@ -428,7 +428,10 @@ public class TransitionSystem {
                     updateIntention();
                 }
             } catch (Exception e) {
-                logger.log(Level.SEVERE, "Error in IA "+body+". Used in the plan that starst at line "+im.getPlan().getStartSourceLine()+" of "+getAg().getASLSource()+".", e);
+                logger.log(Level.SEVERE, "Error in internal action "+body+", used in the plan that starst at line "+
+                		im.getPlan().getStartSourceLine()+" of "+
+                		getAg().getASLSource()+": "+
+                		e.getMessage(), e);
                 ok = false;
             }
             if (!ok) {

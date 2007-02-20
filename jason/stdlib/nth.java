@@ -56,6 +56,8 @@ public class nth extends DefaultInternalAction {
 	        return un.unifies(args[2], element);
 	    } catch (ArrayIndexOutOfBoundsException e) {
 	        throw new JasonException("The internal action 'nth' has not received three arguments.");
+	    } catch (JasonException e) {
+	    	throw e;
 	    } catch (Exception e) {
 	        throw new JasonException("Error in internal action 'nth': " + e, e);
 	    }

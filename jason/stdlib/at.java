@@ -35,6 +35,9 @@ import jason.asSyntax.StringTerm;
 import jason.asSyntax.Term;
 import jason.asSyntax.Trigger;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 /**
   <p>Internal action: <b><code>.at</code></b>.
   
@@ -124,25 +127,48 @@ public class at extends DefaultInternalAction {
         } 
     }
 	
+	private static int idCount = 0;
+	private Map<Integer,CheckDeadline> threads = new ConcurrentHashMap<Integer,CheckDeadline>();
+    
+    public void stopAllWaits() {
+    	for (CheckDeadline t: threads.values()) {
+    		t.abort();
+    	}
+    }
+    
 	class CheckDeadline extends Thread {
-        
-        private long deadline = 0;
-        private Event event;
+        		
+		private int     id = 0;
+        private long    deadline = 0;
+        private Event   event;
         private Circumstance c;
+        private boolean stopped = false;
         
         public CheckDeadline(long d, Trigger te, Circumstance c) {
+        	idCount++;
+        	this.id = idCount;
             this.deadline = d;
             this.event = new Event(te, Intention.EmptyInt);
             this.c = c;
+            
+            threads.put(id, this);
         }
         
-        public void run() {
+        synchronized public void abort() {
+        	stopped = true;
+        	notifyAll();
+        }
+        
+        synchronized public void run() {
             try {
-                sleep(deadline);
-				// add event to Circumstance.Events
-				c.addEvent(event);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+                wait(deadline);
+                if (!stopped) {
+                	// add event to Circumstance.Events
+                	c.addEvent(event);
+                }
+            } catch (InterruptedException e) {             	
+            } finally {
+            	threads.remove(id);
             }
         }
     }
