@@ -21,13 +21,18 @@ public class CheckVersion extends Thread {
     public static final String JasonSite = "http://jason.sf.net";
     String download;
     
+    int version;
+    String release; 
+    
     String getLatestVersion() {
         // read version from Jason site
         try {
             Properties p = new Properties();
             p.load(new URL(JasonSite+"/latest.properties").openStream());
             download = p.getProperty("download");
-            return p.getProperty("version") + "." + p.getProperty("release");
+            version = Integer.parseInt(p.getProperty("version"));
+            release = p.getProperty("release");
+            return version + "." + release;
         } catch (Exception ex) {
             return null;
         }
@@ -37,7 +42,7 @@ public class CheckVersion extends Thread {
         // get user version
         String cVersion = Config.get().getJasonRunningVersion();
         String lv = getLatestVersion();
-        return lv == null || cVersion.equals(lv);
+        return lv == null || cVersion.compareTo(lv) >= 0;
     }
 
     String whatsNew() {
