@@ -86,14 +86,11 @@ public class RelExpr implements LogicalFormula {
 	}
     
     public Iterator<Unifier> logicalConsequence(final Agent ag, Unifier un) {
-        Term xp = null;
-        Term yp = null;
-        if (op != RelationalOp.literalBuilder) {
-            xp = (Term)lhs.clone();
-            yp = (Term)rhs.clone();
-            xp.apply(un);
-            yp.apply(un);
-        }
+        Term xp = (Term)lhs.clone();
+        Term yp = (Term)rhs.clone();
+        xp.apply(un);
+        yp.apply(un);
+
         switch (op) {
         
         case gt : if (xp.compareTo(yp)  >  0) return LogExpr.createUnifIterator(un);  break;
@@ -106,23 +103,27 @@ public class RelExpr implements LogicalFormula {
 
         case literalBuilder: 
             try {
-                Literal p = (Literal)lhs;
-                ListTerm l = (ListTerm)rhs;
-                
+                Literal  p = (Literal)xp;  // lhs clone
+                ListTerm l = (ListTerm)yp; // rhs clone
+                //logger.info(p+" test "+l+" un="+un); 
+
                 // both are not vars, using normal unification
-                if (!lhs.isVar() && !rhs.isVar() && un.unifies((Term)p.getAsListOfTerms(), (Term)l)) {
+                if (!p.isVar() && !l.isVar() && un.unifies(p.getAsListOfTerms(), l)) {
                     return LogExpr.createUnifIterator(un);
                 }
                 
                 // first is var, second is list, var is assigned to l tranformed in literal
-                if (lhs.isVar() && rhs.isList() && un.unifies(p, Literal.newFromListOfTerms(l))) {
+                if (p.isVar() && l.isList() && un.unifies(p, Literal.newFromListOfTerms(l))) {
                     return LogExpr.createUnifIterator(un);
                 }
                 
                 // first is literal, second is var, var is assigned to l tranformed in list
-                if (lhs.isLiteral() && rhs.isVar() && un.unifies((Term)p.getAsListOfTerms(), (Term)l)) {
+                if (p.isLiteral() && l.isVar() && un.unifies(p.getAsListOfTerms(), l)) {
                     return LogExpr.createUnifIterator(un);
                 }
+
+                // both are vars, error
+                logger.log(Level.SEVERE, "Both arguments of "+lhs+" =.. "+rhs+" are variables!");
             } catch (Exception e) {
                 logger.log(Level.SEVERE, "The arguments of operator =.. are not Literal and List.", e);
             }

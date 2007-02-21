@@ -98,7 +98,7 @@ public class LogExpr implements LogicalFormula {
 	                public Unifier next() {
 	                    if (current == null) get();
 	                    Unifier a = current;
-	                    get();
+	                    current = null; //get();
 	                    return a;
 	                }
 	                private void get() {

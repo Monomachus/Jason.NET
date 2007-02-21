@@ -162,11 +162,12 @@ public class Literal extends Pred implements LogicalFormula {
                     if (current == null)
                         get();
                     Unifier a = current;
-                    get();
+                    current = null; //get();
                     return a;
                 }
 
                 private void get() {
+                    //logger.info("*"+Literal.this+" in get, ruleit =  "+ruleIt);
                     current = null;
                     
                     // try rule iterator
@@ -190,7 +191,7 @@ public class Literal extends Pred implements LogicalFormula {
                             rule = (Rule)b;
                             
                             // create a copy of this literal, ground it and 
-                            // make its vars annonim, it is
+                            // make its vars annonym, it is
                             // used to define what will be the unifier used
                             // inside the rule.
                             // Only vars from rule head should get value in the
@@ -200,10 +201,11 @@ public class Literal extends Pred implements LogicalFormula {
                             h.makeVarsAnnon();
                             Unifier ruleUn = new Unifier();
                             if (ruleUn.unifies(h, rule)) {
-                                //System.out.println("indo com "+h+" rule="+rule+" un="+ruleUn);
+                                //logger.info("go "+h+" rule="+rule+" un="+ruleUn);
                                 ruleIt = rule.getBody().logicalConsequence(ag,ruleUn);
+                                //logger.info("ruleIt for "+h+" ="+ruleIt);
                                 get();
-                                //System.out.println("get="+current+" - "+il.hasNext());
+                                //logger.info("ret from "+h+" get="+current+" - "+il.hasNext());
                                 if (current != null) { // if it get a value
                                     return;
                                 }
