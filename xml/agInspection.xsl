@@ -485,8 +485,8 @@
     <xsl:template match="list-term">
         <xsl:text>[</xsl:text>
         <xsl:for-each select="*">
+            <xsl:text><xsl:value-of select="@sep"/></xsl:text>
             <xsl:apply-templates select="." />
-            <xsl:if test="not(position()=last())"><xsl:text>,</xsl:text></xsl:if>
         </xsl:for-each>
         <xsl:text>]</xsl:text>
     </xsl:template>

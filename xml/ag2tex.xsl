@@ -49,7 +49,7 @@
 </xsl:text>
         <xsl:for-each select="literal|rule">
             <xsl:apply-templates select="." />
-			<xsl:text>.\\
+			<xsl:text>\\
 </xsl:text>
 	    </xsl:for-each>
 		<xsl:text>
@@ -216,12 +216,12 @@ Intention: </xsl:text><xsl:value-of select="@id" />
 			<xsl:text>)</xsl:text>
 		</xsl:if>
 		<xsl:if test="count(annotations) > 0">
-			<xsl:text>\small{[</xsl:text>
+			<xsl:text>\small{</xsl:text>
 			<xsl:for-each select="annotations/*">
 				<xsl:apply-templates select="." />
 				<xsl:if test="not(position()=last())">, </xsl:if>
 			</xsl:for-each>
-			<xsl:text>]}</xsl:text>
+			<xsl:text>}</xsl:text>
 		</xsl:if>
     </xsl:template>
 
@@ -242,4 +242,14 @@ Intention: </xsl:text><xsl:value-of select="@id" />
    		<xsl:value-of select="text()"/>
 		<xsl:text>}</xsl:text>
     </xsl:template>
+
+    <xsl:template match="list-term">
+        <xsl:text>[</xsl:text>
+        <xsl:for-each select="*">
+            <xsl:text><xsl:value-of select="@sep"/></xsl:text>
+            <xsl:apply-templates select="." />
+        </xsl:for-each>
+        <xsl:text>]</xsl:text>
+    </xsl:template>
+    
 </xsl:stylesheet> 

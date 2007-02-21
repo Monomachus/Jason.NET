@@ -558,8 +558,18 @@ public class ListTermImpl extends Structure implements ListTerm {
     
     public Element getAsDOM(Document document) {
         Element u = (Element) document.createElement("list-term");
+        String c = "";
         for (Term t: this) {
-            u.appendChild(t.getAsDOM(document));
+        	Element et = t.getAsDOM(document);
+        	et.setAttribute("sep", c);
+        	c = ",";
+            u.appendChild(et);
+        }
+        Term tail = getTail();
+        if (tail != null) {
+        	Element et = tail.getAsDOM(document);
+        	et.setAttribute("sep", "|");
+            u.appendChild(et);
         }
         return u;
     }
