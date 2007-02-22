@@ -43,24 +43,32 @@
 			<xsl:text>}\\
 </xsl:text>
         </xsl:if>
-		<xsl:text/>
+
 		<xsl:apply-templates select="trigger" />
-		<xsl:text>\\
-</xsl:text>
 
         <xsl:if test="count(context) > 0">
-		    <xsl:text>\>:  \> </xsl:text>
-			<xsl:apply-templates select="context" />
-		    <xsl:text>\\
+    		<xsl:text>\\
 </xsl:text>
+		    <xsl:text>\>:  \> \context{</xsl:text>
+			<xsl:apply-templates select="context" />
+		    <xsl:text>}</xsl:text>
 		</xsl:if>
         
         <xsl:if test="count(body/body-literal) > 0">
-			<xsl:text disable-output-escaping="yes">\>&lt;- \> </xsl:text>
-			<xsl:apply-templates select="body"/>
-		</xsl:if>
 		    <xsl:text>\\
-\\
+</xsl:text>
+			<xsl:text disable-output-escaping="yes">\>&lt;- \> \planbody{</xsl:text>
+			<xsl:apply-templates select="body"/>
+		    <xsl:text>}\\
+</xsl:text>
+		</xsl:if>
+
+        <xsl:if test="count(body/body-literal) = 0">
+		    <xsl:text>.\\
+</xsl:text>
+		</xsl:if>
+
+		    <xsl:text>\\
 </xsl:text>
     </xsl:template>
 
@@ -92,9 +100,8 @@
         	  </xsl:choose>
           <xsl:if test="not(position()=last())">
 			<xsl:text>;\\
-\>   \> </xsl:text>
+    </xsl:text>
 		  </xsl:if>
-          <xsl:if test="position()=last()">.</xsl:if>
         </xsl:for-each>
     </xsl:template>
 

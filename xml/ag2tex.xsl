@@ -35,7 +35,10 @@
 \newcommand{\aslstring}[1]{\textsf{#1}}
 \newcommand{\aslvar}[1]{\textit{#1}}
 \newcommand{\asllabel}[1]{\textbf{#1}}
-\newcommand{\rulebody}[1]{\mbox{\hspace{.05\linewidth}}\begin{minipage}[t]{0.95\linewidth}#1.\end{minipage}}
+\newcommand{\rulebody}[1]{\mbox{\hspace{.05\linewidth}}\begin{minipage}[t]{0.9\linewidth}#1.\end{minipage}}
+\newcommand{\context}[1]{\begin{minipage}[t]{0.9\linewidth}#1\end{minipage}}
+\newcommand{\planbody}[1]{\begin{minipage}[t]{0.9\linewidth}#1.\end{minipage}}
+
 </xsl:text>
     </xsl:template>
     
@@ -216,7 +219,7 @@ Intention: </xsl:text><xsl:value-of select="@id" />
 			<xsl:text>)</xsl:text>
 		</xsl:if>
 		<xsl:if test="count(annotations) > 0">
-			<xsl:text>\small{</xsl:text>
+			<xsl:text>{\small </xsl:text>
 			<xsl:for-each select="annotations/*">
 				<xsl:apply-templates select="." />
 				<xsl:if test="not(position()=last())">, </xsl:if>
