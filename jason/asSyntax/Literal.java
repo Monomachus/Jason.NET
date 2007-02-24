@@ -53,7 +53,6 @@ public class Literal extends Pred implements LogicalFormula {
 
 	private boolean type = LPos;
 
-
 	/** creates a positive literal */
 	public Literal(String functor) {
 		super(functor);
@@ -135,7 +134,7 @@ public class Literal extends Pred implements LogicalFormula {
                     return ((Iterator<Unifier>)oresult);
                 }
             } catch (Exception e) {
-                logger.log(Level.SEVERE,"Error in IA ",e);
+                logger.log(Level.SEVERE, getErrorMsg(ag) + ": " +	e.getMessage(), e);
             }
             return LogExpr.EMPTY_UNIF_LIST.iterator();  // empty iterator for unifier
         } else if (this == LTrue) {
@@ -240,6 +239,18 @@ public class Literal extends Pred implements LogicalFormula {
         return false;
 	}
 
+    public String getErrorMsg(Agent ag) {
+    	String line = "";
+    	if (getSrcLine() >= 0) {
+    		line = ":"+getSrcLine();
+    	}
+    	String ia = "";
+    	if (isInternalAction()) {
+    		ia = " internal action";
+    	}
+        return "Error in "+ia+"'"+this+"' ("+ ag.getASLSource() + line + ")";    	
+    }
+    
     @Override
     public int compareTo(Term t) {
         if (t.isLiteral()) {

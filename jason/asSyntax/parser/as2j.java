@@ -451,6 +451,7 @@
                       Token K; Pred p; Term t; List l; ListTerm lt;
     K = jj_consume_token(ATOM);
                       p = new Pred(K.image);
+                      p.setSrcLine(K.beginLine);
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case 37:
       jj_consume_token(37);
@@ -506,8 +507,11 @@
     case TK_NEG:
     case ATOM:
       u = literal();
-                      if (u.isAtom() && !((Literal)u).negated()) {
-                         {if (true) return new Atom(((Literal)u).getFunctor());}
+                      Literal l = (Literal)u;
+                      if (l.isAtom() && !l.negated()) {
+                         Atom a = new Atom(l.getFunctor());
+                         a.setSrcLine(l.getSrcLine());
+                         {if (true) return a;}
                       }
       break;
     case 40:
@@ -931,7 +935,7 @@
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case VAR:
       K = jj_consume_token(VAR);
-                      v = new VarTerm(K.image);
+                      v = new VarTerm(K.image); v.setSrcLine(K.beginLine);
       break;
     case UNNAMEDVAR:
       K = jj_consume_token(UNNAMEDVAR);
@@ -969,8 +973,22 @@
     finally { jj_save(0, xla); }
   }
 
+  final private boolean jj_3R_27() {
+    if (jj_3R_29()) return true;
+    return false;
+  }
+
   final private boolean jj_3R_18() {
     if (jj_scan_token(TK_FALSE)) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_24() {
+    if (jj_scan_token(40)) return true;
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_27()) jj_scanpos = xsp;
+    if (jj_scan_token(42)) return true;
     return false;
   }
 
@@ -984,11 +1002,6 @@
     return false;
   }
 
-  final private boolean jj_3R_27() {
-    if (jj_3R_29()) return true;
-    return false;
-  }
-
   final private boolean jj_3R_16() {
     Token xsp;
     xsp = jj_scanpos;
@@ -997,12 +1010,8 @@
     return false;
   }
 
-  final private boolean jj_3R_24() {
-    if (jj_scan_token(40)) return true;
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_27()) jj_scanpos = xsp;
-    if (jj_scan_token(42)) return true;
+  final private boolean jj_3R_34() {
+    if (jj_3R_36()) return true;
     return false;
   }
 
@@ -1016,11 +1025,6 @@
     if (jj_3R_18()) return true;
     }
     }
-    return false;
-  }
-
-  final private boolean jj_3R_34() {
-    if (jj_3R_36()) return true;
     return false;
   }
 
@@ -1075,24 +1079,18 @@
     return false;
   }
 
-  final private boolean jj_3R_26() {
-    if (jj_3R_24()) return true;
-    return false;
-  }
-
   final private boolean jj_3R_20() {
     if (jj_scan_token(UNNAMEDVAR)) return true;
     return false;
   }
 
-  final private boolean jj_3R_19() {
-    if (jj_scan_token(VAR)) return true;
+  final private boolean jj_3R_26() {
+    if (jj_3R_24()) return true;
     return false;
   }
 
-  final private boolean jj_3R_25() {
-    if (jj_scan_token(37)) return true;
-    if (jj_3R_28()) return true;
+  final private boolean jj_3R_19() {
+    if (jj_scan_token(VAR)) return true;
     return false;
   }
 
@@ -1108,8 +1106,19 @@
     return false;
   }
 
+  final private boolean jj_3R_25() {
+    if (jj_scan_token(37)) return true;
+    if (jj_3R_28()) return true;
+    return false;
+  }
+
   final private boolean jj_3R_42() {
     if (jj_3R_15()) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_41() {
+    if (jj_scan_token(37)) return true;
     return false;
   }
 
@@ -1120,11 +1129,6 @@
     if (jj_3R_25()) jj_scanpos = xsp;
     xsp = jj_scanpos;
     if (jj_3R_26()) jj_scanpos = xsp;
-    return false;
-  }
-
-  final private boolean jj_3R_41() {
-    if (jj_scan_token(37)) return true;
     return false;
   }
 
@@ -1177,6 +1181,11 @@
     return false;
   }
 
+  final private boolean jj_3R_37() {
+    if (jj_3R_38()) return true;
+    return false;
+  }
+
   final private boolean jj_3R_9() {
     if (jj_scan_token(32)) return true;
     return false;
@@ -1194,11 +1203,6 @@
 
   final private boolean jj_3R_6() {
     if (jj_scan_token(27)) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_37() {
-    if (jj_3R_38()) return true;
     return false;
   }
 

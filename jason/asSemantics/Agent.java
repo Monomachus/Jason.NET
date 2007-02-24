@@ -89,7 +89,9 @@ public class Agent {
 
             setTS(new TransitionSystem(this, new Circumstance(), stts, arch));
 
+            if (asSrc.startsWith("./")) asSrc = asSrc.substring(2);
             this.aslSource = asSrc;
+
             parseAS(asSrc);
             // kqml Plans at the end of the ag PS
             parseAS(JasonException.class.getResource("/asl/kqmlPlans.asl"));

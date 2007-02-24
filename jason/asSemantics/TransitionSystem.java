@@ -428,10 +428,7 @@ public class TransitionSystem {
                     updateIntention();
                 }
             } catch (Exception e) {
-                logger.log(Level.SEVERE, "Error in internal action "+body+", used in the plan that starst at line "+
-                		im.getPlan().getStartSourceLine()+" of "+
-                		getAg().getASLSource()+": "+
-                		e.getMessage(), e);
+                logger.log(Level.SEVERE, body.getErrorMsg(getAg())+": "+ e.getMessage(), e);
                 ok = false;
             }
             if (!ok) {
@@ -445,6 +442,7 @@ public class TransitionSystem {
                 im.unif = iu.next();
                 updateIntention();
             } else {
+                logger.info("Constraint "+h+" was not satisfied"+h.getSrcInfo(getAg())+".");
                 generateGoalDeletion();
             }
             break;
@@ -472,12 +470,11 @@ public class TransitionSystem {
                 Trigger te = new Trigger(Trigger.TEAdd, Trigger.TETestG, body);
                 if (ag.getPL().isRelevant(te.getPredicateIndicator())) {
                     Event evt = new Event(te, conf.C.SI);
-                    if (logger.isLoggable(Level.FINE)) {
-                        logger.fine("Test Goal '" + h + "' failed as simple query. Generating internal event for it: "+te);
-                    }
+                    logger.info("Test Goal '" + h + "' failed as simple query. Generating internal event for it: "+te);
                     conf.C.addEvent(evt);
                     confP.step = State.StartRC;
                 } else {
+                    logger.info("Test '"+h+"' failed"+h.getSrcInfo(getAg())+".");
                     generateGoalDeletion();
                 }
             }

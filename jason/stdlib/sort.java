@@ -77,12 +77,18 @@ public class sort extends DefaultInternalAction {
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         try {
-            ListTerm l1 = (ListTerm) args[0];
-            ListTerm l2 = (ListTerm) args[1];
+        	args[0].apply(un);
+        	args[1].apply(un);
+            ListTerm l1 = (ListTerm) args[0].clone();
+            if (l1.isVar()) {
+            	throw new JasonException("The first argument of .sort should not be a free variable.");
+            }
             Collections.sort(l1);
-            return un.unifies(l1, l2);
+            return un.unifies(l1, args[1]);
         } catch (ArrayIndexOutOfBoundsException e) {
             throw new JasonException("The internal action 'sort' has not received two arguments.");
+        } catch (JasonException e) {
+        	throw e;
         } catch (Exception e) {
             throw new JasonException("Error in internal action 'sort': " + e, e);
         }    

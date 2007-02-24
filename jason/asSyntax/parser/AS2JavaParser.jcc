@@ -325,7 +325,9 @@ BodyLiteral body_formula() :  { Literal A; Token k;
 /* Annotated Formulae */
 Pred pred() :       { Token K; Pred p; Term t; List l; ListTerm lt;}
 {
-  K=<ATOM>          { p = new Pred(K.image); } 
+  K=<ATOM>          { p = new Pred(K.image); 
+                      p.setSrcLine(K.beginLine);
+                    } 
   [
       "(" l = terms() 
       ")"           { p.addTerms(l); }
@@ -349,8 +351,11 @@ List terms() : { List listTerms = new ArrayList(); Term v; }
 
 Term term() :       { Term u; Object o; }
 {
-  ( u=literal()     { if (u.isAtom() && !((Literal)u).negated()) {
-                         return new Atom(((Literal)u).getFunctor());
+  ( u=literal()     { Literal l = (Literal)u;
+                      if (l.isAtom() && !l.negated()) {
+                         Atom a = new Atom(l.getFunctor());
+                         a.setSrcLine(l.getSrcLine());
+                         return a;
                       }
                     }
   | u=list()        
@@ -521,7 +526,7 @@ Object arithm_expr_simple():
 
 VarTerm var():      { Token K; VarTerm v; ListTerm lt; }
 {
- ( K = <VAR>        { v = new VarTerm(K.image); }
+ ( K = <VAR>        { v = new VarTerm(K.image); v.setSrcLine(K.beginLine); }
  | K = <UNNAMEDVAR> { v = new UnnamedVar(); }
  )
  [ 
