@@ -119,14 +119,14 @@ public class Environment {
 		}
 		List<Literal> p = new ArrayList<Literal>(size);
 		
-        if (size > 0) {
+        if (! percepts.isEmpty()) { // has global perception?
             synchronized (percepts) {
                 // make a local copy of the environment percepts
     			// Note: a deep copy will be done by BB.add
     			p.addAll(percepts);
             }
         }
-		if (agl != null) {
+		if (agl != null) { // add agent personal perception
 	        synchronized (agl) {
 				p.addAll(agl);
 	        }
@@ -157,8 +157,10 @@ public class Environment {
 	
 	/** Clears the list of global perceptions */
 	public void clearPercepts() {
-		uptodateAgs.clear();
-		percepts.clear();
+        if (!percepts.isEmpty()) {
+            uptodateAgs.clear();
+            percepts.clear();
+        }
 	}
 	
 	public boolean containsPercept(Literal per) {
