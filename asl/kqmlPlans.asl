@@ -4,7 +4,7 @@
 // Variables:
 //   S:   the sender (an atom)
 //   M:   message id (an atom)
-//   KQMLcontentVar: content (a literal)
+//   KQMLcontentVar: content (typically a literal)
 //
 
 
@@ -78,21 +78,23 @@
       .send(S, tell, List, M).
 
 
-/* ---- tell how performatives ---- */ 
+/* ---- know-how performatives ---- */ 
 
 // In tellHow, content must be a string representation
-// of the plan (or a list of strings)
+// of the plan (or a list of such strings)
 
 @kqmlReceivedTellHow
 +!kqml_received(S, tellHow, KQMLcontentVar, M)
    <- .add_plan(KQMLcontentVar, S).
 
-// In untellHow, content must be a plan's label (or a list of labels)
+// In untellHow, content must be a plan's
+// label (or a list of labels)
 @kqmlReceivedUnTellHow
 +!kqml_received(S, untellHow, KQMLcontentVar, M)
    <- .remove_plan(KQMLcontentVar, S).
 
-// In askHow, content must be a string representing the trigger event
+// In askHow, content must be a string representing
+// the triggering event
 @kqmlReceivedAskHow
 +!kqml_received(S, askHow, KQMLcontentVar, M)
    <- .relevant_plans(KQMLcontentVar, ListAsString);
