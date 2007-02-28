@@ -235,7 +235,13 @@ public class PlanLibrary implements Iterable<Plan> {
 	/** get as XML */
 	public Element getAsDOM(Document document) {
 		Element eplans = (Element) document.createElement("plans");
-		for (Plan p: plans) { 
+		String lastFunctor = null;
+		for (Plan p: plans) {
+			String currentFunctor = p.getTriggerEvent().getLiteral().getFunctor();
+			if (lastFunctor != null && !currentFunctor.equals(lastFunctor)) {
+				eplans.appendChild((Element) document.createElement("new-set-of-plans"));
+			}
+			lastFunctor = currentFunctor;
 			eplans.appendChild(p.getAsDOM(document));
 		}
 		return eplans;

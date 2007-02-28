@@ -28,7 +28,7 @@
 
 \begin{asl}
 <xsl:text/>
-		<xsl:apply-templates select="//plan"/>
+    <xsl:apply-templates select="//plans"/>
 
 		
 \end{asl}
@@ -37,41 +37,43 @@
 
 
     <xsl:template match="plan">
-	    <xsl:if test="count(label) > 0 and not(starts-with(label/literal/term/@functor,'l__'))">
+        <xsl:if test="count(label) > 0 and not(starts-with(label/literal/structure/@functor,'l__'))">
             <xsl:text>@\asllabel{</xsl:text>
-			<xsl:apply-templates select="label" />
-			<xsl:text>}\\
+            <xsl:apply-templates select="label" />
+            <xsl:text>}\\
 </xsl:text>
         </xsl:if>
 
-		<xsl:apply-templates select="trigger" />
+	<xsl:apply-templates select="trigger" />
 
         <xsl:if test="count(context) > 0">
-    		<xsl:text>\\
+            <xsl:text>\\
 </xsl:text>
-		    <xsl:text>\>:  \> \context{</xsl:text>
-			<xsl:apply-templates select="context" />
-		    <xsl:text>}</xsl:text>
-		</xsl:if>
+            <xsl:text>\>:  \> \context{</xsl:text>
+            <xsl:apply-templates select="context" />
+	    <xsl:text>}</xsl:text>
+	</xsl:if>
         
         <xsl:if test="count(body/body-literal) > 0">
-		    <xsl:text>\\
+	    <xsl:text>\\
 </xsl:text>
-			<xsl:text disable-output-escaping="yes">\>&lt;- \> \planbody{</xsl:text>
-			<xsl:apply-templates select="body"/>
-		    <xsl:text>}\\
+            <xsl:text disable-output-escaping="yes">\>&lt;- \> \planbody{</xsl:text>
+            <xsl:apply-templates select="body"/>
+	    <xsl:text>}\\
 </xsl:text>
-		</xsl:if>
+	</xsl:if>
 
         <xsl:if test="count(body/body-literal) = 0">
-		    <xsl:text>.\\
+	    <xsl:text>.\\
 </xsl:text>
-		</xsl:if>
-
-		    <xsl:text>\\
-</xsl:text>
+	</xsl:if>
     </xsl:template>
 
+    <xsl:template match="new-set-of-plans">
+	<xsl:text>\\
+</xsl:text>
+    </xsl:template>
+    
 
     <xsl:template match="body">
         <xsl:for-each select="body-literal">
