@@ -32,9 +32,6 @@ import org.gjt.sp.jedit.EBMessage;
 import org.gjt.sp.jedit.EBPlugin;
 import org.gjt.sp.jedit.gui.DockableWindowManager;
 import org.gjt.sp.jedit.msg.BufferUpdate;
-import org.gjt.sp.util.Log;
-
-import sidekick.SideKickPlugin;
 
 public class JasonIDPlugin extends EBPlugin {
     public static final String NAME            = "jason";
@@ -44,8 +41,7 @@ public class JasonIDPlugin extends EBPlugin {
 
     static {
         try {
-            Class.forName(JasonIDOptionPanel.class.getName()); // just to run
-                                                                // static init
+            Class.forName(JasonIDOptionPanel.class.getName()); // just to run static init
         } catch (Exception e) {
         }
     }
@@ -72,7 +68,7 @@ public class JasonIDPlugin extends EBPlugin {
             BufferUpdate bu = (BufferUpdate) msg;
             if ((bu.getWhat() == BufferUpdate.LOADED || bu.getWhat() == BufferUpdate.CREATED)) {
                 if (bu.getBuffer().getPath().endsWith(MAS2JProject.EXT)) {
-                    bu.getBuffer().setProperty("sidekick.parser", JasonProjectSideKickParser.ID);
+                    //bu.getBuffer().setProperty("sidekick.parser", JasonProjectSideKickParser.ID);
 
                     if (Config.get().getBoolean(Config.CLOSEALL) && org.gjt.sp.jedit.jEdit.getViews().length > 0) {
                         // close all other files
@@ -84,27 +80,30 @@ public class JasonIDPlugin extends EBPlugin {
                         }
                     }
                 }
-                if (bu.getBuffer().getPath().endsWith(MAS2JProject.AS_EXT)) {
-                    bu.getBuffer().setProperty("sidekick.parser", AgentSpeakSideKickParser.ID);
-                }
+                //if (bu.getBuffer().getPath().endsWith(MAS2JProject.AS_EXT)) {
+                	//bu.getBuffer().setProperty("sidekick.parser", AgentSpeakSideKickParser.ID);
+                //}
             }
         }
     }
 
-    static AgentSpeakSideKickParser   asskp = new AgentSpeakSideKickParser();
-    static JasonProjectSideKickParser jpskp = new JasonProjectSideKickParser();
+    //static AgentSpeakSideKickParser   asskp = new AgentSpeakSideKickParser();
+    //static JasonProjectSideKickParser jpskp = new JasonProjectSideKickParser();
 
     public void start() {
+    	/*
         SideKickPlugin.registerParser(asskp);
         SideKickPlugin.registerParser(jpskp);
         Log.log(Log.DEBUG, this, "Registered " + asskp);
         Log.log(Log.DEBUG, this, "Registered " + jpskp);
-
+		*/
         handleMessage(null);
     }
 
+	/*
     public void stop() {
         SideKickPlugin.unregisterParser(asskp);
         SideKickPlugin.unregisterParser(jpskp);
     }
+    */
 }

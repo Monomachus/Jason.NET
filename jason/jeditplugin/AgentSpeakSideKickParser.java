@@ -18,7 +18,7 @@ import errorlist.DefaultErrorSource;
 import errorlist.ErrorSource;
 
 public class AgentSpeakSideKickParser extends sidekick.SideKickParser {
-	public static final String ID = "as_parser";
+	public static final String ID = "asl";
 	
 	SideKickParsedData pd = null;
 
@@ -36,24 +36,24 @@ public class AgentSpeakSideKickParser extends sidekick.SideKickParser {
 		}
 
         try {
-            	jason.asSyntax.parser.as2j parser = new jason.asSyntax.parser.as2j(new StringReader(text));
-            	
-            	Agent ag = new Agent();
-            	parser.agent(ag);
-            	
-            	// create nodes 
-            	pd = new SideKickParsedData(buf.getName());
-            	for (Plan p: ag.getPL()) {
-            		DefaultMutableTreeNode node = new PlanAsset(p, buf).createTreeNode();
-            	    pd.root.add(node);
-            	}          
+        	jason.asSyntax.parser.as2j parser = new jason.asSyntax.parser.as2j(new StringReader(text));
+        	
+        	Agent ag = new Agent();
+        	parser.agent(ag);
+        	
+        	// create nodes 
+        	pd = new SideKickParsedData(buf.getName());
+        	for (Plan p: ag.getPL()) {
+        		DefaultMutableTreeNode node = new PlanAsset(p, buf).createTreeNode();
+        	    pd.root.add(node);
+        	}          
         		
         } catch (jason.asSyntax.parser.ParseException ex) {
         	addError(ex, errorSource, buf.getPath());
         } catch (Exception e) {
-        	e.printStackTrace();
+        	System.out.println(e);
         }
-      		return pd;
+        return pd;
 	}
 
 	public static void addError(jason.asSyntax.parser.ParseException ex, DefaultErrorSource errorSource, String path) {
@@ -82,15 +82,14 @@ public class AgentSpeakSideKickParser extends sidekick.SideKickParser {
 		public PlanAsset(Plan p, Buffer buf) {
 			//super(((p.getLabel() == null) ? "" : "@" + p.getLabel() + " ") 	+ p.getTriggerEvent());
 			super(p.getTriggerEvent().toString());
-			this.plan = p;
+			this.plan  = p;
 			this.start = toPos(buf, p.getStartSourceLine());
-			this.end = toPos(buf, p.getEndSourceLine());
+			this.end   = toPos(buf, p.getEndSourceLine());
 		}
 
 		public Icon getIcon() {
 			if (PLAN_ICON == null) {
-				PLAN_ICON = new ImageIcon(AgentSpeakSideKickParser.class
-						.getResource("/images/plan.png"));
+				PLAN_ICON = new ImageIcon(AgentSpeakSideKickParser.class.getResource("/images/plan.png"));
 			}
 			return PLAN_ICON;
 		}

@@ -7,9 +7,9 @@
 
 <MODES>
 
-<MODE NAME="AgentSpeak"	        FILE="agentSpeak.xml"
+<MODE NAME="asl"	        FILE="agentSpeak.xml"
 				FILE_NAME_GLOB="*.asl" />
-<MODE NAME="JasonProject"       FILE="jasonProject.xml"
+<MODE NAME="mas2j"       FILE="jasonProject.xml"
 				FILE_NAME_GLOB="*.mas2j" />
 
 <MODE NAME="actionscript"	FILE="actionscript.xml"

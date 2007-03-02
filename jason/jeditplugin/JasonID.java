@@ -82,23 +82,13 @@ public class JasonID extends JPanel implements EBComponent, RunProjectListener {
 	private static final long serialVersionUID = 1L;
 
 	View                 view;
-
     OutputStreamAdapter  myOut;
-
-    // RunProject runner = null;
-
     JTextArea            textArea;
-
     AnimatedIcon         animation;
-
     JButton              btStop;
-
     JButton              btRun;
-
     JButton              btDebug;
-
     DefaultListModel     listModel   = new DefaultListModel();
-
     JList                lstAgs      = new JList(listModel);
 
     DefaultErrorSource   errorSource = null;
@@ -143,7 +133,7 @@ public class JasonID extends JPanel implements EBComponent, RunProjectListener {
         myOut.setAsDefaultOut();
 
         // add myself in project parser
-        JasonIDPlugin.jpskp.addPluginInstance(this);
+        JasonProjectSideKickParser.addPluginInstance(this);
 
         new CheckVersion().start();
     }

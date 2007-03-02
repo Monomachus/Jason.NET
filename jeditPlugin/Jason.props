@@ -1,15 +1,16 @@
 ### Plugin properties
 
 plugin.jason.jeditplugin.JasonIDPlugin.name=Jason
-plugin.jason.jeditplugin.JasonIDPlugin.version=0.1
+plugin.jason.jeditplugin.JasonIDPlugin.version=0.2
 plugin.jason.jeditplugin.JasonIDPlugin.author=Jomi F. Hubner
 plugin.jason.jeditplugin.JasonIDPlugin.docs=index.html
 plugin.jason.jeditplugin.JasonIDPlugin.activate=startup
 
-plugin.jason.jeditplugin.JasonIDPlugin.depend.0=jedit 04.02.10.00
-plugin.jason.jeditplugin.JasonIDPlugin.depend.1=plugin errorlist.ErrorListPlugin 1.4
+plugin.jason.jeditplugin.JasonIDPlugin.depend.0=jedit 04.02.00.00
+plugin.jason.jeditplugin.JasonIDPlugin.depend.1=jdk 1.5
+plugin.jason.jeditplugin.JasonIDPlugin.depend.2=plugin errorlist.ErrorListPlugin 1.4
 #plugin.jason.jeditplugin.JasonIDPlugin.depend.1=plugin projectviewer.ProjectPlugin 2.1
-plugin.jason.jeditplugin.JasonIDPlugin.depend.1=plugin sidekick.SideKickPlugin 0.2
+plugin.jason.jeditplugin.JasonIDPlugin.depend.3=plugin sidekick.SideKickPlugin 0.3.4
 
 
 # application menu items
@@ -53,6 +54,7 @@ options.general.code=new jason.jeditplugin.JasonIDOptionPanel();
 #jason.debug-mas.icon=Debug MAS
 #jason.stop-mas.icon=Stop current running MAS
 
-sidekick.parser.jason_parser.label=Jason
-mode.asl.sidekick.parser=jason_parser
-mode.mas2j.sidekick.parser=jason_parser
+sidekick.parser.asl.label=AgentSpeak
+mode.asl.sidekick.parser=asl
+sidekick.parser.mas2j_parser.label=JasonProject
+mode.mas2j.sidekick.parser=mas2j

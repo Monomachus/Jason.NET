@@ -6,8 +6,8 @@ import jason.mas2j.parser.mas2j;
 
 import java.io.File;
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.swing.Icon;
 import javax.swing.text.Position;
@@ -22,9 +22,9 @@ import errorlist.DefaultErrorSource;
 import errorlist.ErrorSource;
 
 public class JasonProjectSideKickParser extends sidekick.SideKickParser {
-	public static final String ID = "jason_parser";
+	public static final String ID = "mas2j";
 
-	List<JasonID> jasonPluginInstance = new ArrayList<JasonID>();
+	static Set<JasonID> jasonPluginInstance = new HashSet<JasonID>();
 	
 	SideKickParsedData pd = null;
 	
@@ -32,7 +32,7 @@ public class JasonProjectSideKickParser extends sidekick.SideKickParser {
 		super(ID);
 	}
 	
-	public void addPluginInstance(JasonID p) {
+	public static void addPluginInstance(JasonID p) {
 		jasonPluginInstance.add(p);
 	}
 	
