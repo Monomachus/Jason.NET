@@ -9,7 +9,6 @@ plugin.jason.jeditplugin.JasonIDPlugin.activate=startup
 plugin.jason.jeditplugin.JasonIDPlugin.depend.0=jedit 04.02.00.00
 plugin.jason.jeditplugin.JasonIDPlugin.depend.1=jdk 1.5
 plugin.jason.jeditplugin.JasonIDPlugin.depend.2=plugin errorlist.ErrorListPlugin 1.4
-#plugin.jason.jeditplugin.JasonIDPlugin.depend.1=plugin projectviewer.ProjectPlugin 2.1
 plugin.jason.jeditplugin.JasonIDPlugin.depend.3=plugin sidekick.SideKickPlugin 0.3.4
 
 
@@ -48,13 +47,7 @@ plugin.jason.jeditplugin.JasonIDPlugin.option-pane=general
 options.general.label=Jason
 options.general.code=new jason.jeditplugin.JasonIDOptionPanel();
 
-
 # plugin toolbar buttons
 #jason.run-mas.icon=run.png
 #jason.debug-mas.icon=Debug MAS
 #jason.stop-mas.icon=Stop current running MAS
-
-sidekick.parser.asl.label=AgentSpeak
-mode.asl.sidekick.parser=asl
-sidekick.parser.mas2j_parser.label=JasonProject
-mode.mas2j.sidekick.parser=mas2j
