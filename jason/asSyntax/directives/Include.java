@@ -25,9 +25,8 @@ public class Include implements Directive {
     boolean processInclude(String asFileName, List bels, PlanLibrary pl) {
         try {
             as2j parser = new as2j(new FileInputStream(asFileName));
-            parser.belief_base(bels);
-            PlanLibrary newPl = parser.plan_base(bels);
-            pl.addAll(newPl);
+            parser.belief_base(bels, pl);
+            parser.plan_base(bels, pl);
             logger.fine("as2j: AgentSpeak program '"+asFileName+"' parsed successfully!");
             return true;
         } catch (FileNotFoundException e) {

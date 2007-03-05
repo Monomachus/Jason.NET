@@ -108,11 +108,12 @@ TOKEN : {
 
 /* AgentSpeak Grammar */
 
-void agent(Agent a) : { List bbl = new LinkedList(); PlanLibrary pp;  }
+void agent(Agent a) : { List bbl       = new LinkedList(); 
+                        PlanLibrary pp = new PlanLibrary(); }
 {
-  belief_base(bbl)
+  belief_base(bbl, pp)
   initial_goals(a)
-  pp = plan_base(bbl)
+  plan_base(bbl, pp)
   <EOF>
               { if (a != null) {
                   try {
@@ -132,13 +133,16 @@ void agent(Agent a) : { List bbl = new LinkedList(); PlanLibrary pp;  }
 
 
 /* Beliefs & Rules */
-void belief_base(List bbl) : { Literal h; Object t; }
+void belief_base(List bbl, PlanLibrary pp) : { Literal h; Object t; }
 {
-  ( h=literal()
-    [
-      ":-" t = log_expr()    { h = new Rule(h,(LogicalFormula)t); }
-    ] 
-    "."                      { bbl.add(h);  } 
+  ( ( h=literal()
+      [
+        ":-" t = log_expr()    { h = new Rule(h,(LogicalFormula)t); }
+      ] 
+      "."                      { bbl.add(h);  } 
+    |
+      directive(bbl, pp)
+    )
   )*
 }
 
@@ -155,8 +159,8 @@ void initial_goals(Agent a) : { Literal g; }
 }
 
 /* Plans */
-PlanLibrary plan_base(List bbl) : { PlanLibrary pp = new PlanLibrary(); 
-                                    Plan pl;
+void plan_base(List bbl, PlanLibrary pp) : 
+                                  { Plan pl;
                                     Pred dir;
                                     Pred lastBegin = null;
                                     List plansForDirective = null;
@@ -190,7 +194,6 @@ PlanLibrary plan_base(List bbl) : { PlanLibrary pp = new PlanLibrary();
                    { if (lastBegin != null) {
                         throw new ParseException("The directive '"+lastBegin+"' does not finish with an 'end'.");
                      }
-                     return pp; 
                    }
 }
 
@@ -204,7 +207,7 @@ Pred directive(List bbl, PlanLibrary pl) :
 {
   "{"
    d1 = pred()     { isBegin = d1.getFunctor().equals("begin");
-                     isEnd = d1.getFunctor().equals("end");
+                     isEnd   = d1.getFunctor().equals("end");
                    }
    [ d2 = pred() 
                    { if (!isBegin) {
