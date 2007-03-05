@@ -37,19 +37,19 @@ import jason.asSyntax.Trigger;
   <b><code>.fail_goal(<i>G</i>)</code></b>.
   
   <p>Description: aborts goals <i>G</i> in the agent circumstance as if a plan
-  for such goal had failed. Supposing that <i>G</i> is in a plan like 
+  for such goal had failed. Assuming that one of the plans requiring <i>G</i> was 
   <code>G0 &lt;- !G; ...</code>, an event <code>-!G0</code> is generated. In
-  case <i>G</i> was triggered by <code>!!G</code> (ant thus it was not a sub-goal), 
-  the generated event is <code>-!G0</code>.  <i>G</i>
+  case <i>G</i> was triggered by <code>!!G</code> or an "achieve" performative (and therefore it was not a subgoal), 
+  the generated event is <code>-!G</code>.  A literal <i>G</i>
   is a goal if there is a trigerring event <code>+!G</code> in any plan within
   any intention; also note that intentions can be suspended hence appearing
-  in E, PA, or PI as well.
+  in sets E, PA, or PI of the agent's circumstance as well.
 
   <p>Example:<ul> 
 
   <li> <code>.fail_goal(go(1,3))</code>: aborts any attempt to achieve
-  goals such as <code>!go(1,3)</code> as if a plan for it had failed. Supposing that
-  it is a sub-goal in the plan <code>get_gold(X,Y) &lt;- go(X,Y); pick.</code>, the
+  goals such as <code>!go(1,3)</code> as if a plan for it had failed. Assuming that
+  it is a subgoal in the plan <code>get_gold(X,Y) &lt;- go(X,Y); pick.</code>, the
   generated event is <code>-!get_gold(1,3)</code>.
 
   </ul>
