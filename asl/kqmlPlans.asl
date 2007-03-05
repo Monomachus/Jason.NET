@@ -48,7 +48,7 @@
 @kqmlReceivedAchieve
 +!kqml_received(KQML_Sender_Var, achieve, KQML_Content_Var, KQML_Msg_Id_Var)
    <- .add_annot(KQML_Content_Var, source(KQML_Sender_Var), CA); 
-      !CA.
+      !!CA.
 
 @kqmlReceivedUnAchieve[atomic]
 +!kqml_received(KQML_Sender_Var, unachieve, KQML_Content_Var, KQML_Msg_Id_Var)
