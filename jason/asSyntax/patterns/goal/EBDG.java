@@ -1,11 +1,17 @@
 package jason.asSyntax.patterns.goal;
 
-import jason.asSyntax.*;
+import jason.asSemantics.Agent;
+import jason.asSyntax.BodyLiteral;
+import jason.asSyntax.Literal;
+import jason.asSyntax.LogExpr;
+import jason.asSyntax.LogicalFormula;
+import jason.asSyntax.NumberTermImpl;
+import jason.asSyntax.Plan;
+import jason.asSyntax.Pred;
 import jason.asSyntax.BodyLiteral.BodyType;
 import jason.asSyntax.LogExpr.LogicalOp;
 import jason.asSyntax.directives.Directive;
 
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -18,16 +24,18 @@ public class EBDG implements Directive {
 
     static Logger logger = Logger.getLogger(EBDG.class.getName());
     
-    public boolean process(Pred directive, List<Plan> innerPlans, List<Literal> bels, PlanLibrary pl) {
+    public Agent process(Pred directive, Agent ag) {
         try {
+            Agent newAg = new Agent();
+            
             Literal goal = Literal.parseLiteral(directive.getTerm(0).toString());
 
             // add +!g : g <- true.
-            pl.add(Plan.parse("+!"+goal+" : " +goal+"."));
+            newAg.getPL().add(Plan.parse("+!"+goal+" : " +goal+"."));
             
             // change all inner plans
             int i = 0;
-            for (Plan p: innerPlans) {
+            for (Plan p: ag.getPL()) {
                 i++;
                 // create p__f(i,g)
                 Literal pi = new Literal("p__f");
@@ -49,23 +57,23 @@ public class EBDG implements Directive {
                 // add ?g
                 BodyLiteral b2 = new BodyLiteral(BodyType.test, (Literal)goal.clone());
                 p.getBody().add(b2);
-                pl.add(p);
+                newAg.getPL().add(p);
             }
             
 
             // add -!g : true <- !!g.
-            pl.add(Plan.parse("-!"+goal+" <- !!"+goal+"."));
+            newAg.getPL().add(Plan.parse("-!"+goal+" <- !!"+goal+"."));
 
             // add +g : true <- .abolish(p__f(_,g)); .succeed_goal(g).
-            pl.add(Plan.parse("+"+goal+" <- .abolish(p__f(_,"+goal+")); .succeed_goal("+goal+")."));
+            newAg.getPL().add(Plan.parse("+"+goal+" <- .abolish(p__f(_,"+goal+")); .succeed_goal("+goal+")."));
 
             // add -g <- .abolish(p__f(_,g)).
-            pl.add(Plan.parse("-"+goal+" <- .abolish(p__f(_,"+goal+"))."));
+            newAg.getPL().add(Plan.parse("-"+goal+" <- .abolish(p__f(_,"+goal+"))."));
             
-            return true;
+            return newAg;
         } catch (Exception e) {
             logger.log(Level.SEVERE,"Directive DG error.", e);
         }
-        return false;
+        return null;
     }
 }

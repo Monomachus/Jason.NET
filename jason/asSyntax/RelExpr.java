@@ -108,22 +108,26 @@ public class RelExpr implements LogicalFormula {
                 //logger.info(p+" test "+l+" un="+un); 
 
                 // both are not vars, using normal unification
-                if (!p.isVar() && !l.isVar() && un.unifies(p.getAsListOfTerms(), l)) {
-                    return LogExpr.createUnifIterator(un);
-                }
+                if (!p.isVar() && !l.isVar()) {
+                	if (un.unifies(p.getAsListOfTerms(), l)) {
+                		return LogExpr.createUnifIterator(un);
+                	}
+                } else {
                 
-                // first is var, second is list, var is assigned to l tranformed in literal
-                if (p.isVar() && l.isList() && un.unifies(p, Literal.newFromListOfTerms(l))) {
-                    return LogExpr.createUnifIterator(un);
-                }
-                
-                // first is literal, second is var, var is assigned to l tranformed in list
-                if (p.isLiteral() && l.isVar() && un.unifies(p.getAsListOfTerms(), l)) {
-                    return LogExpr.createUnifIterator(un);
+	                // first is var, second is list, var is assigned to l tranformed in literal
+	                if (p.isVar() && l.isList() && un.unifies(p, Literal.newFromListOfTerms(l))) {
+	                    return LogExpr.createUnifIterator(un);
+	                }
+	                
+	                // first is literal, second is var, var is assigned to l tranformed in list
+	                if (p.isLiteral() && l.isVar() && un.unifies(p.getAsListOfTerms(), l)) {
+	                    return LogExpr.createUnifIterator(un);
+	                }
+
+	                // both are vars, error
+	                logger.log(Level.SEVERE, "Both arguments of "+lhs+" =.. "+rhs+" are variables!");
                 }
 
-                // both are vars, error
-                logger.log(Level.SEVERE, "Both arguments of "+lhs+" =.. "+rhs+" are variables!");
             } catch (Exception e) {
                 logger.log(Level.SEVERE, "The arguments of operator =.. are not Literal and List.", e);
             }

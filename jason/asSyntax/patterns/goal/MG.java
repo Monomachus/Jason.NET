@@ -1,10 +1,12 @@
 package jason.asSyntax.patterns.goal;
 
-import jason.asSyntax.*;
+import jason.asSemantics.Agent;
+import jason.asSyntax.Literal;
+import jason.asSyntax.Plan;
+import jason.asSyntax.Pred;
 import jason.asSyntax.directives.Directive;
 import jason.asSyntax.directives.DirectiveProcessor;
 
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -17,7 +19,7 @@ public class MG implements Directive {
 
     static Logger logger = Logger.getLogger(MG.class.getName());
     
-    public boolean process(Pred directive, List<Plan> innerPlans, List<Literal> bels, PlanLibrary pl) {
+    public Agent process(Pred directive, Agent ag) {
         try {
             Literal goal = Literal.parseLiteral(directive.getTerm(0).toString());
             Literal subDir;
@@ -28,19 +30,20 @@ public class MG implements Directive {
             }
             Directive sd = DirectiveProcessor.getDirective(subDir.getFunctor());
 
-            // add bel g
-            bels.add(goal);
-            
-            // add -g : true <- !g.
-            pl.add(Plan.parse("-"+goal+" <- !"+goal+"."));
-
             // apply sub directive
-            if (sd.process(subDir, innerPlans, bels, pl)) {
-                return true;
+            Agent newAg = sd.process(subDir, ag); 
+            if (newAg != null) {
+                // add bel g
+            	newAg.addInitialBel(goal);
+
+                // add -g : true <- !g.
+                newAg.getPL().add(Plan.parse("-"+goal+" <- !"+goal+"."));
+
+            	return newAg;
             }
         } catch (Exception e) {
             logger.log(Level.SEVERE,"Directive error.", e);
         }
-        return false;
+        return null;
     }
 }

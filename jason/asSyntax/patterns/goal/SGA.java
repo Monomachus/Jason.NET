@@ -1,9 +1,15 @@
 package jason.asSyntax.patterns.goal;
 
-import jason.asSyntax.*;
+import jason.asSemantics.Agent;
+import jason.asSyntax.LogExpr;
+import jason.asSyntax.LogicalFormula;
+import jason.asSyntax.Plan;
+import jason.asSyntax.Pred;
+import jason.asSyntax.StringTerm;
+import jason.asSyntax.Term;
+import jason.asSyntax.Trigger;
 import jason.asSyntax.directives.Directive;
 
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -16,31 +22,33 @@ public class SGA implements Directive {
 
     static Logger logger = Logger.getLogger(SGA.class.getName());
     
-    public boolean process(Pred directive, List<Plan> innerPlans, List<Literal> bels, PlanLibrary pl) {
+    public Agent process(Pred directive, Agent ag) {
         try {
             Trigger trigger = Trigger.parseTrigger(((StringTerm)directive.getTerm(0)).getString());
             LogicalFormula context = LogExpr.parseExpr(((StringTerm)directive.getTerm(1)).getString());
             Term goal = directive.getTerm(2);
+            
+            Agent newAg = new Agent();
 
             // add t : not f__l(_) & c <- !f__g(g).
-            pl.add(Plan.parse(trigger+" : not f__l(_) & " +context +" <- !f__g("+goal+")."));
+            newAg.getPL().add(Plan.parse(trigger+" : not f__l(_) & " +context +" <- !f__g("+goal+")."));
             
             // add t : f__l(_) & c <- +f__l(g).
-            pl.add(Plan.parse(trigger+" : f__l(_) & (" +context +") <- +f__l("+goal+")."));
+            newAg.getPL().add(Plan.parse(trigger+" : f__l(_) & (" +context +") <- +f__l("+goal+")."));
             
             // add +!fg(g) : true <- +fl(g); !g; -fl(g)
-            pl.add(Plan.parse("+!f__g("+goal+") <- +f__l("+goal+"); !"+goal+"; -f__l("+goal+")."));            
+            newAg.getPL().add(Plan.parse("+!f__g("+goal+") <- +f__l("+goal+"); !"+goal+"; -f__l("+goal+")."));            
             
             // add -!fg(g) : true <- -fl(g)
-            pl.add(Plan.parse("-!f__g("+goal+") <- -f__l("+goal+")."));            
+            newAg.getPL().add(Plan.parse("-!f__g("+goal+") <- -f__l("+goal+")."));            
 
             // add -fl(_) : fg(g) <- !fg(g)
-            pl.add(Plan.parse("-f__l("+goal+") : f__l("+goal+") <- !f__g("+goal+")."));            
+            newAg.getPL().add(Plan.parse("-f__l("+goal+") : f__l("+goal+") <- !f__g("+goal+")."));            
 
-            return true;
+            return newAg;
         } catch (Exception e) {
             logger.log(Level.SEVERE,"Directive DG error.", e);
         }
-        return false;
+        return null;
     }
 }

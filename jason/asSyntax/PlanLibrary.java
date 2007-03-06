@@ -150,6 +150,12 @@ public class PlanLibrary implements Iterable<Plan> {
 			add(p);
 		}
 	}
+
+	public void addAll(List<Plan> plans) throws JasonException {
+		for (Plan p: plans) { 
+			add(p);
+		}
+	}
     
 	/** return a plan for a label */
     public Plan get(String label) {

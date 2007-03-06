@@ -1,5 +1,6 @@
 package test;
 
+import jason.JasonException;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.ArithExpr;
 import jason.asSyntax.ListTerm;
@@ -95,45 +96,36 @@ public class ExprTermTest extends TestCase {
         assertEquals(t1.toString(), "p(3)");
     }
 
-	public static void main(String[] a) {
-		new ExprTermTest().testLiteralBuilder();
-	}
+    public void testLiteralBuilder() throws JasonException {
+        Literal l = Literal.parseLiteral("~p(t1,t2)[a1,a2]");
+        assertEquals(l.getAsListOfTerms().size(), 3);
 
-    public void testLiteralBuilder() {
-        try {
-            Literal l = Literal.parseLiteral("~p(t1,t2)[a1,a2]");
-            assertEquals(l.getAsListOfTerms().size(), 3);
+        ListTerm lt1 = ListTermImpl.parseList("[~p,[t1,t2],[a1,a2]]");
+        assertTrue(l.equals(Literal.newFromListOfTerms(lt1)));
+        ListTerm lt2 = ListTermImpl.parseList("[p,[t1,t2],[a1,a2]]");
+        assertFalse(l.equals(Literal.newFromListOfTerms(lt2)));
+        ListTerm lt3 = ListTermImpl.parseList("[~p,[t1,t2],[a1,a2,a3]]");
+        assertFalse(l.equals(Literal.newFromListOfTerms(lt3)));
 
-            ListTerm lt1 = ListTermImpl.parseList("[~p,[t1,t2],[a1,a2]]");
-            assertTrue(l.equals(Literal.newFromListOfTerms(lt1)));
-            ListTerm lt2 = ListTermImpl.parseList("[p,[t1,t2],[a1,a2]]");
-            assertFalse(l.equals(Literal.newFromListOfTerms(lt2)));
-            ListTerm lt3 = ListTermImpl.parseList("[~p,[t1,t2],[a1,a2,a3]]");
-            assertFalse(l.equals(Literal.newFromListOfTerms(lt3)));
+        Unifier u = new Unifier();
+        assertFalse(u.unifies(lt1, lt2));
 
-            Unifier u = new Unifier();
-            assertFalse(u.unifies(lt1, lt2));
+        assertTrue(new RelExpr(l, RelExpr.RelationalOp.literalBuilder, lt1).logicalConsequence(null, u).hasNext());
+        assertFalse(new RelExpr(l, RelExpr.RelationalOp.literalBuilder, lt2).logicalConsequence(null, u).hasNext());
+        assertFalse(new RelExpr(l, RelExpr.RelationalOp.literalBuilder, lt3).logicalConsequence(null, u).hasNext());
 
-            assertTrue(new RelExpr(l, RelExpr.RelationalOp.literalBuilder, lt1).logicalConsequence(null, u).hasNext());
-            assertFalse(new RelExpr(l, RelExpr.RelationalOp.literalBuilder, lt2).logicalConsequence(null, u).hasNext());
-            assertFalse(new RelExpr(l, RelExpr.RelationalOp.literalBuilder, lt3).logicalConsequence(null, u).hasNext());
+        VarTerm v = new VarTerm("X");
+        u.clear();
+        assertTrue(new RelExpr(v, RelExpr.RelationalOp.literalBuilder, lt1).logicalConsequence(null, u).hasNext());
+        assertEquals(u.get("X").toString(), l.toString());
+        assertEquals(u.get("X"), l);
+        assertEquals(l, u.get("X"));
 
-            VarTerm v = new VarTerm("X");
-            u.clear();
-            assertTrue(new RelExpr(v, RelExpr.RelationalOp.literalBuilder, lt1).logicalConsequence(null, u).hasNext());
-            assertEquals(u.get("X").toString(), l.toString());
-            assertEquals(u.get("X"), l);
-            assertEquals(l, u.get("X"));
-
-            u.clear();
-            assertTrue(new RelExpr(l, RelExpr.RelationalOp.literalBuilder, v).logicalConsequence(null, u).hasNext());
-            assertEquals(u.get("X").toString(), lt1.toString());
-            assertEquals(u.get("X"), lt1);
-            assertEquals(lt1, u.get("X"));
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        u.clear();
+        assertTrue(new RelExpr(l, RelExpr.RelationalOp.literalBuilder, v).logicalConsequence(null, u).hasNext());
+        assertEquals(u.get("X").toString(), lt1.toString());
+        assertEquals(u.get("X"), lt1);
+        assertEquals(lt1, u.get("X"));
     }
 
 }

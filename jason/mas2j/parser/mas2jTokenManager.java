@@ -1513,14 +1513,12 @@ protected SimpleCharStream input_stream;
 private final int[] jjrounds = new int[77];
 private final int[] jjstateSet = new int[154];
 protected char curChar;
-public mas2jTokenManager(SimpleCharStream stream)
-{
+public mas2jTokenManager(SimpleCharStream stream){
    if (SimpleCharStream.staticFlag)
       throw new Error("ERROR: Cannot use a static CharStream class with a non-static lexical analyzer.");
    input_stream = stream;
 }
-public mas2jTokenManager(SimpleCharStream stream, int lexState)
-{
+public mas2jTokenManager(SimpleCharStream stream, int lexState){
    this(stream);
    SwitchTo(lexState);
 }

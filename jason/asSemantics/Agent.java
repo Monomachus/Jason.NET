@@ -26,6 +26,7 @@ package jason.asSemantics;
 import jason.JasonException;
 import jason.architecture.AgArch;
 import jason.asSyntax.Literal;
+import jason.asSyntax.Plan;
 import jason.asSyntax.PlanLibrary;
 import jason.asSyntax.Structure;
 import jason.asSyntax.Trigger;
@@ -73,6 +74,9 @@ public class Agent {
     protected TransitionSystem fTS = null;
 
     protected String aslSource = null;
+    
+    private List<Literal> initialGoals = new ArrayList<Literal>(); // initial goals in the source code
+    private List<Literal> initialBels  = new ArrayList<Literal>(); // initial beliefs in the source code
 
     private Logger logger = Logger.getLogger(Agent.class.getName());
 
@@ -96,6 +100,16 @@ public class Agent {
             // kqml Plans at the end of the ag PS
             parseAS(JasonException.class.getResource("/asl/kqmlPlans.asl"));
 
+            // add initial bels events
+            for (Literal b: initialBels) {
+            	addBel(b);
+            }
+
+            // add initial goals events
+            for (Literal g: initialGoals) {
+            	getTS().getC().addAchvGoal(g,Intention.EmptyInt);
+            }
+            
             return fTS;
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error creating the agent class!", e);
@@ -126,7 +140,7 @@ public class Agent {
             return true;
         } catch (IOException e) {
             logger.log(Level.SEVERE, "as2j: the AgentSpeak source file was not found", e);
-        } catch (ParseException e) {
+        } catch (Exception e) {
             logger.log(Level.SEVERE, "as2j: error parsing \"" + asURL + "\"", e);
         }
         return false;
@@ -140,13 +154,13 @@ public class Agent {
             return true;
         } catch (FileNotFoundException e) {
             logger.log(Level.SEVERE, "as2j: the AgentSpeak source file was not found", e);
-        } catch (ParseException e) {
+        } catch (Exception e) {
             logger.log(Level.SEVERE, "as2j: error parsing \"" + asFileName + "\"", e);
         }
         return false;
     }
 
-    void parseAS(InputStream asIn) throws ParseException {
+    void parseAS(InputStream asIn) throws ParseException, JasonException {
         as2j parser = new as2j(asIn);
         parser.agent(this);
     }
@@ -162,7 +176,31 @@ public class Agent {
         }
         return objIA;
     }
+    
+    public void addInitialGoal(Literal g) {
+    	initialGoals.add(g);
+    }
+    public void addInitialBel(Literal b) {
+    	initialBels.add(b);
+    }
+    public List<Literal> getInitialBels() {
+    	return initialBels;
+    }
 
+    /* import bels, plans and initial goals from another agent */
+    public void importComponents(Agent a) throws JasonException {
+    	for (Literal b: a.initialBels) {
+    		this.addInitialBel(b);
+    	}
+    	for (Literal g: a.initialGoals) {
+    		this.addInitialGoal(g);
+    	}
+    	for (Plan p: a.getPL()) {
+    		this.getPL().add(p);
+    	}    	
+    }
+    
+    
     /**
      * Follows the default implementation for the agent's message acceptance
      * relation and selection functions

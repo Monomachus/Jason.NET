@@ -2,6 +2,7 @@ package test;
 
 import jason.asSemantics.Unifier;
 import jason.asSyntax.ArithExpr;
+import jason.asSyntax.DefaultTerm;
 import jason.asSyntax.ListTerm;
 import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Literal;
@@ -10,10 +11,13 @@ import jason.asSyntax.NumberTermImpl;
 import jason.asSyntax.Pred;
 import jason.asSyntax.Structure;
 import jason.asSyntax.Term;
-import jason.asSyntax.DefaultTerm;
 import jason.asSyntax.VarTerm;
 import jason.asSyntax.ArithExpr.ArithmeticOp;
+import jason.asSyntax.parser.SimpleCharStream;
+import jason.asSyntax.parser.Token;
+import jason.asSyntax.parser.as2jTokenManager;
 
+import java.io.StringReader;
 import java.util.Iterator;
 
 import junit.framework.TestCase;
@@ -284,6 +288,26 @@ public class VarTermTest extends TestCase {
         assertFalse(u.unifies(exp, um));
         // X+1 unifies with 2
         assertTrue(u.unifies(exp, dois));
+    }
+    
+    public void testSimple2() {
+    	VarTerm v = new VarTerm("X");
+    	assertFalse(v.isAtom());
+    	assertTrue(v.isVar());
+    	Term t;
+
+    	as2jTokenManager tokens = new as2jTokenManager(new SimpleCharStream(new StringReader("Event")));
+    	Token tk = tokens.getNextToken();
+    	assertEquals(tk.kind, jason.asSyntax.parser.as2jConstants.VAR);
+    	
+    	t = VarTerm.parseVar("Ea");
+    	assertFalse(t.isAtom());
+    	assertTrue(t.isVar());
+    	
+    	t = DefaultTerm.parse("Event");
+    	assertFalse(t.isAtom());
+    	assertTrue(t.isVar());
+    	
     }
     
     public void testUnify1() {

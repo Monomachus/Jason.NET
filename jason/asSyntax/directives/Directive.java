@@ -1,11 +1,7 @@
 package jason.asSyntax.directives;
 
-import jason.asSyntax.Literal;
-import jason.asSyntax.Plan;
-import jason.asSyntax.PlanLibrary;
+import jason.asSemantics.Agent;
 import jason.asSyntax.Pred;
-
-import java.util.List;
 
 /** 
  * Interface for all compiler directives (e.g. include and goal patterns).
@@ -54,10 +50,8 @@ public interface Directive {
      * This method is called to process the directive.
      * 
      * @param directive: the directive as defined in the source (e.g. "include("bla.asl")")
-     * @param innerPlans: the plans inside the begin/end directive (as in goal patterns)
-     * @param bels: the agent's list of beliefs, the directive may include beliefs in this list.
-     * @param pl: the agent's plan library, the directive may include or change plans in this library.
-     * @return true if it is well processed.
+     * @param ag: the agent (plans, beliefs, ...) inside the begin/end directive (as in goal patterns)
+     * @return the agent (plans, bels, ...) with the result of the directive.
      */
-    boolean process(Pred directive, List<Plan> innerPlans, List<Literal> bels, PlanLibrary pl);
+    Agent process(Pred directive, Agent ag);
 }

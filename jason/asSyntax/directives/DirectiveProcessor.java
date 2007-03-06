@@ -1,8 +1,6 @@
 package jason.asSyntax.directives;
 
-import jason.asSyntax.Literal;
-import jason.asSyntax.Plan;
-import jason.asSyntax.PlanLibrary;
+import jason.asSemantics.Agent;
 import jason.asSyntax.Pred;
 import jason.asSyntax.patterns.goal.BC;
 import jason.asSyntax.patterns.goal.BDG;
@@ -15,7 +13,6 @@ import jason.asSyntax.patterns.goal.SGA;
 import jason.asSyntax.patterns.goal.SMC;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -60,18 +57,19 @@ public class DirectiveProcessor {
         addDirective("sga", new SGA());
     }
     
-    public static void process(Pred directive, List<Plan> innerPlans, List<Literal> bels, PlanLibrary pl) {
+    public static Agent process(Pred directive, Agent ag) {
         try {
             logger.fine("Processing directive "+directive);
             Directive d = directives.get(directive.getFunctor());
             if (d != null) {
-                d.process(directive, innerPlans, bels, pl);
+                return d.process(directive, ag);
             } else {
                 logger.log(Level.SEVERE, "Unknown directive "+directive);
             }
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error processing directive "+directive,e);
         }
+        return null;
     }
 
 }

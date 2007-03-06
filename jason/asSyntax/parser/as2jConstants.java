@@ -4,24 +4,26 @@ package jason.asSyntax.parser;
 public interface as2jConstants {
 
   int EOF = 0;
-  int TK_TRUE = 7;
-  int TK_FALSE = 8;
-  int TK_NOT = 9;
-  int TK_NEG = 10;
-  int TK_INTDIV = 11;
-  int TK_INTMOD = 12;
-  int TK_LABEL_AT = 13;
-  int NUMBER = 14;
-  int EXPONENT = 15;
-  int STRING = 16;
-  int ATOM = 17;
-  int VAR = 18;
-  int UNNAMEDVAR = 19;
-  int CHAR = 20;
-  int LETTER = 21;
-  int LC_LETTER = 22;
-  int UP_LETTER = 23;
-  int DIGIT = 24;
+  int VAR = 7;
+  int TK_TRUE = 8;
+  int TK_FALSE = 9;
+  int TK_NOT = 10;
+  int TK_NEG = 11;
+  int TK_INTDIV = 12;
+  int TK_INTMOD = 13;
+  int TK_BEGIN = 14;
+  int TK_END = 15;
+  int TK_LABEL_AT = 16;
+  int NUMBER = 17;
+  int EXPONENT = 18;
+  int STRING = 19;
+  int ATOM = 20;
+  int UNNAMEDVAR = 21;
+  int CHAR = 22;
+  int LETTER = 23;
+  int LC_LETTER = 24;
+  int UP_LETTER = 25;
+  int DIGIT = 26;
 
   int DEFAULT = 0;
 
@@ -33,18 +35,20 @@ public interface as2jConstants {
     "\"\\r\"",
     "<token of kind 5>",
     "<token of kind 6>",
+    "<VAR>",
     "\"true\"",
     "\"false\"",
     "\"not\"",
     "\"~\"",
     "\"div\"",
     "\"mod\"",
+    "\"begin\"",
+    "\"end\"",
     "\"@\"",
     "<NUMBER>",
     "<EXPONENT>",
     "<STRING>",
     "<ATOM>",
-    "<VAR>",
     "<UNNAMEDVAR>",
     "<CHAR>",
     "<LETTER>",

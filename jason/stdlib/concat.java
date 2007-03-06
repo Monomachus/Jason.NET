@@ -70,7 +70,7 @@ public class concat extends DefaultInternalAction {
 	    if (args[0].isList()) {
             // list concat
 			if (!args[args.length-1].isVar() && !args[args.length-1].isList()) {
-				throw new JasonException("Last argument of concat is not a list nor a variable.");
+				throw new JasonException("Last argument of concat '"+args[args.length-1]+"'is not a list nor a variable.");
 			}
             ListTerm result = (ListTerm)args[0];
             for (int i=1; i<args.length-1; i++) {
@@ -84,9 +84,8 @@ public class concat extends DefaultInternalAction {
         
 	    } else {
             // string concat
-
             if (!args[args.length-1].isVar() && !args[args.length-1].isString()) {
-                throw new JasonException("Last argument of concat is not a string nor a variable.");
+                throw new JasonException("Last argument of concat '"+args[args.length-1]+"' is not a string nor a variable.");
             }
             String vl = args[0].toString();
             if (args[0].isString()) {

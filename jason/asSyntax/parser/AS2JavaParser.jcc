@@ -24,6 +24,7 @@
 options {
    FORCE_LA_CHECK=true;
    STATIC=false;
+   IGNORE_CASE=false;
 }
 
 PARSER_BEGIN(as2j)
@@ -71,20 +72,25 @@ SKIP : {
 |  <"/*" (~["*"])* "*" ("*" | ~["*","/"] (~["*"])* "*")* "/">
 }
 
+// Note: i do not why, but vars must be defined before TK_BEGIN and END
+TOKEN : {
+  <VAR : (<UP_LETTER> (<CHAR>)*) >
+}
+
 TOKEN : {
 // Predefined
-  <TK_TRUE: "true">
-| <TK_FALSE: "false">
-| <TK_NOT:  "not">
-| <TK_NEG:  "~">
+  <TK_TRUE:   "true">
+| <TK_FALSE:  "false">
+| <TK_NOT:    "not">
+| <TK_NEG:    "~">
 | <TK_INTDIV: "div">
 | <TK_INTMOD: "mod">
-
-// special chars
-| <TK_LABEL_AT: "@">
+| <TK_BEGIN:  "begin" >
+| <TK_END:    "end" >
+| <TK_LABEL_AT: "@"> // special chars
 
 // Numbers
-|   <NUMBER: ["0"-"9"] (["0"-"9"])*
+|  <NUMBER: ["0"-"9"] (["0"-"9"])*
           | (["0"-"9"])* "." (["0"-"9"])+ (<EXPONENT>)?
           | (["0"-"9"])+ <EXPONENT> >
 |  <EXPONENT: ["e","E"] (["+","-"])? (["0"-"9"])+>
@@ -97,8 +103,7 @@ TOKEN : {
 
 // Identifiers
 |  <ATOM      : (<LC_LETTER> | "." <CHAR>) (<CHAR> | "." <CHAR>)*>
-|  <VAR       :  <UP_LETTER> (<CHAR>)*>
-|  <UNNAMEDVAR:  "_" (["0"-"9"])* >
+|  <UNNAMEDVAR: ("_" (["0"-"9"])*) >
 |  <CHAR      : (<LETTER> | <DIGIT> | "_")>
 |  <LETTER    : ( <LC_LETTER> | <UP_LETTER> )>
 |  <LC_LETTER : ["a"-"z"]>
@@ -108,124 +113,73 @@ TOKEN : {
 
 /* AgentSpeak Grammar */
 
-void agent(Agent a) : { List bbl       = new LinkedList(); 
-                        PlanLibrary pp = new PlanLibrary(); }
-{
-  belief_base(bbl, pp)
-  initial_goals(a)
-  plan_base(bbl, pp)
+void agent(Agent a) throws jason.JasonException :  
+                       {
+                         Agent   na;
+                       }
+{ 
+  ( 
+    agent_component(a)
+  |
+    na = directive()
+                       { // import bels, plans and initial goals from agent a
+                         if (a != null) a.importComponents(na);
+                       }
+  )*
   <EOF>
-              { if (a != null) {
-                  try {
-                    a.getPL().addAll(pp); 
-  
-                    // add beliefs (when the plans are loaded, so the events are relevant
-                    Iterator i = bbl.iterator();
-                    while (i.hasNext()) {
- 	                   a.addBel((Literal)i.next());
-                    }
-                  } catch (JasonException je) {
-                     System.err.println("Error:"+je);
-                  }
-                }
-              }
+}
+
+void agent_component(Agent a) throws jason.JasonException :  
+                       { Literal b;
+                         Literal g;
+                         Plan    p;
+                       }
+{
+  ( 
+    b = belief()       { if (a != null) a.addInitialBel(b); }
+  |
+    g = initial_goal() { if (a != null) a.addInitialGoal(g); } 
+  |
+    p = plan()         { if (a != null) a.getPL().add(p); }
+  )
 }
 
 
 /* Beliefs & Rules */
-void belief_base(List bbl, PlanLibrary pp) : { Literal h; Object t; }
-{
-  ( ( h=literal()
-      [
-        ":-" t = log_expr()    { h = new Rule(h,(LogicalFormula)t); }
-      ] 
-      "."                      { bbl.add(h);  } 
-    |
-      directive(bbl, pp)
-    )
-  )*
+Literal belief() : { Literal h; Object t; }
+{ 
+    h=literal()
+    [
+      ":-" t = log_expr()    { h = new Rule(h,(LogicalFormula)t); }
+    ] 
+    "."                      { return h; } 
 }
 
 
 /* Initial goals */
-void initial_goals(Agent a) : { Literal g; }
+Literal initial_goal() : { Literal g; }
 {
-  ( "!" g=literal() "."   
-                    {  if (a != null && a.getTS() != null) {
-				          a.getTS().getC().addAchvGoal(g,Intention.EmptyInt);
-                       }
-                    } 
-  )*
+  "!" g=literal() "."    {  return g; } 
 }
 
-/* Plans */
-void plan_base(List bbl, PlanLibrary pp) : 
-                                  { Plan pl;
-                                    Pred dir;
-                                    Pred lastBegin = null;
-                                    List plansForDirective = null;
-                                  }
-{
-  ( pl = plan()    { try {
-                       if (lastBegin == null) {
-                          pp.add(pl); 
-                       } else {
-                          plansForDirective.add(pl);
-                       }
-                     } catch (JasonException je) {
-                       System.err.println("Error adding plan:"+je);
-                     }
-                   }
-                   
-    | dir = directive(bbl, pp)
-                   { if (dir != null) {
-                       // it is a begin or end
-                       if (dir.getFunctor().equals("end")) {
-                          DirectiveProcessor.process(lastBegin, plansForDirective, bbl, pp); 
-                          lastBegin = null;
-                       } else {
-                          lastBegin = dir;
-                          plansForDirective = new ArrayList();
-                       }
-                     }      
-                   }
-                   
-  )*
-                   { if (lastBegin != null) {
-                        throw new ParseException("The directive '"+lastBegin+"' does not finish with an 'end'.");
-                     }
-                   }
-}
 
 /* Directive */
-Pred directive(List bbl, PlanLibrary pl) : 
-                   { 
-                             Pred d1 = null, d2 = null;
-                             boolean isBegin = false; 
-                             boolean isEnd = false;
-                   }
+Agent directive() throws jason.JasonException : 
+                     { 
+                        Pred dir = null;
+                     }
 {
-  "{"
-   d1 = pred()     { isBegin = d1.getFunctor().equals("begin");
-                     isEnd   = d1.getFunctor().equals("end");
-                   }
-   [ d2 = pred() 
-                   { if (!isBegin) {
-                        throw new ParseException("Directive: a second predicate must follow 'begin'.");
-                     }
-                   }
-   ]
-  "}"
-                   { if (isBegin) {
-                        return d2;
-                     } else if (isEnd) {
-                        return d1;
-                     } else {
-                        // it is not begin/end directive, process it
-                        DirectiveProcessor.process(d1, null, bbl, pl); 
-                        return null;
-                     }
-                   }
+  ( LOOKAHEAD(4)
+    "{" dir = pred() "}"
+                     { return DirectiveProcessor.process(dir, null); }
+  | 
+    "{" <TK_BEGIN> dir = pred() "}"
+                     { Agent dirAg = new Agent(); } 
+                     
+     	( agent_component(dirAg) )*
+    "{" <TK_END> "}"
+                     { return DirectiveProcessor.process(dir, dirAg); }
+  )
 }
 
 
@@ -328,9 +282,16 @@ BodyLiteral body_formula() :  { Literal A; Token k;
 /* Annotated Formulae */
 Pred pred() :       { Token K; Pred p; Term t; List l; ListTerm lt;}
 {
-  K=<ATOM>          { p = new Pred(K.image); 
-                      p.setSrcLine(K.beginLine);
-                    } 
+  (
+   K=<ATOM>
+   |
+   K=<TK_BEGIN>
+   |
+   K=<TK_END>
+  )                  { p = new Pred(K.image);
+                       p.setSrcLine(K.beginLine);
+                     } 
+  
   [
       "(" l = terms() 
       ")"           { p.addTerms(l); }
@@ -362,7 +323,7 @@ Term term() :       { Term u; Object o; }
                       }
                     }
   | u=list()        
-  | o=arithm_expr() { return (NumberTerm)o; }
+  | o=arithm_expr() { return (Term)o; }
   | u=string()      
   )
   { return u; }
