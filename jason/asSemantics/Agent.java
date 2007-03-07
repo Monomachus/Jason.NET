@@ -189,15 +189,17 @@ public class Agent {
 
     /* import bels, plans and initial goals from another agent */
     public void importComponents(Agent a) throws JasonException {
-    	for (Literal b: a.initialBels) {
-    		this.addInitialBel(b);
+    	if (a != null) {
+	    	for (Literal b: a.initialBels) {
+	    		this.addInitialBel(b);
+	    	}
+	    	for (Literal g: a.initialGoals) {
+	    		this.addInitialGoal(g);
+	    	}
+	    	for (Plan p: a.getPL()) {
+	    		this.getPL().add(p);
+	    	}
     	}
-    	for (Literal g: a.initialGoals) {
-    		this.addInitialGoal(g);
-    	}
-    	for (Plan p: a.getPL()) {
-    		this.getPL().add(p);
-    	}    	
     }
     
     

@@ -69,7 +69,7 @@
       case 30:
         na = directive();
                          // import bels, plans and initial goals from agent a
-                         if (a != null) a.importComponents(na);
+                         if (a != null && na != null) a.importComponents(na);
         break;
       default:
         jj_la1[1] = jj_gen;

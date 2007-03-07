@@ -51,7 +51,8 @@ public class AgentSpeakSideKickParser extends sidekick.SideKickParser {
         } catch (jason.asSyntax.parser.ParseException ex) {
         	addError(ex, errorSource, buf.getPath());
         } catch (Exception e) {
-        	System.out.println(e);
+        	System.out.println("Error in AS SideKick:"+e);
+        	e.printStackTrace();
         }
         return pd;
 	}
