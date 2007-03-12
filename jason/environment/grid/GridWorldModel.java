@@ -9,6 +9,10 @@ package jason.environment.grid;
  */
 public class GridWorldModel {
 
+    // each different object is represented by having a single bit 
+    // set (a bit mask is used in the model), so any power of two
+    // represents different objects. Other numbers represent combinations 
+    // of objects which are all located in the same cell of the grid.
     public static final int       CLEAN    = 0;
     public static final int       AGENT    = 2;
     public static final int       OBSTACLE = 4;
