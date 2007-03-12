@@ -27,6 +27,7 @@ package jason.asSemantics;
 import jason.asSyntax.BodyLiteral;
 import jason.asSyntax.ListTerm;
 import jason.asSyntax.ListTermImpl;
+import jason.asSyntax.Literal;
 import jason.asSyntax.Plan;
 import jason.asSyntax.StringTermImpl;
 import jason.asSyntax.Structure;
@@ -49,14 +50,19 @@ public class IntendedMeans implements Serializable {
     public IntendedMeans(Option opt, Trigger te) {
     	plan = (Plan)opt.plan.clone();
     	unif = (Unifier)opt.unif.clone();
+    	Literal planLiteral = plan.getTriggerEvent().getLiteral();
+    	if (planLiteral.getAnnots() != null) {
+    		planLiteral.getAnnots().apply(unif);
+    	}
         if (te == null) {
             trigger = plan.getTriggerEvent();
         } else {
             trigger = te;
+            trigger.getLiteral().apply(unif);
             // import annots of the trigger into the plan's te
             // so that the event +!g[source(ag1)] will add source(ag1)
             // in the TE of the plan
-            plan.getTriggerEvent().getLiteral().importAnnots(trigger.getLiteral());
+            planLiteral.importAnnots(trigger.getLiteral());
         }
     }
 

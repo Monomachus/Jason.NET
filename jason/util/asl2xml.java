@@ -44,6 +44,8 @@ public class asl2xml  {
     Agent loadAg(String file)  throws Exception {
         Agent ag = new Agent();
         if (ag.parseAS(file)) {
+        	ag.setASLSource(file);
+        	ag.addInitialBelsInBB();
             return ag;
         } else {
             return null;

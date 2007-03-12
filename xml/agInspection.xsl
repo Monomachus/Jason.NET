@@ -21,11 +21,12 @@
     <xsl:param name="var"    select="'rgb(0, 0, 200)'" />
     <xsl:param name="string" select="'rgb(0, 0, 250)'" />
     
-    <xsl:param name="show-bels" select="'true'" />
-    <xsl:param name="show-evt"  select="'true'" />
-    <xsl:param name="show-mb"   select="'true'" />
-    <xsl:param name="show-int"  select="'true'" />
-    <xsl:param name="show-plan" select="'true'" />
+    <xsl:param name="show-bels"  select="'true'" />
+    <xsl:param name="show-rules" select="'true'" />
+    <xsl:param name="show-evt"   select="'true'" />
+    <xsl:param name="show-mb"    select="'true'" />
+    <xsl:param name="show-int"   select="'true'" />
+    <xsl:param name="show-plan"  select="'true'" />
     
     <xsl:output method="html" />
     <xsl:strip-space elements="*" />
@@ -90,15 +91,38 @@
                 <td style="{$td-style}">
                     <hr/>
                     <table cellspacing="0" cellpadding="2">
-                        <xsl:for-each select="literal|rule">
+                        <xsl:for-each select="literal">
                             <tr style="{$trh-style}">
                                 <td style="text-align: left">
                                     <span style="color: {$bc}">
                                         <xsl:apply-templates select="." />
                                     </span>
-                                    <xsl:if test="count(context) = 0">
-                                        <xsl:text>.</xsl:text>
-                                    </xsl:if>
+                                    <xsl:text>.</xsl:text>
+                                </td>
+                            </tr>
+                        </xsl:for-each>
+                    </table>
+                </td>
+            </xsl:if>
+        </tr>
+        
+        <!-- Rules -->
+        <tr style="{$trh-style}">
+            <xsl:call-template name="hideshow">
+                <xsl:with-param name="show" select="$show-rules" />
+                <xsl:with-param name="item" select="'rules'" />
+                <xsl:with-param name="ds" select="'Rules'" />
+            </xsl:call-template>
+            <xsl:if test="$show-rules='true'">
+                <td style="{$td-style}">
+                    <hr/>
+                    <table cellspacing="0" cellpadding="2">
+                        <xsl:for-each select="rule">
+                            <tr style="{$trh-style}">
+                                <td style="text-align: left">
+                                    <span style="color: {$bc}">
+                                        <xsl:apply-templates select="." />
+                                    </span>
                                 </td>
                             </tr>
                         </xsl:for-each>

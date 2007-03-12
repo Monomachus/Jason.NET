@@ -9,24 +9,37 @@
     <xsl:strip-space elements="*"/>
     <xsl:include href="agInspection.xsl" />
     
-    <xsl:template match="/">
-        <html>            
+    <xsl:template match="agent">
+        <html>
+            <xsl:if test="string-length(@source) > 0"> 
+            	<h1><xsl:value-of select="@source" /></h1>
+           	</xsl:if>
             <xsl:apply-templates select="//beliefs" />
             <xsl:apply-templates select="//plans"/>
         </html>
     </xsl:template>
 
     <xsl:template match="beliefs">
-        <h2>Beliefs and Rules</h2>
-        <xsl:for-each select="literal|rule">
-            <span style="color: {$bc}">
-                <xsl:apply-templates select="." />
-                <xsl:if test="count(context) = 0">
+        <xsl:if test="count(literal) > 0"> 
+	        <h2>Beliefs</h2>
+	        <xsl:for-each select="literal">
+	            <span style="color: {$bc}">
+	                <xsl:apply-templates select="." />
                     <xsl:text>.</xsl:text>
-                </xsl:if>
-                <br/>
-            </span>
-        </xsl:for-each>
+	                <br/>
+	            </span>
+	        </xsl:for-each>
+       	</xsl:if>
+        <xsl:if test="count(rule) > 0"> 
+	        <h2>Rules</h2>
+	        <xsl:for-each select="rule">
+	            <span style="color: {$bc}">
+	                <xsl:apply-templates select="." />
+	                <br/>
+	            </span>
+	        </xsl:for-each>
+       	</xsl:if>
+        
     </xsl:template>
     
     <!-- do not show source(self) 0 -->

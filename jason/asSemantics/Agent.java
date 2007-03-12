@@ -93,17 +93,14 @@ public class Agent {
 
             setTS(new TransitionSystem(this, new Circumstance(), stts, arch));
 
-            if (asSrc.startsWith("./")) asSrc = asSrc.substring(2);
-            this.aslSource = asSrc;
-
+            setASLSource(asSrc);
             parseAS(asSrc);
+            
             // kqml Plans at the end of the ag PS
             parseAS(JasonException.class.getResource("/asl/kqmlPlans.asl"));
 
             // add initial bels events
-            for (Literal b: initialBels) {
-            	addBel(b);
-            }
+            addInitialBelsInBB();
 
             // add initial goals events
             for (Literal g: initialGoals) {
@@ -130,6 +127,11 @@ public class Agent {
     /** Returns the .asl file source used to create this agent */
     public String getASLSource() {
         return aslSource;
+    }
+    
+    public void setASLSource(String file) {
+        if (file.startsWith("./")) file = file.substring(2);
+        aslSource = file;    	
     }
 
     /** Adds beliefs and plans form an URL */
@@ -185,6 +187,13 @@ public class Agent {
     }
     public List<Literal> getInitialBels() {
     	return initialBels;
+    }
+    // add initial bels events
+    public void addInitialBelsInBB() {
+        for (Literal b: initialBels) {
+        	addBel(b);
+        }
+        initialBels.clear();
     }
 
     /* import bels, plans and initial goals from another agent */
@@ -504,6 +513,9 @@ public class Agent {
         }
         Document document = builder.newDocument();
         Element ag = (Element) document.createElement("agent");
+        if (getASLSource() != null && getASLSource().length() > 0) {
+        	ag.setAttribute("source", getASLSource());
+        }
         ag.appendChild(fBB.getAsDOM(document));
         ag.appendChild(fPL.getAsDOM(document));
         document.appendChild(ag);

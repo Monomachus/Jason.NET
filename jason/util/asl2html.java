@@ -30,8 +30,8 @@ public class asl2html extends asl2xml {
     public Transformer getTransformer()  throws Exception {
         if (transCache == null) {
             transCache = getFactory().newTransformer(
-            new StreamSource(asl2html.class.getResource(style)
-            .openStream()));
+            		new StreamSource(asl2html.class.getResource(style)
+            				.openStream()));
         }
         return transCache;
     }

@@ -9,17 +9,27 @@
 <xsl:strip-space elements="*"/>
 <xsl:include href="ag2tex.xsl" />
 
-<xsl:template match="/">
-% This stylesheet is not complet
+<xsl:template match="agent">
+	<xsl:text>
+% This stylesheet is not finished
 \documentclass{article}
 
 \newenvironment{asl}{\ttfamily\begin{tabbing}~~~\=$\leftarrow$ \= ~~~ \= 
 \kill}{\end{tabbing}}
 
+</xsl:text>
+
 	<xsl:call-template name="commands" />
+    <xsl:if test="string-length(@source) > 0"> 
+<xsl:text>
+\title{</xsl:text><xsl:value-of select="@source" /><xsl:text>}
+</xsl:text>
+   	</xsl:if>
+\author{\Jason\ \texttt{asl2tex}}
 
 \begin{document}
-
+    \maketitle
+    
     <xsl:apply-templates select="//beliefs" />
 
 
@@ -27,7 +37,6 @@
 
 
 \begin{asl}
-<xsl:text/>
     <xsl:apply-templates select="//plans"/>
 
 		

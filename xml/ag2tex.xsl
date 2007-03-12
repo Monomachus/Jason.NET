@@ -38,28 +38,42 @@
 \newcommand{\rulebody}[1]{\mbox{\hspace{.05\linewidth}}\begin{minipage}[t]{0.9\linewidth}#1.\end{minipage}}
 \newcommand{\context}[1]{\begin{minipage}[t]{0.9\linewidth}#1\end{minipage}}
 \newcommand{\planbody}[1]{\begin{minipage}[t]{0.9\linewidth}#1.\end{minipage}}
+\newcommand{\Jason}[0]{\textbf{\textit{Jason}}}
 
 </xsl:text>
     </xsl:template>
     
     <xsl:template match="beliefs">
 
-\subsection*{Beliefs and Rules}
-
+        <xsl:if test="count(literal) > 0"> 
 <xsl:text>
+\subsection*{Beliefs}
 \noindent
 {\ttfamily
 </xsl:text>
-        <xsl:for-each select="literal|rule">
+        <xsl:for-each select="literal">
             <xsl:apply-templates select="." />
-                <xsl:if test="count(context) = 0">
-                    <xsl:text>.</xsl:text>
-                </xsl:if>
+                <xsl:text>.</xsl:text>
 			<xsl:text>\\
 </xsl:text>
 	    </xsl:for-each>
-		<xsl:text>
-}</xsl:text>
+		<xsl:text>}</xsl:text>
+		</xsl:if>
+
+        <xsl:if test="count(rule) > 0"> 
+<xsl:text>
+\subsection*{Rules}
+\noindent
+{\ttfamily
+</xsl:text>
+        <xsl:for-each select="rule">
+            <xsl:apply-templates select="." />
+			<xsl:text>\\
+</xsl:text>
+	    </xsl:for-each>
+		<xsl:text>}</xsl:text>
+		</xsl:if>
+
     </xsl:template>
 
 
