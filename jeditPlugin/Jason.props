@@ -43,9 +43,9 @@ jason.title=Jason IDE
 jason.label=Jason
 
 # Options
-plugin.jason.jeditplugin.JasonIDPlugin.option-pane=general
-options.general.label=Jason
-options.general.code=new jason.jeditplugin.JasonIDOptionPanel();
+plugin.jason.jeditplugin.JasonIDPlugin.option-pane=jason
+options.jason.label=Jason
+options.jason.code=new jason.jeditplugin.JasonIDOptionPanel();
 
 # plugin toolbar buttons
 #jason.run-mas.icon=run.png
