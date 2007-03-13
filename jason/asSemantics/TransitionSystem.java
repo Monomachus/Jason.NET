@@ -816,9 +816,7 @@ public class TransitionSystem {
 
                 syncMonitor.notifyAll();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        } catch (Exception e) {  }
     }
 
     /**********************************************************************/

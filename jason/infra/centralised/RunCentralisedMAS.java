@@ -396,8 +396,6 @@ public class RunCentralisedMAS {
 
     public void finish() {
         try {
-            stopAgs();
-
             if (control != null) {
                 control.stop();
                 control = null;
@@ -406,6 +404,8 @@ public class RunCentralisedMAS {
                 env.stop();
                 env = null;
             }
+            
+            stopAgs();
 
             if (MASConsoleGUI.hasConsole()) {
                 MASConsoleGUI.get().close();
