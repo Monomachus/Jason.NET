@@ -39,6 +39,7 @@
 \newcommand{\context}[1]{\begin{minipage}[t]{0.9\linewidth}#1\end{minipage}}
 \newcommand{\planbody}[1]{\begin{minipage}[t]{0.9\linewidth}#1.\end{minipage}}
 \newcommand{\Jason}[0]{\textbf{\textit{Jason}}}
+\newcommand{\sn}{\mbox{\large\textbf{\texttt{\textasciitilde}}}}
 
 </xsl:text>
     </xsl:template>
@@ -223,6 +224,12 @@ Intention: </xsl:text><xsl:value-of select="@id" />
         <xsl:text>}</xsl:text>
     </xsl:template>
 
+    <xsl:template match="literal">
+        <xsl:if test="@negated = 'true'">
+            <xsl:text>\sn </xsl:text>
+        </xsl:if>
+        <xsl:apply-templates  />
+    </xsl:template>
 
         
     <xsl:template match="structure">

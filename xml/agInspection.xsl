@@ -472,6 +472,13 @@
             </tr>
         </table>
     </xsl:template>
+
+    <xsl:template match="literal">
+        <xsl:if test="@negated = 'true'">
+            <xsl:text><b>~</b></xsl:text>
+        </xsl:if>
+        <xsl:apply-templates  />
+    </xsl:template>
     
     <xsl:template match="structure">
         <xsl:value-of select="@functor"/>

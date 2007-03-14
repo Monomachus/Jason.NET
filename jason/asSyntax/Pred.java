@@ -432,7 +432,7 @@ public class Pred extends Structure {
     public String toString() {
         String s;
         s = super.toString();
-        if (annots != null && !annots.isEmpty()) {
+        if (hasAnnot()) {
             s += annots.toString();
         }
         return s;
@@ -442,7 +442,7 @@ public class Pred extends Structure {
     @Override
     public Element getAsDOM(Document document) {
         Element u = super.getAsDOM(document);
-        if (getAnnots() != null && !getAnnots().isEmpty()) {
+        if (hasAnnot()) {
             Element ea = document.createElement("annotations");
             ea.appendChild(getAnnots().getAsDOM(document));
             u.appendChild(ea);

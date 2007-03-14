@@ -88,11 +88,6 @@ public final class Atom extends Literal {
         return true;
     }
 
-	@Override
-    public String toString() {
-        return getFunctor().toString();
-    }   
-
     @Override
     public boolean equals(Object o) {
         if (o == null) return false;

@@ -82,20 +82,20 @@ public class asl2xml  {
     TransformerFactory fac = null;
     TransformerFactory getFactory() throws Exception {
         if (fac == null) {
-            fac = TransformerFactory.newInstance();
-            fac.setURIResolver(new URIResolver() {
-                    public Source resolve(String href,String base) throws TransformerException {
-                        try {
-                            return new StreamSource(asl2xml.class.getResource("/xml/"+href).openStream());
-                        } catch (Exception e) {
-                            System.err.println("Error - "+href+"-"+base);
-                            e.printStackTrace();
-                            return null;
-                        }
-                        
-                    }
-                });
-        }
+			fac = TransformerFactory.newInstance();
+			fac.setURIResolver(new URIResolver() {
+				public Source resolve(String href, String base) throws TransformerException {
+					try {
+						return new StreamSource(asl2xml.class.getResource(
+								"/xml/" + href).openStream());
+					} catch (Exception e) {
+						System.err.println("Error - " + href + "-" + base);
+						e.printStackTrace();
+						return null;
+					}
+				}
+			});
+		}
         return fac;
     }
 

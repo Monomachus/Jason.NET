@@ -51,7 +51,7 @@ public class IntendedMeans implements Serializable {
     	plan = (Plan)opt.plan.clone();
     	unif = (Unifier)opt.unif.clone();
     	Literal planLiteral = plan.getTriggerEvent().getLiteral();
-    	if (planLiteral.getAnnots() != null) {
+    	if (planLiteral.hasAnnot()) {
     		planLiteral.getAnnots().apply(unif);
     	}
         if (te == null) {

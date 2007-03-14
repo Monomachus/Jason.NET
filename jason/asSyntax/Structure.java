@@ -263,6 +263,10 @@ public class Structure extends DefaultTerm {
         return terms;
     }
     
+    public boolean hasTerm() {
+    	return getTermsSize() > 0;
+    }
+    
     public Term[] getTermsArray() {
         Term ts[] = null;
         if (getTermsSize() == 0) {
@@ -362,7 +366,7 @@ public class Structure extends DefaultTerm {
         Element u = (Element) document.createElement("structure");
         u.setAttribute("functor",getFunctor());
         //u.appendChild(document.createTextNode(toString()));
-        if (getTerms() != null && !getTerms().isEmpty()) {
+        if (hasTerm()) {
             Element ea = document.createElement("arguments");
             for (Term t: getTerms()) {
                 ea.appendChild(t.getAsDOM(document));

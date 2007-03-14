@@ -303,7 +303,7 @@ public class Literal extends Pred implements LogicalFormula {
 			lt.addAll(getTerms());
 		}
 		l.add(lt);
-		if (getAnnots() != null && !getAnnots().isEmpty()) {
+		if (hasAnnot()) {
 			l.add((ListTerm)getAnnots().clone());
 		} else {
 			l.add(new ListTermImpl());
@@ -351,6 +351,7 @@ public class Literal extends Pred implements LogicalFormula {
         if (isInternalAction()) {
             u.setAttribute("ia", isInternalAction()+"");
         }
+        u.setAttribute("negated", negated()+"");
         u.appendChild(super.getAsDOM(document));
         return u;
     }    

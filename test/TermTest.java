@@ -496,6 +496,17 @@ public class TermTest extends TestCase {
         assertFalse(a1.equals(a2));   
     }
 
+    public void testAtom() {
+    	Atom a = new Atom("a");
+    	try {
+    		//a.addTerm(new Atom("b"));
+    	} catch (Exception e) {}
+    	assertEquals(a.getTermsSize(), 0);
+    	a.addAnnot(new Atom("b"));
+    	assertEquals(a.getAnnots().size(), 1);
+    	assertEquals(a.toString(),"a[b]");
+    }
+    
 	public static void main(String[] a) {
 		new TermTest().testAnnotsUnify7();
 	}
