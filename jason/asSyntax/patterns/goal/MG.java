@@ -19,7 +19,7 @@ public class MG implements Directive {
 
     static Logger logger = Logger.getLogger(MG.class.getName());
     
-    public Agent process(Pred directive, Agent ag) {
+    public Agent process(Pred directive, Agent outerAg, Agent innerAg) {
         try {
             Literal goal = Literal.parseLiteral(directive.getTerm(0).toString());
             Literal subDir;
@@ -31,7 +31,7 @@ public class MG implements Directive {
             Directive sd = DirectiveProcessor.getDirective(subDir.getFunctor());
 
             // apply sub directive
-            Agent newAg = sd.process(subDir, ag); 
+            Agent newAg = sd.process(subDir, outerAg, innerAg); 
             if (newAg != null) {
                 // add bel g
             	newAg.addInitialBel(goal);

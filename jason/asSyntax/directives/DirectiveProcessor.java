@@ -57,12 +57,12 @@ public class DirectiveProcessor {
         addDirective("sga", new SGA());
     }
     
-    public static Agent process(Pred directive, Agent ag) {
+    public static Agent process(Pred directive, Agent outerAg, Agent innerAg) {
         try {
             logger.fine("Processing directive "+directive);
             Directive d = directives.get(directive.getFunctor());
             if (d != null) {
-                return d.process(directive, ag);
+                return d.process(directive, outerAg, innerAg);
             } else {
                 logger.log(Level.SEVERE, "Unknown directive "+directive);
             }

@@ -22,7 +22,7 @@ public class SGA implements Directive {
 
     static Logger logger = Logger.getLogger(SGA.class.getName());
     
-    public Agent process(Pred directive, Agent ag) {
+    public Agent process(Pred directive, Agent outerAg, Agent innerAg) {
         try {
             Trigger trigger = Trigger.parseTrigger(((StringTerm)directive.getTerm(0)).getString());
             LogicalFormula context = LogExpr.parseExpr(((StringTerm)directive.getTerm(1)).getString());

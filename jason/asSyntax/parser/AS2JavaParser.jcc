@@ -121,7 +121,7 @@ void agent(Agent a) throws jason.JasonException :
   ( 
     agent_component(a)
   |
-    na = directive()
+    na = directive(a)
                        { // import bels, plans and initial goals from agent a
                          if (a != null && na != null) a.importComponents(na);
                        }
@@ -164,21 +164,21 @@ Literal initial_goal() : { Literal g; }
 
 
 /* Directive */
-Agent directive() throws jason.JasonException : 
+Agent directive(Agent outerAg) throws jason.JasonException : 
                      { 
                         Pred dir = null;
                      }
 {
   ( LOOKAHEAD(4)
     "{" dir = pred() "}"
-                     { return DirectiveProcessor.process(dir, null); }
+                     { return DirectiveProcessor.process(dir, outerAg, null); }
   | 
     "{" <TK_BEGIN> dir = pred() "}"
                      { Agent dirAg = new Agent(); } 
                      
      	( agent_component(dirAg) )*
     "{" <TK_END> "}"
-                     { return DirectiveProcessor.process(dir, dirAg); }
+                     { return DirectiveProcessor.process(dir, outerAg, dirAg); }
   )
 }
 

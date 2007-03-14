@@ -5,6 +5,7 @@ import jason.asSyntax.Pred;
 import jason.asSyntax.StringTerm;
 import jason.asSyntax.parser.as2j;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.logging.Level;
@@ -15,8 +16,12 @@ public class Include implements Directive {
 
     static Logger logger = Logger.getLogger(Include.class.getName());
 
-    public Agent process(Pred directive, Agent ag) {
-        return processInclude(((StringTerm)directive.getTerm(0)).getString());
+    public Agent process(Pred directive, Agent outerAg, Agent innerAg) {
+    	String file = ((StringTerm)directive.getTerm(0)).getString();
+    	if (outerAg != null && outerAg.getASLSource() != null) {
+    		file = new File(outerAg.getASLSource()).getParentFile().getPath() + File.separator + file; 
+    	}
+        return processInclude(file);
     }
 
     Agent processInclude(String asFileName) {

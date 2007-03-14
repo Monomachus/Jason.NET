@@ -20,7 +20,7 @@ public class RC implements Directive {
 
     static Logger logger = Logger.getLogger(RC.class.getName());
     
-    public Agent process(Pred directive, Agent ag) {
+    public Agent process(Pred directive, Agent outerAg, Agent innerAg) {
     	try {
             Term goal = directive.getTerm(0);
             Term motivation = directive.getTerm(1);
@@ -29,7 +29,7 @@ public class RC implements Directive {
             Directive sd = DirectiveProcessor.getDirective(subDir.getFunctor());
 
             // apply sub directive
-            Agent newAg = sd.process(subDir, ag); 
+            Agent newAg = sd.process(subDir, outerAg, innerAg); 
             if (newAg != null) {
 
                 // add -m : true <- .succeed_goal(g).

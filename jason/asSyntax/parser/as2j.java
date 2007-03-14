@@ -67,7 +67,7 @@
         agent_component(a);
         break;
       case 30:
-        na = directive();
+        na = directive(a);
                          // import bels, plans and initial goals from agent a
                          if (a != null && na != null) a.importComponents(na);
         break;
@@ -141,13 +141,13 @@
   }
 
 /* Directive */
-  final public Agent directive() throws ParseException, jason.JasonException {
+  final public Agent directive(Agent outerAg) throws ParseException, jason.JasonException {
                         Pred dir = null;
     if (jj_2_1(4)) {
       jj_consume_token(30);
       dir = pred();
       jj_consume_token(31);
-                       {if (true) return DirectiveProcessor.process(dir, null);}
+                       {if (true) return DirectiveProcessor.process(dir, outerAg, null);}
     } else {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case 30:
@@ -180,7 +180,7 @@
         jj_consume_token(30);
         jj_consume_token(TK_END);
         jj_consume_token(31);
-                       {if (true) return DirectiveProcessor.process(dir, dirAg);}
+                       {if (true) return DirectiveProcessor.process(dir, outerAg, dirAg);}
         break;
       default:
         jj_la1[5] = jj_gen;

@@ -50,8 +50,9 @@ public interface Directive {
      * This method is called to process the directive.
      * 
      * @param directive: the directive as defined in the source (e.g. "include("bla.asl")")
-     * @param ag: the agent (plans, beliefs, ...) inside the begin/end directive (as in goal patterns)
+     * @param outerAg: the agent where the directive is being processed (the method should not change this agent state)
+     * @param innerAg: the agent (plans, beliefs, ...) inside the begin/end directive (as in goal patterns)
      * @return the agent (plans, bels, ...) with the result of the directive.
      */
-    Agent process(Pred directive, Agent ag);
+    Agent process(Pred directive, Agent outerAg, Agent innerAg);
 }
