@@ -102,7 +102,9 @@ public class AgArch {
     	fTS = ts;
     }
 
-    /** Gets the agent's perception as a list of Literals */
+    /** Gets the agent's perception as a list of Literals.
+     *  The returned list will be modified by Jason.
+     */
     public List<Literal> perceive() {
         return archTier.perceive();
     }

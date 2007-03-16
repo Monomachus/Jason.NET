@@ -110,6 +110,10 @@ public class Message {
 		this.inReplyTo = inReplyTo;
 	}
 	
+	public Object clone() {
+		return new Message(this);
+	}
+	
 	public String toString() {
 		String irt = (inReplyTo == null ? "" : "->"+inReplyTo);
         return "<"+msgId+irt+","+sender+","+ilForce+","+receiver+","+propCont+">";

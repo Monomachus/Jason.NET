@@ -157,6 +157,17 @@ public class Intention implements Serializable, Comparable<Intention> {
         return String.valueOf(id).hashCode();
     }
     
+    public Object clone() {
+    	Intention i = new Intention();
+    	i.id = id;
+        i.isAtomic = isAtomic;
+        i.fIntendedMeans = new Stack<IntendedMeans>();
+        for (IntendedMeans im: fIntendedMeans) {
+        	i.fIntendedMeans.add((IntendedMeans)im.clone());
+        }
+    	return i;
+    }
+        
     public String toString() {
         StringBuilder s = new StringBuilder();
         ListIterator<IntendedMeans> i = fIntendedMeans.listIterator(fIntendedMeans.size());

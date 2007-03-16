@@ -35,8 +35,7 @@ public class Event implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	Trigger trigger = null;
-
+	Trigger   trigger   = null;
     Intention intention = Intention.EmptyInt;
     
     public Event(Trigger t, Intention i) {
@@ -63,6 +62,10 @@ public class Event implements Serializable {
         return (intention!=Intention.EmptyInt);
     }
 
+    public Object clone() {
+    	return new Event((Trigger)trigger.clone(), (Intention)intention.clone());
+    }
+    
     public String toString() {
         if (intention == Intention.EmptyInt)
             return ""+trigger;

@@ -314,9 +314,7 @@ public class Unifier implements Cloneable {
     public Object clone() {
         try {
             Unifier newUn = new Unifier();
-            for (VarTerm k: function.keySet()) {
-                newUn.function.put( (VarTerm)k.clone(), (Term)function.get(k).clone());
-            }
+            newUn.compose(this);
             return newUn;
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error cloning unifier.",e);

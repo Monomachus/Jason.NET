@@ -44,8 +44,8 @@ public class IntendedMeans implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	protected Unifier unif = null;
-	protected Plan plan;
-	private Trigger trigger; // the trigger that create this IM
+	protected Plan    plan;
+	private   Trigger trigger; // the trigger that create this IM
     
     public IntendedMeans(Option opt, Trigger te) {
     	plan = (Plan)opt.plan.clone();
@@ -64,6 +64,10 @@ public class IntendedMeans implements Serializable {
             // in the TE of the plan
             planLiteral.importAnnots(trigger.getLiteral());
         }
+    }
+    
+    private IntendedMeans() {
+    	// used for clone
     }
 
     /** removes the current action of the IM */
@@ -105,7 +109,15 @@ public class IntendedMeans implements Serializable {
     public boolean isGoalAdd() {
         return trigger.isAddition() && trigger.isGoal();
     }
-	
+
+    public Object clone() {
+    	IntendedMeans c = new IntendedMeans();
+    	c.unif = (Unifier)this.unif.clone();
+    	c.plan = (Plan)this.plan.clone();
+    	c.trigger = (Trigger)this.trigger.clone(); 
+    	return c;
+    }
+    
     public String toString() {
         return plan + " : " + unif;
     }
