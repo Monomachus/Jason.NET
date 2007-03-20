@@ -57,6 +57,8 @@ import jason.asSyntax.Term;
   @see jason.stdlib.sort
   @see jason.stdlib.substring
   @see jason.stdlib.nth
+  @see jason.stdlib.max
+  @see jason.stdlib.min
 
 */
 public class concat extends DefaultInternalAction {

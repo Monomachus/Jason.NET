@@ -23,10 +23,12 @@ import jason.asSyntax.*;
 <li> <code>.nth(5,[a,b,c],X)</code>: error.
 </ul>
 
-@see jason.stdlib.concat
-@see jason.stdlib.length
-@see jason.stdlib.member
-@see jason.stdlib.sort
+  @see jason.stdlib.concat
+  @see jason.stdlib.length
+  @see jason.stdlib.member
+  @see jason.stdlib.sort
+  @see jason.stdlib.max
+  @see jason.stdlib.min
 
 */
 

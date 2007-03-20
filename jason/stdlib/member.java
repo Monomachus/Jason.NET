@@ -37,6 +37,8 @@ import java.util.List;
   @see jason.stdlib.length
   @see jason.stdlib.sort
   @see jason.stdlib.nth
+  @see jason.stdlib.max
+  @see jason.stdlib.min
 
 */
 public class member extends DefaultInternalAction {
