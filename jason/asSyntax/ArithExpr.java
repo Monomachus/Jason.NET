@@ -326,14 +326,18 @@ public class ArithExpr extends DefaultTerm implements NumberTerm {
             Element u = (Element) document.createElement("expression");
             u.setAttribute("type", "arithmetic");
             u.setAttribute("operator", op.toString());
-            if (rhs != null) {
+            if (isUnary()) {
+                Element r = (Element) document.createElement("right");
+                r.appendChild(lhs.getAsDOM(document)); // put the left argument indeed!
+                u.appendChild(r);
+            } else {
                 Element l = (Element) document.createElement("left");
                 l.appendChild(lhs.getAsDOM(document));
                 u.appendChild(l);
+                Element r = (Element) document.createElement("right");
+                r.appendChild(rhs.getAsDOM(document));
+                u.appendChild(r);
             }
-            Element r = (Element) document.createElement("right");
-            r.appendChild(rhs.getAsDOM(document));
-            u.appendChild(r);
             return u;
         }
     }

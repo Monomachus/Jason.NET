@@ -190,7 +190,9 @@ public class Agent {
     }
     // add initial bels events
     public void addInitialBelsInBB() {
+        Unifier u = new Unifier();
         for (Literal b: initialBels) {
+            b.apply(u); // to solve arithmetic expressions
         	addBel(b);
         }
         initialBels.clear();
