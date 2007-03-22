@@ -113,7 +113,26 @@ public class Agent {
             throw new JasonException("Error creating the agent class! - " + e);
         }
     }
+    
+    /** 
+     *  Clone BB, PL, Circumstance. 
+     *  A new TS is created (based on the cloned circumstance).
+     */
+    public Agent clone(AgArch arch) {
+    	Agent a = new Agent();
+    	
+    	a.setLogger(arch);
+        a.logger.setLevel(this.getTS().getSettings().logLevel());
 
+    	a.fBB = (BeliefBase)this.fBB.clone();
+    	a.fPL = (PlanLibrary)this.fPL.clone();
+    	a.aslSource = this.aslSource;
+    	
+        a.setTS(new TransitionSystem(a, (Circumstance)this.getTS().getC().clone(), this.getTS().getSettings(), arch));
+
+    	return a;
+    }
+    
     public void setLogger(AgArch arch) {
         if (arch != null) {
             logger = Logger.getLogger(Agent.class.getName() + "." + arch.getAgName());
@@ -198,7 +217,7 @@ public class Agent {
         initialBels.clear();
     }
 
-    /* import bels, plans and initial goals from another agent */
+    /** import bels, plans and initial goals from another agent */
     public void importComponents(Agent a) throws JasonException {
     	if (a != null) {
 	    	for (Literal b: a.initialBels) {

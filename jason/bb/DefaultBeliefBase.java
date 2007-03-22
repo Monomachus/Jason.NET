@@ -192,6 +192,14 @@ public class DefaultBeliefBase implements BeliefBase {
         return belsMap.toString();
     }
 
+    public Object clone() {
+    	DefaultBeliefBase bb = new DefaultBeliefBase();
+    	for (Literal b: this) {
+    		bb.add((Literal)b.clone());
+    	}
+    	return bb;
+    }
+    
     public Element getAsDOM(Document document) {
         Element ebels = (Element) document.createElement("beliefs");
         for (Literal l: this) {
@@ -207,7 +215,6 @@ public class DefaultBeliefBase implements BeliefBase {
         final private Map<LiteralWrapper,Literal> map = new HashMap<LiteralWrapper,Literal>(); // to fastly find contents, from literal do list index
         
         public void add(Literal l) {
-        	// TODO: wrap the literal l so that it can not be changed!
             map.put(new LiteralWrapper(l), l);
             list.add(l);
         }
@@ -225,6 +232,14 @@ public class DefaultBeliefBase implements BeliefBase {
         
         public Literal contains(Literal l) {
             return map.get(new LiteralWrapper(l));
+        }
+        
+        protected Object clone() {
+        	BelEntry be = new BelEntry();
+        	for (Literal l: list) {
+        		be.add((Literal)l.clone());
+        	}
+        	return be;
         }
         
         public String toString() {

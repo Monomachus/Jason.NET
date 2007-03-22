@@ -234,6 +234,16 @@ public class PlanLibrary implements Iterable<Plan> {
         return relPlans.get(TE_IDLE.getPredicateIndicator());
     }
 
+    public Object clone() {
+    	PlanLibrary pl = new PlanLibrary();
+    	try {
+			pl.addAll(this);
+		} catch (JasonException e) {
+			e.printStackTrace();
+		}
+    	return pl;
+    }
+
     public String toString() {
         return plans.toString();
     }

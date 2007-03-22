@@ -79,6 +79,12 @@ public class ActionExec implements Serializable {
         return "<"+action+","+intention+","+result+">";
     }
 
+    protected Object clone() {
+    	ActionExec ae = new ActionExec((Pred)action.clone(),(Intention)intention.clone());
+    	ae.result = this.result;
+    	return ae;
+    }
+
     /** get as XML */
 	public Element getAsDOM(Document document) {
 		Element eact = (Element) document.createElement("action");

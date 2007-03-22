@@ -64,7 +64,6 @@ public class Circumstance implements Serializable {
     
     private Map<String, Intention>     PI; // pending intentions, intentions suspended by any other reason                                                        
 
-
     private List<CircumstanceListener> listeners = new CopyOnWriteArrayList<CircumstanceListener>();
 
     public Circumstance() {
@@ -311,6 +310,31 @@ public class Circumstance implements Serializable {
     public Option getSelectedOption() {
         return SO;
     }
+
+    /** clone E, I, MB, PA, PI, FA, and AI */
+    public Object clone() {
+    	Circumstance c = new Circumstance();
+    	for (Event e: this.E) {
+    		c.E.add((Event)e.clone());
+    	}
+    	for (Intention i: this.I) {
+    		c.I.add((Intention)i.clone());
+    	}
+    	for (Message m: this.MB) {
+    		c.MB.add((Message)m.clone());
+    	}
+    	for (int k: this.PA.keySet()) {
+    		c.PA.put(k, (ActionExec)PA.get(k).clone());
+    	}
+    	for (String k: this.PI.keySet()) {
+    		c.PI.put(k, (Intention)PI.get(k).clone());
+    	}
+    	for (ActionExec ae: FA) {
+    		c.FA.add((ActionExec)ae.clone());
+    	}
+    	return c;
+    }
+
 
     /** get the agent circunstance as XML */
     @SuppressWarnings("unchecked")

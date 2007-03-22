@@ -27,6 +27,7 @@ import jason.JasonException;
 import jason.architecture.AgArch;
 import jason.architecture.AgArchInfraTier;
 import jason.asSemantics.ActionExec;
+import jason.asSemantics.Agent;
 import jason.asSemantics.Message;
 import jason.asSyntax.Literal;
 import jason.asSyntax.Structure;
@@ -86,19 +87,23 @@ public class CentralisedAgArch extends Thread implements AgArchInfraTier {
      * the TS.
      */
     public void initAg(String agArchClass, String agClass, ClassParameters bbPars, String asSrc, Settings stts, RunCentralisedMAS masRunner) throws JasonException {
-        logger = Logger.getLogger(CentralisedAgArch.class.getName() + "." + getAgName());
         try {
         	this.masRunner = masRunner; 
             fUserAgArh = (AgArch) Class.forName(agArchClass).newInstance();
             fUserAgArh.setArchInfraTier(this);
             fUserAgArh.initAg(agClass, bbPars, asSrc, stts);
-            logger.setLevel(fUserAgArh.getTS().getSettings().logLevel());
+            setLogger();
         } catch (Exception e) {
             running = false;
             throw new JasonException("as2j: error creating the agent class! - " + e);
         }
     }
-
+    
+    public void setLogger() {
+        logger = Logger.getLogger(CentralisedAgArch.class.getName() + "." + getAgName());
+        logger.setLevel(fUserAgArh.getTS().getSettings().logLevel());    	
+    }
+    
     public Logger getLogger() {
         return logger;
     }
@@ -112,6 +117,10 @@ public class CentralisedAgArch extends Thread implements AgArchInfraTier {
         return agName;
     }
 
+    public void setUserAgArch(AgArch arch) {
+    	fUserAgArh = arch;
+    }
+    
     public AgArch getUserAgArch() {
         return fUserAgArh;
     }

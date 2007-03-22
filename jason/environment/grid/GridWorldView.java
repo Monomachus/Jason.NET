@@ -26,10 +26,10 @@ public class GridWorldView extends JFrame {
 
     protected Font defaultFont = new Font("Arial", Font.BOLD, 10);
  
-    public GridWorldView(GridWorldModel model, String title, int width) {
+    public GridWorldView(GridWorldModel model, String title, int windowSize) {
         super(title);
         this.model = model;
-        initComponents(width);
+        initComponents(windowSize);
         model.setView(this);
     }
 

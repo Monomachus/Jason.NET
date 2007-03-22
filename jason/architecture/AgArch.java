@@ -90,7 +90,6 @@ public class AgArch {
     public void setArchInfraTier(AgArchInfraTier ai) {
         archTier = ai;
     }
-
     public AgArchInfraTier getArchInfraTier() {
         return archTier;
     }
@@ -98,7 +97,7 @@ public class AgArch {
     public TransitionSystem getTS() {
         return fTS;
     }
-    protected void setTS(TransitionSystem ts) {
+    public void setTS(TransitionSystem ts) {
     	fTS = ts;
     }
 
