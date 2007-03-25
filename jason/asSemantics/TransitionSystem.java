@@ -724,7 +724,7 @@ public class TransitionSystem {
         Event ev = conf.C.SE;
         Trigger tevent = ev.trigger;
 
-        if (tevent.isAddition() && tevent.isGoal() && ev.isInternal()) {
+        if (tevent.isAddition() && tevent.isGoal()) {
             Event failEvent = findEventForFailure(ev.intention, tevent);
             if (failEvent != null) {
                 logger.warning("Generating goal deletion " + failEvent.getTrigger() + " from event: " + ev.getTrigger());
@@ -746,12 +746,14 @@ public class TransitionSystem {
 
     public Event findEventForFailure(Intention i, Trigger tevent) {
         Trigger failTrigger = new Trigger(Trigger.TEDel, tevent.getGoal(), tevent.getLiteral());
-        ListIterator<IntendedMeans> ii = i.iterator();
-        while (!getAg().getPL().isRelevant(failTrigger.getPredicateIndicator()) && ii.hasPrevious()) {
-            IntendedMeans im = ii.previous();
-            tevent = im.getTrigger();
-            failTrigger = new Trigger(Trigger.TEDel, tevent.getGoal(), tevent.getLiteral());
-        }
+    	if (i != Intention.EmptyInt) {
+	        ListIterator<IntendedMeans> ii = i.iterator();
+	        while (!getAg().getPL().isRelevant(failTrigger.getPredicateIndicator()) && ii.hasPrevious()) {
+	            IntendedMeans im = ii.previous();
+	            tevent = im.getTrigger();
+	            failTrigger = new Trigger(Trigger.TEDel, tevent.getGoal(), tevent.getLiteral());
+	        }
+    	}
         // if some failure handling plan is found
         if (tevent.isGoal() && getAg().getPL().isRelevant(failTrigger.getPredicateIndicator())) {
             return new Event(failTrigger, i);
