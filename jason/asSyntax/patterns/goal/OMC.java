@@ -20,7 +20,7 @@ public class OMC implements Directive {
 
     static Logger logger = Logger.getLogger(OMC.class.getName());
     
-    public Agent process(Pred directive, Agent outerAg, Agent innerAg) {
+    public Agent process(Pred directive, Agent outterContent, Agent innerContent) {
         try {
             Term goal = directive.getTerm(0);
             Term fail = directive.getTerm(1);
@@ -29,7 +29,7 @@ public class OMC implements Directive {
             Directive sd = DirectiveProcessor.getDirective(subDir.getFunctor());
 
             // apply sub directive
-            Agent newAg = sd.process(subDir, outerAg, innerAg); 
+            Agent newAg = sd.process(subDir, outterContent, innerContent); 
             if (newAg != null) {
                 // add +f : true <- .fail_goal(g).
                 newAg.getPL().add(Plan.parse("+"+fail+" <- .fail_goal("+goal+")."));

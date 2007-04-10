@@ -16,10 +16,10 @@ public class Include implements Directive {
 
     static Logger logger = Logger.getLogger(Include.class.getName());
 
-    public Agent process(Pred directive, Agent outerAg, Agent innerAg) {
+    public Agent process(Pred directive, Agent outterContent, Agent innerContent) {
     	String file = ((StringTerm)directive.getTerm(0)).getString();
-    	if (outerAg != null && outerAg.getASLSource() != null) {
-    		file = new File(outerAg.getASLSource()).getParentFile().getPath() + File.separator + file; 
+    	if (outterContent != null && outterContent.getASLSource() != null) {
+    		file = new File(outterContent.getASLSource()).getParentFile().getPath() + File.separator + file; 
     	}
         return processInclude(file);
     }

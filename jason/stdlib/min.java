@@ -12,8 +12,8 @@ import java.util.Iterator;
 /**
 <p>Internal action: <b><code>.min</code></b>.
 
-<p>Description: gets the minimal value of a list of terms. 
-The "natural" order for each type of terms is used. Between 
+	<p>Description: gets the minimum value of a list of terms, using
+	the "natural" order of terms. Between 
 different types of terms, the following order is
 used:<br>
 

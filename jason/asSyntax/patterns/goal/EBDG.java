@@ -24,7 +24,7 @@ public class EBDG implements Directive {
 
     static Logger logger = Logger.getLogger(EBDG.class.getName());
     
-    public Agent process(Pred directive, Agent outerAg, Agent innerAg) {
+    public Agent process(Pred directive, Agent outterContent, Agent innerContent) {
         try {
             Agent newAg = new Agent();
             
@@ -35,7 +35,7 @@ public class EBDG implements Directive {
             
             // change all inner plans
             int i = 0;
-            for (Plan p: innerAg.getPL()) {
+            for (Plan p: innerContent.getPL()) {
                 i++;
                 // create p__f(i,g)
                 Literal pi = new Literal("p__f");

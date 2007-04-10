@@ -17,10 +17,10 @@ public class BDG extends DG {
 
     static Logger logger = Logger.getLogger(BDG.class.getName());
     
-    public Agent process(Pred directive, Agent outerAg, Agent innerAg) {
+    public Agent process(Pred directive, Agent outterContent, Agent innerContent) {
         try {
             // apply DG in the inner plans
-        	Agent newAg = super.process(directive, outerAg, innerAg); 
+        	Agent newAg = super.process(directive, outterContent, innerContent); 
             if (newAg != null) {
 
                 Term goal = directive.getTerm(0);

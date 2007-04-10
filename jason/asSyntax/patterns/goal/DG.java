@@ -20,7 +20,7 @@ public class DG implements Directive {
 
     static Logger logger = Logger.getLogger(DG.class.getName());
 
-    public Agent process(Pred directive, Agent outerAg, Agent innerAg) {
+    public Agent process(Pred directive, Agent outterContent, Agent innerContent) {
         try {
             Agent newAg = new Agent();
             
@@ -30,7 +30,7 @@ public class DG implements Directive {
             newAg.getPL().add(Plan.parse("+!"+goal+" : " +goal+"."));
             
             // add ?g in the end of all inner plans
-            for (Plan p: innerAg.getPL()) {
+            for (Plan p: innerContent.getPL()) {
                 BodyLiteral b = new BodyLiteral(BodyType.test, (Literal)goal.clone());
                 p.getBody().add(b);
                 newAg.getPL().add(p);
