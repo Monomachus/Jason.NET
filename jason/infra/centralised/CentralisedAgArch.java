@@ -27,7 +27,6 @@ import jason.JasonException;
 import jason.architecture.AgArch;
 import jason.architecture.AgArchInfraTier;
 import jason.asSemantics.ActionExec;
-import jason.asSemantics.Agent;
 import jason.asSemantics.Message;
 import jason.asSyntax.Literal;
 import jason.asSyntax.Structure;
@@ -63,7 +62,7 @@ public class CentralisedAgArch extends Thread implements AgArchInfraTier {
     private RunCentralisedMAS		    masRunner    = null;
 
     /** The user implementation of the architecture */
-    protected AgArch        fUserAgArh;
+    protected AgArch        userAgArch;
 
     private String          agName  = "";
     private boolean         running = true;
@@ -89,9 +88,9 @@ public class CentralisedAgArch extends Thread implements AgArchInfraTier {
     public void initAg(String agArchClass, String agClass, ClassParameters bbPars, String asSrc, Settings stts, RunCentralisedMAS masRunner) throws JasonException {
         try {
         	this.masRunner = masRunner; 
-            fUserAgArh = (AgArch) Class.forName(agArchClass).newInstance();
-            fUserAgArh.setArchInfraTier(this);
-            fUserAgArh.initAg(agClass, bbPars, asSrc, stts);
+            userAgArch = (AgArch) Class.forName(agArchClass).newInstance();
+            userAgArch.setArchInfraTier(this);
+            userAgArch.initAg(agClass, bbPars, asSrc, stts);
             setLogger();
         } catch (Exception e) {
             running = false;
@@ -101,7 +100,7 @@ public class CentralisedAgArch extends Thread implements AgArchInfraTier {
     
     public void setLogger() {
         logger = Logger.getLogger(CentralisedAgArch.class.getName() + "." + getAgName());
-        logger.setLevel(fUserAgArh.getTS().getSettings().logLevel());    	
+        logger.setLevel(userAgArch.getTS().getSettings().logLevel());    	
     }
     
     public Logger getLogger() {
@@ -118,11 +117,11 @@ public class CentralisedAgArch extends Thread implements AgArchInfraTier {
     }
 
     public void setUserAgArch(AgArch arch) {
-    	fUserAgArh = arch;
+    	userAgArch = arch;
     }
     
     public AgArch getUserAgArch() {
-        return fUserAgArh;
+        return userAgArch;
     }
 
     public void setEnvInfraTier(CentralisedEnvironment env) {
@@ -144,14 +143,11 @@ public class CentralisedAgArch extends Thread implements AgArchInfraTier {
     private Object syncStopRun = new Object();
 
     public void stopAg() {
-        fUserAgArh.stopAg();
+        userAgArch.stopAg();
         running = false;
-        fUserAgArh.getTS().receiveSyncSignal(); // in case the agent is wainting
-        // .....
-        fUserAgArh.getTS().newMessageHasArrived(); // in case the agent is
-        // wainting .....
+        userAgArch.getTS().receiveSyncSignal(); // in case the agent is waiting
+        userAgArch.getTS().newMessageHasArrived(); // in case the agent is waiting
         synchronized (syncStopRun) {
-            //infraEnv.delAgent(fUserAgArh);
         	masRunner.delAg(agName);
         }
     }
@@ -163,7 +159,7 @@ public class CentralisedAgArch extends Thread implements AgArchInfraTier {
     public void run() {
         synchronized (syncStopRun) {
             while (running) {
-                fUserAgArh.getTS().reasoningCycle();
+                userAgArch.getTS().reasoningCycle();
             }
         }
     }
@@ -198,7 +194,7 @@ public class CentralisedAgArch extends Thread implements AgArchInfraTier {
     
     public void receiveMsg(Message m) {
         mbox.offer(m);
-        fUserAgArh.getTS().newMessageHasArrived();    	
+        userAgArch.getTS().newMessageHasArrived();    	
     }
 
     public void broadcast(jason.asSemantics.Message m) throws Exception {
@@ -212,7 +208,7 @@ public class CentralisedAgArch extends Thread implements AgArchInfraTier {
 
     // Deafult procedure for checking messages, move message from local mbox to C.mbox
     public void checkMail() {
-        Queue<Message> tsmb = fUserAgArh.getTS().getC().getMailBox();
+        Queue<Message> tsmb = userAgArch.getTS().getC().getMailBox();
         while (!mbox.isEmpty()) {
             Message im = mbox.poll();
             tsmb.offer(im);
