@@ -52,8 +52,7 @@
 
 @kqmlReceivedUnAchieve[atomic]
 +!kqml_received(KQML_Sender_Var, unachieve, KQML_Content_Var, KQML_MsgId)
-   <- .drop_desire(KQML_Content_Var);
-      .drop_intention(KQML_Content_Var).
+   <- .drop_desire(KQML_Content_Var).
 
 
 /* ---- ask performatives ---- */ 

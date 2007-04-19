@@ -24,7 +24,6 @@
 
 package jason.stdlib;
 
-import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.Term;
@@ -37,10 +36,8 @@ import jason.asSyntax.Term;
   produced.
 
   <p>This action changes the agent's circumstance structure by simply emptying
-  the whole set of events (E). Note that, contrary to the <code>.desire</code>
-  definition, this action does not change the set of intentions; 
-  <code>.drop_all_intentions</code> should be used in combination with this
-  action to remove all intentions also.
+  the whole set of events (E) and then calling  
+  <code>.drop_all_intentions</code>.
 
   <p>Example:<ul> 
 
@@ -58,11 +55,11 @@ import jason.asSyntax.Term;
   @see jason.stdlib.intend
 
  */
-public class drop_all_desires extends DefaultInternalAction {
+public class drop_all_desires extends drop_all_intentions {
     
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         ts.getC().clearEvents();
-        return true;
+        return super.execute(ts, un, args);
     }
 }
