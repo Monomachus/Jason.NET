@@ -24,75 +24,51 @@
 package jason.stdlib;
 
 import jason.JasonException;
-import jason.asSemantics.Circumstance;
-import jason.asSemantics.Event;
-import jason.asSemantics.Intention;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.Literal;
 import jason.asSyntax.Term;
-import jason.asSyntax.Trigger;
-
-import java.util.Iterator;
 
 
 /**
-  <p>Internal action: <b><code>.drop_desire(<i>D</i>)</code></b>.
+  <p>Internal action: <b><code>.drop_event(<i>D</i>)</code></b>.
   
-  <p>Description: removes desire <i>D</i> from the agent circumstance. 
+  <p>Description: removes event <i>D</i> from the agent circumstance. 
   Currently what it does is simply to remove all <i>+!D</i> entries
-  (those for which <code>.desire(D)</code> would succeed) from both 
-  the set of events and the set of intentions.
+  (those for which <code>.desire(D)</code> would succeed) from the set of events.
   No event is produced as a consequence of dropping desires.
 
   <p>Example:<ul> 
 
-  <li> <code>.drop_desire(go(X,Y))</code>: remove desires such as
-  <code>&lt;+!go(1,3),_&gt;</code>.
+  <li> <code>.drop_event(go(X,Y))</code>: remove events such as
+  <code>&lt;+!go(1,3),_&gt;</code> from the set of events.
 
   </ul>
+
  
   @see jason.stdlib.current_intention
   @see jason.stdlib.desire
   @see jason.stdlib.drop_all_desires
   @see jason.stdlib.drop_all_intentions
-  @see jason.stdlib.drop_event
   @see jason.stdlib.drop_intention
+  @see jason.stdlib.drop_desire
   @see jason.stdlib.succeed_goal
   @see jason.stdlib.fail_goal
   @see jason.stdlib.intend
 
 
  */
-public class drop_desire extends drop_intention {
+public class drop_event extends drop_desire {
     
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         try {
             dropEvt(ts.getC(), (Literal)args[0], un);
-            dropInt(ts.getC(), (Literal)args[0], un);
             return true;
         } catch (ArrayIndexOutOfBoundsException e) {
-            throw new JasonException("The internal action 'drop_desire' has not received the required argument.");
+            throw new JasonException("The internal action 'drop_event' has not received the required argument.");
         } catch (Exception e) {
-            throw new JasonException("Error in internal action 'drop_desire': " + e, e);
-        }
-    }
-    
-    public void dropEvt(Circumstance C, Literal l, Unifier un) {
-        Event e = new Event(new Trigger(Trigger.TEAdd, Trigger.TEAchvG, l),Intention.EmptyInt);
-        Iterator<Event> ie = C.getEvents().iterator();
-        while (ie.hasNext()) {
-        	Event ei = ie.next();
-            Trigger t = ei.getTrigger();
-            if (ei.getIntention() != Intention.EmptyInt) {
-                t = (Trigger) t.clone();
-                t.getLiteral().apply(ei.getIntention().peek().getUnif());
-            }
-            if (un.unifies(t, e.getTrigger())) {
-                // old implementation: t.setTrigType(Trigger.TEDel); // Just changing "+!g" to "-!g"
-            	ie.remove();
-            }
+            throw new JasonException("Error in internal action 'drop_event': " + e, e);
         }
     }
 }

@@ -65,7 +65,6 @@ public class drop_intention extends DefaultInternalAction {
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         try {
-        	args[0].apply(un);
             dropInt(ts.getC(),(Literal)args[0],un);
             return true;
         } catch (ArrayIndexOutOfBoundsException e) {

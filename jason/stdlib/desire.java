@@ -63,7 +63,6 @@ public class desire extends intend {
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         try {
-            args[0].apply(un); 
             return desires(ts.getC(),(Literal)args[0],un);
         } catch (ArrayIndexOutOfBoundsException e) {
             throw new JasonException("The internal action 'desire' has not received the required argument.");
