@@ -57,9 +57,6 @@ public class min extends DefaultInternalAction {
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         try {
-        	args[0].apply(un);
-        	args[1].apply(un);
-
         	if (!args[0].isList()) {
             	throw new JasonException("The first argument of .min should be a list.");
             }

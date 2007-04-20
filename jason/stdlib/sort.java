@@ -79,8 +79,6 @@ public class sort extends DefaultInternalAction {
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         try {
-        	args[0].apply(un);
-        	args[1].apply(un);
             ListTerm l1 = (ListTerm) args[0].clone();
             if (l1.isVar()) {
             	throw new JasonException("The first argument of .sort should not be a free variable.");

@@ -66,7 +66,6 @@ public class count extends DefaultInternalAction {
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         try {
             Literal bel = (Literal)args[0]; // Literal.parseLiteral(args[0].toString());
-            bel.apply(un);
             int n = 0;
             // find all "bel" entries in the belief base and builds up a list with them
             Iterator<Unifier> iu = bel.logicalConsequence(ts.getAg(), un);

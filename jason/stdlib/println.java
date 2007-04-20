@@ -62,7 +62,6 @@ public class println extends DefaultInternalAction {
 				sout.append(st.getString());
 			} else {
 				Term t = args[i];
-				t.apply(un);
 				if (! t.isVar()) {
 					sout.append(t);
 				} else {

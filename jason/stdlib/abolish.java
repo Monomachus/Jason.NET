@@ -52,7 +52,6 @@ public class abolish extends DefaultInternalAction {
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         try {
-        	args[0].apply(un);
             ts.getAg().abolish((Literal)args[0], un);
             return true;
         } catch (ArrayIndexOutOfBoundsException e) {

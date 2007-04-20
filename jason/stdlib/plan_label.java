@@ -62,7 +62,6 @@ public class plan_label extends DefaultInternalAction {
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         try {
-			args[1].apply(un);
             Term label = args[1];
             Plan p = ts.getAg().getPL().get(label.toString());
             return un.unifies(new StringTermImpl(p.toASString()), args[0]);

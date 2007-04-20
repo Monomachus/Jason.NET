@@ -122,17 +122,13 @@ public class send extends DefaultInternalAction {
             ilf  = args[1];
             pcnt = args[2];
 	        
-            to.apply(un);
-            
             if (!to.isAtom() && !to.isList() && !to.isString()) {
                 throw new JasonException("The TO parameter ('"+to+"') of the internal action 'send' is not an atom or list of atoms!");
             }
 
-            ilf.apply(un);
             if (! ilf.isAtom()) {
                 throw new JasonException("The illocutionary force parameter ('"+ilf+"') of the internal action 'send' is not an atom!");
             }
-            pcnt.apply(un);
 	        
             // remove source annots in the content (in case it is a pred)
             try {

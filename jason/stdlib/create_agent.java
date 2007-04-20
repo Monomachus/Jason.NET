@@ -86,11 +86,8 @@ public class create_agent extends DefaultInternalAction {
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
 
         try {
-            Term name = args[0];
-            name.apply(un);
-
+            Term       name   = args[0];
             StringTerm source = (StringTerm)args[1];
-            source.apply(un);
 
             File fSource = new File(source.getString());
             if (!fSource.exists()) {

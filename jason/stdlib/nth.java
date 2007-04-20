@@ -37,10 +37,6 @@ public class nth extends DefaultInternalAction {
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
     	try {
-			args[0].apply(un);
-			args[1].apply(un);
-			args[2].apply(un);
-			
 	        if (!args[0].isNumeric()) {
 	            throw new JasonException("nth: the first argument should be numeric!");
 	        }

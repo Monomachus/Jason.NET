@@ -124,6 +124,7 @@ public class Literal extends Pred implements LogicalFormula {
                 Term[] clone = new Term[current.length];
                 for (int i=0; i<clone.length; i++) {
                     clone[i] = (Term)current[i].clone();
+                    clone[i].apply(un);
                 }
 
             	// calls execute

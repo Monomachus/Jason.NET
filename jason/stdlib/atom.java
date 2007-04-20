@@ -43,7 +43,6 @@ public class atom extends DefaultInternalAction {
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         try {
-            args[0].apply(un);
             return args[0].isAtom();
         } catch (ArrayIndexOutOfBoundsException e) {
             throw new JasonException("The internal action 'atom' has not received the required argument.");
