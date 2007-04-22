@@ -19,7 +19,8 @@ public class Include implements Directive {
     public Agent process(Pred directive, Agent outterContent, Agent innerContent) {
     	String file = ((StringTerm)directive.getTerm(0)).getString();
     	if (outterContent != null && outterContent.getASLSource() != null) {
-    		file = new File(outterContent.getASLSource()).getParentFile().getPath() + File.separator + file; 
+    		String dir =new File(outterContent.getASLSource()).getAbsoluteFile().getParent(); 
+    		file =  dir + File.separator + file; 
     	}
         return processInclude(file);
     }
