@@ -209,11 +209,14 @@ public class SaciAgArch extends saci.Agent implements AgArchInfraTier {
     }
 
     public void stopAg() {
-        userAgArh.stopAg();
-
         running = false;
-        userAgArh.getTS().receiveSyncSignal(); // in case the agent is wainting
-        userAgArh.getTS().newMessageHasArrived(); // in case the agent is wainting .....
+        new Thread() {
+            public void run() {
+                userAgArh.stopAg();
+            }
+        }.start();
+        userAgArh.getTS().receiveSyncSignal(); // in case the agent is waiting sync
+        userAgArh.getTS().newMessageHasArrived(); // in case the agent is waiting messages
     }
 
     public void run() {
@@ -256,15 +259,15 @@ public class SaciAgArch extends saci.Agent implements AgArchInfraTier {
             logger.log(Level.SEVERE, "Error receiving perceptions.", e);
         }
         if (m != null) {
-            String content = (String) m.get("content");
-            if (content != null) {
-                percepts = ListTermImpl.parseList(content).getAsList();
+            Object content = m.get("content");
+            if (content != null && content.toString().startsWith("[")) {
+                percepts = ListTermImpl.parseList(content.toString()).getAsList();
                 if (logger.isLoggable(Level.FINE)) {
                     logger.fine("received percepts: " + percepts);
                 }
             } else {
                 percepts = null; // used to indicate that are nothing new in
-                                    // the environment, no BRF needed
+                                 // the environment, no BUF needed
             }
         }
 
