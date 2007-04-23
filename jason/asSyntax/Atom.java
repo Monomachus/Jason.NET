@@ -41,7 +41,7 @@ public final class Atom extends Literal {
     public Atom(String functor) {
         super(functor);
 		if (functor == null) {
-			logger.info("functor of an Atom should not be null!");
+            logger.log(Level.SEVERE, "Functor of an Atom should not be null!",new JasonException(""));
 		}
     }
     

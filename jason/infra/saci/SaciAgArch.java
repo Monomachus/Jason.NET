@@ -353,8 +353,7 @@ public class SaciAgArch extends saci.Agent implements AgArchInfraTier {
                 if (propCont != null) {
                     propCont = m.get("content");
                     String sPropCont = propCont.toString();
-                    if (sPropCont.startsWith("\"")) { // deal with a term
-                                                        // closed by "
+                    if (sPropCont.startsWith("\"")) { // deal with a term enclosed by "
                         sPropCont = sPropCont.substring(1, sPropCont.length() - 1);
                         if (DefaultTerm.parse(sPropCont) != null) {
                             // it was a term with "
