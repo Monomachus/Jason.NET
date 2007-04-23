@@ -319,6 +319,8 @@ public class SaciAgArch extends saci.Agent implements AgArchInfraTier {
     public void broadcast(jason.asSemantics.Message m) throws Exception {
         saci.Message msaci = new saci.Message("(" + m.getIlForce() + ")");
         msaci.put("content", m.getPropCont());
+        msaci.put("reply-with", m.getMsgId());
+        msaci.put("language", "AgentSpeak");
         getMBox().broadcast(msaci);
     }
 
