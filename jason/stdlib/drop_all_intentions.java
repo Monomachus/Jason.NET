@@ -38,7 +38,7 @@ import jason.asSyntax.Term;
   <p>Internal action: <b><code>.drop_all_intentions</code></b>.
   
   <p>Description: removes all intentions from the agent's set of
-  intentions (event suspended intentions are removed). 
+  intentions (even suspended intentions are removed). 
   No event is produced.
 
   <p>This action changes the agent's circumstance structure by simply
