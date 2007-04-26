@@ -40,7 +40,7 @@ import java.util.Iterator;
   <p>Internal action: <b><code>.drop_desire(<i>D</i>)</code></b>.
   
   <p>Description: removes desire <i>D</i> from the agent circumstance. 
-  Currently what it does is simply to remove all <i>+!D</i> entries
+  This internal action simply removes all <i>+!D</i> entries
   (those for which <code>.desire(D)</code> would succeed) from both 
   the set of events and the set of intentions.
   No event is produced as a consequence of dropping desires.

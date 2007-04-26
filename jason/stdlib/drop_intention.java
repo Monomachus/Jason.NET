@@ -39,8 +39,8 @@ import jason.asSyntax.Trigger;
 /**
   <p>Internal action: <b><code>.drop_intention(<i>I</i>)</code></b>.
   
-  <p>Description: removes the intention <i>I</i> from the set of
-  intention of the agent (suspended intetions are also considered).
+  <p>Description: removes intentions <i>I</i> from the set of
+  intentions of the agent (suspended intetions are also considered).
   No event is produced.
 
   <p>Example:<ul> 

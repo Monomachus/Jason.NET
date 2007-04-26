@@ -33,8 +33,8 @@ import jason.asSyntax.Term;
 /**
   <p>Internal action: <b><code>.drop_event(<i>D</i>)</code></b>.
   
-  <p>Description: removes event <i>D</i> from the agent circumstance. 
-  Currently what it does is simply to remove all <i>+!D</i> entries
+  <p>Description: removes events <i>D</i> from the agent circumstance. 
+  This internal action simply removes all <i>+!D</i> entries
   (those for which <code>.desire(D)</code> would succeed) <i>from the set of events only</i>;
   this action is complementary to <code>.drop_desire</code> and <code>.drop_intention</code>,
   in case a goal is to be removed only from the set of events and <i>not</i> from the set of intentions.
@@ -42,7 +42,7 @@ import jason.asSyntax.Term;
 
   <p>Example:<ul> 
 
-  <li> <code>.drop_event(go(X,Y))</code>: remove events such as
+  <li> <code>.drop_event(go(X,Y))</code>: removes events such as
   <code>&lt;+!go(1,3),_&gt;</code> from the set of events.
 
   </ul>
