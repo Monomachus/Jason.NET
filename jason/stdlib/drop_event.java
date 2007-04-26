@@ -35,8 +35,10 @@ import jason.asSyntax.Term;
   
   <p>Description: removes event <i>D</i> from the agent circumstance. 
   Currently what it does is simply to remove all <i>+!D</i> entries
-  (those for which <code>.desire(D)</code> would succeed) from the set of events.
-  No event is produced as a consequence of dropping desires.
+  (those for which <code>.desire(D)</code> would succeed) <i>from the set of events only</i>;
+  this action is complementary to <code>.drop_desire</code> and <code>.drop_intention</code>,
+  in case a goal is to be removed only from the set of events and <i>not</i> from the set of intentions.
+  No event is produced as a consequence of dropping desires from the set of events.
 
   <p>Example:<ul> 
 
