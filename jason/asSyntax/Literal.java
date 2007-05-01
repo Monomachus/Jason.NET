@@ -138,9 +138,9 @@ public class Literal extends Pred implements LogicalFormula {
                 logger.log(Level.SEVERE, getErrorMsg(ag) + ": " +	e.getMessage(), e);
             }
             return LogExpr.EMPTY_UNIF_LIST.iterator();  // empty iterator for unifier
-        } else if (this == LTrue) {
+        } else if (this.equals(LTrue)) {
             return LogExpr.createUnifIterator(un);            
-        } else if (this == LFalse) {
+        } else if (this.equals(LFalse)) {
             return LogExpr.EMPTY_UNIF_LIST.iterator();            
         } else {
             final Iterator<Literal> il = ag.getBB().getRelevant(this);
