@@ -39,6 +39,7 @@ public abstract class DefaultTerm implements Term, Serializable {
 	private static final long serialVersionUID = 1L;
 
     protected Integer hashCodeCache = null;
+	protected int           srcLine = -1; // the line this literal appears in the source
 
     static private Logger logger = Logger.getLogger(Term.class.getName());
     
@@ -119,5 +120,13 @@ public abstract class DefaultTerm implements Term, Serializable {
     public boolean apply(Unifier u) {
     	return false;
     }
+
+    public void setSrcLine(int i) {
+		srcLine = i;
+	}
+    public int getSrcLine() {
+    	return srcLine;
+    }
+
 
 }

@@ -26,6 +26,7 @@ package jason.asSemantics;
 import jason.JasonException;
 import jason.architecture.AgArch;
 import jason.asSyntax.Literal;
+import jason.asSyntax.LogicalFormula;
 import jason.asSyntax.Plan;
 import jason.asSyntax.PlanLibrary;
 import jason.asSyntax.Structure;
@@ -341,10 +342,10 @@ public class Agent {
     }
 
     /**
-     * Returns true if BB contains the literal (using unification to test).
+     * Returns true if BB contains the literal <i>bel</bel> (using unification to test).
      * The unifier <i>un</i> is updated by the method.
      */
-    public boolean believes(Literal bel, Unifier un) {
+    public boolean believes(LogicalFormula bel, Unifier un) {
         try {
             Iterator<Unifier> iun = bel.logicalConsequence(this, un);
             if (iun != null && iun.hasNext()) {

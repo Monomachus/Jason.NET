@@ -93,7 +93,14 @@ public class BodyLiteral implements Cloneable {
 
     public BodyLiteral(RelExpr re) {
         formula = (LogicalFormula) re.clone();
+        srcLine = re.getSrcLine();
         formType = BodyType.constraint;
+    }
+
+    public BodyLiteral(LogExpr le) {
+        formula = (LogicalFormula) le.clone();
+        srcLine = le.getSrcLine();
+        formType = BodyType.test;
     }
 
     public BodyType getType() {
@@ -141,6 +148,8 @@ public class BodyLiteral implements Cloneable {
     public Object clone() {
         if (formType == BodyType.constraint) {
             return new BodyLiteral((RelExpr)formula);
+        } else if (formula instanceof LogExpr) {
+            return new BodyLiteral((LogExpr)formula);
         } else {
             return new BodyLiteral(formType, (Literal)formula);
         }

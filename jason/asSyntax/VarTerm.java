@@ -77,6 +77,7 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
         } else {
             // do not call constructor with term parameter!
             VarTerm t = new VarTerm(super.getFunctor());
+            t.setSrcLine(this.getSrcLine());
             if (hasAnnot()) {
                 t.setAnnots((ListTerm) getAnnots().clone());
             }

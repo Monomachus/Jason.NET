@@ -43,7 +43,6 @@ public class Pred extends Structure {
 	private static final long serialVersionUID = 1L;
 
 	private ListTerm      annots;
-	private int           srcLine = -1; // the line this literal appears in the source
 
     static private Logger logger = Logger.getLogger(Pred.class.getName());
 
@@ -69,13 +68,6 @@ public class Pred extends Structure {
             logger.log(Level.SEVERE, "Error parsing predicate " + sPred, e);
             return null;
         }
-    }
-
-    public void setSrcLine(int i) {
-		srcLine = i;
-	}
-    public int getSrcLine() {
-    	return srcLine;
     }
 
     @Override

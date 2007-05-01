@@ -71,4 +71,6 @@ public interface Term extends Cloneable, Comparable<Term>, Serializable, ToDOM {
 
     /** Removes the valued cached for hashCode */
     public void resetHashCodeCache();
+    
+    public int getSrcLine();
 }

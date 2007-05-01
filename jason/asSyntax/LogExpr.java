@@ -74,7 +74,27 @@ public class LogExpr implements LogicalFormula {
 		op = oper;
 		rhs = f;
 	}
+
+	public boolean apply(Unifier u) {
+		boolean r1 = true, r2 = true;
+		if (lhs != null) r1 = lhs.apply(u);
+		if (rhs != null) r2 = rhs.apply(u);
+		return r1 && r2;
+	}
+	
+	public int getSrcLine() {
+		int l = -1;
+		if (lhs != null)          l = getSrcLine(lhs);
+		if (rhs != null && l < 0) l = getSrcLine(rhs);
+		return l;
+	}
     
+	private int getSrcLine(LogicalFormula f) {
+		if (f instanceof Term) return ((Term)f).getSrcLine();
+		if (f instanceof LogExpr) return ((LogExpr)f).getSrcLine();
+		return -1;
+	}
+	
     public Iterator<Unifier> logicalConsequence(final Agent ag, Unifier un) {
         try {
 	        final Iterator<Unifier> ileft;

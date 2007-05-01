@@ -85,6 +85,20 @@ public class RelExpr implements LogicalFormula {
 		rhs = t2;
 	}
     
+	public boolean apply(Unifier u) {
+		boolean r1 = true, r2 = true;
+		if (lhs != null) r1 = lhs.apply(u);
+		if (rhs != null) r2 = rhs.apply(u);
+		return r1 && r2;
+	}
+
+	public int getSrcLine() {
+		int l = -1;
+		if (lhs != null)          l = lhs.getSrcLine();
+		if (rhs != null && l < 0) l = rhs.getSrcLine();
+		return l;
+	}
+	
     public Iterator<Unifier> logicalConsequence(final Agent ag, Unifier un) {
         Term xp = (Term)lhs.clone();
         Term yp = (Term)rhs.clone();

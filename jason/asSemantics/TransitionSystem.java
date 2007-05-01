@@ -395,7 +395,7 @@ public class TransitionSystem {
 
         Literal body = null;
         
-        if (h.getType() != BodyType.constraint) { // constraint body is not a literal
+        if (h.getType() != BodyType.constraint && h.getType() != BodyType.test) { // constraint and test body may be not a literal
             body = (Literal)h.getLiteralFormula().clone();
             body.apply(u);
         }
@@ -463,17 +463,25 @@ public class TransitionSystem {
 
         // Rule Test
         case test:
-            if (conf.ag.believes(body, u)) {
+            LogicalFormula f = (LogicalFormula)h.getLogicalFormula().clone();
+            f.apply(u);
+            if (conf.ag.believes(f, u)) {
                 updateIntention();
             } else {
-                body.makeVarsAnnon();
-                Trigger te = new Trigger(Trigger.TEAdd, Trigger.TETestG, body);
-                if (ag.getPL().isRelevant(te.getPredicateIndicator())) {
-                    Event evt = new Event(te, conf.C.SI);
-                    logger.info("Test Goal '" + h + "' failed as simple query. Generating internal event for it: "+te);
-                    conf.C.addEvent(evt);
-                    confP.step = State.StartRC;
-                } else {
+            	boolean fail = true;
+            	if (f instanceof Literal) { // generate event when using literal in the test (no events for log. expr. like ?(a & b)
+            		body = (Literal)f;
+	                body.makeVarsAnnon();
+	                Trigger te = new Trigger(Trigger.TEAdd, Trigger.TETestG, body);
+	                if (ag.getPL().isRelevant(te.getPredicateIndicator())) {
+	                    Event evt = new Event(te, conf.C.SI);
+	                    logger.info("Test Goal '" + h + "' failed as simple query. Generating internal event for it: "+te);
+	                    conf.C.addEvent(evt);
+	                    confP.step = State.StartRC;
+	                    fail = false;
+	                } 
+            	}
+                if (fail) {
                     logger.info("Test '"+h+"' failed"+h.getSrcInfo(getAg())+".");
                     generateGoalDeletion();
                 }

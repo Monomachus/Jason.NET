@@ -248,33 +248,41 @@ void plan_body(ArrayList bd) : { BodyLiteral F; }
 
 BodyLiteral body_formula() :  { Literal A; Token k;
                                 BodyType formType = BodyType.action;
+                                Object L;
                                 Object rel; VarTerm v;
                               }
 {
  
  ( LOOKAHEAD(4)
    // goals and belief updates
-   (  "!"             { formType = BodyType.achieve; }
-    | "!!"            { formType = BodyType.achieveNF; }
-    | "?"             { formType = BodyType.test; }
-    | "+"             { formType = BodyType.addBel; }
-    | ( "-"           { formType = BodyType.delBel; }
-        ["+"          { formType = BodyType.delAddBel; }
+   (  "!"              { formType = BodyType.achieve; }
+    | "!!"             { formType = BodyType.achieveNF; }
+    | "?"              { formType = BodyType.test; }
+    | "+"              { formType = BodyType.addBel; }
+    | ( "-"            { formType = BodyType.delBel; }
+        ["+"           { formType = BodyType.delAddBel; }
         ]
       ) 
    )
-   ( A = literal()    { return new BodyLiteral(formType,A); }
-   | v = var()        { return new BodyLiteral(formType,v); } // used in communication "+C"
+   ( A = literal()     { return new BodyLiteral(formType,A); }
+   | v = var()         { return new BodyLiteral(formType,v); } // used in communication "+C"
+   | "(" L = log_expr() ")" 
+                       { if (formType == BodyType.test && L instanceof LogExpr) {
+                            return new BodyLiteral((LogExpr)L);  // used in ?(a & b)
+                         } else {
+                            throw new ParseException("(<logical formula>) can be used only with test goal.");
+                         }
+                       }
    )
  |
   // actions or expressions
   rel = rel_expr()
-                      { if (rel instanceof Literal) {
+                       { if (rel instanceof Literal) {
                           return new BodyLiteral(formType, (Literal)rel);
-                        } else {
+                         } else {
                           return new BodyLiteral((RelExpr)rel); 
-                        }
-                      }
+                         }
+                       }
  )
 }
 
@@ -335,12 +343,12 @@ ListTermImpl list() : { ListTermImpl lt = new ListTermImpl(); ListTerm last;
 {
   "["
   [
-  f=term()                { last = lt.append(f); }
+  f=term()                { last = lt.append(f); lt.setSrcLine(f.getSrcLine()); }
   ( "," f=term()          { last = last.append(f); }
   )*
   [ "|"  ( K=<VAR>        { last.setNext(new VarTerm(K.image)); }
          | K=<UNNAMEDVAR> { last.setNext(new UnnamedVar()); }
-         | f=list()       { last = last.concat((ListTerm)f);	   }
+         | f=list()       { last = last.concat((ListTerm)f); }
          )           
   ]
   ]
@@ -474,9 +482,12 @@ Object arithm_expr_factor():
 
 
 Object arithm_expr_simple():    
-                                { Token K; Object t; VarTerm v; }
+                                { Token K; Object t; VarTerm v; NumberTermImpl n;}
 {
- ( K = <NUMBER>                 { return new NumberTermImpl(K.image); }
+ ( K = <NUMBER>                 { n = new NumberTermImpl(K.image); 
+                                  n.setSrcLine(K.beginLine); 
+                                  return n;
+                                }
  | "-" t = arithm_expr_simple() { if (!(t instanceof NumberTerm)) {
                                     throw new ParseException("operator '-' applied to argument not numeric or variable.");
                                   }
@@ -499,7 +510,10 @@ VarTerm var():      { Token K; VarTerm v; ListTerm lt; }
                     { return v; }
 }
 
-StringTerm string():{ Token k; }
+StringTerm string():{ Token k; StringTermImpl s; }
 {
-  k = <STRING>      { return new StringTermImpl(k.image.substring(1,k.image.length()-1)); } 
+  k = <STRING>      { s = new StringTermImpl(k.image.substring(1,k.image.length()-1)); 
+                      s.setSrcLine(k.beginLine); 
+                      return s;
+                    } 
 }

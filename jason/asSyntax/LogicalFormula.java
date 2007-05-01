@@ -21,5 +21,11 @@ public interface LogicalFormula extends Cloneable, ToDOM {
      */
     public Iterator<Unifier> logicalConsequence(Agent ag, Unifier un);
 
+    /** 
+     *  Applies variables's values in an unifier to the variables in the formula.
+     *  Returns true if some variable was applied.  
+     */
+    public boolean apply(Unifier u);
+
     public Object clone();
 }
