@@ -12,7 +12,12 @@ public class <IA_NAME> extends DefaultInternalAction {
 
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
-        logger.info("not implemented!");
-        return true;
+        try {
+            logger.info("not implemented!");
+            return true;
+        } catch (Exception e) {
+            logger.warning("Error in internal action '<IA_NAME>'! "+e);
+        }
+        return false;
     }
 }
