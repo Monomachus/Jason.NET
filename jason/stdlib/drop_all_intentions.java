@@ -54,6 +54,7 @@ import jason.asSyntax.Term;
 
   @see jason.stdlib.current_intention
   @see jason.stdlib.desire
+  @see jason.stdlib.drop_all_events
   @see jason.stdlib.drop_all_desires
   @see jason.stdlib.drop_desire
   @see jason.stdlib.drop_intention

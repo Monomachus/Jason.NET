@@ -55,6 +55,7 @@ import java.util.Iterator;
   @see jason.stdlib.current_intention
   @see jason.stdlib.desire
   @see jason.stdlib.drop_all_desires
+  @see jason.stdlib.drop_all_events
   @see jason.stdlib.drop_all_intentions
   @see jason.stdlib.drop_event
   @see jason.stdlib.drop_intention

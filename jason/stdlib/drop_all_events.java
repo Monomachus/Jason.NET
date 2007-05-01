@@ -24,31 +24,35 @@
 
 package jason.stdlib;
 
+import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.Term;
 
 /**
 
-  <p>Internal action: <b><code>.drop_all_desires</code></b>.
+  <p>Internal action: <b><code>.drop_all_events</code></b>.
   
-  <p>Description: removes all desires of the agent. No event is
-  produced.
+  <p>Description: removes all desires that the
+     agent has not yet committed to. 
+     No event is produced.
 
-  <p>This action changes the agent's circumstance structure by simply emptying
-  the whole set of events (E) and then calling  
-  <code>.drop_all_intentions</code>.
+  <p>This action changes the agent's circumstance structure by simply
+    emptying the whole set of events (E). This action is complementary
+    to <code>.drop_all_desires</code> and <code>.drop_all_intentions</code>,
+    in case all entries are to be removed from the set of events but
+    <b>not</b> from the set of intentions.
 
   <p>Example:<ul> 
 
-  <li> <code>.drop_all_desires</code>.
+  <li> <code>.drop_all_events</code>.
 
   </ul>
 
   @see jason.stdlib.current_intention
   @see jason.stdlib.desire
   @see jason.stdlib.drop_desire
-  @see jason.stdlib.drop_all_events
+  @see jason.stdlib.drop_all_desires
   @see jason.stdlib.drop_all_intentions
   @see jason.stdlib.drop_intention
   @see jason.stdlib.succeed_goal
@@ -56,11 +60,11 @@ import jason.asSyntax.Term;
   @see jason.stdlib.intend
 
  */
-public class drop_all_desires extends drop_all_intentions {
+public class drop_all_events extends DefaultInternalAction {
     
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         ts.getC().clearEvents();
-        return super.execute(ts, un, args);
+        return true;
     }
 }
