@@ -162,6 +162,7 @@ public class CentralisedAgArch extends Thread implements AgArchInfraTier {
                 userAgArch.getTS().reasoningCycle();
             }
         }
+        logger.info("I finished!");
     }
 
     // Default perception assumes Complete and Accurate sensing.

@@ -97,7 +97,7 @@ public class Circumstance implements Serializable {
     /** Events */
 
     public void addEvent(Event ev) {
-        E.offer(ev);
+        E.add(ev);
 
         // notify listeners
         for (CircumstanceListener el : listeners) {

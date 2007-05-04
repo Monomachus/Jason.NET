@@ -315,20 +315,25 @@ public class TransitionSystem {
 
     private void applyAddIM() throws JasonException {
         // create a new intended means
-        IntendedMeans im = new IntendedMeans(conf.C.SO, (Trigger)conf.C.SE.getTrigger().clone());
-
-        // Rule ExtEv
-        if (conf.C.SE.intention == Intention.EmptyInt) {
-            Intention intention = new Intention();
-            intention.push(im);
-            confP.C.addIntention(intention);
-        }
-        // Rule IntEv
-        else {
-            confP.C.SE.intention.push(im);
-            confP.C.addIntention(confP.C.SE.intention);
-        }
-        confP.step = State.ProcAct;
+    	if (conf.C.SE != null) {
+	        IntendedMeans im = new IntendedMeans(conf.C.SO, (Trigger)conf.C.SE.getTrigger().clone());
+	
+	        // Rule ExtEv
+	        if (conf.C.SE.intention == Intention.EmptyInt) {
+	            Intention intention = new Intention();
+	            intention.push(im);
+	            confP.C.addIntention(intention);
+	        }
+	        // Rule IntEv
+	        else {
+	            confP.C.SE.intention.push(im);
+	            confP.C.addIntention(confP.C.SE.intention);
+	        }
+	        confP.step = State.ProcAct;
+    	} else {
+    		logger.warning("in AddIm with SE == null");
+            confP.step = State.StartRC;    		
+    	}
     }
 
     private void applyProcAct() throws JasonException {
@@ -459,6 +464,7 @@ public class TransitionSystem {
         case achieveNF:
             conf.C.addAchvGoal(body, Intention.EmptyInt);
             updateIntention();
+            logger.fine("* added !! event "+conf.C.getEvents());
             break;
 
         // Rule Test
@@ -829,6 +835,13 @@ public class TransitionSystem {
         } catch (Exception e) {  }
     }
 
+    private boolean stopCycle = false;
+    
+    /** stops the reasoning cycle */
+    public void stopCycle() {
+    	stopCycle = true;
+    }
+    
     /**********************************************************************/
     /* MAIN LOOP */
     /**********************************************************************/
@@ -857,7 +870,7 @@ public class TransitionSystem {
             if (nrcslbr >= setts.nrcbp() || canSleep()) {
                 nrcslbr = 0;
 
-                // logger.fine("perceiving...");
+                logger.fine("perceiving...");
                 List<Literal> percept = agArch.perceive();
 
                 // logger.fine("doing belief revision...");
@@ -866,10 +879,11 @@ public class TransitionSystem {
                 // logger.fine("checking mail...");
                 agArch.checkMail();
             }
-
+            
+            stopCycle = false;
             do {
                 applySemanticRule();
-            } while (step != State.StartRC); // finished a reasoning cycle
+            } while (step != State.StartRC && !stopCycle); // finished a reasoning cycle
 
             ActionExec action = C.getAction(); 
             if (action != null) {
