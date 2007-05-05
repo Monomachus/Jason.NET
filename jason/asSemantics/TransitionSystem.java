@@ -231,6 +231,7 @@ public class TransitionSystem {
         // get all relevant plans for the selected event
         if (conf.C.SE.trigger == null) {
             logger.log(Level.SEVERE, "Event " + C.SE + " has null as trigger! I should not get relevant plan!");
+            confP.step = State.ProcAct;
             return;
         }
         confP.C.RP = relevantPlans(conf.C.SE.trigger);
@@ -464,7 +465,6 @@ public class TransitionSystem {
         case achieveNF:
             conf.C.addAchvGoal(body, Intention.EmptyInt);
             updateIntention();
-            logger.fine("* added !! event "+conf.C.getEvents());
             break;
 
         // Rule Test
@@ -710,6 +710,7 @@ public class TransitionSystem {
     	}
     }
 
+    
     private void generateGoalDeletion() throws JasonException {
         IntendedMeans im = conf.C.SI.peek();
         if (im.isGoalAdd()) {
@@ -736,6 +737,11 @@ public class TransitionSystem {
     // similar to the one above, but for an Event rather than intention
     private void generateGoalDeletionFromEvent() throws JasonException {
         Event ev = conf.C.SE;
+        if (ev == null) {
+            logger.warning("It is not possible to generate an goal deletion event because SE is null!" + conf.C);
+            return;
+        }
+        
         Trigger tevent = ev.trigger;
 
         if (tevent.isAddition() && tevent.isGoal()) {
@@ -835,13 +841,6 @@ public class TransitionSystem {
         } catch (Exception e) {  }
     }
 
-    private boolean stopCycle = false;
-    
-    /** stops the reasoning cycle */
-    public void stopCycle() {
-    	stopCycle = true;
-    }
-    
     /**********************************************************************/
     /* MAIN LOOP */
     /**********************************************************************/
@@ -880,10 +879,9 @@ public class TransitionSystem {
                 agArch.checkMail();
             }
             
-            stopCycle = false;
             do {
                 applySemanticRule();
-            } while (step != State.StartRC && !stopCycle); // finished a reasoning cycle
+            } while (step != State.StartRC); // finished a reasoning cycle
 
             ActionExec action = C.getAction(); 
             if (action != null) {
