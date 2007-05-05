@@ -111,37 +111,18 @@ public class TransitionSystem {
         // the individual semantic rules appear below
 
         switch (step) {
-        case StartRC:
-            applyProcMsg();
-            break;
-        case SelEv:
-            applySelEv();
-            break;
-        case RelPl:
-            applyRelPl();
-            break;
-        case ApplPl:
-            applyApplPl();
-            break;
-        case SelAppl:
-            applySelAppl();
-            break;
-        case AddIM:
-            applyAddIM();
-            break;
-        case ProcAct:
-            applyProcAct();
-            break;
-        case SelInt:
-            applySelInt();
-            break;
-        case ExecInt:
-            applyExecInt();
-            break;
-        case ClrInt:
-            confP.step = State.StartRC;
-            applyClrInt(conf.C.SI);
-            break;
+        case StartRC:   applyProcMsg(); break;
+        case SelEv:     applySelEv(); break;
+        case RelPl:     applyRelPl();  break;
+        case ApplPl:    applyApplPl(); break;
+        case SelAppl:   applySelAppl(); break;
+        case AddIM:     applyAddIM(); break;
+        case ProcAct:   applyProcAct(); break;
+        case SelInt:    applySelInt(); break;
+        case ExecInt:   applyExecInt(); break;
+        case ClrInt:    confP.step = State.StartRC;
+                        applyClrInt(conf.C.SI);
+                        break;
         }
     }
 
@@ -229,11 +210,6 @@ public class TransitionSystem {
 
     private void applyRelPl() throws JasonException {
         // get all relevant plans for the selected event
-        if (conf.C.SE.trigger == null) {
-            logger.log(Level.SEVERE, "Event " + C.SE + " has null as trigger! I should not get relevant plan!");
-            confP.step = State.ProcAct;
-            return;
-        }
         confP.C.RP = relevantPlans(conf.C.SE.trigger);
 
         // Rule Rel1
@@ -262,11 +238,6 @@ public class TransitionSystem {
     }
 
     private void applyApplPl() throws JasonException {
-        if (confP.C.RP == null) {
-            logger.warning("ApplyPl was called even when RP is null!");
-            confP.step = State.ProcAct;
-            return;
-        }
         confP.C.AP = applicablePlans(confP.C.RP);
 
         // Rule Appl1
@@ -303,11 +274,9 @@ public class TransitionSystem {
         confP.C.SO = conf.ag.selectOption(confP.C.AP);
         if (confP.C.SO != null) {
             confP.step = State.AddIM;
-            if (logger.isLoggable(Level.FINE)) {
-                logger.fine("Selected option "+confP.C.SO+" for event "+confP.C.SE);
-            }
+            if (logger.isLoggable(Level.FINE)) logger.fine("Selected option "+confP.C.SO+" for event "+confP.C.SE);
         } else {
-            logger.warning("selectOption returned null.");
+            logger.warning("** selectOption returned null.");
             generateGoalDeletionFromEvent(); 
             // can't carry on, no applicable plan.
             confP.step = State.ProcAct;
@@ -316,25 +285,20 @@ public class TransitionSystem {
 
     private void applyAddIM() throws JasonException {
         // create a new intended means
-    	if (conf.C.SE != null) {
-	        IntendedMeans im = new IntendedMeans(conf.C.SO, (Trigger)conf.C.SE.getTrigger().clone());
-	
-	        // Rule ExtEv
-	        if (conf.C.SE.intention == Intention.EmptyInt) {
-	            Intention intention = new Intention();
-	            intention.push(im);
-	            confP.C.addIntention(intention);
-	        }
-	        // Rule IntEv
-	        else {
-	            confP.C.SE.intention.push(im);
-	            confP.C.addIntention(confP.C.SE.intention);
-	        }
-	        confP.step = State.ProcAct;
-    	} else {
-    		logger.warning("in AddIm with SE == null");
-            confP.step = State.StartRC;    		
-    	}
+        IntendedMeans im = new IntendedMeans(conf.C.SO, (Trigger)conf.C.SE.getTrigger().clone());
+
+        // Rule ExtEv
+        if (conf.C.SE.intention == Intention.EmptyInt) {
+            Intention intention = new Intention();
+            intention.push(im);
+            confP.C.addIntention(intention);
+        }
+        // Rule IntEv
+        else {
+            confP.C.SE.intention.push(im);
+            confP.C.addIntention(confP.C.SE.intention);
+        }
+        confP.step = State.ProcAct;
     }
 
     private void applyProcAct() throws JasonException {
@@ -649,6 +613,9 @@ public class TransitionSystem {
     public List<Option> applicablePlans(List<Option> rp) throws JasonException {
         List<Option> ap = null;
         if (rp != null) {
+        	ap = new ApplPlanTimeOut().get(rp);
+        	
+        	/*
             for (Option opt: rp) {
                 LogicalFormula context = opt.plan.getContext();
                 if (context == null) { // context is true
@@ -672,12 +639,73 @@ public class TransitionSystem {
                         }
                     }
                 }
-            }
+            } 
+            */       	
         }
         return ap;
     }
-
-
+    
+    class ApplPlanTimeOut extends Thread {
+        List<Option> ap = null;
+        List<Option> rp = null;
+    
+        boolean finish = false;
+        
+        List<Option> get(List<Option> rp) {
+        	this.rp = rp;
+        	start();
+        	waitEvaluation();
+        	return ap;
+        }
+        
+        synchronized void waitEvaluation() {
+        	try {
+        		if (!finish) {
+        			wait(3000); // wait 5 seconds for the evaluation!
+        			if (!finish) {
+        				logger.warning("*** Evaluation of appl plan do not finish in 3 seconds!"+C+"\bBB="+getAg().getBB());
+        			}
+        		}
+        		finish = true;
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+        }
+        
+        synchronized void finishEvaluation() {
+            finish = true;
+        	notify();
+        }
+        
+        public void run() {
+            for (Option opt: rp) {
+                LogicalFormula context = opt.plan.getContext();
+                if (context == null) { // context is true
+                    if (ap == null) ap = new LinkedList<Option>();
+                    ap.add(opt);
+                } else {
+                    boolean allUnifs = opt.getPlan().isAllUnifs();
+                    Iterator<Unifier> r = context.logicalConsequence(ag, opt.unif);
+                    if (r != null) {
+                        while (r.hasNext()) {
+                            opt.unif = r.next();
+                            
+                            if (ap == null) ap = new LinkedList<Option>();
+                            ap.add(opt);
+                            
+                            if (!allUnifs) break; // returns only the first unification
+                            if (r.hasNext()) {
+                                // create a new option for the next loop step
+                                opt = new Option((Plan)opt.plan.clone(), null);
+                            }
+                        }
+                    }
+                }
+	        }
+            finishEvaluation();
+        }
+    }
+    
     public void updateEvents(List<Literal>[] result, Intention focus) {
         if (result == null) return;
         // create the events
@@ -738,7 +766,7 @@ public class TransitionSystem {
     private void generateGoalDeletionFromEvent() throws JasonException {
         Event ev = conf.C.SE;
         if (ev == null) {
-            logger.warning("It is not possible to generate an goal deletion event because SE is null!" + conf.C);
+            logger.warning("** It is not possible to generate a goal deletion event because SE is null! " + conf.C);
             return;
         }
         
@@ -841,6 +869,19 @@ public class TransitionSystem {
         } catch (Exception e) {  }
     }
 
+    private boolean stopCycle = false;
+    
+    /** stops the reasoning cycle */
+    public void stopCycle() {
+    	stopCycle = true;
+    }
+
+    private String currentTask = null;
+    
+    public String getCurrentTask() {
+    	return currentTask;
+    }
+    
     /**********************************************************************/
     /* MAIN LOOP */
     /**********************************************************************/
@@ -850,7 +891,9 @@ public class TransitionSystem {
     /**********************************************************************/
     public void reasoningCycle() {
         try {
-
+        	
+        	currentTask = "begin";
+        	
             if (setts.isSync()) {
                 waitSyncSignal();
             } else if (canSleep()) {
@@ -869,22 +912,25 @@ public class TransitionSystem {
             if (nrcslbr >= setts.nrcbp() || canSleep()) {
                 nrcslbr = 0;
 
-                logger.fine("perceiving...");
+                currentTask = "perception";
                 List<Literal> percept = agArch.perceive();
 
-                // logger.fine("doing belief revision...");
+                currentTask = "buf";
                 ag.buf(percept);
 
-                // logger.fine("checking mail...");
+                currentTask = "checkMail";
                 agArch.checkMail();
             }
             
+            stopCycle = false;
             do {
+            	currentTask = "step "+step;
                 applySemanticRule();
-            } while (step != State.StartRC); // finished a reasoning cycle
+            } while (step != State.StartRC && !stopCycle); // finished a reasoning cycle
 
             ActionExec action = C.getAction(); 
             if (action != null) {
+            	currentTask = "action "+action;
             	C.getPendingActions().put(action.getIntention().getId(), action);
                 agArch.act(action, C.getFeedbackActions());
             }
@@ -895,18 +941,19 @@ public class TransitionSystem {
             if (setts.isSync()) {
                 boolean isBreakPoint = false;
                 try {
-                    isBreakPoint = getC().getSelectedOption().getPlan().hasBreakpoint();
-                    if (logger.isLoggable(Level.FINE)) {
-                        logger.fine("Informing controller that I finished a reasoning cycle. Breakpoint is " + isBreakPoint);
-                    }
+                    isBreakPoint = conf.C.getSelectedOption().getPlan().hasBreakpoint();
+                    if (logger.isLoggable(Level.FINE)) logger.fine("Informing controller that I finished a reasoning cycle. Breakpoint is " + isBreakPoint);
                 } catch (NullPointerException e) {
-                    // no problem, the is no sel opt, no plan ....
+                    // no problem, there is no sel opt, no plan ....
                 }
                 agArch.getArchInfraTier().informCycleFinished(isBreakPoint, agArch.getCycleNumber());
             }
+            
+            currentTask = "end";
 
         } catch (Exception e) {
-            logger.log(Level.SEVERE, "*** ERROR in the transition system.", e);
+            logger.log(Level.SEVERE, "*** ERROR in the transition system. "+conf.C+"\nCreating a new C!", e);
+            conf.C.create();
         }
     }
 

@@ -248,7 +248,7 @@ public class Agent {
     }
 
     public Option selectOption(List<Option> options) {
-        if (options != null && options.size() > 0) {
+        if (options != null && !options.isEmpty()) {
             return options.remove(0);
         } else {
             return null;

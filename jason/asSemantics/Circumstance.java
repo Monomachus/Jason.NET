@@ -67,16 +67,20 @@ public class Circumstance implements Serializable {
     private List<CircumstanceListener> listeners = new CopyOnWriteArrayList<CircumstanceListener>();
 
     public Circumstance() {
+    	create();
+        reset();
+    }
+
+    public void create() {
         // use LinkedList since we use a lot of remove(0) in selectEvent
         E = new ConcurrentLinkedQueue<Event>();
         I = new ConcurrentLinkedQueue<Intention>();
         MB = new LinkedList<Message>();
         PA = new ConcurrentHashMap<Integer, ActionExec>();
         PI = new ConcurrentHashMap<String, Intention>();
-        FA = new ArrayList<ActionExec>();
-        reset();
+        FA = new ArrayList<ActionExec>();    	
     }
-
+    
     public void reset() {
         A = null;
         RP = null;
@@ -500,7 +504,21 @@ public class Circumstance implements Serializable {
     }
 
     public String toString() {
-        return "<" + E + "," + I + "," + A + "," + MB + "," + RP + "," + AP + "," + SE + "," + SO + "," + SI + "," + PA + "," + FA + ">";
+    	StringBuilder s = new StringBuilder("Circumstance:\n");
+    	s.append("  E ="+E +"\n");
+    	s.append("  I ="+I +"\n");
+    	s.append("  A ="+A +"\n");
+    	s.append("  MB="+MB+"\n");
+    	s.append("  RP="+RP+"\n");
+    	s.append("  AP="+AP+"\n");
+    	s.append("  SE="+SE+"\n");
+    	s.append("  SO="+SO+"\n");
+    	s.append("  SI="+SI+"\n");
+    	s.append("  AI="+AI+"\n");
+    	s.append("  PA="+PA+"\n");
+    	s.append("  PI="+PI+"\n");
+    	s.append("  FA="+FA+".");
+        return s.toString();
     }
 
 }
