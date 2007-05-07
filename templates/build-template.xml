@@ -31,28 +31,16 @@
     
     <target name="jar" depends="compile">
         <delete file="${ant.project.name}.jar" />
-        <delete dir="xxx" />
-    	<mkdir dir="xxx"/>
-        <copy todir="xxx">
+    	<copy file="${jasonJar}" tofile="${ant.project.name}.jar" />
+    	<copy file="${mas2j.project.file}" tofile="default.mas2j" />
+    	<jar update="yes" jarfile="${ant.project.name}.jar" >
             <fileset dir="${basedir}">
-                 <include name="**/*" />
-                 <exclude name="lib/**" />
-                 <exclude name="doc/**" />
-                 <exclude name="xxx/**" />
-                 <exclude name="${ant.project.name}-jnlp/**" />
+                 <include name="**/*.asl" />
+                 <include name="**/*.class" />
+                <include name="**/*.mas2j" />
             </fileset>
-        </copy>
-    	<unjar src="${jasonJar}" dest="xxx" />
-    	<copy file="xxx/META-INF/MANIFEST.MF" tofile="xxx/jasonmanifest" />
-        <delete dir="xxx/META-INF" />
-    	<copy file="${mas2j.project.file}" tofile="xxx/default.mas2j" />
-        <jar jarfile="${ant.project.name}.jar" basedir="xxx" manifest="xxx/jasonmanifest">
-            <fileset dir="xxx">
-                 <include name="**/*" />
-                 <exclude name="lib/**" />
-            </fileset>
-        </jar>
-        <delete dir="xxx" />
+    	</jar>
+        <delete file="default.mas2j" />
     </target>
 
 	
@@ -63,12 +51,16 @@
             <classpath refid="project.classpath"/>
             <arg line="${ant.project.name} ${mas2j.project.file}"/>
         </java>
-        <copy todir="${basedir}/${ant.project.name}-jnlp">
-	    <fileset dir="${basedir}" includes="lib/**/*" />
+        <copy todir="${basedir}/${ant.project.name}-jnlp" failonerror="no">
+            <fileset dir="${basedir}/lib" includes="**/*.jar" />
+            <fileset dir="${basedir}" includes="${ant.project.name}.jar" />
+            <fileset dir="<JASON-HOME>/src/images" includes="Jason-GMoreau-Icon.jpg" />
         </copy>
-        <copy file="${basedir}/${ant.project.name}.jar" todir="${basedir}/${ant.project.name}-jnlp" />
-        <signjar jar="${basedir}/${ant.project.name}-jnlp/${ant.project.name}.jar" alias="jomi" storepass="fred3271" keystore="/Users/jomi/jason/src/jomiKeystore" />
+        <signjar jar="${basedir}/${ant.project.name}-jnlp/${ant.project.name}.jar" alias="jason" 
+        	storepass="rbjhja" keypass="rbjhja" keystore="<JASON-HOME>/src/jasonKeystore" />
+        <echo message="** JNLP application created! Update the codebase (in the second line of the .jnlp file) with your URL." />
     </target>	
+
 
     <target name="run" depends="compile" >
         <echo message="Running project ${ant.project.name}" />

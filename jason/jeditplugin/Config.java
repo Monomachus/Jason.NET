@@ -91,6 +91,16 @@ public class Config extends Properties {
     public String getJasonJar() {
         return getProperty(JASON_JAR);
     }
+    
+    /** return the jason home based on jason.jar */
+    public String getJasonHome() {
+        try {
+        	return new File(getJasonJar()).getParentFile().getParent();
+        } catch (Exception e) {
+        	e.printStackTrace();
+        }
+    	return "";
+    }
 
     public String getSaciJar() {
         return getProperty(SACI_JAR);

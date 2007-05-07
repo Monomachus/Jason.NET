@@ -32,6 +32,7 @@ import jason.mas2j.ClassParameters;
 import jason.mas2j.MAS2JProject;
 import jason.mas2j.parser.ParseException;
 import jason.runtime.MASConsoleGUI;
+import jason.runtime.MASConsoleLogFormatter;
 import jason.runtime.MASConsoleLogHandler;
 import jason.runtime.Settings;
 
@@ -235,29 +236,31 @@ public class RunCentralisedMAS {
     }
 
     public static void setupLogger() {
-        // see for a local log configuration
-        if (new File(logPropFile).exists()) {
-            try {
-                LogManager.getLogManager().readConfiguration(new FileInputStream(logPropFile));
-            } catch (Exception e) {
-                System.err.println("Error setting up logger:" + e);
-            }
-        } else {
-            try {
-                LogManager.getLogManager().readConfiguration(RunCentralisedMAS.class.getResource("/templates/" + logPropFile).openStream());
-            } catch (Exception e) {
-                System.err.println("Error setting up logger:" + e);
-            }
-            /*
-             * // remove current handlers Handler[] hs =
-             * Logger.getLogger("").getHandlers(); for (int i = 0; i <
-             * hs.length; i++) { Logger.getLogger("").removeHandler(hs[i]); }
-             * 
-             * Handler h = new MASConsoleLogHandler(); h.setFormatter(new
-             * MASConsoleLogFormatter()); Logger.getLogger("").addHandler(h);
-             * Logger.getLogger("").setLevel(Level.INFO);
-             */
-        }
+    	if (readFromJAR) {
+    		Handler[] hs = Logger.getLogger("").getHandlers(); 
+    		for (int i = 0; i < hs.length; i++) { 
+    			Logger.getLogger("").removeHandler(hs[i]); 
+    		}
+    		Handler h = new MASConsoleLogHandler();
+    		h.setFormatter(new MASConsoleLogFormatter()); 
+    		Logger.getLogger("").addHandler(h);
+    		Logger.getLogger("").setLevel(Level.INFO);
+    	} else {
+	        // see for a local log configuration
+	        if (new File(logPropFile).exists()) {
+	            try {
+	                LogManager.getLogManager().readConfiguration(new FileInputStream(logPropFile));
+	            } catch (Exception e) {
+	                System.err.println("Error setting up logger:" + e);
+	            }
+	        } else {
+	            try {
+	                LogManager.getLogManager().readConfiguration(RunCentralisedMAS.class.getResource("/templates/" + logPropFile).openStream());
+	            } catch (Exception e) {
+	                System.err.println("Error setting up logger:" + e);
+	            }
+	        }
+    	}
     }
 
     public static RunCentralisedMAS getRunner() {

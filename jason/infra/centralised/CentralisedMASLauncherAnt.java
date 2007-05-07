@@ -172,10 +172,13 @@ public class CentralisedMASLauncherAnt implements MASLauncherInfraTier {
         }
         script = replace(script, "<DEBUG>", sDebug);
         script = replace(script, "<OTHER-TASK>", "");
+        script = replace(script, "<JASON-HOME>", Config.get().getJasonHome());
+        script = replace(script, "<JASON-HOME>", Config.get().getJasonHome());
+        
         return script;
     }
 
-    protected String replace(String s, String p, String n) {
+    public static String replace(String s, String p, String n) {
         int i = s.indexOf(p);
         if (i >= 0) {
             s = s.substring(0, i) + n + s.substring(i + p.length());
