@@ -40,7 +40,8 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Handler;
@@ -69,17 +70,27 @@ public class RunCentralisedMAS {
     private static Logger            logger      = Logger.getLogger(RunCentralisedMAS.class.getName());
 
     private static RunCentralisedMAS runner      = null;
-
+    private static String            urlPrefix   = "";
+    private static boolean           readFromJAR = false;
+    
     private static MAS2JProject      project;
     
     public final static String       logPropFile = "logging.properties";
     public final static String       stopMASFileName = ".stop___MAS";
-    
+    public final static String       defaultProjectFileName = "default.mas2j";
     
     public static void main(String[] args) {
+    	String projectFileName = null;
         if (args.length < 1) {
-            System.err.println("You should inform the MAS project file.");
-            System.exit(1);
+        	if (RunCentralisedMAS.class.getResource(File.separator+defaultProjectFileName) != null) {
+        		projectFileName = defaultProjectFileName;
+        		readFromJAR = true;
+        	} else {
+        		System.err.println("You should inform the MAS project file.");
+        		System.exit(1);
+        	}
+        } else {
+        	projectFileName = args[0];
         }
 
         setupLogger();
@@ -105,7 +116,24 @@ public class RunCentralisedMAS {
         int errorCode = 0;
 
         try {
-            jason.mas2j.parser.mas2j parser = new jason.mas2j.parser.mas2j(new FileReader(args[0]));
+        	InputStream inProject;
+        	if (readFromJAR) {
+        		inProject = RunCentralisedMAS.class.getResource(File.separator+defaultProjectFileName).openStream();
+        		urlPrefix = "ClassResource:";
+        	} else {
+	        	URL file;
+	        	// test if the argument is an URL
+	        	try {
+	        		file = new URL(projectFileName);
+	        		if (projectFileName.startsWith("jar")) {
+	        			urlPrefix = projectFileName.substring(0,projectFileName.indexOf("!")+1) + File.separator;
+	        		}
+	        	} catch (Exception e) {
+	        		file = new URL("file:"+projectFileName);
+	        	}
+	        	inProject = file.openStream();
+        	}
+            jason.mas2j.parser.mas2j parser = new jason.mas2j.parser.mas2j(inProject); 
             project = parser.mas();
 
             project.registerDirectives();
@@ -184,10 +212,10 @@ public class RunCentralisedMAS {
             errorCode = 0;
 
         } catch (FileNotFoundException e1) {
-            logger.log(Level.SEVERE, "File " + args[0] + " not found!");
+            logger.log(Level.SEVERE, "File " + projectFileName + " not found!");
             errorCode = 2;
         } catch (ParseException e) {
-            logger.log(Level.SEVERE, "Error parsing file " + args[0] + "!", e);
+            logger.log(Level.SEVERE, "Error parsing file " + projectFileName + "!", e);
             errorCode = 3;
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error!?: ", e);
@@ -281,10 +309,11 @@ public class RunCentralisedMAS {
                 }
 
                 String tmpAsSrc = ap.asSource.toString();
-                if (!tmpAsSrc.startsWith(File.separator)) {
+                if (!tmpAsSrc.startsWith(File.separator) && !project.getDirectory().equals("./")) {
                     tmpAsSrc = project.getDirectory() + tmpAsSrc;
                 }
-
+                tmpAsSrc = urlPrefix + tmpAsSrc;
+                
                 for (int cAg = 0; cAg < ap.qty; cAg++) {
                     String numberedAg = agName;
                     if (ap.qty > 1) {

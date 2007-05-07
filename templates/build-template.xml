@@ -28,7 +28,47 @@
             <classpath refid="project.classpath"/>
         </javac>
     </target>
+    
+    <target name="jar" depends="compile">
+        <delete file="${ant.project.name}.jar" />
+        <delete dir="xxx" />
+    	<mkdir dir="xxx"/>
+        <copy todir="xxx">
+            <fileset dir="${basedir}">
+                 <include name="**/*" />
+                 <exclude name="lib/**" />
+                 <exclude name="doc/**" />
+                 <exclude name="${ant.project.name}-jnlp/**" />
+            </fileset>
+        </copy>
+    	<unjar src="${jasonJar}" dest="xxx" />
+    	<copy file="xxx/META-INF/MANIFEST.MF" tofile="xxx/jasonmanifest" />
+        <delete dir="xxx/META-INF" />
+    	<copy file="${mas2j.project.file}" tofile="xxx/default.mas2j" />
+        <jar jarfile="${ant.project.name}.jar" basedir="xxx" manifest="xxx/jasonmanifest">
+            <fileset dir="xxx">
+                 <include name="**/*" />
+                 <exclude name="lib/**" />
+            </fileset>
+        </jar>
+        <delete dir="xxx" />
+    </target>
+
 	
+    <target name="jnlp" depends="jar" >
+        <mkdir dir="${basedir}/${ant.project.name}-jnlp"/>
+        <java classname="jason.infra.centralised.CreateJNLP"
+              failonerror="true" fork="yes" dir="${basedir}/${ant.project.name}-jnlp" >
+            <classpath refid="project.classpath"/>
+            <arg line="${ant.project.name} ${mas2j.project.file}"/>
+        </java>
+        <copy todir="${basedir}/${ant.project.name}-jnlp">
+	    <fileset dir="${basedir}" includes="lib/**/*" />
+        </copy>
+        <copy file="${basedir}/${ant.project.name}.jar" todir="${basedir}/${ant.project.name}-jnlp" />
+        <signjar jar="${basedir}/${ant.project.name}-jnlp/${ant.project.name}.jar" alias="jomi" storepass="fred3271" keystore="/Users/jomi/jason/src/jomiKeystore" />
+    </target>	
+
     <target name="run" depends="compile" >
         <echo message="Running project ${ant.project.name}" />
         <java classname="<PROJECT-RUNNER-CLASS>"

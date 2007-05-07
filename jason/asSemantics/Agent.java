@@ -41,6 +41,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -95,7 +96,18 @@ public class Agent {
             setTS(new TransitionSystem(this, new Circumstance(), stts, arch));
 
             setASLSource(asSrc);
-            parseAS(asSrc);
+
+            if (asSrc.startsWith("ClassResource:")) {
+            	parseAS(Agent.class.getResource("/"+asSrc.substring(14)).openStream());
+            } else {
+	            // check whether source is an URL string
+	            try {
+	            	URL urlSrc = new URL(asSrc); 
+	            	parseAS(urlSrc);
+	            } catch (MalformedURLException e) {
+	            	parseAS(asSrc);
+	            }
+            }
             
             // kqml Plans at the end of the ag PS
             parseAS(JasonException.class.getResource("/asl/kqmlPlans.asl"));
