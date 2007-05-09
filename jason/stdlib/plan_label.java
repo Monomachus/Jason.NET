@@ -63,7 +63,8 @@ public class plan_label extends DefaultInternalAction {
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         try {
             Term label = args[1];
-            Plan p = ts.getAg().getPL().get(label.toString());
+            Plan p = (Plan)ts.getAg().getPL().get(label.toString()).clone();
+            p.getLabel().delSources();
             String ps = p.toASString().replaceAll("\"", "\\\\\"");
             return un.unifies(new StringTermImpl(ps), args[0]);
         } catch (ArrayIndexOutOfBoundsException e) {

@@ -27,12 +27,12 @@ import jason.JasonException;
 import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
+import jason.asSyntax.Atom;
+import jason.asSyntax.DefaultTerm;
 import jason.asSyntax.ListTerm;
 import jason.asSyntax.StringTerm;
 import jason.asSyntax.Structure;
-import jason.asSyntax.Atom;
 import jason.asSyntax.Term;
-import jason.asSyntax.DefaultTerm;
 
 import java.util.Iterator;
 
@@ -85,7 +85,6 @@ public class add_plan extends DefaultInternalAction {
             Structure source = new Atom("self");
             if (args.length > 1) {
                 source = (Structure) args[1];
-                source.apply(un);
             }
 
             if (plans.isList()) { // arg[0] is a list of strings

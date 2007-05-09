@@ -100,6 +100,6 @@ public class remove_plan extends DefaultInternalAction {
         	}
         } catch (ArrayIndexOutOfBoundsException e) {
             throw new JasonException("The internal action 'remove_plan' has not received the required argument (a plan label or list of labels).");
-        } 
+        }
     }
 }

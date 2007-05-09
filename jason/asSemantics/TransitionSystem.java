@@ -613,9 +613,8 @@ public class TransitionSystem {
     public List<Option> applicablePlans(List<Option> rp) throws JasonException {
         List<Option> ap = null;
         if (rp != null) {
-        	ap = new ApplPlanTimeOut().get(rp);
+        	//ap = new ApplPlanTimeOut().get(rp);
         	
-        	/*
             for (Option opt: rp) {
                 LogicalFormula context = opt.plan.getContext();
                 if (context == null) { // context is true
@@ -640,11 +639,11 @@ public class TransitionSystem {
                     }
                 }
             } 
-            */       	
         }
         return ap;
     }
-    
+
+    /*
     class ApplPlanTimeOut extends Thread {
         List<Option> ap = null;
         List<Option> rp = null;
@@ -705,6 +704,7 @@ public class TransitionSystem {
             finishEvaluation();
         }
     }
+    */
     
     public void updateEvents(List<Literal>[] result, Intention focus) {
         if (result == null) return;
