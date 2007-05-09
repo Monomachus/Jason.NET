@@ -58,7 +58,10 @@
         </copy>
         <signjar jar="${basedir}/${ant.project.name}-jnlp/${ant.project.name}.jar" alias="jason" 
         	storepass="rbjhja" keypass="rbjhja" keystore="<JASON-HOME>/src/jasonKeystore" />
-        <echo message="** JNLP application created! Update the codebase (in the second line of the .jnlp file) with your URL." />
+        <echo message="**" />
+        <echo message="** JNLP application created!" />
+        <echo message="** Update the codebase (in the second line of the .jnlp file) with your URL." />
+        <echo message="**" />
     </target>	
 
 

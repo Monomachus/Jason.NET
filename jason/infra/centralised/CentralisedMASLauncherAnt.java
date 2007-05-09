@@ -27,6 +27,17 @@ public class CentralisedMASLauncherAnt implements MASLauncherInfraTier {
     protected Process            masProcess = null;
     protected OutputStream       processOut;
 
+    private String task;
+    
+    public CentralisedMASLauncherAnt() {
+    	task = "run";
+	}
+
+    /** create the launcher for a specific ant task */
+    public CentralisedMASLauncherAnt(String task) {
+    	this.task = task;
+	}
+    
     public void setProject(MAS2JProject project) {
         this.project = project;
     }
@@ -43,7 +54,9 @@ public class CentralisedMASLauncherAnt implements MASLauncherInfraTier {
             for (int i = 1; i < command.length; i++) {
                 cmdstr += " " + command[i];
             }
-            System.out.println("Executing MAS with " + cmdstr);
+            
+            
+            System.out.println("Executing " + cmdstr);
 
             File dir = new File(new File(project.getDirectory()).getAbsolutePath());
             masProcess = Runtime.getRuntime().exec(command, null, dir);
@@ -87,7 +100,7 @@ public class CentralisedMASLauncherAnt implements MASLauncherInfraTier {
             }
         }
     }
-
+    
     public void stopMAS() {
         try {
             // creating this file will stop the MAS, the runner checks for this file creation
@@ -106,8 +119,9 @@ public class CentralisedMASLauncherAnt implements MASLauncherInfraTier {
         String build = "build.xml";
         if (hasCBuild())
             build = "c-build.xml";
+        
         return new String[] { Config.get().getJavaHome() + "bin" + File.separator + "java", "-classpath",
-                Config.get().getAntLib() + "ant-launcher.jar", "org.apache.tools.ant.launch.Launcher", "-e", "-f", build };
+                Config.get().getAntLib() + "ant-launcher.jar", "org.apache.tools.ant.launch.Launcher", "-e", "-f", build, task};
     }
 
     /** write the scripts necessary to run the project */
@@ -187,7 +201,7 @@ public class CentralisedMASLauncherAnt implements MASLauncherInfraTier {
     }
 
     protected boolean hasCBuild() {
-        return new File(project.getDirectory() + "c-build.xml").exists();
+    	return new File(project.getDirectory() + "c-build.xml").exists();
     }
 
 }

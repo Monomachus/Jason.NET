@@ -63,4 +63,16 @@
 			wm.getDockable(jason.jeditplugin.JasonIDPlugin.NAME).asl2tex();
 		</CODE>
 	</ACTION>
+	<ACTION NAME="jason.create-jar">
+		<CODE>
+			wm.addDockableWindow(jason.jeditplugin.JasonIDPlugin.NAME);
+			wm.getDockable(jason.jeditplugin.JasonIDPlugin.NAME).createJar();
+		</CODE>
+	</ACTION>
+	<ACTION NAME="jason.create-jnlp">
+		<CODE>
+			wm.addDockableWindow(jason.jeditplugin.JasonIDPlugin.NAME);
+			wm.getDockable(jason.jeditplugin.JasonIDPlugin.NAME).createJnlp();
+		</CODE>
+	</ACTION>
 </ACTIONS>

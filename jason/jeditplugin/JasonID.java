@@ -23,6 +23,7 @@
 
 package jason.jeditplugin;
 
+import jason.infra.centralised.CentralisedMASLauncherAnt;
 import jason.infra.centralised.RunCentralisedMAS;
 import jason.mas2j.AgentParameters;
 import jason.mas2j.MAS2JProject;
@@ -625,4 +626,38 @@ public class JasonID extends JPanel implements EBComponent, RunProjectListener {
         }
     }
 
+    public void createJar() {
+        final Buffer b = getProjectBuffer();
+        if (b == null) {
+            textArea.setText("There is no Jason project opened!");
+            return;
+        }
+        MAS2JProject project = parseProject(b);
+        if (project == null || !parseProjectAS(project)) {
+        	return;
+        }
+        CentralisedMASLauncherAnt script = new CentralisedMASLauncherAnt("jar");
+        script.setProject(project);
+        if (script.writeScripts(false)) {
+            new Thread(script, "Ant-Task").start();
+        }
+    }
+
+    public void createJnlp() {
+        final Buffer b = getProjectBuffer();
+        if (b == null) {
+            textArea.setText("There is no Jason project opened!");
+            return;
+        }
+        MAS2JProject project = parseProject(b);
+        if (project == null || !parseProjectAS(project)) {
+        	return;
+        }
+        CentralisedMASLauncherAnt script = new CentralisedMASLauncherAnt("jnlp");
+        script.setProject(project);
+        if (script.writeScripts(false)) {
+            new Thread(script, "Ant-Task").start();
+        }
+    }
+    
 }
