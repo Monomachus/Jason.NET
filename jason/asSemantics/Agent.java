@@ -31,6 +31,7 @@ import jason.asSyntax.Plan;
 import jason.asSyntax.PlanLibrary;
 import jason.asSyntax.Structure;
 import jason.asSyntax.Trigger;
+import jason.asSyntax.directives.Include;
 import jason.asSyntax.parser.ParseException;
 import jason.asSyntax.parser.as2j;
 import jason.bb.BeliefBase;
@@ -97,8 +98,8 @@ public class Agent {
 
             setASLSource(asSrc);
 
-            if (asSrc.startsWith("ClassResource:")) {
-            	parseAS(Agent.class.getResource("/"+asSrc.substring(14)).openStream());
+            if (asSrc.startsWith(Include.CRPrefix)) {
+            	parseAS(Agent.class.getResource(asSrc.substring(Include.CRPrefix.length())).openStream());
             } else {
 	            // check whether source is an URL string
 	            try {

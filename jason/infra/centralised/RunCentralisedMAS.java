@@ -25,6 +25,7 @@ package jason.infra.centralised;
 
 import jason.JasonException;
 import jason.architecture.AgArch;
+import jason.asSyntax.directives.Include;
 import jason.bb.DefaultBeliefBase;
 import jason.control.ExecutionControlGUI;
 import jason.mas2j.AgentParameters;
@@ -120,7 +121,7 @@ public class RunCentralisedMAS {
         	InputStream inProject;
         	if (readFromJAR) {
         		inProject = RunCentralisedMAS.class.getResource(File.separator+defaultProjectFileName).openStream();
-        		urlPrefix = "ClassResource:";
+        		urlPrefix = Include.CRPrefix + File.separator;
         	} else {
 	        	URL file;
 	        	// test if the argument is an URL

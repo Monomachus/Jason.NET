@@ -17,11 +17,12 @@ import java.util.logging.Logger;
 public class Include implements Directive {
 
     static Logger logger = Logger.getLogger(Include.class.getName());
-
+    public static final String CRPrefix = "ClassResource:";
+    
     public Agent process(Pred directive, Agent outterContent, Agent innerContent) {
     	String file = ((StringTerm)directive.getTerm(0)).getString();
         try {
-	    	String outterPrefix = outterContent.getASLSource();
+        	String outterPrefix = outterContent.getASLSource();
 	    	InputStream in;
 	    	if (outterContent != null && outterPrefix != null) {
 	    		// check if the outter is URL
@@ -29,8 +30,13 @@ public class Include implements Directive {
 	    			outterPrefix = outterPrefix.substring(0,outterPrefix.indexOf("!")+1) + File.separator;
 	    			file = outterPrefix + file;
 	    			in = new URL(file).openStream();
-	    		} if (outterPrefix.startsWith("ClassResource:")) {
-	    			in = Agent.class.getResource("/"+file).openStream();
+	    		} if (outterPrefix.startsWith(CRPrefix)) { // outter is loaded from a resource ("application".jar) file, used for java web start
+	    			int posSlash = outterPrefix.lastIndexOf(File.separator); 
+	    			if (posSlash > 0) {
+	    				file = outterPrefix.substring(CRPrefix.length(),posSlash+1) + file;
+	    			}
+	    			in = Agent.class.getResource(file).openStream();
+	    			file = CRPrefix + file;
 	    		} else {
 	        		file =  new File(outterPrefix).getAbsoluteFile().getParent() + File.separator + file;
 	        		in = new FileInputStream(file);
@@ -38,9 +44,10 @@ public class Include implements Directive {
 	    	} else {
 	    		in = new FileInputStream(file);    		
 	    	}
-    	
+
         	Agent ag = new Agent();
-            as2j parser = new as2j(in); //new FileInputStream(asFileName));
+	    	ag.setASLSource(file);
+            as2j parser = new as2j(in); 
             parser.agent(ag);
             logger.fine("as2j: AgentSpeak program '"+file+"' parsed successfully!");
             return ag;
@@ -50,7 +57,6 @@ public class Include implements Directive {
             logger.log(Level.SEVERE,"as2j: error parsing \"" + file + "\"", e);
         }
         return null;
-
     	
         //return processInclude(file);
     }
