@@ -77,11 +77,15 @@ public class PlanLibrary implements Iterable<Plan> {
 					sTemp.append(sPlan.charAt(c));
 				}
 			}
-			sPlan = sTemp.toString();
+			sPlan  = sTemp.toString();
 			Plan p = Plan.parse(sPlan);
 			if (p != null) {
     			int i = plans.indexOf(p);
     			if (i < 0) {
+    		        // add label, if necessary
+    		        if (p.getLabel() == null) {
+    		        	setAutoLabel(p);
+    		        }
     				p.getLabel().addSource(tSource);
     				add(p);
     			} else {
@@ -91,7 +95,7 @@ public class PlanLibrary implements Iterable<Plan> {
     			return p;
             }
 		} catch (Exception e) {
-			logger.log(Level.SEVERE,"Error adding plan "+sPlan,e);
+			logger.log(Level.SEVERE,"Error adding plan "+stPlan,e);
 		}
         return null;
 	}
@@ -113,11 +117,7 @@ public class PlanLibrary implements Iterable<Plan> {
 
         // add label, if necessary
         if (p.getLabel() == null) {
-            String l;
-            do {
-                l = "l__" + (lastPlanLabel++);
-            } while (planLabels.keySet().contains(l));
-            p.setLabel(new Pred(l));
+        	setAutoLabel(p);
         }
 
         // add self source
@@ -155,6 +155,15 @@ public class PlanLibrary implements Iterable<Plan> {
 		for (Plan p: plans) { 
 			add(p);
 		}
+	}
+
+	/** add a label to the plan */
+	private void setAutoLabel(Plan p) {
+        String l;
+        do {
+            l = "l__" + (lastPlanLabel++);
+        } while (planLabels.keySet().contains(l));
+        p.setLabel(new Pred(l));
 	}
     
 	/** return a plan for a label */

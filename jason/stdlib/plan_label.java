@@ -64,7 +64,8 @@ public class plan_label extends DefaultInternalAction {
         try {
             Term label = args[1];
             Plan p = ts.getAg().getPL().get(label.toString());
-            return un.unifies(new StringTermImpl(p.toASString()), args[0]);
+            String ps = p.toASString().replaceAll("\"", "\\\\\"");
+            return un.unifies(new StringTermImpl(ps), args[0]);
         } catch (ArrayIndexOutOfBoundsException e) {
             throw new JasonException("The internal action 'plan_label' has not received two arguments.");
         } catch (Exception e) {
