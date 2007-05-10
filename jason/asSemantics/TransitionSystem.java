@@ -869,9 +869,9 @@ public class TransitionSystem {
         } catch (Exception e) {  }
     }
 
+    /*
     private boolean stopCycle = false;
     
-    /** stops the reasoning cycle */
     public void stopCycle() {
     	stopCycle = true;
     }
@@ -881,6 +881,7 @@ public class TransitionSystem {
     public String getCurrentTask() {
     	return currentTask;
     }
+    */
     
     /**********************************************************************/
     /* MAIN LOOP */
@@ -892,7 +893,7 @@ public class TransitionSystem {
     public void reasoningCycle() {
         try {
         	
-        	currentTask = "begin";
+        	//currentTask = "begin";
         	
             if (setts.isSync()) {
                 waitSyncSignal();
@@ -912,25 +913,25 @@ public class TransitionSystem {
             if (nrcslbr >= setts.nrcbp() || canSleep()) {
                 nrcslbr = 0;
 
-                currentTask = "perception";
+                //currentTask = "perception";
                 List<Literal> percept = agArch.perceive();
 
-                currentTask = "buf";
+                //currentTask = "buf";
                 ag.buf(percept);
 
-                currentTask = "checkMail";
+                //currentTask = "checkMail";
                 agArch.checkMail();
             }
             
-            stopCycle = false;
+            //stopCycle = false;
             do {
-            	currentTask = "step "+step;
+            	//currentTask = "step "+step;
                 applySemanticRule();
-            } while (step != State.StartRC && !stopCycle); // finished a reasoning cycle
+            } while (step != State.StartRC); // && !stopCycle); // finished a reasoning cycle
 
             ActionExec action = C.getAction(); 
             if (action != null) {
-            	currentTask = "action "+action;
+            	//currentTask = "action "+action;
             	C.getPendingActions().put(action.getIntention().getId(), action);
                 agArch.act(action, C.getFeedbackActions());
             }
@@ -949,7 +950,7 @@ public class TransitionSystem {
                 agArch.getArchInfraTier().informCycleFinished(isBreakPoint, agArch.getCycleNumber());
             }
             
-            currentTask = "end";
+            //currentTask = "end";
 
         } catch (Exception e) {
             logger.log(Level.SEVERE, "*** ERROR in the transition system. "+conf.C+"\nCreating a new C!", e);
