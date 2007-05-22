@@ -129,8 +129,10 @@ public class TransitionSystem {
     // the semantic rules are referred to in comments in the functions below
 
     private void applyProcMsg() throws JasonException {
+        confP.step = State.SelEv;
         if (!conf.C.MB.isEmpty()) {
             Message m = conf.ag.selectMessage(conf.C.MB);
+            if (m == null) return;
             
             // get the content, it can be any term (literal, list, number, ...; see ask)
             Term content = DefaultTerm.parse(m.getPropCont().toString());
@@ -176,7 +178,6 @@ public class TransitionSystem {
                 updateEvents(new Event(new Trigger(Trigger.TEAdd, Trigger.TEAchvG, received), Intention.EmptyInt));
             }
         }
-        confP.step = State.SelEv;
     }
 
     private void applySelEv() throws JasonException {
@@ -336,7 +337,9 @@ public class TransitionSystem {
         // Rule SelInt1
         if (conf.C.hasIntention()) {
             confP.C.SI = conf.ag.selectIntention(conf.C.getIntentions());
-            return;
+            if (confP.C.SI != null) { // the selectIntention function retuned null
+                return;            	
+            }
         }
 
         confP.step = State.StartRC;
