@@ -120,7 +120,7 @@ public class send extends DefaultInternalAction {
         try {
             to   = args[0];
             ilf  = args[1];
-            pcnt = (Term)args[2].clone();
+            pcnt = args[2];
 	        
             if (!to.isAtom() && !to.isList() && !to.isString()) {
                 throw new JasonException("The TO parameter ('"+to+"') of the internal action 'send' is not an atom or list of atoms!");
