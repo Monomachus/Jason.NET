@@ -28,7 +28,6 @@ import jason.architecture.AgArch;
 import jason.architecture.AgArchInfraTier;
 import jason.asSemantics.ActionExec;
 import jason.asSemantics.TransitionSystem;
-import jason.asSyntax.DefaultTerm;
 import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Term;
 import jason.infra.centralised.RunCentralisedMAS;
@@ -356,7 +355,7 @@ public class SaciAgArch extends saci.Agent implements AgArchInfraTier {
 
                 Object propCont = m.get("content");
                 if (propCont != null) {
-                    propCont = m.get("content");
+                	/*
                     String sPropCont = propCont.toString();
                     if (sPropCont.startsWith("\"")) { // deal with a term enclosed by "
                         sPropCont = sPropCont.substring(1, sPropCont.length() - 1);
@@ -365,6 +364,7 @@ public class SaciAgArch extends saci.Agent implements AgArchInfraTier {
                             propCont = sPropCont.trim();
                         }
                     }
+                    */
 
                     jason.asSemantics.Message im = new jason.asSemantics.Message(ilForce, sender, receiver, propCont, replyWith);
                     if (irt != null) {

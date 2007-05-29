@@ -135,7 +135,12 @@ public class TransitionSystem {
             if (m == null) return;
             
             // get the content, it can be any term (literal, list, number, ...; see ask)
-            Term content = DefaultTerm.parse(m.getPropCont().toString());
+            Term content = null;
+            if (m.getPropCont() instanceof Term) {
+            	content = (Term)m.getPropCont();
+            } else {
+            	content = DefaultTerm.parse(m.getPropCont().toString());
+            }
 
             // check if an intention was suspended waiting this message
             Intention intention = null;

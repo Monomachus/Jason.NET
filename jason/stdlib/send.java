@@ -120,7 +120,7 @@ public class send extends DefaultInternalAction {
         try {
             to   = args[0];
             ilf  = args[1];
-            pcnt = args[2];
+            pcnt = (Term)args[2].clone();
 	        
             if (!to.isAtom() && !to.isList() && !to.isString()) {
                 throw new JasonException("The TO parameter ('"+to+"') of the internal action 'send' is not an atom or list of atoms!");
@@ -138,7 +138,7 @@ public class send extends DefaultInternalAction {
         } catch (ArrayIndexOutOfBoundsException e) {
             throw new JasonException("The internal action 'send' to '"+to+"' has not received three arguments.");
         } 
-        Message m = new Message(ilf.toString(), null, null, pcnt.toString());
+        Message m = new Message(ilf.toString(), null, null, pcnt);
 
         // async ask has a fourth argument and should suspend the intention
         lastSendWasSynAsk = m.isAsk() && args.length > 3;
