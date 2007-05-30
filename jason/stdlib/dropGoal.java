@@ -34,6 +34,8 @@ import jason.asSemantics.Unifier;
 import jason.asSyntax.Literal;
 import jason.asSyntax.Term;
 import jason.asSyntax.Trigger;
+import jason.asSyntax.Trigger.TEOperator;
+import jason.asSyntax.Trigger.TEType;
 
 /**
 
@@ -60,7 +62,7 @@ public class dropGoal extends DefaultInternalAction {
     }
     
     public void drop(TransitionSystem ts, Literal l, boolean success, Unifier un) throws JasonException{
-        Trigger g = new Trigger(Trigger.TEAdd, Trigger.TEAchvG, l);
+        Trigger g = new Trigger(TEOperator.add, TEType.achieve, l);
         Circumstance C = ts.getC();
         
         for (Intention i: C.getIntentions()) {

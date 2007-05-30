@@ -32,6 +32,8 @@ import jason.asSemantics.Unifier;
 import jason.asSyntax.Literal;
 import jason.asSyntax.Term;
 import jason.asSyntax.Trigger;
+import jason.asSyntax.Trigger.TEOperator;
+import jason.asSyntax.Trigger.TEType;
 
 import java.util.Iterator;
 
@@ -81,7 +83,7 @@ public class drop_desire extends drop_intention {
     }
     
     public void dropEvt(Circumstance C, Literal l, Unifier un) {
-        Trigger te = new Trigger(Trigger.TEAdd, Trigger.TEAchvG, l);
+        Trigger te = new Trigger(TEOperator.add, TEType.achieve, l);
         Iterator<Event> ie = C.getEvents().iterator();
         while (ie.hasNext()) {
         	Event ei = ie.next();

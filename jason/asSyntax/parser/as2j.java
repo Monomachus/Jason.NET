@@ -12,6 +12,8 @@
   import jason.asSyntax.LogExpr.LogicalOp;
   import jason.asSyntax.RelExpr.RelationalOp;
   import jason.asSyntax.BodyLiteral.BodyType;
+  import jason.asSyntax.Trigger.TEOperator;
+  import jason.asSyntax.Trigger.TEType;
 
   public class as2j implements as2jConstants {
 
@@ -239,17 +241,17 @@
 
 /* Trigger */
   final public Trigger trigger() throws ParseException {
-                        boolean teType;
-                                byte    teGoal = Trigger.TEBel;
+                        TEOperator teOp;
+                                TEType     teType = TEType.belief;
                                         Literal F;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case 34:
       jj_consume_token(34);
-                 teType = Trigger.TEAdd;
+                 teOp = TEOperator.add;
       break;
     case 35:
       jj_consume_token(35);
-                 teType = Trigger.TEDel;
+                 teOp = TEOperator.del;
       break;
     default:
       jj_la1[9] = jj_gen;
@@ -262,11 +264,11 @@
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case 29:
         jj_consume_token(29);
-                 teGoal = Trigger.TEAchvG;
+                 teType = TEType.achieve;
         break;
       case 36:
         jj_consume_token(36);
-                 teGoal = Trigger.TETestG;
+                 teType = TEType.test;
         break;
       default:
         jj_la1[10] = jj_gen;
@@ -296,7 +298,7 @@
       jj_consume_token(-1);
       throw new ParseException();
     }
-                 {if (true) return new Trigger(teType,teGoal,F);}
+                 {if (true) return new Trigger(teOp,teType,F);}
     throw new Error("Missing return statement in function");
   }
 
@@ -1018,24 +1020,6 @@
     finally { jj_save(1, xla); }
   }
 
-  final private boolean jj_3R_67() {
-    if (jj_scan_token(56)) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_49() {
-    if (jj_3R_58()) return true;
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_67()) jj_scanpos = xsp;
-    return false;
-  }
-
-  final private boolean jj_3R_34() {
-    if (jj_scan_token(45)) return true;
-    return false;
-  }
-
   final private boolean jj_3R_28() {
     if (jj_3R_33()) return true;
     Token xsp;
@@ -1518,6 +1502,24 @@
     jj_scanpos = xsp;
     if (jj_3R_40()) return true;
     }
+    return false;
+  }
+
+  final private boolean jj_3R_67() {
+    if (jj_scan_token(56)) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_49() {
+    if (jj_3R_58()) return true;
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_67()) jj_scanpos = xsp;
+    return false;
+  }
+
+  final private boolean jj_3R_34() {
+    if (jj_scan_token(45)) return true;
     return false;
   }
 

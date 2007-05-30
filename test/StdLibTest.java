@@ -1,6 +1,5 @@
 package test;
 
-import jason.JasonException;
 import jason.asSemantics.Agent;
 import jason.asSemantics.Circumstance;
 import jason.asSemantics.IntendedMeans;
@@ -23,10 +22,10 @@ import jason.asSyntax.VarTerm;
 import jason.bb.BeliefBase;
 import jason.stdlib.add_annot;
 import jason.stdlib.add_plan;
+import jason.stdlib.fail_goal;
 import jason.stdlib.relevant_plans;
 import jason.stdlib.remove_plan;
 import jason.stdlib.succeed_goal;
-import jason.stdlib.fail_goal;
 
 import java.util.Iterator;
 
@@ -274,7 +273,7 @@ public class StdLibTest extends TestCase {
         assertEquals(intention1.size(), 1);
     }
 
-    public void testDropGoal2() throws JasonException {
+    public void testDropGoal2() throws Exception {
         Circumstance c = new Circumstance();
         c.addIntention(intention1);
         TransitionSystem ts = new TransitionSystem(null, c, null, null);
@@ -285,7 +284,7 @@ public class StdLibTest extends TestCase {
         assertTrue(intention1.isFinished());
     }
 
-    public void testDropGoal3() throws JasonException {
+    public void testDropGoal3() throws Exception {
         Circumstance c = new Circumstance();
         c.addIntention(intention1);
         TransitionSystem ts = new TransitionSystem(ag, c, null, null);

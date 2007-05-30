@@ -42,6 +42,8 @@ PARSER_BEGIN(as2j)
   import jason.asSyntax.LogExpr.LogicalOp;
   import jason.asSyntax.RelExpr.RelationalOp;
   import jason.asSyntax.BodyLiteral.BodyType;
+  import jason.asSyntax.Trigger.TEOperator;
+  import jason.asSyntax.Trigger.TEType;
 
   public class as2j {
 
@@ -201,24 +203,25 @@ Plan plan() :         { Token k; Pred L = null;
                    }
 
 /* Trigger */
-Trigger trigger() : { 
-               		boolean teType;
-			    	byte    teGoal = Trigger.TEBel;
+Trigger trigger() : 
+               { 
+               		TEOperator teOp;
+			    	TEType     teType = TEType.belief;
 				 	Literal F; 
                }
 {
-  ( "+"        { teType = Trigger.TEAdd; }
-  | "-"        { teType = Trigger.TEDel; }
+  ( "+"        { teOp = TEOperator.add; }
+  | "-"        { teOp = TEOperator.del; }
   )
   
-  [ ( "!"      { teGoal = Trigger.TEAchvG; }
-    | "?"      { teGoal = Trigger.TETestG; }
+  [ ( "!"      { teType = TEType.achieve; }
+    | "?"      { teType = TEType.test; }
     )
   ]
   
   ( F=literal()
   | F=var()
-  )            { return new Trigger(teType,teGoal,F); }
+  )            { return new Trigger(teOp,teType,F); }
 }
 
 /* Literal */

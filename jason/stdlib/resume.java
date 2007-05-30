@@ -32,6 +32,8 @@ import jason.asSemantics.Unifier;
 import jason.asSyntax.Literal;
 import jason.asSyntax.Term;
 import jason.asSyntax.Trigger;
+import jason.asSyntax.Trigger.TEOperator;
+import jason.asSyntax.Trigger.TEType;
 
 import java.util.Iterator;
 
@@ -77,7 +79,7 @@ public class resume extends DefaultInternalAction {
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         try {
-            Trigger      g = new Trigger(Trigger.TEAdd, Trigger.TEAchvG, (Literal)args[0]);
+            Trigger      g = new Trigger(TEOperator.add, TEType.achieve, (Literal)args[0]);
             Circumstance C = ts.getC();
             
             Iterator<String> ik = C.getPendingIntentions().keySet().iterator();

@@ -35,6 +35,8 @@ import jason.asSemantics.Unifier;
 import jason.asSyntax.Literal;
 import jason.asSyntax.Term;
 import jason.asSyntax.Trigger;
+import jason.asSyntax.Trigger.TEOperator;
+import jason.asSyntax.Trigger.TEType;
 
 /**
   <p>Internal action: <b><code>.drop_intention(<i>I</i>)</code></b>.
@@ -76,7 +78,7 @@ public class drop_intention extends DefaultInternalAction {
     }
     
     public void dropInt(Circumstance C, Literal l, Unifier un) {
-        Trigger g = new Trigger(Trigger.TEAdd, Trigger.TEAchvG, l);
+        Trigger g = new Trigger(TEOperator.add, TEType.achieve, l);
 
         for (Intention i: C.getIntentions()) {
             if (i.hasTrigger(g, un)) {

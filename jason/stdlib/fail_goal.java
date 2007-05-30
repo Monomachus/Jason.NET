@@ -31,6 +31,7 @@ import jason.asSemantics.Unifier;
 import jason.asSyntax.Literal;
 import jason.asSyntax.Term;
 import jason.asSyntax.Trigger;
+import jason.asSyntax.Trigger.TEOperator;
 
 /**
   <p>Internal action:
@@ -83,6 +84,11 @@ public class fail_goal extends succeed_goal {
         }
     }
     
+    /* returns: >0 the intention was changed
+     *           1 = intention must continue running
+     *           2 = fail event was generated and added in C.E
+     *           3 = simply removed without event
+     */
     @Override
     int dropIntention(Intention i, Trigger g, TransitionSystem ts, Unifier un) throws JasonException {
         if (i != null) {
@@ -105,5 +111,10 @@ public class fail_goal extends succeed_goal {
         	}
         }
         return 0;        
+    }
+
+    @Override
+    void dropInEvent(TransitionSystem ts, Event e, Intention i) throws Exception {
+        e.getTrigger().setTrigOp(TEOperator.del);
     }
 }

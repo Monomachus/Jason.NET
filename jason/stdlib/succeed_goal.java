@@ -34,6 +34,8 @@ import jason.asSemantics.Unifier;
 import jason.asSyntax.Literal;
 import jason.asSyntax.Term;
 import jason.asSyntax.Trigger;
+import jason.asSyntax.Trigger.TEOperator;
+import jason.asSyntax.Trigger.TEType;
 
 /**
   <p>Internal action:
@@ -80,8 +82,8 @@ public class succeed_goal extends DefaultInternalAction {
         }
     }
     
-    public void drop(TransitionSystem ts, Literal l, Unifier un) throws JasonException{
-        Trigger g = new Trigger(Trigger.TEAdd, Trigger.TEAchvG, l);
+    public void drop(TransitionSystem ts, Literal l, Unifier un) throws Exception {
+        Trigger g = new Trigger(TEOperator.add, TEType.achieve, l);
         Circumstance C = ts.getC();
         
         for (Intention i: C.getIntentions()) {
@@ -95,11 +97,21 @@ public class succeed_goal extends DefaultInternalAction {
             
         // dropping G in Events
         for (Event e: C.getEvents()) {
+            // test in the intention
             Intention i = e.getIntention();
             if (dropIntention(i, g, ts, un) > 1) {
                 C.removeEvent(e);
+            } else {
+                // test in the event
+                Trigger t = e.getTrigger();
+                if (i != Intention.EmptyInt && i.size() > 0) {
+                    t = (Trigger) t.clone();
+                    t.getLiteral().apply(i.peek().getUnif());
+                }
+                if (un.unifies(t, g)) {
+                    dropInEvent(ts,e,i);
+                }
             }
-            // TODO: should also test in e.getTrigger?
         }
         
         // dropping from Pending Actions
@@ -139,5 +151,15 @@ public class succeed_goal extends DefaultInternalAction {
         	return 1;
         }
         return 0;        
+    }
+    
+    void dropInEvent(TransitionSystem ts, Event e, Intention i) throws Exception {
+        Circumstance C = ts.getC();
+        C.removeEvent(e);
+        if (i != null) {
+            i.peek().removeCurrentStep();
+            ts.applyClrInt(i);
+            C.addIntention(i);
+        }
     }
 }

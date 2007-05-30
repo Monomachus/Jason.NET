@@ -31,6 +31,8 @@ import jason.asSyntax.Plan;
 import jason.asSyntax.PlanLibrary;
 import jason.asSyntax.Structure;
 import jason.asSyntax.Trigger;
+import jason.asSyntax.Trigger.TEOperator;
+import jason.asSyntax.Trigger.TEType;
 import jason.asSyntax.directives.Include;
 import jason.asSyntax.parser.ParseException;
 import jason.asSyntax.parser.as2j;
@@ -333,7 +335,7 @@ public class Agent {
                 l.clearAnnots();
                 l.addAnnot(BeliefBase.TPercept);
 	            if (fBB.remove(l)) {
-	                fTS.updateEvents(new Event(new Trigger(Trigger.TEDel,Trigger.TEBel, l), Intention.EmptyInt));
+	                fTS.updateEvents(new Event(new Trigger(TEOperator.del, TEType.belief, l), Intention.EmptyInt));
 	            }
             }
         }
@@ -345,7 +347,7 @@ public class Agent {
                 lp = (Literal) lp.clone();
                 lp.addAnnot(BeliefBase.TPercept);
                 if (getBB().add(lp)) {
-                    Trigger te = new Trigger(Trigger.TEAdd, Trigger.TEBel, lp);
+                    Trigger te = new Trigger(TEOperator.add, TEType.belief, lp);
                     fTS.updateEvents(new Event(te, Intention.EmptyInt));
                 }
             } catch (Exception e) {

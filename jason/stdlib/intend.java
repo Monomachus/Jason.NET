@@ -35,6 +35,8 @@ import jason.asSemantics.Unifier;
 import jason.asSyntax.Literal;
 import jason.asSyntax.Term;
 import jason.asSyntax.Trigger;
+import jason.asSyntax.Trigger.TEOperator;
+import jason.asSyntax.Trigger.TEType;
 
 
 /**
@@ -77,7 +79,7 @@ public class intend extends DefaultInternalAction {
     }
     
     public boolean intends(Circumstance C, Literal l, Unifier un) {
-        Trigger g = new Trigger(Trigger.TEAdd, Trigger.TEAchvG, l);
+        Trigger g = new Trigger(TEOperator.add, TEType.achieve, l);
 
         // we need to check the intention in the selected event in this cycle!!!
         // (as it was already removed from E)

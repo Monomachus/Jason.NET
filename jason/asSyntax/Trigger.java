@@ -36,22 +36,28 @@ import org.w3c.dom.Element;
 public class Trigger implements Cloneable {
 
 
-    public static final byte      TEBel      = 0;
-    public static final byte      TEAchvG    = 1;
-    public static final byte      TETestG    = 2;
-    public static final boolean   TEAdd      = false;
-    public static final boolean   TEDel      = true;
-	
+    public enum TEOperator { 
+        add { public String toString() { return "+"; } }, 
+        del { public String toString() { return "-"; } }
+    };
+    
+    public enum TEType { 
+        belief  { public String toString() { return ""; } }, 
+        achieve { public String toString() { return "!"; } }, 
+        test    { public String toString() { return "?"; } }
+    };
+    
 	static private Logger logger = Logger.getLogger(Trigger.class.getName());
   
-	boolean trigType = TEAdd;
-	byte goal = TEBel;
+	TEOperator operator = TEOperator.add;
+    TEType     type     = TEType.belief;
+
 	Literal literal;
 	
-	public Trigger(boolean t, byte g, Literal l) {
+	public Trigger(TEOperator op, TEType t, Literal l) {
 		literal = l;
-		setTrigType(t);
-		goal = g;
+        type    = t;
+		setTrigOp(op);
 	}
 
 	public static Trigger parseTrigger(String sTe) {
@@ -64,20 +70,20 @@ public class Trigger implements Cloneable {
 		}
 	}
 
-	public void setTrigType(boolean t) {
-		trigType = t;
-        piCache = null;
+	public void setTrigOp(TEOperator op) {
+		operator = op;
+        piCache  = null;
 	}
 
 	public boolean sameType(Trigger e) {
-		return (trigType == e.trigType && goal == e.goal);
+		return operator == e.operator && type == e.type;
 	}
 
     @Override
 	public boolean equals(Object o) {
         if (o != null && o instanceof Trigger) {
             Trigger t = (Trigger) o;
-            return (trigType == t.trigType && goal == t.goal && literal.equals(t.getLiteral()));
+            return (operator == t.operator && type == t.type && literal.equals(t.getLiteral()));
         }
         return false;
 	}
@@ -89,23 +95,23 @@ public class Trigger implements Cloneable {
 
 
 	public boolean isAchvGoal() {
-		return (goal == TEAchvG);
+		return type == TEType.achieve;
 	}
 
 	public boolean isGoal() {
-		return (goal == TEAchvG || goal == TETestG);
+		return type == TEType.achieve || type == TEType.test;
 	}
 
-	public byte getGoal() {
-		return goal;
+	public TEType getType() {
+		return type;
 	}
 
 	public boolean isAddition() {
-		return (trigType == TEAdd);
+		return (operator == TEOperator.add);
 	}
 
 	public Object clone() {
-        Trigger c = new Trigger(trigType, goal, (Literal)literal.clone());
+        Trigger c = new Trigger(operator, type, (Literal)literal.clone());
         c.piCache = this.piCache;
         return c; 
 	}
@@ -116,16 +122,7 @@ public class Trigger implements Cloneable {
 	/** return [+|-][!|?] super.getFucntorArity */
 	public PredicateIndicator getPredicateIndicator() {
         if (piCache == null) {
-            String s;
-            if (trigType == TEAdd)
-                s = "+";
-            else
-                s = "-";
-            if (goal == TEAchvG)
-                s += "!";
-            else if (goal == TETestG)
-                s += "?";
-            piCache = new PredicateIndicator(s + literal.getFunctor(), literal.getTermsSize());
+            piCache = new PredicateIndicator(operator.toString() + type + literal.getFunctor(), literal.getTermsSize());
         }
         return piCache;
     }
@@ -135,39 +132,15 @@ public class Trigger implements Cloneable {
 	}
 	
 	public String toString() {
-		String s;
-		if (trigType == TEAdd)
-			s = "+";
-		else
-			s = "-";
-		if (goal == TEAchvG)
-			s += "!";
-		else if (goal == TETestG)
-			s += "?";
-		s += literal.toString();
-		return s;
+		return operator.toString() + type + literal;
 	}
     
     
     /** get as XML */
     public Element getAsDOM(Document document) {
         Element e = (Element) document.createElement("trigger");
-        String s;
-        if (trigType == TEAdd)
-            s = "+";
-        else
-            s = "-";
-        e.setAttribute("add", s);
-        
-        s = null;
-        if (goal == TEAchvG)
-            s = "!";
-        else if (goal == TETestG)
-            s = "?";
-        if (s != null) {
-            e.setAttribute("type", s);
-        }
-        
+        e.setAttribute("add", operator.toString());
+        e.setAttribute("type", type.toString());
         e.appendChild(literal.getAsDOM(document));
         return e;
     }

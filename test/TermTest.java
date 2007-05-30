@@ -12,6 +12,8 @@ import jason.asSyntax.Structure;
 import jason.asSyntax.Term;
 import jason.asSyntax.Trigger;
 import jason.asSyntax.VarTerm;
+import jason.asSyntax.Trigger.TEOperator;
+import jason.asSyntax.Trigger.TEType;
 import jason.bb.BeliefBase;
 
 import java.util.Collections;
@@ -342,7 +344,7 @@ public class TermTest extends TestCase {
 		received.addTerm(content);
 		received.addTerm(new Structure("id1"));
 		
-		Trigger t1 = new Trigger(Trigger.TEAdd, Trigger.TEBel, received);
+		Trigger t1 = new Trigger(TEOperator.add, TEType.belief, received);
 
 		Literal received2 = new Literal(Literal.LPos, new Pred("received"));
 		received2.addTerm(new VarTerm("S"));
@@ -350,7 +352,7 @@ public class TermTest extends TestCase {
 		received2.addTerm(new VarTerm("C"));
 		received2.addTerm(new VarTerm("M"));
 		
-		Trigger t2 = new Trigger(Trigger.TEAdd, Trigger.TEBel, received2);
+		Trigger t2 = new Trigger(TEOperator.add, TEType.belief, received2);
 		
 		//System.out.println("t1 = "+t1);
 		//System.out.println("t2 = "+t2);

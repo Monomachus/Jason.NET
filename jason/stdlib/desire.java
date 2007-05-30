@@ -33,6 +33,8 @@ import jason.asSemantics.Unifier;
 import jason.asSyntax.Literal;
 import jason.asSyntax.Term;
 import jason.asSyntax.Trigger;
+import jason.asSyntax.Trigger.TEOperator;
+import jason.asSyntax.Trigger.TEType;
 
 /**
   <p>Internal action: <b><code>.desire(<i>D</i>)</code></b>.
@@ -73,7 +75,7 @@ public class desire extends intend {
     }
     
     public boolean desires(Circumstance C, Literal l, Unifier un) {
-        Trigger teFromL = new Trigger(Trigger.TEAdd, Trigger.TEAchvG, l);
+        Trigger teFromL = new Trigger(TEOperator.add, TEType.achieve, l);
 
         // we need to check the slected event in this cycle (already removed from E)
         if (C.getSelectedEvent() != null) {

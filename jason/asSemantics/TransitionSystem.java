@@ -37,6 +37,8 @@ import jason.asSyntax.Term;
 import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Trigger;
 import jason.asSyntax.BodyLiteral.BodyType;
+import jason.asSyntax.Trigger.TEOperator;
+import jason.asSyntax.Trigger.TEType;
 import jason.bb.BeliefBase;
 import jason.runtime.Settings;
 
@@ -180,7 +182,7 @@ public class TransitionSystem {
                 received.addTerm(content);
                 received.addTerm(new Atom(m.getMsgId()));
 
-                updateEvents(new Event(new Trigger(Trigger.TEAdd, Trigger.TEAchvG, received), Intention.EmptyInt));
+                updateEvents(new Event(new Trigger(TEOperator.add, TEType.achieve, received), Intention.EmptyInt));
             }
         }
     }
@@ -450,7 +452,7 @@ public class TransitionSystem {
             	if (f instanceof Literal) { // generate event when using literal in the test (no events for log. expr. like ?(a & b)
             		body = (Literal)f;
 	                body.makeVarsAnnon();
-	                Trigger te = new Trigger(Trigger.TEAdd, Trigger.TETestG, body);
+	                Trigger te = new Trigger(TEOperator.add, TEType.test, body);
 	                if (ag.getPL().isRelevant(te.getPredicateIndicator())) {
 	                    Event evt = new Event(te, conf.C.SI);
 	                    logger.info("Test Goal '" + h + "' failed as simple query. Generating internal event for it: "+te);
@@ -718,11 +720,11 @@ public class TransitionSystem {
         if (result == null) return;
         // create the events
         for (Literal ladd: result[0]) {
-            Trigger te = new Trigger(Trigger.TEAdd, Trigger.TEBel, ladd);
+            Trigger te = new Trigger(TEOperator.add, TEType.belief, ladd);
             updateEvents(new Event(te, focus));
         }
         for (Literal lrem: result[1]) {
-            Trigger te = new Trigger(Trigger.TEDel, Trigger.TEBel, lrem);
+            Trigger te = new Trigger(TEOperator.del, TEType.belief, lrem);
             updateEvents(new Event(te, focus));
         }
     }
@@ -801,13 +803,13 @@ public class TransitionSystem {
     }
 
     public Event findEventForFailure(Intention i, Trigger tevent) {
-        Trigger failTrigger = new Trigger(Trigger.TEDel, tevent.getGoal(), tevent.getLiteral());
+        Trigger failTrigger = new Trigger(TEOperator.del, tevent.getType(), tevent.getLiteral());
     	if (i != Intention.EmptyInt) {
 	        ListIterator<IntendedMeans> ii = i.iterator();
 	        while (!getAg().getPL().isRelevant(failTrigger.getPredicateIndicator()) && ii.hasPrevious()) {
 	            IntendedMeans im = ii.previous();
 	            tevent = im.getTrigger();
-	            failTrigger = new Trigger(Trigger.TEDel, tevent.getGoal(), tevent.getLiteral());
+	            failTrigger = new Trigger(TEOperator.del, tevent.getType(), tevent.getLiteral());
 	        }
     	}
         // if some failure handling plan is found

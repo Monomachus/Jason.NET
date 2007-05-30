@@ -25,6 +25,8 @@ package jason.asSemantics;
 
 import jason.asSyntax.Literal;
 import jason.asSyntax.Trigger;
+import jason.asSyntax.Trigger.TEOperator;
+import jason.asSyntax.Trigger.TEType;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -91,7 +93,7 @@ public class Circumstance implements Serializable {
     }
 
     public void addAchvGoal(Literal l, Intention i) {
-        addEvent(new Event(new Trigger(Trigger.TEAdd, Trigger.TEAchvG, l), i));
+        addEvent(new Event(new Trigger(TEOperator.add, TEType.achieve, l), i));
     }
 
     public void addExternalEv(Trigger trig) {
