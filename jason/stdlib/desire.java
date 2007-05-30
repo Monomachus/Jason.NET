@@ -89,7 +89,7 @@ public class desire extends intend {
         }
 
         for (Event ei : C.getEvents()) {
-            Trigger t = (Trigger) ei.getTrigger();
+            Trigger t = ei.getTrigger();
             Intention i = ei.getIntention(); 
             if (i != Intention.EmptyInt && i.size() > 0) {
                 t = (Trigger) t.clone();

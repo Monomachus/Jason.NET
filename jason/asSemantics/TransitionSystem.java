@@ -932,6 +932,7 @@ public class TransitionSystem {
             }
             
             //stopCycle = false;
+            step = State.StartRC;
             do {
             	//currentTask = "step "+step;
                 applySemanticRule();

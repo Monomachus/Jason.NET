@@ -81,7 +81,7 @@ public class drop_desire extends drop_intention {
     }
     
     public void dropEvt(Circumstance C, Literal l, Unifier un) {
-        Event e = new Event(new Trigger(Trigger.TEAdd, Trigger.TEAchvG, l),Intention.EmptyInt);
+        Trigger te = new Trigger(Trigger.TEAdd, Trigger.TEAchvG, l);
         Iterator<Event> ie = C.getEvents().iterator();
         while (ie.hasNext()) {
         	Event ei = ie.next();
@@ -90,7 +90,7 @@ public class drop_desire extends drop_intention {
                 t = (Trigger) t.clone();
                 t.getLiteral().apply(ei.getIntention().peek().getUnif());
             }
-            if (un.unifies(t, e.getTrigger())) {
+            if (un.unifies(t, te)) {
                 // old implementation: t.setTrigType(Trigger.TEDel); // Just changing "+!g" to "-!g"
             	ie.remove();
             }

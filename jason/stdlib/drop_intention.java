@@ -106,6 +106,5 @@ public class drop_intention extends DefaultInternalAction {
                 C.dropPendingIntention(i);
             }
         }
-        
     }
 }

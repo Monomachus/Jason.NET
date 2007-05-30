@@ -148,7 +148,12 @@ public class wait extends DefaultInternalAction {
                 // wait was not dropped
                 if (c.getPendingIntentions().remove(sTE) == si && !c.getIntentions().contains(si) && !drop) {
                     si.peek().removeCurrentStep();
-                    c.addIntention(si);
+                    if (si.isSuspended()) { // if the intention was suspended by .suspend
+                    	String k = suspend.SUSPENDED_INT+si.getId();
+                    	c.getPendingIntentions().put(k, si);
+                    } else {
+                    	c.addIntention(si);
+                    }
                 }
 
             } catch (Exception e) {

@@ -82,7 +82,7 @@ public class Circumstance implements Serializable {
     }
     
     public void reset() {
-        A = null;
+        A  = null;
         RP = null;
         AP = null;
         SE = null;

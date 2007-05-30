@@ -70,8 +70,6 @@ public class succeed_goal extends DefaultInternalAction {
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         try {
-        	args[0].apply(un);
-
             drop(ts, (Literal)args[0], un);
             return true;
         } catch (ArrayIndexOutOfBoundsException e) {
@@ -101,6 +99,7 @@ public class succeed_goal extends DefaultInternalAction {
             if (dropIntention(i, g, ts, un) > 1) {
                 C.removeEvent(e);
             }
+            // TODO: should also test in e.getTrigger?
         }
         
         // dropping from Pending Actions

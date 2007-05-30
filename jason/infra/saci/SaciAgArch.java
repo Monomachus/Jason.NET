@@ -114,8 +114,7 @@ public class SaciAgArch extends saci.Agent implements AgArchInfraTier {
             mas2j parser = new mas2j(new StringReader(args[2].replace('$','\"')));
             ClassParameters bbPars = parser.classDef();
             
-	    // TODO: get and register user directives
-
+            // TODO: get and register user directives
 
             String asSource = null;
             if (args.length < 3) { // error
@@ -307,11 +306,8 @@ public class SaciAgArch extends saci.Agent implements AgArchInfraTier {
     // this is used by the .send internal action in stdlib
     /** the saci implementation of the sendMsg interface */
     public void sendMsg(jason.asSemantics.Message m) throws Exception {
-        saci.Message msaci = new saci.Message("(" + m.getIlForce() + ")");
+        saci.Message msaci = jasonToKQML(m);
         msaci.put("receiver", m.getReceiver());
-        msaci.put("content", m.getPropCont());
-        msaci.put("reply-with", m.getMsgId());
-        msaci.put("language", "AgentSpeak");
         if (m.getInReplyTo() != null) {
             msaci.put("in-reply-to", m.getInReplyTo());
         }
@@ -319,11 +315,20 @@ public class SaciAgArch extends saci.Agent implements AgArchInfraTier {
     }
 
     public void broadcast(jason.asSemantics.Message m) throws Exception {
+        saci.Message msaci = jasonToKQML(m);
+        getMBox().broadcast(msaci);
+    }
+    
+    private saci.Message jasonToKQML(jason.asSemantics.Message m) {
         saci.Message msaci = new saci.Message("(" + m.getIlForce() + ")");
-        msaci.put("content", m.getPropCont());
+        if (m.getPropCont() instanceof Term) { // send content as string if it is a Term (it is better for interoperability)
+        	msaci.put("content", m.getPropCont().toString());        	
+        } else {
+        	msaci.put("content", m.getPropCont());
+        }
         msaci.put("reply-with", m.getMsgId());
         msaci.put("language", "AgentSpeak");
-        getMBox().broadcast(msaci);
+        return msaci;
     }
 
     // Deafult procedure for checking messages
@@ -371,15 +376,6 @@ public class SaciAgArch extends saci.Agent implements AgArchInfraTier {
                         im.setInReplyTo(irt);
                     }
                     userAgArh.getTS().getC().getMailBox().add(im);
-
-                    /*
-                     * if (Term.parse(sPropCont) != null) { // the contents are
-                     * well formed
-                     *  } else { // the content is a Java Object (architectures
-                     * deals with this kind of content) //logger.warn("Warning!
-                     * Message received cannot be handled: "+m);
-                     *  }
-                     */
                 }
             }
         } while (m != null);

@@ -44,7 +44,8 @@ public class Intention implements Serializable, Comparable<Intention> {
     private static int idCount = 0;
 
     private int     id;
-    private boolean isAtomic = false;
+    private boolean isAtomic    = false;
+    private boolean isSuspended = false;
     
     Stack<IntendedMeans> fIntendedMeans = new Stack<IntendedMeans>();
 
@@ -104,6 +105,14 @@ public class Intention implements Serializable, Comparable<Intention> {
     
     public void setAtomic(boolean b) {
         isAtomic = b;
+    }
+    
+    public void setSuspended(boolean b) {
+    	isSuspended = b;
+    }
+    
+    public boolean isSuspended() {
+    	return isSuspended;
     }
     
     public Stack<IntendedMeans> getIMs() {

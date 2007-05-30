@@ -77,7 +77,7 @@ public class broadcast extends DefaultInternalAction {
 			throw new JasonException("The content of the message '" + pcnt + "' is not ground!");
 		}
 
-		Message m = new Message(ilf.toString(), null, null, pcnt.toString());
+		Message m = new Message(ilf.toString(), null, null, pcnt);
 
 		try {
 			ts.getUserAgArch().broadcast(m);
