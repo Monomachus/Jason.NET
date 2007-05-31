@@ -30,10 +30,13 @@ import jason.asSemantics.Event;
 import jason.asSemantics.Intention;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
+import jason.asSyntax.Atom;
+import jason.asSyntax.BodyLiteral;
 import jason.asSyntax.NumberTerm;
 import jason.asSyntax.StringTerm;
 import jason.asSyntax.Term;
 import jason.asSyntax.Trigger;
+import jason.asSyntax.BodyLiteral.BodyType;
 
 import java.util.logging.Level;
 
@@ -42,8 +45,8 @@ import java.util.logging.Level;
   
   <p>Description: suspend the intention for the time specified by <i>T</i> (in
   milliseconds) or until some event <i>E</i> happens. The events are
-  strings in AgentSpeak syntax, e.g. <code>+bel(33)</code>,
-  <code>+!go(X,Y)</code>.
+  strings in AgentSpeak syntax, e.g. <code>"+bel(33)"</code>,
+  <code>"+!go(X,Y)"</code>.
 
   <p>Parameters:<ul>
   <li><i>+ event</i> (string): the waited event.<br/>
@@ -59,7 +62,8 @@ import java.util.logging.Level;
 
   <li> <code>.wait("+!g", 2000)</code>: suspend the intention until the goal
   <code>g</code> is triggered or 2 seconds have passed, whatever happens
-  first.
+  first. In case the event does not happens in two seconds, the internal action
+  fails.
 
   </ul>
 
@@ -115,6 +119,7 @@ public class wait extends DefaultInternalAction {
         Circumstance     c;
         boolean          ok      = false;
         boolean          drop    = false;
+        boolean          stopByTimeout = false;
         long             timeout = -1;
         
         WaitEvent(Trigger te, Unifier un, TransitionSystem ts, long to) {
@@ -148,6 +153,10 @@ public class wait extends DefaultInternalAction {
                 // wait was not dropped
                 if (c.getPendingIntentions().remove(sTE) == si && !c.getIntentions().contains(si) && !drop) {
                     si.peek().removeCurrentStep();
+                    if (stopByTimeout) {
+                        // fail the .wait
+                        si.peek().getPlan().getBody().add(0, new BodyLiteral(BodyType.internalAction, new Atom(".fail")));
+                    } 
                     if (si.isSuspended()) { // if the intention was suspended by .suspend
                     	String k = suspend.SUSPENDED_INT+si.getId();
                     	c.getPendingIntentions().put(k, si);
@@ -175,6 +184,7 @@ public class wait extends DefaultInternalAction {
                         wait(to);
                         pass = System.currentTimeMillis() - init;
                         if (pass >= timeout) {
+                            stopByTimeout = true;
                             break;
                         }
                     }
