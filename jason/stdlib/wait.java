@@ -153,12 +153,12 @@ public class wait extends DefaultInternalAction {
                 // wait was not dropped
                 if (c.getPendingIntentions().remove(sTE) == si && !c.getIntentions().contains(si) && !drop) {
                     si.peek().removeCurrentStep();
-                    if (stopByTimeout) {
+                    if (stopByTimeout && te != null) {
                         // fail the .wait
                         si.peek().getPlan().getBody().add(0, new BodyLiteral(BodyType.internalAction, new Atom(".fail")));
                     } 
                     if (si.isSuspended()) { // if the intention was suspended by .suspend
-                    	String k = suspend.SUSPENDED_INT+si.getId();
+                    	String k = "suspended-"+si.getId(); // TODO: use a constant from .suspend
                     	c.getPendingIntentions().put(k, si);
                     } else {
                     	c.addIntention(si);
