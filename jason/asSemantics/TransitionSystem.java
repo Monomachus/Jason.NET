@@ -313,21 +313,23 @@ public class TransitionSystem {
         confP.step = State.SelInt; // default next step
         if (!conf.C.FA.isEmpty()) {
             ActionExec a = conf.ag.selectAction(conf.C.FA);
-            confP.C.SI = a.getIntention();
-
-            // remove the intention from PA (PA has all pending action, including those in FA;
-            // but, if the intention is not in PA, it means that the intention was dropped
-            // and should not return to I)
-            if (C.getPendingActions().remove(a.getIntention().getId()) != null) {
-	            if (a.getResult()) {
-	                // add it back in I
-	                updateIntention();
-	            	applyClrInt(confP.C.SI);
-	            } else {
-	                generateGoalDeletion();
-	            }
-            } else {
-                applyProcAct(); // get next action
+            if (a != null) {
+                confP.C.SI = a.getIntention();
+    
+                // remove the intention from PA (PA has all pending action, including those in FA;
+                // but, if the intention is not in PA, it means that the intention was dropped
+                // and should not return to I)
+                if (C.getPendingActions().remove(a.getIntention().getId()) != null) {
+    	            if (a.getResult()) {
+    	                // add the intention back in I
+    	                updateIntention();
+    	            	applyClrInt(confP.C.SI);
+    	            } else {
+    	                generateGoalDeletion();
+    	            }
+                } else {
+                    applyProcAct(); // get next action
+                }
             }
         }
     }
