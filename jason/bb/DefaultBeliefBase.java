@@ -32,6 +32,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -211,12 +212,12 @@ public class DefaultBeliefBase implements BeliefBase {
     /** each predicate indicator has one BelEntry assigned to it */
     final class BelEntry {
         
-        final private List<Literal> list = new ArrayList<Literal>(); // maintains the order of the bels
+        final private List<Literal> list = new LinkedList<Literal>(); // maintains the order of the bels
         final private Map<LiteralWrapper,Literal> map = new HashMap<LiteralWrapper,Literal>(); // to fastly find contents, from literal do list index
         
         public void add(Literal l) {
             map.put(new LiteralWrapper(l), l);
-            list.add(l);
+            list.add(0,l); // add new bels in the begin of the BB
         }
         
         public void remove(Literal l) {
