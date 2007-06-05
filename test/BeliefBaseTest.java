@@ -474,13 +474,13 @@ public class BeliefBaseTest extends TestCase {
         assertTrue(ag.believes(Literal.parseLiteral("c(20)"), new Unifier()));
         Unifier u = new Unifier();
         assertTrue(ag.believes(Literal.parseLiteral("c(X)"), u));
-        assertEquals(u.get("X").toString(),"x");
+        assertEquals(u.get("X").toString(),"20");
         
         Literal l = Literal.parseLiteral("c(_)");
         u = new Unifier();
         assertTrue(ag.believes(l, u));
         l.apply(u);
-        assertEquals(l.toString(),"c(x)");
+        assertEquals(l.toString(),"c(20)");
         
         assertFalse(ag.believes(Literal.parseLiteral("a(300)"), new Unifier()));
         assertTrue(ag.believes(Literal.parseLiteral("a(30)"), new Unifier()));
@@ -508,7 +508,7 @@ public class BeliefBaseTest extends TestCase {
 
         rbrf = ag.brf(null, Literal.parseLiteral("c(_)"), Intention.EmptyInt);
         assertTrue(rbrf[1].size() == 1);
-        assertEquals(rbrf[1].toString(), "[c(x)]");
+        assertEquals(rbrf[1].toString(), "[c(y)]");
 
         // can not remove b without source
         rbrf = ag.brf(null, Literal.parseLiteral("b(_,_)"), Intention.EmptyInt);

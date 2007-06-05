@@ -87,7 +87,7 @@ public class TSTest extends TestCase {
         q1.offer(i2);
         q1.offer(i3);
         q1.offer(i4);
-        assertTrue(q1.poll().getId() == 3);
+        assertEquals(q1.poll().getId(), i3.getId());
         //System.out.println(q1.poll());
         //System.out.println(q1.poll());
         //System.out.println(q1.poll());
