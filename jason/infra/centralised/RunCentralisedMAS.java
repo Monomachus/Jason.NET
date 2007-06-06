@@ -84,7 +84,7 @@ public class RunCentralisedMAS {
     public static void main(String[] args) {
     	String projectFileName = null;
         if (args.length < 1) {
-        	if (RunCentralisedMAS.class.getResource(File.separator+defaultProjectFileName) != null) {
+        	if (RunCentralisedMAS.class.getResource("/"+defaultProjectFileName) != null) {
         		projectFileName = defaultProjectFileName;
         		readFromJAR = true;
         	} else {
@@ -120,15 +120,15 @@ public class RunCentralisedMAS {
         try {
         	InputStream inProject;
         	if (readFromJAR) {
-        		inProject = RunCentralisedMAS.class.getResource(File.separator+defaultProjectFileName).openStream();
-        		urlPrefix = Include.CRPrefix + File.separator;
+        		inProject = RunCentralisedMAS.class.getResource("/"+defaultProjectFileName).openStream();
+        		urlPrefix = Include.CRPrefix + "/";
         	} else {
 	        	URL file;
 	        	// test if the argument is an URL
 	        	try {
 	        		file = new URL(projectFileName);
 	        		if (projectFileName.startsWith("jar")) {
-	        			urlPrefix = projectFileName.substring(0,projectFileName.indexOf("!")+1) + File.separator;
+	        			urlPrefix = projectFileName.substring(0,projectFileName.indexOf("!")+1) + "/";
 	        		}
 	        	} catch (Exception e) {
 	        		file = new URL("file:"+projectFileName);
@@ -313,7 +313,7 @@ public class RunCentralisedMAS {
                 }
 
                 String tmpAsSrc = ap.asSource.toString();
-                if (!tmpAsSrc.startsWith(File.separator) && !project.getDirectory().equals("./")) {
+                if (!tmpAsSrc.startsWith(File.separator) && !project.getDirectory().equals("."+File.separator)) {
                     tmpAsSrc = project.getDirectory() + tmpAsSrc;
                 }
                 tmpAsSrc = urlPrefix + tmpAsSrc;

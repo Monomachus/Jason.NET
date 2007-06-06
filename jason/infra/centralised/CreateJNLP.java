@@ -10,7 +10,8 @@ public class CreateJNLP {
 	public static void main(String[] args) {
 		try {
 			String projectName = args[0];
-			//String mas2jFile   = args[1];
+			String mas2jFile   = args[1];
+            
 			String file = projectName+".jnlp";
 			PrintWriter out = new PrintWriter(new File(file));
 
@@ -19,7 +20,17 @@ public class CreateJNLP {
 			script = CentralisedMASLauncherAnt.replace(script, "<PROJECT-ID>", projectName);
 			script = CentralisedMASLauncherAnt.replace(script, "<PROJECT-ID>", projectName);
 			script = CentralisedMASLauncherAnt.replace(script, "<PROJECT-ID>", projectName);
-
+            script = CentralisedMASLauncherAnt.replace(script, "<PROJECT-ID>", projectName);
+            
+            String defCodebase = "http://localhost";
+            try {
+                defCodebase = "file:" + new File(mas2jFile).getAbsoluteFile().getParentFile().getAbsolutePath();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            
+            script = CentralisedMASLauncherAnt.replace(script, "<DEFAULT-CODEBASE>", defCodebase);
+             
 			String jars = "";
 			File lib = new File("../lib");
 			if (lib.exists()) {

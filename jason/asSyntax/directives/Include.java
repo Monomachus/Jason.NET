@@ -27,11 +27,11 @@ public class Include implements Directive {
 	    	if (outterContent != null && outterPrefix != null) {
 	    		// check if the outter is URL
 	    		if (outterPrefix.startsWith("jar")) {
-	    			outterPrefix = outterPrefix.substring(0,outterPrefix.indexOf("!")+1) + File.separator;
+	    			outterPrefix = outterPrefix.substring(0,outterPrefix.indexOf("!")+1) + "/";
 	    			file = outterPrefix + file;
 	    			in = new URL(file).openStream();
 	    		} if (outterPrefix.startsWith(CRPrefix)) { // outter is loaded from a resource ("application".jar) file, used for java web start
-	    			int posSlash = outterPrefix.lastIndexOf(File.separator); 
+	    			int posSlash = outterPrefix.lastIndexOf("/"); 
 	    			if (posSlash > 0) {
 	    				file = outterPrefix.substring(CRPrefix.length(),posSlash+1) + file;
 	    			}
