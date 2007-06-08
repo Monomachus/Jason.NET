@@ -29,7 +29,6 @@ import jason.architecture.AgArchInfraTier;
 import jason.asSemantics.ActionExec;
 import jason.asSemantics.Message;
 import jason.asSyntax.Literal;
-import jason.asSyntax.Structure;
 import jason.mas2j.ClassParameters;
 import jason.runtime.RuntimeServicesInfraTier;
 import jason.runtime.Settings;
@@ -218,17 +217,9 @@ public class CentralisedAgArch extends Thread implements AgArchInfraTier {
     }
 
     // Default acting on the environment
-    // it gets action from ts.C.A;
     public void act(ActionExec action, List<ActionExec> feedback) {
-        Structure acTerm = action.getActionTerm();
-        logger.info("doing: " + acTerm);
-
-        if (infraEnv.getUserEnvironment().executeAction(getName(), acTerm)) {
-            action.setResult(true);
-        } else {
-            action.setResult(false);
-        }
-        feedback.add(action);
+        logger.info("doing: " + action.getActionTerm());
+        infraEnv.act(getName(), action, feedback, getUserAgArch().getTS());
     }
 
     public boolean canSleep() {

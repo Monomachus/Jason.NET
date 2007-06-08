@@ -25,12 +25,18 @@
 package jason.infra.centralised;
 
 import jason.JasonException;
+import jason.asSemantics.ActionExec;
+import jason.asSemantics.TransitionSystem;
+import jason.asSyntax.Structure;
 import jason.environment.Environment;
 import jason.environment.EnvironmentInfraTier;
 import jason.mas2j.ClassParameters;
 import jason.runtime.RuntimeServicesInfraTier;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -45,6 +51,8 @@ public class CentralisedEnvironment implements EnvironmentInfraTier {
 
 	private RunCentralisedMAS masRunner = null;
     
+	ExecutorService executor; // the thread pool used to execute actions
+	
     static Logger logger = Logger.getLogger(CentralisedEnvironment.class.getName());
 	
     public CentralisedEnvironment(ClassParameters userEnv, RunCentralisedMAS masRunner) throws JasonException {
@@ -57,17 +65,49 @@ public class CentralisedEnvironment implements EnvironmentInfraTier {
             logger.log(Level.SEVERE,"Error in Centralised MAS environment creation",e);
             throw new JasonException("The user environment class instantiation '"+userEnv+"' has failed!"+e.getMessage());
         }
+
+        // creates and executor with 1 core thread
+		// where no more than 3 tasks will wait for a thread
+		// The max number of thread is 1000 (so the 1001 task will be rejected) 
+		// Threads idle for 10 sec. will be removed from the pool
+        //executor= new ThreadPoolExecutor(1,1000,10,TimeUnit.SECONDS,new ArrayBlockingQueue<Runnable>(3));
+        
+        // creates a thread pool with 4 threads
+        executor = Executors.newFixedThreadPool(4);
     }
 	
 	/** called before the end of MAS execution, it just calls the user environment class stop method. */
 	public void stop() {
 		fUserEnv.stop();
+		executor.shutdownNow();
 	}
 
     public Environment getUserEnvironment() {
         return fUserEnv;
     }
 
+    public void act(final String agName, final ActionExec action, final List<ActionExec> feedback, final TransitionSystem ts) {
+    	if (executor.isTerminated()) return;
+    	executor.execute(new Runnable() {
+    		public void run() {
+    			try {
+	    			Structure acTerm = action.getActionTerm();
+	    	        if (fUserEnv.executeAction(agName, acTerm)) {
+	    	            action.setResult(true);
+	    	        } else {
+	    	            action.setResult(false);
+	    	        }
+	    	        feedback.add(action);
+	    	        ts.newMessageHasArrived();
+    			} catch (Exception ie) {
+    				if (!(ie instanceof InterruptedException)) {
+    					logger.log(Level.WARNING, "act error!",ie);
+    				}
+    			}
+    		}
+    	});
+    }
+    
     public void informAgsEnvironmentChanged() {
         for (CentralisedAgArch ag: masRunner.getAgs().values()) {
             ag.getUserAgArch().getTS().newMessageHasArrived();
