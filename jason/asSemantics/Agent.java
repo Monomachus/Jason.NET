@@ -120,6 +120,7 @@ public class Agent {
 
             // add initial goals events
             for (Literal g: initialGoals) {
+            	g.makeVarsAnnon();
             	getTS().getC().addAchvGoal(g,Intention.EmptyInt);
             }
             

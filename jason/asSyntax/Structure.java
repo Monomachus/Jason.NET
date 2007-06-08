@@ -28,8 +28,10 @@ import jason.asSyntax.parser.as2j;
 
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -299,15 +301,31 @@ public class Structure extends DefaultTerm {
         return true;
     }
 
+    /** Replaces all variables of the term for unnamed variables (_). */
     public void makeVarsAnnon() {
+    	makeVarsAnnon(new HashMap<VarTerm,UnnamedVar>());
+    }
+    
+    /**
+     * Replaces all variables of the term for unnamed variables (_).
+     * 
+     * @param changes is the map of replacements
+     */
+    public void makeVarsAnnon(Map<VarTerm,UnnamedVar> changes) {
         for (int i=0; i<getTermsSize(); i++) {
             Term ti = getTerm(i);
             if (ti.isVar()) {
-                setTerm(i,new UnnamedVar());
+            	// replace ti to an unnamed var
+            	UnnamedVar uv = changes.get(ti);
+            	if (uv == null) {
+            		uv = new UnnamedVar();
+            		changes.put((VarTerm)ti, uv);
+            	}
+            	setTerm(i,uv);
             } else if (ti.isStructure()) {
                 Structure tis = (Structure)ti;
                 if (tis.getTermsSize()>0) {
-                    tis.makeVarsAnnon();
+                    tis.makeVarsAnnon(changes);
                 }
             }
         }

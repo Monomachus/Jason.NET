@@ -63,11 +63,12 @@ public class UnnamedVar extends VarTerm {
         return !hasValue();
     }
 
+    /*
     public String toString() {
         if (hasValue())
             return getValue().toString();
         else
             return "_";
     }
-
+	*/
 }

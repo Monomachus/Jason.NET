@@ -509,6 +509,26 @@ public class TermTest extends TestCase {
     	assertEquals(a.toString(),"a[b]");
     }
     
+    public void testMakeVarAnnon() {
+    	Literal l1 = Literal.parseLiteral("likes(jane,X,peter)");
+    	Literal l2 = Literal.parseLiteral("likes(X,Y,Y)");
+    	Literal l3 = Literal.parseLiteral("likes(X,Y,X)");
+    	Literal l4 = Literal.parseLiteral("likes(Z,Y,Y)");
+    	Unifier u = new Unifier();
+    	                assertFalse(u.unifies(l1, l2));
+    	u.clear();    	assertFalse(u.unifies(l1, l3));
+    	u.clear();    	assertTrue(u.unifies(l1, l4));
+    	
+    	l2.makeVarsAnnon();
+    	u.clear();    	assertTrue(u.unifies(l1, l2));    	
+
+    	l3.makeVarsAnnon();
+    	u.clear();    	assertFalse(u.unifies(l1, l3));    	
+
+    	l4.makeVarsAnnon();
+    	u.clear();    	assertTrue(u.unifies(l1, l4));    	
+    }
+    
 	public static void main(String[] a) {
 		new TermTest().testAnnotsUnify7();
 	}

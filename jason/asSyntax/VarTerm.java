@@ -350,14 +350,12 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
     @Override
     public String toString() {
         if (value == null) {
-            // no value, the var name must be equal
             String s = getFunctor();
             if (hasAnnot()) {
                 s += getAnnots();
             }
             return s;
         } else {
-            // campare the values
             return value.toString();
         }
     }
