@@ -78,6 +78,14 @@ public class DefaultBeliefBase implements BeliefBase {
     }
 
     public boolean add(Literal l) {
+        return add(l, false);
+    }
+    
+    public boolean add(int index, Literal l) {
+        return add(l, index != 0);
+    }
+    
+    protected boolean add(Literal l, boolean addInEnd) {
         if (l.equals(Literal.LTrue) || l.equals(Literal.LFalse)) {
             logger.log(Level.SEVERE, "Error: <true> or <false> can not be added as beliefs.");
             return false;
@@ -107,7 +115,7 @@ public class DefaultBeliefBase implements BeliefBase {
                 entry = new BelEntry();
                 belsMap.put(l.getPredicateIndicator(), entry);
             }
-            entry.add(l);
+            entry.add(l, addInEnd);
             // add it in the percepts list
             if (l.hasAnnot(TPercept)) {
                 percepts.add(l);
@@ -196,7 +204,7 @@ public class DefaultBeliefBase implements BeliefBase {
     public Object clone() {
     	DefaultBeliefBase bb = new DefaultBeliefBase();
     	for (Literal b: this) {
-    		bb.add((Literal)b.clone());
+    		bb.add(1,(Literal)b.clone());
     	}
     	return bb;
     }
@@ -215,9 +223,13 @@ public class DefaultBeliefBase implements BeliefBase {
         final private List<Literal> list = new LinkedList<Literal>(); // maintains the order of the bels
         final private Map<LiteralWrapper,Literal> map = new HashMap<LiteralWrapper,Literal>(); // to fastly find contents, from literal do list index
         
-        public void add(Literal l) {
+        public void add(Literal l, boolean addInEnd) {
             map.put(new LiteralWrapper(l), l);
-            list.add(0,l); // add new bels in the begin of the BB
+            if (addInEnd) {
+                list.add(l);
+            } else {
+                list.add(0,l);
+            }
         }
         
         public void remove(Literal l) {
@@ -238,7 +250,7 @@ public class DefaultBeliefBase implements BeliefBase {
         protected Object clone() {
         	BelEntry be = new BelEntry();
         	for (Literal l: list) {
-        		be.add((Literal)l.clone());
+        		be.add((Literal)l.clone(), false);
         	}
         	return be;
         }

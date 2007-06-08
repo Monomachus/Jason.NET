@@ -56,8 +56,12 @@ public interface BeliefBase extends Iterable<Literal>, Cloneable {
     /** Called just before the end of MAS execution */
     public void stop();
     
-    /** Adds a belief in the BB, returns true if succeed */
+    /** Adds a belief in the end of the BB, returns true if succeed */
     public boolean add(Literal l);
+
+    /** Adds a belief in the BB at <i>index</i> position, returns true if succeed */
+    public boolean add(int index, Literal l);
+
 
     /** Returns an iterator for all beliefs. */
     public Iterator<Literal> iterator();

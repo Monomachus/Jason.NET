@@ -523,6 +523,18 @@ public class BeliefBaseTest extends TestCase {
         assertEquals(ag.getBB().size(),1);
     }
     
+    public void testClone() {
+        Agent ag = new Agent();
+        ag.getBB().add(1,Literal.parseLiteral("a(10)"));
+        ag.getBB().add(1,Literal.parseLiteral("a(20)[a]"));
+        ag.getBB().add(1,Literal.parseLiteral("a(30)[a,b]"));
+        ag.getBB().add(1,Literal.parseLiteral("c(x)"));
+        ag.getBB().add(1,Literal.parseLiteral("c(y)"));
+        ag.getBB().add(Literal.parseLiteral("c(20)"));
+        BeliefBase c = (BeliefBase)ag.getBB().clone();
+        assertEquals(ag.getBB().toString(), c.toString());
+    }
+    
     private int iteratorSize(Iterator i) {
         int c = 0;
         while (i.hasNext()) {
