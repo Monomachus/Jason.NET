@@ -224,10 +224,13 @@ public class Agent {
     public List<Literal> getInitialBels() {
     	return initialBels;
     }
+    
     // add initial bels events
     public void addInitialBelsInBB() {
         Unifier u = new Unifier();
-        for (Literal b: initialBels) {
+        // since bels is a Stack, insert bels in inverse order
+        for (int i=initialBels.size()-1; i >=0; i--) {
+            Literal b = initialBels.get(i);
             b.apply(u); // to solve arithmetic expressions
         	addBel(b);
         }

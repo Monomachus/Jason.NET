@@ -509,24 +509,43 @@ public class TermTest extends TestCase {
     	assertEquals(a.toString(),"a[b]");
     }
     
-    public void testMakeVarAnnon() {
+    public void testMakeVarAnnon1() {
     	Literal l1 = Literal.parseLiteral("likes(jane,X,peter)");
     	Literal l2 = Literal.parseLiteral("likes(X,Y,Y)");
     	Literal l3 = Literal.parseLiteral("likes(X,Y,X)");
     	Literal l4 = Literal.parseLiteral("likes(Z,Y,Y)");
-    	Unifier u = new Unifier();
-    	                assertFalse(u.unifies(l1, l2));
-    	u.clear();    	assertFalse(u.unifies(l1, l3));
-    	u.clear();    	assertTrue(u.unifies(l1, l4));
+    	Unifier u = new Unifier();                
+        assertFalse(u.unifies(l1, l2));
+    	u.clear();    	
+        assertFalse(u.unifies(l1, l3));
+    	u.clear();    	
+        assertTrue(u.unifies(l1, l4));
     	
     	l2.makeVarsAnnon();
-    	u.clear();    	assertTrue(u.unifies(l1, l2));    	
+    	u.clear();    	
+        assertTrue(u.unifies(l1, l2));    	
 
     	l3.makeVarsAnnon();
-    	u.clear();    	assertFalse(u.unifies(l1, l3));    	
+    	u.clear();    	
+        assertFalse(u.unifies(l1, l3));    	
 
     	l4.makeVarsAnnon();
-    	u.clear();    	assertTrue(u.unifies(l1, l4));    	
+    	u.clear();    	
+        assertTrue(u.unifies(l1, l4));    	
+    }
+    
+    public void testMakeVarAnnon2() {
+    	Literal l1 = Literal.parseLiteral("calc(AgY,QuadY2,QuadY2)");
+    	Literal l2 = Literal.parseLiteral("calc(32,33,V)");
+    	Unifier u = new Unifier();
+    	assertTrue(u.unifies(l1, l2));
+    	l2.makeVarsAnnon();
+    	u.clear();
+        assertTrue(u.unifies(l1, l2));
+        l2.apply(u);
+        assertEquals(l2.toString(), "calc(32,33,33)");
+        l1.apply(u);
+        assertEquals(l1.toString(), "calc(32,33,33)");
     }
     
 	public static void main(String[] a) {
