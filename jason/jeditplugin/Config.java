@@ -26,6 +26,7 @@ package jason.jeditplugin;
 import jason.asSemantics.TransitionSystem;
 import jason.infra.centralised.CentralisedFactory;
 import jason.infra.saci.SaciFactory;
+import jason.infra.jade.JadeFactory;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -48,6 +49,9 @@ public class Config extends Properties {
 	public static final String JASON_JAR     = "jasonJar";
     public static final String SACI_JAR      = "saciJar";
     public static final String ANT_LIB       = "antLib";
+
+    public static final String JADE_JAR      = "jadeJar";
+    public static final String JADE_ARGS     = "jadeArgs";
 
     public static final String JAVA_HOME     = "javaHome";
     public static final String RUN_AS_THREAD = "runCentralisedInsideJIDE";
@@ -106,6 +110,14 @@ public class Config extends Properties {
         return getProperty(SACI_JAR);
     }
 
+    public String getJadeJar() {
+        return getProperty(JADE_JAR);
+    }
+
+    public String getJadeArgs() {
+        return getProperty(JADE_ARGS);
+    }
+
     public String getJavaHome() {
         return getProperty(JAVA_HOME);
     }
@@ -139,8 +151,9 @@ public class Config extends Properties {
     }
 
     public void fix() {
-        tryToFixJarFileConf(JASON_JAR, "jason.jar", 500000);
+        tryToFixJarFileConf(JASON_JAR, "jason.jar", 600000);
         tryToFixJarFileConf(SACI_JAR, "saci.jar", 300000);
+        tryToFixJarFileConf(JADE_JAR, "jade.jar", 800000);
 
         // fix java home
         if (get(JAVA_HOME) == null || !checkJavaHomePath(getProperty(JAVA_HOME))) {
@@ -199,10 +212,16 @@ public class Config extends Properties {
         if (get(CHECK_VERSION) == null) {
             put(CHECK_VERSION, "true");
         }
+
+        // jade args
+        if (getProperty(JADE_ARGS) == null) {
+            put(JADE_ARGS, "-gui");
+        }
         
         // Default infrastructures
         put("infrastructure.Centralised", CentralisedFactory.class.getName());
         put("infrastructure.Saci", SaciFactory.class.getName());
+        put("infrastructure.Jade", JadeFactory.class.getName());
     }
 
     public void store() {
@@ -409,5 +428,6 @@ public class Config extends Properties {
     
     public static void main(String[] args) {
         Config.get().fix();
+        Config.get().store();
     }
 }

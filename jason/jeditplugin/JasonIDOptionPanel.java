@@ -47,7 +47,6 @@ public class JasonIDOptionPanel extends AbstractOptionPane  {
 	
 	private static final long serialVersionUID = 1L;
 
-	JTextField saciTF;
 	JTextField jasonTF;
 	JTextField javaTF;
 	JTextField antTF;
@@ -55,6 +54,10 @@ public class JasonIDOptionPanel extends AbstractOptionPane  {
 	//JCheckBox  insideJIDECBox;
 	JCheckBox  closeAllCBox;
     JCheckBox  checkVersionCBox;
+
+	JTextField saciTF;
+	JTextField jadeJarTF;
+	JTextField jadeArgsTF;
 
 	static Config userProperties = Config.get();
 
@@ -70,6 +73,7 @@ public class JasonIDOptionPanel extends AbstractOptionPane  {
     			System.out.println("This is a new version of Jason, reseting configuration...");
     			//userProperties.clear();
     			userProperties.remove(Config.SACI_JAR);
+    			userProperties.remove(Config.JADE_JAR);
     			userProperties.remove(Config.JASON_JAR);
                 userProperties.remove(Config.ANT_LIB);
                 userProperties.remove(Config.CHECK_VERSION);
@@ -86,66 +90,26 @@ public class JasonIDOptionPanel extends AbstractOptionPane  {
 
 	protected void _init() {
 		JPanel pop = new JPanel(new GridLayout(0,1));
+
     	// jason home
-    	JPanel jasonHomePanel = new JPanel();
+    	jasonTF = new JTextField(25);
+    	JPanel jasonHomePanel = new JPanel(new GridLayout(0,1));
     	jasonHomePanel.setBorder(BorderFactory.createTitledBorder(BorderFactory
-				.createEtchedBorder(), "jason.jar file", TitledBorder.LEFT, TitledBorder.TOP));
-    	jasonHomePanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-    	jasonHomePanel.add(new JLabel("Location"));
-    	jasonTF = new JTextField(30);
-    	jasonHomePanel.add(jasonTF);
-    	JButton setJason = new JButton("Browse");
-    	setJason.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-	            try {
-					JFileChooser chooser = new JFileChooser(System.getProperty("user.dir"));
-					chooser.setDialogTitle("Select the jason.jar file");
-					chooser.setFileFilter(new JarFileFilter("jason.jar", "The Jason.jar file"));
-	                //chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-	                if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
-	                	String jasonJar = (new File(chooser.getSelectedFile().getPath())).getCanonicalPath();
-	                	if (Config.checkJar(jasonJar)) {
-							jasonTF.setText(jasonJar);
-	                	} else {
-	                		JOptionPane.showMessageDialog(null, "The selected jason.jar file was not ok!");
-	                	}
-	                }
-	            } catch (Exception e) {}
-			}
-    	});
-    	jasonHomePanel.add(setJason);
+				.createEtchedBorder(), "Jason", TitledBorder.LEFT, TitledBorder.TOP));
+        JPanel jasonJarPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+    	jasonJarPanel.add(new JLabel("jason.jar location"));
+    	jasonJarPanel.add(jasonTF);
+    	jasonJarPanel.add(createBrowseButton("jason.jar", jasonTF));
+        jasonHomePanel.add(jasonJarPanel);
+
+        // jason check version
+        JPanel checkVersionPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        //checkVersionPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Jason options", TitledBorder.LEFT, TitledBorder.TOP));
+        checkVersionCBox = new JCheckBox("Check for Jason new version on startup", false);
+        checkVersionPanel.add(checkVersionCBox);
+        jasonHomePanel.add(checkVersionPanel);
     	pop.add(jasonHomePanel);
     	
-    	
-    	// saci home
-    	JPanel saciHomePanel = new JPanel();
-    	saciHomePanel.setBorder(BorderFactory.createTitledBorder(BorderFactory
-				.createEtchedBorder(), "saci.jar file", TitledBorder.LEFT, TitledBorder.TOP));
-    	saciHomePanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-    	saciHomePanel.add(new JLabel("Location"));
-    	saciTF = new JTextField(30);
-    	saciHomePanel.add(saciTF);
-    	JButton setSaci = new JButton("Browse");
-    	setSaci.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-	            try {
-	                JFileChooser chooser = new JFileChooser(System.getProperty("user.dir"));
-					chooser.setDialogTitle("Select the Saci.jar file");
-					chooser.setFileFilter(new JarFileFilter("saci.jar", "The saci.jar file"));
-					//chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-	                if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
-	                	String saciJar = (new File(chooser.getSelectedFile().getPath())).getCanonicalPath();
-	                	if (Config.checkJar(saciJar)) {
-	                		saciTF.setText(saciJar);
-	                	} else {
-	                		JOptionPane.showMessageDialog(null, "The selected saci.jar file was not ok!");
-	                	}
-	                }
-	            } catch (Exception e) {}
-			}
-    	});
-    	saciHomePanel.add(setSaci);
-    	pop.add(saciHomePanel);
 
     	// java home
     	JPanel javaHomePanel = new JPanel();
@@ -153,7 +117,7 @@ public class JasonIDOptionPanel extends AbstractOptionPane  {
 				.createEtchedBorder(), "Java Home", TitledBorder.LEFT, TitledBorder.TOP));
     	javaHomePanel.setLayout(new FlowLayout(FlowLayout.LEFT));
     	javaHomePanel.add(new JLabel("Directory"));
-    	javaTF = new JTextField(30);
+    	javaTF = new JTextField(25);
     	javaHomePanel.add(javaTF);
     	JButton setJava = new JButton("Browse");
     	setJava.addActionListener(new ActionListener() {
@@ -182,14 +146,14 @@ public class JasonIDOptionPanel extends AbstractOptionPane  {
 				.createEtchedBorder(), "Ant libs", TitledBorder.LEFT, TitledBorder.TOP));
     	antHomePanel.setLayout(new FlowLayout(FlowLayout.LEFT));
     	antHomePanel.add(new JLabel("Directory"));
-    	antTF = new JTextField(30);
+    	antTF = new JTextField(25);
     	antHomePanel.add(antTF);
     	JButton setAnt = new JButton("Browse");
     	setAnt.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 	            try {
 	                JFileChooser chooser = new JFileChooser(System.getProperty("user.dir"));
-					 chooser.setDialogTitle("Select the directory with ant.jar and ant-launcher.jar files");
+                    chooser.setDialogTitle("Select the directory with ant.jar and ant-launcher.jar files");
 	                chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 	                if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
 	                	String antLib = (new File(chooser.getSelectedFile().getPath())).getCanonicalPath();
@@ -204,6 +168,36 @@ public class JasonIDOptionPanel extends AbstractOptionPane  {
     	});
     	antHomePanel.add(setAnt);
     	pop.add(antHomePanel);
+
+    	
+    	// jade home
+    	jadeJarTF  = new JTextField(25);
+    	jadeArgsTF = new JTextField(30);
+    	JPanel jadeHomePanel = new JPanel(new GridLayout(0,1));
+    	jadeHomePanel.setBorder(BorderFactory.createTitledBorder(BorderFactory
+				.createEtchedBorder(), "Jade", TitledBorder.LEFT, TitledBorder.TOP));
+
+        JPanel jadeJarPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+    	jadeJarPanel.add(new JLabel("jade.jar location"));
+    	jadeJarPanel.add(jadeJarTF);
+    	jadeJarPanel.add(createBrowseButton("jade.jar", jadeJarTF));
+        jadeHomePanel.add(jadeJarPanel);
+        JPanel jadeArgsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+    	jadeArgsPanel.add(new JLabel("jade.Boot arguments"));
+    	jadeArgsPanel.add(jadeArgsTF);
+        jadeHomePanel.add(jadeArgsPanel);
+    	pop.add(jadeHomePanel);
+
+    	// saci home
+    	JPanel saciHomePanel = new JPanel();
+    	saciHomePanel.setBorder(BorderFactory.createTitledBorder(BorderFactory
+				.createEtchedBorder(), "Saci", TitledBorder.LEFT, TitledBorder.TOP));
+    	saciHomePanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+    	saciHomePanel.add(new JLabel("saci.jar location"));
+    	saciTF = new JTextField(25);
+    	saciHomePanel.add(saciTF);
+    	saciHomePanel.add(createBrowseButton("saci.jar", saciTF));
+    	pop.add(saciHomePanel);
 
     	
     	// shell command
@@ -236,17 +230,12 @@ public class JasonIDOptionPanel extends AbstractOptionPane  {
     	closeAllPanel.add(closeAllCBox);
     	pop.add(closeAllPanel);
 
-        // check version
-        JPanel checkVersionPanel = new JPanel();
-        checkVersionPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Jason options", TitledBorder.LEFT, TitledBorder.TOP));
-        checkVersionPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-        checkVersionCBox = new JCheckBox("Check for new version on startup.", false);
-        checkVersionPanel.add(checkVersionCBox);
-        pop.add(checkVersionPanel);
 
         addComponent(pop);
     	
     	saciTF.setText(userProperties.getSaciJar());
+    	jadeJarTF.setText(userProperties.getJadeJar());
+    	jadeArgsTF.setText(userProperties.getJadeArgs());
     	jasonTF.setText(userProperties.getJasonJar());
     	javaTF.setText(userProperties.getJavaHome());
     	antTF.setText(userProperties.getAntLib());
@@ -256,19 +245,51 @@ public class JasonIDOptionPanel extends AbstractOptionPane  {
         checkVersionCBox.setSelected(userProperties.getBoolean(Config.CHECK_VERSION));
 	}
 
+    private JButton createBrowseButton(final String jarfile, final JTextField tf) {
+    	JButton bt = new JButton("Browse");
+    	bt.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+	            try {
+	                JFileChooser chooser = new JFileChooser(System.getProperty("user.dir"));
+					chooser.setDialogTitle("Select the "+jarfile+" file");
+					chooser.setFileFilter(new JarFileFilter(jarfile, "The "+jarfile+" file"));
+					//chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+	                if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+	                	String selJar = (new File(chooser.getSelectedFile().getPath())).getCanonicalPath();
+	                	if (Config.checkJar(selJar)) {
+	                		tf.setText(selJar);
+	                	} else {
+	                		JOptionPane.showMessageDialog(null, "The selected "+jarfile+" file was not ok!");
+	                	}
+	                }
+	            } catch (Exception e) {}
+			}
+    	});
+        return bt;
+    }
+
 	protected void _save() {
 		if (Config.checkJar(saciTF.getText())) {
 			userProperties.put(Config.SACI_JAR, saciTF.getText().trim());
 		}
+
+		if (Config.checkJar(jadeJarTF.getText())) {
+			userProperties.put(Config.JADE_JAR, jadeJarTF.getText().trim());
+		}
+        userProperties.put(Config.JADE_ARGS, jadeArgsTF.getText().trim());
+
 		if (Config.checkJar(jasonTF.getText())) {
 			userProperties.put(Config.JASON_JAR, jasonTF.getText().trim());
 		}
+
 		if (Config.checkJavaHomePath(javaTF.getText())) {
 			userProperties.setJavaHome(javaTF.getText().trim());
 		}
+
 		if (Config.checkAntLib(antTF.getText())) {
 			userProperties.setAntLib(antTF.getText().trim());
 		}
+
 		//userProperties.put(Config.SHELL_CMD, shellTF.getText().trim());
 		//userProperties.put(Config.RUN_AS_THREAD, insideJIDECBox.isSelected()+"");
 		userProperties.put(Config.CLOSEALL, closeAllCBox.isSelected()+"");
