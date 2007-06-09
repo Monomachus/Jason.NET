@@ -50,6 +50,7 @@ public class CentralisedEnvironment implements EnvironmentInfraTier {
 	private Environment fUserEnv;
 
 	private RunCentralisedMAS masRunner = null;
+	private boolean running = true;
     
 	ExecutorService executor; // the thread pool used to execute actions
 	
@@ -78,8 +79,9 @@ public class CentralisedEnvironment implements EnvironmentInfraTier {
 	
 	/** called before the end of MAS execution, it just calls the user environment class stop method. */
 	public void stop() {
+        running = false;
+        executor.shutdownNow();
 		fUserEnv.stop();
-		executor.shutdownNow();
 	}
 
     public Environment getUserEnvironment() {
@@ -87,25 +89,26 @@ public class CentralisedEnvironment implements EnvironmentInfraTier {
     }
 
     public void act(final String agName, final ActionExec action, final List<ActionExec> feedback, final TransitionSystem ts) {
-    	if (executor.isTerminated()) return;
-    	executor.execute(new Runnable() {
-    		public void run() {
-    			try {
-	    			Structure acTerm = action.getActionTerm();
-	    	        if (fUserEnv.executeAction(agName, acTerm)) {
-	    	            action.setResult(true);
-	    	        } else {
-	    	            action.setResult(false);
-	    	        }
-	    	        feedback.add(action);
-	    	        ts.newMessageHasArrived();
-    			} catch (Exception ie) {
-    				if (!(ie instanceof InterruptedException)) {
-    					logger.log(Level.WARNING, "act error!",ie);
-    				}
-    			}
-    		}
-    	});
+    	if (running) {
+        	executor.execute(new Runnable() {
+        		public void run() {
+        			try {
+    	    			Structure acTerm = action.getActionTerm();
+    	    	        if (fUserEnv.executeAction(agName, acTerm)) {
+    	    	            action.setResult(true);
+    	    	        } else {
+    	    	            action.setResult(false);
+    	    	        }
+    	    	        feedback.add(action);
+    	    	        ts.newMessageHasArrived();
+        			} catch (Exception ie) {
+        				if (!(ie instanceof InterruptedException)) {
+        					logger.log(Level.WARNING, "act error!",ie);
+        				}
+        			}
+        		}
+        	});
+        }
     }
     
     public void informAgsEnvironmentChanged() {

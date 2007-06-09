@@ -142,13 +142,12 @@ public class CentralisedAgArch extends Thread implements AgArchInfraTier {
     private Object syncStopRun = new Object();
 
     public void stopAg() {
-        userAgArch.stopAg();
         running = false;
-        userAgArch.getTS().receiveSyncSignal(); // in case the agent is waiting
-        userAgArch.getTS().newMessageHasArrived(); // in case the agent is waiting
+        interrupt();
         synchronized (syncStopRun) {
         	masRunner.delAg(agName);
         }
+        userAgArch.stopAg();
     }
 
     public boolean isRunning() {

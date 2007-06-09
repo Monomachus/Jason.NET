@@ -31,6 +31,7 @@ import jason.asSemantics.Event;
 import jason.asSemantics.Intention;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
+import jason.asSyntax.Atom;
 import jason.asSyntax.StringTerm;
 import jason.asSyntax.Term;
 import jason.asSyntax.Trigger;
@@ -70,6 +71,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
  */
 public class at extends DefaultInternalAction {
+
+    public static final Atom atAtom = new Atom(".at"); 
      
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
@@ -130,7 +133,7 @@ public class at extends DefaultInternalAction {
     
     public void stopAllWaits() {
     	for (CheckDeadline t: threads.values()) {
-    		t.abort();
+            t.interrupt();
     	}
     }
     
@@ -140,7 +143,6 @@ public class at extends DefaultInternalAction {
         private long    deadline = 0;
         private Event   event;
         private Circumstance c;
-        private boolean stopped = false;
         
         public CheckDeadline(long d, Trigger te, Circumstance c) {
         	idCount++;
@@ -152,18 +154,11 @@ public class at extends DefaultInternalAction {
             threads.put(id, this);
         }
         
-        synchronized public void abort() {
-        	stopped = true;
-        	notifyAll();
-        }
-        
         synchronized public void run() {
             try {
                 wait(deadline);
-                if (!stopped) {
-                	// add event to Circumstance.Events
-                	c.addEvent(event);
-                }
+                // add event to Circumstance.Events
+                c.addEvent(event);
             } catch (InterruptedException e) {             	
             } finally {
             	threads.remove(id);

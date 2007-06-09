@@ -832,8 +832,9 @@ public class TransitionSystem {
         try {
             logger.fine("Waiting message....");
             wait(500); // wait for messages
+        } catch (InterruptedException e) {
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.log(Level.WARNING,"Error waiting mgs", e);
         }
     }
 
@@ -856,8 +857,9 @@ public class TransitionSystem {
                 syncMonitor.wait();
                 inWaitSyncMonitor = false;
             }
+        } catch (InterruptedException e) {
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.log(Level.WARNING,"Error waiting sync (1)", e);
         }
     }
 
@@ -868,17 +870,17 @@ public class TransitionSystem {
     public void receiveSyncSignal() {
         try {
             synchronized (syncMonitor) {
-                while (!inWaitSyncMonitor) {
+                while (!inWaitSyncMonitor && !agArch.isRunning()) {
                     // waits the agent to enter in waitSyncSignal
                     syncMonitor.wait(50); 
-                    if (!agArch.isRunning()) {
-                        break;
-                    }
                 }
 
                 syncMonitor.notifyAll();
             }
-        } catch (Exception e) {  }
+        } catch (InterruptedException e) {
+        } catch (Exception e) {
+            logger.log(Level.WARNING,"Error waiting sync (2)", e);
+        }
     }
 
     /*
@@ -919,6 +921,7 @@ public class TransitionSystem {
                     }
                 }
             }
+            if (!agArch.isRunning()) return;
 
             C.reset();
 
@@ -938,6 +941,7 @@ public class TransitionSystem {
             //stopCycle = false;
             step = State.StartRC;
             do {
+                if (!agArch.isRunning()) return;
             	//currentTask = "step "+step;
                 applySemanticRule();
             } while (step != State.StartRC); // && !stopCycle); // finished a reasoning cycle

@@ -38,6 +38,9 @@ import jason.asSyntax.Term;
 import jason.asSyntax.Trigger;
 import jason.asSyntax.BodyLiteral.BodyType;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.logging.Level;
 
 /**
@@ -71,6 +74,9 @@ import java.util.logging.Level;
 
  */
 public class wait extends DefaultInternalAction {
+
+    public static final Atom waitAtom = new Atom(".wait"); 
+    //static Logger logger = Logger.getLogger(wait.class.getName());
 
     @Override
     public Object execute(final TransitionSystem ts, Unifier un, Term[] args) throws Exception {
@@ -108,7 +114,16 @@ public class wait extends DefaultInternalAction {
     @Override
     public boolean suspendIntention() {
         return true;
-    }  
+    } 
+    
+    private List<WaitEvent> threads = Collections.synchronizedList(new ArrayList<WaitEvent>());
+    
+    public void stopAllWaits() {
+        for (WaitEvent t: threads) {
+            t.interrupt();
+        }
+    }
+
 
     class WaitEvent extends Thread implements CircumstanceListener {
         Trigger          te;
@@ -123,6 +138,7 @@ public class wait extends DefaultInternalAction {
         long             timeout = -1;
         
         WaitEvent(Trigger te, Unifier un, TransitionSystem ts, long to) {
+            super("wait "+te);
             this.te = te;
             this.un = un;
             this.ts = ts;
@@ -140,6 +156,8 @@ public class wait extends DefaultInternalAction {
             }
             sTE = si.getId()+"/"+sTE;
             c.getPendingIntentions().put(sTE, si);
+            
+            threads.add(this);
         }
 
         public void run() {
@@ -167,13 +185,15 @@ public class wait extends DefaultInternalAction {
 
             } catch (Exception e) {
                 ts.getLogger().log(Level.SEVERE, "Error at .wait thread", e);
+            } finally {
+                threads.remove(this);
             }
         }
 
         synchronized public void waitEvent() {
             long init = System.currentTimeMillis();
             long pass = 0;
-            while (!ok || drop) {
+            while (!ok && !drop) {
                 try {
                     if (timeout == -1) {
                         wait();
@@ -188,6 +208,8 @@ public class wait extends DefaultInternalAction {
                             break;
                         }
                     }
+                } catch (InterruptedException e)  {
+                    drop = true;
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
