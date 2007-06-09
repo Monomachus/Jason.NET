@@ -31,6 +31,7 @@ import java.awt.event.ActionListener;
 import java.io.File;
 
 import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
@@ -89,7 +90,8 @@ public class JasonIDOptionPanel extends AbstractOptionPane  {
 	}
 
 	protected void _init() {
-		JPanel pop = new JPanel(new GridLayout(0,1));
+		JPanel pop = new JPanel();
+        pop.setLayout(new BoxLayout(pop, BoxLayout.Y_AXIS));
 
     	// jason home
     	jasonTF = new JTextField(25);
@@ -105,7 +107,7 @@ public class JasonIDOptionPanel extends AbstractOptionPane  {
         // jason check version
         JPanel checkVersionPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         //checkVersionPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Jason options", TitledBorder.LEFT, TitledBorder.TOP));
-        checkVersionCBox = new JCheckBox("Check for Jason new version on startup", false);
+        checkVersionCBox = new JCheckBox("Check for new Jason versions on startup", false);
         checkVersionPanel.add(checkVersionCBox);
         jasonHomePanel.add(checkVersionPanel);
     	pop.add(jasonHomePanel);
@@ -229,7 +231,6 @@ public class JasonIDOptionPanel extends AbstractOptionPane  {
     	closeAllCBox = new JCheckBox("Close all files before opening a new Jason Project.");
     	closeAllPanel.add(closeAllCBox);
     	pop.add(closeAllPanel);
-
 
         addComponent(pop);
     	
