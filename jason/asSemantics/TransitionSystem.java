@@ -439,6 +439,7 @@ public class TransitionSystem {
 
         // Rule Achieve as a New Focus (the !! operator)
         case achieveNF:
+            body.makeVarsAnnon();
             conf.C.addAchvGoal(body, Intention.EmptyInt);
             updateIntention();
             break;
@@ -870,11 +871,10 @@ public class TransitionSystem {
     public void receiveSyncSignal() {
         try {
             synchronized (syncMonitor) {
-                while (!inWaitSyncMonitor && !agArch.isRunning()) {
+                while (!inWaitSyncMonitor && agArch.isRunning()) {
                     // waits the agent to enter in waitSyncSignal
                     syncMonitor.wait(50); 
                 }
-
                 syncMonitor.notifyAll();
             }
         } catch (InterruptedException e) {
@@ -960,7 +960,7 @@ public class TransitionSystem {
                 boolean isBreakPoint = false;
                 try {
                     isBreakPoint = conf.C.getSelectedOption().getPlan().hasBreakpoint();
-                    if (logger.isLoggable(Level.FINE)) logger.fine("Informing controller that I finished a reasoning cycle. Breakpoint is " + isBreakPoint);
+                    if (logger.isLoggable(Level.FINE)) logger.fine("Informing controller that I finished a reasoning cycle "+agArch.getCycleNumber()+". Breakpoint is " + isBreakPoint);
                 } catch (NullPointerException e) {
                     // no problem, there is no sel opt, no plan ....
                 }

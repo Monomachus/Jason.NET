@@ -1,430 +1,784 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet href="agInspection.xsl" type="text/xsl" ?>
-<agent name="aa" cycle="14">
+<agent cycle="52" name="robot">
 <beliefs>
-	<literal>
-		<term functor="b">
-			<arguments>
-				<number-term>30</number-term>
-			</arguments>
-			<annotations>
-				<literal>
-					<term functor="source">
-						<arguments>
-							<literal>
-								<term functor="self"/>
-							</literal>
-						</arguments>
-					</term>
-				</literal>
-			</annotations>
-		</term>
-	</literal>
-
+<literal>
+<structure functor="available">
+<arguments>
+<literal>
+<structure functor="beer"/>
+</literal>
+<literal>
+<structure functor="fridge"/>
+</literal>
+</arguments>
+<annotations>
+<list-term>
+<literal sep="">
+<structure functor="source">
+<arguments>
+<literal>
+<structure functor="self"/>
+</literal>
+</arguments>
+</structure>
+</literal>
+</list-term>
+</annotations>
+</structure>
+</literal>
+<literal>
+<structure functor="consumed">
+<arguments>
+<number-term>2007</number-term>
+<number-term>5</number-term>
+<number-term>9</number-term>
+<number-term>8</number-term>
+<number-term>44</number-term>
+<number-term>17</number-term>
+<literal>
+<structure functor="beer"/>
+</literal>
+</arguments>
+<annotations>
+<list-term>
+<literal sep="">
+<structure functor="source">
+<arguments>
+<literal>
+<structure functor="self"/>
+</literal>
+</arguments>
+</structure>
+</literal>
+</list-term>
+</annotations>
+</structure>
+</literal>
+<literal>
+<structure functor="limit">
+<arguments>
+<literal>
+<structure functor="beer"/>
+</literal>
+<number-term>10</number-term>
+</arguments>
+<annotations>
+<list-term>
+<literal sep="">
+<structure functor="source">
+<arguments>
+<literal>
+<structure functor="self"/>
+</literal>
+</arguments>
+</structure>
+</literal>
+</list-term>
+</annotations>
+</structure>
+</literal>
 <rule>
 <head>
 <literal>
-<term functor="gvl">
+<structure functor="too_much">
 <arguments>
-<var-term>X</var-term>
+<var-term functor="B"/>
 </arguments>
 <annotations>
-<literal>
-<term functor="source">
+<list-term>
+<literal sep="">
+<structure functor="source">
 <arguments>
 <literal>
-<term functor="self"/>
+<structure functor="self"/>
 </literal>
 </arguments>
-</term>
+</structure>
 </literal>
+</list-term>
 </annotations>
-</term>
+</structure>
 </literal>
 </head>
-
 <context>
 <expression operator=" &amp; " type="logical">
 <left>
-<literal>
-<term functor="a">
+<literal ia="true">
+<structure functor=".date">
 <arguments>
-<var-term>X</var-term>
+<var-term functor="YY"/>
+<var-term functor="MM"/>
+<var-term functor="DD"/>
 </arguments>
-</term>
+</structure>
+</literal>
+</left>
+<right>
+<expression operator=" &amp; " type="logical">
+<left>
+<literal ia="true">
+<structure functor=".count">
+<arguments>
+<literal>
+<structure functor="consumed">
+<arguments>
+<var-term functor="YY"/>
+<var-term functor="MM"/>
+<var-term functor="DD"/>
+<var-term functor="_1"/>
+<var-term functor="_2"/>
+<var-term functor="_3"/>
+<var-term functor="B"/>
+</arguments>
+</structure>
+</literal>
+<var-term functor="QtdB"/>
+</arguments>
+</structure>
+</literal>
+</left>
+<right>
+<expression operator=" &amp; " type="logical">
+<left>
+<literal>
+<structure functor="limit">
+<arguments>
+<var-term functor="B"/>
+<var-term functor="Limit"/>
+</arguments>
+</structure>
 </literal>
 </left>
 <right>
 <expression operator=" &gt; " type="relational">
 <left>
-<var-term>X</var-term>
+<var-term functor="QtdB"/>
 </left>
 <right>
-<number-term>10</number-term>
+<var-term functor="Limit"/>
+</right>
+</expression>
+</right>
+</expression>
 </right>
 </expression>
 </right>
 </expression>
 </context>
-
 </rule>
-
-<literal>
-<term functor="demo">
-<annotations>
-<literal>
-<term functor="source">
-<arguments>
-<literal>
-<term functor="self"/>
-</literal>
-</arguments>
-</term>
-</literal>
-</annotations>
-</term>
-</literal>
-<literal>
-<term functor="a">
-<arguments>
-<number-term>10</number-term>
-</arguments>
-<annotations>
-<literal>
-<term functor="source">
-<arguments>
-<literal>
-<term functor="self"/>
-</literal>
-</arguments>
-</term>
-</literal>
-</annotations>
-</term>
-</literal>
-<literal>
-<term functor="a">
-<arguments>
-<number-term>20</number-term>
-</arguments>
-<annotations>
-<literal>
-<term functor="source">
-<arguments>
-<literal>
-<term functor="self"/>
-</literal>
-</arguments>
-</term>
-</literal>
-</annotations>
-</term>
-</literal>
 </beliefs>
 <circumstance>
 <events>
-<event selected="true">
-<trigger add="+">
+<event intention="10" selected="true">
+<trigger operator="+" type="!">
 <literal>
-<term functor="demo">
-<annotations>
-<literal>
-<term functor="source">
+<structure functor="at">
 <arguments>
 <literal>
-<term functor="self"/>
+<structure functor="robot"/>
+</literal>
+<literal>
+<structure functor="fridge"/>
 </literal>
 </arguments>
-</term>
-</literal>
-</annotations>
-</term>
+</structure>
 </literal>
 </trigger>
 </event>
 </events>
-<plans>
+<options>
 <option applicable="true" relevant="true" selected="true">
 <plan>
 <label>
-	<literal>
-		<term functor="l__0">
-			<annotations>
-				<term functor="source">
-					<arguments>
-						<term functor="self"/>
-					</arguments>
-				</term>
-			</annotations>
-		</term>
-	</literal>
-</label>
-<trigger add="+">
 <literal>
-<term functor="demo"/>
+<structure functor="l__5">
+<annotations>
+<list-term>
+<literal sep="">
+<structure functor="source">
+<arguments>
+<literal>
+<structure functor="self"/>
+</literal>
+</arguments>
+</structure>
+</literal>
+</list-term>
+</annotations>
+</structure>
+</literal>
+</label>
+<trigger operator="+" type="!">
+<literal>
+<structure functor="at">
+<arguments>
+<literal>
+<structure functor="robot"/>
+</literal>
+<var-term functor="P"/>
+</arguments>
+</structure>
 </literal>
 </trigger>
 <context>
-<expression operator=" &amp; " type="logical">
-<left>
-<expression operator=" | " type="logical">
-<left>
-<literal>
-<term functor="a">
-<arguments>
-<var-term>X</var-term>
-</arguments>
-</term>
-</literal>
-</left>
+<expression operator="not " type="logical">
 <right>
 <literal>
-<term functor="b">
+<structure functor="at">
 <arguments>
-<var-term>X</var-term>
-</arguments>
-</term>
+<literal>
+<structure functor="robot"/>
 </literal>
-</right>
-</expression>
-</left>
-<right>
-<expression operator=" &gt; " type="relational">
-<left>
-<var-term>X</var-term>
-</left>
-<right>
-<number-term>25</number-term>
-</right>
-</expression>
+<var-term functor="P"/>
+</arguments>
+</structure>
+</literal>
 </right>
 </expression>
 </context>
 <body>
 <body-literal>
-<expression operator=" = " type="relational">
-<left>
-<var-term>W</var-term>
-</left>
-<right>
-<expression operator=" div " type="arithmetic">
-<left>
-<number-term>5</number-term>
-</left>
-<right>
-<number-term>2</number-term>
-</right>
-</expression>
-</right>
-</expression>
-</body-literal>
-
-<body-literal>
-<expression operator=" &gt; " type="relational">
-<left>
-<var-term>W</var-term>
-</left>
-<right>
-<number-term>1</number-term>
-</right>
-</expression>
-</body-literal>
-
-<body-literal>
-<literal ia="true">
-<term functor=".print">
+<literal>
+<structure functor="move_towards">
 <arguments>
-<string-term>"hello world "</string-term>
-<var-term>X</var-term>
-<string-term>" - "</string-term>
-<var-term>W</var-term>
+<var-term functor="P"/>
 </arguments>
-</term>
+</structure>
 </literal>
 </body-literal>
-
+<body-literal type="!">
+<literal>
+<structure functor="at">
+<arguments>
+<literal>
+<structure functor="robot"/>
+</literal>
+<var-term functor="P"/>
+</arguments>
+</structure>
+</literal>
+</body-literal>
 </body>
 </plan>
-
-<unifier>{X=30}</unifier>
+<unifier>
+<map>
+<var-term functor="P"/>
+<value>
+<literal>
+<structure functor="fridge"/>
+</literal>
+</value>
+</map>
+</unifier>
 </option>
-</plans>
+<option relevant="true">
+<plan>
+<label>
+<literal>
+<structure functor="l__4">
+<annotations>
+<list-term>
+<literal sep="">
+<structure functor="source">
+<arguments>
+<literal>
+<structure functor="self"/>
+</literal>
+</arguments>
+</structure>
+</literal>
+</list-term>
+</annotations>
+</structure>
+</literal>
+</label>
+<trigger operator="+" type="!">
+<literal>
+<structure functor="at">
+<arguments>
+<literal>
+<structure functor="robot"/>
+</literal>
+<var-term functor="P"/>
+</arguments>
+</structure>
+</literal>
+</trigger>
+<context>
+<literal>
+<structure functor="at">
+<arguments>
+<literal>
+<structure functor="robot"/>
+</literal>
+<var-term functor="P"/>
+</arguments>
+</structure>
+</literal>
+</context>
+</plan>
+<unifier>
+<map>
+<var-term functor="P"/>
+<value>
+<literal>
+<structure functor="fridge"/>
+</literal>
+</value>
+</map>
+</unifier>
+</option>
+</options>
 <intentions>
-
-
-<intention id="1" selected="true">
+<intention id="10" selected="true">
 <intended-means>
 <plan>
 <label>
 <literal>
-<term functor="l__0">
+<structure functor="l__5">
 <annotations>
-<term functor="source">
+<list-term>
+<literal sep="">
+<structure functor="source">
 <arguments>
-<term functor="self"/>
+<literal>
+<structure functor="self"/>
+</literal>
 </arguments>
-</term>
+</structure>
+</literal>
+</list-term>
 </annotations>
-</term>
+</structure>
 </literal>
 </label>
-<trigger add="+">
+<trigger operator="+" type="!">
 <literal>
-<term functor="demo"/>
+<structure functor="at">
+<arguments>
+<literal>
+<structure functor="robot"/>
+</literal>
+<var-term functor="P"/>
+</arguments>
+</structure>
+</literal>
+</trigger>
+<context>
+<expression operator="not " type="logical">
+<right>
+<literal>
+<structure functor="at">
+<arguments>
+<literal>
+<structure functor="robot"/>
+</literal>
+<var-term functor="P"/>
+</arguments>
+</structure>
+</literal>
+</right>
+</expression>
+</context>
+<body>
+<body-literal>
+<literal>
+<structure functor="move_towards">
+<arguments>
+<var-term functor="P"/>
+</arguments>
+</structure>
+</literal>
+</body-literal>
+<body-literal type="!">
+<literal>
+<structure functor="at">
+<arguments>
+<literal>
+<structure functor="robot"/>
+</literal>
+<var-term functor="P"/>
+</arguments>
+</structure>
+</literal>
+</body-literal>
+</body>
+</plan>
+<unifier>
+<map>
+<var-term functor="P"/>
+<value>
+<literal>
+<structure functor="fridge"/>
+</literal>
+</value>
+</map>
+</unifier>
+</intended-means>
+<intended-means>
+<plan>
+<label>
+<literal>
+<structure functor="l__5">
+<annotations>
+<list-term>
+<literal sep="">
+<structure functor="source">
+<arguments>
+<literal>
+<structure functor="self"/>
+</literal>
+</arguments>
+</structure>
+</literal>
+</list-term>
+</annotations>
+</structure>
+</literal>
+</label>
+<trigger operator="+" type="!">
+<literal>
+<structure functor="at">
+<arguments>
+<literal>
+<structure functor="robot"/>
+</literal>
+<var-term functor="P"/>
+</arguments>
+</structure>
+</literal>
+</trigger>
+<context>
+<expression operator="not " type="logical">
+<right>
+<literal>
+<structure functor="at">
+<arguments>
+<literal>
+<structure functor="robot"/>
+</literal>
+<var-term functor="P"/>
+</arguments>
+</structure>
+</literal>
+</right>
+</expression>
+</context>
+<body>
+<body-literal type="!">
+<literal>
+<structure functor="at">
+<arguments>
+<literal>
+<structure functor="robot"/>
+</literal>
+<var-term functor="P"/>
+</arguments>
+</structure>
+</literal>
+</body-literal>
+</body>
+</plan>
+<unifier>
+<map>
+<var-term functor="P"/>
+<value>
+<literal>
+<structure functor="fridge"/>
+</literal>
+</value>
+</map>
+</unifier>
+</intended-means>
+<intended-means>
+<plan>
+<label>
+<literal>
+<structure functor="l__5">
+<annotations>
+<list-term>
+<literal sep="">
+<structure functor="source">
+<arguments>
+<literal>
+<structure functor="self"/>
+</literal>
+</arguments>
+</structure>
+</literal>
+</list-term>
+</annotations>
+</structure>
+</literal>
+</label>
+<trigger operator="+" type="!">
+<literal>
+<structure functor="at">
+<arguments>
+<literal>
+<structure functor="robot"/>
+</literal>
+<var-term functor="P"/>
+</arguments>
+</structure>
+</literal>
+</trigger>
+<context>
+<expression operator="not " type="logical">
+<right>
+<literal>
+<structure functor="at">
+<arguments>
+<literal>
+<structure functor="robot"/>
+</literal>
+<var-term functor="P"/>
+</arguments>
+</structure>
+</literal>
+</right>
+</expression>
+</context>
+<body>
+<body-literal type="!">
+<literal>
+<structure functor="at">
+<arguments>
+<literal>
+<structure functor="robot"/>
+</literal>
+<var-term functor="P"/>
+</arguments>
+</structure>
+</literal>
+</body-literal>
+</body>
+</plan>
+<unifier>
+<map>
+<var-term functor="P"/>
+<value>
+<literal>
+<structure functor="fridge"/>
+</literal>
+</value>
+</map>
+</unifier>
+</intended-means>
+<intended-means>
+<plan>
+<label>
+<literal>
+<structure functor="l__0">
+<annotations>
+<list-term>
+<literal sep="">
+<structure functor="source">
+<arguments>
+<literal>
+<structure functor="self"/>
+</literal>
+</arguments>
+</structure>
+</literal>
+</list-term>
+</annotations>
+</structure>
+</literal>
+</label>
+<trigger operator="+" type="!">
+<literal>
+<structure functor="has">
+<arguments>
+<literal>
+<structure functor="owner"/>
+</literal>
+<literal>
+<structure functor="beer"/>
+</literal>
+</arguments>
+<annotations>
+<list-term>
+<literal sep="">
+<structure functor="source">
+<arguments>
+<literal>
+<structure functor="owner"/>
+</literal>
+</arguments>
+</structure>
+</literal>
+</list-term>
+</annotations>
+</structure>
 </literal>
 </trigger>
 <context>
 <expression operator=" &amp; " type="logical">
 <left>
-<expression operator=" | " type="logical">
-<left>
 <literal>
-<term functor="a">
+<structure functor="available">
 <arguments>
-<var-term>X</var-term>
+<literal>
+<structure functor="beer"/>
+</literal>
+<literal>
+<structure functor="fridge"/>
+</literal>
 </arguments>
-</term>
+</structure>
 </literal>
 </left>
 <right>
+<expression operator="not " type="logical">
+<right>
 <literal>
-<term functor="b">
+<structure functor="too_much">
 <arguments>
-<var-term>X</var-term>
-</arguments>
-</term>
+<literal>
+<structure functor="beer"/>
 </literal>
-</right>
-</expression>
-</left>
-<right>
-<expression operator=" &gt; " type="relational">
-<left>
-<var-term>X</var-term>
-</left>
-<right>
-<number-term>25</number-term>
+</arguments>
+</structure>
+</literal>
 </right>
 </expression>
 </right>
 </expression>
 </context>
 <body>
-<body-literal>
-<expression operator=" &gt; " type="relational">
-<left>
-<var-term>W</var-term>
-</left>
-<right>
-<number-term>1</number-term>
-</right>
-</expression>
+<body-literal type="!">
+<literal>
+<structure functor="at">
+<arguments>
+<literal>
+<structure functor="robot"/>
+</literal>
+<literal>
+<structure functor="fridge"/>
+</literal>
+</arguments>
+</structure>
+</literal>
 </body-literal>
-
+<body-literal>
+<literal>
+<structure functor="open">
+<arguments>
+<literal>
+<structure functor="fridge"/>
+</literal>
+</arguments>
+</structure>
+</literal>
+</body-literal>
+<body-literal>
+<literal>
+<structure functor="get">
+<arguments>
+<literal>
+<structure functor="beer"/>
+</literal>
+</arguments>
+</structure>
+</literal>
+</body-literal>
+<body-literal>
+<literal>
+<structure functor="close">
+<arguments>
+<literal>
+<structure functor="fridge"/>
+</literal>
+</arguments>
+</structure>
+</literal>
+</body-literal>
+<body-literal type="!">
+<literal>
+<structure functor="at">
+<arguments>
+<literal>
+<structure functor="robot"/>
+</literal>
+<literal>
+<structure functor="owner"/>
+</literal>
+</arguments>
+</structure>
+</literal>
+</body-literal>
+<body-literal>
+<literal>
+<structure functor="hand_in">
+<arguments>
+<literal>
+<structure functor="beer"/>
+</literal>
+</arguments>
+</structure>
+</literal>
+</body-literal>
+<body-literal type="?">
+<literal>
+<structure functor="has">
+<arguments>
+<literal>
+<structure functor="owner"/>
+</literal>
+<literal>
+<structure functor="beer"/>
+</literal>
+</arguments>
+</structure>
+</literal>
+</body-literal>
 <body-literal>
 <literal ia="true">
-<term functor=".print">
+<structure functor=".date">
 <arguments>
-<string-term>"hello world "</string-term>
-<var-term>X</var-term>
-<string-term>" - "</string-term>
-<var-term>W</var-term>
+<var-term functor="YY"/>
+<var-term functor="MM"/>
+<var-term functor="DD"/>
 </arguments>
-</term>
+</structure>
 </literal>
 </body-literal>
-</body>
-</plan>
-<unifier>{W=2, X=30}</unifier>
-</intended-means>
-</intention>
-
-<intention id="2" selected="false">
-<intended-means>
-<plan>
-<label>
-<literal>
-<term functor="l__1">
-<annotations>
-<term functor="source">
-<arguments>
-<term functor="self"/>
-</arguments>
-</term>
-</annotations>
-</term>
-</literal>
-</label>
-<trigger add="+" type="!">
-<literal>
-<term functor="other"/>
-</literal>
-</trigger>
-<context>
-<literal>
-<term functor="a" />
-</literal>
-</context>
-<body>
 <body-literal>
 <literal ia="true">
-<term functor=".print">
+<structure functor=".time">
 <arguments>
-<string-term>"ok"</string-term>
+<var-term functor="HH"/>
+<var-term functor="NN"/>
+<var-term functor="SS"/>
 </arguments>
-</term>
+</structure>
+</literal>
+</body-literal>
+<body-literal type="+">
+<literal>
+<structure functor="consumed">
+<arguments>
+<var-term functor="YY"/>
+<var-term functor="MM"/>
+<var-term functor="DD"/>
+<var-term functor="HH"/>
+<var-term functor="NN"/>
+<var-term functor="SS"/>
+<literal>
+<structure functor="beer"/>
+</literal>
+</arguments>
+</structure>
 </literal>
 </body-literal>
 </body>
 </plan>
-<unifier>{W=2, X=30}</unifier>
 </intended-means>
-
-
-<intended-means>
-<plan>
-<label>
-<literal>
-<term functor="@p1">
-<annotations>
-<term functor="source">
-<arguments>
-<term functor="self"/>
-</arguments>
-</term>
-</annotations>
-</term>
-</literal>
-</label>
-<trigger add="+!">
-<literal>
-<term functor="g"/>
-</literal>
-</trigger>
-<context>
-<literal>
-<term functor="c" />
-</literal>
-</context>
-<body>
-<body-literal>
-<literal>
-<term functor="!other" />
-</literal>
-</body-literal>
-<body-literal>
-<literal>
-<term functor="a2" />
-</literal>
-</body-literal>
-</body>
-</plan>
-<unifier>{X=1}</unifier>
-</intended-means>
-
 </intention>
-
-
 </intentions>
+<actions>
+<action feedback="true" intention="10" pending="true" result="true" selected="true" term="move_towards(fridge)"/>
+</actions>
 </circumstance>
 </agent>

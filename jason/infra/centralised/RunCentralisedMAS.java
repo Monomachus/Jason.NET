@@ -163,10 +163,8 @@ public class RunCentralisedMAS {
                         runner.btDebug.setEnabled(false);
                         if (runner.control != null) {
                             try {
-                                ExecutionControlGUI ecg = (ExecutionControlGUI) runner.control.getUserControl();
-                                ecg.setRunMode(false);
-                            } catch (Exception e) {
-                            }
+                                runner.control.getUserControl().setRunningCycle(false);
+                            } catch (Exception e) { }
                         }
                     }
                 });

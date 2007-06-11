@@ -352,7 +352,9 @@ public class Literal extends Pred implements LogicalFormula {
         if (isInternalAction()) {
             u.setAttribute("ia", isInternalAction()+"");
         }
-        u.setAttribute("negated", negated()+"");
+        if (negated()) {
+            u.setAttribute("negated", negated()+"");
+        }
         u.appendChild(super.getAsDOM(document));
         return u;
     }    

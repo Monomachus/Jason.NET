@@ -384,7 +384,7 @@ public class Circumstance implements Serializable {
         }
 
         // relPlans
-        Element plans = (Element) document.createElement("plans");
+        Element plans = (Element) document.createElement("options");
         List<Object> alreadyIn = new ArrayList<Object>();
 
         // option
@@ -430,13 +430,13 @@ public class Circumstance implements Serializable {
         // intentions
         Element ints = (Element) document.createElement("intentions");
         Element selIntEle = null;
-        if (getSelectedIntention() != null) {
+        if (getSelectedIntention() != null && !getSelectedIntention().isFinished()) {
             selIntEle = getSelectedIntention().getAsDOM(document);
             selIntEle.setAttribute("selected", "true");
             ints.appendChild(selIntEle);
         }
         for (Intention in : getIntentions()) {
-            if (getSelectedIntention() != in) {
+            if (getSelectedIntention() != in && !in.isFinished()) {
                 ints.appendChild(in.getAsDOM(document));
             }
         }

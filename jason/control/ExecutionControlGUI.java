@@ -52,7 +52,9 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSlider;
 import javax.swing.JSplitPane;
+import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
 import javax.swing.border.TitledBorder;
@@ -65,9 +67,15 @@ import org.w3c.dom.Document;
 
 public class ExecutionControlGUI extends ExecutionControl {
 
-	String currentAg = "";
-	boolean inRunMode = false;
-	
+	String currentAgState = "";
+    String currentAgName  = "";
+
+    private int countCycles = 0; // cycles since last "Run"
+    private int maxCycles = 0;   // cycles to run
+    private boolean waitAll = false; // run cycles in all agentes
+    private boolean waitSelected = false; // run cycles in selected agent
+    private boolean breakpoint   = false;
+
 	// xml components
     asl2xml  agTransformerXML  = new asl2xml();
     asl2tex  agTransformerTex  = new asl2tex("/xml/ag2tex.xsl");
@@ -77,12 +85,14 @@ public class ExecutionControlGUI extends ExecutionControl {
 
 	public ExecutionControlGUI() {
 		agTransformer = agTransformerHtml;
+        setRunningCycle(false);
 		initComponents();
 	}
 
 	// Inteface components
 	JFrame  frame;
-	JButton jBtStep = null;
+    JTextField jTfSteps = null;
+    JComboBox jCbWho = null;
 	JButton jBtRun = null;
     JComboBox jCbViewAs = null;
 
@@ -100,30 +110,27 @@ public class ExecutionControlGUI extends ExecutionControl {
     Map<String,Boolean> show = new HashMap<String,Boolean>();
 
 	void initComponents() {
-		frame = new JFrame("MAS Execution Control");
+		frame = new JFrame(":: Jason Mind Inspector ::");
 
-		jBtStep = new JButton("Step", new ImageIcon(ExecutionControlGUI.class.getResource("/images/resume_co.gif")));
-		jBtStep.setToolTipText("ask all agents to perform one reasoning cycle");
-		jBtStep.setEnabled(false);
-		jBtStep.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				jBtStep.setEnabled(false);
-				infraControl.informAllAgsToPerformCycle(getCycleNumber());
-			}
-		});
-
+        jTfSteps = new JTextField(3);
+        jTfSteps.setText("1");
+        jTfSteps.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                startRun();
+            }
+        });
+        
+        jCbWho = new JComboBox();
+        jCbWho.addItem("all agents");
+        jCbWho.addItem("selected agent");
+        
 		jBtRun = new JButton("Run", new ImageIcon(ExecutionControlGUI.class.getResource("/images/run.gif")));
 		jBtRun.setToolTipText("Run the MAS until some agent achieve a breakpoint. Breakpoints are annotations in plans' label");
-		jBtRun.setEnabled(false);
+		jBtRun.setEnabled(true);
 		jBtRun.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				jBtRun.setEnabled(false);
-				inRunMode = true;
-				infraControl.informAllAgsToPerformCycle(getCycleNumber());
-				if (RunCentralisedMAS.getRunner() != null && RunCentralisedMAS.getRunner().btDebug != null) {
-					RunCentralisedMAS.getRunner().btDebug.setEnabled(true);
-				}
-			}
+			    startRun();
+            }
 		});
 
         jCbViewAs = new JComboBox();
@@ -158,21 +165,27 @@ public class ExecutionControlGUI extends ExecutionControl {
         });
         jTA.setText("<html><body>Select the agent to inspect.</body></html>");
 		
-		JPanel spTA = new JPanel(new BorderLayout());
-		spTA.add(BorderLayout.CENTER, new JScrollPane(jTA));
+		JPanel spTA = new JPanel();//new BorderLayout());
+		//spTA.add(BorderLayout.CENTER, new JScrollPane(jTA));
 		spTA.setBorder(BorderFactory.createTitledBorder(BorderFactory
-				.createEtchedBorder(), "Agent Inspection", TitledBorder.LEFT,
-				TitledBorder.TOP));
+				.createEtchedBorder(), "Agent Inspection", TitledBorder.LEFT, TitledBorder.TOP));
 
-		/*
-		jConsole = new JTextArea(10, 40);
-		jConsole.setEditable(false);
-		JScrollPane spConsole = new JScrollPane(jConsole);
-		spConsole.setBorder(BorderFactory.createTitledBorder(BorderFactory
-				.createEtchedBorder(), "Console", TitledBorder.LEFT,
-				TitledBorder.TOP));
-        */
-		
+        JPanel pHistory = new JPanel(new BorderLayout());//new FlowLayout(FlowLayout.CENTER));
+        pHistory.setBorder(BorderFactory.createTitledBorder(BorderFactory
+                .createEtchedBorder(), "Agent History", TitledBorder.LEFT, TitledBorder.TOP));
+        JSlider jHistory = new JSlider();
+        jHistory.setMinimum(0);
+        jHistory.setMaximum(10);
+        jHistory.setValue(0);
+        jHistory.setPaintTicks(true);
+        jHistory.setMajorTickSpacing(1);
+        //jHistory.setL
+        pHistory.add(BorderLayout.CENTER, jHistory);
+        JPanel pAg = new JPanel(new BorderLayout());
+        pAg.add(BorderLayout.CENTER, spTA);
+        pAg.add(BorderLayout.SOUTH, pHistory);
+        
+
 		listModel = new DefaultListModel();//MyListModel();
 		jList = new JList(listModel);
 		spList = new JPanel(new BorderLayout());
@@ -183,28 +196,30 @@ public class ExecutionControlGUI extends ExecutionControl {
 		jList.addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent e) {
 				String ag = jList.getSelectedValue().toString();
-				if (!ag.equals(currentAg)) {
-                    currentAg = ag;
+				if (!ag.equals(currentAgState)) {
+                    currentAgState = ag;
                     SwingUtilities.invokeLater(new Runnable() {
                     	public void run() {
-                    		inspectAgent(currentAg);
+                    		inspectAgent(currentAgState);
                     	}
                     });
 				}
 			}
-
 		});
 
+        
 		JPanel pButtons = new JPanel(new FlowLayout(FlowLayout.CENTER));
-		pButtons.add(jBtStep);
-		pButtons.add(jBtRun);
-        pButtons.add(new JLabel("           View as:"));
+        pButtons.add(jBtRun);
+		pButtons.add(jTfSteps);
+        pButtons.add(new JLabel("cycle(s) for "));
+        pButtons.add(jCbWho);
+        pButtons.add(new JLabel("        view as:"));
         pButtons.add(jCbViewAs);
 
 		JSplitPane splitPaneHor = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 		splitPaneHor.setTopComponent(spList);
 		splitPaneHor.setDividerLocation(100);
-		splitPaneHor.setBottomComponent(spTA);
+		splitPaneHor.setBottomComponent(pAg);
 		splitPaneHor.setOneTouchExpandable(true);
 		//splitPane.setPreferredSize(new Dimension(600, 300));
 
@@ -235,17 +250,15 @@ public class ExecutionControlGUI extends ExecutionControl {
         show.put("evt", true);
         show.put("mb", false);
         show.put("int", false);
+        show.put("int-details", false);
         show.put("plan", false);
+        show.put("plan-details", false);
 	}
 	
 	public void stop() {
 		super.stop();
 		frame.dispose();
 		frame = null;
-	}
-
-	public void setRunMode(boolean b) {
-		inRunMode = b;
 	}
 	
 	private void inspectAgent(String agName) {
@@ -255,7 +268,7 @@ public class ExecutionControlGUI extends ExecutionControl {
 		if (agName.length() == 0) {
 			return;
 		}
-
+		currentAgName = agName;
 		try {
 			agState = infraControl.getAgState(agName);
             showAgState();
@@ -267,6 +280,7 @@ public class ExecutionControlGUI extends ExecutionControl {
 	}
 
     private String previousMind = "--";
+    
     /** show current agent state */
     void showAgState() {
         if (agState != null) {
@@ -292,33 +306,6 @@ public class ExecutionControlGUI extends ExecutionControl {
         }        
     }
 
-	/** 
-	 * Called when the agent <i>agName</i> has finished its reasoning cycle.
-	 * <i>breakpoint</i> is true in case the agent selected one plan with "breakpoint" 
-	 * annotation. 
-	  */
-	public void receiveFinishedCycle(String agName, boolean breakpoint, int cycle) {
-		if (breakpoint) {
-			inRunMode = false;
-		}
-		if (!listModel.contains(agName)) {
-			logger.fine("New agent "+agName);
-			listModel.addElement(agName);
-		}
-		super.receiveFinishedCycle(agName, breakpoint, cycle);
-	}
-
-
-	/** called when all agents have finished the current cycle */
-	protected void allAgsFinished() {
-		if (inRunMode) {
-			infraControl.informAllAgsToPerformCycle(getCycleNumber());
-		} else {
-			inspectAgent(currentAg);
-			jBtStep.setEnabled(true);
-			jBtRun.setEnabled(true);
-		}
-	}
     
     private void hyperLink(HyperlinkEvent evt) {
         if (evt.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
@@ -339,4 +326,93 @@ public class ExecutionControlGUI extends ExecutionControl {
             showAgState();
         }
     }
+
+    
+    
+    protected void startRun() {
+        jBtRun.setEnabled(false);
+        countCycles = 0;
+        maxCycles = Integer.parseInt(jTfSteps.getText());
+        breakpoint = false;
+        if (jCbWho.getSelectedIndex() == 0) {
+            waitAll      = true; 
+            waitSelected = false;
+        } else {
+            waitAll      = false; 
+            waitSelected = true;
+        }
+        if (RunCentralisedMAS.getRunner() != null && RunCentralisedMAS.getRunner().btDebug != null) {
+            RunCentralisedMAS.getRunner().btDebug.setEnabled(true);
+        }        
+
+        startNewCycle();
+        continueRun();
+    }
+    
+    /** stop the execution */
+    protected void stopRun() {
+        waitAll      = false; 
+        waitSelected = false;
+        inspectAgent(currentAgState);
+        jBtRun.setEnabled(true);
+        setRunningCycle(false);
+    }
+    
+    protected void continueRun() {
+        if (waitAll) {
+            infraControl.informAllAgsToPerformCycle(getCycleNumber());            
+        }
+        if (waitSelected) {
+            new Thread() {
+                public void run() {
+                    infraControl.informAgToPerformCycle(currentAgName, getCycleNumber());
+                }
+            }.start();
+        }
+    }
+    
+	/** 
+	 * Called when the agent <i>agName</i> has finished its reasoning cycle.
+	 * <i>breakpoint</i> is true in case the agent selected one plan with "breakpoint" 
+	 * annotation. 
+	  */
+	public void receiveFinishedCycle(String agName, boolean breakpoint, int cycle) {
+		if (!listModel.contains(agName)) {
+			logger.fine("New agent "+agName);
+			listModel.addElement(agName);
+		}
+        this.breakpoint = breakpoint;
+        if (waitSelected) {
+            countCycles++;
+            logger.fine("Agent "+agName+" has finished the cycle "+cycle);
+            if (testStop()) {
+                stopRun();
+            } else {
+                startNewCycle();
+                continueRun();
+            }
+        } else {
+            super.receiveFinishedCycle(agName, breakpoint, cycle);    
+        }
+	}
+
+
+	/** called when all agents have finished the current cycle */
+	protected void allAgsFinished() {
+        if (waitAll) {
+            countCycles++;
+            if (testStop()) {
+                stopRun();
+            } else {
+                startNewCycle();
+                continueRun();
+            }
+        }
+	}
+    
+    /** test whether to stop running and show the agent state */
+    protected boolean testStop() {
+        return breakpoint || countCycles >= maxCycles; 
+    }
+    
 }

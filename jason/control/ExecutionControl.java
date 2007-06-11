@@ -25,6 +25,8 @@ package jason.control;
 
 import jason.runtime.RuntimeServicesInfraTier;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
@@ -51,8 +53,9 @@ public class ExecutionControl {
 
 	protected ExecutionControlInfraTier infraControl = null;
 	
-	private int nbFinished = 0; // the number of agents that have finished its reasoning cycle
+	private Set<String> finished = new HashSet<String>(); // the agents that have finished its reasoning cycle
 	private int cycleNumber = 0;
+    private boolean runningCycle = true;
 
 	private Lock lock = new ReentrantLock();
     private Condition agFinishedCond = lock.newCondition();
@@ -69,14 +72,10 @@ public class ExecutionControl {
                 try {
 					while (true) {
 						try {
-                            //boolean wait = 
                             agFinishedCond.await(5, TimeUnit.SECONDS); // waits signal
-                            if (runtime != null) { 
-								//if (wait) { // received all signals before 5 seconds
-									nbFinished = 0;
-                                    cycleNumber++;
-									allAgsFinished();
-								//}
+                            if (runtime != null && runningCycle) { 
+                                runningCycle = false;
+                                allAgsFinished();
 							}
 						} catch (Exception e) {
 							e.printStackTrace();
@@ -88,7 +87,13 @@ public class ExecutionControl {
 			}
 		}.start();
 	}
-	
+
+    protected void startNewCycle() {
+        runningCycle = true;
+        finished.clear();
+        cycleNumber++;        
+    }
+    
 	
 	/** 
 	 * Called when the agent <i>agName</i> has finished its reasoning cycle.
@@ -96,18 +101,16 @@ public class ExecutionControl {
 	 * annotation. 
 	  */
 	public void receiveFinishedCycle(String agName, boolean breakpoint, int cycle) {
-        if (cycle == this.cycleNumber) { // the agent finished the current cycle
+        if (cycle == this.cycleNumber && runningCycle) { // the agent finished the current cycle
             lock.lock();
             try {                
                 if (logger.isLoggable(Level.FINE)) {
-                    logger.fine("Agent "+agName+" has finished the cycle "+cycle+", # of finished agents is "+(nbFinished+1)+"/"+runtime.getAgentsQty());
-                    if (breakpoint) {
-                        logger.fine("Agent "+agName+" reached a breakpoint");               
-                    }
+                    logger.fine("Agent "+agName+" has finished the cycle "+cycle+", # of finished agents is "+(finished.size()+1)+"/"+runtime.getAgentsQty());
+                    if (breakpoint) logger.fine("Agent "+agName+" reached a breakpoint");               
                 }
 
-                nbFinished++;
-                if (nbFinished >= runtime.getAgentsQty()) {
+                finished.add(agName);
+                if (finished.size() >= runtime.getAgentsQty()) {
                     agFinishedCond.signal();
                 }
     		} finally {
@@ -129,18 +132,17 @@ public class ExecutionControl {
 	 * This method is called when setExecutionControlInfraTier was already called
 	 */
 	public void init(String[] args) {
-		
 	}
 	
 	/**
 	 * This method is called when MAS execution is being finished
 	 */
 	public void stop() {
-		
 	}
 	
 	/** Called when all agents have finished the current cycle */
 	protected void allAgsFinished() {
+        startNewCycle();
 		infraControl.informAllAgsToPerformCycle(cycleNumber);
 		logger.fine("starting cycle "+cycleNumber);
 	}
@@ -148,4 +150,9 @@ public class ExecutionControl {
 	public int getCycleNumber() {
 		return cycleNumber;
 	}
+    
+    public void setRunningCycle(boolean rc) {
+        runningCycle = rc;
+    }
+    
 }

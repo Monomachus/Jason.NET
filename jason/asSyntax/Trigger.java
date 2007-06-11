@@ -139,7 +139,7 @@ public class Trigger implements Cloneable {
     /** get as XML */
     public Element getAsDOM(Document document) {
         Element e = (Element) document.createElement("trigger");
-        e.setAttribute("add", operator.toString());
+        e.setAttribute("operator", operator.toString());
         e.setAttribute("type", type.toString());
         e.appendChild(literal.getAsDOM(document));
         return e;
