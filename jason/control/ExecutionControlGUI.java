@@ -29,6 +29,7 @@ import jason.util.asl2tex;
 import jason.util.asl2xml;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Toolkit;
@@ -39,6 +40,7 @@ import java.awt.event.ItemListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Map;
 import java.util.logging.Level;
 
@@ -58,6 +60,8 @@ import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
 import javax.swing.border.TitledBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.event.ListSelectionEvent;
@@ -69,7 +73,10 @@ public class ExecutionControlGUI extends ExecutionControl {
 
 	String currentAgState = "";
     String currentAgName  = "";
-
+    int    agShownState   = 0;
+    
+    Map<String,Map<Integer,Document>> agsHistory = new HashMap<String,Map<Integer,Document>>();
+    
     private int countCycles = 0; // cycles since last "Run"
     private int maxCycles = 0;   // cycles to run
     private boolean waitAll = false; // run cycles in all agentes
@@ -95,7 +102,8 @@ public class ExecutionControlGUI extends ExecutionControl {
     JComboBox jCbWho = null;
 	JButton jBtRun = null;
     JComboBox jCbViewAs = null;
-
+    JSlider jHistory = null;
+    
 	JTextPane jTA = null;
 
 	JList jList = null;
@@ -165,20 +173,32 @@ public class ExecutionControlGUI extends ExecutionControl {
         });
         jTA.setText("<html><body>Select the agent to inspect.</body></html>");
 		
-		JPanel spTA = new JPanel();//new BorderLayout());
-		//spTA.add(BorderLayout.CENTER, new JScrollPane(jTA));
+		JPanel spTA = new JPanel(new BorderLayout());
+		spTA.add(BorderLayout.CENTER, new JScrollPane(jTA));
 		spTA.setBorder(BorderFactory.createTitledBorder(BorderFactory
 				.createEtchedBorder(), "Agent Inspection", TitledBorder.LEFT, TitledBorder.TOP));
 
         JPanel pHistory = new JPanel(new BorderLayout());//new FlowLayout(FlowLayout.CENTER));
         pHistory.setBorder(BorderFactory.createTitledBorder(BorderFactory
                 .createEtchedBorder(), "Agent History", TitledBorder.LEFT, TitledBorder.TOP));
-        JSlider jHistory = new JSlider();
+        jHistory = new JSlider();
+        jHistory.setMaximum(1);
         jHistory.setMinimum(0);
-        jHistory.setMaximum(10);
         jHistory.setValue(0);
         jHistory.setPaintTicks(true);
-        jHistory.setMajorTickSpacing(1);
+        jHistory.setPaintLabels(true);
+        jHistory.setMajorTickSpacing(10);
+        jHistory.setMinorTickSpacing(1);
+        setupSlider();
+        jHistory.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent e) {
+                int c = (int)jHistory.getValue();
+                try {
+                    agState = agsHistory.get(currentAgName).get(c);
+                    showAgState();
+                } catch (Exception ex) { }
+            }
+        });
         //jHistory.setL
         pHistory.add(BorderLayout.CENTER, jHistory);
         JPanel pAg = new JPanel(new BorderLayout());
@@ -191,8 +211,7 @@ public class ExecutionControlGUI extends ExecutionControl {
 		spList = new JPanel(new BorderLayout());
 		spList.add(BorderLayout.CENTER, new JScrollPane(jList));
 		spList.setBorder(BorderFactory.createTitledBorder(BorderFactory
-				.createEtchedBorder(), "Agents", TitledBorder.LEFT,
-				TitledBorder.TOP));
+				.createEtchedBorder(), "Agents", TitledBorder.LEFT,	TitledBorder.TOP));
 		jList.addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent e) {
 				String ag = jList.getSelectedValue().toString();
@@ -254,7 +273,24 @@ public class ExecutionControlGUI extends ExecutionControl {
         show.put("plan", false);
         show.put("plan-details", false);
 	}
-	
+
+    @SuppressWarnings("unchecked")
+    private void setupSlider() {
+        // get ag history
+        //Map<Integer,Document> lag = agsHistory.get(currentAgName);
+        //if (lag != null && !lag.isEmpty()) {
+        //} else {
+        //    jHistory.setValue(0);            
+        //}
+        int size = getCycleNumber();
+        Hashtable<Integer,Component> labelTable = new Hashtable<Integer,Component>();
+        labelTable.put( 0, new JLabel("Cycle 0") );
+        labelTable.put( size, new JLabel("Cycle "+size) );
+        jHistory.setLabelTable( labelTable );
+        jHistory.setMaximum(size);
+        jHistory.setValue(size);
+    }
+    
 	public void stop() {
 		super.stop();
 		frame.dispose();
@@ -269,14 +305,28 @@ public class ExecutionControlGUI extends ExecutionControl {
 			return;
 		}
 		currentAgName = agName;
-		try {
-			agState = infraControl.getAgState(agName);
-            showAgState();
-		} catch (Exception e) {
-			jTA.setText("Error getting the state of agent "+agName);
-            logger.log(Level.SEVERE,"Error:",e);
-		}
-		
+        
+        agState = null;
+        
+        // try to get the state from the history
+        try {
+            agState = agsHistory.get(agName).get(getCycleNumber());
+        } catch (Exception et) {}
+
+        // if no state from history, ask the agent
+        if (agState == null) {
+    		try {
+                // try to get from history
+    			agState = infraControl.getAgState(agName);
+                storeAgHistory(agName, getCycleNumber(), infraControl.getAgState(agName));
+    		} catch (Exception e) {
+    			jTA.setText("Error getting the state of agent "+agName);
+                logger.log(Level.SEVERE,"Error:",e);
+    		}
+        }
+        
+        showAgState();
+        setupSlider();
 	}
 
     private String previousMind = "--";
@@ -353,7 +403,7 @@ public class ExecutionControlGUI extends ExecutionControl {
     protected void stopRun() {
         waitAll      = false; 
         waitSelected = false;
-        inspectAgent(currentAgState);
+        inspectAgent(currentAgName);
         jBtRun.setEnabled(true);
         setRunningCycle(false);
     }
@@ -381,6 +431,15 @@ public class ExecutionControlGUI extends ExecutionControl {
 			logger.fine("New agent "+agName);
 			listModel.addElement(agName);
 		}
+		if (agName.equals(currentAgName)) {
+		    // get the state of this agent and add it in history
+            try {
+                storeAgHistory(agName, cycle, infraControl.getAgState(agName));
+            } catch (Exception e) {
+                jTA.setText("Error getting the state of agent "+agName);
+                logger.log(Level.SEVERE,"Error:",e);
+            }
+        }
         this.breakpoint = breakpoint;
         if (waitSelected) {
             countCycles++;
@@ -414,5 +473,13 @@ public class ExecutionControlGUI extends ExecutionControl {
     protected boolean testStop() {
         return breakpoint || countCycles >= maxCycles; 
     }
-    
+
+    protected void storeAgHistory(String agName, int cycle, Document doc) {
+        Map<Integer,Document> lag = agsHistory.get(agName);
+        if (lag == null) {
+            lag = new HashMap<Integer,Document>();
+            agsHistory.put(agName, lag);
+        }
+        lag.put(cycle,doc);
+    }
 }
