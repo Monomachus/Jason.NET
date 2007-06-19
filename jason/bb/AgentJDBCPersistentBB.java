@@ -2,8 +2,8 @@ package jason.bb;
 
 import jason.asSyntax.Literal;
 import jason.asSyntax.PredicateIndicator;
+import jason.asSyntax.Structure;
 
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.logging.Logger;
 
@@ -25,23 +25,10 @@ public class AgentJDBCPersistentBB extends JDBCPersistentBB {
     }
 
     @Override
-    protected String getCreateTable(String table, int arity) throws SQLException {
-        StringBuilder q = new StringBuilder(super.getCreateTable(table,arity));
+    protected String getCreateTable(String table, int arity, Structure columns) throws SQLException {
+        StringBuilder q = new StringBuilder(super.getCreateTable(table,arity,columns));
         q.insert(q.length()-1, ", " + COL_AGENT + " varchar(100)");
         return q.toString(); 
-    }
-
-    @Override
-    protected boolean isCreatedByJason(PredicateIndicator pi) throws SQLException {
-        ResultSetMetaData meta = belsDB.get(pi);
-        if (meta != null) {
-            int cols = meta.getColumnCount();
-            return cols >= extraCols && 
-                   meta.getColumnName(cols - 2).equalsIgnoreCase(COL_NEG) && 
-                   meta.getColumnName(cols - 1).equalsIgnoreCase(COL_ANNOT) &&
-                   meta.getColumnName(cols).equalsIgnoreCase(COL_AGENT);
-        }
-        return false;
     }
 
     protected String getAgWhere() {

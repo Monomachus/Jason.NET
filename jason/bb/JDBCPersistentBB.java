@@ -5,6 +5,7 @@ import jason.asSyntax.DefaultTerm;
 import jason.asSyntax.ListTerm;
 import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Literal;
+import jason.asSyntax.NumberTermImpl;
 import jason.asSyntax.PredicateIndicator;
 import jason.asSyntax.StringTerm;
 import jason.asSyntax.StringTermImpl;
@@ -17,6 +18,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -28,6 +30,46 @@ import java.util.logging.Logger;
 /**
  * Implementation of BB that stores some beliefs in a relational data base.
  * 
+ * <p>The parameters for this customisation are:
+ * <ul>
+ * <li>args[0] is the Database Engine JDBC drive
+ * <li>args[1] is the JDBC URL connection string <br/> 
+ *     The url can use the agent name as parameter as in "jdbc:mysql://localhost/%s".
+ *     In this case, %s will be replaced by the agent's name. 
+ * <li>args[2] is the username 
+ * <li>args[3] is the password
+ * <li>args[4] is an AS list with all beliefs that are mapped to DB.
+ *     Each element of the list is in the form
+ *     <blockquote>
+ *     <code>predicate(arity [, table_name [, columns]])</code>
+ *     </blockquote>
+ *     and columns is in the form
+ *     <blockquote>
+ *     <code>columns( col_name(col_type), col_name(col_type), ....)</code>
+ *     </blockquote>
+ * </ul>
+ * 
+ * <p>Example in .mas2j project:<br>
+ * <blockquote>
+ * <pre>
+ agents: 
+   c beliefBaseClass jason.bb.JDBCPersistentBB(
+      "org.hsqldb.jdbcDriver", // driver for HSQLDB
+      "jdbc:hsqldb:bookstore", // URL connection
+      "sa", // user
+      "", // password
+      "[a(1,tablea,columns(runs(integer))),book(5),book_author(2),author(2,author,columns(id(integer),name(varchar(30)))),publisher(2)]");
+            // predicate a/1 is mapped to a table called "tablea" with an integer column called runs;
+            //     the name and type of the columns is used only if the table does not exits and
+            //     have to be created;
+            //     if no column name/type is provided, an arbitrary name is used with type varchar(256)
+            // predicate book (with arity 5) is mapped to a table called "book" 
+            //     if no table name is provided the predicate name is used for the table name
+            // the columns for author are "id" (an integer) and "name" (char);
+            // and so on...
+   </pre>
+ * </blockquote>
+ * 
  *  @author Jomi
  */
 public class JDBCPersistentBB extends DefaultBeliefBase {
@@ -37,6 +79,7 @@ public class JDBCPersistentBB extends DefaultBeliefBase {
     static final String   COL_NEG    = "j_negated";
     static final String   COL_ANNOT  = "j_annots";
 
+    /** the number of columns that this customisation creates (default is 2: the j_negated and j_annots columns) */
     protected int extraCols = 0;
     
     protected Connection  conn;
@@ -50,23 +93,6 @@ public class JDBCPersistentBB extends DefaultBeliefBase {
     // map of bels in DB
     Map<PredicateIndicator, ResultSetMetaData> belsDB = new HashMap<PredicateIndicator, ResultSetMetaData>();
 
-    // TODO: get column names/type
-    // [book(5,book,columns(id(integer), title(varchar(20)),....
-    
-    /**
-     * args[0] is the Database Engine JDBC drive. args[1] is the JDBC URL
-     * connection string, args[2] is the username, args[3] is the password,
-     * args[4] AS list with beliefs mapped to DB, each element is in the form
-     * "bel(arity[,table_name])".
-     * 
-     * The url can use the agent name as parameter as in "jdbc:mysql://localhost/%s".
-     * In this case, %s will be replaced by the agent's name. 
-     * 
-     * Example in .mas2j project:<br>
-     * <code>agents: a beliefBaseClass jason.bb.JDBCPersistentBB(
-     * "org.hsqldb.jdbcDriver", "jdbc:hsqldb:bookstore", "sa", "",
-     * "[book(5,author(2,book_author)]")</code><br>
-     */
     @Override
     public void init(Agent ag, String[] args) {
         try {
@@ -92,6 +118,11 @@ public class JDBCPersistentBB extends DefaultBeliefBase {
                 	table = ts.getTerm(1).toString();
                 }
 
+                Structure columns = new Structure("columns");
+                if (ts.getTermsSize() >= 3) {
+                    columns = (Structure)ts.getTerm(2);
+                }
+
                 // create the table and get its Metadata
                 Statement stmt = conn.createStatement();
                 ResultSet rs;
@@ -99,14 +130,14 @@ public class JDBCPersistentBB extends DefaultBeliefBase {
                     rs = stmt.executeQuery("select * from " + table);
                 } catch (SQLException e) {
                     // create table
-                    stmt.executeUpdate(getCreateTable(table, arity));
+                    stmt.executeUpdate(getCreateTable(table, arity, columns));
                     rs = stmt.executeQuery("select * from " + table);
                 }
                 belsDB.put(new PredicateIndicator(ts.getFunctor(), arity), rs.getMetaData());
                 belsDB.put(new PredicateIndicator("~"+ts.getFunctor(), arity), rs.getMetaData());
                 stmt.close();
             }
-            logger.fine("Map=" + belsDB);
+            //logger.fine("Map=" + belsDB);
         } catch (ArrayIndexOutOfBoundsException e) {
             logger.log(Level.SEVERE, "Wrong parameters for JDBCPersistentBB initialisation.", e);
         } catch (ClassNotFoundException e) {
@@ -128,27 +159,19 @@ public class JDBCPersistentBB extends DefaultBeliefBase {
         }
     }
 
+    /** returns true if the literal is stored in a DB */
     protected boolean isDB(Literal l) {
         return belsDB.get(l.getPredicateIndicator()) != null;
     }
 
-    protected String getCreateTable(String table, int arity) throws SQLException {
-        StringBuilder ct = new StringBuilder("create table " + table + " (");
-        for (int c = 0; c < arity; c++) {
-            ct.append(COL_PREFIX + c + " varchar(256), ");
-        }
-        ct.append(COL_NEG + " boolean, " + COL_ANNOT + " varchar(256))");
-        logger.fine("Creating table: " + ct);
-        return ct.toString();
-    }
-    
+    /** returns true if the table for pi was created by Jason */
     protected boolean isCreatedByJason(PredicateIndicator pi) throws SQLException {
         ResultSetMetaData meta = belsDB.get(pi);
         if (meta != null) {
             int cols = meta.getColumnCount();
             return cols >= extraCols && 
-                   meta.getColumnName(cols - 1).equalsIgnoreCase(COL_NEG) && 
-                   meta.getColumnName(cols).equalsIgnoreCase(COL_ANNOT);
+                   meta.getColumnName((cols - extraCols) + 1).equalsIgnoreCase(COL_NEG) && 
+                   meta.getColumnName((cols - extraCols) + 2).equalsIgnoreCase(COL_ANNOT);
         }
         return false;
     }
@@ -162,7 +185,9 @@ public class JDBCPersistentBB extends DefaultBeliefBase {
         try {
             // create a literal from query
             stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery(getSelect(l));
+            String q = getSelect(l);
+            if (logger.isLoggable(Level.FINE)) logger.fine("query for contains "+l+":"+q);
+            ResultSet rs = stmt.executeQuery(q);
             if (rs.next()) {
                 return resultSetToLiteral(rs,l.getPredicateIndicator());
             }
@@ -221,8 +246,9 @@ public class JDBCPersistentBB extends DefaultBeliefBase {
             logger.log(Level.SEVERE, "SQL Error", e);
         } finally {
             try {
-                stmt.close();
+                if (stmt != null) stmt.close();
             } catch (Exception e) {
+                logger.log(Level.WARNING, "SQL Error closing connection", e);                    
             }
         }
         return false;
@@ -288,22 +314,7 @@ public class JDBCPersistentBB extends DefaultBeliefBase {
         return false;
     }
 
-    protected String getDeleteAll(PredicateIndicator pi) throws SQLException {
-        return "delete from " + getTableName(pi);
-    }
 
-    
-    // use the same statement for all queries, so previous queries are closed before new ones
-    private Statement relevantStmt;
-    
-    /** returns a statement for getRelevant method */
-    protected Statement getRelevantStatement() throws SQLException {
-        if (relevantStmt == null) {
-            relevantStmt = conn.createStatement();
-        }
-        return relevantStmt;
-    }
-    
     @Override
     public Iterator<Literal> getRelevant(Literal l) {
         final PredicateIndicator pi = l.getPredicateIndicator();
@@ -316,7 +327,9 @@ public class JDBCPersistentBB extends DefaultBeliefBase {
         } else {
             // get all rows of l's table
             try {
-                final ResultSet rs = getRelevantStatement().executeQuery(getSelectAll(pi));
+                String q = getSelect(l);
+                if (logger.isLoggable(Level.FINE)) logger.fine("getRelevant query for "+l+": "+q);
+                final ResultSet rs = conn.createStatement().executeQuery(q);
                 return new Iterator<Literal>() {
                     boolean hasNext   = true;
                     boolean firstcall = true;
@@ -339,6 +352,7 @@ public class JDBCPersistentBB extends DefaultBeliefBase {
                             }
                             Literal l = resultSetToLiteral(rs,pi);
                             hasNext = rs.next();
+                            if (!hasNext) rs.close();
                             return l;
                         } catch (SQLException e) {
                             logger.log(Level.SEVERE, "SQL Error", e);
@@ -383,10 +397,6 @@ public class JDBCPersistentBB extends DefaultBeliefBase {
         return count + super.size();
     }
     
-    protected String getCountQuery(PredicateIndicator pi) throws SQLException {
-        return "select count(*) from " + getTableName(pi);
-    }
-
     @Override
     public Iterator<Literal> iterator() {
         List<Literal> all = new ArrayList<Literal>(size());
@@ -430,20 +440,33 @@ public class JDBCPersistentBB extends DefaultBeliefBase {
         if (isJasonTable)
             end = end - extraCols;
         for (int c = 1; c <= end; c++) {
-            String sc = rs.getString(c);
             Term parsed = null;
-            if (sc.trim().length() == 0) {
-                parsed = new StringTermImpl("");
-            } else if (Character.isUpperCase(sc.charAt(0))) {
-                // there no var at BB
-                parsed = new StringTermImpl(sc);
-            } else {
-                parsed = DefaultTerm.parse(sc);
-                
-                // if the parsed term is not equals to sc, try as string
-                if (!parsed.toString().equals(sc)) {
-                    parsed = DefaultTerm.parse(sc = "\"" + sc + "\"");
+            String sc = rs.getString(c);
+            switch (meta.getColumnType(c)) {
+            case Types.INTEGER:
+            case Types.FLOAT:
+            case Types.DECIMAL:
+            case Types.DOUBLE:
+            case Types.NUMERIC:
+            case Types.REAL:
+                parsed = new NumberTermImpl(sc);
+                break;
+
+            default:
+                if (sc.trim().length() == 0) {
+                    parsed = new StringTermImpl("");
+                } else if (Character.isUpperCase(sc.charAt(0))) {
+                    // there is no var at BB
+                    parsed = new StringTermImpl(sc);
+                } else {
+                    parsed = DefaultTerm.parse(sc);
+                    
+                    // if the parsed term is not equals to sc, try as string
+                    if (!parsed.toString().equals(sc)) {
+                        parsed = DefaultTerm.parse(sc = "\"" + sc + "\"");
+                    }
                 }
+                break;
             }
             ldb.addTerm(parsed);
         }
@@ -463,14 +486,37 @@ public class JDBCPersistentBB extends DefaultBeliefBase {
         return meta.getTableName(1);
     }
     
+    /** returns the SQL command to create a new table */
+    protected String getCreateTable(String table, int arity, Structure columns) throws SQLException {
+        StringBuilder ct = new StringBuilder("create table " + table + " (");
+        for (int c = 0; c < arity; c++) {
+            String colName = COL_PREFIX + c;
+            String colType = "varchar(256)";
+            // try to get colName and type from columns
+            if (columns.getTermsSize() > c) {
+                Structure scol = (Structure)columns.getTerm(c);
+                colName = scol.getFunctor();
+                colType = scol.getTerm(0).toString();
+            }
+            ct.append(colName + " " + colType + ", ");
+        }
+        ct.append(COL_NEG + " boolean, " + COL_ANNOT + " varchar(256))");
+        logger.fine("Creating table: " + ct);
+        return ct.toString();
+    }
+
+    /** returns the SQL command for a select that retrieves the literal l from the DB */ 
     protected String getSelect(Literal l) throws SQLException {
         return "select * from "+getTableName(l)+getWhere(l);
     }
 
+    /** returns the SQL command the selects all literals of type pi */
     protected String getSelectAll(PredicateIndicator pi) throws SQLException {
         return "select * from " + getTableName(pi);
     }
     
+    
+    /** returns the where clausule for a select for literal l */ 
     protected String getWhere(Literal l) throws SQLException {
         ResultSetMetaData meta = belsDB.get(l.getPredicateIndicator());
         StringBuilder q = new StringBuilder(" where ");
@@ -499,6 +545,7 @@ public class JDBCPersistentBB extends DefaultBeliefBase {
         return q.toString();
     }
 
+    /** returns the SQL command to insert l into the DB */
     protected String getInsert(Literal l) throws SQLException {
         StringBuilder q = new StringBuilder("insert into ");
         ResultSetMetaData meta = belsDB.get(l.getPredicateIndicator());
@@ -528,6 +575,17 @@ public class JDBCPersistentBB extends DefaultBeliefBase {
         q.append(")");
         return q.toString();
     }
+
+    /** returns a SQL command to delete all entries for a predicate */
+    protected String getDeleteAll(PredicateIndicator pi) throws SQLException {
+        return "delete from " + getTableName(pi);
+    }
+
+    /** returns a SQL command to count the number of instances of a predicate */
+    protected String getCountQuery(PredicateIndicator pi) throws SQLException {
+        return "select count(*) from " + getTableName(pi);
+    }
+
 
     /** just create some data to test */
     public void test() {

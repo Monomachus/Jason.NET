@@ -143,7 +143,9 @@ public class Literal extends Pred implements LogicalFormula {
         } else if (this.equals(LFalse)) {
             return LogExpr.EMPTY_UNIF_LIST.iterator();            
         } else {
-            final Iterator<Literal> il = ag.getBB().getRelevant(this);
+            final Literal lclone = (Literal)this.clone();
+            lclone.apply(un);
+            final Iterator<Literal> il = ag.getBB().getRelevant(lclone);
             if (il == null)
                 return LogExpr.EMPTY_UNIF_LIST.iterator();
 
@@ -167,7 +169,6 @@ public class Literal extends Pred implements LogicalFormula {
                 }
 
                 private void get() {
-                    //logger.info("*"+Literal.this+" in get, ruleit =  "+ruleIt);
                     current = null;
                     
                     // try rule iterator
@@ -178,7 +179,7 @@ public class Literal extends Pred implements LogicalFormula {
                         rhead.apply(ruleUn);
                         
                         Unifier unC = (Unifier) un.clone();
-                        if (unC.unifies(Literal.this, rhead)) {
+                        if (unC.unifies(lclone, rhead)) {
                             current = unC;
                             return;
                         }
@@ -212,7 +213,7 @@ public class Literal extends Pred implements LogicalFormula {
                             }
                         } else {
                             Unifier unC = (Unifier) un.clone();
-                            if (unC.unifies(Literal.this, b)) {
+                            if (unC.unifies(lclone, b)) {
                                 current = unC;
                                 return;
                             }

@@ -411,8 +411,8 @@ public class BeliefBaseTest extends TestCase {
         assertTrue(bb.add(l));
         assertFalse(bb.add(l));
         Literal linbb = ((JDBCPersistentBB)bb).contains(l);
-        assertTrue(l.getTerm(0).equals(linbb.getTerm(0)));
-        assertTrue(l.getTerm(1).equals(linbb.getTerm(1)));
+        assertEquals(l.getTerm(0),linbb.getTerm(0));
+        assertEquals(l.getTerm(1),linbb.getTerm(1));
         assertTrue(l.equals(linbb));
         l = Literal.parseLiteral("test(t1(a(10),b(20)),[v1,30,\"a vl\"])[annot2]");
         assertTrue(bb.add(l));

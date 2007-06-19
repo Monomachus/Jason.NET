@@ -76,7 +76,7 @@ public class AgArch {
             fTS = ag.initAg(this, bb, asSrc, stts);
             bb.init(ag, bbPars.getParametersArray());
         } catch (Exception e) {
-            throw new JasonException("as2j: error creating the agent class! - " + e);
+            throw new JasonException("as2j: error creating the agent class! - ", e);
         }
     }
 
