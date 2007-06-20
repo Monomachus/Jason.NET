@@ -121,6 +121,14 @@ public class GridWorldView extends JFrame {
         }
     }
     
+    public Canvas getCanvas() {
+        return drawArea;
+    }
+    
+    public GridWorldModel getModel() {
+        return model;
+    }
+    
     class GridCanvas extends Canvas {
         
 		private static final long serialVersionUID = 1L;
