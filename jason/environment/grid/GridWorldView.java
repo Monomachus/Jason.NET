@@ -12,7 +12,7 @@ import javax.swing.JFrame;
 /**
  * View component for a GirdWorldModel. 
  * 
- * @author jomi
+ * @author Jomi
  */
 public class GridWorldView extends JFrame {
 

@@ -431,15 +431,15 @@ public class ExecutionControlGUI extends ExecutionControl {
 			logger.fine("New agent "+agName);
 			listModel.addElement(agName);
 		}
-		if (agName.equals(currentAgName)) {
-		    // get the state of this agent and add it in history
-            try {
-                storeAgHistory(agName, cycle, infraControl.getAgState(agName));
-            } catch (Exception e) {
-                jTA.setText("Error getting the state of agent "+agName);
-                logger.log(Level.SEVERE,"Error:",e);
-            }
+
+        // get the state of this agent and add it in history
+		try {
+		    storeAgHistory(agName, cycle, infraControl.getAgState(agName));
+        } catch (Exception e) {
+            jTA.setText("Error getting the state of agent "+agName);
+            logger.log(Level.SEVERE,"Error:",e);
         }
+
         this.breakpoint = breakpoint;
         if (waitSelected) {
             countCycles++;
