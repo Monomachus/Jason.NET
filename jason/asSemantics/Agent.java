@@ -40,6 +40,7 @@ import jason.bb.BeliefBase;
 import jason.bb.DefaultBeliefBase;
 import jason.runtime.Settings;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -105,8 +106,7 @@ public class Agent {
             } else {
 	            // check whether source is an URL string
 	            try {
-	            	URL urlSrc = new URL(asSrc); 
-	            	parseAS(urlSrc);
+	            	parseAS(new URL(asSrc));
 	            } catch (MalformedURLException e) {
 	            	parseAS(asSrc);
 	            }
@@ -166,7 +166,7 @@ public class Agent {
     }
     
     public void setASLSource(String file) {
-        if (file.startsWith("./")) file = file.substring(2);
+        if (file.startsWith("."+File.separator)) file = file.substring(2);
         aslSource = file;    	
     }
 

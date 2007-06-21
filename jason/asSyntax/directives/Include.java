@@ -57,24 +57,5 @@ public class Include implements Directive {
             logger.log(Level.SEVERE,"as2j: error parsing \"" + file + "\"", e);
         }
         return null;
-    	
-        //return processInclude(file);
     }
-
-    /*
-    Agent processInclude(String asFileName) {
-        try {
-        	Agent ag = new Agent();
-            as2j parser = new as2j(new FileInputStream(asFileName));
-            parser.agent(ag);
-            logger.fine("as2j: AgentSpeak program '"+asFileName+"' parsed successfully!");
-            return ag;
-        } catch (FileNotFoundException e) {
-            logger.log(Level.SEVERE,"as2j: the AgentSpeak source file was not found", e);
-        } catch (Exception e) {
-            logger.log(Level.SEVERE,"as2j: error parsing \"" + asFileName + "\"", e);
-        }
-        return null;
-    }
-    */
 }
