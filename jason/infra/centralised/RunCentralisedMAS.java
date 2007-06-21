@@ -43,6 +43,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -53,6 +54,10 @@ import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextArea;
 
 /**
  * Runs MASProject using centralised infrastructure.
@@ -189,6 +194,15 @@ public class RunCentralisedMAS {
                 });
                 MASConsoleGUI.get().addButton(btPause);
 
+                // add show sources button
+                final JButton btShowSrc = new JButton("Show sources", new ImageIcon(RunCentralisedMAS.class.getResource("/images/list.gif")));
+                btShowSrc.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent evt) {
+                        showProjectSources(project);
+                    }
+                });
+                MASConsoleGUI.get().addButton(btShowSrc);
+
                 // add Button start
                 final JButton btStartAg = new JButton("Start new agent", new ImageIcon(RunCentralisedMAS.class.getResource("/images/newAgent.gif")));
                 btStartAg.addActionListener(new ActionListener() {
@@ -205,7 +219,7 @@ public class RunCentralisedMAS {
                         new KillAgentGUI(MASConsoleGUI.get().getFrame(), "Kill an agent of the current MAS");
                     }
                 });
-                MASConsoleGUI.get().addButton(btKillAg);
+                MASConsoleGUI.get().addButton(btKillAg);          
             }
 
             runner.waitEnd();
@@ -449,5 +463,51 @@ public class RunCentralisedMAS {
         }
 
         System.exit(0);
+    }
+    
+    /** show the sources of the project */
+    private static void showProjectSources(MAS2JProject project) {
+        JFrame frame = new JFrame("Project "+project.getSocName()+" sources");
+        JTabbedPane pane = new JTabbedPane();
+        frame.getContentPane().add(pane);
+        for (AgentParameters ap : project.getAgents()) {
+            try {
+                String tmpAsSrc = ap.asSource.toString();
+                if (!tmpAsSrc.startsWith(File.separator) && !project.getDirectory().equals("."+File.separator)) {
+                    tmpAsSrc = project.getDirectory() + tmpAsSrc;
+                }
+                tmpAsSrc = urlPrefix + tmpAsSrc;
+                
+                // read sources
+                InputStream in = null;
+                if (tmpAsSrc.startsWith(Include.CRPrefix)) {
+                    in = RunCentralisedMAS.class.getResource(tmpAsSrc.substring(Include.CRPrefix.length())).openStream();
+                } else {
+                    try {
+                        in = new URL(tmpAsSrc).openStream(); 
+                    } catch (MalformedURLException e) {
+                        in = new FileInputStream(tmpAsSrc);
+                    }
+                }
+                StringBuilder s = new StringBuilder();
+                int c = in.read();
+                while (c > 0) {
+                    s.append((char)c);
+                    c = in.read();
+                }
+                
+                // show sources
+                JTextArea ta = new JTextArea(40,50);
+                ta.setEditable(false);
+                ta.setText(s.toString());
+                ta.setCaretPosition(0);
+                JScrollPane sp = new JScrollPane(ta);
+                pane.add(ap.name, sp);
+            } catch (Exception e) {
+                logger.info("Error:"+e);
+            }
+        }
+        frame.pack();
+        frame.setVisible(true);
     }
 }
