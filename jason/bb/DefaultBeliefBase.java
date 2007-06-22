@@ -26,6 +26,7 @@ package jason.bb;
 import jason.asSemantics.Agent;
 import jason.asSyntax.Literal;
 import jason.asSyntax.PredicateIndicator;
+import jason.asSyntax.Rule;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -89,6 +90,11 @@ public class DefaultBeliefBase implements BeliefBase {
         if (l.equals(Literal.LTrue) || l.equals(Literal.LFalse)) {
             logger.log(Level.SEVERE, "Error: <true> or <false> can not be added as beliefs.");
             return false;
+        }
+        
+        // if l is not a rule and has free vars, convert it in a rule like "l :- true."
+        if (!l.isRule() && !l.isGround()) {
+            l = new Rule(l,Literal.LTrue);
         }
         
         Literal bl = contains(l);

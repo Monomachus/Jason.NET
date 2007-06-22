@@ -42,7 +42,9 @@ public class Rule extends Literal {
 
     public Rule(Literal head, LogicalFormula body) {
         super(head);
-        if (isInternalAction()) {
+        if (head.isRule()) {
+            logger.log(Level.SEVERE,"The rule head ("+head+") is a rule!");
+        } else if (isInternalAction()) {
             logger.log(Level.SEVERE,"The rule head ("+head+") can not be an internal action!");
         } else if (head == LTrue || head == LFalse) {
             logger.log(Level.SEVERE,"The rule head ("+head+") can not be a true or false!");
