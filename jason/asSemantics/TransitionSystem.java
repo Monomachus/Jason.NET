@@ -293,7 +293,7 @@ public class TransitionSystem {
 
     private void applyAddIM() throws JasonException {
         // create a new intended means
-        IntendedMeans im = new IntendedMeans(conf.C.SO, (Trigger)conf.C.SE.getTrigger().clone());
+        IntendedMeans im = new IntendedMeans(conf.C.SO, conf.C.SE.getTrigger());
 
         // Rule ExtEv
         if (conf.C.SE.intention == Intention.EmptyInt) {
@@ -446,24 +446,8 @@ public class TransitionSystem {
 
         // Rule Test
         case test:
-            LogicalFormula f = (LogicalFormula)h.getLogicalFormula().clone();
-            f.apply(u);
-
-            Iterator<Unifier> iun = f.logicalConsequence(getAg(), new Unifier());
-            if (iun != null && iun.hasNext()) {
-                Unifier result = iun.next();
-                if (f instanceof Literal) {
-                    // import from result those vars in f, so
-                    //   1. clone f to c
-                    //   2. apply result to c
-                    //   3. unify with the current unifier f and c
-                    Literal c = (Literal)h.getLiteralFormula().clone();
-                    c.apply(result);
-                    u.unifies(h.getLiteralFormula(),c);
-                } else { 
-                    // f is a log expr, so import all vars
-                    u.compose(result);
-                }
+            LogicalFormula f = h.getLogicalFormula();
+            if (conf.ag.believes(f, u)) {
                 updateIntention();
             } else {
             	boolean fail = true;
@@ -661,7 +645,7 @@ public class TransitionSystem {
                             if (!allUnifs) break; // returns only the first unification
                             if (r.hasNext()) {
                                 // create a new option for the next loop step
-                                opt = new Option((Plan)opt.plan.clone(), null);
+                                opt = new Option(opt.plan, null);
                             }
                         }
                     }

@@ -57,7 +57,7 @@ public class IntendedMeans implements Serializable {
         if (te == null) {
             trigger = plan.getTriggerEvent();
         } else {
-            trigger = te;
+            trigger = (Trigger)te.clone();
             trigger.getLiteral().apply(unif);
             // import annots of the trigger into the plan's te
             // so that the event +!g[source(ag1)] will add source(ag1)
