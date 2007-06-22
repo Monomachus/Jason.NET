@@ -146,13 +146,15 @@ public class Literal extends Pred implements LogicalFormula {
             final Literal lclone = (Literal)this.clone();
             lclone.apply(un);
             final Iterator<Literal> il = ag.getBB().getRelevant(lclone);
-            if (il == null)
+
+            if (il == null) // no relevant bels
                 return LogExpr.EMPTY_UNIF_LIST.iterator();
 
             return new Iterator<Unifier>() {
-                Unifier current = null;
+                Unifier           current = null;
                 Iterator<Unifier> ruleIt = null; // current rule solutions iterator
-                Rule rule; // current rule
+                Rule              rule; // current rule
+                Literal           lcloneAnnon = null; // a copy of lclone with makeVarsAnnon
                 
                 public boolean hasNext() {
                     if (current == null)
@@ -164,7 +166,7 @@ public class Literal extends Pred implements LogicalFormula {
                     if (current == null)
                         get();
                     Unifier a = current;
-                    current = null; //get();
+                    current = null;
                     return a;
                 }
 
@@ -175,7 +177,7 @@ public class Literal extends Pred implements LogicalFormula {
                     while (ruleIt != null && ruleIt.hasNext()) {
                         // unifies the rule head with the result of rule evaluation
                         Unifier ruleUn = ruleIt.next(); // evaluation result
-                        Literal rhead = rule.headClone();
+                        Literal rhead  = rule.headClone();
                         rhead.apply(ruleUn);
                         
                         Unifier unC = (Unifier) un.clone();
@@ -192,16 +194,15 @@ public class Literal extends Pred implements LogicalFormula {
                             rule = (Rule)b;
                             
                             // create a copy of this literal, ground it and 
-                            // make its vars annonym, it is
-                            // used to define what will be the unifier used
+                            // make its vars annonym, 
+                            // it is used to define what will be the unifier used
                             // inside the rule.
-                            // Only vars from rule head should get value in the
-                            // unifier used inside the rule evaluation.
-                            Literal h = (Literal)Literal.this.clone();
-                            h.apply(un);
-                            h.makeVarsAnnon();
+                            if (lcloneAnnon == null) {
+                                lcloneAnnon = (Literal)lclone.clone();
+                                lcloneAnnon.makeVarsAnnon();
+                            }
                             Unifier ruleUn = new Unifier();
-                            if (ruleUn.unifies(h, rule)) {
+                            if (ruleUn.unifies(lcloneAnnon, rule)) {
                                 //logger.info("go "+h+" rule="+rule+" un="+ruleUn);
                                 ruleIt = rule.getBody().logicalConsequence(ag,ruleUn);
                                 //logger.info("ruleIt for "+h+" ="+ruleIt);

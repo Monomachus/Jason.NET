@@ -448,7 +448,22 @@ public class TransitionSystem {
         case test:
             LogicalFormula f = (LogicalFormula)h.getLogicalFormula().clone();
             f.apply(u);
-            if (conf.ag.believes(f, u)) {
+
+            Iterator<Unifier> iun = f.logicalConsequence(getAg(), new Unifier());
+            if (iun != null && iun.hasNext()) {
+                Unifier result = iun.next();
+                if (f instanceof Literal) {
+                    // import from result those vars in f, so
+                    //   1. clone f to c
+                    //   2. apply result to c
+                    //   3. unify with the current unifier f and c
+                    Literal c = (Literal)h.getLiteralFormula().clone();
+                    c.apply(result);
+                    u.unifies(h.getLiteralFormula(),c);
+                } else { 
+                    // f is a log expr, so import all vars
+                    u.compose(result);
+                }
                 updateIntention();
             } else {
             	boolean fail = true;
