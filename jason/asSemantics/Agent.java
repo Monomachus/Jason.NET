@@ -71,18 +71,15 @@ import org.w3c.dom.Element;
 public class Agent {
 
     // Members
-    protected BeliefBase fBB = new DefaultBeliefBase();
-
-    protected PlanLibrary fPL = new PlanLibrary();
+    protected BeliefBase       bb = new DefaultBeliefBase();
+    protected PlanLibrary      pl = new PlanLibrary();
+    protected TransitionSystem ts = null;
+    protected String           aslSource = null;
+    
+    private List<Literal>      initialGoals = new ArrayList<Literal>(); // initial goals in the source code
+    private List<Literal>      initialBels  = new ArrayList<Literal>(); // initial beliefs in the source code
 
     private Map<String, InternalAction> internalActions = new HashMap<String, InternalAction>();
-
-    protected TransitionSystem fTS = null;
-
-    protected String aslSource = null;
-    
-    private List<Literal> initialGoals = new ArrayList<Literal>(); // initial goals in the source code
-    private List<Literal> initialBels  = new ArrayList<Literal>(); // initial beliefs in the source code
 
     private Logger logger = Logger.getLogger(Agent.class.getName());
 
@@ -94,7 +91,7 @@ public class Agent {
             logger.setLevel(stts.logLevel());
 
             if (bb != null) {
-                this.fBB = bb;
+                this.bb = bb;
             }
 
             setTS(new TransitionSystem(this, new Circumstance(), stts, arch));
@@ -124,7 +121,7 @@ public class Agent {
             	getTS().getC().addAchvGoal(g,Intention.EmptyInt);
             }
             
-            return fTS;
+            return ts;
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error creating the agent class!", e);
             throw new JasonException("Error creating the agent class! - " + e);
@@ -141,8 +138,8 @@ public class Agent {
     	a.setLogger(arch);
         a.logger.setLevel(this.getTS().getSettings().logLevel());
 
-    	a.fBB = (BeliefBase)this.fBB.clone();
-    	a.fPL = (PlanLibrary)this.fPL.clone();
+    	a.bb = (BeliefBase)this.bb.clone();
+    	a.pl = (PlanLibrary)this.pl.clone();
     	a.aslSource = this.aslSource;
     	
         a.setTS(new TransitionSystem(a, (Circumstance)this.getTS().getC().clone(), this.getTS().getSettings(), arch));
@@ -301,20 +298,20 @@ public class Agent {
 
     /** TS Initialisation (called by the AgArch) */
     public void setTS(TransitionSystem ts) {
-        this.fTS = ts;
+        this.ts = ts;
     }
 
     public TransitionSystem getTS() {
-        return fTS;
+        return ts;
     }
 
     // Accessing the agent's belief base and plans
     public BeliefBase getBB() {
-        return fBB;
+        return bb;
     }
 
     public PlanLibrary getPL() {
-        return fPL;
+        return pl;
     }
 
     /** Belief Update Function: adds/removes perceptions into belief base */
@@ -347,8 +344,8 @@ public class Agent {
                 l = (Literal)l.clone();
                 l.clearAnnots();
                 l.addAnnot(BeliefBase.TPercept);
-	            if (fBB.remove(l)) {
-	                fTS.updateEvents(new Event(new Trigger(TEOperator.del, TEType.belief, l), Intention.EmptyInt));
+	            if (bb.remove(l)) {
+	                ts.updateEvents(new Event(new Trigger(TEOperator.del, TEType.belief, l), Intention.EmptyInt));
 	            }
             }
         }
@@ -361,7 +358,7 @@ public class Agent {
                 lp.addAnnot(BeliefBase.TPercept);
                 if (getBB().add(lp)) {
                     Trigger te = new Trigger(TEOperator.add, TEType.belief, lp);
-                    fTS.updateEvents(new Event(te, Intention.EmptyInt));
+                    ts.updateEvents(new Event(te, Intention.EmptyInt));
                 }
             } catch (Exception e) {
                 logger.log(Level.SEVERE, "Error adding percetion " + lp, e);
@@ -395,7 +392,7 @@ public class Agent {
      * The unifier <i>un</i> is updated by the method.
      */
     public Literal findBel(Literal bel, Unifier un) {
-        Iterator<Literal> relB = fBB.getRelevant(bel);
+        Iterator<Literal> relB = bb.getRelevant(bel);
         if (relB != null) {
             while (relB.hasNext()) {
                 Literal b = relB.next();
@@ -473,8 +470,8 @@ public class Agent {
             bel.addAnnot(BeliefBase.TSelf);
         }
         List<Literal>[] result = brf(bel, null, Intention.EmptyInt);
-        if (result != null && fTS != null) {
-            fTS.updateEvents(result, Intention.EmptyInt);
+        if (result != null && ts != null) {
+            ts.updateEvents(result, Intention.EmptyInt);
             return true;
         } else {
             return false;
@@ -487,8 +484,8 @@ public class Agent {
      */
     public boolean delBel(Literal bel) {
         List<Literal>[] result = brf(null, bel, Intention.EmptyInt);
-        if (result != null && fTS != null) {
-            fTS.updateEvents(result, Intention.EmptyInt);
+        if (result != null && ts != null) {
+            ts.updateEvents(result, Intention.EmptyInt);
             return true;
         } else {
             return false;
@@ -536,17 +533,17 @@ public class Agent {
         Element ag = getAsDOM(document);
         document.appendChild(ag);
 
-        ag.appendChild(fTS.getC().getAsDOM(document));
+        ag.appendChild(ts.getC().getAsDOM(document));
         return document;
     }
 
     /** Gets the agent "mind" as XML */
     public Element getAsDOM(Document document) {
         Element ag = (Element) document.createElement("agent");
-        ag.setAttribute("name", fTS.getUserAgArch().getAgName());
-        ag.setAttribute("cycle", ""+fTS.getUserAgArch().getCycleNumber());
+        ag.setAttribute("name", ts.getUserAgArch().getAgName());
+        ag.setAttribute("cycle", ""+ts.getUserAgArch().getCycleNumber());
 
-        ag.appendChild(fBB.getAsDOM(document));
+        ag.appendChild(bb.getAsDOM(document));
         // ag.appendChild(ps.getAsDOM(document));
         return ag;
     }
@@ -566,8 +563,8 @@ public class Agent {
         if (getASLSource() != null && getASLSource().length() > 0) {
         	ag.setAttribute("source", getASLSource());
         }
-        ag.appendChild(fBB.getAsDOM(document));
-        ag.appendChild(fPL.getAsDOM(document));
+        ag.appendChild(bb.getAsDOM(document));
+        ag.appendChild(pl.getAsDOM(document));
         document.appendChild(ag);
 
         return document;

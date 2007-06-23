@@ -36,7 +36,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
- * A Pred is a Structure with annotations, eg a(1)[an1,an2].
+ * A Pred is a Structure with annotations, e.g.: a(1)[an1,an2].
  */
 public class Pred extends Structure {
 
@@ -107,15 +107,11 @@ public class Pred extends Structure {
     
     public void setAnnots(ListTerm l) {
         annots = l;
-        if (annots != null && annots.isEmpty()) {
-            annots = null;
-        }
+        if (annots != null && annots.isEmpty()) annots = null;
     }
 
     public boolean addAnnot(Term t) {
-        if (annots == null) {
-            annots = new ListTermImpl();
-        }
+        if (annots == null) annots = new ListTermImpl();
         if (!annots.contains(t)) {
             annots.add(t);
             return true;
@@ -124,23 +120,19 @@ public class Pred extends Structure {
     }
 
     public void addAnnots(List<Term> l) {
-        if (l == null)
-            return;
+        if (l == null) return;
         for (Term t : l) {
             addAnnot(t);
         }
     }
 
     public void addAnnot(int index, Term t) {
-        if (annots == null)
-            annots = new ListTermImpl();
-        if (!annots.contains(t))
-            annots.add(index, t);
+        if (annots == null) annots = new ListTermImpl();
+        if (!annots.contains(t)) annots.add(index, t);
     }
 
     public void delAnnot(Term t) {
-        if (annots != null)
-            annots.remove(t);
+        if (annots != null) annots.remove(t);
     }
 
     public void clearAnnots() {
@@ -152,8 +144,7 @@ public class Pred extends Structure {
     }
 
     public boolean hasAnnot(Term t) {
-        if (annots == null)
-            return false;
+        if (annots == null) return false;
         return annots.contains(t);
     }
 
@@ -213,10 +204,8 @@ public class Pred extends Structure {
 
     /** returns true if all this predicate annots are in p's annots */
     public boolean hasSubsetAnnot(Pred p) {
-        if (annots == null)
-            return true;
-        if (annots != null && p.getAnnots() == null)
-            return false;
+        if (annots == null) return true;
+        if (annots != null && p.getAnnots() == null) return false;
         for (Term myAnnot : annots) {
             if (!p.hasAnnot(myAnnot)) {
                 return false;
@@ -230,10 +219,8 @@ public class Pred extends Structure {
      * unifies the annot list and remove p's annots)
      */
     public boolean hasSubsetAnnot(Pred p, Unifier u) {
-        if (annots == null)
-            return true;
-        if (annots != null && p.getAnnots() == null)
-            return false;
+        if (annots == null) return true;
+        if (annots != null && p.getAnnots() == null) return false;
 
         p = (Pred) p.clone(); // clone p to change its annots, the remaining
                               // annots will unify this annots Tail
@@ -243,9 +230,7 @@ public class Pred extends Structure {
         // T will be [a,b,c]
         VarTerm pTail = null;
         Term tail = p.getAnnots().getTail();
-        if (tail instanceof VarTerm) {
-            pTail = (VarTerm)tail;
-        }
+        if (tail instanceof VarTerm) pTail = (VarTerm)tail;
         
         for (Term annot : annots) {
             // search annot in p's annots
@@ -269,8 +254,7 @@ public class Pred extends Structure {
                 pTailAnnots.add(annot);
                 ok = true;
             }
-            if (!ok)
-                return false;
+            if (!ok) return false;
         }
 
         // if this Pred has a Tail, unify it with p remaining annots
@@ -382,33 +366,22 @@ public class Pred extends Structure {
     @Override
     public int compareTo(Term t) {
         int c = super.compareTo(t);
-        if (c != 0)
-            return c;
+        if (c != 0) return c;
         
         if (t.isPred()) {
             Pred tAsPred = (Pred)t;
-            if (getAnnots() == null && tAsPred.getAnnots() == null) {
-                return 0;
-            }
-            if (getAnnots() == null) {
-                return -1;
-            }
-            if (tAsPred.getAnnots() == null) {
-                return 1;
-            }
+            if (getAnnots() == null && tAsPred.getAnnots() == null) return 0;
+            if (getAnnots() == null) return -1;
+            if (tAsPred.getAnnots() == null) return 1;
     
             Iterator<Term> pai = tAsPred.getAnnots().iterator();
             for (Term a : getAnnots()) {
                 c = a.compareTo(pai.next());
-                if (c != 0) {
-                    return c;
-                }
+                if (c != 0) return c;
             }
 
-            if (getAnnots().size() < tAsPred.getAnnots().size())
-                return -1;
-            if (getAnnots().size() > tAsPred.getAnnots().size())
-                return 1;
+            if (getAnnots().size() < tAsPred.getAnnots().size()) return -1;
+            if (getAnnots().size() > tAsPred.getAnnots().size()) return 1;
         }
         return 0;
     }
@@ -424,9 +397,7 @@ public class Pred extends Structure {
     public String toString() {
         String s;
         s = super.toString();
-        if (hasAnnot()) {
-            s += annots.toString();
-        }
+        if (hasAnnot())  s += annots.toString();
         return s;
     }
 

@@ -45,7 +45,7 @@ public class IntendedMeans implements Serializable {
 
 	protected Unifier unif = null;
 	protected Plan    plan;
-	private   Trigger trigger; // the trigger that create this IM
+	private   Trigger trigger; // the trigger which created this IM
     
     public IntendedMeans(Option opt, Trigger te) {
     	plan = (Plan)opt.plan.clone();

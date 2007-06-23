@@ -44,11 +44,10 @@ import org.w3c.dom.Element;
           Z -> { X, Y, W, Z } 
       where { X, Y, W, Z } is a VarsCluster instance.
      
-      So when one var is assigned to a value, all vars gives this
-      value.
+      So when one var is assigned to a value, all vars in the
+      cluster receive this same value.
       
-      @author jomi
-      
+      @author Jomi
 */
 public class VarsCluster extends DefaultTerm implements Iterable<VarTerm> {
 	

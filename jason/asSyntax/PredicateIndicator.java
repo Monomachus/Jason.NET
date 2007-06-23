@@ -48,9 +48,7 @@ public final class PredicateIndicator {
     private int calcHash() {
         final int PRIME = 31;
         int t  = PRIME * arity;
-        if (functor != null) {
-            t = PRIME * t + functor.hashCode();
-        }
+        if (functor != null) t = PRIME * t + functor.hashCode();
         return t;
     }
       

@@ -121,7 +121,7 @@ public class ArithExpr extends DefaultTerm implements NumberTerm {
 
     private ArithmeticOp  op     = ArithmeticOp.none;
 
-    private NumberTerm fValue = null; // value, when evaluated	
+    private NumberTerm    fValue = null; // value, when evaluated	
 
     static private Logger logger = Logger.getLogger(ArithExpr.class.getName());
 
@@ -201,11 +201,8 @@ public class ArithExpr extends DefaultTerm implements NumberTerm {
 
     @Override
     public boolean equals(Object t) {
-        if (t == null) 
-            return false;
-        if (isEvaluated()) {
-            return fValue.equals(t);
-        }
+        if (t == null) return false;
+        if (isEvaluated()) return fValue.equals(t);
         if (t instanceof ArithExpr) {
             ArithExpr eprt = (ArithExpr) t;
             if (lhs == null && eprt.lhs != null) {
@@ -242,15 +239,12 @@ public class ArithExpr extends DefaultTerm implements NumberTerm {
 
     @Override
     protected int calcHashCode() {
-        if (isEvaluated())
-            return fValue.hashCode();
+        if (isEvaluated()) return fValue.hashCode();
         
         final int PRIME = 31;
         int code = PRIME * op.hashCode();
-        if (lhs != null)
-            code = PRIME * code + lhs.hashCode();
-        if (rhs != null)
-            code = PRIME * code + rhs.hashCode();
+        if (lhs != null) code = PRIME * code + lhs.hashCode();
+        if (rhs != null) code = PRIME * code + rhs.hashCode();
         return code;
     }
     

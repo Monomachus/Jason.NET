@@ -93,9 +93,7 @@ public class Structure extends DefaultTerm {
     protected int calcHashCode() {
         final int PRIME = 7;
         int result = 1;
-        if (functor != null) {
-            result = PRIME * result + functor.hashCode();
-        }
+        if (functor != null) result = PRIME * result + functor.hashCode();
         final int ts = getTermsSize();
         if (ts > 0) {
             result = PRIME * result + getTermsSize();
@@ -114,33 +112,18 @@ public class Structure extends DefaultTerm {
             Structure tAsStruct = (Structure)t;
 
             // if t is a VarTerm, uses var's equals
-            if (tAsStruct.isVar()) {
-                return ((VarTerm)t).equals(this);
-            }
-            
-            if (getFunctor() == null && tAsStruct.getFunctor() != null) {
-                return false;
-            }
-            if (getFunctor() != null && !getFunctor().equals(tAsStruct.getFunctor())) {
-                return false;
-            }
-            if (getTerms() == null && tAsStruct.getTerms() == null) {
-                return true;
-            }
-            if (getTerms() == null || tAsStruct.getTerms() == null) {
-                return false;
-            }
+            if (tAsStruct.isVar()) return ((VarTerm)t).equals(this);
+
+            if (getFunctor() == null && tAsStruct.getFunctor() != null) return false;
+            if (getFunctor() != null && !getFunctor().equals(tAsStruct.getFunctor())) return false;
+            if (getTerms() == null && tAsStruct.getTerms() == null) return true;
+            if (getTerms() == null || tAsStruct.getTerms() == null) return false;
+
             final int ts = getTermsSize(); 
-            if (ts != tAsStruct.getTermsSize()) {
-                return false;
-            }
+            if (ts != tAsStruct.getTermsSize()) return false;
 
             for (int i=0; i<ts; i++) {
-                //System.out.println(" *term "+i+" "+getTerm(i)+getTerm(i).getClass().getName()
-                //      +"="+tAsTerm.getTerm(i)+tAsTerm.getTerm(i).getClass().getName()+" deu "+getTerm(i).equals(tAsTerm.getTerm(i)));             
-                if (!getTerm(i).equals(tAsStruct.getTerm(i))) {
-                    return false;
-                }
+                if (!getTerm(i).equals(tAsStruct.getTerm(i))) return false;
             }
             return true;
         } 
@@ -149,49 +132,38 @@ public class Structure extends DefaultTerm {
 
 
     public int compareTo(Term t) {
-        if (! t.isStructure()) {
-            return super.compareTo(t);
-        }
+        if (! t.isStructure()) return super.compareTo(t);
 
 		// this is a list and the other not
-		if (isList() && !t.isList()) 
-			return 1;
+		if (isList() && !t.isList()) return 1;
 
 		// this is not a list and the other is
-		if (!isList() && t.isList()) 
-			return -1;
+		if (!isList() && t.isList()) return -1;
 
 		// both are lists, check the size
 		if (isList() && t.isList()) {
 			ListTerm l1 = (ListTerm)this;
 			ListTerm l2 = (ListTerm)t;
-			if (l1.size() > l2.size()) 
-				return 1;
-			if (l2.size() > l1.size())
-				return -1;
+			if (l1.size() > l2.size()) return 1;
+			if (l2.size() > l1.size()) return -1;
 		}
 
 		// both are list with same size,
 		// or none are list
-
         Structure tAsStruct = (Structure)t;
 
-        if (getTermsSize() < tAsStruct.getTermsSize())
-            return -1;
-        else if (getTermsSize() > tAsStruct.getTermsSize())
-            return 1;
+        if (getTermsSize() < tAsStruct.getTermsSize()) return -1;
+        else if (getTermsSize() > tAsStruct.getTermsSize()) return 1;
 
         int c;
         if (getFunctor() != null && tAsStruct.getFunctor() != null) {
             c = getFunctor().compareTo(tAsStruct.getFunctor());
-            if (c != 0)
-                return c;
+            if (c != 0) return c;
         }
 
         for (int i=0; i<getTermsSize() && i<tAsStruct.getTermsSize(); i++) {
             c = getTerm(i).compareTo(tAsStruct.getTerm(i));
-            if (c != 0)
-                return c;
+            if (c != 0) return c;
         }
 
         return 0;
@@ -213,15 +185,13 @@ public class Structure extends DefaultTerm {
     public Object clone() {
         Structure c = new Structure(this);
         c.predicateIndicatorCache = this.predicateIndicatorCache;
-        c.hashCodeCache = this.hashCodeCache;
+        c.hashCodeCache           = this.hashCodeCache;
         return c;
     }
 
     public void addTerm(Term t) {
-    	if (t == null)
-    		return;
-        if (terms == null)
-            terms = new ArrayList<Term>();
+    	if (t == null) return;
+        if (terms == null) terms = new ArrayList<Term>();
         terms.add(t);
         predicateIndicatorCache = null;
         hashCodeCache = null;
@@ -340,8 +310,7 @@ public class Structure extends DefaultTerm {
     }
 
     public boolean hasVar(Term t) {
-        if (this.equals(t))
-            return true;
+        if (this.equals(t)) return true;
         for (int i=0; i<getTermsSize(); i++) {
             if (getTerm(i).hasVar(t)) {
                 return true;
@@ -351,9 +320,8 @@ public class Structure extends DefaultTerm {
     }
 
     protected List<Term> getDeepCopyOfTerms() {
-        if (terms == null) {
-            return null;
-        }
+        if (terms == null) return null;
+
         List<Term> l = new ArrayList<Term>(terms.size());
         for (Term ti: terms) {
             l.add((Term)ti.clone());
@@ -363,16 +331,13 @@ public class Structure extends DefaultTerm {
     
     public String toString() {
         StringBuilder s = new StringBuilder();
-        if (functor != null) {
-            s.append(functor);
-        }
+        if (functor != null) s.append(functor);
         if (terms != null) {
             s.append("(");
             Iterator<Term> i = terms.iterator();
             while (i.hasNext()) {
                 s.append(i.next());
-                if (i.hasNext())
-                    s.append(",");
+                if (i.hasNext()) s.append(",");
             }
             s.append(")");
         }

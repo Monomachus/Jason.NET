@@ -134,7 +134,7 @@ public class Plan implements Cloneable, Serializable {
     
     public void setSourceLines(int b, int e) {
         startSourceLine = b;
-        endSourceLine = e;
+        endSourceLine   = e;
     }
     
     public int getStartSourceLine() {
@@ -197,28 +197,20 @@ public class Plan implements Cloneable, Serializable {
     @Override
     public int hashCode() {
         int code = 37;
-        if (context != null)
-            code += context.hashCode();
-        if (tevent != null)
-            code += tevent.hashCode();
-        if (body != null) {
-            code += body.hashCode();
-        }
+        if (context != null) code += context.hashCode();
+        if (tevent != null)  code += tevent.hashCode();
+        if (body != null)    code += body.hashCode();
         return code;
     }
     
     public Object clone() {
         Plan p = new Plan();
-        if (label != null) {
-            p.setLabel((Pred) label.clone());
-        }
+        if (label != null) p.setLabel((Pred) label.clone());
         
         // tevent shouldn't be null!!!
         p.tevent = (Trigger) tevent.clone();
         
-        if (context != null) {
-            p.setContext((LogicalFormula) context.clone());
-        }
+        if (context != null) p.setContext((LogicalFormula) context.clone());
         
         List<BodyLiteral> copy = new LinkedList<BodyLiteral>(); // the plan will be "consumed" by remove(0), so linkedlist
         for (BodyLiteral l : body) {

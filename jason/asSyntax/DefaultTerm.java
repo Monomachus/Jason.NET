@@ -38,8 +38,8 @@ public abstract class DefaultTerm implements Term, Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-    protected Integer hashCodeCache = null;
-	protected int           srcLine = -1; // the line this literal appears in the source
+    protected Integer     hashCodeCache = null;
+	protected int         srcLine = -1; // the line this literal appears in the source
 
     static private Logger logger = Logger.getLogger(Term.class.getName());
     
@@ -52,16 +52,28 @@ public abstract class DefaultTerm implements Term, Serializable {
             return null;
         }
     }
+            
+    public boolean isVar()            { return false; }
+    public boolean isLiteral()        { return false; }
+    public boolean isRule()           { return false; }
+    public boolean isList()           { return false; }
+    public boolean isString()         { return false; }
+    public boolean isInternalAction() { return false; }
+    public boolean isArithExpr()      { return false; }
+    public boolean isNumeric()        { return false; }
+    public boolean isPred()           { return false; }
+    public boolean isStructure()      { return false; }
+	public boolean isAtom()           { return false; }
+    public boolean isGround()         { return true; }
+    public boolean hasVar(Term t)     { return false; }
+
+    abstract public    Object clone();
+    abstract protected int    calcHashCode();
     
     public int hashCode() {
-        if (hashCodeCache == null) {
-            hashCodeCache = calcHashCode();
-        }
+        if (hashCodeCache == null) hashCodeCache = calcHashCode();
         return hashCodeCache;
     }
-    
-    abstract protected int calcHashCode();
-    
     /** remove the valued cached for hashCode */
     public void resetHashCodeCache() {
         hashCodeCache = null;
@@ -70,53 +82,7 @@ public abstract class DefaultTerm implements Term, Serializable {
     public int compareTo(Term t) {
         return this.toString().compareTo(t.toString());
     }
-        
-    public boolean isVar() {
-        return false;
-    }
-    public boolean isLiteral() {
-        return false;
-    }
-    public boolean isRule() {
-        return false;
-    }
-    public boolean isList() {
-        return false;
-    }
-    public boolean isString() {
-        return false;
-    }
-    public boolean isInternalAction() {
-        return false;
-    }
-    public boolean isArithExpr() {
-        return false;
-    }
-    public boolean isNumeric() {
-        return false;
-    }
-    public boolean isPred() {
-        return false;
-    }
-    
-    public boolean isStructure() {
-        return false;
-    }
 
-	public boolean isAtom() {
-		return false;
-	}
-    
-    public boolean isGround() {
-        return true;
-    }
-    
-    public boolean hasVar(Term t) {
-        return false;
-    }
-
-    abstract public Object clone();
-    
     public boolean apply(Unifier u) {
     	return false;
     }
@@ -124,9 +90,8 @@ public abstract class DefaultTerm implements Term, Serializable {
     public void setSrcLine(int i) {
 		srcLine = i;
 	}
+
     public int getSrcLine() {
     	return srcLine;
     }
-
-
 }

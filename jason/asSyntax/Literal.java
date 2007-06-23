@@ -157,14 +157,12 @@ public class Literal extends Pred implements LogicalFormula {
                 Literal           lcloneAnnon = null; // a copy of lclone with makeVarsAnnon
                 
                 public boolean hasNext() {
-                    if (current == null)
-                        get();
+                    if (current == null) get();
                     return current != null;
                 }
 
                 public Unifier next() {
-                    if (current == null)
-                        get();
+                    if (current == null) get();
                     Unifier a = current;
                     current = null;
                     return a;
@@ -266,14 +264,8 @@ public class Literal extends Pred implements LogicalFormula {
 	}
 
     public String getErrorMsg(Agent ag) {
-    	String line = "";
-    	if (getSrcLine() >= 0) {
-    		line = ":"+getSrcLine();
-    	}
-    	String ia = "";
-    	if (isInternalAction()) {
-    		ia = " internal action";
-    	}
+    	String line = (getSrcLine() >= 0 ? ":"+getSrcLine() : "");
+    	String ia   = (isInternalAction() ? " internal action" : "");
         return "Error in "+ia+"'"+this+"' ("+ ag.getASLSource() + line + ")";    	
     }
     
@@ -288,8 +280,7 @@ public class Literal extends Pred implements LogicalFormula {
             }
         }
         int c = super.compareTo(t);
-        if (c != 0)
-            return c;
+        if (c != 0) return c;
         return 0;
     }        
 
@@ -304,9 +295,7 @@ public class Literal extends Pred implements LogicalFormula {
     @Override
     protected int calcHashCode() {
         int result = super.calcHashCode();
-        if (negated()) {
-            result += 3271;
-        }
+        if (negated()) result += 3271;
         return result;
     }
 
@@ -314,9 +303,8 @@ public class Literal extends Pred implements LogicalFormula {
 	/** return [~] super.getFunctorArity */
 	@Override 
     public PredicateIndicator getPredicateIndicator() {
-		if (predicateIndicatorCache == null) {
+		if (predicateIndicatorCache == null)
 		    predicateIndicatorCache = new PredicateIndicator(((type == LPos) ? "" : "~")+getFunctor(),getTermsSize());
-		}
 		return predicateIndicatorCache;
 	}
 	
@@ -325,9 +313,7 @@ public class Literal extends Pred implements LogicalFormula {
 		ListTerm l = new ListTermImpl();
 		l.add(new Literal(type, getFunctor()));
 		ListTerm lt = new ListTermImpl();
-		if (getTerms() != null) {
-			lt.addAll(getTerms());
-		}
+		if (getTerms() != null) lt.addAll(getTerms());
 		l.add(lt);
 		if (hasAnnot()) {
 			l.add((ListTerm)getAnnots().clone());

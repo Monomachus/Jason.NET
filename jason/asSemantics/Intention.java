@@ -133,7 +133,7 @@ public class Intention implements Serializable, Comparable<Intention> {
         return getIM(g,u) != null;
     }
 
-    /** remove all IMss until the IM with trigger te */
+    /** remove all IMs until the IM with trigger te */
     public boolean dropGoal(Trigger te, Unifier un) {
         IntendedMeans im = getIM(te, un);
         if (im != null) {

@@ -159,34 +159,34 @@ public class LogExpr implements LogicalFormula {
 	                public void remove() {}
 	            };
 	        }
-    	    } catch (Exception e) {
-        		String slhs = "is null";
-        		if (lhs != null) {
-        			Iterator<Unifier> i = lhs.logicalConsequence(ag,un);
-        			if (i != null) {
-        				slhs = "";
-        				while (i.hasNext()) {
-        					slhs += i.next().toString()+", ";
-        				}
-        			} else {
-        				slhs = "iterator is null";
-        			}
-        		} 
-        		String srhs = "is null";
-        		if (lhs != null) {
-        			Iterator<Unifier> i = rhs.logicalConsequence(ag,un);
-        			if (i != null) {
-        				srhs = "";
-        				while (i.hasNext()) {
-        					srhs += i.next().toString()+", ";
-        				}
-        			} else {
-        				srhs = "iterator is null";
-        			}
-        		} 
-        		
-        		logger.log(Level.SEVERE, "Error evaluating expression "+this+". \nlhs elements="+slhs+". \nrhs elements="+srhs,e);
-        	}
+	    } catch (Exception e) {
+    		String slhs = "is null";
+    		if (lhs != null) {
+    			Iterator<Unifier> i = lhs.logicalConsequence(ag,un);
+    			if (i != null) {
+    				slhs = "";
+    				while (i.hasNext()) {
+    					slhs += i.next().toString()+", ";
+    				}
+    			} else {
+    				slhs = "iterator is null";
+    			}
+    		} 
+    		String srhs = "is null";
+    		if (lhs != null) {
+    			Iterator<Unifier> i = rhs.logicalConsequence(ag,un);
+    			if (i != null) {
+    				srhs = "";
+    				while (i.hasNext()) {
+    					srhs += i.next().toString()+", ";
+    				}
+    			} else {
+    				srhs = "iterator is null";
+    			}
+    		} 
+    		
+    		logger.log(Level.SEVERE, "Error evaluating expression "+this+". \nlhs elements="+slhs+". \nrhs elements="+srhs,e);
+    	}
         return EMPTY_UNIF_LIST.iterator();  // empty iterator for unifier
     }   
 
@@ -214,15 +214,9 @@ public class LogExpr implements LogicalFormula {
 	public Object clone() {
 		// do not call constructor with term parameter!
 		LogExpr t = new LogExpr();
-		if (lhs != null) {
-			t.lhs = (LogicalFormula) lhs.clone();
-		}
-
-		t.op = this.op;
-		
-		if (rhs != null) {
-			t.rhs = (LogicalFormula) rhs.clone();
-		}
+        t.op = this.op;
+		if (lhs != null) t.lhs = (LogicalFormula) lhs.clone();
+		if (rhs != null) t.rhs = (LogicalFormula) rhs.clone();
 		return t;
 	}
 	
@@ -231,23 +225,11 @@ public class LogExpr implements LogicalFormula {
 	public boolean equals(Object t) {
 		if (t != null && t instanceof LogExpr) {
 			LogExpr eprt = (LogExpr)t;
-			if (lhs == null && eprt.lhs != null) {
-				return false;
-			}
-			if (lhs != null && !lhs.equals(eprt.lhs)) {
-				return false;
-			}
-			
-			if (op != eprt.op) {
-				return false;
-			}
-
-			if (rhs == null && eprt.rhs != null) {
-				return false;
-			}
-			if (rhs != null && !rhs.equals(eprt.rhs)) {
-				return false;
-			}
+			if (lhs == null && eprt.lhs != null) return false;
+			if (lhs != null && !lhs.equals(eprt.lhs)) return false;
+			if (op != eprt.op) return false;
+			if (rhs == null && eprt.rhs != null) return false;
+			if (rhs != null && !rhs.equals(eprt.rhs)) return false;
 			return true;
 		} 
 		return false;
@@ -256,10 +238,8 @@ public class LogExpr implements LogicalFormula {
     @Override
     public int hashCode() {
         int code = op.hashCode();
-        if (lhs != null)
-            code += lhs.hashCode();
-        if (rhs != null)
-            code += rhs.hashCode();
+        if (lhs != null) code += lhs.hashCode();
+        if (rhs != null) code += rhs.hashCode();
         return code;
     }	
     

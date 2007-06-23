@@ -116,14 +116,11 @@ public class PlanLibrary implements Iterable<Plan> {
         }
 
         // add label, if necessary
-        if (p.getLabel() == null) {
-        	setAutoLabel(p);
-        }
+        if (p.getLabel() == null) setAutoLabel(p);
 
         // add self source
-        if (!p.getLabel().hasSource()) {
-            p.getLabel().addAnnot(BeliefBase.TSelf);
-        }
+        if (!p.getLabel().hasSource()) p.getLabel().addAnnot(BeliefBase.TSelf);
+
         planLabels.put(p.getLabel().getFunctor(), p);
 
         if (p.getTriggerEvent().getLiteral().isVar()) {
@@ -172,7 +169,7 @@ public class PlanLibrary implements Iterable<Plan> {
     }
     
     public List<Plan> getPlans() {
-    	    return plans;
+        return plans;
     }
     
     public Iterator<Plan> iterator() {
@@ -224,17 +221,17 @@ public class PlanLibrary implements Iterable<Plan> {
     }
 
     public boolean isRelevant(PredicateIndicator pi) {
-        	List l = getAllRelevant(pi);
-        	return l != null && l.size() > 0;
+        List l = getAllRelevant(pi);
+        return l != null && l.size() > 0;
     }
 
 
     public List<Plan> getAllRelevant(PredicateIndicator pi) {
-        	List<Plan> l = relPlans.get(pi);
-        	if ((l == null || l.size() == 0) && varPlans.size() > 0) { // no rel plan, try varPlan
-        		l = varPlans;
-        	}
-        	return l;
+    	List<Plan> l = relPlans.get(pi);
+    	if ((l == null || l.size() == 0) && varPlans.size() > 0) { // no rel plan, try varPlan
+    		l = varPlans;
+    	}
+    	return l;
     }
 
     public static final Trigger TE_IDLE = Trigger.parseTrigger("+!idle");

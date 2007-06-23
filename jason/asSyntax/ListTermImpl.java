@@ -112,10 +112,8 @@ public class ListTermImpl extends Structure implements ListTerm {
     @Override
     public int calcHashCode() {
         int code = 37;
-        if (term != null) 
-            code += term.hashCode();
-        if (next != null)
-            code += next.hashCode();
+        if (term != null) code += term.hashCode();
+        if (next != null) code += next.hashCode();
         return code;
     }
     
@@ -150,24 +148,16 @@ public class ListTermImpl extends Structure implements ListTerm {
 	}
 	// for unifier compatibility
 	public Term getTerm(int i) {
-		if (i == 0) {
-			return term;
-		}
-		if (i == 1) {
-			return next;
-		}
+		if (i == 0) return term;
+		if (i == 1) return next;
 		return null;
 	}
 	
 	/** return the this ListTerm elements (0=Term, 1=ListTerm) */
 	public List<Term> getTerms() {
 		List<Term> l = new ArrayList<Term>(2);
-		if (term != null) {
-			l.add(term);
-		}
-		if (next != null) {
-			l.add(next);
-		}
+		if (term != null) l.add(term);
+		if (next != null) l.add(next);
 		return l;
 	}
 	

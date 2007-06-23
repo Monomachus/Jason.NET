@@ -166,15 +166,9 @@ public class RelExpr implements LogicalFormula {
 	public Object clone() {
 		// do not call constructor with term parameter!
 		RelExpr t = new RelExpr();
-		if (lhs != null) {
-			t.lhs = (Term) lhs.clone();
-		}
-
-		t.op = this.op;
-		
-		if (rhs != null) {
-			t.rhs = (Term) rhs.clone();
-		}
+        t.op = this.op;
+		if (lhs != null) t.lhs = (Term) lhs.clone();
+		if (rhs != null) t.rhs = (Term) rhs.clone();
 		return t;
 	}
 	
@@ -183,23 +177,11 @@ public class RelExpr implements LogicalFormula {
 	public boolean equals(Object t) {
 		if (t != null && t instanceof RelExpr) {
 			RelExpr eprt = (RelExpr)t;
-			if (lhs == null && eprt.lhs != null) {
-				return false;
-			}
-			if (lhs != null && !lhs.equals(eprt.lhs)) {
-				return false;
-			}
-			
-			if (op != eprt.op) {
-				return false;
-			}
-
-			if (rhs == null && eprt.rhs != null) {
-				return false;
-			}
-			if (rhs != null && !rhs.equals(eprt.rhs)) {
-				return false;
-			}
+			if (lhs == null && eprt.lhs != null) return false;
+			if (lhs != null && !lhs.equals(eprt.lhs)) return false;
+			if (op != eprt.op) return false;
+			if (rhs == null && eprt.rhs != null) return false;
+			if (rhs != null && !rhs.equals(eprt.rhs)) return false;
 			return true;
 		}
         return false;
@@ -208,10 +190,8 @@ public class RelExpr implements LogicalFormula {
     @Override
     public int hashCode() {
         int code = op.hashCode();
-        if (lhs != null)
-            code += lhs.hashCode();
-        if (rhs != null)
-            code += rhs.hashCode();
+        if (lhs != null) code += lhs.hashCode();
+        if (rhs != null) code += rhs.hashCode();
         return code;
     }
 	

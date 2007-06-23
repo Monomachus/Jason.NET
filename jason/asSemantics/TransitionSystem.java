@@ -609,7 +609,7 @@ public class TransitionSystem {
     public List<Option> relevantPlans(Trigger teP) throws JasonException {
         Trigger te = (Trigger) teP.clone();
         List<Option> rp = null;
-        List<Plan> candidateRPs = conf.ag.fPL.getAllRelevant(te.getPredicateIndicator());
+        List<Plan> candidateRPs = conf.ag.pl.getAllRelevant(te.getPredicateIndicator());
         if (candidateRPs != null) {
             for (Plan pl : candidateRPs) {
                 Unifier relUn = pl.relevant(te);
@@ -911,7 +911,7 @@ public class TransitionSystem {
             if (setts.isSync()) {
                 waitSyncSignal();
             } else if (canSleep()) {
-                if (getAg().fPL.getIdlePlans() != null) {
+                if (getAg().pl.getIdlePlans() != null) {
                     logger.fine("generating idle event");
                     C.addExternalEv(PlanLibrary.TE_IDLE);
                 } else {

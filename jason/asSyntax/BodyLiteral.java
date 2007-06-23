@@ -125,9 +125,7 @@ public class BodyLiteral implements Cloneable {
 
     public String getSrcInfo(Agent ag) {
     	String line = "";
-    	if (srcLine >= 0) {
-    		line = ":"+srcLine;
-    	}
+    	if (srcLine >= 0) line = ":"+srcLine;
     	return " ("+ag.getASLSource()+line+")";
     }
     
