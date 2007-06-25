@@ -41,6 +41,11 @@ import java.util.logging.Logger;
 
 /**
  * Runs MASProject using jade infrastructure.
+ * 
+ * This class reads the mas2j project and create the 
+ * corresponding agents.
+ * 
+ * @author Jomi
  */
 public class RunJadeMAS extends RunCentralisedMAS {
 
@@ -52,6 +57,12 @@ public class RunJadeMAS extends RunCentralisedMAS {
     public static void main(String[] args) {
         runner = new RunJadeMAS();
         runner.init(args);
+    }
+    
+    @Override
+    protected void createButtons() {
+        // TODO: add start RMA, Sniffer, DF buttons
+        // TODO: add debug button
     }
     
     @Override
@@ -79,7 +90,7 @@ public class RunJadeMAS extends RunCentralisedMAS {
                         String numberedAg = agName;
                         if (ap.qty > 1) numberedAg += (cAg + 1);
                         logger.fine("Creating agent " + numberedAg + " (" + (cAg + 1) + "/" + ap.qty + ")");
-                        AgentController ac = cc.createNewAgent(numberedAg, JadeAgArch.class.getName(), new Object[] { ap });
+                        AgentController ac = cc.createNewAgent(numberedAg, JadeAgArch.class.getName(), new Object[] { ap, debug, project.getControlClass() != null });
                         ags.put(numberedAg,ac);
                     }
                 } catch (Exception e) {
@@ -114,7 +125,16 @@ public class RunJadeMAS extends RunCentralisedMAS {
             }
             
         } catch (Exception e) {
-            logger.log(Level.SEVERE, "Error starting agents: ", e);            
+            logger.log(Level.SEVERE, "Error starting agents.", e);            
+        }
+    }
+    
+    @Override
+    public void finish() {
+        try {
+            new JadeRuntimeServices().stopMAS();
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Error stopping system.", e);            
         }
     }
 }

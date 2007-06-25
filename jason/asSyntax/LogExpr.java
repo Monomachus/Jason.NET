@@ -88,12 +88,24 @@ public class LogExpr implements LogicalFormula {
 		if (rhs != null && l < 0) l = getSrcLine(rhs);
 		return l;
 	}
+    private int getSrcLine(LogicalFormula f) {
+        if (f instanceof Term)    return ((Term)f).getSrcLine();
+        if (f instanceof LogExpr) return ((LogExpr)f).getSrcLine();
+        return -1;
+    }
     
-	private int getSrcLine(LogicalFormula f) {
-		if (f instanceof Term) return ((Term)f).getSrcLine();
-		if (f instanceof LogExpr) return ((LogExpr)f).getSrcLine();
-		return -1;
-	}
+    public String getSrc() {
+        String s = null;
+        if (lhs != null)              s = getSrc(lhs);
+        if (rhs != null && s != null) s = getSrc(rhs);
+        return s;     
+    }    
+    private String getSrc(LogicalFormula f) {
+        if (f instanceof Term)    return ((Term)f).getSrc();
+        if (f instanceof LogExpr) return ((LogExpr)f).getSrc();
+        return null;
+    }
+    
 	
     public Iterator<Unifier> logicalConsequence(final Agent ag, Unifier un) {
         try {

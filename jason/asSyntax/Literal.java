@@ -135,7 +135,7 @@ public class Literal extends Pred implements LogicalFormula {
                     return ((Iterator<Unifier>)oresult);
                 }
             } catch (Exception e) {
-                logger.log(Level.SEVERE, getErrorMsg(ag) + ": " +	e.getMessage(), e);
+                logger.log(Level.SEVERE, getErrorMsg() + ": " +	e.getMessage(), e);
             }
             return LogExpr.EMPTY_UNIF_LIST.iterator();  // empty iterator for unifier
         } else if (this.equals(LTrue)) {
@@ -263,10 +263,10 @@ public class Literal extends Pred implements LogicalFormula {
         return false;
 	}
 
-    public String getErrorMsg(Agent ag) {
+    public String getErrorMsg() {
     	String line = (getSrcLine() >= 0 ? ":"+getSrcLine() : "");
     	String ia   = (isInternalAction() ? " internal action" : "");
-        return "Error in "+ia+"'"+this+"' ("+ ag.getASLSource() + line + ")";    	
+        return "Error in "+ia+"'"+this+"' ("+ getSrc() + line + ")";    	
     }
     
     @Override

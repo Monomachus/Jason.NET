@@ -33,6 +33,7 @@ import org.w3c.dom.Document;
 /**
  * Concrete execution control implementation based on Jade infrastructure.
  */
+@SuppressWarnings("serial")
 public class JadeExecutionControl extends Agent implements ExecutionControlInfraTier {
 
     private ExecutionControl userControl;
@@ -147,6 +148,6 @@ public class JadeExecutionControl extends Agent implements ExecutionControlInfra
     }
 
     public RuntimeServicesInfraTier getRuntimeServices() {
-        return null; // TODO: new SaciRuntimeServices(getSociety());
+        return new JadeRuntimeServices();
     }
 }

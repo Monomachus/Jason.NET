@@ -23,8 +23,6 @@
 
 package jason.asSyntax;
 
-import jason.asSemantics.Agent;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -80,12 +78,14 @@ public class BodyLiteral implements Cloneable {
 
     LogicalFormula  formula;
     BodyType        formType;
+    String          source  = null;
     int             srcLine = -1;
     
     public BodyLiteral(BodyType t, Literal l) {
         formula = (Literal) l.clone();
         formType = t;
         srcLine = l.getSrcLine();
+        source  = l.getSrc();
         if (l.isInternalAction()) {
             formType = BodyType.internalAction;
         }
@@ -94,12 +94,14 @@ public class BodyLiteral implements Cloneable {
     public BodyLiteral(RelExpr re) {
         formula = (LogicalFormula) re.clone();
         srcLine = re.getSrcLine();
+        source  = re.getSrc();
         formType = BodyType.constraint;
     }
 
     public BodyLiteral(LogExpr le) {
         formula = (LogicalFormula) le.clone();
         srcLine = le.getSrcLine();
+        source  = le.getSrc();
         formType = BodyType.test;
     }
 
@@ -123,10 +125,11 @@ public class BodyLiteral implements Cloneable {
         ((Literal)formula).addTerm(t);
     }
 
-    public String getSrcInfo(Agent ag) {
+    public String getSrcInfo() {
     	String line = "";
-    	if (srcLine >= 0) line = ":"+srcLine;
-    	return " ("+ag.getASLSource()+line+")";
+    	if (srcLine >= 0)   line = ":"+srcLine;
+        if (source != null) line = source+line;
+    	return " ("+line+")";
     }
     
     @Override

@@ -67,6 +67,7 @@ public class Plan implements Cloneable, Serializable {
     
     private int               startSourceLine = 0;
     private int               endSourceLine   = 0;
+    private String            source          = null;
     
     static private Logger     logger          = Logger.getLogger(Plan.class.getName());
     
@@ -132,16 +133,21 @@ public class Plan implements Cloneable, Serializable {
         }
     }
     
-    public void setSourceLines(int b, int e) {
+    public void setSrc(String asSource) {
+        source = asSource;
+    }
+    public String getSrc() {
+        return source;
+    }
+    
+    public void setSrcLines(int b, int e) {
         startSourceLine = b;
         endSourceLine   = e;
     }
-    
-    public int getStartSourceLine() {
+    public int getStartSrcLine() {
         return startSourceLine;
     }
-    
-    public int getEndSourceLine() {
+    public int getEndSrcLine() {
         return endSourceLine;
     }
     
@@ -220,6 +226,7 @@ public class Plan implements Cloneable, Serializable {
         
         p.startSourceLine = startSourceLine;
         p.endSourceLine   = endSourceLine;
+        p.source          = source;
 
         return p;
     }

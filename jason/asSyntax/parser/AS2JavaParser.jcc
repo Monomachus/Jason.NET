@@ -46,21 +46,7 @@ PARSER_BEGIN(as2j)
   import jason.asSyntax.Trigger.TEType;
 
   public class as2j {
-
-    private String name;
-    private File source = null;
-
-    private PrintStream out = System.out;
-
-    /* Auxiliary Functions */
-
-    void setName(String n) {
-    	name = n;
-    }
-
-    void setSource(File f) {
-        source = f;
-    }
+    private String asSource = null;
   }
 
 PARSER_END(as2j)
@@ -135,6 +121,7 @@ void agent_component(Agent a) throws jason.JasonException :
                        { Literal b;
                          Literal g;
                          Plan    p;
+                         if (a != null) asSource = a.getASLSrc();
                        }
 {
   ( 
@@ -198,7 +185,8 @@ Plan plan() :         { Token k; Pred L = null;
     k = "."                      { if (start == -1) start = k.beginLine; } 
                    { end = k.beginLine;
                      Plan p = new Plan(L,T,(LogicalFormula)C,B);
-                     p.setSourceLines(start,end);
+                     p.setSrcLines(start,end);
+                     p.setSrc(asSource);
                      return p;}
                    }
 
@@ -301,6 +289,7 @@ Pred pred() :       { Token K; Pred p; Term t; List l; ListTerm lt;}
    K=<TK_END>
   )                  { p = new Pred(K.image);
                        p.setSrcLine(K.beginLine);
+                       p.setSrc(asSource);
                      } 
   
   [
@@ -330,6 +319,7 @@ Term term() :       { Term u; Object o; }
                       if (l.isAtom() && !l.negated()) {
                          Atom a = new Atom(l.getFunctor());
                          a.setSrcLine(l.getSrcLine());
+                         a.setSrc(l.getSrc());
                          return a;
                       }
                     }
@@ -346,7 +336,7 @@ ListTermImpl list() : { ListTermImpl lt = new ListTermImpl(); ListTerm last;
 {
   "["
   [
-  f=term()                { last = lt.append(f); lt.setSrcLine(f.getSrcLine()); }
+  f=term()                { last = lt.append(f); lt.setSrcLine(f.getSrcLine()); lt.setSrc(f.getSrc());}
   ( "," f=term()          { last = last.append(f); }
   )*
   [ "|"  ( K=<VAR>        { last.setNext(new VarTerm(K.image)); }
@@ -489,6 +479,7 @@ Object arithm_expr_simple():
 {
  ( K = <NUMBER>                 { n = new NumberTermImpl(K.image); 
                                   n.setSrcLine(K.beginLine); 
+                                  n.setSrc(asSource);
                                   return n;
                                 }
  | "-" t = arithm_expr_simple() { if (!(t instanceof NumberTerm)) {
@@ -504,7 +495,7 @@ Object arithm_expr_simple():
 
 VarTerm var():      { Token K; VarTerm v; ListTerm lt; }
 {
- ( K = <VAR>        { v = new VarTerm(K.image); v.setSrcLine(K.beginLine); }
+ ( K = <VAR>        { v = new VarTerm(K.image); v.setSrcLine(K.beginLine); v.setSrc(asSource);}
  | K = <UNNAMEDVAR> { v = new UnnamedVar(); }
  )
  [ 
@@ -517,6 +508,7 @@ StringTerm string():{ Token k; StringTermImpl s; }
 {
   k = <STRING>      { s = new StringTermImpl(k.image.substring(1,k.image.length()-1)); 
                       s.setSrcLine(k.beginLine); 
+                      s.setSrc(asSource);
                       return s;
                     } 
 }

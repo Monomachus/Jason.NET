@@ -23,25 +23,36 @@
 
 package jason.infra.jade;
 
-import jade.core.Agent;
+import jade.core.AID;
+import jade.core.behaviours.CyclicBehaviour;
+import jade.lang.acl.ACLMessage;
+import jade.lang.acl.MessageTemplate;
+import jason.asSemantics.Message;
+import jason.asSyntax.Structure;
 import jason.environment.Environment;
 import jason.environment.EnvironmentInfraTier;
 import jason.mas2j.ClassParameters;
 import jason.runtime.RuntimeServicesInfraTier;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
  * This class implements the Jade version of the environment
  * infrastructure tier. 
+ * 
+ * @author Jomi
  */
-public class JadeEnvironment extends Agent implements EnvironmentInfraTier {
+@SuppressWarnings("serial")
+public class JadeEnvironment extends JadeAg implements EnvironmentInfraTier {
 
     private Environment userEnv;
 
-    static Logger       logger = Logger.getLogger(JadeEnvironment.class.getName());
+    static Logger logger = Logger.getLogger(JadeEnvironment.class.getName());
 
     public JadeEnvironment() {
     }
@@ -64,85 +75,71 @@ public class JadeEnvironment extends Agent implements EnvironmentInfraTier {
         }
 
         try {
-
             // add a message handler to answer perception asks
             // this handler filter is
             // . content: getPercepts
-            // . performative: ask-all
-            // . language: all
-            // . ontology: AS-Perception
-            /*
-            mbox.addMessageHandler("getPercepts", "ask-all", null, "AS-Perception", new MessageHandler() {
-                public boolean processMessage(saci.Message m) {
-                    saci.Message r = null;
-                    try {
-                        r = new saci.Message("(tell)");
-                        r.put("receiver", m.get("sender"));
-                        r.put("in-reply-to", m.get("reply-with"));
-                        r.put("ontology", m.get("ontology"));
-
-                        List percepts = userEnv.getPercepts(m.get("sender").toString());
-                        if (percepts != null) {
-                            synchronized (percepts) {
-                                r.put("content", percepts.toString());
+            final MessageTemplate pt = MessageTemplate.MatchContent("getPercepts");
+            addBehaviour(new CyclicBehaviour() {
+                public void action() {
+                    ACLMessage m = receive(pt);
+                    if (m == null) {
+                        block();
+                    } else {
+                        ACLMessage r = new ACLMessage(ACLMessage.INFORM);
+                        r.addReceiver(m.getSender());
+                        r.setInReplyTo(m.getReplyWith());
+                        ArrayList percepts = (ArrayList)userEnv.getPercepts(m.getSender().getLocalName());
+                        try {
+                            if (percepts == null) {
+                                r.setContentObject("nothing_new");
+                            } else {
+                                synchronized (percepts) {
+                                    r.setContentObject(percepts);
+                                }
                             }
+                        } catch (IOException e) {
+                            e.printStackTrace();
                         }
-                        mbox.sendMsg(r);
-
-                    } catch (Exception e) {
-                        logger.log(Level.SEVERE, "Error sending message " + r, e);
+                        send(r);
                     }
-                    return true; // no other message handler gives this
-                                    // message
                 }
             });
 
             // add a message handler to answer action asks
-            // this handler filter is
-            // . content: execute
-            // . performative: ask
-            // . language: all
-            // . ontology: AS-Action
-            mbox.addMessageHandler("execute", "ask", null, "AS-Action", new MessageHandler() {
-                public boolean processMessage(saci.Message m) {
-                    saci.Message r = null;
-                    try {
-                        r = new saci.Message("(tell)");
-                        r.put("receiver", m.get("sender"));
-                        r.put("in-reply-to", m.get("reply-with"));
-                        r.put("ontology", m.get("ontology"));
-                        String sender = m.get("sender").toString();
-                        Structure action = Structure.parse((String) m.get("action"));
-
-                        // logger.info("doing: "+action);
-
-                        if (userEnv.executeAction(sender, action)) {
-                            r.put("content", "ok");
-                        } else {
-                            r.put("content", "error");
+            final MessageTemplate at = MessageTemplate.MatchOntology("AS-actions");
+            addBehaviour(new CyclicBehaviour() {
+                public void action() {
+                    ACLMessage m = receive(at);
+                    if (m == null) {
+                        block();
+                    } else {
+                        ACLMessage r = new ACLMessage(ACLMessage.INFORM);
+                        r.addReceiver(m.getSender());
+                        r.setInReplyTo(m.getReplyWith());
+                        r.setOntology(m.getOntology());
+                        Structure action;
+                        try {
+                            action = (Structure)m.getContentObject();
+                            if (userEnv.executeAction(m.getSender().getLocalName(), action)) {
+                                r.setContent("ok");
+                            } else {
+                                r.setContent("error");
+                            }
+                            send(r);
+                        } catch (Exception e) {
+                            e.printStackTrace();
                         }
-
-                        if (mbox != null) { // the agent could be out meanwhile
-                            mbox.sendMsg(r);
-                        }
-                    } catch (Exception e) {
-                        logger.log(Level.SEVERE, "Error sending message " + e, e);
                     }
-                    return true; // no other message handler gives this
-                                    // message
                 }
             });
-            */
-
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error starting agent", e);
         }
     }
+
     public void informAgsEnvironmentChanged() {
         try {
-            // TODO:
-            //saci.Message m = new saci.Message("(tell :content environmentChanged)");
-            //mbox.broadcast(m);
+            broadcast(new Message("tell", null, null, "environmentChanged"));
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error sending notifyEvents ", e);
         }
@@ -153,32 +150,24 @@ public class JadeEnvironment extends Agent implements EnvironmentInfraTier {
             if (agentsToNotify == null) {
                 informAgsEnvironmentChanged();
             } else {
-                // TODO:
-                //saci.Message m = new saci.Message("(tell :content environmentChanged)");
-                //Iterator i = agentsToNotify.iterator();
-                //while (i.hasNext()) {
-                //    m.put("receiver", i.next().toString());
-                //    mbox.sendMsg(m);
-                //}
+                ACLMessage m = new ACLMessage(ACLMessage.INFORM);
+                m.setContent("environmentChanged");
+                Iterator i = agentsToNotify.iterator();
+                while (i.hasNext()) {
+                    m.addReceiver(new AID(i.next().toString(), AID.ISLOCALNAME));
+                }
+                send(m);
             }
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error sending notifyEvents ", e);
         }
     }
 
-
-    /**
-     * TODO:
-     */
     public void stopAg() {
-        //userEnv.stop();
-        //super.stopAg();
+        userEnv.stop();
     }
 
-    /**
-     * TODO:
-     */
     public RuntimeServicesInfraTier getRuntimeServices() {
-        return null; //new SaciRuntimeServices(getSociety());
+        return new JadeRuntimeServices();
     }
 }

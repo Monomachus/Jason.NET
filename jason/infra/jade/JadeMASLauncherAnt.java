@@ -19,10 +19,9 @@ public class JadeMASLauncherAnt extends CentralisedMASLauncherAnt implements MAS
         new Thread() {
             public void run() {
                 try {
-                    // TODO:
-                    //new SaciRuntimeServices(project.getSocName()).stopMAS();
+                    new JadeRuntimeServices().stopMAS();
                 } catch (Exception e) {
-                    logger.log(Level.SEVERE, "Error stoping saci MAS", e);
+                    logger.log(Level.SEVERE, "Error stoping jade MAS", e);
                 }
             }
         }.start();

@@ -410,7 +410,7 @@ public class TransitionSystem {
                     updateIntention();
                 }
             } catch (Exception e) {
-                logger.log(Level.SEVERE, body.getErrorMsg(getAg())+": "+ e.getMessage(), e);
+                logger.log(Level.SEVERE, body.getErrorMsg()+": "+ e.getMessage(), e);
                 ok = false;
             }
             if (!ok) {
@@ -424,7 +424,7 @@ public class TransitionSystem {
                 im.unif = iu.next();
                 updateIntention();
             } else {
-                logger.info("Constraint "+h+" was not satisfied"+h.getSrcInfo(getAg())+".");
+                logger.info("Constraint "+h+" was not satisfied"+h.getSrcInfo()+".");
                 generateGoalDeletion();
             }
             break;
@@ -447,6 +447,7 @@ public class TransitionSystem {
         // Rule Test
         case test:
             LogicalFormula f = h.getLogicalFormula();
+            f.apply(u);
             if (conf.ag.believes(f, u)) {
                 updateIntention();
             } else {
@@ -464,7 +465,7 @@ public class TransitionSystem {
 	                } 
             	}
                 if (fail) {
-                    logger.info("Test '"+h+"' failed"+h.getSrcInfo(getAg())+".");
+                    logger.info("Test '"+h+"' failed"+h.getSrcInfo()+".");
                     generateGoalDeletion();
                 }
             }

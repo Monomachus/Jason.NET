@@ -24,9 +24,7 @@
 package jason.infra.centralised;
 
 import jason.JasonException;
-import jason.architecture.AgArch;
 import jason.asSyntax.directives.Include;
-import jason.bb.DefaultBeliefBase;
 import jason.control.ExecutionControlGUI;
 import jason.mas2j.AgentParameters;
 import jason.mas2j.ClassParameters;
@@ -156,76 +154,7 @@ public class RunCentralisedMAS {
             if (MASConsoleGUI.hasConsole()) {
                 MASConsoleGUI.get().setTitle("MAS Console - " + project.getSocName());
 
-                // add Button
-                JButton btStop = new JButton("Stop", new ImageIcon(RunCentralisedMAS.class.getResource("/images/suspend.gif")));
-                btStop.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent evt) {
-                        MASConsoleGUI.get().setPause(false);
-                        runner.finish();
-                    }
-                });
-                MASConsoleGUI.get().addButton(btStop);
-
-                // add Button
-                runner.btDebug = new JButton("Debug", new ImageIcon(RunCentralisedMAS.class.getResource("/images/debug.gif")));
-                runner.btDebug.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent evt) {
-                        runner.changeToDebugMode();
-                        runner.btDebug.setEnabled(false);
-                        if (runner.control != null) {
-                            try {
-                                runner.control.getUserControl().setRunningCycle(false);
-                            } catch (Exception e) { }
-                        }
-                    }
-                });
-                if (debug) {
-                    runner.btDebug.setEnabled(false);
-                }
-                MASConsoleGUI.get().addButton(runner.btDebug);
-
-                // add Button pause
-                final JButton btPause = new JButton("Pause", new ImageIcon(RunCentralisedMAS.class.getResource("/images/resume_co.gif")));
-                btPause.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent evt) {
-                        if (MASConsoleGUI.get().isPause()) {
-                            btPause.setText("Pause");
-                            MASConsoleGUI.get().setPause(false);
-                        } else {
-                            btPause.setText("Continue");
-                            MASConsoleGUI.get().setPause(true);
-                        }
-
-                    }
-                });
-                MASConsoleGUI.get().addButton(btPause);
-
-                // add show sources button
-                final JButton btShowSrc = new JButton("Show sources", new ImageIcon(RunCentralisedMAS.class.getResource("/images/list.gif")));
-                btShowSrc.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent evt) {
-                        showProjectSources(project);
-                    }
-                });
-                MASConsoleGUI.get().addButton(btShowSrc);
-
-                // add Button start
-                final JButton btStartAg = new JButton("Start new agent", new ImageIcon(RunCentralisedMAS.class.getResource("/images/newAgent.gif")));
-                btStartAg.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent evt) {
-                        new StartNewAgentGUI(MASConsoleGUI.get().getFrame(), "Start a new agent to run in current MAS", System.getProperty("user.dir"));
-                    }
-                });
-                MASConsoleGUI.get().addButton(btStartAg);
-
-                // add Button kill
-                final JButton btKillAg = new JButton("Kill agent", new ImageIcon(RunCentralisedMAS.class.getResource("/images/killAgent.gif")));
-                btKillAg.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent evt) {
-                        new KillAgentGUI(MASConsoleGUI.get().getFrame(), "Kill an agent of the current MAS");
-                    }
-                });
-                MASConsoleGUI.get().addButton(btKillAg);          
+                createButtons();
             }
 
             runner.waitEnd();
@@ -282,6 +211,79 @@ public class RunCentralisedMAS {
     	}
     }
 
+    protected void createButtons() {
+        // add Button
+        JButton btStop = new JButton("Stop", new ImageIcon(RunCentralisedMAS.class.getResource("/images/suspend.gif")));
+        btStop.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                MASConsoleGUI.get().setPause(false);
+                runner.finish();
+            }
+        });
+        MASConsoleGUI.get().addButton(btStop);
+
+        // add Button
+        runner.btDebug = new JButton("Debug", new ImageIcon(RunCentralisedMAS.class.getResource("/images/debug.gif")));
+        runner.btDebug.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                runner.changeToDebugMode();
+                runner.btDebug.setEnabled(false);
+                if (runner.control != null) {
+                    try {
+                        runner.control.getUserControl().setRunningCycle(false);
+                    } catch (Exception e) { }
+                }
+            }
+        });
+        if (debug) {
+            runner.btDebug.setEnabled(false);
+        }
+        MASConsoleGUI.get().addButton(runner.btDebug);
+
+        // add Button pause
+        final JButton btPause = new JButton("Pause", new ImageIcon(RunCentralisedMAS.class.getResource("/images/resume_co.gif")));
+        btPause.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                if (MASConsoleGUI.get().isPause()) {
+                    btPause.setText("Pause");
+                    MASConsoleGUI.get().setPause(false);
+                } else {
+                    btPause.setText("Continue");
+                    MASConsoleGUI.get().setPause(true);
+                }
+
+            }
+        });
+        MASConsoleGUI.get().addButton(btPause);
+
+        // add show sources button
+        final JButton btShowSrc = new JButton("Show sources", new ImageIcon(RunCentralisedMAS.class.getResource("/images/list.gif")));
+        btShowSrc.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                showProjectSources(project);
+            }
+        });
+        MASConsoleGUI.get().addButton(btShowSrc);
+
+        // add Button start
+        final JButton btStartAg = new JButton("Start new agent", new ImageIcon(RunCentralisedMAS.class.getResource("/images/newAgent.gif")));
+        btStartAg.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                new StartNewAgentGUI(MASConsoleGUI.get().getFrame(), "Start a new agent to run in current MAS", System.getProperty("user.dir"));
+            }
+        });
+        MASConsoleGUI.get().addButton(btStartAg);
+
+        // add Button kill
+        final JButton btKillAg = new JButton("Kill agent", new ImageIcon(RunCentralisedMAS.class.getResource("/images/killAgent.gif")));
+        btKillAg.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                new KillAgentGUI(MASConsoleGUI.get().getFrame(), "Kill an agent of the current MAS");
+            }
+        });
+        MASConsoleGUI.get().addButton(btKillAg);        
+    }
+    
     public static RunCentralisedMAS getRunner() {
         return runner;
     }

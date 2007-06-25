@@ -57,7 +57,6 @@ public class Pred extends Structure {
     public Pred(Pred p) {
         this((Structure) p);
         copyAnnot(p);
-        this.srcLine = p.srcLine;
     }
 
     public static Pred parsePred(String sPred) {

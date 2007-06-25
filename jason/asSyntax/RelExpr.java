@@ -70,7 +70,7 @@ public class RelExpr implements LogicalFormula {
 		literalBuilder { public String toString() { return " =.. "; } };
 	}
 
-    private Term lhs, rhs;
+    private Term         lhs, rhs;
 	private RelationalOp op = RelationalOp.none;
 
 	static private Logger logger = Logger.getLogger(RelExpr.class.getName());
@@ -98,6 +98,13 @@ public class RelExpr implements LogicalFormula {
 		if (rhs != null && l < 0) l = rhs.getSrcLine();
 		return l;
 	}
+    
+    public String getSrc() {
+        String s = null;
+        if (lhs != null)              s = lhs.getSrc();
+        if (rhs != null && s != null) s = rhs.getSrc();
+        return s;     
+    }
 	
     public Iterator<Unifier> logicalConsequence(final Agent ag, Unifier un) {
         Term xp = (Term)lhs.clone();

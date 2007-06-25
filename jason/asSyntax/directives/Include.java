@@ -22,7 +22,7 @@ public class Include implements Directive {
     public Agent process(Pred directive, Agent outterContent, Agent innerContent) {
     	String file = ((StringTerm)directive.getTerm(0)).getString();
         try {
-        	String outterPrefix = outterContent.getASLSource();
+        	String outterPrefix = outterContent.getASLSrc();
 	    	InputStream in;
 	    	if (outterContent != null && outterPrefix != null) {
 	    		// check if the outter is URL
@@ -46,7 +46,7 @@ public class Include implements Directive {
 	    	}
 
         	Agent ag = new Agent();
-	    	ag.setASLSource(file);
+	    	ag.setASLSrc(file);
             as2j parser = new as2j(in); 
             parser.agent(ag);
             logger.fine("as2j: AgentSpeak program '"+file+"' parsed successfully!");

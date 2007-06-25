@@ -64,6 +64,8 @@ public class Structure extends DefaultTerm {
     public Structure(Structure t) {
         functor = t.getFunctor();
         setTerms(t.getDeepCopyOfTerms());
+        this.srcLine = t.srcLine;
+        this.source  = t.source;
     }
 
     public static Structure parse(String sTerm) {
