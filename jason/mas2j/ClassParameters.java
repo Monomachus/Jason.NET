@@ -32,6 +32,10 @@ public class ClassParameters {
         }
     }
     
+    public boolean hasParameters() {
+        return !parameters.isEmpty();
+    }
+    
     public String[] getParametersArray() {        
         String[] p = new String[parameters.size()];
         int i=0;
@@ -42,11 +46,13 @@ public class ClassParameters {
     }
     
     /** returns parameters with space as separator */
-    public String getParametersStr() {
+    public String getParametersStr(String sep) {
         StringBuilder out = new StringBuilder();
         if (parameters.size() > 0) {
-            for (String s: parameters) {
-                out.append(s+" ");
+            Iterator<String> i = parameters.iterator();
+            while (i.hasNext()) {
+                out.append(i.next());
+                if (i.hasNext()) out.append(sep);
             }
         }
         return out.toString();

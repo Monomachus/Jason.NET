@@ -71,7 +71,7 @@
         <java classname="<PROJECT-RUNNER-CLASS>"
               failonerror="true" fork="yes" dir="${basedir}" >
             <classpath refid="project.classpath"/>
-            <arg line="${mas2j.project.file} ${debug}"/>
+            <arg line="${mas2j.project.file} ${debug} <RUN-ARGS>"/>
         </java>
     </target>
 

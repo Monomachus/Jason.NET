@@ -64,6 +64,7 @@
 		<!-- values -->
  		<LITERAL2>Centralised</LITERAL2>
  		<LITERAL2>Saci</LITERAL2>
+ 		<LITERAL2>Jade</LITERAL2>
 
  		<FUNCTION>discard</FUNCTION>
  		<FUNCTION>requeue</FUNCTION>

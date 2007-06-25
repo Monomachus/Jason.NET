@@ -79,6 +79,12 @@ public class MAS2JProject {
         }
     }
     
+    public void setupDefault() {
+        if (envClass == null) {
+            envClass = new ClassParameters(jason.environment.Environment.class.getName());
+        }
+    }
+    
 	public void setDirectory(String d) {
 		if (d != null) {
 			projectDir = d;

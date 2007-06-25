@@ -76,9 +76,9 @@ public class RunCentralisedMAS {
 
     private static Logger            logger      = Logger.getLogger(RunCentralisedMAS.class.getName());
 
-    private static RunCentralisedMAS runner      = null;
-    private static String            urlPrefix   = "";
-    private static boolean           readFromJAR = false;
+    protected static RunCentralisedMAS runner      = null;
+    private   static String            urlPrefix   = "";
+    private   static boolean           readFromJAR = false;
     
     private static MAS2JProject      project;
     
@@ -87,6 +87,11 @@ public class RunCentralisedMAS {
     public final static String       defaultProjectFileName = "default.mas2j";
     
     public static void main(String[] args) {
+        runner = new RunCentralisedMAS();
+        runner.init(args);
+    }
+    
+    public void init(String[] args) {
     	String projectFileName = null;
         if (args.length < 1) {
         	if (RunCentralisedMAS.class.getResource("/"+defaultProjectFileName) != null) {
@@ -118,8 +123,6 @@ public class RunCentralisedMAS {
             }
         }
 
-        runner = new RunCentralisedMAS();
-
         int errorCode = 0;
 
         try {
@@ -142,6 +145,7 @@ public class RunCentralisedMAS {
         	}
             jason.mas2j.parser.mas2j parser = new jason.mas2j.parser.mas2j(inProject); 
             project = parser.mas();
+            project.setupDefault();
 
             project.registerDirectives();
             
@@ -150,6 +154,8 @@ public class RunCentralisedMAS {
             runner.startSyncMode();
 
             if (MASConsoleGUI.hasConsole()) {
+                MASConsoleGUI.get().setTitle("MAS Console - " + project.getSocName());
+
                 // add Button
                 JButton btStop = new JButton("Stop", new ImageIcon(RunCentralisedMAS.class.getResource("/images/suspend.gif")));
                 btStop.addActionListener(new ActionListener() {
@@ -292,37 +298,17 @@ public class RunCentralisedMAS {
         return project;
     }
 
-    void createAg(MAS2JProject project, boolean debug) throws JasonException {
-
-        if (MASConsoleGUI.hasConsole()) {
-            MASConsoleGUI.get().setTitle("MAS Console - " + project.getSocName());
-        }
-
+    protected void createAg(MAS2JProject project, boolean debug) throws JasonException {
         // create environment
-        ClassParameters envClass = project.getEnvClass();
-        if (envClass == null) {
-            envClass = new ClassParameters(jason.environment.Environment.class.getName());
-        }
-        logger.fine("Creating environment " + envClass);
-        env = new CentralisedEnvironment(envClass, this);
+        logger.fine("Creating environment " + project.getEnvClass());
+        env = new CentralisedEnvironment(project.getEnvClass(), this);
 
         // create the agents
         for (AgentParameters ap : project.getAgents()) {
             try {
-                String agName = ap.name;
+                ap.setupDefault();
 
-                ClassParameters tmpAgClass = ap.agClass;
-                if (tmpAgClass == null) {
-                    tmpAgClass = new ClassParameters(jason.asSemantics.Agent.class.getName());
-                }
-                ClassParameters tmpAgArchClass = ap.archClass;
-                if (tmpAgArchClass == null) {
-                    tmpAgArchClass = new ClassParameters(AgArch.class.getName());
-                }
-                ClassParameters tmpBBClass = ap.bbClass;
-                if (tmpBBClass == null) {
-                    tmpBBClass = new ClassParameters(DefaultBeliefBase.class.getName());
-                }
+                String agName = ap.name;
 
                 String tmpAsSrc = ap.asSource.toString();
                 if (!tmpAsSrc.startsWith(File.separator) && !project.getDirectory().equals("."+File.separator)) {
@@ -339,7 +325,7 @@ public class RunCentralisedMAS {
                     CentralisedAgArch agArch = new CentralisedAgArch();
                     agArch.setAgName(numberedAg);
                     agArch.setEnvInfraTier(env);
-                    agArch.initAg(tmpAgArchClass.className, tmpAgClass.className, tmpBBClass, tmpAsSrc, ap.getAsSetts(debug, project.getControlClass() != null), this);
+                    agArch.initAg(ap.archClass.className, ap.agClass.className, ap.bbClass, tmpAsSrc, ap.getAsSetts(debug, project.getControlClass() != null), this);
                     addAg(agArch);
                 }
             } catch (Exception e) {
@@ -393,7 +379,7 @@ public class RunCentralisedMAS {
     	return ags;
     }
     
-    void startAgs() {
+    protected void startAgs() {
         // run the agents
         for (CentralisedAgArch ag : ags.values()) {
             ag.setControlInfraTier(control);
@@ -401,14 +387,14 @@ public class RunCentralisedMAS {
         }
     }
 
-    void stopAgs() {
+    protected void stopAgs() {
         // run the agents
         for (CentralisedAgArch ag : ags.values()) {
             ag.stopAg();
         }
     }
 
-    void startSyncMode() {
+    protected void startSyncMode() {
         if (control != null) {
             // start the execution, if it is controlled
             try {

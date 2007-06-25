@@ -1,5 +1,7 @@
 package jason.mas2j;
 
+import jason.architecture.AgArch;
+import jason.bb.DefaultBeliefBase;
 import jason.runtime.Settings;
 
 import java.io.File;
@@ -26,6 +28,18 @@ public class AgentParameters {
 		return getAsInMASProject();
 	}
 	
+    public void setupDefault() {
+        if (agClass == null) {
+            agClass = new ClassParameters(jason.asSemantics.Agent.class.getName());
+        }
+        if (archClass == null) {
+            archClass = new ClassParameters(AgArch.class.getName());
+        }
+        if (bbClass == null) {
+            bbClass = new ClassParameters(DefaultBeliefBase.class.getName());
+        }        
+    }
+    
 	public String getAsInMASProject() {
         StringBuilder s = new StringBuilder(name+" ");
 		if (asSource != null && !asSource.getName().startsWith(name)) {

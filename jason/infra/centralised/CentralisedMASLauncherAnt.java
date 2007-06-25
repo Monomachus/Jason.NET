@@ -188,6 +188,7 @@ public class CentralisedMASLauncherAnt implements MASLauncherInfraTier {
         script = replace(script, "<OTHER-TASK>", "");
         script = replace(script, "<JASON-HOME>", Config.get().getJasonHome());
         script = replace(script, "<JASON-HOME>", Config.get().getJasonHome());
+        script = replace(script, "<RUN-ARGS>", "");
         
         return script;
     }
