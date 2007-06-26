@@ -869,17 +869,19 @@ public class TransitionSystem {
      * wainting a signal
      */
     public void receiveSyncSignal() {
-        try {
-            synchronized (syncMonitor) {
-                while (!inWaitSyncMonitor && agArch.isRunning()) {
-                    // waits the agent to enter in waitSyncSignal
-                    syncMonitor.wait(50); 
+        if (setts.isSync()) {
+            try {
+                synchronized (syncMonitor) {
+                    while (!inWaitSyncMonitor && agArch.isRunning()) {
+                        // waits the agent to enter in waitSyncSignal
+                        syncMonitor.wait(50); 
+                    }
+                    syncMonitor.notifyAll();
                 }
-                syncMonitor.notifyAll();
+            } catch (InterruptedException e) {
+            } catch (Exception e) {
+                logger.log(Level.WARNING,"Error waiting sync (2)", e);
             }
-        } catch (InterruptedException e) {
-        } catch (Exception e) {
-            logger.log(Level.WARNING,"Error waiting sync (2)", e);
         }
     }
 
@@ -915,10 +917,8 @@ public class TransitionSystem {
                 if (getAg().pl.getIdlePlans() != null) {
                     logger.fine("generating idle event");
                     C.addExternalEv(PlanLibrary.TE_IDLE);
-                } else {
-                    if (nrcslbr <= 1) {
-                        waitMessage();
-                    }
+                } else if (nrcslbr <= 1) {
+                    waitMessage();
                 }
             }
             if (!agArch.isRunning()) return;

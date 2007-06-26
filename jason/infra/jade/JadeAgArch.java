@@ -5,7 +5,6 @@ import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
-import jade.wrapper.ControllerException;
 import jason.architecture.AgArch;
 import jason.architecture.AgArchInfraTier;
 import jason.asSemantics.ActionExec;
@@ -72,6 +71,11 @@ public class JadeAgArch extends JadeAg implements AgArchInfraTier {
             Settings stts          = null;
 
             Object[] args = getArguments();
+            if (args == null) {
+                logger.info("No AgentSpeak source informed!");
+                return;
+                //args = new Object[] { "a.asl" };
+            }
             if (args[0] instanceof AgentParameters) {
                 AgentParameters ap = (AgentParameters)args[0];
                 asSource      = ap.asSource.getAbsolutePath();
@@ -153,17 +157,25 @@ public class JadeAgArch extends JadeAg implements AgArchInfraTier {
         }
     }
 
+    @Override
+    public void doDelete() {
+        try {
+            running = false;
+            if (userAgArh != null) {
+                userAgArh.stopAg();
+                userAgArh.getTS().receiveSyncSignal();    // in case the agent is waiting sync
+                userAgArh.getTS().newMessageHasArrived(); // in case the agent is waiting messages
+            }
+        } catch (Exception e) {
+            logger.log(Level.SEVERE,"Error in doDelete.",e);
+        } finally {
+            super.doDelete();
+        }
+    }
+    
 	@Override
 	protected void takeDown() {
-        super.takeDown();
-        new Thread() {
-            public void run() {
-                userAgArh.stopAg();
-            }
-        }.start();
-        userAgArh.getTS().receiveSyncSignal();    // in case the agent is waiting sync
-        userAgArh.getTS().newMessageHasArrived(); // in case the agent is waiting messages
-        logger.info("finished running.");
+        logger.info("Finished!");
 	}
 	
 	
@@ -180,7 +192,7 @@ public class JadeAgArch extends JadeAg implements AgArchInfraTier {
 	}
 
 	public boolean canSleep() {
-		return getCurQueueSize() == 0;
+		return getCurQueueSize() == 0 && isRunning();
 	}
 
 	public void checkMail() {
@@ -299,12 +311,7 @@ public class JadeAgArch extends JadeAg implements AgArchInfraTier {
 	}
 
 	public RuntimeServicesInfraTier getRuntimeServices() {
-		try {
-            return new JadeRuntimeServices(getContainerController().getPlatformController());
-        } catch (ControllerException e) {
-            e.printStackTrace();
-        }
-        return null;
+	    return new JadeRuntimeServices(getContainerController());
 	}
 
 	public void informCycleFinished(boolean arg0, int arg1) {

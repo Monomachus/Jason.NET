@@ -116,7 +116,11 @@ public class Config extends Properties {
         return getProperty(JADE_JAR);
     }
 
-    public String[] getJadeArgs() {
+    public String getJadeArgs() {
+        return getProperty(JADE_ARGS);
+    }
+
+    public String[] getJadeArrayArgs() {
         List<String> ls = new ArrayList<String>();
         StringTokenizer t = new StringTokenizer(getProperty(JADE_ARGS));
         while (t.hasMoreTokens()) {

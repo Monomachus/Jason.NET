@@ -27,7 +27,6 @@ import jade.core.AID;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
-import jade.wrapper.ControllerException;
 import jason.asSemantics.Message;
 import jason.asSyntax.Structure;
 import jason.environment.Environment;
@@ -63,13 +62,24 @@ public class JadeEnvironment extends JadeAg implements EnvironmentInfraTier {
         // create the user environment
         try {
             Object[] args = getArguments();
-            if (args != null && args.length > 0 && args[0] instanceof ClassParameters) { // it is an mas2j parameter
-                ClassParameters ep = (ClassParameters)args[0];
-                userEnv = (Environment) Class.forName(ep.className).newInstance();
-                userEnv.setEnvironmentInfraTier(this);
-                userEnv.init(ep.getParametersArray());
+            if (args != null && args.length > 0) {
+                if (args[0] instanceof ClassParameters) { // it is an mas2j parameter
+                    ClassParameters ep = (ClassParameters)args[0];
+                    userEnv = (Environment) Class.forName(ep.className).newInstance();
+                    userEnv.setEnvironmentInfraTier(this);
+                    userEnv.init(ep.getParametersArray());
+                } else {
+                    userEnv = (Environment) Class.forName(args[0].toString()).newInstance();
+                    userEnv.setEnvironmentInfraTier(this);
+                    //userEnv.init(ep.getParametersArray());
+                    if (args.length > 1) {
+                        logger.warning("Environment arguments are not implemented!");
+                    }
+                }
             } else {
-                logger.warning("Environment parameters is not implemented yet!");
+                logger.warning("Using default environment.");
+                userEnv = new Environment();
+                userEnv.setEnvironmentInfraTier(this);                
             }
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error in setup Jade Environment", e);
@@ -89,8 +99,8 @@ public class JadeEnvironment extends JadeAg implements EnvironmentInfraTier {
                         ACLMessage r = new ACLMessage(ACLMessage.INFORM);
                         r.addReceiver(m.getSender());
                         r.setInReplyTo(m.getReplyWith());
-                        ArrayList percepts = (ArrayList)userEnv.getPercepts(m.getSender().getLocalName());
                         try {
+                            ArrayList percepts = (ArrayList)userEnv.getPercepts(m.getSender().getLocalName());
                             if (percepts == null) {
                                 r.setContentObject("nothing_new");
                             } else {
@@ -170,11 +180,6 @@ public class JadeEnvironment extends JadeAg implements EnvironmentInfraTier {
     }
 
     public RuntimeServicesInfraTier getRuntimeServices() {
-        try {
-            return new JadeRuntimeServices(getContainerController().getPlatformController());
-        } catch (ControllerException e) {
-            e.printStackTrace();
-        }
-        return null;
+        return new JadeRuntimeServices(getContainerController());
     }
 }

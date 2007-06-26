@@ -1,8 +1,6 @@
 package jason.infra.centralised;
 
-import jason.architecture.AgArch;
-import jason.asSemantics.Agent;
-import jason.bb.DefaultBeliefBase;
+import jason.mas2j.AgentParameters;
 import jason.mas2j.ClassParameters;
 import jason.runtime.RuntimeServicesInfraTier;
 import jason.runtime.Settings;
@@ -28,22 +26,21 @@ public class CentralisedRuntimeServices implements RuntimeServicesInfraTier {
         }
         // parameters for ini
 
-        if (agClass == null)
-            agClass = Agent.class.getName();
-        if (archClass == null)
-            archClass = AgArch.class.getName();
-        if (stts == null)
-            stts = new Settings();
-        if (bbPars == null) {
-            bbPars = new ClassParameters(DefaultBeliefBase.class.getName());
-        }
+        AgentParameters ap = new AgentParameters();
+        ap.setAgClass(agClass);
+        ap.setArchClass(archClass);
+        ap.setBB(bbPars);
+        ap.setupDefault();        
+        
+        if (stts == null) stts = new Settings();
+        
         while (masRunner.getAg(agName) != null) {
             agName += "_a";
         }
 
         CentralisedAgArch agArch = new CentralisedAgArch();
         agArch.setAgName(agName);
-        agArch.initAg(archClass, agClass, bbPars, agSource, stts, masRunner);
+        agArch.initAg(ap.archClass.className, ap.agClass.className, ap.bbClass, agSource, stts, masRunner);
         agArch.setEnvInfraTier(RunCentralisedMAS.getRunner().getEnvironmentInfraTier());
         agArch.setControlInfraTier(RunCentralisedMAS.getRunner().getControllerInfraTier());
         masRunner.addAg(agArch);

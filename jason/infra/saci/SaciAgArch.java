@@ -407,7 +407,7 @@ public class SaciAgArch extends saci.Agent implements AgArchInfraTier {
 
     public boolean canSleep() {
         try {
-            return getMBox().getMessages(null, 1, 0, false).size() == 0;
+            return getMBox().getMessages(null, 1, 0, false).size() == 0 && isRunning();
         } catch (Exception e) {
             return true;
         }

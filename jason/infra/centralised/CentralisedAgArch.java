@@ -222,7 +222,7 @@ public class CentralisedAgArch extends Thread implements AgArchInfraTier {
     }
 
     public boolean canSleep() {
-        return mbox.isEmpty();
+        return mbox.isEmpty() && isRunning();
     }
 
     public void informCycleFinished(boolean breakpoint, int cycle) {

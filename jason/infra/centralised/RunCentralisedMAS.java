@@ -170,13 +170,12 @@ public class RunCentralisedMAS {
             logger.log(Level.SEVERE, "Error!?: ", e);
             errorCode = 4;
         }
-        System.out.close();
-        System.err.close();
+        System.out.flush();
+        System.err.flush();
 
         if (!MASConsoleGUI.hasConsole() && errorCode != 0) {
             System.exit(errorCode);
         }
-
     }
 
     public static boolean isDebug() {
@@ -212,15 +211,7 @@ public class RunCentralisedMAS {
     }
 
     protected void createButtons() {
-        // add Button
-        JButton btStop = new JButton("Stop", new ImageIcon(RunCentralisedMAS.class.getResource("/images/suspend.gif")));
-        btStop.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent evt) {
-                MASConsoleGUI.get().setPause(false);
-                runner.finish();
-            }
-        });
-        MASConsoleGUI.get().addButton(btStop);
+        createStopButton();
 
         // add Button
         runner.btDebug = new JButton("Debug", new ImageIcon(RunCentralisedMAS.class.getResource("/images/debug.gif")));
@@ -282,6 +273,18 @@ public class RunCentralisedMAS {
             }
         });
         MASConsoleGUI.get().addButton(btKillAg);        
+    }
+
+    protected void createStopButton() {
+        // add Button
+        JButton btStop = new JButton("Stop", new ImageIcon(RunCentralisedMAS.class.getResource("/images/suspend.gif")));
+        btStop.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                MASConsoleGUI.get().setPause(false);
+                runner.finish();
+            }
+        });
+        MASConsoleGUI.get().addButton(btStop);
     }
     
     public static RunCentralisedMAS getRunner() {
@@ -408,7 +411,7 @@ public class RunCentralisedMAS {
         }
     }
 
-    void waitEnd() {
+    protected void waitEnd() {
         try {
             // wait a file called .stop___MAS to be created!
             File stop = new File(stopMASFileName);

@@ -40,6 +40,16 @@ public class AgentParameters {
         }        
     }
     
+    public void setAgClass(String c) {
+        if (c != null) agClass = new ClassParameters(c);
+    }
+    public void setArchClass(String c) {
+        if (c != null) archClass = new ClassParameters(c);        
+    }
+    public void setBB(ClassParameters c) {
+        if (c != null) bbClass = c;        
+    }
+    
 	public String getAsInMASProject() {
         StringBuilder s = new StringBuilder(name+" ");
 		if (asSource != null && !asSource.getName().startsWith(name)) {

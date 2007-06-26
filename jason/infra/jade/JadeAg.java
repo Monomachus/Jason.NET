@@ -37,12 +37,14 @@ public abstract class JadeAg extends Agent {
 
     protected static int rwid = 0; // reply-with counter
 
-    private boolean running = true;
+    protected boolean running = true;
 
     @Override
-    protected void takeDown() {
+    public void doDelete() {
         running = false;
+        super.doDelete();
     }
+    
 
     public boolean isRunning() {
         return running;
