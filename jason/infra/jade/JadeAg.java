@@ -135,11 +135,11 @@ public abstract class JadeAg extends Agent {
         try {
             send(m);
             MessageTemplate t = MessageTemplate.MatchInReplyTo(m.getReplyWith());
-            while (isRunning()) {
-                ACLMessage r = blockingReceive(t,1000);
+            //while (isRunning()) {
+                ACLMessage r = blockingReceive(t); //,1000);
                 if (r != null) 
                     return r;
-            }
+            //}
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error waiting message.", e);            
         }

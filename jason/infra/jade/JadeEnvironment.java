@@ -27,6 +27,7 @@ import jade.core.AID;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
+import jade.wrapper.ControllerException;
 import jason.asSemantics.Message;
 import jason.asSyntax.Structure;
 import jason.environment.Environment;
@@ -62,7 +63,7 @@ public class JadeEnvironment extends JadeAg implements EnvironmentInfraTier {
         // create the user environment
         try {
             Object[] args = getArguments();
-            if (args[0] instanceof ClassParameters) { // it is an mas2j parameter
+            if (args != null && args.length > 0 && args[0] instanceof ClassParameters) { // it is an mas2j parameter
                 ClassParameters ep = (ClassParameters)args[0];
                 userEnv = (Environment) Class.forName(ep.className).newInstance();
                 userEnv.setEnvironmentInfraTier(this);
@@ -137,6 +138,11 @@ public class JadeEnvironment extends JadeAg implements EnvironmentInfraTier {
         }
     }
 
+    @Override
+    protected void takeDown() {
+        if (userEnv != null) userEnv.stop();
+    }
+    
     public void informAgsEnvironmentChanged() {
         try {
             broadcast(new Message("tell", null, null, "environmentChanged"));
@@ -163,11 +169,12 @@ public class JadeEnvironment extends JadeAg implements EnvironmentInfraTier {
         }
     }
 
-    public void stopAg() {
-        userEnv.stop();
-    }
-
     public RuntimeServicesInfraTier getRuntimeServices() {
-        return new JadeRuntimeServices();
+        try {
+            return new JadeRuntimeServices(getContainerController().getPlatformController());
+        } catch (ControllerException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

@@ -117,8 +117,7 @@ public class CentralisedMASLauncherAnt implements MASLauncherInfraTier {
     /** returns the operating system command that runs the MAS */
     public String[] getStartCommandArray() {
         String build = "build.xml";
-        if (hasCBuild())
-            build = "c-build.xml";
+        if (hasCBuild()) build = "c-build.xml";
         
         return new String[] { Config.get().getJavaHome() + "bin" + File.separator + "java", "-classpath",
                 Config.get().getAntLib() + "ant-launcher.jar", "org.apache.tools.ant.launch.Launcher", "-e", "-f", build, task};

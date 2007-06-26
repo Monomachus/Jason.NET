@@ -5,6 +5,7 @@ import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
+import jade.wrapper.ControllerException;
 import jason.architecture.AgArch;
 import jason.architecture.AgArchInfraTier;
 import jason.asSemantics.ActionExec;
@@ -162,14 +163,13 @@ public class JadeAgArch extends JadeAg implements AgArchInfraTier {
         }.start();
         userAgArh.getTS().receiveSyncSignal();    // in case the agent is waiting sync
         userAgArh.getTS().newMessageHasArrived(); // in case the agent is waiting messages
-        logger.fine("finished running.\n");
+        logger.info("finished running.");
 	}
 	
 	
 	// Jason Methods
 	// -------------
-	//
-	
+	//	
 
 	public void stopAg() {
 		doDelete();
@@ -246,12 +246,8 @@ public class JadeAgArch extends JadeAg implements AgArchInfraTier {
             if (r != null && r.getContentObject() instanceof List) {
                 percepts = (List)r.getContentObject();
             }
-        } catch (Exception e) {
-            logger.log(Level.SEVERE, "Error in perceive.", e);            
-        }
 
-        // check if there are feedbacks on requested action executions
-        try {
+            // check if there are feedbacks on requested action executions
             ACLMessage m;
             do {
                 m = receive(at);
@@ -273,8 +269,9 @@ public class JadeAgArch extends JadeAg implements AgArchInfraTier {
                     }
                 }
             } while (m != null);
+        } catch (UnreadableException _) {
         } catch (Exception e) {
-            logger.log(Level.SEVERE, "Error receiving message.", e);
+            logger.log(Level.SEVERE, "Error in perceive.", e);
         }
         
         return percepts;
@@ -302,7 +299,12 @@ public class JadeAgArch extends JadeAg implements AgArchInfraTier {
 	}
 
 	public RuntimeServicesInfraTier getRuntimeServices() {
-		return new JadeRuntimeServices();
+		try {
+            return new JadeRuntimeServices(getContainerController().getPlatformController());
+        } catch (ControllerException e) {
+            e.printStackTrace();
+        }
+        return null;
 	}
 
 	public void informCycleFinished(boolean arg0, int arg1) {

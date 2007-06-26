@@ -5,27 +5,13 @@ import jason.jeditplugin.Config;
 import jason.jeditplugin.MASLauncherInfraTier;
 
 import java.io.File;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Creates the script build.xml to launch the MAS using JADE.
  */
 public class JadeMASLauncherAnt extends CentralisedMASLauncherAnt implements MASLauncherInfraTier {
 
-    private static Logger logger = Logger.getLogger(JadeMASLauncherAnt.class.getName());
-
-    public void stopMAS() {
-        new Thread() {
-            public void run() {
-                try {
-                    new JadeRuntimeServices().stopMAS();
-                } catch (Exception e) {
-                    logger.log(Level.SEVERE, "Error stoping jade MAS", e);
-                }
-            }
-        }.start();
-    }
+    //private static Logger logger = Logger.getLogger(JadeMASLauncherAnt.class.getName());
 
     protected String replaceMarks(String script, boolean debug) {
         String jadeJar = Config.get().getJadeJar();
@@ -41,6 +27,15 @@ public class JadeMASLauncherAnt extends CentralisedMASLauncherAnt implements MAS
             String http = new File(Config.get().getJadeJar()).getAbsoluteFile().getParent() + "/http.jar";
             jadepath += "\n\t<pathelement location=\"" + http + "\"/>";
         } catch (Exception _) {}
+        try {
+            String tools = new File(Config.get().getJadeJar()).getAbsoluteFile().getParent() + "/jadeTools.jar";
+            jadepath += "\n\t<pathelement location=\"" + tools + "\"/>";
+        } catch (Exception _) {}
+        try {
+            String jar = new File(Config.get().getJadeJar()).getAbsoluteFile().getParent() + "/commons-codec-1.3.jar";
+            jadepath += "\n\t<pathelement location=\"" + jar + "\"/>";
+        } catch (Exception _) {}
+        
         
         script = replace(script, "<PATH-LIB>", jadepath + "\n\t<PATH-LIB>");
 

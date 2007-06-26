@@ -23,12 +23,16 @@
 
 package jason.infra.jade;
 
+import jade.BootProfileImpl;
+import jade.core.Profile;
 import jade.core.ProfileImpl;
+import jade.core.Runtime;
 import jade.wrapper.AgentController;
 import jade.wrapper.ContainerController;
 import jason.JasonException;
 import jason.control.ExecutionControlGUI;
 import jason.infra.centralised.RunCentralisedMAS;
+import jason.jeditplugin.Config;
 import jason.mas2j.AgentParameters;
 import jason.mas2j.ClassParameters;
 import jason.mas2j.MAS2JProject;
@@ -54,6 +58,8 @@ public class RunJadeMAS extends RunCentralisedMAS {
     AgentController envc, crtc;
     Map<String,AgentController> ags = new HashMap<String,AgentController>();
 
+    ContainerController cc;
+    
     public static void main(String[] args) {
         runner = new RunJadeMAS();
         runner.init(args);
@@ -64,14 +70,20 @@ public class RunJadeMAS extends RunCentralisedMAS {
         // TODO: add start RMA, Sniffer, DF buttons
         // TODO: add debug button
     }
+
+    protected void startContainer() {
+        ProfileImpl profile = new BootProfileImpl(Config.get().getJadeArgs());
+        if (profile.getBooleanProperty(Profile.MAIN, true)) 
+            cc = Runtime.instance().createMainContainer(profile);
+        else
+            cc = Runtime.instance().createAgentContainer(profile);
+    }
     
     @Override
     protected void createAg(MAS2JProject project, boolean debug) throws JasonException {
         try {
-            jade.core.Runtime jadeRT = jade.core.Runtime.instance();
-            // TODO: use userArgs
-            ContainerController cc = jadeRT.createMainContainer(new ProfileImpl()); 
-    
+            startContainer();
+            
             // create environment
             logger.fine("Creating environment " + project.getEnvClass());
             envc = cc.createNewAgent("environment", JadeEnvironment.class.getName(), new Object[] { project.getEnvClass() });
@@ -132,7 +144,10 @@ public class RunJadeMAS extends RunCentralisedMAS {
     @Override
     public void finish() {
         try {
-            new JadeRuntimeServices().stopMAS();
+            logger.info("Finishing the system.");
+            new JadeRuntimeServices(cc.getPlatformController()).stopMAS();
+            try { Thread.sleep(2000); } catch (Exception _) {}
+            System.exit(0);
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error stopping system.", e);            
         }

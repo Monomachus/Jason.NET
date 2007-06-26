@@ -25,8 +25,8 @@ package jason.jeditplugin;
 
 import jason.asSemantics.TransitionSystem;
 import jason.infra.centralised.CentralisedFactory;
-import jason.infra.saci.SaciFactory;
 import jason.infra.jade.JadeFactory;
+import jason.infra.saci.SaciFactory;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -34,6 +34,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
@@ -114,8 +116,17 @@ public class Config extends Properties {
         return getProperty(JADE_JAR);
     }
 
-    public String getJadeArgs() {
-        return getProperty(JADE_ARGS);
+    public String[] getJadeArgs() {
+        List<String> ls = new ArrayList<String>();
+        StringTokenizer t = new StringTokenizer(getProperty(JADE_ARGS));
+        while (t.hasMoreTokens()) {
+            ls.add(t.nextToken());
+        }
+        String[] as = new String[ls.size()];
+        for (int i=0; i<ls.size(); i++) {
+            as[i] = ls.get(i);
+        }
+        return as;
     }
 
     public String getJavaHome() {

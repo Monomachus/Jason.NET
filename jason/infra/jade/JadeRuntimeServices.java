@@ -1,5 +1,6 @@
 package jason.infra.jade;
 
+import jade.wrapper.PlatformController;
 import jason.mas2j.ClassParameters;
 import jason.runtime.RuntimeServicesInfraTier;
 import jason.runtime.Settings;
@@ -11,7 +12,13 @@ import java.util.logging.Logger;
 public class JadeRuntimeServices implements RuntimeServicesInfraTier {
 
     private static Logger logger  = Logger.getLogger(JadeRuntimeServices.class.getName());
-
+    
+    private PlatformController pc;
+    
+    JadeRuntimeServices(PlatformController pc) {
+        this.pc = pc;
+    }
+    
     public boolean createAgent(String agName, String agSource, String agClass, String archClass, ClassParameters bbPars, Settings stts) throws Exception {
         // TODO: implement
         logger.warning("not implemented yet!");
@@ -47,7 +54,6 @@ public class JadeRuntimeServices implements RuntimeServicesInfraTier {
     }
 
     public void stopMAS() throws Exception {
-        // TODO: implement
-        logger.warning("not implemented yet!");
+        if (pc != null) pc.kill();
     }
 }

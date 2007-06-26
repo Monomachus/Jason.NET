@@ -24,6 +24,7 @@
 package jason.infra.jade;
 
 import jade.core.Agent;
+import jade.wrapper.ControllerException;
 import jason.control.ExecutionControl;
 import jason.control.ExecutionControlInfraTier;
 import jason.runtime.RuntimeServicesInfraTier;
@@ -148,6 +149,11 @@ public class JadeExecutionControl extends Agent implements ExecutionControlInfra
     }
 
     public RuntimeServicesInfraTier getRuntimeServices() {
-        return new JadeRuntimeServices();
+        try {
+            return new JadeRuntimeServices(getContainerController().getPlatformController());
+        } catch (ControllerException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }
