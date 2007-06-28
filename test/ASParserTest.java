@@ -27,12 +27,12 @@ public class ASParserTest extends TestCase {
         ag.setLogger(null);
 
         assertTrue(ag.parseAS("src/asl/kqmlPlans.asl"));
-        assertTrue(ag.parseAS("examples/Auction/ag1.asl"));
+        assertTrue(ag.parseAS("examples/auction/ag1.asl"));
         Plan p = ag.getPL().get("l__0");
         assertEquals(p.getBody().size(), 1);
         assertEquals(p.getBody().get(0).getType(), BodyLiteral.BodyType.internalAction);
-        assertTrue(ag.parseAS("examples/Auction/ag2.asl"));
-        assertTrue(ag.parseAS("examples/Auction/ag3.asl"));
+        assertTrue(ag.parseAS("examples/auction/ag2.asl"));
+        assertTrue(ag.parseAS("examples/auction/ag3.asl"));
     }
 
     public void testLogicalExpr() {
