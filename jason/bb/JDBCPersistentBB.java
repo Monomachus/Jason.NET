@@ -149,6 +149,8 @@ public class JDBCPersistentBB extends DefaultBeliefBase {
 
     @Override
     public void stop() {
+        if (conn == null) return;
+        
         try {
             if (url.startsWith("jdbc:hsqldb")) {
                 conn.createStatement().execute("SHUTDOWN");

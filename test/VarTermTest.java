@@ -376,4 +376,22 @@ public class VarTermTest extends TestCase {
         
         assertEquals(u1,u2);
     }
+    
+    public void testApply() {
+        VarTerm x = new VarTerm("X");
+        VarTerm y = new VarTerm("Y");
+        
+        Unifier u = new Unifier();
+        
+        // X = Y 
+        u.unifies(y, x);
+
+        x = (VarTerm)x.clone();
+
+        // Y = 10
+        u.unifies(y, new NumberTermImpl(10));
+        
+        x.apply(u);
+        assertEquals(x.toString(), "10");
+    }
 }

@@ -68,6 +68,10 @@ public class RunJadeMAS extends RunCentralisedMAS {
 
     ContainerController cc;
     
+    public static String controllerName  = "j_controller";
+    public static String environmentName = "j_environment";
+    
+    
     public static void main(String[] args) {
         runner = new RunJadeMAS();
         runner.init(args);
@@ -76,9 +80,9 @@ public class RunJadeMAS extends RunCentralisedMAS {
     @Override
     protected void createButtons() {
         createStopButton();
-        // TODO: add debug button
+        createPauseButton();
 
-        JButton btRMA = new JButton("Jade Management Agent", new ImageIcon(jade.tools.rma.rma.class.getResource("/jade/tools/rma/images/logosmall.jpg")));
+        JButton btRMA = new JButton("Management Agent", new ImageIcon(jade.tools.sniffer.Sniffer.class.getResource("/jade/tools/sniffer/images/jadelogo.jpg"))); //"/jade/tools/rma/images/logosmall.jpg")));
         btRMA.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 try {
@@ -89,6 +93,18 @@ public class RunJadeMAS extends RunCentralisedMAS {
             }
         });
         MASConsoleGUI.get().addButton(btRMA);
+
+        JButton btSniffer = new JButton("Jade Sniffer", new ImageIcon(jade.tools.sniffer.Sniffer.class.getResource("/jade/tools/sniffer/images/sniffer.gif")));
+        btSniffer.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                try {
+                    cc.createNewAgent("Sniffer", jade.tools.sniffer.Sniffer.class.getName(), null).start();
+                } catch (StaleProxyException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        MASConsoleGUI.get().addButton(btSniffer);
 
     }
 
@@ -109,7 +125,7 @@ public class RunJadeMAS extends RunCentralisedMAS {
             
             // create environment
             logger.fine("Creating environment " + project.getEnvClass());
-            envc = cc.createNewAgent("environment", JadeEnvironment.class.getName(), new Object[] { project.getEnvClass() });
+            envc = cc.createNewAgent(environmentName, JadeEnvironment.class.getName(), new Object[] { project.getEnvClass() });
 
             // create the agents
             for (AgentParameters ap : project.getAgents()) {
@@ -140,7 +156,7 @@ public class RunJadeMAS extends RunCentralisedMAS {
             }
             if (controlClass != null) {
                 logger.fine("Creating controller " + controlClass);
-                crtc = cc.createNewAgent("controller", JadeExecutionControl.class.getName(), new Object[] { controlClass });
+                crtc = cc.createNewAgent(controllerName, JadeExecutionControl.class.getName(), new Object[] { controlClass });
             }
            
         } catch (Exception e) {
@@ -152,13 +168,13 @@ public class RunJadeMAS extends RunCentralisedMAS {
     protected void startAgs() {
         try {
             envc.start();
-            if (crtc != null) crtc.start();
             
             // run the agents
             for (AgentController ag : ags.values()) {
                 ag.start();
             }
             
+            if (crtc != null) crtc.start();
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error starting agents.", e);            
         }
@@ -168,9 +184,7 @@ public class RunJadeMAS extends RunCentralisedMAS {
     public void finish() {
         try {
             logger.info("Finishing the system.");
-            new JadeRuntimeServices(cc).stopMAS();
-            try { Thread.sleep(2000); } catch (Exception _) {}
-            //System.exit(0);
+            new JadeRuntimeServices(cc,null).stopMAS();
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error stopping system.", e);            
         }

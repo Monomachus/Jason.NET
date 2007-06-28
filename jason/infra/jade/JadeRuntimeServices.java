@@ -1,5 +1,10 @@
 package jason.infra.jade;
 
+import jade.core.AID;
+import jade.core.Agent;
+import jade.domain.AMSService;
+import jade.domain.FIPAAgentManagement.AMSAgentDescription;
+import jade.domain.FIPAAgentManagement.SearchConstraints;
 import jade.wrapper.AgentController;
 import jade.wrapper.ContainerController;
 import jade.wrapper.ControllerException;
@@ -9,6 +14,7 @@ import jason.runtime.RuntimeServicesInfraTier;
 import jason.runtime.Settings;
 
 import java.io.File;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -19,8 +25,11 @@ public class JadeRuntimeServices implements RuntimeServicesInfraTier {
     
     private ContainerController cc;
     
-    JadeRuntimeServices(ContainerController cc) {
+    private Agent jadeAgent;
+    
+    JadeRuntimeServices(ContainerController cc, Agent ag) {
         this.cc = cc;
+        jadeAgent = ag;
     }
     
     public boolean createAgent(String agName, String agSource, String agClass, String archClass, ClassParameters bbPars, Settings stts) throws Exception {
@@ -49,9 +58,26 @@ public class JadeRuntimeServices implements RuntimeServicesInfraTier {
 
     @SuppressWarnings("unchecked")
     public Set<String> getAgentsName() {
+        // TODO: make a cache list and update it when a new agent enters the system
+        // TODO: only count Jason agents.
+        if (jadeAgent == null) return null;
+        Set<String> ags = new HashSet<String>();
         try {
-            // TODO:
-            logger.warning("getAgentsName is not implemented yet!");
+            SearchConstraints c = new SearchConstraints();
+            c.setMaxResults( new Long(-1) );
+            AMSAgentDescription[] all = AMSService.search( jadeAgent, new AMSAgentDescription(), c);
+            for (AMSAgentDescription ad: all) {
+                AID agentID = ad.getName();
+                if (    !agentID.getName().startsWith("ams@") && 
+                        !agentID.getName().startsWith("df@") &&
+                        !agentID.getName().startsWith(RunJadeMAS.environmentName) &&
+                        !agentID.getName().startsWith(RunJadeMAS.controllerName)
+                   ) {
+                    ags.add(agentID.getLocalName());                
+                }
+            }        
+            return ags;
+            //logger.warning("getAgentsName is not implemented yet!");
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error getting agents' name", e);
         }

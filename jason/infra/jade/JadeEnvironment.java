@@ -34,7 +34,6 @@ import jason.environment.EnvironmentInfraTier;
 import jason.mas2j.ClassParameters;
 import jason.runtime.RuntimeServicesInfraTier;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -54,6 +53,8 @@ public class JadeEnvironment extends JadeAg implements EnvironmentInfraTier {
 
     static Logger logger = Logger.getLogger(JadeEnvironment.class.getName());
 
+    public static String actionOntology = "AS-actions";
+    
     public JadeEnvironment() {
     }
 
@@ -73,7 +74,7 @@ public class JadeEnvironment extends JadeAg implements EnvironmentInfraTier {
                     userEnv.setEnvironmentInfraTier(this);
                     //userEnv.init(ep.getParametersArray());
                     if (args.length > 1) {
-                        logger.warning("Environment arguments are not implemented!");
+                        logger.warning("Environment arguments is not implemented yet (ask it to us if you need)!");
                     }
                 }
             } else {
@@ -94,21 +95,22 @@ public class JadeEnvironment extends JadeAg implements EnvironmentInfraTier {
                 public void action() {
                     ACLMessage m = receive(pt);
                     if (m == null) {
-                        block();
+                        block(1000);
                     } else {
                         ACLMessage r = new ACLMessage(ACLMessage.INFORM);
                         r.addReceiver(m.getSender());
                         r.setInReplyTo(m.getReplyWith());
+                        r.setOntology(m.getOntology());
                         try {
                             ArrayList percepts = (ArrayList)userEnv.getPercepts(m.getSender().getLocalName());
                             if (percepts == null) {
-                                r.setContentObject("nothing_new");
+                                r.setContent("nothing_new");
                             } else {
                                 synchronized (percepts) {
-                                    r.setContentObject(percepts);
+                                    r.setContent(percepts.toString());
                                 }
                             }
-                        } catch (IOException e) {
+                        } catch (Exception e) {
                             e.printStackTrace();
                         }
                         send(r);
@@ -117,20 +119,19 @@ public class JadeEnvironment extends JadeAg implements EnvironmentInfraTier {
             });
 
             // add a message handler to answer action asks
-            final MessageTemplate at = MessageTemplate.MatchOntology("AS-actions");
+            final MessageTemplate at = MessageTemplate.MatchOntology(actionOntology);
             addBehaviour(new CyclicBehaviour() {
                 public void action() {
                     ACLMessage m = receive(at);
                     if (m == null) {
-                        block();
+                        block(1000);
                     } else {
                         ACLMessage r = new ACLMessage(ACLMessage.INFORM);
                         r.addReceiver(m.getSender());
                         r.setInReplyTo(m.getReplyWith());
                         r.setOntology(m.getOntology());
-                        Structure action;
                         try {
-                            action = (Structure)m.getContentObject();
+                            Structure action = Structure.parse(m.getContent());
                             if (userEnv.executeAction(m.getSender().getLocalName(), action)) {
                                 r.setContent("ok");
                             } else {
@@ -180,6 +181,6 @@ public class JadeEnvironment extends JadeAg implements EnvironmentInfraTier {
     }
 
     public RuntimeServicesInfraTier getRuntimeServices() {
-        return new JadeRuntimeServices(getContainerController());
+        return new JadeRuntimeServices(getContainerController(), this);
     }
 }

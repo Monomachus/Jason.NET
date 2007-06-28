@@ -11,6 +11,6 @@ public class JadeFactory implements InfrastructureFactory {
 	}
 
 	public RuntimeServicesInfraTier createRuntimeServices() {
-		return new JadeRuntimeServices(null);
+		return new JadeRuntimeServices(null, null);
 	}
 }

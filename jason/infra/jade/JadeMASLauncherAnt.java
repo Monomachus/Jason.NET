@@ -20,7 +20,6 @@ public class JadeMASLauncherAnt extends CentralisedMASLauncherAnt implements MAS
         }
 
         script = replace(script, "<PROJECT-RUNNER-CLASS>", RunJadeMAS.class.getName());
-        script = replace(script, "<DEBUG>", "");
 
         String jadepath = "\t<pathelement location=\"" + Config.get().getJadeJar() + "\"/>";
         try {

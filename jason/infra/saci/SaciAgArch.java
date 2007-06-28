@@ -156,8 +156,7 @@ public class SaciAgArch extends saci.Agent implements AgArchInfraTier {
                     int cycle = Integer.parseInt(m.get("cycle").toString());
                     userAgArh.setCycleNumber(cycle);
                     userAgArh.getTS().receiveSyncSignal();
-                    return true; // no other message handler gives this
-                                    // message
+                    return true; // no other message handler gives this message
                 }
             });
 
@@ -184,8 +183,7 @@ public class SaciAgArch extends saci.Agent implements AgArchInfraTier {
                     } catch (Exception e) {
                         logger.log(Level.SEVERE, "Error sending message " + r, e);
                     }
-                    return true; // no other message handler gives this
-                                    // message
+                    return true; // no other message handler gives this message
                 }
             });
 

@@ -232,20 +232,7 @@ public class RunCentralisedMAS {
         MASConsoleGUI.get().addButton(runner.btDebug);
 
         // add Button pause
-        final JButton btPause = new JButton("Pause", new ImageIcon(RunCentralisedMAS.class.getResource("/images/resume_co.gif")));
-        btPause.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent evt) {
-                if (MASConsoleGUI.get().isPause()) {
-                    btPause.setText("Pause");
-                    MASConsoleGUI.get().setPause(false);
-                } else {
-                    btPause.setText("Continue");
-                    MASConsoleGUI.get().setPause(true);
-                }
-
-            }
-        });
-        MASConsoleGUI.get().addButton(btPause);
+        createPauseButton();
 
         // add show sources button
         final JButton btShowSrc = new JButton("Show sources", new ImageIcon(RunCentralisedMAS.class.getResource("/images/list.gif")));
@@ -273,6 +260,23 @@ public class RunCentralisedMAS {
             }
         });
         MASConsoleGUI.get().addButton(btKillAg);        
+    }
+
+    protected void createPauseButton() {
+        final JButton btPause = new JButton("Pause", new ImageIcon(RunCentralisedMAS.class.getResource("/images/resume_co.gif")));
+        btPause.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                if (MASConsoleGUI.get().isPause()) {
+                    btPause.setText("Pause");
+                    MASConsoleGUI.get().setPause(false);
+                } else {
+                    btPause.setText("Continue");
+                    MASConsoleGUI.get().setPause(true);
+                }
+
+            }
+        });
+        MASConsoleGUI.get().addButton(btPause);
     }
 
     protected void createStopButton() {

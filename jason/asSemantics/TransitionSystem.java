@@ -832,7 +832,7 @@ public class TransitionSystem {
     synchronized private void waitMessage() {
         try {
             logger.fine("Waiting message....");
-            wait(500); // wait for messages
+            wait(1000); // wait for messages
         } catch (InterruptedException e) {
         } catch (Exception e) {
             logger.log(Level.WARNING,"Error waiting mgs", e);

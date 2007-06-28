@@ -117,8 +117,10 @@ public class ExecutionControlGUI extends ExecutionControl {
     // Which item is to be shown in HTML interface
     Map<String,Boolean> show = new HashMap<String,Boolean>();
 
+    static String title = ":: Jason Mind Inspector ::";
+    
 	void initComponents() {
-		frame = new JFrame(":: Jason Mind Inspector ::");
+		frame = new JFrame(title);
 
         jTfSteps = new JTextField(3);
         jTfSteps.setText("1");
@@ -443,7 +445,7 @@ public class ExecutionControlGUI extends ExecutionControl {
         this.breakpoint = breakpoint;
         if (waitSelected) {
             countCycles++;
-            logger.fine("Agent "+agName+" has finished the cycle "+cycle);
+            logger.info("Agent "+agName+" has finished the cycle "+cycle);
             if (testStop()) {
                 stopRun();
             } else {
@@ -459,11 +461,13 @@ public class ExecutionControlGUI extends ExecutionControl {
 	/** called when all agents have finished the current cycle */
 	protected void allAgsFinished() {
         if (waitAll) {
+            logger.fine("All agents have finished the cycle "+getCycleNumber());
             countCycles++;
             if (testStop()) {
                 stopRun();
             } else {
                 startNewCycle();
+                frame.setTitle(title + " cycle "+getCycleNumber()+" ::");
                 continueRun();
             }
         }

@@ -23,131 +23,133 @@
 
 package jason.infra.jade;
 
-import jade.core.Agent;
+import jade.core.AID;
+import jade.core.behaviours.CyclicBehaviour;
+import jade.lang.acl.ACLMessage;
+import jade.lang.acl.MessageTemplate;
 import jason.control.ExecutionControl;
 import jason.control.ExecutionControlInfraTier;
+import jason.mas2j.ClassParameters;
 import jason.runtime.RuntimeServicesInfraTier;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.w3c.dom.Document;
 
 /**
- * Concrete execution control implementation based on Jade infrastructure.
+ * Concrete execution control implementation for Jade infrastructure.
  */
 @SuppressWarnings("serial")
-public class JadeExecutionControl extends Agent implements ExecutionControlInfraTier {
+public class JadeExecutionControl extends JadeAg implements ExecutionControlInfraTier {
+
+    static Logger logger = Logger.getLogger(JadeExecutionControl.class.getName());
+    public static String controllerOntology = "AS-ExecControl";
 
     private ExecutionControl userControl;
-
-    /*
-    public void initAg(String[] args) throws JasonException {
-        // create the user controller
+    
+    @Override
+    public void setup()  {
+        // create the user environment
         try {
-            System.out.println("Creating controller from " + args[0]);
-            userControl = (ExecutionControl) Class.forName(args[0]).newInstance();
-            userControl.setExecutionControlInfraTier(this);
-            // create parameters array
-            String[] p = new String[args.length-1];
-            for (int i=0; i<p.length; i++) {
-                p[i] = args[i+1];
+            Object[] args = getArguments();
+            if (args != null && args.length > 0) {
+                if (args[0] instanceof ClassParameters) { // it is an mas2j parameter
+                    ClassParameters ecp = (ClassParameters)args[0];
+                    userControl = (ExecutionControl) Class.forName(ecp.className).newInstance();
+                    userControl.setExecutionControlInfraTier(this);
+                    userControl.init(ecp.getParametersArray());
+                } else {
+                    userControl = (ExecutionControl) Class.forName(args[0].toString()).newInstance();
+                    userControl.setExecutionControlInfraTier(this);
+                    if (args.length > 1) {
+                        logger.warning("Execution control arguments is not implemented yet (ask it to us if you need)!");
+                    }
+                }
+            } else {
+                logger.warning("Using default execution control.");
+                userControl = new ExecutionControl();
+                userControl.setExecutionControlInfraTier(this);
             }
-            userControl.init(p);
         } catch (Exception e) {
-            System.err.println("Error " + e);
-            e.printStackTrace();
-            throw new JasonException("The user execution control class instantiation '" + args[1] + "' has failed!" + e.getMessage());
+            logger.log(Level.SEVERE, "Error in setup Jade Environment", e);
         }
 
         try {
             // message handler for "informCycleFinished"
-            mbox.addMessageHandler("cycleFinished", "tell", null, "AS-ExecControl", new MessageHandler() {
-                public boolean processMessage(saci.Message m) {
-                    String sender = (String) m.get("sender");
-                    boolean breakpoint = false;
-                    if (m.get("breakpoint") != null) {
-                        breakpoint = m.get("breakpoint").equals("true");
+            final MessageTemplate ect = MessageTemplate.MatchOntology(controllerOntology);
+            addBehaviour(new CyclicBehaviour() {
+                public void action() {
+                    ACLMessage m = receive(ect);
+                    if (m == null) {
+                        block(1000);
+                    } else {
+                        String content = m.getContent();
+                        int p = content.indexOf(",");
+                        boolean breakpoint = Boolean.parseBoolean(content.substring(0,p));
+                        int cycle = Integer.parseInt(content.substring(p+1));
+                        userControl.receiveFinishedCycle(m.getSender().getLocalName(), breakpoint, cycle);
                     }
-                    int cycle = Integer.parseInt(m.get("cycle").toString());
-                    userControl.receiveFinishedCycle(sender, breakpoint, cycle);
-                    return true; // no other message handler gives this message
                 }
             });
-
+            
+            informAllAgsToPerformCycle(0);
         } catch (Exception e) {
-            System.err.println("Error adding message handler for agent:" + e);
-            e.printStackTrace();
+            logger.log(Level.SEVERE, "Error starting agent", e);
         }
     }
 
-    public void stopAg() {
-        userControl.stop();
-        super.stopAg();
+    @Override
+    protected void takeDown() {
+        if (userControl != null) userControl.stop();
     }
-
-    public void run() {
-        try {
-            Thread.sleep(1000); // gives a time to agents enter in wait
-        } catch (Exception e) {
-        }
-        informAllAgsToPerformCycle(0);
-    }
-
+    
+    
     public ExecutionControl getUserControl() {
         return userControl;
     }
-    */
     
     public void informAgToPerformCycle(String agName, int cycle) {
-        /*
-        Message m = new Message("(tell)");
-        m.put("ontology", "AS-ExecControl");
-        m.put("receiver", agName);
-        m.put("content", "performCycle");
-        m.put("cycle", String.valueOf(cycle));
-        try {
-            mbox.sendMsg(m);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        */
+        ACLMessage m = new ACLMessage(ACLMessage.INFORM);
+        m.setOntology(controllerOntology);
+        m.addReceiver(new AID(agName, AID.ISLOCALNAME));
+        m.setContent("performCycle "+cycle);
+        send(m);
     }
 
     public void informAllAgsToPerformCycle(int cycle) {
-        /*
-        Message m = new Message("(tell)");
-        m.put("ontology", "AS-ExecControl");
-        m.put("content", "performCycle");
-        m.put("cycle", String.valueOf(cycle));
         try {
-            mbox.broadcast(m);
+            ACLMessage m = new ACLMessage(ACLMessage.INFORM);
+            m.setOntology(controllerOntology);
+            addAllAgsAsReceivers(m);
+            m.setContent("performCycle "+cycle);
+            send(m);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        */
     }
 
     public Document getAgState(String agName) {
-        /*
-        Message m = new Message("(ask)");
-        m.put("ontology", "AS-ExecControl");
-        m.put("receiver", agName);
-        m.put("content", "agState");
         try {
-            Message r = mbox.ask(m);
+            ACLMessage m = new ACLMessage(ACLMessage.QUERY_REF);
+            m.setOntology(controllerOntology);
+            m.addReceiver(new AID(agName, AID.ISLOCALNAME));
+            m.setContent("agState");
+            ACLMessage r = ask(m);
 
             if (r == null) {
                 System.err.println("No agent state received! (possibly timeout in ask)");
             } else {
-                return (Document) r.get("content");
+                return (Document) r.getContentObject();
             }
         } catch (Exception e) {
             System.err.println("Error receiving agent state " + e);
             e.printStackTrace();
         }
-        */
         return null;
     }
 
     public RuntimeServicesInfraTier getRuntimeServices() {
-        return new JadeRuntimeServices(getContainerController());
+        return new JadeRuntimeServices(getContainerController(), this);
     }
 }

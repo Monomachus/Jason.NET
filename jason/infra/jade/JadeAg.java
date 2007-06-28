@@ -38,6 +38,7 @@ public abstract class JadeAg extends Agent {
     protected static int rwid = 0; // reply-with counter
 
     protected boolean running = true;
+    protected boolean inAsk = false;
 
     @Override
     public void doDelete() {
@@ -58,8 +59,30 @@ public abstract class JadeAg extends Agent {
 
 	public void broadcast(Message m) throws Exception {
 		ACLMessage acl = jasonToACL(m);
-		
-		// get all agents' name
+        addAllAgsAsReceivers(acl);
+        send(acl);
+	}
+    
+    // send a message and wait answer
+    protected ACLMessage ask(ACLMessage m) {
+        rwid++;
+        m.setReplyWith("id"+rwid);
+        try {
+            inAsk = true;
+            send(m);
+            MessageTemplate t = MessageTemplate.MatchInReplyTo(m.getReplyWith());
+            ACLMessage r = blockingReceive(t, 2000);
+            if (r != null) return r;
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Error waiting message.", e);            
+        } finally {
+            inAsk = false;
+        }
+        return null;
+    }
+
+    public void addAllAgsAsReceivers(ACLMessage m) throws Exception {
+        // get all agents' name
         SearchConstraints c = new SearchConstraints();
         c.setMaxResults( new Long(-1) );
         AMSAgentDescription[] all = AMSService.search( this, new AMSAgentDescription(), c);
@@ -68,12 +91,13 @@ public abstract class JadeAg extends Agent {
             if (!agentID.equals(getAID()) && 
                     !agentID.getName().startsWith("ams@") && 
                     !agentID.getName().startsWith("df@") &&
-                    !agentID.getName().startsWith("environment@")) {
-                acl.addReceiver(agentID);                
+                    !agentID.getName().startsWith(RunJadeMAS.environmentName) &&
+                    !agentID.getName().startsWith(RunJadeMAS.controllerName)
+               ) {
+                m.addReceiver(agentID);                
             }
-        }
-        send(acl);
-	}
+        }        
+    }
 
 	protected ACLMessage jasonToACL(Message m) throws IOException {
 		ACLMessage acl = new ACLMessage(kqmlToACL(m.getIlForce()));
@@ -130,21 +154,4 @@ public abstract class JadeAg extends Agent {
 		return "unknown";		
 	}
 	
-    // send a message and wait answer
-    synchronized protected ACLMessage ask(ACLMessage m) {
-        rwid++;
-        m.setReplyWith("id"+rwid);
-        try {
-            send(m);
-            MessageTemplate t = MessageTemplate.MatchInReplyTo(m.getReplyWith());
-            //while (isRunning()) {
-                ACLMessage r = blockingReceive(t); //,1000);
-                if (r != null) 
-                    return r;
-            //}
-        } catch (Exception e) {
-            logger.log(Level.SEVERE, "Error waiting message.", e);            
-        }
-        return null;
-    }
 }
