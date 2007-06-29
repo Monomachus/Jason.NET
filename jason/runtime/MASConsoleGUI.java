@@ -47,14 +47,8 @@ import javax.swing.JTextArea;
 public class MASConsoleGUI {
 
     private static MASConsoleGUI masConsole        = null;
-
     public static String         isTabbedPropField = MASConsoleLogHandler.class.getName() + ".tabbed";
-
     private boolean              isTabbed          = false;
-
-    JTabbedPane                  tabPane;
-
-    Map<String, JTextArea>       agsTextArea       = new HashMap<String, JTextArea>();
 
     /** for sigleton pattern */
     public static MASConsoleGUI get() {
@@ -68,14 +62,12 @@ public class MASConsoleGUI {
         return masConsole != null;
     }
 
+    Map<String, JTextArea>       agsTextArea       = new HashMap<String, JTextArea>();
+    JTabbedPane                  tabPane;
     JFrame              frame   = null;
-
     JTextArea           output;
-
     JPanel              pBt     = null;
-
     OutputStreamAdapter out;
-
     private boolean     inPause = false;
 
     private MASConsoleGUI(String title) {
@@ -178,7 +170,7 @@ public class MASConsoleGUI {
                 if (ta != null) { // no new TA was created
                     // print out
                     int l = ta.getDocument().getLength();
-                    if (l > 50000) {
+                    if (l > 100000) {
                         ta.setText("");
                         // l = output.getDocument().getLength();
                     }
@@ -189,16 +181,14 @@ public class MASConsoleGUI {
 
             // print in output
             int l = output.getDocument().getLength();
-            if (l > 30000) {
+            if (l > 60000) {
                 output.setText("");
                 // l = output.getDocument().getLength();
             }
             synchronized (this) {
                 output.append(s);
             }
-        } catch (Exception e) {
-
-        }
+        } catch (Exception e) { }
     }
 
     public void close() {

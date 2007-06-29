@@ -63,6 +63,8 @@ public class ExecutionControl {
 	static Logger logger = Logger.getLogger(ExecutionControl.class.getName());
 	RuntimeServicesInfraTier runtime;
 
+    private int nbAgs = 0;
+    
 	public ExecutionControl() {
 
 		// create a thread to wait ag Finished signals
@@ -91,7 +93,8 @@ public class ExecutionControl {
     protected void startNewCycle() {
         runningCycle = true;
         finished.clear();
-        cycleNumber++;        
+        cycleNumber++;
+        nbAgs = runtime.getAgentsQty();
     }
     
 	
@@ -105,12 +108,12 @@ public class ExecutionControl {
             lock.lock();
             try {                
                 if (logger.isLoggable(Level.FINE)) {
-                    logger.fine("Agent "+agName+" has finished the cycle "+cycle+", # of finished agents is "+(finished.size()+1)+"/"+runtime.getAgentsQty());
+                    logger.fine("Agent "+agName+" has finished the cycle "+cycle+", # of finished agents is "+(finished.size()+1)+"/"+nbAgs);
                     if (breakpoint) logger.fine("Agent "+agName+" reached a breakpoint");               
                 }
 
                 finished.add(agName);
-                if (finished.size() >= runtime.getAgentsQty()) {
+                if (finished.size() >= nbAgs) {
                     agFinishedCond.signal();
                 }
     		} finally {

@@ -84,11 +84,19 @@ public class JadeExecutionControl extends JadeAg implements ExecutionControlInfr
                     if (m == null) {
                         block(1000);
                     } else {
-                        String content = m.getContent();
-                        int p = content.indexOf(",");
-                        boolean breakpoint = Boolean.parseBoolean(content.substring(0,p));
-                        int cycle = Integer.parseInt(content.substring(p+1));
-                        userControl.receiveFinishedCycle(m.getSender().getLocalName(), breakpoint, cycle);
+                        if (!isAskAnswer(m)) {
+                            try {
+                                String content = m.getContent();
+                                int p = content.indexOf(",");
+                                if (p > 0) {
+                                    boolean breakpoint = Boolean.parseBoolean(content.substring(0,p));
+                                    int cycle = Integer.parseInt(content.substring(p+1));
+                                    userControl.receiveFinishedCycle(m.getSender().getLocalName(), breakpoint, cycle);
+                                }
+                            } catch (Exception e) {
+                                logger.log(Level.SEVERE, "Error in processing "+m, e);
+                            }
+                        }
                     }
                 }
             });

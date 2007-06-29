@@ -25,8 +25,11 @@ package jason.infra.jade;
 
 import jade.core.AID;
 import jade.core.behaviours.CyclicBehaviour;
+import jade.domain.DFService;
+import jade.domain.FIPAException;
+import jade.domain.FIPAAgentManagement.DFAgentDescription;
+import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
-import jade.lang.acl.MessageTemplate;
 import jason.asSemantics.Message;
 import jason.asSyntax.Structure;
 import jason.environment.Environment;
@@ -53,7 +56,8 @@ public class JadeEnvironment extends JadeAg implements EnvironmentInfraTier {
 
     static Logger logger = Logger.getLogger(JadeEnvironment.class.getName());
 
-    public static String actionOntology = "AS-actions";
+    public static String actionOntology     = "AS-actions";
+    public static String perceptionOntology = "AS-perception";
     
     public JadeEnvironment() {
     }
@@ -86,64 +90,73 @@ public class JadeEnvironment extends JadeAg implements EnvironmentInfraTier {
             logger.log(Level.SEVERE, "Error in setup Jade Environment", e);
         }
 
+        // DF register
+        DFAgentDescription dfa = new DFAgentDescription();
+        dfa.setName(getAID());
+        ServiceDescription vc = new ServiceDescription();
+        vc.setType("jason");
+        vc.setName(RunJadeMAS.environmentName);
+        dfa.addServices(vc);
+        try {
+            DFService.register(this,dfa);
+        } catch (FIPAException e) {
+            logger.log(Level.SEVERE, "Error registering environment in DF", e);
+        }
+
         try {
             // add a message handler to answer perception asks
-            // this handler filter is
-            // . content: getPercepts
-            final MessageTemplate pt = MessageTemplate.MatchContent("getPercepts");
+            // ans actions asks
             addBehaviour(new CyclicBehaviour() {
+                ACLMessage m;
                 public void action() {
-                    ACLMessage m = receive(pt);
+                    synchronized (syncReceive) {
+                        m = receive();
+                    }
                     if (m == null) {
                         block(1000);
                     } else {
-                        ACLMessage r = new ACLMessage(ACLMessage.INFORM);
-                        r.addReceiver(m.getSender());
-                        r.setInReplyTo(m.getReplyWith());
-                        r.setOntology(m.getOntology());
-                        try {
-                            ArrayList percepts = (ArrayList)userEnv.getPercepts(m.getSender().getLocalName());
-                            if (percepts == null) {
-                                r.setContent("nothing_new");
-                            } else {
-                                synchronized (percepts) {
-                                    r.setContent(percepts.toString());
+                        // is getPerceps
+                        if (m.getContent().equals("getPercepts")) {
+                            ACLMessage r = new ACLMessage(ACLMessage.INFORM);
+                            r.addReceiver(m.getSender());
+                            r.setInReplyTo(m.getReplyWith());
+                            r.setOntology(m.getOntology());
+                            try {
+                                ArrayList percepts = (ArrayList)userEnv.getPercepts(m.getSender().getLocalName());
+                                if (percepts == null) {
+                                    r.setContent("nothing_new");
+                                } else {
+                                    synchronized (percepts) {
+                                        r.setContent(percepts.toString());
+                                    }
                                 }
+                            } catch (Exception e) {
+                                e.printStackTrace();
                             }
-                        } catch (Exception e) {
-                            e.printStackTrace();
+                            send(r);
+                            
+                        // is action?    
+                        } else if (m.getOntology().equals(actionOntology)) {
+                            ACLMessage r = new ACLMessage(ACLMessage.INFORM);
+                            r.addReceiver(m.getSender());
+                            r.setInReplyTo(m.getReplyWith());
+                            r.setOntology(m.getOntology());
+                            try {
+                                Structure action = Structure.parse(m.getContent());
+                                if (userEnv.executeAction(m.getSender().getLocalName(), action)) {
+                                    r.setContent("ok");
+                                } else {
+                                    r.setContent("error");
+                                }
+                                send(r);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }                            
                         }
-                        send(r);
                     }
                 }
             });
 
-            // add a message handler to answer action asks
-            final MessageTemplate at = MessageTemplate.MatchOntology(actionOntology);
-            addBehaviour(new CyclicBehaviour() {
-                public void action() {
-                    ACLMessage m = receive(at);
-                    if (m == null) {
-                        block(1000);
-                    } else {
-                        ACLMessage r = new ACLMessage(ACLMessage.INFORM);
-                        r.addReceiver(m.getSender());
-                        r.setInReplyTo(m.getReplyWith());
-                        r.setOntology(m.getOntology());
-                        try {
-                            Structure action = Structure.parse(m.getContent());
-                            if (userEnv.executeAction(m.getSender().getLocalName(), action)) {
-                                r.setContent("ok");
-                            } else {
-                                r.setContent("error");
-                            }
-                            send(r);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-            });
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error starting agent", e);
         }

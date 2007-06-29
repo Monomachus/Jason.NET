@@ -2,11 +2,10 @@ package jason.infra.jade;
 
 import jade.core.AID;
 import jade.core.Agent;
-import jade.domain.AMSService;
-import jade.domain.FIPAAgentManagement.AMSAgentDescription;
-import jade.domain.FIPAAgentManagement.SearchConstraints;
+import jade.domain.DFService;
+import jade.domain.FIPAAgentManagement.DFAgentDescription;
+import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
-import jade.lang.acl.MessageTemplate;
 import jason.asSemantics.Message;
 import jason.asSyntax.Term;
 
@@ -38,7 +37,9 @@ public abstract class JadeAg extends Agent {
     protected static int rwid = 0; // reply-with counter
 
     protected boolean running = true;
-    protected boolean inAsk = false;
+    //protected boolean inAsk = false;
+    
+    protected Object syncReceive = new Object();
 
     @Override
     public void doDelete() {
@@ -63,40 +64,65 @@ public abstract class JadeAg extends Agent {
         send(acl);
 	}
     
+    private String waintingRW = null;
+    private ACLMessage answer = null;
+    
     // send a message and wait answer
     protected ACLMessage ask(ACLMessage m) {
-        rwid++;
-        m.setReplyWith("id"+rwid);
         try {
-            inAsk = true;
+            rwid++;
+            waintingRW = "id"+rwid;
+            m.setReplyWith(waintingRW);
+            answer = null;
             send(m);
-            MessageTemplate t = MessageTemplate.MatchInReplyTo(m.getReplyWith());
-            ACLMessage r = blockingReceive(t, 2000);
-            if (r != null) return r;
+            ACLMessage r = waitAns();
+            if (r != null) 
+                return r;
+            else 
+                logger.warning("ask timeout for "+m.getContent());
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error waiting message.", e);            
-        } finally {
-            inAsk = false;
         }
         return null;
+    }
+    
+    synchronized ACLMessage waitAns() {
+        try {
+            if (answer == null) {
+                wait(3000);
+            }
+            return answer;
+        } catch (InterruptedException e) {
+            return null;
+        }        
+    }
+    
+    synchronized boolean isAskAnswer(ACLMessage m) {
+        if (m.getInReplyTo() != null && m.getInReplyTo().equals(waintingRW)) {
+            answer = m;
+            notifyAll();
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public void addAllAgsAsReceivers(ACLMessage m) throws Exception {
         // get all agents' name
-        SearchConstraints c = new SearchConstraints();
-        c.setMaxResults( new Long(-1) );
-        AMSAgentDescription[] all = AMSService.search( this, new AMSAgentDescription(), c);
-        for (AMSAgentDescription ad: all) {
-            AID agentID = ad.getName();
-            if (!agentID.equals(getAID()) && 
-                    !agentID.getName().startsWith("ams@") && 
-                    !agentID.getName().startsWith("df@") &&
-                    !agentID.getName().startsWith(RunJadeMAS.environmentName) &&
-                    !agentID.getName().startsWith(RunJadeMAS.controllerName)
-               ) {
-                m.addReceiver(agentID);                
+        DFAgentDescription template = new DFAgentDescription();
+        ServiceDescription sd = new ServiceDescription();
+        sd.setType("jason");
+        sd.setName(JadeAgArch.dfName);
+        template.addServices(sd);
+        DFAgentDescription[] ans;
+        synchronized (syncReceive) {
+            ans = DFService.search(this, template);
+        }
+        for (int i=0; i<ans.length; i++) {
+            if (!ans[i].getName().equals(getAID())) {
+                m.addReceiver(ans[i].getName());
             }
-        }        
+        }
     }
 
 	protected ACLMessage jasonToACL(Message m) throws IOException {

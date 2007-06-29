@@ -2,6 +2,10 @@ package jason.infra.jade;
 
 import jade.core.AID;
 import jade.core.behaviours.CyclicBehaviour;
+import jade.domain.DFService;
+import jade.domain.FIPAException;
+import jade.domain.FIPAAgentManagement.DFAgentDescription;
+import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.UnreadableException;
 import jason.architecture.AgArch;
@@ -42,9 +46,11 @@ public class JadeAgArch extends JadeAg implements AgArchInfraTier {
 	public static final int TELLHOW   = 1004;
 	public static final int UNTELLHOW = 1005;
 	public static final int ASKHOW    = 1006;
-	
-	private static final long serialVersionUID = 1L;
 
+    /** name of the service in DF */
+    public static String dfName = "j_agent";
+    
+	private static final long serialVersionUID = 1L;
 	private Logger logger;
    
     /** the user customisation of the architecture */
@@ -56,7 +62,7 @@ public class JadeAgArch extends JadeAg implements AgArchInfraTier {
     private Queue<ACLMessage> msgs = new ConcurrentLinkedQueue<ACLMessage>();
     
     AID controllerAID  = new AID(RunJadeMAS.controllerName, AID.ISLOCALNAME);
-    AID environmentAID = new AID(RunJadeMAS.environmentName, AID.ISLOCALNAME);
+    AID environmentAID = null;
 
     // 
 	// Jade Methods
@@ -130,22 +136,37 @@ public class JadeAgArch extends JadeAg implements AgArchInfraTier {
             userAgArh.initAg(agClassName, bbPars, asSource, stts);
             logger.setLevel(userAgArh.getTS().getSettings().logLevel());
     
+            // DF register
+            DFAgentDescription dfa = new DFAgentDescription();
+            dfa.setName(getAID());
+            ServiceDescription vc = new ServiceDescription();
+            vc.setType("jason");
+            vc.setName(dfName);
+            dfa.addServices(vc);
+            try {
+                DFService.register(this,dfa);
+            } catch (FIPAException e) {
+                logger.log(Level.SEVERE, "Error registering agent in DF", e);
+            }
+            
             // wakeup the agent when new messages arrives
             addBehaviour(new CyclicBehaviour() {
+                ACLMessage m;
                 public void action() {
                     try {
-                        if (inAsk) {
-                            block(1000); // do not receive msgs if running ask
+                        synchronized (syncReceive) {
+                            m = receive();
+                        }
+                        if (m == null) {
+                            block(1000);
                         } else {
-                            ACLMessage m = receive();
-                            if (m == null) {
-                                block(1000);
-                            } else {
-                                if (logger.isLoggable(Level.FINE)) logger.fine("Received message: " + m);
-                                if (!isExecutionControlOntology(m) && !isActionFeedback(m)) {
-                                    msgs.offer(m); // store msgs to be processed by checkMail
-                                    userAgArh.getTS().newMessageHasArrived();
-                                }
+                            if (logger.isLoggable(Level.FINE)) logger.fine("Received message: " + m);
+                            if (!isAskAnswer(m) &&
+                                !isActionFeedback(m) && 
+                                !isExecutionControlOntology(m)
+                                ) {
+                                msgs.offer(m); // store msgs to be processed by checkMail
+                                userAgArh.getTS().newMessageHasArrived();
                             }
                         }
                     } catch (Exception e) {
@@ -253,6 +274,7 @@ public class JadeAgArch extends JadeAg implements AgArchInfraTier {
                         a.setResult(false);
                     }
                     userAgArh.getTS().getC().getFeedbackActions().add(a);
+                    userAgArh.getTS().newMessageHasArrived();
                 } else {
                     logger.log(Level.SEVERE, "Error: received feedback for an Action that is not pending. The message is "+m);
                 }
@@ -290,21 +312,25 @@ public class JadeAgArch extends JadeAg implements AgArchInfraTier {
         }
         return false;
     }
-    
+
+    boolean isPerceptionOntology(ACLMessage m) {
+        return m.getOntology() != null && m.getOntology().equals(JadeEnvironment.perceptionOntology);
+    }
+
 	@SuppressWarnings("unchecked")
     public List<Literal> perceive() {
         if (!isRunning()) return null;
-
+        if (getEnvironmentAg() == null) return null;
+        
         List percepts = null;
-
-        ACLMessage askMsg = new ACLMessage(ACLMessage.QUERY_REF);
-        askMsg.addReceiver(environmentAID);
-        askMsg.setOntology("AS-perception");
-        askMsg.setContent("getPercepts");
         try {
+            ACLMessage askMsg = new ACLMessage(ACLMessage.QUERY_REF);
+            askMsg.addReceiver(environmentAID);
+            askMsg.setOntology(JadeEnvironment.perceptionOntology);
+            askMsg.setContent("getPercepts");
             ACLMessage r = ask(askMsg);
-            if (r != null && r.getContent().startsWith("[")) { // && r.getContentObject() instanceof List) {
-                percepts = ListTermImpl.parseList(r.getContent()); //(List)r.getContentObject();
+            if (r != null && r.getContent().startsWith("[")) {
+                percepts = ListTermImpl.parseList(r.getContent());
             }
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error in perceive.", e);
@@ -313,9 +339,33 @@ public class JadeAgArch extends JadeAg implements AgArchInfraTier {
         return percepts;
 	}
 
+    private AID getEnvironmentAg() {
+        // get the name of the environment
+        if (environmentAID == null) {
+            DFAgentDescription template = new DFAgentDescription();
+            ServiceDescription sd = new ServiceDescription();
+            sd.setType("jason");
+            sd.setName(RunJadeMAS.environmentName);
+            template.addServices(sd);
+            try {
+                synchronized (syncReceive) {                    
+                    DFAgentDescription[] ans = DFService.search(this, template);
+                    if (ans.length > 0) {
+                        environmentAID =  ans[0].getName();
+                        return environmentAID;
+                    }
+                }
+            } catch (Exception e) {
+                logger.log(Level.SEVERE,"Error getting environment from DF.",e);
+            }
+        }
+        return environmentAID;
+    }
+
 	public void act(ActionExec action, List<ActionExec> feedback) {
         if (!isRunning()) return;
-
+        if (getEnvironmentAg() == null) return;
+        
         try {
             Term acTerm = action.getActionTerm();
             logger.info("doing: " + acTerm);

@@ -59,6 +59,8 @@ public class JasonIDOptionPanel extends AbstractOptionPane  {
 	JTextField saciTF;
 	JTextField jadeJarTF;
 	JTextField jadeArgsTF;
+    JCheckBox  jadeSnifferCB;
+    JCheckBox  jadeRmaCB;
 
 	static Config userProperties = Config.get();
 
@@ -188,6 +190,19 @@ public class JasonIDOptionPanel extends AbstractOptionPane  {
     	jadeArgsPanel.add(new JLabel("jade.Boot arguments"));
     	jadeArgsPanel.add(jadeArgsTF);
         jadeHomePanel.add(jadeArgsPanel);
+
+        JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        jadeRmaCB = new JCheckBox();
+        jadeRmaCB.setToolTipText("Whether the Jade management agent should be started in the begin.");
+        p.add(jadeRmaCB);
+        p.add(new JLabel("Start management agent             "));
+
+        jadeSnifferCB = new JCheckBox();
+        jadeSnifferCB.setToolTipText("Whether the Jade sniffer agent should be started in the begin and sniffing all agents.");
+        p.add(jadeSnifferCB);
+        p.add(new JLabel("Start Sniffer"));
+        jadeHomePanel.add(p);
+        
     	pop.add(jadeHomePanel);
 
     	// saci home
@@ -244,6 +259,8 @@ public class JasonIDOptionPanel extends AbstractOptionPane  {
     	//insideJIDECBox.setSelected(userProperties.runAsInternalTread());
     	closeAllCBox.setSelected(userProperties.getBoolean(Config.CLOSEALL));
         checkVersionCBox.setSelected(userProperties.getBoolean(Config.CHECK_VERSION));
+        jadeSnifferCB.setSelected(userProperties.getBoolean(Config.JADE_SNIFFER));        
+        jadeRmaCB.setSelected(userProperties.getBoolean(Config.JADE_RMA));        
 	}
 
     private JButton createBrowseButton(final String jarfile, final JTextField tf) {
@@ -295,6 +312,8 @@ public class JasonIDOptionPanel extends AbstractOptionPane  {
 		//userProperties.put(Config.RUN_AS_THREAD, insideJIDECBox.isSelected()+"");
 		userProperties.put(Config.CLOSEALL, closeAllCBox.isSelected()+"");
         userProperties.put(Config.CHECK_VERSION, checkVersionCBox.isSelected()+"");
+        userProperties.put(Config.JADE_SNIFFER, jadeSnifferCB.isSelected()+"");
+        userProperties.put(Config.JADE_RMA, jadeRmaCB.isSelected()+"");
 		userProperties.store();
 	}
 

@@ -158,6 +158,17 @@ public class RunJadeMAS extends RunCentralisedMAS {
                 logger.fine("Creating controller " + controlClass);
                 crtc = cc.createNewAgent(controllerName, JadeExecutionControl.class.getName(), new Object[] { controlClass });
             }
+            
+            // create rma
+            if (Config.get().getBoolean(Config.JADE_RMA)) {
+                cc.createNewAgent("RMA", jade.tools.rma.rma.class.getName(), null).start();
+            }
+
+            // create sniffer
+            if (Config.get().getBoolean(Config.JADE_SNIFFER)) {
+                cc.createNewAgent("Sniffer", jade.tools.sniffer.Sniffer.class.getName(), null).start();
+                Thread.sleep(1000); // give 1 second for sniffer to start
+            }
            
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error creating agents: ", e);            

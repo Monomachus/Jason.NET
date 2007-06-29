@@ -1,10 +1,9 @@
 package jason.infra.jade;
 
-import jade.core.AID;
 import jade.core.Agent;
-import jade.domain.AMSService;
-import jade.domain.FIPAAgentManagement.AMSAgentDescription;
-import jade.domain.FIPAAgentManagement.SearchConstraints;
+import jade.domain.DFService;
+import jade.domain.FIPAAgentManagement.DFAgentDescription;
+import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.wrapper.AgentController;
 import jade.wrapper.ContainerController;
 import jade.wrapper.ControllerException;
@@ -59,10 +58,19 @@ public class JadeRuntimeServices implements RuntimeServicesInfraTier {
     @SuppressWarnings("unchecked")
     public Set<String> getAgentsName() {
         // TODO: make a cache list and update it when a new agent enters the system
-        // TODO: only count Jason agents.
         if (jadeAgent == null) return null;
-        Set<String> ags = new HashSet<String>();
         try {
+            Set<String> ags = new HashSet<String>();
+            DFAgentDescription template = new DFAgentDescription();
+            ServiceDescription sd = new ServiceDescription();
+            sd.setType("jason");
+            sd.setName(JadeAgArch.dfName);
+            template.addServices(sd);
+            DFAgentDescription[] ans = DFService.search(jadeAgent, template);
+            for (int i=0; i<ans.length; i++) {
+                ags.add(ans[i].getName().getLocalName());                
+            }
+            /*
             SearchConstraints c = new SearchConstraints();
             c.setMaxResults( new Long(-1) );
             AMSAgentDescription[] all = AMSService.search( jadeAgent, new AMSAgentDescription(), c);
@@ -75,12 +83,13 @@ public class JadeRuntimeServices implements RuntimeServicesInfraTier {
                    ) {
                     ags.add(agentID.getLocalName());                
                 }
-            }        
+            } 
+            */       
             return ags;
             //logger.warning("getAgentsName is not implemented yet!");
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error getting agents' name", e);
-        }
+        }        
         return null;
     }
 

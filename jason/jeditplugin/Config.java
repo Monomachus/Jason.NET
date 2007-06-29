@@ -54,6 +54,8 @@ public class Config extends Properties {
 
     public static final String JADE_JAR      = "jadeJar";
     public static final String JADE_ARGS     = "jadeArgs";
+    public static final String JADE_RMA      = "jadeRMA";
+    public static final String JADE_SNIFFER  = "jadeSniffer";
 
     public static final String JAVA_HOME     = "javaHome";
     public static final String RUN_AS_THREAD = "runCentralisedInsideJIDE";
@@ -229,8 +231,8 @@ public class Config extends Properties {
         }
 
         // jade args
-        if (getProperty(JADE_ARGS) == null) {
-            put(JADE_ARGS, "-gui");
+        if (getProperty(JADE_RMA) == null) {
+            put(JADE_RMA, "true");
         }
         
         // Default infrastructures
