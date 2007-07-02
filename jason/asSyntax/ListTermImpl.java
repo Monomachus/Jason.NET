@@ -73,12 +73,8 @@ public class ListTermImpl extends Structure implements ListTerm {
 	/** make a hard copy of the terms */
 	public Object clone() {
 		ListTermImpl t = new ListTermImpl();
-		if (term != null) {
-			t.term = (Term)this.term.clone();
-		}
-		if (next != null) {
-			t.next = (Term)this.next.clone();
-		}
+		if (term != null) t.term = (Term)this.term.clone();
+		if (next != null) t.next = (Term)this.next.clone();
 		return t;
 	}
 	
@@ -88,22 +84,13 @@ public class ListTermImpl extends Structure implements ListTerm {
         if (t == null) return false;
         if (t == this) return true;
 
-		if (t instanceof Term &&  ((Term)t).isVar() )  // unground var is not equals a list
-		    return false;
+		if (t instanceof Term &&  ((Term)t).isVar() ) return false; // unground var is not equals a list
 		if (t instanceof ListTerm) {
 			ListTerm tAsList = (ListTerm)t;
-			if (term == null && tAsList.getTerm() != null) {
-				return false;
-			}
-			if (term != null && !term.equals(tAsList.getTerm())) {
-				return false;
-			}
-			if (next == null && tAsList.getNext() != null) {
-				return false;
-			}
-			if (next != null) {
-				return next.equals(tAsList.getNext());
-			}
+			if (term == null && tAsList.getTerm() != null) return false;
+			if (term != null && !term.equals(tAsList.getTerm())) return false;
+			if (next == null && tAsList.getNext() != null) return false;
+			if (next != null) return next.equals(tAsList.getNext());
 			return true;
 		} 
 	    return false;
@@ -162,7 +149,7 @@ public class ListTermImpl extends Structure implements ListTerm {
 	}
 	
 	public void addTerm(Term t) {
-		logger.warning("Do not use addTerm in lists! Use add.");
+		logger.warning("Do not use addTerm in lists! Use add(Term).");
 	}
 
 	public int size() {
@@ -331,7 +318,6 @@ public class ListTermImpl extends Structure implements ListTerm {
 		Iterator i = listTermIterator();
 		while (i.hasNext()) {
 			ListTerm lt = (ListTerm)i.next();
-			//System.out.println(s+"/cur="+lt.getTerm()+"/"+lt.getNext()+"/"+lt.getClass());
 			s.append( lt.getTerm() );
 			if (lt.isTail()) {
 				s.append("|");
