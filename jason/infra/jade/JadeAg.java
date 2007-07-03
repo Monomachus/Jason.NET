@@ -32,15 +32,16 @@ public abstract class JadeAg extends Agent {
 	
 	private static final long serialVersionUID = 1L;
 
-    private static Logger logger = Logger.getLogger(JadeAg.class.getName());
+    protected Logger logger = Logger.getLogger(JadeAg.class.getName());
 
     protected static int rwid = 0; // reply-with counter
 
     protected boolean running = true;
-    //protected boolean inAsk = false;
     
     protected Object syncReceive = new Object();
 
+    
+    
     @Override
     public void doDelete() {
         running = false;
@@ -64,17 +65,21 @@ public abstract class JadeAg extends Agent {
         send(acl);
 	}
     
-    private String waintingRW = null;
+    private String waitingRW = null;
     private ACLMessage answer = null;
     
     // send a message and wait answer
-    protected ACLMessage ask(ACLMessage m) {
+    protected ACLMessage ask(final ACLMessage m) {
+        if (waitingRW != null) {
+            logger.warning("Ignoring ask (already waiting answer): "+m);
+            return null;
+        }
         try {
             rwid++;
-            waintingRW = "id"+rwid;
-            m.setReplyWith(waintingRW);
+            waitingRW = "id"+rwid;
+            m.setReplyWith(waitingRW);
             answer = null;
-            send(m);
+            send(m);                    
             ACLMessage r = waitAns();
             if (r != null) 
                 return r;
@@ -82,25 +87,36 @@ public abstract class JadeAg extends Agent {
                 logger.warning("ask timeout for "+m.getContent());
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error waiting message.", e);            
+        } finally {
+            waitingRW = null;
         }
         return null;
     }
     
-    synchronized ACLMessage waitAns() {
+    private Object syncAsk = new Object();
+    
+    ACLMessage waitAns() {
         try {
             if (answer == null) {
-                wait(3000);
-            }
+                //logger.info("waiting "+waitingRW);
+                synchronized (syncAsk) {
+                    syncAsk.wait(5000);
+                }
+            } //else logger.info("no need to wait "+waitingRW);
+            //logger.info("stop wait  "+answer);
             return answer;
         } catch (InterruptedException e) {
             return null;
         }        
     }
     
-    synchronized boolean isAskAnswer(ACLMessage m) {
-        if (m.getInReplyTo() != null && m.getInReplyTo().equals(waintingRW)) {
+    boolean isAskAnswer(ACLMessage m) {
+        //logger.info("testing "+m);
+        if (m.getInReplyTo() != null && m.getInReplyTo().equals(waitingRW)) {
             answer = m;
-            notifyAll();
+            synchronized (syncAsk) {
+                syncAsk.notifyAll();
+            }
             return true;
         } else {
             return false;

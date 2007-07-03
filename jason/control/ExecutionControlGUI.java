@@ -42,6 +42,8 @@ import java.awt.event.WindowEvent;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.logging.Level;
 
 import javax.swing.BorderFactory;
@@ -79,9 +81,9 @@ public class ExecutionControlGUI extends ExecutionControl {
     
     private int countCycles = 0; // cycles since last "Run"
     private int maxCycles = 0;   // cycles to run
-    private boolean waitAll = false; // run cycles in all agentes
-    private boolean waitSelected = false; // run cycles in selected agent
-    private boolean breakpoint   = false;
+    private boolean waitAllAgs     = false; // run cycles in all agentes
+    private boolean waitSelectedAg = false; // run cycles in selected agent
+    private boolean breakpoint     = false;
 
 	// xml components
     asl2xml  agTransformerXML  = new asl2xml();
@@ -97,17 +99,15 @@ public class ExecutionControlGUI extends ExecutionControl {
 	}
 
 	// Inteface components
-	JFrame  frame;
+	JFrame     frame;
     JTextField jTfSteps = null;
-    JComboBox jCbWho = null;
-	JButton jBtRun = null;
-    JComboBox jCbViewAs = null;
-    JSlider jHistory = null;
-    
-	JTextPane jTA = null;
-
-	JList jList = null;
-	JPanel spList;
+    JComboBox  jCbWho = null;
+	JButton    jBtRun = null;
+    JComboBox  jCbViewAs = null;
+    JSlider    jHistory = null;
+	JTextPane  jTA = null;
+	JList      jList = null;
+	JPanel     spList;
 	
 	DefaultListModel listModel;
     
@@ -126,7 +126,11 @@ public class ExecutionControlGUI extends ExecutionControl {
         jTfSteps.setText("1");
         jTfSteps.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                startRun();
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        startRun();
+                    }
+                });
             }
         });
         
@@ -139,7 +143,11 @@ public class ExecutionControlGUI extends ExecutionControl {
 		jBtRun.setEnabled(true);
 		jBtRun.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-			    startRun();
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        startRun();
+                    }
+                });
             }
 		});
 
@@ -201,14 +209,13 @@ public class ExecutionControlGUI extends ExecutionControl {
                 } catch (Exception ex) { }
             }
         });
-        //jHistory.setL
         pHistory.add(BorderLayout.CENTER, jHistory);
         JPanel pAg = new JPanel(new BorderLayout());
         pAg.add(BorderLayout.CENTER, spTA);
         pAg.add(BorderLayout.SOUTH, pHistory);
         
 
-		listModel = new DefaultListModel();//MyListModel();
+		listModel = new DefaultListModel();
 		jList = new JList(listModel);
 		spList = new JPanel(new BorderLayout());
 		spList.add(BorderLayout.CENTER, new JScrollPane(jList));
@@ -220,9 +227,9 @@ public class ExecutionControlGUI extends ExecutionControl {
 				if (!ag.equals(currentAgState)) {
                     currentAgState = ag;
                     SwingUtilities.invokeLater(new Runnable() {
-                    	public void run() {
+                        public void run() {
                     		inspectAgent(currentAgState);
-                    	}
+                        }
                     });
 				}
 			}
@@ -278,12 +285,6 @@ public class ExecutionControlGUI extends ExecutionControl {
 
     @SuppressWarnings("unchecked")
     private void setupSlider() {
-        // get ag history
-        //Map<Integer,Document> lag = agsHistory.get(currentAgName);
-        //if (lag != null && !lag.isEmpty()) {
-        //} else {
-        //    jHistory.setValue(0);            
-        //}
         int size = getCycleNumber();
         Hashtable<Integer,Component> labelTable = new Hashtable<Integer,Component>();
         labelTable.put( 0, new JLabel("Cycle 0") );
@@ -309,26 +310,26 @@ public class ExecutionControlGUI extends ExecutionControl {
 		currentAgName = agName;
         
         agState = null;
-        
+
         // try to get the state from the history
         try {
-            agState = agsHistory.get(agName).get(getCycleNumber());
+            agState = agsHistory.get(currentAgName).get(getCycleNumber());
         } catch (Exception et) {}
 
         // if no state from history, ask the agent
         if (agState == null) {
-    		try {
+            try {
                 // try to get from history
-    			agState = infraControl.getAgState(agName);
-                storeAgHistory(agName, getCycleNumber(), infraControl.getAgState(agName));
-    		} catch (Exception e) {
-    			jTA.setText("Error getting the state of agent "+agName);
+                agState = infraControl.getAgState(currentAgName);
+                storeAgHistory(currentAgName, getCycleNumber(), agState);
+            } catch (Exception e) {
+                jTA.setText("Error getting the state of agent "+currentAgName);
                 logger.log(Level.SEVERE,"Error:",e);
-    		}
+            }
         }
         
         showAgState();
-        setupSlider();
+        setupSlider();                
 	}
 
     private String previousMind = "--";
@@ -387,11 +388,11 @@ public class ExecutionControlGUI extends ExecutionControl {
         maxCycles = Integer.parseInt(jTfSteps.getText());
         breakpoint = false;
         if (jCbWho.getSelectedIndex() == 0) {
-            waitAll      = true; 
-            waitSelected = false;
+            waitAllAgs     = true; 
+            waitSelectedAg = false;
         } else {
-            waitAll      = false; 
-            waitSelected = true;
+            waitAllAgs     = false; 
+            waitSelectedAg = true;
         }
         if (RunCentralisedMAS.getRunner() != null && RunCentralisedMAS.getRunner().btDebug != null) {
             RunCentralisedMAS.getRunner().btDebug.setEnabled(true);
@@ -403,24 +404,26 @@ public class ExecutionControlGUI extends ExecutionControl {
     
     /** stop the execution */
     protected void stopRun() {
-        waitAll      = false; 
-        waitSelected = false;
+        waitAllAgs     = false; 
+        waitSelectedAg = false;
         inspectAgent(currentAgName);
         jBtRun.setEnabled(true);
         setRunningCycle(false);
     }
+
+    private ExecutorService executor = Executors.newFixedThreadPool(5);
     
     protected void continueRun() {
-        if (waitAll) {
-            infraControl.informAllAgsToPerformCycle(getCycleNumber());            
-        }
-        if (waitSelected) {
-            new Thread() {
-                public void run() {
+        executor.execute(new Runnable() {
+            public void run() {
+                if (waitAllAgs) {
+                    infraControl.informAllAgsToPerformCycle(getCycleNumber());            
+                }
+                if (waitSelectedAg) {
                     infraControl.informAgToPerformCycle(currentAgName, getCycleNumber());
                 }
-            }.start();
-        }
+            }
+        });
     }
     
 	/** 
@@ -428,7 +431,7 @@ public class ExecutionControlGUI extends ExecutionControl {
 	 * <i>breakpoint</i> is true in case the agent selected one plan with "breakpoint" 
 	 * annotation. 
 	  */
-	public void receiveFinishedCycle(String agName, boolean breakpoint, int cycle) {
+	public void receiveFinishedCycle(final String agName, boolean breakpoint, final int cycle) {
 		if (!listModel.contains(agName)) {
 			logger.fine("New agent "+agName);
 			listModel.addElement(agName);
@@ -443,7 +446,7 @@ public class ExecutionControlGUI extends ExecutionControl {
         }
 
         this.breakpoint = breakpoint;
-        if (waitSelected) {
+        if (waitSelectedAg) {
             countCycles++;
             logger.info("Agent "+agName+" has finished the cycle "+cycle);
             if (testStop()) {
@@ -460,7 +463,7 @@ public class ExecutionControlGUI extends ExecutionControl {
 
 	/** called when all agents have finished the current cycle */
 	protected void allAgsFinished() {
-        if (waitAll) {
+        if (waitAllAgs) {
             logger.fine("All agents have finished the cycle "+getCycleNumber());
             countCycles++;
             if (testStop()) {
@@ -479,6 +482,7 @@ public class ExecutionControlGUI extends ExecutionControl {
     }
 
     protected void storeAgHistory(String agName, int cycle, Document doc) {
+        if (doc == null) return;
         Map<Integer,Document> lag = agsHistory.get(agName);
         if (lag == null) {
             lag = new HashMap<Integer,Document>();

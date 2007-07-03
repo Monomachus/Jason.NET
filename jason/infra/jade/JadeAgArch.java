@@ -47,11 +47,10 @@ public class JadeAgArch extends JadeAg implements AgArchInfraTier {
 	public static final int UNTELLHOW = 1005;
 	public static final int ASKHOW    = 1006;
 
-    /** name of the service in DF */
+    /** name of the "jason agent" service in DF */
     public static String dfName = "j_agent";
     
 	private static final long serialVersionUID = 1L;
-	private Logger logger;
    
     /** the user customisation of the architecture */
     protected AgArch userAgArh;
@@ -296,6 +295,7 @@ public class JadeAgArch extends JadeAg implements AgArchInfraTier {
             } else if (content.startsWith("agState")) {
                 // send the agent state
                 ACLMessage r = new ACLMessage(ACLMessage.INFORM);
+                r.setOntology(m.getOntology());
                 r.addReceiver(m.getSender());
                 r.setInReplyTo(m.getReplyWith());
                 try {

@@ -26,12 +26,13 @@ package jason.infra.jade;
 import jade.core.AID;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
-import jade.lang.acl.MessageTemplate;
 import jason.control.ExecutionControl;
 import jason.control.ExecutionControlInfraTier;
 import jason.mas2j.ClassParameters;
 import jason.runtime.RuntimeServicesInfraTier;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -43,13 +44,16 @@ import org.w3c.dom.Document;
 @SuppressWarnings("serial")
 public class JadeExecutionControl extends JadeAg implements ExecutionControlInfraTier {
 
-    static Logger logger = Logger.getLogger(JadeExecutionControl.class.getName());
     public static String controllerOntology = "AS-ExecControl";
 
     private ExecutionControl userControl;
+
+    ExecutorService executor; // the thread pool used to execute actions
     
     @Override
     public void setup()  {
+        logger = Logger.getLogger(JadeExecutionControl.class.getName());
+        
         // create the user environment
         try {
             Object[] args = getArguments();
@@ -75,26 +79,40 @@ public class JadeExecutionControl extends JadeAg implements ExecutionControlInfr
             logger.log(Level.SEVERE, "Error in setup Jade Environment", e);
         }
 
+        executor = Executors.newFixedThreadPool(5);
+        
         try {
             // message handler for "informCycleFinished"
-            final MessageTemplate ect = MessageTemplate.MatchOntology(controllerOntology);
             addBehaviour(new CyclicBehaviour() {
+                ACLMessage m;
                 public void action() {
-                    ACLMessage m = receive(ect);
+                    synchronized (syncReceive) {
+                        m = receive();
+                    }
                     if (m == null) {
                         block(1000);
                     } else {
                         if (!isAskAnswer(m)) {
                             try {
-                                String content = m.getContent();
-                                int p = content.indexOf(",");
-                                if (p > 0) {
-                                    boolean breakpoint = Boolean.parseBoolean(content.substring(0,p));
-                                    int cycle = Integer.parseInt(content.substring(p+1));
-                                    userControl.receiveFinishedCycle(m.getSender().getLocalName(), breakpoint, cycle);
+                                @SuppressWarnings("unused")
+                                Document o = (Document)m.getContentObject();
+                                logger.warning("Received agState too late! in-reply-to:"+m.getInReplyTo());
+                            } catch (Exception _) {
+                                try {
+                                    final String content = m.getContent();
+                                    final int p = content.indexOf(",");
+                                    if (p > 0) {
+                                        final boolean breakpoint = Boolean.parseBoolean(content.substring(0,p));
+                                        final int cycle = Integer.parseInt(content.substring(p+1));
+                                        executor.execute(new Runnable() {
+                                            public void run() {
+                                                userControl.receiveFinishedCycle(m.getSender().getLocalName(), breakpoint, cycle);
+                                            }
+                                        });
+                                    }
+                                } catch (Exception e) {
+                                    logger.log(Level.SEVERE, "Error in processing "+m, e);
                                 }
-                            } catch (Exception e) {
-                                logger.log(Level.SEVERE, "Error in processing "+m, e);
                             }
                         }
                     }
@@ -112,7 +130,6 @@ public class JadeExecutionControl extends JadeAg implements ExecutionControlInfr
         if (userControl != null) userControl.stop();
     }
     
-    
     public ExecutionControl getUserControl() {
         return userControl;
     }
@@ -125,7 +142,7 @@ public class JadeExecutionControl extends JadeAg implements ExecutionControlInfr
         send(m);
     }
 
-    public void informAllAgsToPerformCycle(int cycle) {
+    public void informAllAgsToPerformCycle(final int cycle) {
         try {
             ACLMessage m = new ACLMessage(ACLMessage.INFORM);
             m.setOntology(controllerOntology);
@@ -133,26 +150,25 @@ public class JadeExecutionControl extends JadeAg implements ExecutionControlInfr
             m.setContent("performCycle "+cycle);
             send(m);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.log(Level.SEVERE, "Error in informAllAgsToPerformCycle", e);
         }
     }
 
     public Document getAgState(String agName) {
+        if (agName == null) return null;
         try {
             ACLMessage m = new ACLMessage(ACLMessage.QUERY_REF);
             m.setOntology(controllerOntology);
             m.addReceiver(new AID(agName, AID.ISLOCALNAME));
             m.setContent("agState");
             ACLMessage r = ask(m);
-
             if (r == null) {
                 System.err.println("No agent state received! (possibly timeout in ask)");
             } else {
                 return (Document) r.getContentObject();
             }
         } catch (Exception e) {
-            System.err.println("Error receiving agent state " + e);
-            e.printStackTrace();
+            logger.log(Level.SEVERE, "Error in getAgState", e);
         }
         return null;
     }
