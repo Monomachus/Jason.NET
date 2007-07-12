@@ -55,10 +55,10 @@ public class TransitionSystem {
     
     private Logger        logger     = null;
 
-    Agent                 ag         = null;
-    AgArch                agArch     = null;
-    Circumstance          C          = null;
-    Settings              setts      = null;
+    private Agent         ag         = null;
+    private AgArch        agArch     = null;
+    private Circumstance  C          = null;
+    private Settings      setts      = null;
 
     // first step of the SOS 
     private State         step       = State.StartRC;                                                                                               
@@ -68,15 +68,15 @@ public class TransitionSystem {
     
     // both configuration and configuration' point to this
     // object, this is just to make it look more like the SOS
-    TransitionSystem      confP;
+    private TransitionSystem      confP;
 
     // both configuration and configuration' point to this
     // object, this is just to make it look more like the SOS
-    TransitionSystem      conf;
+    private TransitionSystem      conf;
 
     public TransitionSystem(Agent a, Circumstance c, Settings s, AgArch ar) {
-        ag = a;
-        C = c;
+        ag     = a;
+        C      = c;
         agArch = ar;
 
         if (s == null) {
@@ -629,16 +629,16 @@ public class TransitionSystem {
         	//ap = new ApplPlanTimeOut().get(rp);
         	
             for (Option opt: rp) {
-                LogicalFormula context = opt.plan.getContext();
+                LogicalFormula context = opt.getPlan().getContext();
                 if (context == null) { // context is true
                     if (ap == null) ap = new LinkedList<Option>();
                     ap.add(opt);
                 } else {
                     boolean allUnifs = opt.getPlan().isAllUnifs();
-                    Iterator<Unifier> r = context.logicalConsequence(ag, opt.unif);
+                    Iterator<Unifier> r = context.logicalConsequence(ag, opt.getUnifier());
                     if (r != null) {
                         while (r.hasNext()) {
-                            opt.unif = r.next();
+                            opt.setUnifier(r.next());
                             
                             if (ap == null) ap = new LinkedList<Option>();
                             ap.add(opt);
@@ -646,7 +646,7 @@ public class TransitionSystem {
                             if (!allUnifs) break; // returns only the first unification
                             if (r.hasNext()) {
                                 // create a new option for the next loop step
-                                opt = new Option(opt.plan, null);
+                                opt = new Option(opt.getPlan(), null);
                             }
                         }
                     }

@@ -43,13 +43,12 @@ import org.w3c.dom.Element;
 public class Literal extends Pred implements LogicalFormula {
 
 	private static final long serialVersionUID = 1L;
-
+    private static Logger logger = Logger.getLogger(Literal.class.getName());
+    
 	public static final boolean LPos   = true;
     public static final boolean LNeg   = false;
     public static final Literal LTrue  = new Literal("true");
     public static final Literal LFalse = new Literal("false");
-
-    static private Logger logger = Logger.getLogger(Literal.class.getName());
 
 	private boolean type = LPos;
 
@@ -101,7 +100,7 @@ public class Literal extends Pred implements LogicalFormula {
 	}
 	
 	public boolean negated() {
-		return (type == LNeg);
+		return type == LNeg;
 	}
     
     public void setNegated(boolean b) {

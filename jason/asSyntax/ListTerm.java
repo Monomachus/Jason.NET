@@ -4,7 +4,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * The interface for lists if the AgentSpeak language
+ * The interface for lists of the AgentSpeak language
  * 
  * @author Jomi
  */

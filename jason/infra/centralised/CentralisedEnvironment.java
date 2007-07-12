@@ -52,9 +52,9 @@ public class CentralisedEnvironment implements EnvironmentInfraTier {
 	private RunCentralisedMAS masRunner = null;
 	private boolean running = true;
     
-	ExecutorService executor; // the thread pool used to execute actions
+	private ExecutorService executor; // the thread pool used to execute actions
 	
-    static Logger logger = Logger.getLogger(CentralisedEnvironment.class.getName());
+    private static Logger logger = Logger.getLogger(CentralisedEnvironment.class.getName());
 	
     public CentralisedEnvironment(ClassParameters userEnv, RunCentralisedMAS masRunner) throws JasonException {
         this.masRunner = masRunner;

@@ -34,16 +34,13 @@ import java.util.logging.Logger;
 /**
  * Base class for all terms.
  */
-public abstract class DefaultTerm implements Term, Serializable {
+public abstract class DefaultTerm extends SourceInfo implements Term, Serializable {
 
 	private static final long serialVersionUID = 1L;
+    private static Logger logger = Logger.getLogger(Term.class.getName());
 
     protected Integer     hashCodeCache = null;
-    protected String      source  = null; 
-	protected int         srcLine = -1; // the line this literal appears in the source
 
-    static private Logger logger = Logger.getLogger(Term.class.getName());
-    
     public static Term parse(String sTerm) {
         as2j parser = new as2j(new StringReader(sTerm));
         try {
@@ -86,19 +83,5 @@ public abstract class DefaultTerm implements Term, Serializable {
 
     public boolean apply(Unifier u) {
     	return false;
-    }
-
-    public void setSrcLine(int i) {
-		srcLine = i;
-	}
-    public int getSrcLine() {
-    	return srcLine;
-    }
-    
-    public void setSrc(String asSource) {
-        source = asSource;
-    }
-    public String getSrc() {
-        return source;
     }
 }

@@ -73,7 +73,7 @@ import java.util.logging.Logger;
  *  @author Jomi
  */
 public class JDBCPersistentBB extends DefaultBeliefBase {
-    static private Logger logger     = Logger.getLogger(JDBCPersistentBB.class.getName());
+    private static Logger logger     = Logger.getLogger(JDBCPersistentBB.class.getName());
 
     static final String   COL_PREFIX = "term";
     static final String   COL_NEG    = "j_negated";

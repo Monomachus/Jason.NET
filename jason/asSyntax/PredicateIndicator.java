@@ -1,7 +1,7 @@
 package jason.asSyntax;
 
 /**
- * Represents the "type" of a predicate, e.g.: ask/4
+ * Represents the "type" of a predicate based on the functor and the arity, e.g.: ask/4
  * 
  * @author jomi
  */

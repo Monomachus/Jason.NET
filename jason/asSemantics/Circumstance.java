@@ -39,7 +39,6 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.logging.Logger;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -47,8 +46,6 @@ import org.w3c.dom.Element;
 public class Circumstance implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-
-	static Logger                      logger    = Logger.getLogger(Circumstance.class.getName());
 
     private Queue<Event>               E;
     private Queue<Intention>           I;
@@ -73,6 +70,7 @@ public class Circumstance implements Serializable {
         reset();
     }
 
+    /** creates new collections for E, I, MB, PA, PI, and FA */
     public void create() {
         // use LinkedList since we use a lot of remove(0) in selectEvent
         E = new ConcurrentLinkedQueue<Event>();
@@ -83,6 +81,7 @@ public class Circumstance implements Serializable {
         FA = new ArrayList<ActionExec>();    	
     }
     
+    /** set null for A, RP, AP, SE, SO, and SI */
     public void reset() {
         A  = null;
         RP = null;
@@ -132,7 +131,7 @@ public class Circumstance implements Serializable {
         Iterator<Event> i = E.iterator();
         while (i.hasNext()) {
             Event e = i.next();
-            if (e.intention != null && e.intention.isAtomic()) {
+            if (e.getIntention() != null && e.getIntention().isAtomic()) {
                 i.remove();
                 return e;
             }

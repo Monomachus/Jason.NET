@@ -47,7 +47,8 @@ import javax.swing.JTextArea;
 public class MASConsoleGUI {
 
     private static MASConsoleGUI masConsole        = null;
-    public static String         isTabbedPropField = MASConsoleLogHandler.class.getName() + ".tabbed";
+    public  static String        isTabbedPropField = MASConsoleLogHandler.class.getName() + ".tabbed";
+
     private boolean              isTabbed          = false;
 
     /** for sigleton pattern */
@@ -62,12 +63,12 @@ public class MASConsoleGUI {
         return masConsole != null;
     }
 
-    Map<String, JTextArea>       agsTextArea       = new HashMap<String, JTextArea>();
-    JTabbedPane                  tabPane;
-    JFrame              frame   = null;
-    JTextArea           output;
-    JPanel              pBt     = null;
-    OutputStreamAdapter out;
+    private Map<String, JTextArea>       agsTextArea       = new HashMap<String, JTextArea>();
+    private JTabbedPane                  tabPane;
+    private JFrame              frame   = null;
+    private JTextArea           output;
+    private JPanel              pBt     = null;
+    private OutputStreamAdapter out;
     private boolean     inPause = false;
 
     private MASConsoleGUI(String title) {

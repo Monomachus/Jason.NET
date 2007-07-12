@@ -32,7 +32,8 @@ import java.util.logging.LogRecord;
  * Default formatter for Jason output.
  */
 public class MASConsoleLogFormatter extends java.util.logging.Formatter {
-	public String format(LogRecord l) {
+
+    public String format(LogRecord l) {
         StringBuilder s = new StringBuilder("[");
 		s.append(getAgName(l));
 		s.append("] ");

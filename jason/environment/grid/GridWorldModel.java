@@ -17,8 +17,8 @@ public class GridWorldModel {
     public static final int       AGENT    = 2;
     public static final int       OBSTACLE = 4;
 
-    int                           width, height;
-    public int[][]                data = null; 
+    protected int                 width, height;
+    protected int[][]             data = null; 
     protected Location[]          agPos;
     protected GridWorldView       view;
 

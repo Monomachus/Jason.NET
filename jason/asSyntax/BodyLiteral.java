@@ -26,66 +26,29 @@ package jason.asSyntax;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-public class BodyLiteral implements Cloneable {
+/** Represents an item of a plan body (achieve, test, action, ...) */
+public class BodyLiteral extends SourceInfo implements Cloneable {
 
     public enum BodyType {
-        action {
-            public String toString() {
-                return "";
-            }
-        },
-        internalAction {
-            public String toString() {
-                return "";
-            }
-        },
-        achieve {
-            public String toString() {
-                return "!";
-            }
-        },
-        test {
-            public String toString() {
-                return "?";
-            }
-        },
-        addBel {
-            public String toString() {
-                return "+";
-            }
-        },
-        delBel {
-            public String toString() {
-                return "-";
-            }
-        },
-        delAddBel {
-            public String toString() {
-                return "-+";
-            }
-        },
-        achieveNF {
-            public String toString() {
-                return "!!";
-            }
-        },
-        constraint {
-            public String toString() {
-                return "";
-            }
-        }
+        action {          public String toString() { return ""; }},
+        internalAction {  public String toString() { return ""; }},
+        achieve {         public String toString() { return "!"; }},
+        test {            public String toString() { return "?"; }},
+        addBel {          public String toString() { return "+"; }},
+        delBel {          public String toString() { return "-"; }},
+        delAddBel {       public String toString() { return "-+"; }},
+        achieveNF {       public String toString() { return "!!"; }},
+        constraint {      public String toString() { return ""; }}
     }
 
-    LogicalFormula  formula;
-    BodyType        formType;
-    String          source  = null;
-    int             srcLine = -1;
+    private LogicalFormula  formula;
+    private BodyType        formType;
     
     public BodyLiteral(BodyType t, Literal l) {
         formula = (Literal) l.clone();
         formType = t;
-        srcLine = l.getSrcLine();
-        source  = l.getSrc();
+        setSrcLine(l.getSrcLine());
+        setSrc(l.getSrc());
         if (l.isInternalAction()) {
             formType = BodyType.internalAction;
         }
@@ -93,15 +56,15 @@ public class BodyLiteral implements Cloneable {
 
     public BodyLiteral(RelExpr re) {
         formula = (LogicalFormula) re.clone();
-        srcLine = re.getSrcLine();
-        source  = re.getSrc();
+        setSrcLine(re.getSrcLine());
+        setSrc(re.getSrc());
         formType = BodyType.constraint;
     }
 
     public BodyLiteral(LogExpr le) {
         formula = (LogicalFormula) le.clone();
-        srcLine = le.getSrcLine();
-        source  = le.getSrc();
+        setSrcLine(le.getSrcLine());
+        setSrc(le.getSrc());
         formType = BodyType.test;
     }
 
@@ -127,8 +90,8 @@ public class BodyLiteral implements Cloneable {
 
     public String getSrcInfo() {
     	String line = "";
-    	if (srcLine >= 0)   line = ":"+srcLine;
-        if (source != null) line = source+line;
+    	if (getSrcLine() >= 0)   line = ":"+getSrcLine();
+        if (getSrc() != null) line = getSrc()+line;
     	return " ("+line+")";
     }
     

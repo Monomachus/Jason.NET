@@ -39,37 +39,24 @@ import java.util.logging.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-public class Plan implements Cloneable, Serializable {
+/** Represents an AgentSpack plan */
+public class Plan extends SourceInfo implements Cloneable, Serializable {
     
 	private static final long serialVersionUID = 1L;
-
-	protected Pred              label  = null;
-    protected Trigger           tevent = null;
-    protected LogicalFormula    context;
-    protected List<BodyLiteral> body;
-    
-    private boolean isAtomic = false;
-    private boolean isAllUnifs = false;
-    private boolean hasBreakpoint = false;
-    
     private static final Term TAtomic         = DefaultTerm.parse("atomic");
     private static final Term TBreakPoint     = DefaultTerm.parse("breakpoint");
     private static final Term TAllUnifs       = DefaultTerm.parse("all_unifs");
     
-    /*
-    private enum Annots {
-        atomic, breakpoint
-    }
-    // enum set of special annots, to improve performance in isAtomic, isBreak,
-    // ...
-    private EnumSet<Annots>   properties      = EnumSet.noneOf(Annots.class);
-     */
+    private static Logger     logger          = Logger.getLogger(Plan.class.getName());
     
-    private int               startSourceLine = 0;
-    private int               endSourceLine   = 0;
-    private String            source          = null;
+	private Pred              label  = null;
+    private Trigger           tevent = null;
+    private LogicalFormula    context;
+    private List<BodyLiteral> body;
     
-    static private Logger     logger          = Logger.getLogger(Plan.class.getName());
+    private boolean isAtomic = false;
+    private boolean isAllUnifs = false;
+    private boolean hasBreakpoint = false;
     
     public Plan() {
     }
@@ -133,24 +120,6 @@ public class Plan implements Cloneable, Serializable {
         }
     }
     
-    public void setSrc(String asSource) {
-        source = asSource;
-    }
-    public String getSrc() {
-        return source;
-    }
-    
-    public void setSrcLines(int b, int e) {
-        startSourceLine = b;
-        endSourceLine   = e;
-    }
-    public int getStartSrcLine() {
-        return startSourceLine;
-    }
-    public int getEndSrcLine() {
-        return endSourceLine;
-    }
-    
     public Trigger getTriggerEvent() {
         return tevent;
     }
@@ -191,10 +160,8 @@ public class Plan implements Cloneable, Serializable {
 
         if (o != null && o instanceof Plan) {
             Plan p = (Plan) o;
-            if (context == null && p.context != null)
-                return false;
-            if (context != null && p.context != null && !context.equals(p.context))
-                return false;
+            if (context == null && p.context != null) return false;
+            if (context != null && p.context != null && !context.equals(p.context)) return false;
             return tevent.equals(p.tevent) && body.equals(p.body);
         }
         return false;
@@ -224,9 +191,7 @@ public class Plan implements Cloneable, Serializable {
         }
         p.setBody(copy);
         
-        p.startSourceLine = startSourceLine;
-        p.endSourceLine   = endSourceLine;
-        p.source          = source;
+        p.setSrc(this);
 
         return p;
     }

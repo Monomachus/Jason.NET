@@ -17,9 +17,8 @@ public class KillAgentGUI extends BaseDialogGUI {
 
 	private static final long serialVersionUID = 1L;
 
-	JList                    lAgs;
-
-    RuntimeServicesInfraTier services;
+	private JList lAgs;
+    private RuntimeServicesInfraTier services;
 
     public KillAgentGUI(Frame f, String title) {
         super(f, title);

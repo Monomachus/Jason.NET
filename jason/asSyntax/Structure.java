@@ -45,12 +45,11 @@ import org.w3c.dom.Element;
 public class Structure extends DefaultTerm {
 
 	private static final long serialVersionUID = 1L;
+    private static Logger logger = Logger.getLogger(Structure.class.getName());
 
 	private final String functor; // immutable field
     private List<Term> terms = null;
 
-    static private Logger logger = Logger.getLogger(Structure.class.getName());
-    
     public Structure(String functor) {
         //if (functor != null && Character.isUpperCase(functor.charAt(0))) {
         //    logger.warning("Are you sure you want to create a structure that begins with uppercase ("+functor+")? Should it be a VarTerm instead?");
@@ -64,8 +63,8 @@ public class Structure extends DefaultTerm {
     public Structure(Structure t) {
         functor = t.getFunctor();
         setTerms(t.getDeepCopyOfTerms());
-        this.srcLine = t.srcLine;
-        this.source  = t.source;
+        setSrcLine(t.getSrcLine());
+        setSrc(t.getSrc());
     }
 
     public static Structure parse(String sTerm) {

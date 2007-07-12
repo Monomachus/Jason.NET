@@ -6,7 +6,7 @@ import jason.util.ToDOM;
 import java.io.Serializable;
 
 /**
- * Common interface for all kind of Terms
+ * Common interface for all kind of terms
  */
 public interface Term extends Cloneable, Comparable<Term>, Serializable, ToDOM {
 

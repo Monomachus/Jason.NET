@@ -37,8 +37,10 @@ import org.w3c.dom.Element;
 
     
 /**
-      used to group a set of vars. E.g.: when X = Y = W = Z the function map
-      has X -> { X, Y, W, Z } 
+      Stores a set of vars that were unified. 
+      
+      E.g.: when X = Y = W = Z the unifier function maps
+          X -> { X, Y, W, Z } 
           Y -> { X, Y, W, Z } 
           W -> { X, Y, W, Z } 
           Z -> { X, Y, W, Z } 
@@ -51,14 +53,14 @@ import org.w3c.dom.Element;
 */
 public class VarsCluster extends DefaultTerm implements Iterable<VarTerm> {
 	
-    static Logger logger = Logger.getLogger(VarsCluster.class.getName());
     private static final long serialVersionUID = 1L;
+    private static Logger logger = Logger.getLogger(VarsCluster.class.getName());
 
     private static int idCount = 0;
 
-    int          id = 0;
-    Set<VarTerm> vars = null;
-    Unifier      u;
+    private int          id = 0;
+    private Set<VarTerm> vars = null;
+    private Unifier      u;
 		
     // used in clone
 	private VarsCluster(Unifier u) {
@@ -96,13 +98,9 @@ public class VarsCluster extends DefaultTerm implements Iterable<VarTerm> {
 	}
 
 	public boolean equals(Object o) {
-		if (o == null)
-			return false;
-		if (o == this)
-			return true;
-		if (o instanceof VarsCluster) {
-			return vars.equals(((VarsCluster) o).vars);
-		}
+		if (o == null) return false;
+		if (o == this) return true;
+		if (o instanceof VarsCluster) return vars.equals(((VarsCluster) o).vars);
 		return false;
 	}
 

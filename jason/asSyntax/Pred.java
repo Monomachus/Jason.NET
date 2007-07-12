@@ -41,10 +41,9 @@ import org.w3c.dom.Element;
 public class Pred extends Structure {
 
 	private static final long serialVersionUID = 1L;
+    private static Logger logger = Logger.getLogger(Pred.class.getName());
 
 	private ListTerm      annots;
-
-    static private Logger logger = Logger.getLogger(Pred.class.getName());
 
     public Pred(String ps) {
         super(ps);

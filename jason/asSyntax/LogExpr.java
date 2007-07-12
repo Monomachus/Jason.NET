@@ -40,11 +40,12 @@ import org.w3c.dom.Element;
 
 
 /** 
- *  represents a logical formula with some logical operator ("&amp;",  "|", "not").
+ *  Represents a logical formula with some logical operator ("&amp;",  "|", "not").
  */
 public class LogExpr implements LogicalFormula {
 
 	private static final long serialVersionUID = 1L;
+    private static Logger logger = Logger.getLogger(LogExpr.class.getName());
 
     public static final List<Unifier> EMPTY_UNIF_LIST = Collections.emptyList();
 
@@ -57,8 +58,6 @@ public class LogExpr implements LogicalFormula {
 
 	private  LogicalFormula lhs, rhs;
 	private  LogicalOp      op = LogicalOp.none;
-
-	static private Logger logger = Logger.getLogger(LogExpr.class.getName());
 	
 	public LogExpr() {
 		super();

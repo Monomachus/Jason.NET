@@ -77,7 +77,7 @@ public class ExecutionControlGUI extends ExecutionControl {
     String currentAgName  = "";
     int    agShownState   = 0;
     
-    Map<String,Map<Integer,Document>> agsHistory = new HashMap<String,Map<Integer,Document>>();
+    private Map<String,Map<Integer,Document>> agsHistory = new HashMap<String,Map<Integer,Document>>();
     
     private int countCycles = 0; // cycles since last "Run"
     private int maxCycles = 0;   // cycles to run

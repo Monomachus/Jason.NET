@@ -37,9 +37,9 @@ public class ActionExec implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-    Structure action;
-	Intention intention;
-    boolean   result;
+    private Structure action;
+	private Intention intention;
+    private boolean   result;
     
     public ActionExec(Pred ac, Intention i) {
         action = ac;
@@ -49,10 +49,8 @@ public class ActionExec implements Serializable {
     
     @Override
     public boolean equals(Object ao) {
-        if (ao == null)
-            return false;
-        if (!(ao instanceof ActionExec)) 
-            return false;
+        if (ao == null) return false;
+        if (!(ao instanceof ActionExec)) return false;
         ActionExec a = (ActionExec)ao;
         return action.equals(a.action);
     }

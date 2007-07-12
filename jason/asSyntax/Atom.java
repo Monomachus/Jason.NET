@@ -35,8 +35,7 @@ import java.util.logging.*;
 public final class Atom extends Literal {
 
     private static final long serialVersionUID = 1L;
-
-    static private Logger logger = Logger.getLogger(Atom.class.getName());
+    private static Logger logger = Logger.getLogger(Atom.class.getName());
 
     public Atom(String functor) {
         super(functor);
@@ -92,9 +91,7 @@ public final class Atom extends Literal {
     public boolean equals(Object o) {
         if (o == null) return false;
         if (o == this) return true;
-        if (o instanceof Structure) {
-            return getFunctor().equals(((Structure)o).getFunctor());
-        }
+        if (o instanceof Structure) return getFunctor().equals(((Structure)o).getFunctor());
         return false;
     }
 }

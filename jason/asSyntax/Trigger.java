@@ -24,6 +24,7 @@
 
 package jason.asSyntax;
 
+/** Represents an AgentSpeak trigger (like +!g, +p, ...) */
 import jason.asSyntax.parser.as2j;
 
 import java.io.StringReader;
@@ -35,7 +36,8 @@ import org.w3c.dom.Element;
 
 public class Trigger implements Cloneable {
 
-
+    private static Logger logger = Logger.getLogger(Trigger.class.getName());
+      
     public enum TEOperator { 
         add { public String toString() { return "+"; } }, 
         del { public String toString() { return "-"; } }
@@ -47,12 +49,10 @@ public class Trigger implements Cloneable {
         test    { public String toString() { return "?"; } }
     };
     
-	static private Logger logger = Logger.getLogger(Trigger.class.getName());
-  
-	TEOperator operator = TEOperator.add;
-    TEType     type     = TEType.belief;
+	private TEOperator operator = TEOperator.add;
+    private TEType     type     = TEType.belief;
 
-	Literal literal;
+	private Literal literal;
 	
 	public Trigger(TEOperator op, TEType t, Literal l) {
 		literal = l;

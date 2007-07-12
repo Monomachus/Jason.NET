@@ -40,30 +40,28 @@ import org.w3c.dom.Element;
 public final class StringTermImpl extends DefaultTerm implements StringTerm {
 
 	private static final long serialVersionUID = 1L;
+	private static Logger logger = Logger.getLogger(StringTermImpl.class.getName());
     
-    private final String fValue;
-
-	static private Logger logger = Logger.getLogger(StringTermImpl.class.getName());
+    private final String value;
 
 	public StringTermImpl() {
 		super();
-		fValue = null;
+		value = null;
 	}
 	
 	public StringTermImpl(String fs) {
-		fValue = fs;
+		value = fs;
 	}
 	
 	public StringTermImpl(StringTermImpl t) {
-		fValue = t.getString();
+		value = t.getString();
 	}
 
 	public String getString() {
-		return fValue;
+		return value;
 	}
 	
 	public Object clone() {
-		//return new StringTermImpl(getString());
 		return this;
 	}
 	
@@ -83,7 +81,7 @@ public final class StringTermImpl extends DefaultTerm implements StringTerm {
 	}
 
  	public int length() {
-		return fValue.length();
+		return value.length();
 	}
 
     @Override
@@ -92,18 +90,18 @@ public final class StringTermImpl extends DefaultTerm implements StringTerm {
 
         if (t != null && t instanceof StringTerm) {
             StringTerm st = (StringTerm)t;
-            return fValue.equals(st.getString());
+            return value.equals(st.getString());
         }
         return false;
     }
 
     @Override
     protected int calcHashCode() {
-        return fValue.hashCode();
+        return value.hashCode();
     }
 	
 	public String toString() {
-		return "\""+fValue+"\"";
+		return "\""+value+"\"";
 	}
 
     /** get as XML */

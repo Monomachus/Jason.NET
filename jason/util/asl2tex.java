@@ -43,8 +43,7 @@ public class asl2tex extends asl2xml {
     public Transformer getTransformer()  throws Exception {
         if (transCache == null) {
             transCache = getFactory().newTransformer(
-            new StreamSource(asl2tex.class.getResource(style)
-            .openStream()));
+                    new StreamSource(asl2tex.class.getResource(style).openStream()));
         }
         return transCache;
     }

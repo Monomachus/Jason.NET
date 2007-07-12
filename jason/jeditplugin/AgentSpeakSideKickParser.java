@@ -84,7 +84,7 @@ public class AgentSpeakSideKickParser extends sidekick.SideKickParser {
 			//super(((p.getLabel() == null) ? "" : "@" + p.getLabel() + " ") 	+ p.getTriggerEvent());
 			super(p.getTriggerEvent().toString());
 			this.plan  = p;
-			this.start = toPos(buf, p.getStartSrcLine());
+			this.start = toPos(buf, p.getBeginSrcLine());
 			this.end   = toPos(buf, p.getEndSrcLine());
 		}
 

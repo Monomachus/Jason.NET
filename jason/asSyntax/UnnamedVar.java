@@ -48,27 +48,10 @@ public class UnnamedVar extends VarTerm {
         } else {
         	return new UnnamedVar(getFunctor());
         }
-
-        /*
-        UnnamedVar v = new UnnamedVar(getFunctor());
-        if (hasValue()) {
-            v.setValue((Term) getValue().clone());
-        }
-        return v;
-        */
     }
 
     @Override
     public boolean isUnnamedVar() {
         return !hasValue();
     }
-
-    /*
-    public String toString() {
-        if (hasValue())
-            return getValue().toString();
-        else
-            return "_";
-    }
-	*/
 }

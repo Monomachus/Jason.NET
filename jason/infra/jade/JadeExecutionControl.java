@@ -48,7 +48,7 @@ public class JadeExecutionControl extends JadeAg implements ExecutionControlInfr
 
     private ExecutionControl userControl;
 
-    ExecutorService executor; // the thread pool used to execute actions
+    private ExecutorService executor; // the thread pool used to execute actions
     
     @Override
     public void setup()  {

@@ -48,7 +48,7 @@ import org.w3c.dom.Element;
  */
 public class DefaultBeliefBase implements BeliefBase {
 
-    static private Logger logger;
+    private static Logger logger;
 
     /**
      * belsMap is a table where the key is the bel.getFunctorArity and the value

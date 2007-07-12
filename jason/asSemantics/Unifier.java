@@ -40,7 +40,7 @@ import org.w3c.dom.Element;
 
 public class Unifier implements Cloneable {
 
-    static Logger logger = Logger.getLogger(Unifier.class.getName());
+    private static Logger logger = Logger.getLogger(Unifier.class.getName());
 
     private HashMap<VarTerm, Term> function = new HashMap<VarTerm, Term>();
 
@@ -325,9 +325,7 @@ public class Unifier implements Cloneable {
     public boolean equals(Object o) {
         if (o == null) return false;
         if (o == this) return true;
-        if (o instanceof Unifier) {
-            return function.equals( ((Unifier)o).function);
-        }
+        if (o instanceof Unifier) return function.equals( ((Unifier)o).function);
         return false;
     }
     

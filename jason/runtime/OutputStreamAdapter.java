@@ -31,8 +31,8 @@ import javax.swing.JTextArea;
 /** adapts an output print stream to a GUI interface (MasConsole or some JTextArea) */
 public class OutputStreamAdapter extends PrintStream {
 
-	MASConsoleGUI masConsole;
-	JTextArea     ta;
+	private MASConsoleGUI masConsole;
+	private JTextArea     ta;
 
     public PrintStream originalOut = null;
     public PrintStream originalErr = null;

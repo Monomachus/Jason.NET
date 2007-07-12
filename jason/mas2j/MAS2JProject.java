@@ -51,23 +51,15 @@ public class MAS2JProject {
 	
 	private static Logger logger = Logger.getLogger(MAS2JProject.class.getName());
 		
-	String soc;
-
-	ClassParameters envClass = null; 
-	
-    ClassParameters controlClass = null;
-	
-	String infrastructure = "Centralised";
-
-	String projectDir = "." + File.separator;
-	File   projectFile = null;
-	
-	List<AgentParameters> agents = new ArrayList<AgentParameters>();
-
-    List<String> classpaths = new ArrayList<String>();
-
-    Map<String,String> directiveClasses = new HashMap<String,String>();
-
+	private String soc;
+	private ClassParameters envClass = null; 
+    private ClassParameters controlClass = null;
+    private String infrastructure = "Centralised";
+    private String projectDir = "." + File.separator;
+    private File   projectFile = null;
+	private List<AgentParameters> agents = new ArrayList<AgentParameters>();
+    private List<String> classpaths = new ArrayList<String>();
+    private Map<String,String> directiveClasses = new HashMap<String,String>();
     
     public static MAS2JProject parse(String file) {
         try {
@@ -261,6 +253,5 @@ public class MAS2JProject {
 			}
 		}
 		return infraFac;
-	}
-	
+    }
 }

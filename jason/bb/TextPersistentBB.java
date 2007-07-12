@@ -16,7 +16,7 @@ import java.util.logging.Logger;
  * The file name is the agent's name + ".bb".
  */
 public class TextPersistentBB extends DefaultBeliefBase {
-    static private Logger logger = Logger.getLogger(TextPersistentBB.class.getName());
+    private static Logger logger = Logger.getLogger(TextPersistentBB.class.getName());
 
     File file = null;
 

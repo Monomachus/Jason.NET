@@ -39,7 +39,7 @@ public class Event implements Serializable {
     Intention intention = Intention.EmptyInt;
     
     public Event(Trigger t, Intention i) {
-        trigger = t;
+        trigger   = t;
         intention = i;
     }
 
@@ -56,10 +56,10 @@ public class Event implements Serializable {
     }
 
     public boolean isExternal() {
-        return (intention==Intention.EmptyInt);
+        return intention == Intention.EmptyInt;
     }
     public boolean isInternal() {
-        return (intention!=Intention.EmptyInt);
+        return intention != Intention.EmptyInt;
     }
 
     public Object clone() {

@@ -33,8 +33,7 @@ import org.w3c.dom.Element;
 public final class NumberTermImpl extends DefaultTerm implements NumberTerm {
 
 	private static final long serialVersionUID = 1L;
-
-	static private Logger logger = Logger.getLogger(NumberTermImpl.class.getName());
+    private static Logger logger = Logger.getLogger(NumberTermImpl.class.getName());
 
 	private final double fValue;
 	
@@ -66,7 +65,6 @@ public final class NumberTermImpl extends DefaultTerm implements NumberTerm {
 	}
 
 	public Object clone() {
-		//return new NumberTermImpl(solve());
 		return this;
 	}
 	

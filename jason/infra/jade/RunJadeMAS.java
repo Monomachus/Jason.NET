@@ -61,16 +61,15 @@ import javax.swing.JButton;
  */
 public class RunJadeMAS extends RunCentralisedMAS {
 
-    private static Logger logger = Logger.getLogger(RunJadeMAS.class.getName());
-    
-    AgentController envc, crtc;
-    Map<String,AgentController> ags = new HashMap<String,AgentController>();
-
-    ContainerController cc;
-    
     public static String controllerName  = "j_controller";
     public static String environmentName = "j_environment";
     
+    private static Logger logger = Logger.getLogger(RunJadeMAS.class.getName());
+    
+    private AgentController envc, crtc;
+    private Map<String,AgentController> ags = new HashMap<String,AgentController>();
+
+    private ContainerController cc;    
     
     public static void main(String[] args) {
         runner = new RunJadeMAS();

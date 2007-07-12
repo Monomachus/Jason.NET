@@ -57,6 +57,7 @@ import org.w3c.dom.Element;
 public class RelExpr implements LogicalFormula {
 
 	private static final long serialVersionUID = 1L;
+    private static Logger logger = Logger.getLogger(RelExpr.class.getName());
 
 	public enum RelationalOp { 
 		none   { public String toString() { return ""; } }, 
@@ -73,8 +74,6 @@ public class RelExpr implements LogicalFormula {
     private Term         lhs, rhs;
 	private RelationalOp op = RelationalOp.none;
 
-	static private Logger logger = Logger.getLogger(RelExpr.class.getName());
-	
 	public RelExpr() {
 		super();
 	}

@@ -45,7 +45,7 @@ public class CentralisedExecutionControl implements ExecutionControlInfraTier {
 
     private RunCentralisedMAS masRunner = null;
 
-    static Logger logger = Logger.getLogger(CentralisedExecutionControl.class.getName());
+    private static Logger logger = Logger.getLogger(CentralisedExecutionControl.class.getName());
 
     public CentralisedExecutionControl(ClassParameters userControlClass, RunCentralisedMAS masRunner) throws JasonException {
         this.masRunner = masRunner;

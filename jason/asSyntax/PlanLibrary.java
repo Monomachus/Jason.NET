@@ -39,21 +39,22 @@ import java.util.logging.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+/** Represents a set of plans used by an agent */  
 public class PlanLibrary implements Iterable<Plan> {
 
 	/** a MAP from TE to a list of relevant plans */
-    Map<PredicateIndicator,List<Plan>> relPlans = new HashMap<PredicateIndicator,List<Plan>>();
+    private Map<PredicateIndicator,List<Plan>> relPlans = new HashMap<PredicateIndicator,List<Plan>>();
 
 	/**
 	 * All plans as defined in the AS code (maintains the order of the plans)
 	 */
-	List<Plan> plans = new ArrayList<Plan>();
+	private List<Plan> plans = new ArrayList<Plan>();
 	
 	/** list of plans that have var as TE */
-	List<Plan> varPlans = new ArrayList<Plan>();
+	private List<Plan> varPlans = new ArrayList<Plan>();
 	
 	/** A map from labels to plans */
-	Map<String,Plan> planLabels = new HashMap<String,Plan>();
+	private Map<String,Plan> planLabels = new HashMap<String,Plan>();
 	
 	private static int lastPlanLabel = 0;
 

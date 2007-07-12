@@ -27,13 +27,12 @@ package jason.asSemantics;
 
 public class Message {
     
-    String ilForce  = null;
-    String sender   = null;
-    String receiver = null;
-    Object propCont = null;
-    String msgId    = null;
-    String inReplyTo = null;
-    //String askVar   = null; // used for 'send(ag1, askOne, value, R)' askVar is R
+    private String ilForce  = null;
+    private String sender   = null;
+    private String receiver = null;
+    private Object propCont = null;
+    private String msgId    = null;
+    private String inReplyTo = null;
     
     private static int idCount = 1;
     
@@ -118,5 +117,4 @@ public class Message {
 		String irt = (inReplyTo == null ? "" : "->"+inReplyTo);
         return "<"+msgId+irt+","+sender+","+ilForce+","+receiver+","+propCont+">";
     }
-
 }

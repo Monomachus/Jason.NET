@@ -48,8 +48,8 @@ public class IntendedMeans implements Serializable {
 	private   Trigger trigger; // the trigger which created this IM
     
     public IntendedMeans(Option opt, Trigger te) {
-    	plan = (Plan)opt.plan.clone();
-    	unif = (Unifier)opt.unif.clone();
+    	plan = (Plan)opt.getPlan().clone();
+    	unif = (Unifier)opt.getUnifier().clone();
     	Literal planLiteral = plan.getTriggerEvent().getLiteral();
     	if (planLiteral.hasAnnot()) {
     		planLiteral.getAnnots().apply(unif);

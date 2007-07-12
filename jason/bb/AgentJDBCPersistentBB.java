@@ -5,7 +5,6 @@ import jason.asSyntax.PredicateIndicator;
 import jason.asSyntax.Structure;
 
 import java.sql.SQLException;
-import java.util.logging.Logger;
 
 /**
  * Implementation of BB that stores some beliefs in a relational data base.
@@ -16,7 +15,6 @@ import java.util.logging.Logger;
  * @author Neil Madden
  */
 public class AgentJDBCPersistentBB extends JDBCPersistentBB {
-    static private Logger logger  = Logger.getLogger(AgentJDBCPersistentBB.class.getName());
 
     static final String COL_AGENT = "j_agent";
     

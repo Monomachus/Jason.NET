@@ -39,16 +39,8 @@ import org.w3c.dom.Document;
  */
 public class JadeAgArch extends JadeAg implements AgArchInfraTier {
 
-	// KQML performatives not available in FIPA-ACL
-	public static final int UNTELL    = 1001;
-	public static final int ASKALL    = 1002;
-	public static final int UNACHIEVE = 1003;
-	public static final int TELLHOW   = 1004;
-	public static final int UNTELLHOW = 1005;
-	public static final int ASKHOW    = 1006;
-
     /** name of the "jason agent" service in DF */
-    public static String dfName = "j_agent";
+    public  static String dfName = "j_agent";
     
 	private static final long serialVersionUID = 1L;
    

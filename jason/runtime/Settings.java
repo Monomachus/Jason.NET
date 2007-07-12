@@ -44,16 +44,15 @@ public class Settings {
     public static final int       ODefaultVerbose = 1;
     public static final boolean   ODefaultSync    = false;
 	
-	
-    byte    events    = ODiscard;
-    boolean intBels   = OSameFocus;
-    int     nrcbp     = ODefaultNRC;
-    int     verbose   = ODefaultVerbose;
-    boolean sync      = ODefaultSync; 
+    private static Logger logger = Logger.getLogger(Settings.class.getName());          
+    	
+    private byte    events    = ODiscard;
+    private boolean intBels   = OSameFocus;
+    private int     nrcbp     = ODefaultNRC;
+    private int     verbose   = ODefaultVerbose;
+    private boolean sync      = ODefaultSync; 
     
-    Map<String,Object> userParameters = new HashMap<String,Object>();
-    
-    Logger logger = Logger.getLogger(Settings.class.getName());			
+    private Map<String,Object> userParameters = new HashMap<String,Object>();
     
     public Settings() {
     }

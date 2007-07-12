@@ -10,7 +10,7 @@ import java.util.Map;
 
 /** 
  * represents the agent declaration in the MAS2J project file. 
- * The project parser create this object while parsing.
+ * The project parser creates this object while parsing.
  * 
  * @author jomi
  */

@@ -54,17 +54,17 @@ public class ExecutionControl {
 	protected ExecutionControlInfraTier infraControl = null;
 	
 	private Set<String> finished = new HashSet<String>(); // the agents that have finished its reasoning cycle
-	private int cycleNumber = 0;
+	private int     cycleNumber = 0;
     private boolean runningCycle = true;
-
-	private Lock lock = new ReentrantLock();
-    private Condition agFinishedCond = lock.newCondition();
-
-	static Logger logger = Logger.getLogger(ExecutionControl.class.getName());
-	RuntimeServicesInfraTier runtime;
 
     private int nbAgs = 0;
     
+	private Lock lock = new ReentrantLock();
+    private Condition agFinishedCond = lock.newCondition();
+    private RuntimeServicesInfraTier runtime;
+
+	protected static Logger logger = Logger.getLogger(ExecutionControl.class.getName());
+
 	public ExecutionControl() {
 
 		// create a thread to wait ag Finished signals

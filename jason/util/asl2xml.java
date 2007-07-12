@@ -86,8 +86,7 @@ public class asl2xml  {
 			fac.setURIResolver(new URIResolver() {
 				public Source resolve(String href, String base) throws TransformerException {
 					try {
-						return new StreamSource(asl2xml.class.getResource(
-								"/xml/" + href).openStream());
+						return new StreamSource(asl2xml.class.getResource("/xml/" + href).openStream());
 					} catch (Exception e) {
 						System.err.println("Error - " + href + "-" + base);
 						e.printStackTrace();

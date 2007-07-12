@@ -62,27 +62,22 @@ import javax.swing.JTextArea;
  */
 public class RunCentralisedMAS {
 
-    CentralisedEnvironment           env         = null;
-
-    CentralisedExecutionControl      control     = null;
-
-    static boolean                   debug       = false;
-
-    public JButton                   btDebug;
-
-    private Map<String,CentralisedAgArch> ags    = new ConcurrentHashMap<String,CentralisedAgArch>();
-
-    private static Logger            logger      = Logger.getLogger(RunCentralisedMAS.class.getName());
-
-    protected static RunCentralisedMAS runner      = null;
-    private   static String            urlPrefix   = "";
-    private   static boolean           readFromJAR = false;
-    
-    private static MAS2JProject      project;
-    
     public final static String       logPropFile = "logging.properties";
     public final static String       stopMASFileName = ".stop___MAS";
     public final static String       defaultProjectFileName = "default.mas2j";
+
+    private   static Logger            logger      = Logger.getLogger(RunCentralisedMAS.class.getName());
+    protected static RunCentralisedMAS runner      = null;
+    private   static String            urlPrefix   = "";
+    private   static boolean           readFromJAR = false;
+    private   static MAS2JProject      project;
+    
+    private CentralisedEnvironment        env         = null;
+    private CentralisedExecutionControl   control     = null;
+    private boolean                       debug       = false;
+    private Map<String,CentralisedAgArch> ags    = new ConcurrentHashMap<String,CentralisedAgArch>();
+
+    public JButton                   btDebug;
     
     public static void main(String[] args) {
         runner = new RunCentralisedMAS();
@@ -179,7 +174,7 @@ public class RunCentralisedMAS {
     }
 
     public static boolean isDebug() {
-        return debug;
+        return runner.debug;
     }
 
     public static void setupLogger() {

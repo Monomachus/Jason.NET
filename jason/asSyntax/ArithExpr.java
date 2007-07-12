@@ -39,6 +39,7 @@ import org.w3c.dom.Element;
 public class ArithExpr extends DefaultTerm implements NumberTerm {
 
 	private static final long serialVersionUID = 1L;
+    private static Logger logger = Logger.getLogger(ArithExpr.class.getName());
 	
 	public enum ArithmeticOp {
         none {
@@ -118,12 +119,8 @@ public class ArithExpr extends DefaultTerm implements NumberTerm {
     }
 
     private NumberTerm    lhs, rhs;
-
     private ArithmeticOp  op     = ArithmeticOp.none;
-
     private NumberTerm    fValue = null; // value, when evaluated	
-
-    static private Logger logger = Logger.getLogger(ArithExpr.class.getName());
 
     private ArithExpr() {
         super();
@@ -205,23 +202,11 @@ public class ArithExpr extends DefaultTerm implements NumberTerm {
         if (isEvaluated()) return fValue.equals(t);
         if (t instanceof ArithExpr) {
             ArithExpr eprt = (ArithExpr) t;
-            if (lhs == null && eprt.lhs != null) {
-                return false;
-            }
-            if (lhs != null && !lhs.equals(eprt.lhs)) {
-                return false;
-            }
-
-            if (op != eprt.op) {
-                return false;
-            }
-
-            if (rhs == null && eprt.rhs != null) {
-                return false;
-            }
-            if (rhs != null && !rhs.equals(eprt.rhs)) {
-                return false;
-            }
+            if (lhs == null && eprt.lhs != null) return false;
+            if (lhs != null && !lhs.equals(eprt.lhs)) return false;
+            if (op != eprt.op) return false;
+            if (rhs == null && eprt.rhs != null) return false;
+            if (rhs != null && !rhs.equals(eprt.rhs)) return false;
             return true;
         }
         return false;

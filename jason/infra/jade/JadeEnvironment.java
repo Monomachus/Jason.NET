@@ -52,13 +52,13 @@ import java.util.logging.Logger;
 @SuppressWarnings("serial")
 public class JadeEnvironment extends JadeAg implements EnvironmentInfraTier {
 
-    private Environment userEnv;
-
-    static Logger logger = Logger.getLogger(JadeEnvironment.class.getName());
+    private static Logger logger = Logger.getLogger(JadeEnvironment.class.getName());
 
     public static String actionOntology     = "AS-actions";
     public static String perceptionOntology = "AS-perception";
     
+    private Environment userEnv;
+
     public JadeEnvironment() {
     }
 

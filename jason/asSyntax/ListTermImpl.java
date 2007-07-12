@@ -50,11 +50,10 @@ import org.w3c.dom.Element;
 public class ListTermImpl extends Structure implements ListTerm {
 	
 	private static final long serialVersionUID = 1L;
+    private static Logger logger = Logger.getLogger(ListTermImpl.class.getName());
 
 	private Term term;
 	private Term next;
-
-	static private Logger logger = Logger.getLogger(ListTermImpl.class.getName());
 	
 	public ListTermImpl() {
 		super((String)null);
@@ -549,5 +548,4 @@ public class ListTermImpl extends Structure implements ListTerm {
         }
         return u;
     }
-
 }
