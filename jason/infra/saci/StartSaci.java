@@ -1,5 +1,6 @@
 package jason.infra.saci;
 
+import jason.infra.centralised.CentralisedMASLauncherAnt;
 import jason.jeditplugin.Config;
 import jason.mas2j.MAS2JProject;
 
@@ -82,8 +83,8 @@ class StartSaci extends Thread {
 
     /** returns the operating system command that runs the MAS */
     public String[] getStartCommandArray() {
-        String build = "build.xml";
-        if (hasCBuild()) build = "c-build.xml";
+        String build = CentralisedMASLauncherAnt.bindir+"build.xml";
+        if (hasCBuild()) build = CentralisedMASLauncherAnt.bindir+"c-build.xml";
         return  new String[] {
                     Config.get().getJavaHome()+"bin"+File.separator+"java",
                     "-classpath", 
@@ -96,7 +97,7 @@ class StartSaci extends Thread {
     }
 
     protected boolean hasCBuild() {
-        return new File(project.getDirectory()+ "c-build.xml").exists();
+        return new File(project.getDirectory()+ CentralisedMASLauncherAnt.bindir+"c-build.xml").exists();
     }
 
 	synchronized void stopWaitSaciOk() {

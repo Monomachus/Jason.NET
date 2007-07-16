@@ -27,6 +27,8 @@ public class CentralisedMASLauncherAnt implements MASLauncherInfraTier {
     protected Process            masProcess = null;
     protected OutputStream       processOut;
 
+    public static String         bindir = "bin"+File.separator;
+    
     private String task;
     
     public CentralisedMASLauncherAnt() {
@@ -116,11 +118,13 @@ public class CentralisedMASLauncherAnt implements MASLauncherInfraTier {
 
     /** returns the operating system command that runs the MAS */
     public String[] getStartCommandArray() {
-        String build = "build.xml";
-        if (hasCBuild()) build = "c-build.xml";
+        String build = bindir+"build.xml";
+        if (hasCBuild()) build = bindir+"c-build.xml";
         
-        return new String[] { Config.get().getJavaHome() + "bin" + File.separator + "java", "-classpath",
-                Config.get().getAntLib() + "ant-launcher.jar", "org.apache.tools.ant.launch.Launcher", "-e", "-f", build, task};
+        return new String[] { Config.get().getJavaHome() + "bin" + File.separator + "java", 
+                "-classpath",
+                Config.get().getAntLib() + "ant-launcher.jar", "org.apache.tools.ant.launch.Launcher", 
+                "-e", "-f", build, task};
     }
 
     /** write the scripts necessary to run the project */
@@ -136,8 +140,14 @@ public class CentralisedMASLauncherAnt implements MASLauncherInfraTier {
             // replace <....>
             script = replaceMarks(script, debug);
 
+            // create bin dir
+            File bindirfile = new File(project.getDirectory()+bindir);
+            if (!bindirfile.exists()) {
+                bindirfile.mkdir();
+            }
+                
             // write the script
-            FileWriter out = new FileWriter(project.getDirectory() + "build.xml");
+            FileWriter out = new FileWriter(project.getDirectory() + bindir + "build.xml");
             out.write(script);
             out.close();
             return true;
@@ -201,7 +211,7 @@ public class CentralisedMASLauncherAnt implements MASLauncherInfraTier {
     }
 
     protected boolean hasCBuild() {
-    	return new File(project.getDirectory() + "c-build.xml").exists();
+    	return new File(project.getDirectory() + bindir + "c-build.xml").exists();
     }
 
 }

@@ -48,7 +48,7 @@ public class mas2j implements mas2jConstants {
                 launcher.writeScripts(false);
 
         int step = 1;
-        System.out.println("To run your MAS, just run \"ant\".");
+        System.out.println("To run your MAS, just type \"cd bin; ant\".");
         //System.out.println("  1. chmod u+x *.sh");
       } catch(Exception e){
                 System.err.println("mas2j: parsing errors found... \n" + e);

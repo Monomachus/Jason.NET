@@ -265,7 +265,7 @@ public class ArithExpr extends DefaultTerm implements NumberTerm {
 
     @Override
     public boolean isGround() {
-        return isEvaluated() || (lhs.isGround() && rhs.isGround());
+        return isEvaluated() || (lhs.isGround() && (rhs == null || rhs.isGround()));
     }
 
     public double solve() {

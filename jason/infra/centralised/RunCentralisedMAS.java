@@ -62,7 +62,7 @@ import javax.swing.JTextArea;
  */
 public class RunCentralisedMAS {
 
-    public final static String       logPropFile = "logging.properties";
+    public final static String       logPropFile     = "logging.properties";
     public final static String       stopMASFileName = ".stop___MAS";
     public final static String       defaultProjectFileName = "default.mas2j";
 

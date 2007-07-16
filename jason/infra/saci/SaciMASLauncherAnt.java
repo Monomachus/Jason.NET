@@ -25,11 +25,8 @@ import saci.launcher.Launcher;
 public class SaciMASLauncherAnt extends CentralisedMASLauncherAnt implements MASLauncherInfraTier {
 
     StartSaci             saciThread;
-
     Launcher              l;
-
     boolean               iHaveStartedSaci = false;
-
     private static Logger logger           = Logger.getLogger(SaciMASLauncherAnt.class.getName());
 
     public void run() {
@@ -87,8 +84,8 @@ public class SaciMASLauncherAnt extends CentralisedMASLauncherAnt implements MAS
         script = replace(script, "<PROJECT-FILE>", project.getSocName() + ".xml");
         script = replace(script, "<DEBUG>", "");
 
-        String sacipath = "<pathelement location=\"" + Config.get().getSaciJar() + "\"/>";
-        script = replace(script, "<PATH-LIB>", sacipath + "\n\t<PATH-LIB>");
+        String sacipath = "        <pathelement location=\"" + Config.get().getSaciJar() + "\"/>";
+        script = replace(script, "<PATH-LIB>", sacipath + "<PATH-LIB>");
 
         // write start saci script
         String startsaci = "    <property name=\"saci.main\" value=\"saci.tools.SaciMenu\"/> <!-- use \"saci.launcher.LauncherD\" to run saci without a GUI -->\n\n"
