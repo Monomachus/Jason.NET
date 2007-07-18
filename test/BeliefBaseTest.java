@@ -323,6 +323,12 @@ public class BeliefBaseTest extends TestCase {
         }
         assertEquals(c,3);
         
+        ag.getBB().add(Literal.parseLiteral("k(20,c)"));
+        ag.getBB().add(Literal.parseLiteral("k(10,b)"));
+        Unifier u = new Unifier();
+        assertTrue(ag.believes(Literal.parseLiteral("k(X,c)"), u));
+        assertEquals(u.get("X").toString(), "20");
+        assertEquals(ag.findBel(Literal.parseLiteral("k(X,c)"), new Unifier()).toString(), "k(20,c)");
     }
     
     public void testPercept() {

@@ -29,6 +29,7 @@ import jason.asSyntax.Literal;
 import jason.asSyntax.LogicalFormula;
 import jason.asSyntax.Plan;
 import jason.asSyntax.PlanLibrary;
+import jason.asSyntax.Rule;
 import jason.asSyntax.Structure;
 import jason.asSyntax.Trigger;
 import jason.asSyntax.Trigger.TEOperator;
@@ -231,6 +232,11 @@ public class Agent {
         for (int i=initialBels.size()-1; i >=0; i--) {
             Literal b = initialBels.get(i);
             b.apply(u); // to solve arithmetic expressions
+
+            // if l is not a rule and has free vars, convert it in a rule like "l :- true."
+            if (!b.isRule() && !b.isGround()) {
+                b = new Rule(b,Literal.LTrue);
+            }
         	addBel(b);
         }
         initialBels.clear();
@@ -398,9 +404,13 @@ public class Agent {
         if (relB != null) {
             while (relB.hasNext()) {
                 Literal b = relB.next();
-
+                
+                // clone the original unifier
+                Unifier c = (Unifier)un.clone();
+                
                 // recall that order is important because of annotations!
-                if (!b.isRule() && un.unifies(bel, b)) {
+                if (!b.isRule() && c.unifies(bel, b)) {
+                    un.compose(c);
                     return b;
                 }
             }
