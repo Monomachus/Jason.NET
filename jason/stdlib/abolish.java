@@ -42,7 +42,7 @@ import jason.asSyntax.Term;
   
   <p>Examples:<ul>
   <li> <code>.abolish(b(_))</code>: remove all <code>b/1</code> beliefs, regardless of the argument value.</li>
-  <li> <code>.abolish(c(_,2))</code>: remove all <code>c/2</code> beliefs where the second argument is <code>2</code>.</li>
+  <li> <code>.abolish(c(_,t))</code>: remove all <code>c/2</code> beliefs where the second argument is <code>2</code>.</li>
   <li> <code>.abolish(c(_,_)[source(ag1)])</code>: remove all <code>c/2</code> beliefs that have <code>ag1</code> as source.</li>
   </ul>
 
