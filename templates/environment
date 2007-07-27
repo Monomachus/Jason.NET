@@ -23,5 +23,6 @@ public class <ENV_NAME> extends jason.environment.Environment {
     /** Called before the end of MAS execution */
     @Override
     public void stop() {
+        super.stop();
     }
 }

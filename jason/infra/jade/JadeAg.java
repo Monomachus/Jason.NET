@@ -48,7 +48,6 @@ public abstract class JadeAg extends Agent {
         super.doDelete();
     }
     
-
     public boolean isRunning() {
         return running;
     }

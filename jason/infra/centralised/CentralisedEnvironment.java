@@ -26,7 +26,6 @@ package jason.infra.centralised;
 
 import jason.JasonException;
 import jason.asSemantics.ActionExec;
-import jason.asSemantics.TransitionSystem;
 import jason.asSyntax.Structure;
 import jason.environment.Environment;
 import jason.environment.EnvironmentInfraTier;
@@ -34,9 +33,6 @@ import jason.mas2j.ClassParameters;
 import jason.runtime.RuntimeServicesInfraTier;
 
 import java.util.Collection;
-import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -47,69 +43,55 @@ import java.util.logging.Logger;
 public class CentralisedEnvironment implements EnvironmentInfraTier {
 
     /** the user customisation class for the environment */
-	private Environment fUserEnv;
-
+	private Environment userEnv;
 	private RunCentralisedMAS masRunner = null;
 	private boolean running = true;
     
-	private ExecutorService executor; // the thread pool used to execute actions
-	
     private static Logger logger = Logger.getLogger(CentralisedEnvironment.class.getName());
 	
-    public CentralisedEnvironment(ClassParameters userEnv, RunCentralisedMAS masRunner) throws JasonException {
+    public CentralisedEnvironment(ClassParameters userEnvArgs, RunCentralisedMAS masRunner) throws JasonException {
         this.masRunner = masRunner;
         try { 
-			fUserEnv = (Environment) getClass().getClassLoader().loadClass(userEnv.className).newInstance();
-			fUserEnv.setEnvironmentInfraTier(this);
-			fUserEnv.init(userEnv.getParametersArray());
+			userEnv = (Environment) getClass().getClassLoader().loadClass(userEnvArgs.className).newInstance();
+			userEnv.setEnvironmentInfraTier(this);
+			userEnv.init(userEnvArgs.getParametersArray());
         } catch (Exception e) {
             logger.log(Level.SEVERE,"Error in Centralised MAS environment creation",e);
-            throw new JasonException("The user environment class instantiation '"+userEnv+"' has failed!"+e.getMessage());
+            throw new JasonException("The user environment class instantiation '"+userEnvArgs+"' has failed!"+e.getMessage());
         }
-
-        // creates and executor with 1 core thread
-		// where no more than 3 tasks will wait for a thread
-		// The max number of thread is 1000 (so the 1001 task will be rejected) 
-		// Threads idle for 10 sec. will be removed from the pool
-        //executor= new ThreadPoolExecutor(1,1000,10,TimeUnit.SECONDS,new ArrayBlockingQueue<Runnable>(3));
-        
-        // creates a thread pool with 4 threads
-        executor = Executors.newFixedThreadPool(4);
     }
 	
+    public boolean isRunning() {
+        return running;
+    }
+    
 	/** called before the end of MAS execution, it just calls the user environment class stop method. */
 	public void stop() {
         running = false;
-        executor.shutdownNow();
-		fUserEnv.stop();
+		userEnv.stop();
 	}
 
     public Environment getUserEnvironment() {
-        return fUserEnv;
+        return userEnv;
     }
 
-    public void act(final String agName, final ActionExec action, final List<ActionExec> feedback, final TransitionSystem ts) {
+    /** called by the agent infra arch to perform an action in the environment */
+    public void act(final String agName, final ActionExec action) {
     	if (running) {
-        	executor.execute(new Runnable() {
-        		public void run() {
-        			try {
-    	    			Structure acTerm = action.getActionTerm();
-    	    	        if (fUserEnv.executeAction(agName, acTerm)) {
-    	    	            action.setResult(true);
-    	    	        } else {
-    	    	            action.setResult(false);
-    	    	        }
-    	    	        feedback.add(action);
-    	    	        ts.newMessageHasArrived();
-        			} catch (Exception ie) {
-        				if (!(ie instanceof InterruptedException)) {
-        					logger.log(Level.WARNING, "act error!",ie);
-        				}
-        			}
-        		}
-        	});
+            userEnv.scheduleAction(agName, action.getActionTerm(), action);
         }
     }
+    
+    public void actionExecuted(String agName, Structure actTerm, boolean success, Object infraData) {
+        ActionExec action = (ActionExec)infraData;
+        if (success) {
+            action.setResult(true);
+        } else {
+            action.setResult(false);
+        }
+        masRunner.getAg(agName).actionExecuted(action);
+    }
+    
     
     public void informAgsEnvironmentChanged() {
         for (CentralisedAgArch ag: masRunner.getAgs().values()) {

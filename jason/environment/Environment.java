@@ -35,6 +35,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * It is a base class for Environment, it is overridden by the user
@@ -58,8 +62,27 @@ public class Environment {
 
 	// set of agents that already received the last version of perception
 	private Set<String> uptodateAgs = Collections.synchronizedSet(new HashSet<String>());
-	
-	//static private Logger logger = Logger.getLogger(Environment.class.getName());
+
+    private ExecutorService executor; // the thread pool used to execute actions
+
+    private static Logger logger = Logger.getLogger(Environment.class.getName());
+
+    /** creates an environment class with n threads to execute actions requited by the agents */
+    public Environment(int n) {
+        // creates a thread pool with n threads
+        executor = Executors.newFixedThreadPool(n);
+
+        // creates and executor with 1 core thread
+        // where no more than 3 tasks will wait for a thread
+        // The max number of thread is 1000 (so the 1001 task will be rejected) 
+        // Threads idle for 10 sec. will be removed from the pool
+        //executor= new ThreadPoolExecutor(1,1000,10,TimeUnit.SECONDS,new ArrayBlockingQueue<Runnable>(3));
+    }
+
+    /** creates an environment class with the default number of threads in the pool */
+    public Environment() {
+        this(4);
+    }
 
 	/** 
      * Called before the MAS execution with the args informed in
@@ -73,6 +96,7 @@ public class Environment {
      * environment could override it.
      */
 	public void stop() {
+        executor.shutdownNow();
 	}
 	
 	
@@ -170,8 +194,6 @@ public class Environment {
 		return false;
 	}
 	
-	
-	
 	/** Adds a perception for a specific agent */
 	public void addPercept(String agName, Literal per) {
 		if (per != null && agName != null) {
@@ -219,14 +241,31 @@ public class Environment {
 			if (agl != null) {
 				uptodateAgs.remove(agName);
 				agl.clear();
-				//agPercepts.put( agName, agl);
 			}
 		}
 	}
+    
+    /** 
+     * Called by the agent infrastructure to schedule an action to be 
+     * executed on the environment
+     */
+    public void scheduleAction(final String agName, final Structure action, final Object infraData) {
+        executor.execute(new Runnable() {
+            public void run() {
+                try {
+                    boolean success = executeAction(agName, action);
+                    environmentInfraTier.actionExecuted(agName, action, success, infraData);
+                } catch (Exception ie) {
+                    if (!(ie instanceof InterruptedException)) {
+                        logger.log(Level.WARNING, "act error!",ie);
+                    }
+                }
+            }
+        });        
+    }
 	
     /**
-     * Called by the agent architecture to execute an action on the
-     * environment.
+     * Execute an action on the environment.
      */
     public boolean executeAction(String agName, Structure act) {
         return true;

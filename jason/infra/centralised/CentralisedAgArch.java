@@ -215,10 +215,16 @@ public class CentralisedAgArch extends Thread implements AgArchInfraTier {
         }
     }
 
-    // Default acting on the environment
+    /** called by the TS to ask the execution of an action in the environment */
     public void act(ActionExec action, List<ActionExec> feedback) {
         logger.info("doing: " + action.getActionTerm());
-        infraEnv.act(getName(), action, feedback, getUserAgArch().getTS());
+        infraEnv.act(getName(), action);
+    }
+    
+    /** called the the environment when the action was executed */
+    public void actionExecuted(ActionExec action) {
+        userAgArch.getTS().getC().getFeedbackActions().add(action);
+        userAgArch.getTS().newMessageHasArrived();        
     }
 
     public boolean canSleep() {

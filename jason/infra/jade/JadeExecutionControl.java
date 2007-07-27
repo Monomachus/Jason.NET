@@ -47,7 +47,6 @@ public class JadeExecutionControl extends JadeAg implements ExecutionControlInfr
     public static String controllerOntology = "AS-ExecControl";
 
     private ExecutionControl userControl;
-
     private ExecutorService executor; // the thread pool used to execute actions
     
     @Override
@@ -138,7 +137,8 @@ public class JadeExecutionControl extends JadeAg implements ExecutionControlInfr
         ACLMessage m = new ACLMessage(ACLMessage.INFORM);
         m.setOntology(controllerOntology);
         m.addReceiver(new AID(agName, AID.ISLOCALNAME));
-        m.setContent("performCycle "+cycle);
+        m.setContent("performCycle");
+        m.addUserDefinedParameter("cycle", String.valueOf(cycle));
         send(m);
     }
 
@@ -147,7 +147,8 @@ public class JadeExecutionControl extends JadeAg implements ExecutionControlInfr
             ACLMessage m = new ACLMessage(ACLMessage.INFORM);
             m.setOntology(controllerOntology);
             addAllAgsAsReceivers(m);
-            m.setContent("performCycle "+cycle);
+            m.setContent("performCycle");
+            m.addUserDefinedParameter("cycle", String.valueOf(cycle));
             send(m);
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error in informAllAgsToPerformCycle", e);

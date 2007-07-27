@@ -281,15 +281,13 @@ public class JadeAgArch extends JadeAg implements AgArchInfraTier {
         if (m.getOntology() != null && m.getOntology().equals(JadeExecutionControl.controllerOntology)) {
             String content = m.getContent();
             if (content.startsWith("performCycle")) {
-                int cycle = Integer.parseInt(content.substring(13));
+                int cycle = Integer.parseInt(m.getUserDefinedParameter("cycle"));
                 userAgArh.setCycleNumber(cycle);
                 userAgArh.getTS().receiveSyncSignal();
             } else if (content.startsWith("agState")) {
                 // send the agent state
-                ACLMessage r = new ACLMessage(ACLMessage.INFORM);
-                r.setOntology(m.getOntology());
-                r.addReceiver(m.getSender());
-                r.setInReplyTo(m.getReplyWith());
+                ACLMessage r = m.createReply();
+                r.setPerformative(ACLMessage.INFORM);
                 try {
                     Document agStateDoc = userAgArh.getTS().getAg().getAgState();
                     r.setContentObject((Serializable)agStateDoc);

@@ -49,8 +49,9 @@ import saci.MessageHandler;
  */
 public class SaciEnvironment extends saci.Agent implements EnvironmentInfraTier {
 
-    private Environment fUserEnv;
+    private static final long serialVersionUID = 3076623775045768401L;
 
+    private Environment userEnv;
     static Logger       logger = Logger.getLogger(SaciEnvironment.class.getName());
 
     public SaciEnvironment() {
@@ -85,14 +86,14 @@ public class SaciEnvironment extends saci.Agent implements EnvironmentInfraTier 
     public void initAg(String[] args) throws JasonException {
         // create the user environment
         try {
-            fUserEnv = (Environment) Class.forName(args[0]).newInstance();
-            fUserEnv.setEnvironmentInfraTier(this);
+            userEnv = (Environment) Class.forName(args[0]).newInstance();
+            userEnv.setEnvironmentInfraTier(this);
             // create parameters array
             String[] p = new String[args.length-1];
             for (int i=0; i<p.length; i++) {
                 p[i] = args[i+1];
             }
-            fUserEnv.init(p);
+            userEnv.init(p);
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error in Saci Environment initAg", e);
             throw new JasonException("The user environment class instantiation '" + args[0] + "' fail!" + e.getMessage());
@@ -115,7 +116,7 @@ public class SaciEnvironment extends saci.Agent implements EnvironmentInfraTier 
                         r.put("in-reply-to", m.get("reply-with"));
                         r.put("ontology", m.get("ontology"));
 
-                        List percepts = fUserEnv.getPercepts(m.get("sender").toString());
+                        List percepts = userEnv.getPercepts(m.get("sender").toString());
                         if (percepts != null) {
                             synchronized (percepts) {
                                 r.put("content", percepts.toString());
@@ -147,23 +148,11 @@ public class SaciEnvironment extends saci.Agent implements EnvironmentInfraTier 
                         r.put("ontology", m.get("ontology"));
                         String sender = m.get("sender").toString();
                         Structure action = Structure.parse((String) m.get("action"));
-
-                        // logger.info("doing: "+action);
-
-                        if (fUserEnv.executeAction(sender, action)) {
-                            r.put("content", "ok");
-                        } else {
-                            r.put("content", "error");
-                        }
-
-                        if (mbox != null) { // the agent could be out meanwhile
-                            mbox.sendMsg(r);
-                        }
+                        userEnv.scheduleAction(sender, action, r);
                     } catch (Exception e) {
                         logger.log(Level.SEVERE, "Error sending message " + e, e);
                     }
-                    return true; // no other message handler gives this
-                                    // message
+                    return true; // no other message handler gives this message
                 }
             });
 
@@ -171,12 +160,28 @@ public class SaciEnvironment extends saci.Agent implements EnvironmentInfraTier 
             logger.log(Level.SEVERE, "Error starting agent", e);
         }
     }
-
-    public void stopAg() {
-        fUserEnv.stop();
-        super.stopAg();
+    
+    public void actionExecuted(String agName, Structure actTerm, boolean success, Object infraData) {
+        try {
+            saci.Message r = (saci.Message)infraData;
+            if (success) {
+                r.put("content", "ok");
+            } else {
+                r.put("content", "error");
+            }
+            if (mbox != null) {
+                mbox.sendMsg(r);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }                        
     }
 
+    public void stopAg() {
+        userEnv.stop();
+        super.stopAg();
+    }
+    
     public RuntimeServicesInfraTier getRuntimeServices() {
         return new SaciRuntimeServices(getSociety());
     }

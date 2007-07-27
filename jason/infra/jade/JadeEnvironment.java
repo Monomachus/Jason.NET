@@ -105,7 +105,7 @@ public class JadeEnvironment extends JadeAg implements EnvironmentInfraTier {
 
         try {
             // add a message handler to answer perception asks
-            // ans actions asks
+            // and actions asks
             addBehaviour(new CyclicBehaviour() {
                 ACLMessage m;
                 public void action() {
@@ -117,10 +117,8 @@ public class JadeEnvironment extends JadeAg implements EnvironmentInfraTier {
                     } else {
                         // is getPerceps
                         if (m.getContent().equals("getPercepts")) {
-                            ACLMessage r = new ACLMessage(ACLMessage.INFORM);
-                            r.addReceiver(m.getSender());
-                            r.setInReplyTo(m.getReplyWith());
-                            r.setOntology(m.getOntology());
+                            ACLMessage r = m.createReply();
+                            r.setPerformative(ACLMessage.INFORM);
                             try {
                                 ArrayList percepts = (ArrayList)userEnv.getPercepts(m.getSender().getLocalName());
                                 if (percepts == null) {
@@ -137,18 +135,11 @@ public class JadeEnvironment extends JadeAg implements EnvironmentInfraTier {
                             
                         // is action?    
                         } else if (m.getOntology().equals(actionOntology)) {
-                            ACLMessage r = new ACLMessage(ACLMessage.INFORM);
-                            r.addReceiver(m.getSender());
-                            r.setInReplyTo(m.getReplyWith());
-                            r.setOntology(m.getOntology());
+                            ACLMessage r = m.createReply();
+                            r.setPerformative(ACLMessage.INFORM);
                             try {
                                 Structure action = Structure.parse(m.getContent());
-                                if (userEnv.executeAction(m.getSender().getLocalName(), action)) {
-                                    r.setContent("ok");
-                                } else {
-                                    r.setContent("error");
-                                }
-                                send(r);
+                                userEnv.scheduleAction(m.getSender().getLocalName(), action, r);
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }                            
@@ -167,6 +158,20 @@ public class JadeEnvironment extends JadeAg implements EnvironmentInfraTier {
         if (userEnv != null) userEnv.stop();
     }
     
+    public void actionExecuted(String agName, Structure actTerm, boolean success, Object infraData) {
+        try {
+            ACLMessage r = (ACLMessage)infraData;
+            if (success) {
+                r.setContent("ok");
+            } else {
+                r.setContent("error");
+            }
+            send(r);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }                            
+    }
+
     public void informAgsEnvironmentChanged() {
         try {
             broadcast(new Message("tell", null, null, "environmentChanged"));
