@@ -105,12 +105,12 @@ public class Literal extends Pred implements LogicalFormula {
     
     public void setNegated(boolean b) {
         type = b;
-        hashCodeCache = null;
+        resetHashCodeCache();
     }
 
     /** 
-     * logCons checks whether one particular predicate
-     * is a log(ical)Cons(equence) of the belief base.
+     * logicalConsequence checks whether one particular predicate
+     * is a logical consequence of the belief base.
      * 
      * Returns an iterator for all unifiers that are logCons.
      */
@@ -299,7 +299,7 @@ public class Literal extends Pred implements LogicalFormula {
     }
 
 	
-	/** return [~] super.getFunctorArity */
+	/** returns [~] super.getPredicateIndicator */
 	@Override 
     public PredicateIndicator getPredicateIndicator() {
 		if (predicateIndicatorCache == null)

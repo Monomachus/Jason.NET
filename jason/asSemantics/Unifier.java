@@ -82,9 +82,27 @@ public class Unifier implements Cloneable {
         }
     }
 
+    public boolean unifies(Trigger te1, Trigger te2) {
+        return te1.sameType(te2) && unifies(te1.getLiteral(), te2.getLiteral());
+    }
+
     // ----- Unify for Predicates/Literals
     
-    public boolean unifies(Term t1g, Term t2g) {
+    // this version of unifies undo the variables' mapping 
+    // if the unification fails
+    public boolean unifies(Term t1, Term t2) {
+        HashMap cfunction = (HashMap)function.clone();
+        if (unifiesNoUndo(t1,t2)) {
+            return true;
+        } else {
+            function = cfunction;
+            return false;
+        }
+    }
+
+    // this version of unifies does no undo the variables'mapping 
+    // in case of failure
+    private boolean unifiesNoUndo(Term t1g, Term t2g) {
 
 		Pred np1 = null;
 		Pred np2 = null;
@@ -286,10 +304,6 @@ public class Unifier implements Cloneable {
             function.put((VarTerm) vt.clone(), (Term) value.clone());
         }
         return true;
-    }
-
-    public boolean unifies(Trigger te1, Trigger te2) {
-        return te1.sameType(te2) && unifies(te1.getLiteral(), te2.getLiteral());
     }
 
     public void clear() {

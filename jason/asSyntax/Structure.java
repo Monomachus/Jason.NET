@@ -39,8 +39,9 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
- * Represents a structure: a functor with <i>n</i> arguments, e.g.: val(10,x(3)). <i>n</i> can be
- * 0, so this class also represents atoms.
+ * Represents a structure: a functor with <i>n</i> arguments, 
+ * e.g.: val(10,x(3)). 
+ * <i>n</i> can be 0, so this class also represents atoms.
  */
 public class Structure extends DefaultTerm {
 
@@ -195,12 +196,12 @@ public class Structure extends DefaultTerm {
         if (terms == null) terms = new ArrayList<Term>();
         terms.add(t);
         predicateIndicatorCache = null;
-        hashCodeCache = null;
+        resetHashCodeCache();
     }
     
     public void addTerms(List<Term> l) {
         for (Term t: l) {
-            addTerm( t);
+            addTerm(t);
         }
     }
 
@@ -245,8 +246,9 @@ public class Structure extends DefaultTerm {
         if (getTermsSize() == 0) {
             ts = new Term[0];
         } else {
-            ts = new Term[getTermsSize()];
-            for (int i=0; i<getTermsSize(); i++) { // use "for" instead of iterator for ListTerm compatibility
+            final int size = getTermsSize();
+            ts = new Term[size];
+            for (int i=0; i<size; i++) { // use "for" instead of iterator for ListTerm compatibility
                 ts[i] = getTerm(i);
             }
         }
@@ -264,7 +266,8 @@ public class Structure extends DefaultTerm {
 	}
 
     public boolean isGround() {
-        for (int i=0; i<getTermsSize(); i++) {
+        final int size = getTermsSize();
+        for (int i=0; i<size; i++) {
             if (!getTerm(i).isGround()) {
                 return false;
             }
@@ -283,7 +286,8 @@ public class Structure extends DefaultTerm {
      * @param changes is the map of replacements
      */
     public void makeVarsAnnon(Map<VarTerm,UnnamedVar> changes) {
-        for (int i=0; i<getTermsSize(); i++) {
+        final int size = getTermsSize();
+        for (int i=0; i<size; i++) {
             Term ti = getTerm(i);
             if (ti.isVar()) {
             	// replace ti to an unnamed var
@@ -295,24 +299,26 @@ public class Structure extends DefaultTerm {
             	setTerm(i,uv);
             } else if (ti.isStructure()) {
                 Structure tis = (Structure)ti;
-                if (tis.getTermsSize()>0) {
+                if (tis.hasTerm()) {
                     tis.makeVarsAnnon(changes);
                 }
             }
         }
-        hashCodeCache = null;
+        resetHashCodeCache();
     }
 
     public void makeTermsAnnon() {
-        for (int i=0; i<getTermsSize(); i++) {
+        final int size = getTermsSize();
+        for (int i=0; i<size; i++) {
             setTerm(i,new UnnamedVar());
         }
-        hashCodeCache = null;
+        resetHashCodeCache();
     }
 
     public boolean hasVar(Term t) {
         if (this.equals(t)) return true;
-        for (int i=0; i<getTermsSize(); i++) {
+        final int size = getTermsSize();
+        for (int i=0; i<size; i++) {
             if (getTerm(i).hasVar(t)) {
                 return true;
             }

@@ -39,7 +39,7 @@ public abstract class DefaultTerm extends SourceInfo implements Term, Serializab
 	private static final long serialVersionUID = 1L;
     private static Logger logger = Logger.getLogger(Term.class.getName());
 
-    protected Integer     hashCodeCache = null;
+    protected Integer hashCodeCache = null;
 
     public static Term parse(String sTerm) {
         as2j parser = new as2j(new StringReader(sTerm));
@@ -72,7 +72,7 @@ public abstract class DefaultTerm extends SourceInfo implements Term, Serializab
         if (hashCodeCache == null) hashCodeCache = calcHashCode();
         return hashCodeCache;
     }
-    /** remove the valued cached for hashCode */
+
     public void resetHashCodeCache() {
         hashCodeCache = null;
     }

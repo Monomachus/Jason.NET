@@ -498,6 +498,14 @@ public class TermTest extends TestCase {
         assertFalse(a1.equals(a2));   
     }
 
+    public void testUnify5() {
+        Structure s1 = Structure.parse("a(X,Y,10)");
+        Structure s2 = Structure.parse("a(1,2,1)");
+        Unifier u = new Unifier();
+        assertFalse(u.unifies(s1,s2));
+        assertEquals(u.size(),0);
+    }
+
     public void testAtom() {
     	Atom a = new Atom("a");
     	try {
