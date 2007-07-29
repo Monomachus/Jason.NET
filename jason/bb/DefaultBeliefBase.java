@@ -156,12 +156,32 @@ public class DefaultBeliefBase implements BeliefBase {
 
 
     public Iterator<Literal> iterator() {
-        List<Literal> all = new ArrayList<Literal>(size());
-        for (BelEntry be : belsMap.values()) {
-            all.addAll(be.list);
+        final Iterator<BelEntry> ibe = belsMap.values().iterator();
+        if (ibe.hasNext()) {
+            return new Iterator<Literal>() {
+
+                Iterator<Literal> il = ibe.next().list.iterator();
+
+                public boolean hasNext() {
+                    return il.hasNext();
+                }
+
+                public Literal next() {
+                    Literal l = il.next();
+                    if (!il.hasNext() && ibe.hasNext()) {
+                        il = ibe.next().list.iterator();
+                    }
+                    return l;
+                }
+
+                public void remove() {
+                    logger.warning("remove is not implemented for BB.iterator().");
+                }
+            };
+        } else {
+            return new ArrayList<Literal>(0).iterator();
         }
-        return all.iterator();
-	}
+    }
     
     /** @deprecated use iterator() instead of getAll */
     public Iterator<Literal> getAll() {

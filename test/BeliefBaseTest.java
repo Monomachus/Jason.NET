@@ -109,6 +109,7 @@ public class BeliefBaseTest extends TestCase {
 		lRel2.addTerm(new VarTerm("Y"));
 		//System.out.println("Rel "+lRel2.getFunctorArity()+"="+bb.getRelevant(lRel2));
 		assertEquals(bb.size(), 4);
+		assertEquals(iteratorSize(bb.iterator()), 4);
 		
 		// remove
 		l5 = new Literal(true, new Pred("garb"));
@@ -124,6 +125,7 @@ public class BeliefBaseTest extends TestCase {
 		assertTrue(bb.remove(l4));
 		assertEquals(iteratorSize(bb.getRelevant(l4)), 1);
 		assertEquals(bb.size(), 2);
+		assertEquals(iteratorSize(bb.iterator()), 2);
 
 		//System.out.println("remove grab(r1), pos(5,6)");
 		//System.out.println("BB="+bb);
@@ -172,6 +174,7 @@ public class BeliefBaseTest extends TestCase {
 		//System.out.println("removed "+l3);
 		//System.out.println("BB="+bb);
 		assertEquals(bb.size(), 0);
+		assertEquals(iteratorSize(bb.iterator()), 0);
 	}
 
     public void testAdd2() {
