@@ -201,13 +201,18 @@ public class LogExpr implements LogicalFormula {
         return EMPTY_UNIF_LIST.iterator();  // empty iterator for unifier
     }   
 
-    /** create an iterator for a list of unifiers */
-    static public Iterator<Unifier> createUnifIterator(Unifier... unifs) {
-        List<Unifier> r = new ArrayList<Unifier>(unifs.length);
-        for (int i=0; i<unifs.length; i++) {
-            r.add(unifs[i]);
-        }
-        return r.iterator();
+    /** creates an iterator for a list of unifiers */
+    static public Iterator<Unifier> createUnifIterator(final Unifier... unifs) {
+        return new Iterator<Unifier>() {
+            int i = 0;
+            public boolean hasNext() {
+                return i < unifs.length;
+            }
+            public Unifier next() {
+                return unifs[i++];
+            }
+            public void remove() {}
+        };
     }
 
     /** returns some LogicalFormula that can be evaluated */

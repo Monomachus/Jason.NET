@@ -613,7 +613,7 @@ public class TransitionSystem {
         List<Plan> candidateRPs = conf.ag.pl.getAllRelevant(te.getPredicateIndicator());
         if (candidateRPs != null) {
             for (Plan pl : candidateRPs) {
-                Unifier relUn = pl.relevant(te);
+                Unifier relUn = pl.isRelevant(te);
                 if (relUn != null) {
                     if (rp == null) rp = new LinkedList<Option>();
                     rp.add(new Option(pl, relUn));

@@ -144,7 +144,10 @@ public class Plan extends SourceInfo implements Cloneable, Serializable {
         return isAllUnifs; 
     }
     
-    public Unifier relevant(Trigger te) {
+    /** returns an unifier if this plan is relevant for the event <i>te</i>, 
+        returns null otherwise.
+    */
+    public Unifier isRelevant(Trigger te) {
         // annots in plan's TE must be a subset of the ones in the event!
         // (see definition of Unifier.unifies for 2 Preds)
         Unifier u = new Unifier();

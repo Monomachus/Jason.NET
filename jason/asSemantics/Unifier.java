@@ -88,8 +88,12 @@ public class Unifier implements Cloneable {
 
     // ----- Unify for Predicates/Literals
     
-    // this version of unifies undo the variables' mapping 
-    // if the unification fails
+    /** this version of unifies undo the variables' mapping 
+        if the unification fails. 
+        E.g. 
+          u.unifier( a(X,10), a(1,1) );
+        does not change u, i.e., u = {}
+     */
     public boolean unifies(Term t1, Term t2) {
         HashMap cfunction = (HashMap)function.clone();
         if (unifiesNoUndo(t1,t2)) {
@@ -100,9 +104,14 @@ public class Unifier implements Cloneable {
         }
     }
 
-    // this version of unifies does no undo the variables'mapping 
-    // in case of failure
-    private boolean unifiesNoUndo(Term t1g, Term t2g) {
+    /** this version of unifies does not undo the variables' mapping 
+        in case of failure. It is however faster than the version with
+        undo.
+        E.g. 
+          u.unifier( a(X,10), a(1,1) );
+        fails, but changes u to {X = 10} 
+    */
+    public boolean unifiesNoUndo(Term t1g, Term t2g) {
 
 		Pred np1 = null;
 		Pred np2 = null;
@@ -173,15 +182,15 @@ public class Unifier implements Cloneable {
 
             // both has value, their values should unify
             if (t1vl != null && t2vl != null) {
-                return unifies(t1vl, t2vl);
+                return unifiesNoUndo(t1vl, t2vl);
             }
             // only t1 has value, t1's value should unify with var t2
             if (t1vl != null) {
-                return unifies(t2gv, t1vl);
+                return unifiesNoUndo(t2gv, t1vl);
             }
             // only t2 has value, t2's value should unify with var t1
             if (t2vl != null) {
-                return unifies(t1gv, t2vl);
+                return unifiesNoUndo(t1gv, t2vl);
             }
 
             // both are var (not unnamedvar) with no value, like X=Y
@@ -206,7 +215,7 @@ public class Unifier implements Cloneable {
             // if t1g is not free, must unify values
             Term t1vl = function.get(t1gv);
             if (t1vl != null && !(t1vl instanceof VarsCluster)) {
-                return unifies(t1vl,t2g);
+                return unifiesNoUndo(t1vl,t2g);
             } else if (!t2g.hasVar(t1g)) {
                 return setVarValue(t1gv, t2g);
             }
@@ -219,7 +228,7 @@ public class Unifier implements Cloneable {
             // if t1g is not free, must unify values
             Term t2vl = function.get(t2gv);
             if (t2vl != null && !(t2vl instanceof VarsCluster)) {
-                return unifies(t2vl,t1g);
+                return unifiesNoUndo(t2vl,t1g);
             } else if (!t1g.hasVar(t2g)) {
                 return setVarValue(t2gv, t1g);
             } 
@@ -284,7 +293,7 @@ public class Unifier implements Cloneable {
         // do not use iterator! (see ListTermImpl class)
         final int ts = t1s.getTermsSize();
         for (int i = 0; i < ts; i++) {
-            if (!unifies(t1s.getTerm(i), t2s.getTerm(i))) {
+            if (!unifiesNoUndo(t1s.getTerm(i), t2s.getTerm(i))) {
                 return false;
             }
         }
@@ -328,7 +337,8 @@ public class Unifier implements Cloneable {
     public Object clone() {
         try {
             Unifier newUn = new Unifier();
-            newUn.compose(this);
+            newUn.function = (HashMap)function.clone();
+            //newUn.compose(this);
             return newUn;
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error cloning unifier.",e);
