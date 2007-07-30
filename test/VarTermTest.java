@@ -39,7 +39,7 @@ public class VarTermTest extends TestCase {
         assertTrue("a1".equals(k.toString()));
         k.addTerm(new Structure("p1"));
         k.addTerm(new Structure("p2"));
-        assertEquals(k.getTermsSize(), 2);
+        assertEquals(k.getArity(), 2);
 
         VarTerm x1 = new VarTerm("X1");
         VarTerm x2 = new VarTerm("X2");

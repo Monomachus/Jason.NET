@@ -23,7 +23,7 @@ public class MG implements Directive {
         try {
             Literal goal = Literal.parseLiteral(directive.getTerm(0).toString());
             Literal subDir;
-            if (directive.getTermsSize() > 1) {
+            if (directive.getArity() > 1) {
                 subDir = Literal.parseLiteral(directive.getTerm(1).toString());
             } else {
                 subDir = Literal.parseLiteral("bc("+goal+")");

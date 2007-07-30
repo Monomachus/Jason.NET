@@ -114,12 +114,12 @@ public class JDBCPersistentBB extends DefaultBeliefBase {
                 Structure ts = (Structure)t;
                 int arity    = Integer.parseInt(ts.getTerm(0).toString());
             	String table = ts.getFunctor();
-                if (ts.getTermsSize() >= 2) {
+                if (ts.getArity() >= 2) {
                 	table = ts.getTerm(1).toString();
                 }
 
                 Structure columns = new Structure("columns");
-                if (ts.getTermsSize() >= 3) {
+                if (ts.getArity() >= 3) {
                     columns = (Structure)ts.getTerm(2);
                 }
 
@@ -495,7 +495,7 @@ public class JDBCPersistentBB extends DefaultBeliefBase {
             String colName = COL_PREFIX + c;
             String colType = "varchar(256)";
             // try to get colName and type from columns
-            if (columns.getTermsSize() > c) {
+            if (columns.getArity() > c) {
                 Structure scol = (Structure)columns.getTerm(c);
                 colName = scol.getFunctor();
                 colType = scol.getTerm(0).toString();
@@ -524,7 +524,7 @@ public class JDBCPersistentBB extends DefaultBeliefBase {
         StringBuilder q = new StringBuilder(" where ");
         String and = "";
         // for all ground terms of l
-        for (int i = 0; i < l.getTermsSize(); i++) {
+        for (int i = 0; i < l.getArity(); i++) {
             Term t = l.getTerm(i);
             if (t.isGround()) {
                 q.append(and);
@@ -555,7 +555,7 @@ public class JDBCPersistentBB extends DefaultBeliefBase {
         q.append(" values(");
 
         // values
-        for (int i = 0; i < l.getTermsSize(); i++) {
+        for (int i = 0; i < l.getArity(); i++) {
             Term t = l.getTerm(i);
             if (t.isString()) {
                 q.append("'" + ((StringTerm) t).getString() + "'");

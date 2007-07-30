@@ -94,6 +94,7 @@ public class Unifier implements Cloneable {
           u.unifier( a(X,10), a(1,1) );
         does not change u, i.e., u = {}
      */
+    @SuppressWarnings("unchecked")
     public boolean unifies(Term t1, Term t2) {
         HashMap cfunction = (HashMap)function.clone();
         if (unifiesNoUndo(t1,t2)) {
@@ -280,7 +281,7 @@ public class Unifier implements Cloneable {
         if ((t1gts == null && t2gts != null) || (t1gts != null && t2gts == null)) {
             return false;
         }
-        if (t1s.getTermsSize() != t2s.getTermsSize()) {
+        if (t1s.getArity() != t2s.getArity()) {
             return false;
         }
         
@@ -291,7 +292,7 @@ public class Unifier implements Cloneable {
     
         // unify inner terms
         // do not use iterator! (see ListTermImpl class)
-        final int ts = t1s.getTermsSize();
+        final int ts = t1s.getArity();
         for (int i = 0; i < ts; i++) {
             if (!unifiesNoUndo(t1s.getTerm(i), t2s.getTerm(i))) {
                 return false;
@@ -334,6 +335,7 @@ public class Unifier implements Cloneable {
         }
     }
     
+    @SuppressWarnings("unchecked")
     public Object clone() {
         try {
             Unifier newUn = new Unifier();

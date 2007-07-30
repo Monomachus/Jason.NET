@@ -242,9 +242,9 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
     }
 
     @Override
-    public int getTermsSize() {
+    public int getArity() {
         if (value != null && value.isStructure()) {
-            return ((Structure)getValue()).getTermsSize();
+            return ((Structure)getValue()).getArity();
         } else {
             return 0;
         }

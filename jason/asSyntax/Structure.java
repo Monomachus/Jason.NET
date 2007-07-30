@@ -87,7 +87,7 @@ public class Structure extends DefaultTerm {
     /** returns functor symbol "/" arity */
     public PredicateIndicator getPredicateIndicator() {
         if (predicateIndicatorCache == null) {
-            predicateIndicatorCache = new PredicateIndicator(getFunctor(),getTermsSize());
+            predicateIndicatorCache = new PredicateIndicator(getFunctor(),getArity());
         }
         return predicateIndicatorCache;
     }
@@ -96,9 +96,9 @@ public class Structure extends DefaultTerm {
         final int PRIME = 7;
         int result = 1;
         if (functor != null) result = PRIME * result + functor.hashCode();
-        final int ts = getTermsSize();
+        final int ts = getArity();
         if (ts > 0) {
-            result = PRIME * result + getTermsSize();
+            result = PRIME * result + getArity();
             for (int i=0; i<ts; i++) {
                 result = PRIME * result + getTerm(i).hashCode();
             }
@@ -121,8 +121,8 @@ public class Structure extends DefaultTerm {
             if (getTerms() == null && tAsStruct.getTerms() == null) return true;
             if (getTerms() == null || tAsStruct.getTerms() == null) return false;
 
-            final int ts = getTermsSize(); 
-            if (ts != tAsStruct.getTermsSize()) return false;
+            final int ts = getArity(); 
+            if (ts != tAsStruct.getArity()) return false;
 
             for (int i=0; i<ts; i++) {
                 if (!getTerm(i).equals(tAsStruct.getTerm(i))) return false;
@@ -154,8 +154,8 @@ public class Structure extends DefaultTerm {
 		// or none are list
         Structure tAsStruct = (Structure)t;
 
-        if (getTermsSize() < tAsStruct.getTermsSize()) return -1;
-        else if (getTermsSize() > tAsStruct.getTermsSize()) return 1;
+        if (getArity() < tAsStruct.getArity()) return -1;
+        else if (getArity() > tAsStruct.getArity()) return 1;
 
         int c;
         if (getFunctor() != null && tAsStruct.getFunctor() != null) {
@@ -163,7 +163,7 @@ public class Structure extends DefaultTerm {
             if (c != 0) return c;
         }
 
-        for (int i=0; i<getTermsSize() && i<tAsStruct.getTermsSize(); i++) {
+        for (int i=0; i<getArity() && i<tAsStruct.getArity(); i++) {
             c = getTerm(i).compareTo(tAsStruct.getTerm(i));
             if (c != 0) return c;
         }
@@ -174,7 +174,7 @@ public class Structure extends DefaultTerm {
     public boolean apply(Unifier u) {
     	boolean r = false;
         // do not use iterator! (see ListTermImpl class)
-        final int tss = getTermsSize();
+        final int tss = getArity();
         for (int i = 0; i < tss; i++) {
         	boolean tr = getTerm(i).apply(u); 
             r = r || tr;
@@ -226,27 +226,33 @@ public class Structure extends DefaultTerm {
         }
     }
 
-    public int getTermsSize() {
+    public int getArity() {
         if (terms != null) {
             return terms.size();
         } else {
             return 0;
         }
     }
+    
+    /** @deprecated use getArity */
+    public int getTermsSize() {
+        return getArity();
+    }
+
     public List<Term> getTerms() {
         return terms;
     }
     
     public boolean hasTerm() {
-    	return getTermsSize() > 0;
+    	return getArity() > 0;
     }
     
     public Term[] getTermsArray() {
         Term ts[] = null;
-        if (getTermsSize() == 0) {
+        if (getArity() == 0) {
             ts = new Term[0];
         } else {
-            final int size = getTermsSize();
+            final int size = getArity();
             ts = new Term[size];
             for (int i=0; i<size; i++) { // use "for" instead of iterator for ListTerm compatibility
                 ts[i] = getTerm(i);
@@ -262,11 +268,11 @@ public class Structure extends DefaultTerm {
     
 	@Override
 	public boolean isAtom() {
-		return getTermsSize() == 0 && !isList();
+		return getArity() == 0 && !isList();
 	}
 
     public boolean isGround() {
-        final int size = getTermsSize();
+        final int size = getArity();
         for (int i=0; i<size; i++) {
             if (!getTerm(i).isGround()) {
                 return false;
@@ -286,7 +292,7 @@ public class Structure extends DefaultTerm {
      * @param changes is the map of replacements
      */
     public void makeVarsAnnon(Map<VarTerm,UnnamedVar> changes) {
-        final int size = getTermsSize();
+        final int size = getArity();
         for (int i=0; i<size; i++) {
             Term ti = getTerm(i);
             if (ti.isVar()) {
@@ -308,7 +314,7 @@ public class Structure extends DefaultTerm {
     }
 
     public void makeTermsAnnon() {
-        final int size = getTermsSize();
+        final int size = getArity();
         for (int i=0; i<size; i++) {
             setTerm(i,new UnnamedVar());
         }
@@ -317,7 +323,7 @@ public class Structure extends DefaultTerm {
 
     public boolean hasVar(Term t) {
         if (this.equals(t)) return true;
-        final int size = getTermsSize();
+        final int size = getArity();
         for (int i=0; i<size; i++) {
             if (getTerm(i).hasVar(t)) {
                 return true;

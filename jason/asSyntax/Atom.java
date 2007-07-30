@@ -73,7 +73,7 @@ public final class Atom extends Literal {
     }
      
 	@Override
-    public int getTermsSize() {
+    public int getArity() {
 		return 0;
     }
     

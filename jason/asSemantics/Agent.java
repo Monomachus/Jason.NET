@@ -405,12 +405,8 @@ public class Agent {
             while (relB.hasNext()) {
                 Literal b = relB.next();
                 
-                // clone the original unifier
-                Unifier c = (Unifier)un.clone();
-                
                 // recall that order is important because of annotations!
-                if (!b.isRule() && c.unifies(bel, b)) {
-                    un.compose(c);
+                if (!b.isRule() && un.unifies(bel, b)) {
                     return b;
                 }
             }

@@ -511,7 +511,7 @@ public class TermTest extends TestCase {
     	try {
     		//a.addTerm(new Atom("b"));
     	} catch (Exception e) {}
-    	assertEquals(a.getTermsSize(), 0);
+    	assertEquals(a.getArity(), 0);
     	a.addAnnot(new Atom("b"));
     	assertEquals(a.getAnnots().size(), 1);
     	assertEquals(a.toString(),"a[b]");

@@ -125,7 +125,7 @@ public class ListTermImpl extends Structure implements ListTerm {
 	
 	
 	// for unifier compatibility
-	public int getTermsSize() {
+	public int getArity() {
 		if (isEmpty()) {
 			return 0;
 		} else {

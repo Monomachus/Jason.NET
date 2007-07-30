@@ -122,7 +122,7 @@ public class Trigger implements Cloneable {
 	/** return [+|-][!|?] super.getFucntorArity */
 	public PredicateIndicator getPredicateIndicator() {
         if (piCache == null) {
-            piCache = new PredicateIndicator(operator.toString() + type + literal.getFunctor(), literal.getTermsSize());
+            piCache = new PredicateIndicator(operator.toString() + type + literal.getFunctor(), literal.getArity());
         }
         return piCache;
     }

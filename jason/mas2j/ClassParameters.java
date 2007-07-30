@@ -25,7 +25,7 @@ public class ClassParameters {
     }
     public ClassParameters(Structure s) {
         className = s.getFunctor();
-        if (s.getTermsSize() > 0) {
+        if (s.getArity() > 0) {
             for (Term t: s.getTerms()) {
                 parameters.add(t.toString());
             }
