@@ -2,10 +2,12 @@ package jason.infra.jade;
 
 import jade.core.AID;
 import jade.core.Agent;
+import jade.core.behaviours.OneShotBehaviour;
 import jade.domain.DFService;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
+import jade.lang.acl.MessageTemplate;
 import jason.asSemantics.Message;
 import jason.asSyntax.Term;
 
@@ -35,12 +37,7 @@ public abstract class JadeAg extends Agent {
     protected Logger logger = Logger.getLogger(JadeAg.class.getName());
 
     protected static int rwid = 0; // reply-with counter
-
     protected boolean running = true;
-    
-    protected Object syncReceive = new Object();
-
-    
     
     @Override
     public void doDelete() {
@@ -58,70 +55,39 @@ public abstract class JadeAg extends Agent {
         send(acl);
     }
 
-	public void broadcast(Message m) throws Exception {
-		ACLMessage acl = jasonToACL(m);
-        addAllAgsAsReceivers(acl);
-        send(acl);
+	public void broadcast(final Message m) {
+        addBehaviour(new OneShotBehaviour() {
+            private static final long serialVersionUID = 1L;
+            public void action() {
+                try {
+                    ACLMessage acl = jasonToACL(m);
+                    addAllAgsAsReceivers(acl);
+                    send(acl);
+                } catch (Exception e) {
+                    logger.log(Level.SEVERE, "Error in broadcast of "+m, e);
+                }
+            }
+        });
 	}
     
-    private String waitingRW = null;
-    private ACLMessage answer = null;
-    
-    // send a message and wait answer
     protected ACLMessage ask(final ACLMessage m) {
-        if (waitingRW != null) {
-            logger.warning("Ignoring ask (already waiting answer): "+m);
-            return null;
-        }
         try {
             rwid++;
-            waitingRW = "id"+rwid;
+            String waitingRW = "id"+rwid;
             m.setReplyWith(waitingRW);
-            answer = null;
             send(m);                    
-            ACLMessage r = waitAns();
+            ACLMessage r = blockingReceive(MessageTemplate.MatchInReplyTo(waitingRW), 5000);
             if (r != null) 
                 return r;
             else 
                 logger.warning("ask timeout for "+m.getContent());
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error waiting message.", e);            
-        } finally {
-            waitingRW = null;
         }
         return null;
     }
-    
-    private Object syncAsk = new Object();
-    
-    ACLMessage waitAns() {
-        try {
-            if (answer == null) {
-                //logger.info("waiting "+waitingRW);
-                synchronized (syncAsk) {
-                    syncAsk.wait(5000);
-                }
-            } //else logger.info("no need to wait "+waitingRW);
-            //logger.info("stop wait  "+answer);
-            return answer;
-        } catch (InterruptedException e) {
-            return null;
-        }        
-    }
-    
-    boolean isAskAnswer(ACLMessage m) {
-        //logger.info("testing "+m);
-        if (m.getInReplyTo() != null && m.getInReplyTo().equals(waitingRW)) {
-            answer = m;
-            synchronized (syncAsk) {
-                syncAsk.notifyAll();
-            }
-            return true;
-        } else {
-            return false;
-        }
-    }
 
+    
     public void addAllAgsAsReceivers(ACLMessage m) throws Exception {
         // get all agents' name
         DFAgentDescription template = new DFAgentDescription();
@@ -129,10 +95,7 @@ public abstract class JadeAg extends Agent {
         sd.setType("jason");
         sd.setName(JadeAgArch.dfName);
         template.addServices(sd);
-        DFAgentDescription[] ans;
-        synchronized (syncReceive) {
-            ans = DFService.search(this, template);
-        }
+        DFAgentDescription[] ans = DFService.search(this, template);
         for (int i=0; i<ans.length; i++) {
             if (!ans[i].getName().equals(getAID())) {
                 m.addReceiver(ans[i].getName());

@@ -28,6 +28,7 @@ import jason.architecture.AgArch;
 import jason.architecture.AgArchInfraTier;
 import jason.asSemantics.ActionExec;
 import jason.asSemantics.Message;
+import jason.asSemantics.TransitionSystem;
 import jason.asSyntax.Literal;
 import jason.mas2j.ClassParameters;
 import jason.runtime.RuntimeServicesInfraTier;
@@ -156,11 +157,49 @@ public class CentralisedAgArch extends Thread implements AgArchInfraTier {
 
     public void run() {
         synchronized (syncStopRun) {
+            TransitionSystem ts = userAgArch.getTS();
             while (running) {
-                userAgArch.getTS().reasoningCycle();
+                if (ts.getSettings().isSync()) {
+                    waitSyncSignal();
+                    ts.reasoningCycle();
+                    boolean isBreakPoint = false;
+                    try {
+                        isBreakPoint = ts.getC().getSelectedOption().getPlan().hasBreakpoint();
+                        if (logger.isLoggable(Level.FINE)) logger.fine("Informing controller that I finished a reasoning cycle "+userAgArch.getCycleNumber()+". Breakpoint is " + isBreakPoint);
+                    } catch (NullPointerException e) {
+                        // no problem, there is no sel opt, no plan ....
+                    }
+                    informCycleFinished(isBreakPoint, userAgArch.getCycleNumber());
+                } else {
+                    ts.reasoningCycle();
+                }
             }
         }
         logger.info("I finished!");
+    }
+
+    private Object sleepSync = new Object();
+    
+    public boolean sleep() {
+        try {
+            if (!userAgArch.getTS().getSettings().isSync()) {
+                logger.fine("Entering in sleep mode....");
+                synchronized (sleepSync) {
+                    sleepSync.wait(1000); // wait for messages
+                }
+            }
+            return true;
+        } catch (InterruptedException e) {
+        } catch (Exception e) {
+            logger.log(Level.WARNING,"Error in sleep.", e);
+        }
+        return false;
+    }
+    
+    public void wake() {
+        synchronized (sleepSync) {
+            sleepSync.notifyAll(); // notify sleep method
+        }
     }
 
     // Default perception assumes Complete and Accurate sensing.
@@ -193,7 +232,7 @@ public class CentralisedAgArch extends Thread implements AgArchInfraTier {
     
     public void receiveMsg(Message m) {
         mbox.offer(m);
-        userAgArch.getTS().newMessageHasArrived();    	
+        wake();    	
     }
 
     public void broadcast(jason.asSemantics.Message m) throws Exception {
@@ -224,13 +263,59 @@ public class CentralisedAgArch extends Thread implements AgArchInfraTier {
     /** called the the environment when the action was executed */
     public void actionExecuted(ActionExec action) {
         userAgArch.getTS().getC().getFeedbackActions().add(action);
-        userAgArch.getTS().newMessageHasArrived();        
+        wake();        
     }
 
     public boolean canSleep() {
         return mbox.isEmpty() && isRunning();
     }
 
+    private Object  syncMonitor       = new Object(); 
+    private boolean inWaitSyncMonitor = false;
+
+    /**
+     * waits for a signal to continue the execution (used in synchronized
+     * execution mode)
+     */
+    private void waitSyncSignal() {
+        try {
+            synchronized (syncMonitor) {
+                inWaitSyncMonitor = true;
+                syncMonitor.wait();
+                inWaitSyncMonitor = false;
+            }
+        } catch (InterruptedException e) {
+        } catch (Exception e) {
+            logger.log(Level.WARNING,"Error waiting sync (1)", e);
+        }
+    }
+
+    /**
+     * inform this agent that it can continue, if it is in sync mode and
+     * wainting a signal
+     */
+    public void receiveSyncSignal() {
+        try {
+            synchronized (syncMonitor) {
+                while (!inWaitSyncMonitor && isRunning()) {
+                    // waits the agent to enter in waitSyncSignal
+                    syncMonitor.wait(50); 
+                }
+                syncMonitor.notifyAll();
+            }
+        } catch (InterruptedException e) {
+        } catch (Exception e) {
+            logger.log(Level.WARNING,"Error waiting sync (2)", e);
+        }
+    }
+
+    /** 
+     *  Informs the infrastructure tier controller that the agent 
+     *  has finished its reasoning cycle (used in sync mode).
+     *  
+     *  <p><i>breakpoint</i> is true in case the agent selected one plan 
+     *  with the "breakpoint" annotation.  
+     */ 
     public void informCycleFinished(boolean breakpoint, int cycle) {
         infraControl.receiveFinishedCycle(getName(), breakpoint, cycle);
     }

@@ -230,7 +230,7 @@ public class RunCentralisedMAS {
         createPauseButton();
 
         // add show sources button
-        final JButton btShowSrc = new JButton("Show sources", new ImageIcon(RunCentralisedMAS.class.getResource("/images/list.gif")));
+        final JButton btShowSrc = new JButton("Sources", new ImageIcon(RunCentralisedMAS.class.getResource("/images/list.gif")));
         btShowSrc.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 showProjectSources(project);
@@ -239,7 +239,7 @@ public class RunCentralisedMAS {
         MASConsoleGUI.get().addButton(btShowSrc);
 
         // add Button start
-        final JButton btStartAg = new JButton("Start new agent", new ImageIcon(RunCentralisedMAS.class.getResource("/images/newAgent.gif")));
+        final JButton btStartAg = new JButton("New agent", new ImageIcon(RunCentralisedMAS.class.getResource("/images/newAgent.gif")));
         btStartAg.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 new StartNewAgentGUI(MASConsoleGUI.get().getFrame(), "Start a new agent to run in current MAS", System.getProperty("user.dir"));

@@ -68,7 +68,7 @@ public class SaciAgArch extends saci.Agent implements AgArchInfraTier {
     private MBoxSAg  mboxPercept = null;
 
     /** the user implementation of the architecture */
-    protected AgArch userAgArh;
+    protected AgArch userAgArch;
 
     private Map<String,ActionExec> myPA = new HashMap<String,ActionExec>();
     
@@ -128,10 +128,10 @@ public class SaciAgArch extends saci.Agent implements AgArchInfraTier {
                     stts.setOptions("[" + args[5] + "]");
                 }
             }
-            userAgArh = (AgArch) Class.forName(archClassName).newInstance();
-            userAgArh.setArchInfraTier(this);
-            userAgArh.initAg(agClassName, bbPars, asSource, stts);
-            logger.setLevel(userAgArh.getTS().getSettings().logLevel());
+            userAgArch = (AgArch) Class.forName(archClassName).newInstance();
+            userAgArch.setArchInfraTier(this);
+            userAgArch.initAg(agClassName, bbPars, asSource, stts);
+            logger.setLevel(userAgArch.getTS().getSettings().logLevel());
         } catch (Exception e) {
             running = false;
             throw new JasonException("as2j: error creating the agent class! - " + e.getMessage());
@@ -145,17 +145,16 @@ public class SaciAgArch extends saci.Agent implements AgArchInfraTier {
             mboxPercept.init();
             mboxPercept.setMboxChangedListener(new MBoxChangedListener() {
                 public void mboxChanged() {
-                    if (userAgArh.getTS() != null) {
-                        userAgArh.getTS().newMessageHasArrived();
-                    }
+                    wake();
                 }
             });
 
             mboxPercept.addMessageHandler("performCycle", "tell", null, "AS-ExecControl", new MessageHandler() {
                 public boolean processMessage(saci.Message m) {
                     int cycle = Integer.parseInt(m.get("cycle").toString());
-                    userAgArh.setCycleNumber(cycle);
-                    userAgArh.getTS().receiveSyncSignal();
+                    userAgArch.setCycleNumber(cycle);
+                    //userAgArch.getTS().receiveSyncSignal();
+                    receiveSyncSignal();
                     return true; // no other message handler gives this message
                 }
             });
@@ -169,7 +168,7 @@ public class SaciAgArch extends saci.Agent implements AgArchInfraTier {
                     r.put("ontology", m.get("ontology"));
 
                     try {
-                        Document agStateDoc = userAgArh.getTS().getAg().getAgState();
+                        Document agStateDoc = userAgArch.getTS().getAg().getAgState();
 
                         // serialize
                         // StringWriter so = new StringWriter();
@@ -189,9 +188,7 @@ public class SaciAgArch extends saci.Agent implements AgArchInfraTier {
 
             getMBox().setMboxChangedListener(new MBoxChangedListener() {
                 public void mboxChanged() {
-                    if (userAgArh.getTS() != null) {
-                        userAgArh.getTS().newMessageHasArrived();
-                    }
+                    wake();
                 }
             });
 
@@ -208,16 +205,57 @@ public class SaciAgArch extends saci.Agent implements AgArchInfraTier {
         running = false;
         new Thread() {
             public void run() {
-                userAgArh.stopAg();
+                userAgArch.stopAg();
             }
         }.start();
-        userAgArh.getTS().receiveSyncSignal(); // in case the agent is waiting sync
-        userAgArh.getTS().newMessageHasArrived(); // in case the agent is waiting messages
+        receiveSyncSignal();
+        wake(); // in case the agent is waiting messages
     }
 
+
+    private Object sleepSync = new Object();
+    
+    public boolean sleep() {
+        try {
+            if (!userAgArch.getTS().getSettings().isSync()) {
+                logger.fine("Entering in sleep mode....");
+                synchronized (sleepSync) {
+                    sleepSync.wait(1000); // wait for messages
+                }
+            }
+            return true;
+        } catch (InterruptedException e) {
+        } catch (Exception e) {
+            logger.log(Level.WARNING,"Error waiting mgs", e);
+        }
+        return false;
+    }
+    
+    public void wake() {
+        synchronized (sleepSync) {
+            sleepSync.notifyAll(); // notify sleep method
+        }
+    }
+    
     public void run() {
         while (running) {
-            userAgArh.getTS().reasoningCycle();
+            TransitionSystem ts = userAgArch.getTS();
+            while (running) {
+                if (ts.getSettings().isSync()) {
+                    waitSyncSignal();
+                    ts.reasoningCycle();
+                    boolean isBreakPoint = false;
+                    try {
+                        isBreakPoint = ts.getC().getSelectedOption().getPlan().hasBreakpoint();
+                        if (logger.isLoggable(Level.FINE)) logger.fine("Informing controller that I finished a reasoning cycle "+userAgArch.getCycleNumber()+". Breakpoint is " + isBreakPoint);
+                    } catch (NullPointerException e) {
+                        // no problem, there is no sel opt, no plan ....
+                    }
+                    informCycleFinished(isBreakPoint, userAgArch.getCycleNumber());
+                } else {
+                    ts.reasoningCycle();
+                }
+            }
         }
 
         super.stopAg();
@@ -284,7 +322,7 @@ public class SaciAgArch extends saci.Agent implements AgArchInfraTier {
                                     } else {
                                         a.setResult(false);
                                     }
-                                    userAgArh.getTS().getC().getFeedbackActions().add(a);
+                                    userAgArch.getTS().getC().getFeedbackActions().add(a);
                                 } else {
                                     logger.log(Level.SEVERE, "Error: received feedback for an Action that is not pending.");
                                 }
@@ -373,7 +411,7 @@ public class SaciAgArch extends saci.Agent implements AgArchInfraTier {
                     if (irt != null) {
                         im.setInReplyTo(irt);
                     }
-                    userAgArh.getTS().getC().getMailBox().add(im);
+                    userAgArch.getTS().getC().getMailBox().add(im);
                 }
             }
         } while (m != null);
@@ -384,7 +422,7 @@ public class SaciAgArch extends saci.Agent implements AgArchInfraTier {
         if (!running) {
             return;
         }
-        TransitionSystem ts = userAgArh.getTS();
+        TransitionSystem ts = userAgArch.getTS();
         try {
             Term acTerm = action.getActionTerm();
             logger.info("doing: " + acTerm);
@@ -411,8 +449,57 @@ public class SaciAgArch extends saci.Agent implements AgArchInfraTier {
         }
     }
 
+    
+    private Object  syncMonitor       = new Object(); 
+    private boolean inWaitSyncMonitor = false;
+
+    /**
+     * waits for a signal to continue the execution (used in synchronized
+     * execution mode)
+     */
+    private void waitSyncSignal() {
+        try {
+            synchronized (syncMonitor) {
+                inWaitSyncMonitor = true;
+                syncMonitor.wait();
+                inWaitSyncMonitor = false;
+            }
+        } catch (InterruptedException e) {
+        } catch (Exception e) {
+            logger.log(Level.WARNING,"Error waiting sync (1)", e);
+        }
+    }
+
+    /**
+     * inform this agent that it can continue, if it is in sync mode and
+     * wainting a signal
+     */
+    private void receiveSyncSignal() {
+        if (userAgArch.getTS().getSettings().isSync()) {
+            try {
+                synchronized (syncMonitor) {
+                    while (!inWaitSyncMonitor && isRunning()) {
+                        // waits the agent to enter in waitSyncSignal
+                        syncMonitor.wait(50); 
+                    }
+                    syncMonitor.notifyAll();
+                }
+            } catch (InterruptedException e) {
+            } catch (Exception e) {
+                logger.log(Level.WARNING,"Error waiting sync (2)", e);
+            }
+        }
+    }
+    
     private static Message cycleFinished = new Message("(tell :receiver controller :ontology AS-ExecControl :content cycleFinished)");
 
+    /** 
+     *  Informs the infrastructure tier controller that the agent 
+     *  has finished its reasoning cycle (used in sync mode).
+     *  
+     *  <p><i>breakpoint</i> is true in case the agent selected one plan 
+     *  with the "breakpoint" annotation.  
+     */ 
     public void informCycleFinished(boolean breakpoint, int cycle) {
         // send a message to the executionControl agent
         Message m = (Message) cycleFinished.clone();

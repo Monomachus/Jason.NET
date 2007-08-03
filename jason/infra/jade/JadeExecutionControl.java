@@ -25,6 +25,7 @@ package jason.infra.jade;
 
 import jade.core.AID;
 import jade.core.behaviours.CyclicBehaviour;
+import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
 import jason.control.ExecutionControl;
 import jason.control.ExecutionControlInfraTier;
@@ -85,33 +86,29 @@ public class JadeExecutionControl extends JadeAg implements ExecutionControlInfr
             addBehaviour(new CyclicBehaviour() {
                 ACLMessage m;
                 public void action() {
-                    synchronized (syncReceive) {
-                        m = receive();
-                    }
+                    m = receive();
                     if (m == null) {
                         block(1000);
                     } else {
-                        if (!isAskAnswer(m)) {
+                        try {
+                            @SuppressWarnings("unused")
+                            Document o = (Document)m.getContentObject();
+                            logger.warning("Received agState too late! in-reply-to:"+m.getInReplyTo());
+                        } catch (Exception _) {
                             try {
-                                @SuppressWarnings("unused")
-                                Document o = (Document)m.getContentObject();
-                                logger.warning("Received agState too late! in-reply-to:"+m.getInReplyTo());
-                            } catch (Exception _) {
-                                try {
-                                    final String content = m.getContent();
-                                    final int p = content.indexOf(",");
-                                    if (p > 0) {
-                                        final boolean breakpoint = Boolean.parseBoolean(content.substring(0,p));
-                                        final int cycle = Integer.parseInt(content.substring(p+1));
-                                        executor.execute(new Runnable() {
-                                            public void run() {
-                                                userControl.receiveFinishedCycle(m.getSender().getLocalName(), breakpoint, cycle);
-                                            }
-                                        });
-                                    }
-                                } catch (Exception e) {
-                                    logger.log(Level.SEVERE, "Error in processing "+m, e);
+                                final String content = m.getContent();
+                                final int p = content.indexOf(",");
+                                if (p > 0) {
+                                    final boolean breakpoint = Boolean.parseBoolean(content.substring(0,p));
+                                    final int cycle = Integer.parseInt(content.substring(p+1));
+                                    executor.execute(new Runnable() {
+                                        public void run() {
+                                            userControl.receiveFinishedCycle(m.getSender().getLocalName(), breakpoint, cycle);
+                                        }
+                                    });
                                 }
+                            } catch (Exception e) {
+                                logger.log(Level.SEVERE, "Error in processing "+m, e);
                             }
                         }
                     }
@@ -133,45 +130,76 @@ public class JadeExecutionControl extends JadeAg implements ExecutionControlInfr
         return userControl;
     }
     
-    public void informAgToPerformCycle(String agName, int cycle) {
-        ACLMessage m = new ACLMessage(ACLMessage.INFORM);
-        m.setOntology(controllerOntology);
-        m.addReceiver(new AID(agName, AID.ISLOCALNAME));
-        m.setContent("performCycle");
-        m.addUserDefinedParameter("cycle", String.valueOf(cycle));
-        send(m);
+    public void informAgToPerformCycle(final String agName, final int cycle) {
+        addBehaviour(new OneShotBehaviour() {
+            public void action() {
+                ACLMessage m = new ACLMessage(ACLMessage.INFORM);
+                m.setOntology(controllerOntology);
+                m.addReceiver(new AID(agName, AID.ISLOCALNAME));
+                m.setContent("performCycle");
+                m.addUserDefinedParameter("cycle", String.valueOf(cycle));
+                send(m);
+            }
+        });
     }
 
     public void informAllAgsToPerformCycle(final int cycle) {
-        try {
-            ACLMessage m = new ACLMessage(ACLMessage.INFORM);
-            m.setOntology(controllerOntology);
-            addAllAgsAsReceivers(m);
-            m.setContent("performCycle");
-            m.addUserDefinedParameter("cycle", String.valueOf(cycle));
-            send(m);
-        } catch (Exception e) {
-            logger.log(Level.SEVERE, "Error in informAllAgsToPerformCycle", e);
-        }
+        addBehaviour(new OneShotBehaviour() {
+            public void action() {
+                try {
+                    ACLMessage m = new ACLMessage(ACLMessage.INFORM);
+                    m.setOntology(controllerOntology);
+                    addAllAgsAsReceivers(m);
+                    m.setContent("performCycle");
+                    m.addUserDefinedParameter("cycle", String.valueOf(cycle));
+                    send(m);
+                } catch (Exception e) {
+                    logger.log(Level.SEVERE, "Error in informAllAgsToPerformCycle", e);
+                }
+            }
+        });
     }
 
-    public Document getAgState(String agName) {
+    public Document getAgState(final String agName) {
         if (agName == null) return null;
-        try {
-            ACLMessage m = new ACLMessage(ACLMessage.QUERY_REF);
-            m.setOntology(controllerOntology);
-            m.addReceiver(new AID(agName, AID.ISLOCALNAME));
-            m.setContent("agState");
-            ACLMessage r = ask(m);
-            if (r == null) {
-                System.err.println("No agent state received! (possibly timeout in ask)");
-            } else {
-                return (Document) r.getContentObject();
+        
+        state = null;
+        addBehaviour(new OneShotBehaviour() {
+            public void action() {
+                try {
+                    ACLMessage m = new ACLMessage(ACLMessage.QUERY_REF);
+                    m.setOntology(controllerOntology);
+                    m.addReceiver(new AID(agName, AID.ISLOCALNAME));
+                    m.setContent("agState");
+                    ACLMessage r = ask(m);
+                    if (r == null) {
+                        System.err.println("No agent state received! (possibly timeout in ask)");
+                    } else {
+                        state = (Document) r.getContentObject();
+                    }
+                } catch (Exception e) {
+                    logger.log(Level.SEVERE, "Error in getAgState", e);
+                } finally {
+                    synchronized (syncWaitState) {
+                        syncWaitState.notifyAll();
+                    }
+                }
             }
-        } catch (Exception e) {
-            logger.log(Level.SEVERE, "Error in getAgState", e);
+        });
+        return waitState();
+    }
+    
+    private Document state = null;
+    private Object syncWaitState = new Object();
+    private Document waitState() {
+        if (state == null) {
+            synchronized (syncWaitState) {
+                try {
+                    syncWaitState.wait();
+                } catch (InterruptedException e) {}
+            }
         }
-        return null;
+        return state;
     }
 
     public RuntimeServicesInfraTier getRuntimeServices() {

@@ -1,16 +1,19 @@
 package jason.infra.jade;
 
 import jade.core.AID;
+import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.domain.DFService;
 import jade.domain.FIPAException;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
+import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
 import jason.architecture.AgArch;
 import jason.architecture.AgArchInfraTier;
 import jason.asSemantics.ActionExec;
+import jason.asSemantics.TransitionSystem;
 import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Literal;
 import jason.asSyntax.Term;
@@ -24,8 +27,6 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -45,16 +46,16 @@ public class JadeAgArch extends JadeAg implements AgArchInfraTier {
 	private static final long serialVersionUID = 1L;
    
     /** the user customisation of the architecture */
-    protected AgArch userAgArh;
+    protected AgArch userAgArch;
 
     // map of pending actions
     private Map<String,ActionExec> myPA = new HashMap<String,ActionExec>();
 
-    private Queue<ACLMessage> msgs = new ConcurrentLinkedQueue<ACLMessage>();
-    
     AID controllerAID  = new AID(RunJadeMAS.controllerName, AID.ISLOCALNAME);
     AID environmentAID = null;
 
+    Behaviour tsBehaviour;
+    
     // 
 	// Jade Methods
 	// ------------
@@ -122,10 +123,10 @@ public class JadeAgArch extends JadeAg implements AgArchInfraTier {
                 }       
             }
 
-            userAgArh = (AgArch) Class.forName(archClassName).newInstance();
-            userAgArh.setArchInfraTier(this);
-            userAgArh.initAg(agClassName, bbPars, asSource, stts);
-            logger.setLevel(userAgArh.getTS().getSettings().logLevel());
+            userAgArch = (AgArch) Class.forName(archClassName).newInstance();
+            userAgArch.setArchInfraTier(this);
+            userAgArch.initAg(agClassName, bbPars, asSource, stts);
+            logger.setLevel(userAgArch.getTS().getSettings().logLevel());
     
             // DF register
             DFAgentDescription dfa = new DFAgentDescription();
@@ -140,41 +141,32 @@ public class JadeAgArch extends JadeAg implements AgArchInfraTier {
                 logger.log(Level.SEVERE, "Error registering agent in DF", e);
             }
             
-            // wakeup the agent when new messages arrives
-            addBehaviour(new CyclicBehaviour() {
-                ACLMessage m;
+            tsBehaviour = new CyclicBehaviour() {
+                TransitionSystem ts = userAgArch.getTS();
                 public void action() {
-                    try {
-                        synchronized (syncReceive) {
-                            m = receive();
-                        }
-                        if (m == null) {
-                            block(1000);
-                        } else {
-                            if (logger.isLoggable(Level.FINE)) logger.fine("Received message: " + m);
-                            if (!isAskAnswer(m) &&
-                                !isActionFeedback(m) && 
-                                !isExecutionControlOntology(m)
-                                ) {
-                                msgs.offer(m); // store msgs to be processed by checkMail
-                                userAgArh.getTS().newMessageHasArrived();
+                    if (ts.getSettings().isSync()) {
+                        if (processExecutionControlOntologyMsg()) {
+                            // execute a cycle in sync mode
+                            ts.reasoningCycle();
+                            boolean isBreakPoint = false;
+                            try {
+                                isBreakPoint = ts.getC().getSelectedOption().getPlan().hasBreakpoint();
+                                if (logger.isLoggable(Level.FINE)) logger.fine("Informing controller that I finished a reasoning cycle "+userAgArch.getCycleNumber()+". Breakpoint is " + isBreakPoint);
+                            } catch (NullPointerException e) {
+                                // no problem, there is no sel opt, no plan ....
                             }
-                        }
-                    } catch (Exception e) {
-                        logger.log(Level.SEVERE,"Error receiving message.",e);                        
-                    }
-                }
-            });
+                            informCycleFinished(isBreakPoint, userAgArch.getCycleNumber());
 
-            // main reasoning cycle (can not use Jade behaviour!)
-            new Thread(getLocalName()+" thread") {
-                public void run() {
-                    while (isRunning()) {
-                        userAgArh.getTS().reasoningCycle();
+                        } else {
+                            block(1000);
+                        }
+                    } else {
+                        ts.reasoningCycle();
                     }
                 }
-            }.start();
-    
+            };
+            addBehaviour(tsBehaviour);
+
             logger.fine("Created from source "+asSource);
         } catch (Exception e) {
             logger.log(Level.SEVERE,"Error creating JADE architecture.",e);
@@ -185,10 +177,8 @@ public class JadeAgArch extends JadeAg implements AgArchInfraTier {
     public void doDelete() {
         try {
             running = false;
-            if (userAgArh != null) {
-                userAgArh.stopAg();
-                userAgArh.getTS().receiveSyncSignal();    // in case the agent is waiting sync
-                userAgArh.getTS().newMessageHasArrived(); // in case the agent is waiting messages
+            if (userAgArch != null) {
+                userAgArch.stopAg();
             }
         } catch (Exception e) {
             logger.log(Level.SEVERE,"Error in doDelete.",e);
@@ -210,21 +200,42 @@ public class JadeAgArch extends JadeAg implements AgArchInfraTier {
 	public void stopAg() {
 		doDelete();
 	}
+    
+    private boolean continueAfterSleep = false;
+    
+    public boolean sleep() {
+        tsBehaviour.block(1000);
+        continueAfterSleep = !continueAfterSleep;
+        return continueAfterSleep;
+    }
+    
+    public void wake() {
+        tsBehaviour.restart();
+    }
 
 	public String getAgName() {
 		return getLocalName();
 	}
 
 	public boolean canSleep() {
-		return msgs.isEmpty() && isRunning();
+		return getCurQueueSize() == 0 && isRunning();
 	}
 
 	public void checkMail() {
         ACLMessage m = null;
         do {
             try {
-                m = msgs.poll();
+                m = receive();
                 if (m != null) {
+                    if (logger.isLoggable(Level.FINE)) logger.fine("Received message: " + m);
+                    if (isActionFeedback(m)) {
+                        // ignore this message
+                        continue;
+                    }
+                    if  (!m.getLanguage().equals("AgentSpeak")) {
+                        logger.warning("Ignoring message where language is not AgentSpeak"+m);
+                        continue;
+                    }
                     String ilForce   = aclToKqml(m.getPerformative());
                     String sender    = m.getSender().getLocalName();
                     String replyWith = m.getReplyWith();
@@ -242,7 +253,7 @@ public class JadeAgArch extends JadeAg implements AgArchInfraTier {
                         if (irt != null) {
                             im.setInReplyTo(irt);
                         }
-                        userAgArh.getTS().getC().getMailBox().add(im);
+                        userAgArch.getTS().getC().getMailBox().add(im);
                     }
                 }
             } catch (Exception e) {
@@ -264,8 +275,7 @@ public class JadeAgArch extends JadeAg implements AgArchInfraTier {
                     } else {
                         a.setResult(false);
                     }
-                    userAgArh.getTS().getC().getFeedbackActions().add(a);
-                    userAgArh.getTS().newMessageHasArrived();
+                    userAgArch.getTS().getC().getFeedbackActions().add(a);
                 } else {
                     logger.log(Level.SEVERE, "Error: received feedback for an Action that is not pending. The message is "+m);
                 }
@@ -275,34 +285,38 @@ public class JadeAgArch extends JadeAg implements AgArchInfraTier {
         return false;
     }
     
-    
-    boolean isExecutionControlOntology(ACLMessage m) {
-        // test if it is execution control protocol
-        if (m.getOntology() != null && m.getOntology().equals(JadeExecutionControl.controllerOntology)) {
-            String content = m.getContent();
-            if (content.startsWith("performCycle")) {
-                int cycle = Integer.parseInt(m.getUserDefinedParameter("cycle"));
-                userAgArh.setCycleNumber(cycle);
-                userAgArh.getTS().receiveSyncSignal();
-            } else if (content.startsWith("agState")) {
-                // send the agent state
-                ACLMessage r = m.createReply();
-                r.setPerformative(ACLMessage.INFORM);
-                try {
-                    Document agStateDoc = userAgArh.getTS().getAg().getAgState();
-                    r.setContentObject((Serializable)agStateDoc);
-                    send(r);
-                } catch (Exception e) {
-                    logger.log(Level.SEVERE, "Error sending message " + r, e);
-                }
-            } else {
-                logger.warning("Unknown message:"+m);
-            }
+    private MessageTemplate ts = MessageTemplate.and(
+            MessageTemplate.MatchContent("agState"),
+            MessageTemplate.MatchOntology(JadeExecutionControl.controllerOntology));
+    private MessageTemplate tc = MessageTemplate.and(
+            MessageTemplate.MatchContent("performCycle"),
+            MessageTemplate.MatchOntology(JadeExecutionControl.controllerOntology));
+
+    boolean processExecutionControlOntologyMsg() {
+        ACLMessage m = receive(ts);
+        if (m != null) {
+            // send the agent state
+            ACLMessage r = m.createReply();
+            r.setPerformative(ACLMessage.INFORM);
+            try {
+                Document agStateDoc = userAgArch.getTS().getAg().getAgState();
+                r.setContentObject((Serializable)agStateDoc);
+                send(r);
+            } catch (Exception e) {
+                logger.log(Level.SEVERE, "Error sending message " + r, e);
+            }            
+        }
+        
+        m = receive(tc);
+        if (m != null) {
+            int cycle = Integer.parseInt(m.getUserDefinedParameter("cycle"));
+            logger.fine("new cycle: "+cycle);
+            userAgArch.setCycleNumber(cycle);
             return true;
         }
         return false;
     }
-
+    
     boolean isPerceptionOntology(ACLMessage m) {
         return m.getOntology() != null && m.getOntology().equals(JadeEnvironment.perceptionOntology);
     }
@@ -338,12 +352,10 @@ public class JadeAgArch extends JadeAg implements AgArchInfraTier {
             sd.setName(RunJadeMAS.environmentName);
             template.addServices(sd);
             try {
-                synchronized (syncReceive) {                    
-                    DFAgentDescription[] ans = DFService.search(this, template);
-                    if (ans.length > 0) {
-                        environmentAID =  ans[0].getName();
-                        return environmentAID;
-                    }
+                DFAgentDescription[] ans = DFService.search(this, template);
+                if (ans.length > 0) {
+                    environmentAID =  ans[0].getName();
+                    return environmentAID;
                 }
             } catch (Exception e) {
                 logger.log(Level.SEVERE,"Error getting environment from DF.",e);
@@ -378,6 +390,13 @@ public class JadeAgArch extends JadeAg implements AgArchInfraTier {
 	    return new JadeRuntimeServices(getContainerController(), this);
 	}
 
+    /** 
+     *  Informs the infrastructure tier controller that the agent 
+     *  has finished its reasoning cycle (used in sync mode).
+     *  
+     *  <p><i>breakpoint</i> is true in case the agent selected one plan 
+     *  with the "breakpoint" annotation.  
+     */ 
 	public void informCycleFinished(boolean breakpoint, int cycle) {
         try {
             ACLMessage m = new ACLMessage(ACLMessage.INFORM);

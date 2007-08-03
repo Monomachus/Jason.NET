@@ -34,7 +34,7 @@ import java.util.List;
 
 
 /**
- * This interface is implemented by the infrastructure tier (Saci/Centralised/...)
+ * This interface is implemented by the infrastructure tier (Saci/Jade/Centralised/...)
  * to provide concrete perception, action, and communication to the agent architecture.
  **/
 
@@ -61,21 +61,18 @@ public interface AgArchInfraTier {
     /** Broadcasts a Jason message in a specific infrastructure */
     public void broadcast(Message m) throws Exception;
     
-    /** Checks whether the agent is running */
+    /** Checks whether the agent is running (alive). */
     public boolean isRunning();
     
     /** Stops the agent */
     public void stopAg();
     
+    /** Put the agent in "sleep" mode, returns true if the agent should continue running. */
+    public boolean sleep();
+    
+    /** Removes the agent from the "sleep" mode */
+    public void wake();
+    
     /** Gets an object with infrastructure runtime services */
     public RuntimeServicesInfraTier getRuntimeServices();
-    
-    /** 
-      *  Informs the infrastructure tier controller that the agent 
-      *  has finished its reasoning cycle (used in sync mode).
-      *  
-      *  <p><i>breakpoint</i> is true in case the agent selected one plan 
-      *  with the "breakpoint" annotation.  
-      */ 
-    public void informCycleFinished(boolean breakpoint, int cycle);
 }

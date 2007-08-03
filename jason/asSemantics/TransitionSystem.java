@@ -822,68 +822,12 @@ public class TransitionSystem {
         return null;
     }
     
-    boolean canSleep() {
+    public boolean canSleep() {
         return !conf.C.hasEvent() && !conf.C.hasIntention() && 
                conf.C.MB.isEmpty() && conf.C.FA.isEmpty() && 
                agArch.canSleep();
     }
 
-    /** waits for a new message */
-    synchronized private void waitMessage() {
-        try {
-            logger.fine("Waiting message....");
-            wait(1000); // wait for messages
-        } catch (InterruptedException e) {
-        } catch (Exception e) {
-            logger.log(Level.WARNING,"Error waiting mgs", e);
-        }
-    }
-
-    synchronized public void newMessageHasArrived() {
-        notifyAll(); // notify waitMessage method
-    }
-
-    private Object  syncMonitor       = new Object(); 
-
-    private boolean inWaitSyncMonitor = false;
-
-    /**
-     * waits for a signal to continue the execution (used in synchronized
-     * execution mode)
-     */
-    private void waitSyncSignal() {
-        try {
-            synchronized (syncMonitor) {
-                inWaitSyncMonitor = true;
-                syncMonitor.wait();
-                inWaitSyncMonitor = false;
-            }
-        } catch (InterruptedException e) {
-        } catch (Exception e) {
-            logger.log(Level.WARNING,"Error waiting sync (1)", e);
-        }
-    }
-
-    /**
-     * inform this agent that it can continue, if it is in sync mode and
-     * wainting a signal
-     */
-    public void receiveSyncSignal() {
-        if (setts.isSync()) {
-            try {
-                synchronized (syncMonitor) {
-                    while (!inWaitSyncMonitor && agArch.isRunning()) {
-                        // waits the agent to enter in waitSyncSignal
-                        syncMonitor.wait(50); 
-                    }
-                    syncMonitor.notifyAll();
-                }
-            } catch (InterruptedException e) {
-            } catch (Exception e) {
-                logger.log(Level.WARNING,"Error waiting sync (2)", e);
-            }
-        }
-    }
 
     /*
     private boolean stopCycle = false;
@@ -911,18 +855,16 @@ public class TransitionSystem {
         	
         	//currentTask = "begin";
         	
-            if (setts.isSync()) {
-                waitSyncSignal();
-            } else if (canSleep()) {
+            if (canSleep()) {
                 if (getAg().pl.getIdlePlans() != null) {
                     logger.fine("generating idle event");
                     C.addExternalEv(PlanLibrary.TE_IDLE);
                 } else if (nrcslbr <= 1) {
-                    waitMessage();
+                    if (!agArch.getArchInfraTier().sleep())
+                        return;
                 }
             }
-            if (!agArch.isRunning()) return;
-
+            
             C.reset();
 
             if (nrcslbr >= setts.nrcbp() || canSleep()) {
@@ -955,20 +897,8 @@ public class TransitionSystem {
 
             // counting number of cycles since last belief revision
             nrcslbr++;
-
-            if (setts.isSync()) {
-                boolean isBreakPoint = false;
-                try {
-                    isBreakPoint = conf.C.getSelectedOption().getPlan().hasBreakpoint();
-                    if (logger.isLoggable(Level.FINE)) logger.fine("Informing controller that I finished a reasoning cycle "+agArch.getCycleNumber()+". Breakpoint is " + isBreakPoint);
-                } catch (NullPointerException e) {
-                    // no problem, there is no sel opt, no plan ....
-                }
-                agArch.getArchInfraTier().informCycleFinished(isBreakPoint, agArch.getCycleNumber());
-            }
             
             //currentTask = "end";
-
         } catch (Exception e) {
             logger.log(Level.SEVERE, "*** ERROR in the transition system. "+conf.C+"\nCreating a new C!", e);
             conf.C.create();

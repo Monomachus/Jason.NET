@@ -109,9 +109,7 @@ public class JadeEnvironment extends JadeAg implements EnvironmentInfraTier {
             addBehaviour(new CyclicBehaviour() {
                 ACLMessage m;
                 public void action() {
-                    synchronized (syncReceive) {
-                        m = receive();
-                    }
+                    m = receive();
                     if (m == null) {
                         block(1000);
                     } else {
@@ -173,11 +171,7 @@ public class JadeEnvironment extends JadeAg implements EnvironmentInfraTier {
     }
 
     public void informAgsEnvironmentChanged() {
-        try {
-            broadcast(new Message("tell", null, null, "environmentChanged"));
-        } catch (Exception e) {
-            logger.log(Level.SEVERE, "Error sending notifyEvents ", e);
-        }
+        broadcast(new Message("tell", null, null, "environmentChanged"));
     }
 
     public void informAgsEnvironmentChanged(Collection agentsToNotify) {

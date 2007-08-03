@@ -411,7 +411,7 @@ public class ExecutionControlGUI extends ExecutionControl {
         setRunningCycle(false);
     }
 
-    private ExecutorService executor = Executors.newFixedThreadPool(5);
+    private ExecutorService executor = Executors.newFixedThreadPool(2);
     
     protected void continueRun() {
         executor.execute(new Runnable() {
