@@ -14,7 +14,7 @@
 
     <property name="mas2j.project.file" value="<PROJECT-FILE>"/>
     <property name="debug" value="<DEBUG>"/> <!-- use "-debug" to run in debug mode -->
-	<property name="build.dir" value="${basedir}/bin/classes" />
+    <property name="build.dir" value="${basedir}/bin/classes" />
 
     <property name="jasonJar" value="<JASON-JAR>"/>
 
@@ -25,9 +25,9 @@
 <PATH-LIB>
     </path>
 
-	<target name="init">
-		<mkdir dir="${build.dir}" />
-	</target>
+    <target name="init">
+        <mkdir dir="${build.dir}" />
+    </target>
 
     <target name="compile" depends="init">
         <javac srcdir="${basedir}" destdir="${build.dir}" debug="true" optimize="true" >
