@@ -80,6 +80,7 @@
               failonerror="true" fork="yes" dir="${basedir}" >
             <classpath refid="project.classpath"/>
             <arg line="${mas2j.project.file} ${debug} <RUN-ARGS>"/>
+            <jvmarg line="-Xmx750M"/>    
         </java>
     </target>
 

@@ -93,7 +93,7 @@ public class Config extends Properties {
     }
 
     public boolean getBoolean(String key) {
-        return get(key) != null && get(key).equals("true");
+        return "true".equals(get(key));
     }
 
     public String getJasonJar() {

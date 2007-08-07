@@ -55,7 +55,7 @@ import java.util.logging.Logger;
  * <li>stopAg.
  * </ul>
  */
-public class CentralisedAgArch extends Thread implements AgArchInfraTier {
+public class CentralisedAgArch implements Runnable, AgArchInfraTier {
 
 	protected CentralisedEnvironment    infraEnv     = null;
     private CentralisedExecutionControl infraControl = null;
@@ -108,7 +108,6 @@ public class CentralisedAgArch extends Thread implements AgArchInfraTier {
     }
 
     public void setAgName(String name) {
-        super.setName(name);
         agName = name;
     }
 
@@ -142,9 +141,15 @@ public class CentralisedAgArch extends Thread implements AgArchInfraTier {
 
     private Object syncStopRun = new Object();
 
+    private Thread myThread = null;
+    protected void setThread(Thread t) { 
+        myThread = t;
+        myThread.setName(agName);
+    }
+    
     public void stopAg() {
         running = false;
-        interrupt();
+        if (myThread != null) myThread.interrupt();
         synchronized (syncStopRun) {
         	masRunner.delAg(agName);
         }
@@ -204,7 +209,7 @@ public class CentralisedAgArch extends Thread implements AgArchInfraTier {
 
     // Default perception assumes Complete and Accurate sensing.
     public List<Literal> perceive() {
-        List<Literal> percepts = infraEnv.getUserEnvironment().getPercepts(getName());
+        List<Literal> percepts = infraEnv.getUserEnvironment().getPercepts(getAgName());
         if (logger.isLoggable(Level.FINE) && percepts != null) {
             logger.fine("percepts: " + percepts);
         }
@@ -214,7 +219,7 @@ public class CentralisedAgArch extends Thread implements AgArchInfraTier {
     // this is used by the .send internal action in stdlib
     public void sendMsg(Message m) throws Exception {
         // actually send the message
-        m.setSender(getName());
+        m.setSender(getAgName());
         CentralisedAgArch rec = masRunner.getAg(m.getReceiver());
         
         if (rec == null) {
@@ -257,7 +262,7 @@ public class CentralisedAgArch extends Thread implements AgArchInfraTier {
     /** called by the TS to ask the execution of an action in the environment */
     public void act(ActionExec action, List<ActionExec> feedback) {
         logger.info("doing: " + action.getActionTerm());
-        infraEnv.act(getName(), action);
+        infraEnv.act(getAgName(), action);
     }
     
     /** called the the environment when the action was executed */
@@ -317,7 +322,7 @@ public class CentralisedAgArch extends Thread implements AgArchInfraTier {
      *  with the "breakpoint" annotation.  
      */ 
     public void informCycleFinished(boolean breakpoint, int cycle) {
-        infraControl.receiveFinishedCycle(getName(), breakpoint, cycle);
+        infraControl.receiveFinishedCycle(getAgName(), breakpoint, cycle);
     }
 
     public RuntimeServicesInfraTier getRuntimeServices() {

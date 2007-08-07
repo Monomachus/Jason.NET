@@ -177,10 +177,11 @@ MAS2JProject mas() :           { Token soc; }
                             { return project; }
 }
 
-void infra() :              { Token t; }
-{                           { project.setInfrastructure("Centralised"); }
+void infra() :              { ClassParameters infra; }
+{                           
   [ <INFRA> 
-    ":" t = <ID>            { project.setInfrastructure(t.image); } 
+    ":"  
+    infra = classDef()      { project.setInfrastructure(infra); }     
   ]
 }
 

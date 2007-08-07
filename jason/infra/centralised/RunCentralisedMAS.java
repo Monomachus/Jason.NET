@@ -44,7 +44,11 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
@@ -66,10 +70,10 @@ public class RunCentralisedMAS {
     public final static String       stopMASFileName = ".stop___MAS";
     public final static String       defaultProjectFileName = "default.mas2j";
 
-    private   static Logger            logger      = Logger.getLogger(RunCentralisedMAS.class.getName());
-    protected static RunCentralisedMAS runner      = null;
-    private   static String            urlPrefix   = "";
-    private   static boolean           readFromJAR = false;
+    private   static Logger            logger        = Logger.getLogger(RunCentralisedMAS.class.getName());
+    protected static RunCentralisedMAS runner        = null;
+    private   static String            urlPrefix     = "";
+    private   static boolean           readFromJAR   = false;
     private   static MAS2JProject      project;
     
     private CentralisedEnvironment        env         = null;
@@ -100,7 +104,7 @@ public class RunCentralisedMAS {
 
         setupLogger();
 
-        if (args.length > 1) {
+        if (args.length == 2) {
             if (args[1].equals("-debug")) {
                 debug = true;
                 Logger.getLogger("").setLevel(Level.FINE);
@@ -320,13 +324,21 @@ public class RunCentralisedMAS {
                 }
                 tmpAsSrc = urlPrefix + tmpAsSrc;
                 
+                boolean isPool = project.getInfrastructure().parameters.contains("pool");
+                
                 for (int cAg = 0; cAg < ap.qty; cAg++) {
                     String numberedAg = agName;
                     if (ap.qty > 1) {
                         numberedAg += (cAg + 1);
                     }
-                    logger.fine("Creating agent " + numberedAg + " (" + (cAg + 1) + "/" + ap.qty + ")");
-                    CentralisedAgArch agArch = new CentralisedAgArch();
+                    CentralisedAgArch agArch;
+                    if (isPool) {
+                        logger.info("Creating agent " + numberedAg + " (" + (cAg + 1) + "/" + ap.qty + ")");
+                        agArch = new CentralisedAgArchForPool();
+                    } else {
+                        logger.fine("Creating agent " + numberedAg + " (" + (cAg + 1) + "/" + ap.qty + ")");
+                        agArch = new CentralisedAgArch();
+                    }
                     agArch.setAgName(numberedAg);
                     agArch.setEnvInfraTier(env);
                     agArch.initAg(ap.archClass.className, ap.agClass.className, ap.bbClass, tmpAsSrc, ap.getAsSetts(debug, project.getControlClass() != null), this);
@@ -348,26 +360,6 @@ public class RunCentralisedMAS {
         }
     }
 
-    /** change the current running MAS to debug mode */
-    void changeToDebugMode() {
-        try {
-            if (control == null) {
-                control = new CentralisedExecutionControl(new ClassParameters(ExecutionControlGUI.class.getName()), this);
-                for (CentralisedAgArch ag : ags.values()) {
-                    ag.setControlInfraTier(control);
-                    Settings stts = ag.getUserAgArch().getTS().getSettings();
-                    stts.setVerbose(2);
-                    stts.setSync(true);
-                    ag.getLogger().setLevel(Level.FINE);
-                    ag.getUserAgArch().getTS().getLogger().setLevel(Level.FINE);
-                    ag.getUserAgArch().getTS().getAg().getLogger().setLevel(Level.FINE);
-                }
-            }
-        } catch (Exception e) {
-            logger.log(Level.SEVERE, "Error entering in debug mode", e);
-        }
-    }
-
     public void addAg(CentralisedAgArch ag) {
     	ags.put(ag.getAgName(), ag);
     }
@@ -385,16 +377,120 @@ public class RunCentralisedMAS {
     
     protected void startAgs() {
         // run the agents
-        for (CentralisedAgArch ag : ags.values()) {
-            ag.setControlInfraTier(control);
-            ag.start();
+        if (project.getInfrastructure().parameters.contains("pool")) {
+            createThreadPool();
+        } else {
+            createAgsThreads();
         }
     }
+    
+    private void createAgsThreads() {
+        for (CentralisedAgArch ag : ags.values()) {
+            ag.setControlInfraTier(control);
+            
+            // create the agent thread
+            Thread agThread = new Thread(ag);
+            ag.setThread(agThread);
+            agThread.start();
+        }        
+    }
+    
+    private BlockingQueue<Runnable> myAgTasks;
+    private BlockingQueue<Runnable> mySleepAgs;
+    
+    private void createThreadPool() {
+        myAgTasks = new LinkedBlockingQueue<Runnable>();
+        mySleepAgs = new LinkedBlockingQueue<Runnable>();
+        
+        new Thread() {
+            public void run() {
+                // initially, add all agents in the tasks
+                for (CentralisedAgArch ag : ags.values()) {
+                    myAgTasks.offer(ag);
+                }
+                
+                int poolSize = ags.size();
+                if (poolSize > 20) {
+                    poolSize = 20;
+                }
+                ExecutorService executor = Executors.newFixedThreadPool(poolSize);
+                while (runner != null) {
+                    try {
+                        executor.execute(myAgTasks.take());
+                    } catch (InterruptedException e) { }
+                }
+                executor.shutdownNow();
+            }
+        }.start();
+        
+        // create a thread that wakeup the sleeping agents
+        new Thread() {
+            public void run() {
+                while (runner != null) {
+                    try {
+                        Runnable ag = mySleepAgs.poll();
+                        while (ag != null) {
+                            myAgTasks.offer(ag);
+                            ag = mySleepAgs.poll();
+                        }
+                        sleep(2000);
+                    } catch (InterruptedException e) { }
+                }
+            }            
+        }.start();
+    }
+    
+    private final class CentralisedAgArchForPool extends CentralisedAgArch {
+        boolean inSleep;
 
+        @Override
+        public boolean sleep() { 
+            mySleepAgs.offer(this);
+            inSleep = true;
+            return false; 
+        }
+
+        @Override
+        public void wake() {
+            if (mySleepAgs.remove(this)) {
+                myAgTasks.offer(this);
+            }
+        }
+        
+        @Override
+        public void run() {
+            if (isRunning()) { 
+                inSleep = false;
+                userAgArch.getTS().reasoningCycle();
+                if (!inSleep) myAgTasks.offer(this);
+            }
+        }
+    }
+    
     protected void stopAgs() {
         // run the agents
         for (CentralisedAgArch ag : ags.values()) {
             ag.stopAg();
+        }
+    }
+
+    /** change the current running MAS to debug mode */
+    void changeToDebugMode() {
+        try {
+            if (control == null) {
+                control = new CentralisedExecutionControl(new ClassParameters(ExecutionControlGUI.class.getName()), this);
+                for (CentralisedAgArch ag : ags.values()) {
+                    ag.setControlInfraTier(control);
+                    Settings stts = ag.getUserAgArch().getTS().getSettings();
+                    stts.setVerbose(2);
+                    stts.setSync(true);
+                    ag.getLogger().setLevel(Level.FINE);
+                    ag.getUserAgArch().getTS().getLogger().setLevel(Level.FINE);
+                    ag.getUserAgArch().getTS().getAg().getLogger().setLevel(Level.FINE);
+                }
+            }
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Error entering in debug mode", e);
         }
     }
 

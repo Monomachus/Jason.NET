@@ -44,7 +44,12 @@ public class CentralisedRuntimeServices implements RuntimeServicesInfraTier {
         agArch.setEnvInfraTier(RunCentralisedMAS.getRunner().getEnvironmentInfraTier());
         agArch.setControlInfraTier(RunCentralisedMAS.getRunner().getControllerInfraTier());
         masRunner.addAg(agArch);
-        agArch.start();
+        
+        // create the agent thread
+        Thread agThread = new Thread(agArch);
+        agArch.setThread(agThread);
+        agThread.start(); 
+
         logger.fine("Agent " + agName + " created!");
         return true;
     }

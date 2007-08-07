@@ -52,7 +52,7 @@ public class JasonProjectSideKickParser extends sidekick.SideKickParser {
             	// create nodes 
             	pd = new SideKickParsedData(buf.getName());
             	
-            	pd.root.add(new ProjectAsset("Infrastructure: ",project.getInfrastructure(), buf, INFRA_TYPE).createTreeNode());
+            	pd.root.add(new ProjectAsset("Infrastructure: ",project.getInfrastructure().toString(), buf, INFRA_TYPE).createTreeNode());
             	if (project.getEnvClass() != null) {
                 	pd.root.add(new ProjectAsset("Environment: ",project.getEnvClass().toString(), buf, ENV_TYPE).createTreeNode());
             	}

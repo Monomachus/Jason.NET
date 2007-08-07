@@ -54,7 +54,7 @@ public class MAS2JProject {
 	private String soc;
 	private ClassParameters envClass = null; 
     private ClassParameters controlClass = null;
-    private String infrastructure = "Centralised";
+    private ClassParameters infrastructure = new ClassParameters("Centralised");
     private String projectDir = "." + File.separator;
     private File   projectFile = null;
 	private List<AgentParameters> agents = new ArrayList<AgentParameters>();
@@ -99,10 +99,10 @@ public class MAS2JProject {
 		return projectFile;
 	}
 	
-	public void setInfrastructure(String a) {
-		infrastructure = a;
+	public void setInfrastructure(ClassParameters infra) {
+		infrastructure = infra;
 	}
-	public String getInfrastructure() {
+	public ClassParameters getInfrastructure() {
 		return infrastructure;
 	}
 
@@ -246,7 +246,7 @@ public class MAS2JProject {
 	public InfrastructureFactory getInfrastructureFactory() throws JasonException {
 		if (infraFac == null) {
 			try {
-				String facClass = Config.get().getInfrastructureFactoryClass(infrastructure);
+				String facClass = Config.get().getInfrastructureFactoryClass(infrastructure.className);
 				infraFac = (InfrastructureFactory)Class.forName(facClass).newInstance();
 			} catch (Exception e) { 
 				throw new JasonException("The project's infrastructure ('"+infrastructure+"') is unknown!");

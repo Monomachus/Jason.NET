@@ -75,14 +75,13 @@ public class mas2j implements mas2jConstants {
   }
 
   final public void infra() throws ParseException {
-                              Token t;
-                              project.setInfrastructure("Centralised");
+                              ClassParameters infra;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case INFRA:
       jj_consume_token(INFRA);
       jj_consume_token(38);
-      t = jj_consume_token(ID);
-                              project.setInfrastructure(t.image);
+      infra = classDef();
+                              project.setInfrastructure(infra);
       break;
     default:
       jj_la1[0] = jj_gen;
