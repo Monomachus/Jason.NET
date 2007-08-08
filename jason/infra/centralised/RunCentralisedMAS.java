@@ -311,6 +311,9 @@ public class RunCentralisedMAS {
         logger.fine("Creating environment " + project.getEnvClass());
         env = new CentralisedEnvironment(project.getEnvClass(), this);
 
+        boolean isPool = project.getInfrastructure().parameters.contains("pool");
+        if (isPool) logger.info("Creating agents....");
+        int nbAg = 0;
         // create the agents
         for (AgentParameters ap : project.getAgents()) {
             try {
@@ -324,19 +327,18 @@ public class RunCentralisedMAS {
                 }
                 tmpAsSrc = urlPrefix + tmpAsSrc;
                 
-                boolean isPool = project.getInfrastructure().parameters.contains("pool");
-                
                 for (int cAg = 0; cAg < ap.qty; cAg++) {
+                    nbAg++;
+                    
                     String numberedAg = agName;
                     if (ap.qty > 1) {
                         numberedAg += (cAg + 1);
                     }
+                    logger.fine("Creating agent " + numberedAg + " (" + (cAg + 1) + "/" + ap.qty + ")");
                     CentralisedAgArch agArch;
                     if (isPool) {
-                        logger.info("Creating agent " + numberedAg + " (" + (cAg + 1) + "/" + ap.qty + ")");
                         agArch = new CentralisedAgArchForPool();
                     } else {
-                        logger.fine("Creating agent " + numberedAg + " (" + (cAg + 1) + "/" + ap.qty + ")");
                         agArch = new CentralisedAgArch();
                     }
                     agArch.setAgName(numberedAg);
@@ -348,6 +350,8 @@ public class RunCentralisedMAS {
                 logger.log(Level.SEVERE, "Error creating agent " + ap.name, e);
             }
         }
+        
+        if (isPool) logger.info("Created "+nbAg+" agents.");
 
         // create controller
         ClassParameters controlClass = project.getControlClass();
@@ -442,12 +446,13 @@ public class RunCentralisedMAS {
     
     private final class CentralisedAgArchForPool extends CentralisedAgArch {
         boolean inSleep;
-
+        boolean percept = false;
         @Override
         public boolean sleep() { 
             mySleepAgs.offer(this);
             inSleep = true;
-            return false; 
+            percept = !percept;
+            return percept; 
         }
 
         @Override

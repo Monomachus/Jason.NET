@@ -15,7 +15,7 @@ public class <ENV_NAME> extends jason.environment.Environment {
     }
 
     @Override
-    public boolean executeAction(String ag, Structure action) {
+    public boolean executeAction(String agName, Structure action) {
         logger.info("executing: "+action+", but not implemented!");
         return true;
     }
