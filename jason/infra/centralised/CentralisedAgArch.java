@@ -27,9 +27,11 @@ import jason.JasonException;
 import jason.architecture.AgArch;
 import jason.architecture.AgArchInfraTier;
 import jason.asSemantics.ActionExec;
+import jason.asSemantics.Agent;
 import jason.asSemantics.Message;
 import jason.asSemantics.TransitionSystem;
 import jason.asSyntax.Literal;
+import jason.bb.BeliefBase;
 import jason.mas2j.ClassParameters;
 import jason.runtime.RuntimeServicesInfraTier;
 import jason.runtime.Settings;
@@ -91,6 +93,22 @@ public class CentralisedAgArch implements Runnable, AgArchInfraTier {
             userAgArch = (AgArch) Class.forName(agArchClass).newInstance();
             userAgArch.setArchInfraTier(this);
             userAgArch.initAg(agClass, bbPars, asSrc, stts);
+            setLogger();
+        } catch (Exception e) {
+            running = false;
+            throw new JasonException("as2j: error creating the agent class! - ", e);
+        }
+    }
+
+    /** init the agent based on another agent */
+    void initAg(String agArchClass, Agent ag, RunCentralisedMAS masRunner) throws JasonException {
+        try {
+            this.masRunner = masRunner; 
+            userAgArch = (AgArch) Class.forName(agArchClass).newInstance();
+            userAgArch.setArchInfraTier(this);
+
+            Agent agClone = ag.clone(userAgArch);
+            userAgArch.setTS(agClone.getTS());
             setLogger();
         } catch (Exception e) {
             running = false;

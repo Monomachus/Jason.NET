@@ -24,6 +24,7 @@
 package jason.infra.centralised;
 
 import jason.JasonException;
+import jason.asSemantics.Agent;
 import jason.asSyntax.directives.Include;
 import jason.control.ExecutionControlGUI;
 import jason.mas2j.AgentParameters;
@@ -314,6 +315,8 @@ public class RunCentralisedMAS {
         boolean isPool = project.getInfrastructure().parameters.contains("pool");
         if (isPool) logger.info("Creating agents....");
         int nbAg = 0;
+        Agent pag = null;
+        
         // create the agents
         for (AgentParameters ap : project.getAgents()) {
             try {
@@ -343,8 +346,16 @@ public class RunCentralisedMAS {
                     }
                     agArch.setAgName(numberedAg);
                     agArch.setEnvInfraTier(env);
-                    agArch.initAg(ap.archClass.className, ap.agClass.className, ap.bbClass, tmpAsSrc, ap.getAsSetts(debug, project.getControlClass() != null), this);
+                    if (isPool && cAg > 0) {
+                        // creation by cloning previous agent
+                        agArch.initAg(ap.archClass.className, pag, this);
+                    } else {
+                        // normal creation
+                        agArch.initAg(ap.archClass.className, ap.agClass.className, ap.bbClass, tmpAsSrc, ap.getAsSetts(debug, project.getControlClass() != null), this);
+                    }
                     addAg(agArch);
+                    
+                    pag = agArch.getUserAgArch().getTS().getAg();
                 }
             } catch (Exception e) {
                 logger.log(Level.SEVERE, "Error creating agent " + ap.name, e);
@@ -446,13 +457,13 @@ public class RunCentralisedMAS {
     
     private final class CentralisedAgArchForPool extends CentralisedAgArch {
         boolean inSleep;
-        boolean percept = false;
+        boolean percept = true;
         @Override
         public boolean sleep() { 
             mySleepAgs.offer(this);
             inSleep = true;
             percept = !percept;
-            return percept; 
+            return percept;
         }
 
         @Override

@@ -97,33 +97,34 @@ public class Agent {
 
             setTS(new TransitionSystem(this, new Circumstance(), stts, arch));
 
-            setASLSrc(asSrc);
-
-            if (asSrc.startsWith(Include.CRPrefix)) {
-            	parseAS(Agent.class.getResource(asSrc.substring(Include.CRPrefix.length())).openStream());
-            } else {
-	            // check whether source is an URL string
-	            try {
-	            	parseAS(new URL(asSrc));
-	            } catch (MalformedURLException e) {
-	            	parseAS(asSrc);
-	            }
+            if (asSrc != null) {
+                setASLSrc(asSrc);
+    
+                if (asSrc.startsWith(Include.CRPrefix)) {
+                	parseAS(Agent.class.getResource(asSrc.substring(Include.CRPrefix.length())).openStream());
+                } else {
+    	            // check whether source is an URL string
+    	            try {
+    	            	parseAS(new URL(asSrc));
+    	            } catch (MalformedURLException e) {
+    	            	parseAS(asSrc);
+    	            }
+                }
+                
+                // kqml Plans at the end of the ag PS
+                setASLSrc("kqmlPlans.asl");
+                parseAS(JasonException.class.getResource("/asl/kqmlPlans.asl"));
+                setASLSrc(asSrc);
+    
+                // add initial bels events
+                addInitialBelsInBB();
+    
+                // add initial goals events
+                for (Literal g: initialGoals) {
+                	g.makeVarsAnnon();
+                	getTS().getC().addAchvGoal(g,Intention.EmptyInt);
+                }
             }
-            
-            // kqml Plans at the end of the ag PS
-            setASLSrc("kqmlPlans.asl");
-            parseAS(JasonException.class.getResource("/asl/kqmlPlans.asl"));
-            setASLSrc(asSrc);
-
-            // add initial bels events
-            addInitialBelsInBB();
-
-            // add initial goals events
-            for (Literal g: initialGoals) {
-            	g.makeVarsAnnon();
-            	getTS().getC().addAchvGoal(g,Intention.EmptyInt);
-            }
-            
             return ts;
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error creating the agent class!", e);
