@@ -94,8 +94,8 @@ public class GridWorldView extends JFrame {
 
     /** method to draw unknown object, probably overrideen */
     public void draw(Graphics g, int x, int y, int object) {
-        g.setColor(Color.black);
-        drawString(g,x,y,defaultFont,String.valueOf(object));
+        //g.setColor(Color.black);
+        //drawString(g,x,y,defaultFont,String.valueOf(object));
     }
 
     private static int limit = (int)Math.pow(2,14);
