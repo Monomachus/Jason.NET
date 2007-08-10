@@ -63,7 +63,9 @@ public class Event implements Serializable {
     }
 
     public Object clone() {
-    	return new Event((Trigger)trigger.clone(), (Intention)intention.clone());
+        Trigger   tc = (trigger   == null ? null : (Trigger)trigger.clone());
+        Intention ic = (intention == null ? null : (Intention)intention.clone());
+    	return new Event(tc, ic);
     }
     
     public String toString() {

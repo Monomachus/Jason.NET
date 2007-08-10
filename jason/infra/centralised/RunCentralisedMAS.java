@@ -417,16 +417,28 @@ public class RunCentralisedMAS {
         myAgTasks = new LinkedBlockingQueue<Runnable>();
         mySleepAgs = new LinkedBlockingQueue<Runnable>();
         
-        new Thread() {
+        new Thread("feed-pool") {
             public void run() {
                 // initially, add all agents in the tasks
                 for (CentralisedAgArch ag : ags.values()) {
                     myAgTasks.offer(ag);
                 }
                 
+                // get the max number of threads in the pool
+                int maxthreads = 10;
+                try {
+                    if (project.getInfrastructure().parameters.size() > 1) {
+                        maxthreads = Integer.parseInt(project.getInfrastructure().parameters.get(1));
+                        logger.info("Creating a thread pool with "+maxthreads+" thread(s).");
+                    }
+                } catch (Exception e) {
+                    logger.warning("Error getting the number of thread for the pool.");
+                }
+
+                // define pool size
                 int poolSize = ags.size();
-                if (poolSize > 20) {
-                    poolSize = 20;
+                if (poolSize > maxthreads) {
+                    poolSize = maxthreads;
                 }
                 ExecutorService executor = Executors.newFixedThreadPool(poolSize);
                 while (runner != null) {
@@ -439,7 +451,7 @@ public class RunCentralisedMAS {
         }.start();
         
         // create a thread that wakeup the sleeping agents
-        new Thread() {
+        new Thread("wake-sleep-ag") {
             public void run() {
                 while (runner != null) {
                     try {
