@@ -75,7 +75,10 @@ public class Rule extends Literal {
     }
     
     public Object clone() {
-        return new Rule(this, (LogicalFormula)body.clone());
+        Rule r = new Rule((Literal)super.clone(), (LogicalFormula)body.clone());
+        r.predicateIndicatorCache = null;
+        r.resetHashCodeCache();
+        return r; 
     }
 
     public Literal headClone() {
