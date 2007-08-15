@@ -111,7 +111,7 @@ public class GridWorldModel {
         if (view != null) view.update(x,y);
     }
 
-    public void setAgPos(int ag, Location l) throws Exception {
+    public void setAgPos(int ag, Location l) {
         Location oldLoc = getAgPos(ag);
         if (oldLoc != null) {
             remove(AGENT, oldLoc.x, oldLoc.y);
@@ -120,7 +120,7 @@ public class GridWorldModel {
         add(AGENT, l.x, l.y);
     }
 
-    public void setAgPos(int ag, int x, int y) throws Exception {
+    public void setAgPos(int ag, int x, int y) {
         setAgPos(ag, new Location(x, y));
     }
 

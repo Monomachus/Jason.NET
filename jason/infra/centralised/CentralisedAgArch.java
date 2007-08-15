@@ -31,7 +31,6 @@ import jason.asSemantics.Agent;
 import jason.asSemantics.Message;
 import jason.asSemantics.TransitionSystem;
 import jason.asSyntax.Literal;
-import jason.bb.BeliefBase;
 import jason.mas2j.ClassParameters;
 import jason.runtime.RuntimeServicesInfraTier;
 import jason.runtime.Settings;
@@ -203,7 +202,7 @@ public class CentralisedAgArch implements Runnable, AgArchInfraTier {
 
     private Object sleepSync = new Object();
     
-    public boolean sleep() {
+    public void sleep() {
         try {
             if (!userAgArch.getTS().getSettings().isSync()) {
                 logger.fine("Entering in sleep mode....");
@@ -211,12 +210,10 @@ public class CentralisedAgArch implements Runnable, AgArchInfraTier {
                     sleepSync.wait(1000); // wait for messages
                 }
             }
-            return true;
         } catch (InterruptedException e) {
         } catch (Exception e) {
             logger.log(Level.WARNING,"Error in sleep.", e);
         }
-        return false;
     }
     
     public void wake() {

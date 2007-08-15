@@ -215,7 +215,7 @@ public class SaciAgArch extends saci.Agent implements AgArchInfraTier {
 
     private Object sleepSync = new Object();
     
-    public boolean sleep() {
+    public void sleep() {
         try {
             if (!userAgArch.getTS().getSettings().isSync()) {
                 logger.fine("Entering in sleep mode....");
@@ -223,12 +223,10 @@ public class SaciAgArch extends saci.Agent implements AgArchInfraTier {
                     sleepSync.wait(1000); // wait for messages
                 }
             }
-            return true;
         } catch (InterruptedException e) {
         } catch (Exception e) {
             logger.log(Level.WARNING,"Error waiting mgs", e);
         }
-        return false;
     }
     
     public void wake() {

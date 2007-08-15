@@ -828,21 +828,6 @@ public class TransitionSystem {
                agArch.canSleep();
     }
 
-
-    /*
-    private boolean stopCycle = false;
-    
-    public void stopCycle() {
-    	stopCycle = true;
-    }
-
-    private String currentTask = null;
-    
-    public String getCurrentTask() {
-    	return currentTask;
-    }
-    */
-    
     /**********************************************************************/
     /* MAIN LOOP */
     /**********************************************************************/
@@ -852,53 +837,37 @@ public class TransitionSystem {
     /**********************************************************************/
     public void reasoningCycle() {
         try {
-        	
-        	//currentTask = "begin";
-        	
+            C.reset();
+
+            if (nrcslbr >= setts.nrcbp()) { 
+                nrcslbr = 0;
+                ag.buf(agArch.perceive());
+                agArch.checkMail();
+            }
+            nrcslbr++; // counting number of cycles since last belief revision
+
             if (canSleep()) {
-                if (getAg().pl.getIdlePlans() != null) {
+                if (ag.pl.getIdlePlans() != null) {
                     logger.fine("generating idle event");
                     C.addExternalEv(PlanLibrary.TE_IDLE);
-                } else if (nrcslbr <= 1) {
-                    if (!agArch.getArchInfraTier().sleep())
-                        return;
+                } else {
+                    agArch.getArchInfraTier().sleep();
+                    return;
                 }
             }
             
-            C.reset();
-
-            if (nrcslbr >= setts.nrcbp() || canSleep()) {
-                nrcslbr = 0;
-
-                //currentTask = "perception";
-                List<Literal> percept = agArch.perceive();
-
-                //currentTask = "buf";
-                ag.buf(percept);
-
-                //currentTask = "checkMail";
-                agArch.checkMail();
-            }
-            
-            //stopCycle = false;
             step = State.StartRC;
             do {
                 if (!agArch.isRunning()) return;
-            	//currentTask = "step "+step;
                 applySemanticRule();
-            } while (step != State.StartRC); // && !stopCycle); // finished a reasoning cycle
+            } while (step != State.StartRC);
 
             ActionExec action = C.getAction(); 
             if (action != null) {
-            	//currentTask = "action "+action;
             	C.getPendingActions().put(action.getIntention().getId(), action);
                 agArch.act(action, C.getFeedbackActions());
             }
 
-            // counting number of cycles since last belief revision
-            nrcslbr++;
-            
-            //currentTask = "end";
         } catch (Exception e) {
             logger.log(Level.SEVERE, "*** ERROR in the transition system. "+conf.C+"\nCreating a new C!", e);
             conf.C.create();

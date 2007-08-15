@@ -24,3 +24,4 @@ sidekick-tree.dock-position=left
 tip.show=false
 buffer.tabSize=4
 buffer.indentSize=4
+twoStageSave=false

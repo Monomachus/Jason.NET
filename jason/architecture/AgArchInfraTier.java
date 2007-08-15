@@ -61,14 +61,14 @@ public interface AgArchInfraTier {
     /** Broadcasts a Jason message in a specific infrastructure */
     public void broadcast(Message m) throws Exception;
     
-    /** Checks whether the agent is running (alive). */
+    /** Checks whether the agent is running (alive) */
     public boolean isRunning();
     
     /** Stops the agent */
     public void stopAg();
     
-    /** Put the agent in "sleep" mode, returns true if the agent should continue running. */
-    public boolean sleep();
+    /** Put the agent in "sleep" mode */
+    public void sleep();
     
     /** Removes the agent from the "sleep" mode */
     public void wake();

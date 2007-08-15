@@ -469,13 +469,11 @@ public class RunCentralisedMAS {
     
     private final class CentralisedAgArchForPool extends CentralisedAgArch {
         boolean inSleep;
-        boolean percept = true;
+        
         @Override
-        public boolean sleep() { 
+        public void sleep() { 
             mySleepAgs.offer(this);
             inSleep = true;
-            percept = !percept;
-            return percept;
         }
 
         @Override

@@ -51,6 +51,8 @@ public class JadeAgArch extends JadeAg implements AgArchInfraTier {
     // map of pending actions
     private Map<String,ActionExec> myPA = new HashMap<String,ActionExec>();
 
+    private boolean enterInSleepMode = false;
+
     AID controllerAID  = new AID(RunJadeMAS.controllerName, AID.ISLOCALNAME);
     AID environmentAID = null;
 
@@ -161,7 +163,12 @@ public class JadeAgArch extends JadeAg implements AgArchInfraTier {
                             block(1000);
                         }
                     } else {
-                        ts.reasoningCycle();
+                        if (enterInSleepMode) {
+                            block(1000);
+                            enterInSleepMode = false;
+                        } else {
+                            ts.reasoningCycle();
+                        }
                     }
                 }
             };
@@ -201,12 +208,9 @@ public class JadeAgArch extends JadeAg implements AgArchInfraTier {
 		doDelete();
 	}
     
-    private boolean continueAfterSleep = false;
-    
-    public boolean sleep() {
-        tsBehaviour.block(1000);
-        continueAfterSleep = !continueAfterSleep;
-        return continueAfterSleep;
+    public void sleep() {
+        enterInSleepMode = true;
+        //tsBehaviour.block(1000);
     }
     
     public void wake() {
