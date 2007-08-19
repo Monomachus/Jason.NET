@@ -1,6 +1,7 @@
 package jason.asSyntax.patterns.goal;
 
 import jason.asSemantics.Agent;
+import jason.bb.BeliefBase;
 import jason.asSyntax.Literal;
 import jason.asSyntax.Plan;
 import jason.asSyntax.Pred;
@@ -34,6 +35,8 @@ public class MG implements Directive {
             Agent newAg = sd.process(subDir, outterContent, innerContent); 
             if (newAg != null) {
                 // add bel g
+                Literal ig = (Literal)goal.clone();
+                ig.addAnnot(BeliefBase.TPercept);
             	newAg.addInitialBel(goal);
 
                 // add -g : true <- !g.
