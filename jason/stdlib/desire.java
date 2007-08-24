@@ -45,7 +45,7 @@ import jason.asSyntax.Trigger.TEType;
   
   <p>Example:<ul> 
 
-  <li> <code>.desire(go(1,3))</code>: is true if <code>go(1,3)</code>
+  <li> <code>.desire(go(1,3))</code>: true if <code>go(1,3)</code>
   is a desire of the agent.
 
   </ul>

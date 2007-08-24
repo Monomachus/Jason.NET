@@ -33,7 +33,7 @@ import jason.asSyntax.Term;
 /**
   <p>Internal action: <b><code>.my_name</code></b>.
   
-  <p>Description: gets the agent unique identification in the
+  <p>Description: gets the agent's unique identification in the
   multi-agent system. This identification is given by the runtime
   infrastructure of the system (centralised, saci, jade, ...).
   

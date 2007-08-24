@@ -49,8 +49,10 @@ import java.util.Iterator;
 
   <p>Example:<ul> 
 
-  <li> <code>.drop_desire(go(X,Y))</code>: remove desires such as
-  <code>&lt;+!go(1,3),_&gt;</code>.
+  <li> <code>.drop_desire(go(X,3))</code>: remove desires such as
+  <code>&lt;+!go(1,3),_&gt;</code> from the set of events and 
+  intentions having plans with triggering events such as 
+  <code>+!go(1,3)<code>.
 
   </ul>
  

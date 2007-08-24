@@ -22,7 +22,7 @@ import jason.asSyntax.Term;
 <li> <code>.atom(~b)</code>: false.
 <li> <code>.atom(10)</code>: false.
 <li> <code>.atom("home page")</code>: false.
-<li> <code>.atom(X)</code>: false if X is free and true if X is bound to an atom.
+<li> <code>.atom(X)</code>: only true if X is bound to an atom.
 <li> <code>.atom(a(X))</code>: false.
 <li> <code>.atom(a[X])</code>: false.
 <li> <code>.atom([a,b,c])</code>: false.

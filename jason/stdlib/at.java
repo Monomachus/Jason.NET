@@ -57,7 +57,7 @@ import java.util.concurrent.ConcurrentHashMap;
       "d" or "day(s)".
       The default &lt;time_unit> is milliseconds.<br/><br/>
 
-  <li>+ event (string): the event to be created. The string of the event will
+  <li>+ event (string): the event to be created. The string will
       be parsed as a triggering event (see the <b><i>Jason</i></b> syntax).
       </ul>
   

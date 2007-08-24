@@ -19,10 +19,10 @@ variables. Numbers, Strings, and Atoms are always ground.
 <p>Examples:<ul>
 <li> <code>.ground(b(10))</code>: true.
 <li> <code>.ground(10)</code>: true.
-<li> <code>.ground(X)</code>: false only if X is free.
-<li> <code>.ground(a(X))</code>: false only if X is free.
+<li> <code>.ground(X)</code>: false if X is free or bound to a term with free variables.
+<li> <code>.ground(a(X))</code>: false if X is free or bound to a term with free variables.
 <li> <code>.ground([a,b,c])</code>: true.
-<li> <code>.ground([a,b,c(X)])</code>: false only if X is free.
+<li> <code>.ground([a,b,c(X)])</code>: false if X is free or bound to a term with free variables.
 </ul>
 
   @see jason.stdlib.atom

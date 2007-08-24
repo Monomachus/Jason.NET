@@ -48,7 +48,7 @@ import jason.asSyntax.Term;
   <p>Example:<ul> 
 
   <li> <code>.plan_label(P,p1)</code>: unifies P with the string
-  representation of the plan with label <code>p1</code>.</li>
+  representation of the plan labelled <code>p1</code>.</li>
 
   </ul>
 

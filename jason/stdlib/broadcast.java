@@ -38,7 +38,7 @@ import jason.asSyntax.Term;
   <p>Parameters:<ul>
   
   <li>+ ilf (atom): the illocutionary force of the message (tell,
-  achieve, ...). This internal action does not work for asks.<br/>
+  achieve, ...). <br/>
   
   <li>+ message (literal): the content of the message.<br/>
   

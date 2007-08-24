@@ -47,8 +47,9 @@ import jason.asSyntax.Trigger.TEType;
 
   <p>Example:<ul> 
 
-  <li> <code>.drop_intention(go(1,3))</code>: removes an intention with goal
-  <code>!go(1,3)</code> in the agent's current circumstance.
+  <li> <code>.drop_intention(go(1,3))</code>: removes an intention having a plan
+   with triggering event
+  <code>+!go(1,3)</code> in the agent's current circumstance.
 
   </ul>
 

@@ -34,7 +34,7 @@ numbers &lt; atoms &lt; structures &lt; lists
 <code>X</code> unifies with <code>5</code>.
 
 <li>
-<code>.min([3,2,5],2])</code>: true.
+<code>.min([3,2,5],2)</code>: true.
 
 <li>
 <code>.min([3,2,5],5)</code>: false.

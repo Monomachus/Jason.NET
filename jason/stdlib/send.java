@@ -86,7 +86,7 @@ import jason.asSyntax.Term;
 
   <li> <code>.send(rafael,askOne,value(beer,X))</code>: sends
   <code>value(beer,X)</code> to the agent named rafael. This .send
-  does not suspend the jomi's intention. An event like
+  does not suspend jomi's intention. An event 
   <code>+value(beer,10)[source(rafael)]</code> is generated in jomi's
   side when rafael answer the ask.</li>
 

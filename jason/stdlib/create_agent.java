@@ -44,7 +44,7 @@ import java.io.File;
   <li>+ name (atom): the name for the new agent.<br/>
   
   <li>+ source (string): path to the file where the AgentSpeak code
-  for that new agent can be found.<br/>
+  for the new agent can be found.<br/>
 
   <li><i>+ customisations</i> (list -- optional): list of optional parameters
   as agent class, architecture and belief base.<br/>
@@ -53,7 +53,8 @@ import java.io.File;
   
   <p>Examples:<ul> 
 
-  <li> <code>.create_agent(bob,"/tmp/x.asl")</code>: creates the agent named "bob" from the source file in "/tmp/x.asl".</li>
+  <li> <code>.create_agent(bob,"/tmp/x.asl")</code>: creates an agent named "bob" 
+  from the source file in "/tmp/x.asl".</li>
 
   <li>
   <code>.create_agent(bob,"x.asl", [agentClass(myp.MyAgent)])</code>:

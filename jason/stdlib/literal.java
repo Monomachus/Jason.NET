@@ -21,7 +21,7 @@ import jason.asSyntax.Term;
   <li> <code>.literal(b)</code>: true.
   <li> <code>.literal(10)</code>: false.
   <li> <code>.literal("Jason")</code>: false.
-  <li> <code>.literal(X)</code>: false if X is free, true if X is bount to a literal.
+  <li> <code>.literal(X)</code>: false if X is free, true if X is bound to a literal.
   <li> <code>.literal(a(X))</code>: true.
   <li> <code>.literal([a,b,c])</code>: false.
   <li> <code>.literal([a,b,c(X)])</code>: false.

@@ -54,7 +54,7 @@ import java.util.Iterator;
   
   </ul>
   
-  <p>Examples supposing the BB is currently
+  <p>Examples assuming the BB is currently
   {a(30),a(20),b(1,2),b(3,4),b(5,6)}:
 
   <ul>

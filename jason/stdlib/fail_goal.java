@@ -40,8 +40,8 @@ import jason.asSyntax.Trigger.TEOperator;
   <p>Description: aborts goals <i>G</i> in the agent circumstance as if a plan
   for such goal had failed. Assuming that one of the plans requiring <i>G</i> was 
   <code>G0 &lt;- !G; ...</code>, an event <code>-!G0</code> is generated. In
-  case <i>G</i> was triggered by <code>!!G</code> (and therefore it was
-  not a subgoal, as happens, for instance, when an "achieve" performative is used),
+  case <i>G</i> was triggered by <code>!!G</code> (and therefore
+  not a subgoal, as happens also when an "achieve" performative is used),
   the generated event is <code>-!G</code>.  A literal <i>G</i>
   is a goal if there is a trigerring event <code>+!G</code> in any plan within
   any intention; also note that intentions can be suspended hence appearing

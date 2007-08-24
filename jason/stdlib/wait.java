@@ -52,7 +52,7 @@ import java.util.logging.Level;
   <code>"+!go(X,Y)"</code>.
 
   <p>Parameters:<ul>
-  <li><i>+ event</i> (string): the waited event.<br/>
+  <li><i>+ event</i> (string): the event to wait for.<br/>
   <li>+ timeout (number).<br/>
   </ul>
   

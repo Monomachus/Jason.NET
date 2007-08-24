@@ -49,8 +49,8 @@ import jason.asSyntax.Trigger.TEType;
   
   <p>Example:<ul> 
 
-  <li> <code>.intend(go(1,3))</code>: is true if a plan for goal
-  <code>!go(1,3)</code> appears in an intention of the agent.
+  <li> <code>.intend(go(1,3))</code>: is true if a plan with triggering event
+  <code>+!go(1,3)</code> appears in an intention of the agent.
 
   </ul>
 
