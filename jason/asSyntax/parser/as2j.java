@@ -1064,18 +1064,18 @@
     return false;
   }
 
-  final private boolean jj_3R_13() {
-    if (jj_scan_token(39)) return true;
-    if (jj_3R_19()) return true;
-    if (jj_scan_token(40)) return true;
-    return false;
-  }
-
   final private boolean jj_3R_19() {
     if (jj_3R_28()) return true;
     Token xsp;
     xsp = jj_scanpos;
     if (jj_3R_29()) jj_scanpos = xsp;
+    return false;
+  }
+
+  final private boolean jj_3R_13() {
+    if (jj_scan_token(39)) return true;
+    if (jj_3R_19()) return true;
+    if (jj_scan_token(40)) return true;
     return false;
   }
 
@@ -1257,13 +1257,13 @@
     return false;
   }
 
-  final private boolean jj_3R_24() {
-    if (jj_scan_token(TK_FALSE)) return true;
+  final private boolean jj_3R_35() {
+    if (jj_3R_17()) return true;
     return false;
   }
 
-  final private boolean jj_3R_35() {
-    if (jj_3R_17()) return true;
+  final private boolean jj_3R_24() {
+    if (jj_scan_token(TK_FALSE)) return true;
     return false;
   }
 
@@ -1277,13 +1277,13 @@
     return false;
   }
 
-  final private boolean jj_3R_23() {
-    if (jj_scan_token(TK_TRUE)) return true;
+  final private boolean jj_3R_32() {
+    if (jj_scan_token(TK_NEG)) return true;
     return false;
   }
 
-  final private boolean jj_3R_32() {
-    if (jj_scan_token(TK_NEG)) return true;
+  final private boolean jj_3R_23() {
+    if (jj_scan_token(TK_TRUE)) return true;
     return false;
   }
 
@@ -1341,6 +1341,11 @@
     return false;
   }
 
+  final private boolean jj_3R_27() {
+    if (jj_3R_21()) return true;
+    return false;
+  }
+
   final private boolean jj_3R_17() {
     Token xsp;
     xsp = jj_scanpos;
@@ -1351,11 +1356,6 @@
     if (jj_3R_24()) return true;
     }
     }
-    return false;
-  }
-
-  final private boolean jj_3R_27() {
-    if (jj_3R_21()) return true;
     return false;
   }
 
@@ -1397,13 +1397,13 @@
     return false;
   }
 
-  final private boolean jj_3R_20() {
-    if (jj_3R_30()) return true;
+  final private boolean jj_3R_25() {
+    if (jj_scan_token(VAR)) return true;
     return false;
   }
 
-  final private boolean jj_3R_25() {
-    if (jj_scan_token(VAR)) return true;
+  final private boolean jj_3R_20() {
+    if (jj_3R_30()) return true;
     return false;
   }
 

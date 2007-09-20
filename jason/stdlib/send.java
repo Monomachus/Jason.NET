@@ -85,17 +85,23 @@ import jason.asSyntax.Term;
   <code>rafael</code>'s event queue.</li>
 
   <li> <code>.send(rafael,askOne,value(beer,X))</code>: sends
-  <code>value(beer,X)</code> to the agent named rafael. This .send
-  does not suspend jomi's intention. An event 
-  <code>+value(beer,10)[source(rafael)]</code> is generated in jomi's
-  side when rafael answer the ask.</li>
-
+  <code>value(beer,X)</code> to the agent named rafael. This askOne is an
+  assynchronous ask since it
+  does not suspend jomi's intention. If rafael has, for instance, the literal
+  <code>value(beer,2)</code>
+  in its belief base, this belief is automatically sent to jomi. Otherwise an event
+  like <code>+?value(beer,X)[source(self)]</code> is generated in rafael's side
+  and the result of this query is then sent to jomi. In the jomi's side, the rafael's answer
+  is added in the jomi's belief base and an event like
+  <code>+value(beer,10)[source(rafael)]</code> is generated.</li>
+  
   <li> <code>.send(rafael,askOne,value(beer,X),A)</code>: sends
-  <code>value(beer,X)</code> to the agent named <code>rafael</code>. This
-  action suspends <code>jomi</code>'s intention until <code>rafael</code>'s
+  <code>value(beer,X)</code> to the agent named <code>rafael</code>. This askOne
+  is a synchronous askOne, it suspends <code>jomi</code>'s intention until 
+  <code>rafael</code>'s
   answer is received. The answer (something like <code>value(beer,10)</code>)
   unifies with <code>A</code>.</li>
-
+  
   <li> <code>.send(rafael,askOne,value(beer,X),A,2000)</code>: as in the
   previous example, but agent <code>jomi</code> waits for 2 seconds. If no
   message is received by then, <code>A</code> unifies with
