@@ -47,6 +47,7 @@ import saci.MessageHandler;
  * communication, and the environment society (used to get
  * perception). The environment agent enter only in the second.
  */
+@SuppressWarnings("unchecked")
 public class SaciEnvironment extends saci.Agent implements EnvironmentInfraTier {
 
     private static final long serialVersionUID = 3076623775045768401L;
@@ -66,7 +67,7 @@ public class SaciEnvironment extends saci.Agent implements EnvironmentInfraTier 
         }
     }
 
-    public void informAgsEnvironmentChanged(Collection agentsToNotify) {
+	public void informAgsEnvironmentChanged(Collection agentsToNotify) {
         try {
             if (agentsToNotify == null) {
                 informAgsEnvironmentChanged();

@@ -31,15 +31,15 @@ import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
 import jason.asSemantics.Message;
+import jason.asSyntax.Literal;
 import jason.asSyntax.Structure;
 import jason.environment.Environment;
 import jason.environment.EnvironmentInfraTier;
 import jason.mas2j.ClassParameters;
 import jason.runtime.RuntimeServicesInfraTier;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -118,7 +118,7 @@ public class JadeEnvironment extends JadeAg implements EnvironmentInfraTier {
                             ACLMessage r = m.createReply();
                             r.setPerformative(ACLMessage.INFORM);
                             try {
-                                ArrayList percepts = (ArrayList)userEnv.getPercepts(m.getSender().getLocalName());
+                                List<Literal> percepts = userEnv.getPercepts(m.getSender().getLocalName());
                                 if (percepts == null) {
                                     r.setContent("nothing_new");
                                 } else {
@@ -174,16 +174,15 @@ public class JadeEnvironment extends JadeAg implements EnvironmentInfraTier {
         broadcast(new Message("tell", null, null, "environmentChanged"));
     }
 
-    public void informAgsEnvironmentChanged(Collection agentsToNotify) {
+    public void informAgsEnvironmentChanged(Collection<String> agentsToNotify) {
         try {
             if (agentsToNotify == null) {
                 informAgsEnvironmentChanged();
             } else {
                 ACLMessage m = new ACLMessage(ACLMessage.INFORM);
                 m.setContent("environmentChanged");
-                Iterator i = agentsToNotify.iterator();
-                while (i.hasNext()) {
-                    m.addReceiver(new AID(i.next().toString(), AID.ISLOCALNAME));
+                for (String ag: agentsToNotify) {
+                    m.addReceiver(new AID(ag, AID.ISLOCALNAME));
                 }
                 send(m);
             }

@@ -33,8 +33,6 @@ import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Literal;
 import jason.asSyntax.Term;
 
-import java.util.Iterator;
-
 /**
   <p>Internal action: <b><code>.add_annot</code></b>.
   
@@ -85,10 +83,8 @@ public class add_annot extends DefaultInternalAction {
 		l.apply(unif);
 		if (l.isList()) {
 			ListTerm result = new ListTermImpl();
-			ListTerm lt = (ListTerm)l;
-			Iterator i = lt.iterator();
-			while (i.hasNext()) {
-				Term t = addAnnotToList( unif, (Term)i.next(), annot);
+			for (Term lTerm: (ListTerm)l) {
+				Term t = addAnnotToList( unif, lTerm, annot);
 				if (t != null) {
 					result.add(t);
 				}

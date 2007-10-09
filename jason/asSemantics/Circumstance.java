@@ -300,7 +300,7 @@ public class Circumstance implements Serializable {
         return false;
     }
 
-    public List getRelevantPlans() {
+    public List<Option> getRelevantPlans() {
         return RP;
     }
 

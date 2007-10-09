@@ -222,7 +222,7 @@ public class PlanLibrary implements Iterable<Plan> {
     }
 
     public boolean isRelevant(PredicateIndicator pi) {
-        List l = getAllRelevant(pi);
+        List<Plan> l = getAllRelevant(pi);
         return l != null && l.size() > 0;
     }
 

@@ -113,7 +113,8 @@ public class RuleTest extends TestCase {
     }    
     
     
-    private int iteratorSize(Iterator i) {
+    @SuppressWarnings("unchecked")
+	private int iteratorSize(Iterator i) {
         int c = 0;
         while (i.hasNext()) {
             i.next();

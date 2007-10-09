@@ -133,7 +133,7 @@ public class Environment {
 		if (uptodateAgs.contains(agName)) {
 			return null;
 		}
-		// add agName in the set of uptodate agents
+		// add agName in the set of updated agents
 		uptodateAgs.add(agName);
 		
 		int size = percepts.size();
@@ -145,7 +145,7 @@ public class Environment {
 		
         if (! percepts.isEmpty()) { // has global perception?
             synchronized (percepts) {
-                // make a local copy of the environment percepts
+                // make a local copy of the environment perceptions
     			// Note: a deep copy will be done by BB.add
     			p.addAll(percepts);
             }
@@ -169,7 +169,7 @@ public class Environment {
 		}
 	}
 
-	/** Removes a perception in the commom perception list */
+	/** Removes a perception in the common perception list */
 	public boolean removePercept(Literal per) {
 		if (per != null) {
 			uptodateAgs.clear();
@@ -224,6 +224,7 @@ public class Environment {
 		return false;
 	}
 
+	@SuppressWarnings("unchecked")
 	public boolean containsPercept(String agName, Literal per) {
 		if (per != null && agName != null) {
 			List agl = (List)agPercepts.get(agName);

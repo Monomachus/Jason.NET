@@ -14,7 +14,9 @@ import org.gjt.sp.jedit.View;
 
 public class NewInternalActionGUI extends NewAgentGUI {
 
-    private JTextField iaClass;
+	private static final long serialVersionUID = 1L;
+
+	private JTextField iaClass;
 
     private JTextField iaPkg;
 

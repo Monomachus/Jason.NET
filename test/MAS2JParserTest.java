@@ -41,6 +41,7 @@ public class MAS2JParserTest extends TestCase {
         assertTrue(ok);
     }
 
+	@SuppressWarnings("unchecked")
 	public void testParser() {
 		try {
 			MAS2JProject project = parser.mas();

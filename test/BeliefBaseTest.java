@@ -469,7 +469,8 @@ public class BeliefBaseTest extends TestCase {
     }
     
     
-    public void testBelBRF() {
+    @SuppressWarnings("unchecked")
+	public void testBelBRF() {
         Agent ag = new Agent();
         ag.getBB().add(Literal.parseLiteral("a(10)"));
         ag.getBB().add(Literal.parseLiteral("a(20)[a]"));
@@ -544,7 +545,8 @@ public class BeliefBaseTest extends TestCase {
         assertEquals(ag.getBB().toString(), c.toString());
     }
     
-    private int iteratorSize(Iterator i) {
+    @SuppressWarnings("unchecked")
+	private int iteratorSize(Iterator i) {
         int c = 0;
         while (i.hasNext()) {
             i.next();

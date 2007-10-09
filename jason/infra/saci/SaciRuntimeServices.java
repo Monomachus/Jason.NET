@@ -19,6 +19,7 @@ import saci.launcher.Command;
 import saci.launcher.Launcher;
 import saci.launcher.LauncherD;
 
+@SuppressWarnings("unchecked")
 public class SaciRuntimeServices implements RuntimeServicesInfraTier {
 
     private static Logger logger  = Logger.getLogger(SaciRuntimeServices.class.getName());

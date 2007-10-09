@@ -162,7 +162,7 @@ public class StdLibTest extends TestCase {
 
         // add plans returned from getRelevantPlans
         // using IA addPlan
-        Iterator i = plans.iterator();
+        Iterator<Term> i = plans.iterator();
         try {
             while (i.hasNext()) {
                 StringTerm t = (StringTerm) i.next();
@@ -342,7 +342,8 @@ public class StdLibTest extends TestCase {
         assertEquals(i.next().get("X").toString(),"4");
     }
 
-    private int iteratorSize(Iterator i) {
+    @SuppressWarnings("unchecked")
+	private int iteratorSize(Iterator i) {
         int c = 0;
         while (i.hasNext()) {
             i.next();

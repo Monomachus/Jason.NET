@@ -97,9 +97,9 @@ public class ListTermTest extends TestCase {
 		assertTrue(l1.remove(new Structure("a2")));
 		assertEquals(l1.size(), 3);
 		
-		Iterator i = l1.iterator();
+		Iterator<Term> i = l1.iterator();
 		while (i.hasNext()) {
-			Term t = (Term)i.next();
+			Term t = i.next();
 			//System.out.println("-"+t);
 			if (t.equals(new Structure("a"))) {
 				i.remove();

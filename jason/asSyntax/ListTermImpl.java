@@ -314,9 +314,9 @@ public class ListTermImpl extends Structure implements ListTerm {
 	
 	public String toString() {
         StringBuilder s = new StringBuilder("[");
-		Iterator i = listTermIterator();
+		Iterator<ListTerm> i = listTermIterator();
 		while (i.hasNext()) {
-			ListTerm lt = (ListTerm)i.next();
+			ListTerm lt = i.next();
 			s.append( lt.getTerm() );
 			if (lt.isTail()) {
 				s.append("|");

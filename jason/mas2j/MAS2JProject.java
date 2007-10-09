@@ -135,9 +135,7 @@ public class MAS2JProject {
 		agents.add(a);
 	}
 	public AgentParameters getAg(String name) {
-		Iterator i = agents.iterator();
-		while (i.hasNext()) {
-			AgentParameters a = (AgentParameters)i.next();
+		for (AgentParameters a: agents) {
 			if (a.name.equals(name)) {
 				return a;
 			}
@@ -213,7 +211,7 @@ public class MAS2JProject {
 		
 		// agents
 		s.append("   agents:\n");
-		Iterator i = agents.iterator();
+		Iterator<AgentParameters> i = agents.iterator();
 		while (i.hasNext()) {
 			s.append("       "+i.next());
 			s.append("\n");

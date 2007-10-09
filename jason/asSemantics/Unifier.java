@@ -274,8 +274,8 @@ public class Unifier implements Cloneable {
         Structure t1s = (Structure)t1g;
         Structure t2s = (Structure)t2g;
         
-        List t1gts = t1s.getTerms();
-        List t2gts = t2s.getTerms();
+        List<Term> t1gts = t1s.getTerms();
+        List<Term> t2gts = t2s.getTerms();
 
         // different arities
         if ((t1gts == null && t2gts != null) || (t1gts != null && t2gts == null)) {

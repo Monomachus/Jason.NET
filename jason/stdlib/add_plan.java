@@ -34,8 +34,6 @@ import jason.asSyntax.StringTerm;
 import jason.asSyntax.Structure;
 import jason.asSyntax.Term;
 
-import java.util.Iterator;
-
 
 /**
   <p>Internal action: <b><code>.add_plan</code></b>.
@@ -88,10 +86,8 @@ public class add_plan extends DefaultInternalAction {
             }
 
             if (plans.isList()) { // arg[0] is a list of strings
-                ListTerm lt = (ListTerm) plans;
-                Iterator i = lt.iterator();
-                while (i.hasNext()) {
-                    ts.getAg().getPL().add((StringTerm) i.next(), source);
+                for (Term t: (ListTerm) plans) {
+                    ts.getAg().getPL().add((StringTerm) t, source);
                 }
             } else { // args[0] is a plan
                 ts.getAg().getPL().add((StringTerm) plans, source);

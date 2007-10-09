@@ -57,9 +57,9 @@ public class AgentParameters {
 		}
 		if (options != null && options.size() > 0) {
 			s.append("[");
-			Iterator i = options.keySet().iterator();
+			Iterator<String> i = options.keySet().iterator();
 			while (i.hasNext()) {
-				String k = (String)i.next();
+				String k = i.next();
 				s.append(k+"="+options.get(k));
 				if (i.hasNext()) {
 					s.append(", ");
@@ -88,10 +88,8 @@ public class AgentParameters {
 	public Settings getAsSetts(boolean debug, boolean forceSync) {
 		Settings stts = new Settings();
 		if (options != null) {
-			Iterator i = options.keySet().iterator();
 			String s = ""; String v = "";
-			while (i.hasNext()) {
-				String key = (String) i.next();
+			for (String key: options.keySet()) {
 				s += v + key + "=" + options.get(key);
 				v = ",";
 			}

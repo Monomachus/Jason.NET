@@ -85,7 +85,8 @@ public class DefaultBeliefBase implements BeliefBase {
         return add(l, index != 0);
     }
     
-    protected boolean add(Literal l, boolean addInEnd) {
+    @SuppressWarnings("unchecked")
+	protected boolean add(Literal l, boolean addInEnd) {
         if (l.equals(Literal.LTrue) || l.equals(Literal.LFalse)) {
             logger.log(Level.SEVERE, "Error: <true> or <false> can not be added as beliefs.");
             return false;
@@ -103,7 +104,7 @@ public class DefaultBeliefBase implements BeliefBase {
             }
         } else {
             try {
-                // minimize the allocation space of terms
+                // minimise the allocation space of terms
                 if (l.getTerms() != null)
                     ((ArrayList) l.getTerms()).trimToSize();
             } catch (Exception e) {

@@ -86,7 +86,7 @@ public class VarTermTest extends TestCase {
         u.unifies(v1, lt);
         v1.apply(u);
         lt = (ListTerm) v1.getValue();
-        Iterator i = lt.iterator();
+        Iterator<Term> i = lt.iterator();
         i.next();
         i.next();
         Term third = (Term) i.next();

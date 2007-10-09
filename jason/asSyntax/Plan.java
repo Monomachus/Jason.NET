@@ -199,9 +199,9 @@ public class Plan extends SourceInfo implements Cloneable, Serializable {
         return p;
     }
     
-    private String listToString(List l, String separator) {
+    private String listToString(List<BodyLiteral> l, String separator) {
         StringBuffer s = new StringBuffer();
-        Iterator i = l.iterator();
+        Iterator<BodyLiteral> i = l.iterator();
         while (i.hasNext()) {
             s.append(i.next().toString());
             if (i.hasNext()) {

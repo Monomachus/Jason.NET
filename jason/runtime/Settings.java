@@ -26,7 +26,6 @@ package jason.runtime;
 
 import java.io.StringReader;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -77,9 +76,7 @@ public class Settings {
         if (options == null) return;
         userParameters = options;
         
-        Iterator i = options.keySet().iterator();
-        while (i.hasNext()) {
-        	String key = (String)i.next();
+        for (String key: options.keySet()) {
         	
         	if (key.equals("events")) {
 		        String events = (String)options.get("events");
