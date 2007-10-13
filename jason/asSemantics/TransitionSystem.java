@@ -311,8 +311,8 @@ public class TransitionSystem {
 
     private void applyProcAct() throws JasonException {
         confP.step = State.SelInt; // default next step
-        if (!conf.C.FA.isEmpty()) {
-            ActionExec a = conf.ag.selectAction(conf.C.FA);
+        if (conf.C.hasFeedbackAction()) {
+            ActionExec a = conf.ag.selectAction(conf.C.getFeedbackActions());
             if (a != null) {
                 confP.C.SI = a.getIntention();
     
@@ -824,7 +824,7 @@ public class TransitionSystem {
     
     public boolean canSleep() {
         return !conf.C.hasEvent() && !conf.C.hasIntention() && 
-               conf.C.MB.isEmpty() && conf.C.FA.isEmpty() && 
+               conf.C.MB.isEmpty() && !conf.C.hasFeedbackAction() && 
                agArch.canSleep();
     }
 

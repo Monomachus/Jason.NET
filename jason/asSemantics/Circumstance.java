@@ -59,7 +59,7 @@ public class Circumstance implements Serializable {
     private   Intention                AI; // Atomic Intention
 
     private Map<Integer, ActionExec>   PA; // Pending actions, waiting action execution (key is the intention id)
-    protected List<ActionExec>         FA; // Feedback actions, those that are already executed
+    private List<ActionExec>           FA; // Feedback actions, those that are already executed
     
     private Map<String, Intention>     PI; // pending intentions, intentions suspended by any other reason                                                        
 
@@ -268,8 +268,18 @@ public class Circumstance implements Serializable {
         return AP;
     }
 
+    public boolean hasFeedbackAction() {
+    	return !FA.isEmpty();
+    }
+    
     public List<ActionExec> getFeedbackActions() {
         return FA;
+    }
+    
+    public void addFeedbackAction(ActionExec act) {
+    	synchronized (FA) {
+			FA.add(act);
+		}
     }
 
     public Map<Integer, ActionExec> getPendingActions() {
@@ -341,7 +351,7 @@ public class Circumstance implements Serializable {
     }
 
 
-    /** get the agent circunstance as XML */
+    /** get the agent circumstance as XML */
     @SuppressWarnings("unchecked")
     public Element getAsDOM(Document document) {
         Element c = (Element) document.createElement("circumstance");
@@ -480,7 +490,7 @@ public class Circumstance implements Serializable {
         }
 
         // FA
-        if (getFeedbackActions() != null && !getFeedbackActions().isEmpty()) {
+        if (hasFeedbackAction()) {
             i = getFeedbackActions().iterator();
             while (i.hasNext()) {
                 ActionExec o = (ActionExec) i.next();

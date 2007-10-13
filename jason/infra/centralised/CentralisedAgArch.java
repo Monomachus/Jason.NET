@@ -282,7 +282,7 @@ public class CentralisedAgArch implements Runnable, AgArchInfraTier {
     
     /** called the the environment when the action was executed */
     public void actionExecuted(ActionExec action) {
-        userAgArch.getTS().getC().getFeedbackActions().add(action);
+        userAgArch.getTS().getC().addFeedbackAction(action);
         wake();        
     }
 

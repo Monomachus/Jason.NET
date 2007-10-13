@@ -279,7 +279,7 @@ public class JadeAgArch extends JadeAg implements AgArchInfraTier {
                     } else {
                         a.setResult(false);
                     }
-                    userAgArch.getTS().getC().getFeedbackActions().add(a);
+                    userAgArch.getTS().getC().addFeedbackAction(a);
                 } else {
                     logger.log(Level.SEVERE, "Error: received feedback for an Action that is not pending. The message is "+m);
                 }

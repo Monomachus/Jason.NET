@@ -294,14 +294,16 @@ public class Agent {
     public ActionExec selectAction(List<ActionExec> actList) {
         // make sure the selected Action is removed from actList
         // (do not return suspended intentions)
-        Iterator<ActionExec> i = actList.iterator();
-        while (i.hasNext()) {
-            ActionExec a = i.next();
-            if (!a.getIntention().isSuspended()) {
-                i.remove();
-                return a;
-            }
-        }
+    	synchronized (actList) {
+            Iterator<ActionExec> i = actList.iterator();
+            while (i.hasNext()) {
+                ActionExec a = i.next();
+                if (!a.getIntention().isSuspended()) {
+                    i.remove();
+                    return a;
+                }
+            }			
+		}
         return null;
     }
 
