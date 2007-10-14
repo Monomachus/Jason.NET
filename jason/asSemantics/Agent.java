@@ -325,7 +325,7 @@ public class Agent {
         return pl;
     }
 
-    /** Belief Update Function: adds/removes perceptions into belief base */
+    /** Belief Update Function: adds/removes percepts into belief base */
     public void buf(List<Literal> percepts) {
         if (percepts == null) {
             return;
@@ -343,7 +343,7 @@ public class Agent {
             while (ip.hasNext()) {
             	Literal t = ip.next();
             	
-                // if percept t is already in BB
+                // if perception t is already in BB
                 if (l.equalsAsTerm(t) && l.negated() == t.negated()) {
                     wasPerceived = true;
                     ip.remove(); // remove in percepts, since it already is in BB
@@ -434,40 +434,43 @@ public class Agent {
         // It simply add/del the belief.
 
         List<Literal>[] result = null;
-
-        if (beliefToAdd != null) {
-        	if (logger.isLoggable(Level.FINE)) logger.fine("adding " + beliefToAdd);
-            
-            if (getBB().add(beliefToAdd)) {
-            	result = new List[2];
-                result[0] = Collections.singletonList(beliefToAdd);
-                result[1] = Collections.emptyList();
-            }
-        }
-
-        if (beliefToDel != null) {
-            Unifier u = null;
-            try {
-                u = i.peek().unif; // get from current intention
-            } catch (Exception e) {
-                u = new Unifier();
-            }
-
-            if (logger.isLoggable(Level.FINE)) logger.fine("doing brf for " + beliefToDel + " in BB=" + believes(beliefToDel, u));
-            
-            if (believes(beliefToDel, u)) {
-            	beliefToDel.apply(u);
-                if (getBB().remove(beliefToDel)) {
-                    if (logger.isLoggable(Level.FINE)) logger.fine("Removed:" + beliefToDel);
-                    if (result == null) {
-                    	result = new List[2];
-                        result[0] = Collections.emptyList();
-                    }
-                    result[1] = Collections.singletonList(beliefToDel);
-                }
-            }
-
-        }
+        try {
+	        if (beliefToAdd != null) {
+	        	if (logger.isLoggable(Level.FINE)) logger.fine("adding " + beliefToAdd);
+	            
+	            if (getBB().add(beliefToAdd)) {
+	            	result = new List[2];
+	                result[0] = Collections.singletonList(beliefToAdd);
+	                result[1] = Collections.emptyList();
+	            }
+	        }
+	
+	        if (beliefToDel != null) {
+	            Unifier u = null;
+	            try {
+	                u = i.peek().unif; // get from current intention
+	            } catch (Exception e) {
+	                u = new Unifier();
+	            }
+	
+	            if (logger.isLoggable(Level.FINE)) logger.fine("doing brf for " + beliefToDel + " in BB=" + believes(beliefToDel, u));
+	            
+	            if (believes(beliefToDel, u)) {
+	            	beliefToDel.apply(u);
+	                if (getBB().remove(beliefToDel)) {
+	                    if (logger.isLoggable(Level.FINE)) logger.fine("Removed:" + beliefToDel);
+	                    if (result == null) {
+	                    	result = new List[2];
+	                        result[0] = Collections.emptyList();
+	                    }
+	                    result[1] = Collections.singletonList(beliefToDel);
+	                }
+	            }
+	
+	        }
+    	} catch (Exception e) {
+    		logger.log(Level.WARNING, "Error at BRF.",e);
+    	}
         return result;
     }
 

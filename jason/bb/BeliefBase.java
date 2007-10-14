@@ -91,7 +91,7 @@ public interface BeliefBase extends Iterable<Literal>, Cloneable {
     /** Returns the number of beliefs in BB */
     public int size();
 
-    /** Returns all beliefs that have percept as source */
+    /** Returns all beliefs that have "percept" as source */
     public Iterator<Literal> getPercepts();
 
     /** Removes a literal from BB, returns true if succeed */

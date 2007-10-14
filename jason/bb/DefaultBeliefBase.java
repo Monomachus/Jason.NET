@@ -73,7 +73,7 @@ public class DefaultBeliefBase implements BeliefBase {
 
     @SuppressWarnings("unchecked")
 	public Iterator<Literal> getPercepts() {
-    	// returns a clone so that the caller can not change the perceptions
+    	// returns a clone so that the caller can not change the percepts
         return ((Set<Literal>)percepts.clone()).iterator();
     }
 

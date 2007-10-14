@@ -124,8 +124,8 @@ public class Environment {
     }
 
 	/**
-	 * Returns perceptions for an agent.  A full copy of both common
-	 * and agent perceptions lists is returned.
+	 * Returns percepts for an agent.  A full copy of both common
+	 * and agent's percepts lists is returned.
 	 */
     public List<Literal> getPercepts(String agName) {
 		
@@ -145,7 +145,7 @@ public class Environment {
 		
         if (! percepts.isEmpty()) { // has global perception?
             synchronized (percepts) {
-                // make a local copy of the environment perceptions
+                // make a local copy of the environment percepts
     			// Note: a deep copy will be done by BB.add
     			p.addAll(percepts);
             }
@@ -179,7 +179,7 @@ public class Environment {
 	}
 	
 	
-	/** Clears the list of global perceptions */
+	/** Clears the list of global percepts */
 	public void clearPercepts() {
         if (!percepts.isEmpty()) {
             uptodateAgs.clear();

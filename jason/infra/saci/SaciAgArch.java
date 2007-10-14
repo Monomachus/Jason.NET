@@ -288,7 +288,7 @@ public class SaciAgArch extends saci.Agent implements AgArchInfraTier {
         try {
             m = mboxPercept.ask(askMsg);
         } catch (Exception e) {
-            logger.log(Level.SEVERE, "Error receiving perceptions.", e);
+            logger.log(Level.SEVERE, "Error receiving percepts.", e);
         }
         if (m != null) {
             Object content = m.get("content");
