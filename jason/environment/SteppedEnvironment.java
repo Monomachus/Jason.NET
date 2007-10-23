@@ -113,44 +113,49 @@ public class SteppedEnvironment extends Environment {
     }
     
     private void startNewStep() {
-    	step++;
-    	stepStarted(step);
-    	
     	synchronized (requests) {
 
 			//logger.info("#"+requests.size());
 			
-    		// execute all scheduled actions
-			for (ActRequest a: requests.values()) {
-                try {
-                    boolean success = executeAction(a.agName, a.action);
-                    getEnvironmentInfraTier().actionExecuted(a.agName, a.action, success, a.infraData);
-                } catch (Exception ie) {
-                    if (!(ie instanceof InterruptedException)) {
-                        logger.log(Level.WARNING, "act error!",ie);
-                    }
-                }
-                //super.scheduleAction(a.agName, a.action, a.infraData);				
-			}
-			requests.clear();
-			
-			// add actions waiting in over requests into the requests
-			Iterator<ActRequest> io = overRequests.iterator();
-			while (io.hasNext()) {
-				ActRequest a = io.next();
-				if (requests.get(a.agName) == null) {
-					requests.put(a.agName, a);
-					io.remove();
+            try {
+	    		// execute all scheduled actions
+				for (ActRequest a: requests.values()) {
+					a.success = executeAction(a.agName, a.action);
+	                //super.scheduleAction(a.agName, a.action, a.infraData);				
 				}
-			}
-			
-			// the over requests could complete the requests
-	    	// so test end of step again
-			if (requests.size() == nbAgs) {
-				startNewStep();
-	    	}
+	
+				// notify the agents about the result of the execution
+				for (ActRequest a: requests.values()) {
+					getEnvironmentInfraTier().actionExecuted(a.agName, a.action, a.success, a.infraData);
+				}
+				
+				// clear all requests
+				requests.clear();
+				
+				// add actions waiting in over requests into the requests
+				Iterator<ActRequest> io = overRequests.iterator();
+				while (io.hasNext()) {
+					ActRequest a = io.next();
+					if (requests.get(a.agName) == null) {
+						requests.put(a.agName, a);
+						io.remove();
+					}
+				}
+				
+				// the over requests could complete the requests
+		    	// so test end of step again
+				if (requests.size() == nbAgs) {
+					startNewStep();
+		    	}
+            } catch (Exception ie) {
+                if (!(ie instanceof InterruptedException)) {
+                    logger.log(Level.WARNING, "act error!",ie);
+                }
+            }
 			
     	}
+    	step++;
+    	stepStarted(step);    	
     }
     
     /** to be overridden by the user class */
@@ -173,6 +178,7 @@ public class SteppedEnvironment extends Environment {
     	String agName;
     	Structure action;
     	Object infraData;
+    	boolean success; 
     	public ActRequest(String ag, Structure act, Object data) {
     		agName = ag;
     		action = act;
