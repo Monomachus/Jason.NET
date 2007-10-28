@@ -101,15 +101,21 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
     }
 
     /**
-     * grounds a variable, set a value for this var (e.g. X = 10; Y = a(b,c);
-     * ...)
+     * grounds a variable, set a value for this var 
+     * (e.g. X = 10; Y = a(b,c); ...)
      */
     public boolean setValue(Term vl) {
         if (vl.isVar()) {
             logger.warning("Attempted set a variable as a value for a variable, in " + this.getFunctor());
             return false;
         }
-        value = vl;
+
+        if (vl.isPred() && this.hasAnnot()) { // if this var has annots, add them in the value's annots (Experimental)
+        	vl = (Term)vl.clone();
+        	((Pred)vl).addAnnots(this.getAnnots());
+        }
+        
+        value = vl;        
         resetHashCodeCache();
         return true;
     }
@@ -122,7 +128,7 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
     public boolean apply(Unifier u) {
         if (!hasValue()) {
             Term vl = u.get(this);
-            // System.out.println("appling="+t+"="+vl+" un="+this);
+            // System.out.println("applying="+t+"="+vl+" un="+this);
             if (vl != null && !(vl instanceof VarsCluster)) {
                 setValue(vl);
                 vl.apply(u); // in case t has var args
