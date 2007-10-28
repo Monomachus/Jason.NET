@@ -12,7 +12,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Implementation of the Declarative Goal pattern (see DALT 2006 papper)
+ * Implementation of the Declarative Goal pattern (see DALT 2006 paper)
  * 
  * @author jomi
  */
@@ -20,7 +20,7 @@ public class DG implements Directive {
 
     static Logger logger = Logger.getLogger(DG.class.getName());
 
-    public Agent process(Pred directive, Agent outterContent, Agent innerContent) {
+    public Agent process(Pred directive, Agent outerContent, Agent innerContent) {
         try {
             Agent newAg = new Agent();
             

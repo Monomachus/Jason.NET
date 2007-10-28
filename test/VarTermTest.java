@@ -272,6 +272,31 @@ public class VarTermTest extends TestCase {
     	assertTrue(u.unifies(v1, v2));
         assertEquals(u.get("R").toString(),"[b,d]");
     }
+    
+    public void testVarWithAnnots4() {
+    	// X[source(A)] = open[source(a)] - ok and A -> a
+    	VarTerm v1 = VarTerm.parseVar("X[source(A)]");
+    	Unifier u = new Unifier();
+    	assertTrue(u.unifies(v1, Literal.parseLiteral("open[source(a)]")));
+    	assertEquals(u.get("A").toString(),"a");
+    	assertEquals(u.get("X").toString(),"open");
+
+    	VarTerm v2 = VarTerm.parseVar("X[source(self)]");
+    	u = new Unifier();
+    	assertFalse(u.unifies(v2, Literal.parseLiteral("open[source(a)]")));
+    }
+
+    public void testVarWithAnnots5() {
+    	// P -> open[source(a)]
+    	// P[source(self)]
+    	// apply on P is open[source(a),source(self)]?
+    	Unifier u = new Unifier();
+    	u.unifies(new VarTerm("P"), Literal.parseLiteral("open[source(a)]"));
+    	VarTerm v1 = VarTerm.parseVar("P[source(self)]");
+    	v1.apply(u);
+    	assertEquals(v1.getAnnots().size(), 2);
+    }
+
 
     public static void main(String[] a) {
         new VarTermTest().testVarWithAnnots3();

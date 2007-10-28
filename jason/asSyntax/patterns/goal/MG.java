@@ -12,7 +12,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Implementation of the  Maintenance Goal pattern (see DALT 2006 papper)
+ * Implementation of the  Maintenance Goal pattern (see DALT 2006 paper)
  * 
  * @author jomi
  */
@@ -20,7 +20,7 @@ public class MG implements Directive {
 
     static Logger logger = Logger.getLogger(MG.class.getName());
     
-    public Agent process(Pred directive, Agent outterContent, Agent innerContent) {
+    public Agent process(Pred directive, Agent outerContent, Agent innerContent) {
         try {
             Literal goal = Literal.parseLiteral(directive.getTerm(0).toString());
             Literal subDir;
@@ -32,7 +32,7 @@ public class MG implements Directive {
             Directive sd = DirectiveProcessor.getDirective(subDir.getFunctor());
 
             // apply sub directive
-            Agent newAg = sd.process(subDir, outterContent, innerContent); 
+            Agent newAg = sd.process(subDir, outerContent, innerContent); 
             if (newAg != null) {
                 // add bel g
                 Literal ig = (Literal)goal.clone();

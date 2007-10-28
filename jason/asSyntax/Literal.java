@@ -191,7 +191,7 @@ public class Literal extends Pred implements LogicalFormula {
                             rule = (Rule)b;
                             
                             // create a copy of this literal, ground it and 
-                            // make its vars annonym, 
+                            // make its vars anonymous, 
                             // it is used to define what will be the unifier used
                             // inside the rule.
                             if (lcloneAnnon == null) {

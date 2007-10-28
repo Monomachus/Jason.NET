@@ -14,7 +14,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Implementation of the Sequenced Goal Adoption pattern (see DALT 2006 papper)
+ * Implementation of the Sequenced Goal Adoption pattern (see DALT 2006 paper)
  * 
  * @author jomi
  */
@@ -22,7 +22,7 @@ public class SGA implements Directive {
 
     static Logger logger = Logger.getLogger(SGA.class.getName());
     
-    public Agent process(Pred directive, Agent outterContent, Agent innerContent) {
+    public Agent process(Pred directive, Agent outerContent, Agent innerContent) {
         try {
             Trigger trigger = Trigger.parseTrigger(((StringTerm)directive.getTerm(0)).getString());
             LogicalFormula context = LogExpr.parseExpr(((StringTerm)directive.getTerm(1)).getString());

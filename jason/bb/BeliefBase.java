@@ -71,11 +71,11 @@ public interface BeliefBase extends Iterable<Literal>, Cloneable {
     
     /** 
      * Returns an iterator for all literals relevant for l's predicate
-     * indicator, if l is a var, return all beliefs.<br>
+     * indicator, if l is a var, returns all beliefs.<br>
      *
      * Example, if BB={a(10),a(20),a(2,1),b(f)}, then
-     * <code>getRelevant(a(5))</code> = {{a(10),a(20)}.<br> if
-     * BB={a(10),a(20)}, then <code>getRelevant(X)</code> =
+     * <code>getRelevant(a(5))</code> = {{a(10),a(20)}.<br>
+     * if BB={a(10),a(20)}, then <code>getRelevant(X)</code> =
      * {{a(10),a(20)}.
      */
     public Iterator<Literal> getRelevant(Literal l);

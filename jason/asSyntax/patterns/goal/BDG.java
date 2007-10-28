@@ -9,7 +9,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Implementation of the Backtracking Declarative Goal pattern (see DALT 2006 papper)
+ * Implementation of the Backtracking Declarative Goal pattern (see DALT 2006 paper)
  * 
  * @author jomi
  */
@@ -17,10 +17,10 @@ public class BDG extends DG {
 
     static Logger logger = Logger.getLogger(BDG.class.getName());
     
-    public Agent process(Pred directive, Agent outterContent, Agent innerContent) {
+    public Agent process(Pred directive, Agent outerContent, Agent innerContent) {
         try {
             // apply DG in the inner plans
-        	Agent newAg = super.process(directive, outterContent, innerContent); 
+        	Agent newAg = super.process(directive, outerContent, innerContent); 
             if (newAg != null) {
 
                 Term goal = directive.getTerm(0);

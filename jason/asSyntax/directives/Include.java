@@ -19,26 +19,26 @@ public class Include implements Directive {
     static Logger logger = Logger.getLogger(Include.class.getName());
     public static final String CRPrefix = "ClassResource:";
     
-    public Agent process(Pred directive, Agent outterContent, Agent innerContent) {
+    public Agent process(Pred directive, Agent outerContent, Agent innerContent) {
     	String file = ((StringTerm)directive.getTerm(0)).getString();
         try {
-        	String outterPrefix = outterContent.getASLSrc();
+        	String outerPrefix = outerContent.getASLSrc();
 	    	InputStream in;
-	    	if (outterContent != null && outterPrefix != null) {
-	    		// check if the outter is URL
-	    		if (outterPrefix.startsWith("jar")) {
-	    			outterPrefix = outterPrefix.substring(0,outterPrefix.indexOf("!")+1) + "/";
-	    			file = outterPrefix + file;
+	    	if (outerContent != null && outerPrefix != null) {
+	    		// check if the outer is URL
+	    		if (outerPrefix.startsWith("jar")) {
+	    			outerPrefix = outerPrefix.substring(0,outerPrefix.indexOf("!")+1) + "/";
+	    			file = outerPrefix + file;
 	    			in = new URL(file).openStream();
-	    		} if (outterPrefix.startsWith(CRPrefix)) { // outter is loaded from a resource ("application".jar) file, used for java web start
-	    			int posSlash = outterPrefix.lastIndexOf("/"); 
+	    		} if (outerPrefix.startsWith(CRPrefix)) { // outer is loaded from a resource ("application".jar) file, used for java web start
+	    			int posSlash = outerPrefix.lastIndexOf("/"); 
 	    			if (posSlash > 0) {
-	    				file = outterPrefix.substring(CRPrefix.length(),posSlash+1) + file;
+	    				file = outerPrefix.substring(CRPrefix.length(),posSlash+1) + file;
 	    			}
 	    			in = Agent.class.getResource(file).openStream();
 	    			file = CRPrefix + file;
 	    		} else {
-	        		file =  new File(outterPrefix).getAbsoluteFile().getParent() + File.separator + file;
+	        		file =  new File(outerPrefix).getAbsoluteFile().getParent() + File.separator + file;
 	        		in = new FileInputStream(file);
 	    		}
 	    	} else {

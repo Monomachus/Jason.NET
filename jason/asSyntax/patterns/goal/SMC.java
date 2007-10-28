@@ -12,7 +12,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Implementation of the Single-Minded Commitment pattern (see DALT 2006 papper)
+ * Implementation of the Single-Minded Commitment pattern (see DALT 2006 paper)
  * 
  * @author jomi
  */
@@ -20,7 +20,7 @@ public class SMC implements Directive {
 
     static Logger logger = Logger.getLogger(SMC.class.getName());
     
-    public Agent process(Pred directive, Agent outterContent, Agent innerContent) {
+    public Agent process(Pred directive, Agent outerContent, Agent innerContent) {
         try {
             Term goal = directive.getTerm(0);
             Term fail = directive.getTerm(1);
@@ -29,7 +29,7 @@ public class SMC implements Directive {
             Directive sd = DirectiveProcessor.getDirective(subDir.getFunctor());
 
             // apply sub directive
-            Agent newAg = sd.process(subDir, outterContent, innerContent); 
+            Agent newAg = sd.process(subDir, outerContent, innerContent); 
             if (newAg != null) {
 
                 // add +f : true <- .fail_goal(g).
