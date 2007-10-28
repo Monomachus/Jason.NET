@@ -116,14 +116,8 @@ public class Agent {
                 parseAS(JasonException.class.getResource("/asl/kqmlPlans.asl"));
                 setASLSrc(asSrc);
     
-                // add initial bels events
                 addInitialBelsInBB();
-    
-                // add initial goals events
-                for (Literal g: initialGoals) {
-                	g.makeVarsAnnon();
-                	getTS().getC().addAchvGoal(g,Intention.EmptyInt);
-                }
+                addInitialGoalsInTS();
             }
             return ts;
         } catch (Exception e) {
@@ -226,24 +220,40 @@ public class Agent {
     	return initialBels;
     }
     
-    // add initial bels events
+    /** add the initial beliefs in BB and produce the corresponding events */
     public void addInitialBelsInBB() {
         Unifier u = new Unifier();
-        // since bels is a Stack, insert bels in inverse order
+        // Once beliefs are stored in a Stack in the BB, insert them in inverse order
         for (int i=initialBels.size()-1; i >=0; i--) {
             Literal b = initialBels.get(i);
             b.apply(u); // to solve arithmetic expressions
 
-            // if l is not a rule and has free vars, convert it in a rule like "l :- true."
+            // if l is not a rule and has free vars (like l(X)), convert it into a rule like "l(X) :- true."
             if (!b.isRule() && !b.isGround()) {
                 b = new Rule(b,Literal.LTrue);
             }
-        	addBel(b);
+            
+            // does not do BRF for rules (and so do produce events +bel for rules)
+            if (b.isRule()) {
+            	getBB().add(b);
+            } else {
+            	addBel(b);
+            }
         }
         initialBels.clear();
     }
+    
+    public void addInitialGoalsInTS() {
+	    for (Literal g: initialGoals) {
+	    	g.makeVarsAnnon();
+	    	getTS().getC().addAchvGoal(g,Intention.EmptyInt);
+	    }
+    }
 
-    /** import bels, plans and initial goals from another agent */
+    /** Imports beliefs, plans and initial goals from another agent. Initial beliefs and goals 
+     *  are stored in "initialBels" and "initialGoals" lists but not included in the BB / TS.
+     *  The methods addInitialBelsInBB and addInitialGoalsInTS should be called in the sequel to
+     *  add those beliefs and goals into the agent. */
     public void importComponents(Agent a) throws JasonException {
     	if (a != null) {
 	    	for (Literal b: a.initialBels) {
