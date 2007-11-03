@@ -213,58 +213,67 @@ public class Pred extends Structure {
     }
 
     /**
-     * returns true if all this predicate annots are in p's annots (this version
-     * unifies the annot list and remove p's annots)
+     * Returns true if all this predicate's annots are in p's annots using the
+     * unifier u. 
+     *
+     * if p annots has a Tail, p annots's Tail will receive this predicate's annots,
+     * e.g.: 
+     *   this[a,b,c] = p[x,y,b|T]
+     * unifies and T is [a,c] (this will be a subset if p has a and c in its annots).
+     *
+     * if this annots has a tail, the Tail will receive all necessary term
+     * to be a subset, e.g.:
+     *   this[b|T] = p[x,y,b]
+     * unifies and T is [x,y] (this will be a subset if T is [x,y].
      */
     public boolean hasSubsetAnnot(Pred p, Unifier u) {
+    	//return getSubsetAnnots(p,u,null);
+    	
         if (annots == null) return true;
-        if (annots != null && p.getAnnots() == null) return false;
+        if (p.getAnnots() == null) return false;
 
-        p = (Pred) p.clone(); // clone p to change its annots, the remaining
-                              // annots will unify this annots Tail
+        // since p's annots will be changed, clone them
+        ListTerm pannots = (ListTerm)p.getAnnots().clone();
 
-        // if p annots has a Tail, p annots's Tail will receive this annots
-        // this[a,b,c] = p[x,y|T]
-        // T will be [a,b,c]
         VarTerm pTail = null;
-        Term tail = p.getAnnots().getTail();
-        if (tail instanceof VarTerm) pTail = (VarTerm)tail;
-        
+        if (pannots.getTail() instanceof VarTerm) pTail = (VarTerm)pannots.getTail();
+
         for (Term annot : annots) {
             // search annot in p's annots
             boolean ok = false;
-            Iterator<Term> j = p.getAnnots().iterator();
+            Iterator<Term> j = pannots.iterator();
             while (j.hasNext() && !ok) {
                 Term pAnnot = j.next();
-                if (u.unifies(annot, pAnnot)) {
+                if (u.unifiesNoUndo(annot, pAnnot)) {
                     ok = true;
                     j.remove();
                 }
             }
             // if p has a tail, add annot in p's tail
             if (!ok && pTail != null) {
-                ListTerm pTailAnnots = (ListTerm) u.get(pTail);
-                if (pTailAnnots == null) {
-                    pTailAnnots = new ListTermImpl();
-                    u.unifies(pTail, pTailAnnots);
-                    pTailAnnots = (ListTerm)u.get(pTail);
+                ListTerm pAnnotsTail = (ListTerm) u.get(pTail);
+                if (pAnnotsTail == null) {
+                    pAnnotsTail = new ListTermImpl();
+                    u.unifies(pTail, pAnnotsTail);
+                    pAnnotsTail = (ListTerm)u.get(pTail);
                 }
-                pTailAnnots.add(annot);
+                pAnnotsTail.add(annot);
                 ok = true;
             }
             if (!ok) return false;
         }
 
         // if this Pred has a Tail, unify it with p remaining annots
-        tail = annots.getTail();
-        if (tail instanceof VarTerm) {
-            // System.out.println("tail="+tail+"/"+p.getAnnots());
-            u.unifies((VarTerm)tail, p.getAnnots());
+        Term thisTail = annots.getTail();
+        if (thisTail instanceof VarTerm) {
+            u.unifies(thisTail, pannots);
         }
 
         return true;
     }
 
+    
+    
     /**
      * Adds a source annotation like "source(<i>agName</i>)".
      */

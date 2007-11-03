@@ -191,16 +191,16 @@ public class TermTest extends TestCase {
 		
 		p1.addAnnot(new VarTerm("X"));
 		p2.addAnnot(new Structure("ag1"));
-		//System.out.println("p1="+p1+"; p2="+p2);
 		
         // pos(1)[X]=pos(1)[ag1]
 		assertTrue(u.unifies(p1, p2));
+		
 		assertEquals(u.get("X").toString(),"ag1");
 		
 		p1.addAnnot(new Structure("ag2"));
 		p2.addAnnot(new VarTerm("Y"));
-		//System.out.println("p1="+p1+"; p2="+p2);
 		u = new Unifier();
+		// pos(1)[X,ag2] = pos(1)[ag1,Y]
 		assertTrue(u.unifies(p1, p2));
 		//System.out.println("u="+u);
 		
@@ -401,7 +401,10 @@ public class TermTest extends TestCase {
 		Pred p1 = Pred.parsePred("p1(t1,t2)[a1,a(2,3),a(3)]");
 		Pred p2 = Pred.parsePred("p2(t1,t2)[a(2,3),a(3)]");
 		assertTrue(p2.hasSubsetAnnot(p1));
+		//assertTrue(p2.getSubsetAnnots(p1.getAnnots(), new Unifier(), null));
+
 		assertFalse(p1.hasSubsetAnnot(p2));
+		//assertFalse(p1.getSubsetAnnots(p2.getAnnots(), new Unifier(), null));
 		
 		Pred p3 = Pred.parsePred("p2(t1,t2)[a(A,_),a(X)]");
 		Unifier u = new Unifier();
@@ -411,6 +414,11 @@ public class TermTest extends TestCase {
 		assertTrue(p3.hasSubsetAnnot(p1,u));
         
         Pred p4 = Pred.parsePred("p1(t1,t2)[a1|T]");
+
+        //List<Unifier> r = new ArrayList<Unifier>();
+        //assertTrue(p1.getSubsetAnnots(p4.getAnnots(),new Unifier(),r));
+        //assertEquals(r.get(0).get("T").toString(), "[a(2,3),a(3)]");
+        
         u = new Unifier();
         assertTrue(p1.hasSubsetAnnot(p4, u));
         assertEquals(u.get("T").toString(), "[a(2,3),a(3)]");
@@ -420,6 +428,12 @@ public class TermTest extends TestCase {
         assertTrue(p1.hasSubsetAnnot(p5, u));
 
         Pred p6 = Pred.parsePred("p1(t1,t2)[a1|T]");
+
+        //r.clear();
+        //assertTrue(p6.getSubsetAnnots(p1.getAnnots(),new Unifier(),r));
+        //System.out.println("p6="+p6+"; p1="+p1+" r="+r);
+        //assertEquals(r.get(0).get("T").toString(), "[a(2,3),a(3)]");
+
         u = new Unifier();
         assertTrue(p6.hasSubsetAnnot(p1, u));
         assertEquals(u.get("T").toString(), "[a(2,3),a(3)]");
