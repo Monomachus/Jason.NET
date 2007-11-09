@@ -46,7 +46,7 @@ import java.util.List;
  * 
  * <p>
  * This class normally just calls the AgArchInfraTier methods 
- * implemented by the infrastructure tier (Centralised, Saci, ...). 
+ * implemented by the infrastructure tier (Centralised, Jade, Saci, ...). 
  * However, the user can customise
  * these methods overridding some of them in his/her arch. class.
  */
@@ -81,7 +81,7 @@ public class AgArch {
     }
 
     /**
-     * A call-back method called (by the infrasctructure tier) 
+     * A call-back method called by the infrastructure tier 
      * when the agent is about to be killed.
      */
     public void stopAg() {
@@ -138,6 +138,11 @@ public class AgArch {
         return archTier.canSleep();
     }
 
+    /** Puts the agent in sleep. */
+    public void sleep() {
+    	archTier.sleep();
+    }
+    
     /** Gets the agent's name */
     public String getAgName() {
         return archTier.getAgName();
@@ -158,9 +163,12 @@ public class AgArch {
         return archTier.isRunning();
     }
     
+    /** sets the number of the current cycle in the sync execution mode */
     public void setCycleNumber(int cycle) {
         cycleNumber = cycle;
     }
+    
+    /** gets the current cycle number in case of running in sync execution mode */
     public int getCycleNumber() {
         return cycleNumber;
     }

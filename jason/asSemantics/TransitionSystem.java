@@ -851,7 +851,7 @@ public class TransitionSystem {
                     logger.fine("generating idle event");
                     C.addExternalEv(PlanLibrary.TE_IDLE);
                 } else {
-                    agArch.getArchInfraTier().sleep();
+                    agArch.sleep();
                     return;
                 }
             }

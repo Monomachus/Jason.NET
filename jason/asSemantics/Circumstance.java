@@ -277,9 +277,11 @@ public class Circumstance implements Serializable {
     }
     
     public void addFeedbackAction(ActionExec act) {
-    	synchronized (FA) {
-			FA.add(act);
-		}
+    	if (act.getIntention() != null) {
+	    	synchronized (FA) {
+				FA.add(act);
+			}
+    	}
     }
 
     public Map<Integer, ActionExec> getPendingActions() {
