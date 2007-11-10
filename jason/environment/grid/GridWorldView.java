@@ -92,7 +92,7 @@ public class GridWorldView extends JFrame {
     }
 
 
-    /** method to draw unknown object, probably overrideen */
+    /** method to draw unknown object, probably overridden by the user viewer class */
     public void draw(Graphics g, int x, int y, int object) {
         //g.setColor(Color.black);
         //drawString(g,x,y,defaultFont,String.valueOf(object));

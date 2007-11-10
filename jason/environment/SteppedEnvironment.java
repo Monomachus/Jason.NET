@@ -29,17 +29,29 @@ public class SteppedEnvironment extends Environment {
 
 	private Logger logger = Logger.getLogger(SteppedEnvironment.class.getName());
 
-	// TODO: polices for more action per step tentative: fail_first, fail_second, queue
-	
+    /** Policy used when a second action is requested and the agent still has another action pending execution */
+	public enum OverActionsPolicy {
+    	/** Queue the second action request for future execution */
+    	queue, 
+    	
+    	/** Fail the second action */
+    	failSecond,
+    	
+    	/** Ignore the second action, it is considered as successfully executed */
+    	ignoreSecond
+	};
+    	
 	private int step = 0;   // step counter
     private int nbAgs = -1; // number of agents acting on the environment
     private Map<String,ActRequest> requests = new HashMap<String,ActRequest>(); // actions to be executed
     private Queue<ActRequest> overRequests = new LinkedList<ActRequest>(); // second action tentative in the step  
     private TimeOutThread timeoutThread = null;
     private long stepTimeout = 0;
+
+    private OverActionsPolicy overActPol = OverActionsPolicy.ignoreSecond;
     
     public SteppedEnvironment() {
-    	super(1);
+    	super(2);
 	}
     
     @Override
@@ -78,6 +90,15 @@ public class SteppedEnvironment extends Environment {
     	return step;
     }
     
+    /** 
+     * Sets the policy used for the second ask for an action while another action is not finished yet.
+     * If set as queue, the second action is added in a queue for future execution 
+     * If set as failSecond, the second action fails.
+     */
+    public void setOverActionsPolicy(OverActionsPolicy p) {
+    	overActPol = p;
+    }
+    
     @Override
     public void scheduleAction(String agName, Structure action, Object infraData) {
     	synchronized (requests) {
@@ -90,15 +111,18 @@ public class SteppedEnvironment extends Environment {
             	}
         	}
         	
-    		ActRequest newRequest = new ActRequest(agName, action, infraData);
+    		ActRequest newRequest = new ActRequest(agName, action, requiredSteps(agName, action), infraData);
     		
     		// if the agent already has an action scheduled, fail the first
     		ActRequest inSchedule = requests.get(agName);
     		if (inSchedule != null) {
-    			overRequests.offer(newRequest);
-    			// logger.info("add over " + newRequest + " in step "+step);
-    			// for fail_second:
-    			//getEnvironmentInfraTier().actionExecuted(inSchedule.agName, inSchedule.action, false, inSchedule.infraData);
+    			if (overActPol == OverActionsPolicy.queue) {
+    				overRequests.offer(newRequest);
+    			} else if (overActPol == OverActionsPolicy.failSecond) {
+					getEnvironmentInfraTier().actionExecuted(agName, action, false, infraData);
+    			} else if (overActPol == OverActionsPolicy.ignoreSecond) {
+    				getEnvironmentInfraTier().actionExecuted(agName, action, true, infraData);
+    			}	
     		} else {
 				// store the action request 		
 				requests.put(agName, newRequest);
@@ -116,21 +140,31 @@ public class SteppedEnvironment extends Environment {
     	synchronized (requests) {
 
 			//logger.info("#"+requests.size());
+    		//logger.info("#"+overRequests.size());
 			
             try {
+
 	    		// execute all scheduled actions
 				for (ActRequest a: requests.values()) {
-					a.success = executeAction(a.agName, a.action);
-	                //super.scheduleAction(a.agName, a.action, a.infraData);				
-				}
-	
-				// notify the agents about the result of the execution
-				for (ActRequest a: requests.values()) {
-					getEnvironmentInfraTier().actionExecuted(a.agName, a.action, a.success, a.infraData);
+					a.remainSteps--;
+					if (a.remainSteps == 0) {
+						// calls the user implementation of the action
+						a.success = executeAction(a.agName, a.action);
+					}
 				}
 				
+				// notify the agents about the result of the execution
+				Iterator<ActRequest> i = requests.values().iterator();
+				while (i.hasNext()) {
+					ActRequest a = i.next();
+					if (a.remainSteps == 0) {
+						getEnvironmentInfraTier().actionExecuted(a.agName, a.action, a.success, a.infraData);
+						i.remove();
+					}
+				}
+            	
 				// clear all requests
-				requests.clear();
+				//requests.clear();
 				
 				// add actions waiting in over requests into the requests
 				Iterator<ActRequest> io = overRequests.iterator();
@@ -166,6 +200,10 @@ public class SteppedEnvironment extends Environment {
     protected void stepFinished(int step, long time, boolean timeout) {    	
     }
     
+    protected int requiredSteps(String agName, Structure action) {
+    	return 1;
+    }
+    
     /** stops perception while executing the step's actions */
     @Override
     public List<Literal> getPercepts(String agName) {
@@ -179,10 +217,12 @@ public class SteppedEnvironment extends Environment {
     	Structure action;
     	Object infraData;
     	boolean success; 
-    	public ActRequest(String ag, Structure act, Object data) {
+    	int remainSteps; // the number os steps this action have to wait to be executed
+    	public ActRequest(String ag, Structure act, int rs, Object data) {
     		agName = ag;
     		action = act;
     		infraData = data;
+    		remainSteps = rs;
 		}
     	public boolean equals(Object obj) {
     		return agName.equals(obj);
@@ -194,8 +234,6 @@ public class SteppedEnvironment extends Environment {
     		return "["+agName+","+action+"]";
     	}
     }
-    
-    // TODO: add step spend time
     
     class TimeOutThread extends Thread {
 		Lock lock = new ReentrantLock();
@@ -233,7 +271,6 @@ public class SteppedEnvironment extends Environment {
 				logger.log(Level.SEVERE, "Error in timeout thread!",e);
 			}
 		}
-    }
-    
+    }    
 }
 

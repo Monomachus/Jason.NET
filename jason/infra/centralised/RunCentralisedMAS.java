@@ -213,7 +213,10 @@ public class RunCentralisedMAS {
     protected void createButtons() {
         createStopButton();
 
-        // add Button
+        // add Button pause
+        createPauseButton();
+
+        // add Button debug
         runner.btDebug = new JButton("Debug", new ImageIcon(RunCentralisedMAS.class.getResource("/images/debug.gif")));
         runner.btDebug.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
@@ -230,9 +233,6 @@ public class RunCentralisedMAS {
             runner.btDebug.setEnabled(false);
         }
         MASConsoleGUI.get().addButton(runner.btDebug);
-
-        // add Button pause
-        createPauseButton();
 
         // add show sources button
         final JButton btShowSrc = new JButton("Sources", new ImageIcon(RunCentralisedMAS.class.getResource("/images/list.gif")));

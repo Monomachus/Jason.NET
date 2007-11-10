@@ -1,9 +1,12 @@
 package jason.environment.grid;
 
+import java.util.Random;
+
 
 
 /**
- * Simple model for a grid world (with Agents and obstacles)
+ * Simple model for a grid world (with agents and obstacles).
+ * Every agent gets an identification (a integer from 0 to the number of ag - 1).
  * 
  * @author Jomi
  */
@@ -21,6 +24,9 @@ public class GridWorldModel {
     protected int[][]             data = null; 
     protected Location[]          agPos;
     protected GridWorldView       view;
+
+    protected Random              random = new Random();
+    
 
     protected GridWorldModel(int w, int h, int nbAgs) {
         width  = w;
@@ -65,7 +71,7 @@ public class GridWorldModel {
     }
 
     public boolean hasObject(int obj, Location l) {
-        return hasObject(obj, l.x, l.y);
+        return inGrid(l.x, l.y) && (data[l.x][l.y] & obj) != 0;
     }
     public boolean hasObject(int obj, int x, int y) {
         return inGrid(x, y) && (data[x][y] & obj) != 0;
@@ -135,12 +141,12 @@ public class GridWorldModel {
         }
     }
 
-    /** returns the agent at location l */
+    /** returns the agent at location l or -1 if there is not one there */
     public int getAgAtPos(Location l) {
         return getAgAtPos(l.x, l.y);
     }
 
-    /** returns the agent at x,y */
+    /** returns the agent at x,y or -1 if there is not one there */
     public int getAgAtPos(int x, int y) {
         for (int i=0; i<agPos.length; i++) {
             if (agPos[i].x == x && agPos[i].y == y) {
@@ -150,20 +156,55 @@ public class GridWorldModel {
         return -1;
     }
 
+    /** returns true if the location l has no obstacle neither agent */
     public boolean isFree(Location l) {
         return isFree(l.x, l.y);
     }
 
+    /** returns true if the location x,y has no obstacle neither agent */
     public boolean isFree(int x, int y) {
         return inGrid(x, y) && (data[x][y] & OBSTACLE) == 0 && (data[x][y] & AGENT) == 0;
     }
 
+    /** returns true if the location l has not the object obj */
+    public boolean isFree(int obj, Location l) {
+        return inGrid(l.x, l.y) && (data[l.x][l.y] & obj) == 0;    	
+    }
+    /** returns true if the location x,y has not the object obj */
+    public boolean isFree(int obj, int x, int y) {
+        return inGrid(x, y) && (data[x][y] & obj) == 0;    	
+    }
+    
     public boolean isFreeOfObstacle(Location l) {
-        return isFreeOfObstacle(l.x, l.y);
+        return isFree(OBSTACLE, l);
     }
-
     public boolean isFreeOfObstacle(int x, int y) {
-        return inGrid(x, y) && (data[x][y] & OBSTACLE) == 0;
+        return isFree(OBSTACLE, x, y);
     }
 
+    /** returns a random free location using isFree to test the availability of some possible location (it means free of agents and obstacles) */ 
+    protected Location getFreePos() {
+    	for (int i=0; i<(getWidth()*getHeight()*5); i++) {
+    		int x = random.nextInt(getWidth());
+    		int y = random.nextInt(getHeight());
+    		Location l = new Location(x,y);
+    		if (isFree(l)) {
+    			return l;
+    		}
+    	}
+    	return null; // not found
+    }
+
+    /** returns a random free location using isFree(object) to test the availability of some possible location */ 
+    protected Location getFreePos(int obj) {
+    	for (int i=0; i<(getWidth()*getHeight()*5); i++) {
+    		int x = random.nextInt(getWidth());
+    		int y = random.nextInt(getHeight());
+    		Location l = new Location(x,y);
+    		if (isFree(obj,l)) {
+    			return l;
+    		}
+    	}
+    	return null; // not found
+    }
 }

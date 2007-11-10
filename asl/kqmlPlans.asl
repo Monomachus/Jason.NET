@@ -4,7 +4,7 @@
 // Variables:
 //   Sender:  the sender (an atom)
 //   Content: content (typically a literal)
-//   KQML_MsgId:       message id (an atom)
+//   MsgId:   message id (an atom)
 //
 
 

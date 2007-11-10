@@ -48,7 +48,7 @@ import java.util.List;
  * This class normally just calls the AgArchInfraTier methods 
  * implemented by the infrastructure tier (Centralised, Jade, Saci, ...). 
  * However, the user can customise
- * these methods overridding some of them in his/her arch. class.
+ * these methods overriding some of them in his/her arch. class.
  */
 public class AgArch {
 

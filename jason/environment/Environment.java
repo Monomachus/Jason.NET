@@ -65,7 +65,7 @@ public class Environment {
 	// set of agents that already received the last version of perception
 	private Set<String> uptodateAgs = Collections.synchronizedSet(new HashSet<String>());
 
-    private ExecutorService executor; // the thread pool used to execute actions
+    protected ExecutorService executor; // the thread pool used to execute actions
 
     private static Logger logger = Logger.getLogger(Environment.class.getName());
 
