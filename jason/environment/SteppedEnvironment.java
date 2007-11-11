@@ -101,19 +101,22 @@ public class SteppedEnvironment extends Environment {
     
     @Override
     public void scheduleAction(String agName, Structure action, Object infraData) {
-    	synchronized (requests) {
-        	if (nbAgs < 0) {
-        		// init something
-        		updateNumberOfAgents();
-            	if (stepTimeout > 0 && timeoutThread == null) {
-            		timeoutThread = new TimeOutThread(stepTimeout);
-            		timeoutThread.start();
-            	}
-        	}
-        	
-    		ActRequest newRequest = new ActRequest(agName, action, requiredSteps(agName, action), infraData);
-    		
-    		// if the agent already has an action scheduled, fail the first
+		ActRequest newRequest = new ActRequest(agName, action, requiredSteps(agName, action), infraData);
+
+		boolean startNew = false;
+		
+		synchronized (requests) { // lock access to requests
+	    	if (nbAgs < 0) {
+	    		// initialise dynamic information
+	    		// (must be in sync part, so that more agents do not start the timeout thread)
+	    		updateNumberOfAgents();
+	        	if (stepTimeout > 0 && timeoutThread == null) {
+	        		timeoutThread = new TimeOutThread(stepTimeout);
+	        		timeoutThread.start();
+	        	}
+	    	}
+
+	    	// if the agent already has an action scheduled, fail the first
     		ActRequest inSchedule = requests.get(agName);
     		if (inSchedule != null) {
     			if (overActPol == OverActionsPolicy.queue) {
@@ -129,11 +132,20 @@ public class SteppedEnvironment extends Environment {
 		
 		    	// wait all agents to sent their actions
 				if (requests.size() == nbAgs) {
-					if (timeoutThread != null) timeoutThread.allAgFinished();
-					startNewStep();
+					startNew = true;
 		    	}
     		}
     	}
+		
+		if (startNew) {
+			// starts the execution of the next step by another thread, so to not look the agent thread
+			executor.execute(new Runnable() {
+				public void run() {
+					if (timeoutThread != null) timeoutThread.allAgFinished();
+					startNewStep();
+				}
+			});			
+		}
     }
     
     private void startNewStep() {
