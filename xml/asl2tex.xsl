@@ -53,7 +53,7 @@
 </xsl:text>
         </xsl:if>
 
-	<xsl:apply-templates select="trigger" />
+        <xsl:apply-templates select="trigger" />
 
         <xsl:if test="count(context) > 0">
             <xsl:text>\\

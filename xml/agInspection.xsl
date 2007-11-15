@@ -528,19 +528,27 @@
             <xsl:text>)</xsl:text>
         </xsl:if>
         <xsl:if test="count(annotations) > 0">
-            <span style="color: rgb(0 ,190, 0)">
-                <sub>
-                    <xsl:apply-templates select="annotations" />
-                </sub>
-            </span>
+            <xsl:apply-templates select="annotations" />
         </xsl:if>
     </xsl:template>
 
+    <xsl:template match="annotations">
+            <span style="color: rgb(0 ,190, 0)">
+                <sub>
+                    <xsl:apply-templates />
+                </sub>
+            </span>
+    </xsl:template>
+    
     <xsl:template match="var-term">
         <span style="color: {$var}">
             <xsl:value-of select="@functor"/>
+            <xsl:if test="count(annotations) > 0">
+                <xsl:apply-templates select="annotations" />
+            </xsl:if>
         </span>
     </xsl:template>
+    
     <xsl:template match="number-term">
         <i><xsl:value-of select="text()"/></i>
     </xsl:template>

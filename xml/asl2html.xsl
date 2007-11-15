@@ -42,11 +42,15 @@
         
     </xsl:template>
     
-    <!-- do not show source(self) 0 -->
+    <!-- do not show source(self)  [we need to show self annot in case of some rules] -->
     <xsl:template match="annotations">
-        <xsl:if test="count(list-term/literal/structure/arguments/literal/structure[@functor = 'self']) != count(list-term/literal)">
-            <xsl:apply-templates select="list-term" />
-        </xsl:if>
+        <!-- xsl:if test="count(list-term/literal/structure/arguments/literal/structure[@functor = 'self']) != count(list-term/literal)"-->
+            <span style="color: rgb(0 ,190, 0)">
+                <sub>
+                    <xsl:apply-templates select="list-term" />
+                </sub>
+            </span>
+        <!-- /xsl:if -->
     </xsl:template>    
     
     <xsl:template match="plans">

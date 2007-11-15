@@ -35,6 +35,7 @@
 \newcommand{\aslstring}[1]{\textsf{#1}}
 \newcommand{\aslvar}[1]{\textit{#1}}
 \newcommand{\asllabel}[1]{\textbf{#1}}
+\newcommand{\annotation}[1]{{\footnotesize #1}}
 \newcommand{\rulebody}[1]{\mbox{\hspace{.05\linewidth}}\begin{minipage}[t]{0.9\linewidth}#1.\end{minipage}}
 \newcommand{\context}[1]{\begin{minipage}[t]{0.9\linewidth}#1\end{minipage}}
 \newcommand{\planbody}[1]{\begin{minipage}[t]{0.9\linewidth}#1.\end{minipage}}
@@ -210,7 +211,7 @@ Intention: </xsl:text><xsl:value-of select="@id" />
     
     
     <xsl:template match="trigger">
-        <xsl:value-of select="@add"/>
+        <xsl:value-of select="@operator"/>
         <xsl:value-of select="@type"/>
         <xsl:apply-templates />
     </xsl:template>
@@ -243,17 +244,17 @@ Intention: </xsl:text><xsl:value-of select="@id" />
             <xsl:text>)</xsl:text>
         </xsl:if>
         <xsl:if test="count(annotations) > 0">
-            <xsl:text>{\small </xsl:text>
             <xsl:apply-templates select="annotations" />
-            <xsl:text>}</xsl:text>
         </xsl:if>
     </xsl:template>
 
-    <!-- do not show source(self) 0 -->
+    <!-- do not show source(self) [we need to show self annot in case of some rules] -->
     <xsl:template match="annotations">
-        <xsl:if test="count(list-term/literal/structure/arguments/literal/structure[@functor = 'self']) != count(list-term/literal)">
+        <!-- xsl:if test="count(list-term/literal/structure/arguments/literal/structure[@functor = 'self']) != count(list-term/literal)" -->
+        	<xsl:text>\annotation{</xsl:text>
             <xsl:apply-templates select="list-term" />
-        </xsl:if>
+        	<xsl:text>}</xsl:text>
+        <!-- /xsl:if -->
     </xsl:template>    
 
 
@@ -262,6 +263,9 @@ Intention: </xsl:text><xsl:value-of select="@id" />
         <xsl:text>\aslvar{</xsl:text>
         <xsl:value-of select="@functor"/>
         <xsl:text>}</xsl:text>
+        <xsl:if test="count(annotations) > 0">
+            <xsl:apply-templates select="annotations" />
+        </xsl:if>
     </xsl:template>
     
     <xsl:template match="number-term">

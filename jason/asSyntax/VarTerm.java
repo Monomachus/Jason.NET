@@ -807,7 +807,12 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
             return value.getAsDOM(document);
         } else {
             Element u = (Element) document.createElement("var-term");
-            u.setAttribute("functor", toString());
+            u.setAttribute("functor", getFunctor());
+            if (hasAnnot()) {
+                Element ea = document.createElement("annotations");
+                ea.appendChild(getAnnots().getAsDOM(document));
+                u.appendChild(ea);
+            }
             return u;
         }
     }
