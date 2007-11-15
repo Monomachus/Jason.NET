@@ -57,7 +57,7 @@ public class ExecutionControl {
 	private int     cycleNumber = 0;
     private boolean runningCycle = true;
 
-    private int nbAgs = 0;
+    private int nbAgs = -1;
     
 	private Lock lock = new ReentrantLock();
     private Condition agFinishedCond = lock.newCondition();
@@ -94,9 +94,21 @@ public class ExecutionControl {
         runningCycle = true;
         finished.clear();
         cycleNumber++;
-        nbAgs = runtime.getAgentsQty();
+    }
+
+    
+    /** 
+     * 	Updates the number of agents in the MAS, this default
+     *  implementation, considers all agents in the MAS as actors .
+     */
+    protected void updateNumberOfAgents() {
+    	nbAgs = runtime.getAgentsQty();
     }
     
+    /** Returns the number of agents in the MAS (used to test the end of a cycle) */
+    public int getNbAgs() {
+    	return nbAgs;
+    }
 	
 	/** 
 	 * Called when the agent <i>agName</i> has finished its reasoning cycle.
@@ -104,6 +116,9 @@ public class ExecutionControl {
 	 * annotation. 
 	  */
 	public void receiveFinishedCycle(String agName, boolean breakpoint, int cycle) {
+		if (nbAgs < 0) {
+			updateNumberOfAgents();	
+		}
         if (cycle == this.cycleNumber && runningCycle) { // the agent finished the current cycle
             lock.lock();
             try {                
@@ -113,13 +128,23 @@ public class ExecutionControl {
                 }
 
                 finished.add(agName);
-                if (finished.size() >= nbAgs) {
+                if (testEndCycle(finished)) {
                     agFinishedCond.signal();
                 }
     		} finally {
     		    lock.unlock();
             }
         }
+	}
+
+	/** 
+	 * Returns true when a new cycle can start, it normally 
+	 * holds when all agents are in the finishedAgs set.
+	 *  
+	 * @param finishedAgs the set of agents' name that already finished the current cycle
+	 */ 
+	protected boolean testEndCycle(Set<String> finishedAgs) {
+		return finishedAgs.size() >= nbAgs;
 	}
 
 	public void setExecutionControlInfraTier(ExecutionControlInfraTier jasonControl) {
@@ -158,4 +183,8 @@ public class ExecutionControl {
         runningCycle = rc;
     }
     
+    @Override
+    public String toString() {
+    	return "Synchronous execution control.";
+    }    
 }

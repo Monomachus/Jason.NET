@@ -126,6 +126,16 @@ public class RunJadeMAS extends RunCentralisedMAS {
             logger.fine("Creating environment " + project.getEnvClass());
             envc = cc.createNewAgent(environmentName, JadeEnvironment.class.getName(), new Object[] { project.getEnvClass() });
 
+            // create controller
+            ClassParameters controlClass = project.getControlClass();
+            if (debug && controlClass == null) {
+                controlClass = new ClassParameters(ExecutionControlGUI.class.getName());
+            }
+            if (controlClass != null) {
+                logger.fine("Creating controller " + controlClass);
+                crtc = cc.createNewAgent(controllerName, JadeExecutionControl.class.getName(), new Object[] { controlClass });
+            }
+
             // create the agents
             for (AgentParameters ap : project.getAgents()) {
                 try {
@@ -148,16 +158,6 @@ public class RunJadeMAS extends RunCentralisedMAS {
                 }
             }
     
-            // create controller
-            ClassParameters controlClass = project.getControlClass();
-            if (debug && controlClass == null) {
-                controlClass = new ClassParameters(ExecutionControlGUI.class.getName());
-            }
-            if (controlClass != null) {
-                logger.fine("Creating controller " + controlClass);
-                crtc = cc.createNewAgent(controllerName, JadeExecutionControl.class.getName(), new Object[] { controlClass });
-            }
-            
             // create rma
             if (Config.get().getBoolean(Config.JADE_RMA)) {
                 cc.createNewAgent("RMA", jade.tools.rma.rma.class.getName(), null).start();
@@ -179,12 +179,13 @@ public class RunJadeMAS extends RunCentralisedMAS {
         try {
             envc.start();
             
+            if (crtc != null) crtc.start();
+
             // run the agents
             for (AgentController ag : ags.values()) {
                 ag.start();
             }
             
-            if (crtc != null) crtc.start();
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error starting agents.", e);            
         }

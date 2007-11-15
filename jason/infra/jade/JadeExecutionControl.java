@@ -91,19 +91,26 @@ public class JadeExecutionControl extends JadeAg implements ExecutionControlInfr
                         block(1000);
                     } else {
                         try {
+                        	// check if the message is an agent state
                             @SuppressWarnings("unused")
                             Document o = (Document)m.getContentObject();
                             logger.warning("Received agState too late! in-reply-to:"+m.getInReplyTo());
                         } catch (Exception _) {
                             try {
+                            	// check if the message is an end of cycle from some agent 
                                 final String content = m.getContent();
                                 final int p = content.indexOf(",");
                                 if (p > 0) {
+                                    final String sender  = m.getSender().getLocalName();
                                     final boolean breakpoint = Boolean.parseBoolean(content.substring(0,p));
                                     final int cycle = Integer.parseInt(content.substring(p+1));
                                     executor.execute(new Runnable() {
                                         public void run() {
-                                            userControl.receiveFinishedCycle(m.getSender().getLocalName(), breakpoint, cycle);
+                                        	try {
+                                        		userControl.receiveFinishedCycle(sender, breakpoint, cycle);
+                                        	} catch (Exception e) {
+                                                logger.log(Level.SEVERE, "Error processing end of cycle.", e);                                        		
+                                        	}
                                         }
                                     });
                                 }

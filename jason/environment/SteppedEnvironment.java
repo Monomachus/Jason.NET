@@ -9,6 +9,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
@@ -85,6 +86,12 @@ public class SteppedEnvironment extends Environment {
     	nbAgs = getEnvironmentInfraTier().getRuntimeServices().getAgentsName().size();
     }
 
+    /** Returns the number of agents in the MAS (used to test the end of a cycle) */
+    public int getNbAgs() {
+    	return nbAgs;
+    }
+    
+
     /** returns the current step counter */
     public int getStep() {
     	return step;
@@ -130,8 +137,8 @@ public class SteppedEnvironment extends Environment {
 				// store the action request 		
 				requests.put(agName, newRequest);
 		
-		    	// wait all agents to sent their actions
-				if (requests.size() == nbAgs) {
+		    	// test if all agents have sent their actions
+				if (testEndCycle(requests.keySet())) {
 					startNew = true;
 		    	}
     		}
@@ -147,6 +154,16 @@ public class SteppedEnvironment extends Environment {
 			});			
 		}
     }
+
+	/** 
+	 * Returns true when a new cycle can start, it normally 
+	 * holds when all agents are in the finishedAgs set.
+	 *  
+	 * @param finishedAgs the set of agents' name that already finished the current cycle
+	 */ 
+	protected boolean testEndCycle(Set<String> finishedAgs) {
+		return finishedAgs.size() >= nbAgs;
+	}
     
     private void startNewStep() {
     	synchronized (requests) {
