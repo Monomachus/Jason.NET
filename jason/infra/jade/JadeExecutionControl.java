@@ -82,7 +82,20 @@ public class JadeExecutionControl extends JadeAg implements ExecutionControlInfr
         executor = Executors.newFixedThreadPool(5);
         
         try {
-            // message handler for "informCycleFinished"
+            addBehaviour(new OneShotBehaviour() {
+            	@Override
+            	public void action() {
+            		userControl.updateNumberOfAgents();
+            		informAllAgsToPerformCycle(0);
+            		/*
+            		executor.execute(new Runnable() {
+            			public void run() {
+            			}
+            		});
+            		*/
+            	}
+            });
+
             addBehaviour(new CyclicBehaviour() {
                 ACLMessage m;
                 public void action() {
@@ -122,7 +135,6 @@ public class JadeExecutionControl extends JadeAg implements ExecutionControlInfr
                 }
             });
             
-            informAllAgsToPerformCycle(0);
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error starting agent", e);
         }
@@ -154,6 +166,7 @@ public class JadeExecutionControl extends JadeAg implements ExecutionControlInfr
         addBehaviour(new OneShotBehaviour() {
             public void action() {
                 try {
+                	logger.fine("Sending performCycle "+cycle+" to all agents.");
                     ACLMessage m = new ACLMessage(ACLMessage.INFORM);
                     m.setOntology(controllerOntology);
                     addAllAgsAsReceivers(m);

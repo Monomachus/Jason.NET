@@ -74,11 +74,15 @@ public class ExecutionControl {
                 try {
 					while (true) {
 						try {
-                            agFinishedCond.await(5, TimeUnit.SECONDS); // waits signal
+                            boolean to = !agFinishedCond.await(getCycleTimeout(), TimeUnit.MILLISECONDS); // waits signal
                             if (runtime != null && runningCycle) { 
                                 runningCycle = false;
                                 allAgsFinished();
 							}
+                            
+                            // update number of agents if finished by timeout
+                            if (to)
+                            	updateNumberOfAgents();
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
@@ -88,6 +92,11 @@ public class ExecutionControl {
                 }
 			}
 		}.start();
+	}
+	
+	/** returns the maximum number of milliseconds of a cycle */ 
+	protected int getCycleTimeout() {
+		return 5000;
 	}
 
     protected void startNewCycle() {
@@ -101,13 +110,18 @@ public class ExecutionControl {
      * 	Updates the number of agents in the MAS, this default
      *  implementation, considers all agents in the MAS as actors .
      */
-    protected void updateNumberOfAgents() {
-    	nbAgs = runtime.getAgentsQty();
+    public void updateNumberOfAgents() {
+    	setNbAgs(runtime.getAgentsQty());
     }
     
     /** Returns the number of agents in the MAS (used to test the end of a cycle) */
     public int getNbAgs() {
     	return nbAgs;
+    }
+    
+    /** Set the number of agents */
+    public void setNbAgs(int n) {
+    	nbAgs = n;
     }
 	
 	/** 
@@ -116,7 +130,7 @@ public class ExecutionControl {
 	 * annotation. 
 	  */
 	public void receiveFinishedCycle(String agName, boolean breakpoint, int cycle) {
-		if (nbAgs < 0) {
+		if (nbAgs < 0 || cycle != this.cycleNumber) {
 			updateNumberOfAgents();	
 		}
         if (cycle == this.cycleNumber && runningCycle) { // the agent finished the current cycle
@@ -144,7 +158,7 @@ public class ExecutionControl {
 	 * @param finishedAgs the set of agents' name that already finished the current cycle
 	 */ 
 	protected boolean testEndCycle(Set<String> finishedAgs) {
-		return finishedAgs.size() >= nbAgs;
+		return finishedAgs.size() >= getNbAgs();
 	}
 
 	public void setExecutionControlInfraTier(ExecutionControlInfraTier jasonControl) {

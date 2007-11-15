@@ -232,12 +232,14 @@ public class JadeAgArch extends JadeAg implements AgArchInfraTier {
                 m = receive();
                 if (m != null) {
                     if (logger.isLoggable(Level.FINE)) logger.fine("Received message: " + m);
+                    
                     if (isActionFeedback(m)) {
                         // ignore this message
                         continue;
                     }
-                    if  (!m.getLanguage().equals("AgentSpeak")) {
-                        logger.warning("Ignoring message where language is not AgentSpeak"+m);
+                    
+                    if (m.getLanguage() == null || !m.getLanguage().equals("AgentSpeak")) {
+                        logger.warning("Ignoring message where language is not AgentSpeak "+m);
                         continue;
                     }
                     String ilForce   = aclToKqml(m.getPerformative());

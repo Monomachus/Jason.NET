@@ -83,7 +83,7 @@ public class SteppedEnvironment extends Environment {
      *  environment.
      */
     protected void updateNumberOfAgents() {
-    	nbAgs = getEnvironmentInfraTier().getRuntimeServices().getAgentsName().size();
+    	setNbAgs(getEnvironmentInfraTier().getRuntimeServices().getAgentsName().size());
     }
 
     /** Returns the number of agents in the MAS (used to test the end of a cycle) */
@@ -91,6 +91,10 @@ public class SteppedEnvironment extends Environment {
     	return nbAgs;
     }
     
+    /** Set the number of agents */
+    public void setNbAgs(int n) {
+    	nbAgs = n;
+    }
 
     /** returns the current step counter */
     public int getStep() {
@@ -108,7 +112,7 @@ public class SteppedEnvironment extends Environment {
     
     @Override
     public void scheduleAction(String agName, Structure action, Object infraData) {
-		ActRequest newRequest = new ActRequest(agName, action, requiredSteps(agName, action), infraData);
+		ActRequest newRequest = new ActRequest(agName, action, requiredStepsForAction(agName, action), infraData);
 
 		boolean startNew = false;
 		
@@ -162,7 +166,7 @@ public class SteppedEnvironment extends Environment {
 	 * @param finishedAgs the set of agents' name that already finished the current cycle
 	 */ 
 	protected boolean testEndCycle(Set<String> finishedAgs) {
-		return finishedAgs.size() >= nbAgs;
+		return finishedAgs.size() >= getNbAgs();
 	}
     
     private void startNewStep() {
@@ -207,7 +211,7 @@ public class SteppedEnvironment extends Environment {
 				
 				// the over requests could complete the requests
 		    	// so test end of step again
-				if (requests.size() == nbAgs) {
+				if (testEndCycle(requests.keySet())) {
 					startNewStep();
 		    	}
             } catch (Exception ie) {
@@ -229,7 +233,7 @@ public class SteppedEnvironment extends Environment {
     protected void stepFinished(int step, long time, boolean timeout) {    	
     }
     
-    protected int requiredSteps(String agName, Structure action) {
+    protected int requiredStepsForAction(String agName, Structure action) {
     	return 1;
     }
     
