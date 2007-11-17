@@ -55,7 +55,7 @@ public class NewProjectGUI extends NewAgentGUI {
         // implements the environment (<package.classname>). If not filled, the
         // default class will be used.");
 
-        projInfra = new JComboBox(new String[] { "Centralised", "Saci" });
+        projInfra = new JComboBox(Config.get().getAvailableInfrastructures());
         projInfra.setSelectedIndex(0);
         createField("Infrastructure", projInfra, "Set the Infrastructure");
 

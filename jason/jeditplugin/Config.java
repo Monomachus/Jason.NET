@@ -255,6 +255,10 @@ public class Config extends Properties {
         }
     }
 
+    public String[] getAvailableInfrastructures() {
+    	return new String[] {"Centralised","Jade","Saci"};
+    }
+    
     public String getInfrastructureFactoryClass(String infraId) {
         return get("infrastructure." + infraId).toString();
     }
