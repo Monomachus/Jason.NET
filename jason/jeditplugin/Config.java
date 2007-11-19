@@ -48,16 +48,30 @@ public class Config extends Properties {
 
 	private static final long  serialVersionUID = 1L;
 
+	/** path to jason.jar */
 	public static final String JASON_JAR     = "jasonJar";
+	
+	/** path to saci.jar */
     public static final String SACI_JAR      = "saciJar";
+    
+    /** path to ant home (jar directory) */
     public static final String ANT_LIB       = "antLib";
 
+    /** path to jade.jar */
     public static final String JADE_JAR      = "jadeJar";
+    
+    /** runtime jade arguments (the same used in jade.Boot) */
     public static final String JADE_ARGS     = "jadeArgs";
+    
+    /** boolean, whether to start jade RMA or not */
     public static final String JADE_RMA      = "jadeRMA";
+
+    /** boolean, whether to start jade Sniffer or not */
     public static final String JADE_SNIFFER  = "jadeSniffer";
 
+    /** path to java home */
     public static final String JAVA_HOME     = "javaHome";
+    
     public static final String RUN_AS_THREAD = "runCentralisedInsideJIDE";
     public static final String SHELL_CMD     = "shellCommand";
     public static final String CLOSEALL      = "closeAllBeforeOpenMAS2J";
@@ -68,7 +82,10 @@ public class Config extends Properties {
     public static Config get() {
         if (singleton == null) {
             singleton = new Config();
-            singleton.load();
+            if (!singleton.load()) {
+            	singleton.fix();
+            	singleton.store();
+            }
         }
         return singleton;
     }
@@ -76,31 +93,36 @@ public class Config extends Properties {
     private Config() {
     }
 
+    /** returns the file where the user preferences are stored */
     public File getUserConfFile() {
         return new File(System.getProperties().get("user.home") + File.separator + ".jason/user.properties");
     }
 
-    public void load() {
+    /** Returns true if the file was loaded */
+    public boolean load() {
         try {
             File f = getUserConfFile();
             if (f.exists()) {
                 super.load(new FileInputStream(f));
+                return true;
             }
         } catch (Exception e) {
             System.err.println("Error reading preferences");
             e.printStackTrace();
         }
+        return false;
     }
 
     public boolean getBoolean(String key) {
         return "true".equals(get(key));
     }
 
+    /** Returns the full path to the jason.jar file */
     public String getJasonJar() {
         return getProperty(JASON_JAR);
     }
     
-    /** return the jason home based on jason.jar */
+    /** returns the jason home (based on jason.jar) */
     public String getJasonHome() {
         try {
         	return new File(getJasonJar()).getParentFile().getParent();
@@ -110,14 +132,17 @@ public class Config extends Properties {
     	return "";
     }
 
+    /** Returns the full path to the saci.jar file */
     public String getSaciJar() {
         return getProperty(SACI_JAR);
     }
 
+    /** Returns the full path to the jade.jar file */
     public String getJadeJar() {
         return getProperty(JADE_JAR);
     }
 
+    /** Return the jade args (those used in jade.Boot) */
     public String getJadeArgs() {
         return getProperty(JADE_ARGS);
     }
@@ -135,10 +160,12 @@ public class Config extends Properties {
         return as;
     }
 
+    /** Returns the path to the java  home directory */    
     public String getJavaHome() {
         return getProperty(JAVA_HOME);
     }
 
+    /** Returns the path to the ant home directory (where its jars are stored) */    
     public String getAntLib() {
         return getProperty(ANT_LIB);
     }
@@ -167,6 +194,7 @@ public class Config extends Properties {
         return getProperty(SHELL_CMD);
     }
 
+    /** Set most important parameters with default values */
     public void fix() {
         tryToFixJarFileConf(JASON_JAR, "jason.jar", 600000);
         tryToFixJarFileConf(SACI_JAR, "saci.jar", 300000);
@@ -256,7 +284,31 @@ public class Config extends Properties {
     }
 
     public String[] getAvailableInfrastructures() {
-    	return new String[] {"Centralised","Jade","Saci"};
+    	try {
+    		List<String> infras = new ArrayList<String>();
+    		infras.add("Centralised"); // set Centralised as the first
+    		for (Object k: keySet()) {
+    			String sk = k.toString();
+    			int p = sk.indexOf(".");
+    			if (p > 0 && sk.startsWith("infrastructure") && p == sk.lastIndexOf(".")) { // only one "."
+    				String newinfra = sk.substring(p+1);
+    				if (!infras.contains(newinfra)) {
+    					infras.add(newinfra);
+    				}
+    			}
+    		}
+    		if (infras.size() > 0) {
+	    		// copy infras to a array
+	    		String[] r = new String[infras.size()];
+	    		for (int i=0; i<r.length; i++) {
+	    			r[i] = infras.get(i);
+	    		}
+	    		return r;
+    		}
+    	} catch (Exception e) {
+            System.err.println("Error getting user infrastructures.");    		
+    	}
+		return new String[] {"Centralised","Jade","Saci"};
     }
     
     public String getInfrastructureFactoryClass(String infraId) {

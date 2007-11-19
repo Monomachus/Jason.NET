@@ -143,7 +143,7 @@ public class CentralisedMASLauncherAnt implements MASLauncherInfraTier {
             // create bin dir
             File bindirfile = new File(project.getDirectory()+bindir);
             if (!bindirfile.exists()) {
-                bindirfile.mkdir();
+                bindirfile.mkdirs();
             }
                 
             // write the script

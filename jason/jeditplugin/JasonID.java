@@ -440,7 +440,7 @@ public class JasonID extends JPanel implements EBComponent, RunProjectListener {
         new Thread() {
             public void run() {
 
-                // wait buffers io
+                // wait for buffers io
                 Buffer[] bufs = org.gjt.sp.jedit.jEdit.getBuffers();
                 int max = 1;
                 for (int i = 0; i < bufs.length && max < 20; i++) {
@@ -459,7 +459,7 @@ public class JasonID extends JPanel implements EBComponent, RunProjectListener {
                     return;
                 }
 
-                // launch the MAs
+                // launch the MAS
                 animation.start();
                 btStop.setEnabled(true);
                 btRun.setEnabled(false);
@@ -470,29 +470,25 @@ public class JasonID extends JPanel implements EBComponent, RunProjectListener {
                         masLauncher.stopMAS();
                     }
 
+                    // Check configuration
                     String jasonJar = Config.get().getJasonJar();
                     if (!Config.checkJar(jasonJar)) {
                         System.err.println("The path to the jason.jar file (" + jasonJar
                                 + ") was not correctly set, the MAS may not run. Go to menu Plugins->Plugins Options->Jason to configure the path.");
+                        return;
                     }
                     String javaHome = Config.get().getJavaHome();
                     if (!Config.checkJavaHomePath(javaHome)) {
                         System.err.println("The Java home directory (" + javaHome
                                 + ") was not correctly set, the MAS may not run. Go to the Plugins->Options->Jason menu to configure the path.");
+                        return;
                     }
                     String antLib = Config.get().getAntLib();
                     if (!Config.checkAntLib(antLib)) {
                         System.err.println("The ant lib directory (" + antLib
                                 + ") was not correctly set, the MAS may not run. Go to the Plugins->Options->Jason menu to configure the path.");
+                        return;
                     }
-
-                    // compile some files
-                    /*
-                     * CompileProjectJavaSources compT = new
-                     * CompileProjectJavaSources(project.getProjectJavaFiles(),
-                     * project); compT.start(); if (!compT.waitCompilation()) {
-                     * masFinished(); return; }
-                     */
 
                     masLauncher = project.getInfrastructureFactory().createMASLauncher();
                     masLauncher.setProject(project);
