@@ -169,6 +169,10 @@ public class SteppedEnvironment extends Environment {
 		return finishedAgs.size() >= getNbAgs();
 	}
     
+	/** This method is called after the execution of the action and before to send 'continue' to the agents */ 
+    protected void updateAgsPercept() {
+    }	
+	
     private void startNewStep() {
     	synchronized (requests) {
 
@@ -185,6 +189,8 @@ public class SteppedEnvironment extends Environment {
 						a.success = executeAction(a.agName, a.action);
 					}
 				}
+				
+				updateAgsPercept();
 				
 				// notify the agents about the result of the execution
 				Iterator<ActRequest> i = requests.values().iterator();
@@ -306,4 +312,3 @@ public class SteppedEnvironment extends Environment {
 		}
     }    
 }
-
