@@ -91,6 +91,7 @@ public class IntendedMeans implements Serializable {
     	return unif;
     }
 
+    /** gets the trigger event that caused the creation of this IM */
     public Trigger getTrigger() {
     	return trigger;
     }

@@ -37,6 +37,14 @@ import java.util.Stack;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+/**
+ * Represents and Intention (a stack of IntendedMeans).
+ * 
+ * The comparable sorts the intentions based on the atomic property: 
+ * atomic intentions comes first.
+ * 
+ * @author Jomi & Rafael
+ */
 public class Intention implements Serializable, Comparable<Intention> {
 
 	private static final long serialVersionUID = 1L;
@@ -148,6 +156,7 @@ public class Intention implements Serializable, Comparable<Intention> {
         return false;
     }
     
+    /** implements atomic intentions > not atomic intentions */
     public int compareTo(Intention o) {
         if (o.isAtomic && !this.isAtomic) return 1;
         if (this.isAtomic && !o.isAtomic) return -1;

@@ -24,7 +24,14 @@
 
 package jason.asSyntax;
 
-/** Represents an AgentSpeak trigger (like +!g, +p, ...) */
+/** 
+ * Represents an AgentSpeak trigger (like +!g, +p, ...).
+ * 
+ * It is composed by:
+ *    an operator (+ or -);
+ *    a type (<empty>, !, or ?);
+ *    a literal
+ */
 import jason.asSyntax.parser.as2j;
 
 import java.io.StringReader;
@@ -51,8 +58,7 @@ public class Trigger implements Cloneable {
     
 	private TEOperator operator = TEOperator.add;
     private TEType     type     = TEType.belief;
-
-	private Literal literal;
+	private Literal    literal;
 	
 	public Trigger(TEOperator op, TEType t, Literal l) {
 		literal = l;
@@ -92,7 +98,6 @@ public class Trigger implements Cloneable {
     public int hashCode() {
         return getPredicateIndicator().hashCode();
     }
-
 
 	public boolean isAchvGoal() {
 		return type == TEType.achieve;

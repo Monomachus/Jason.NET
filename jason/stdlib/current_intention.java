@@ -69,15 +69,17 @@ import jason.asSyntax.Term;
 
   </ul>
 
+  @see jason.stdlib.intend
   @see jason.stdlib.desire
-  @see jason.stdlib.drop_desire
   @see jason.stdlib.drop_all_desires
   @see jason.stdlib.drop_all_events
   @see jason.stdlib.drop_all_intentions
   @see jason.stdlib.drop_intention
-  @see jason.stdlib.intend
+  @see jason.stdlib.drop_desire
   @see jason.stdlib.succeed_goal
   @see jason.stdlib.fail_goal
+  @see jason.stdlib.suspend
+  @see jason.stdlib.resume
 */
 public class current_intention extends DefaultInternalAction {
 
