@@ -86,7 +86,7 @@ import jason.asSyntax.Term;
 
   <li> <code>.send(rafael,askOne,value(beer,X))</code>: sends
   <code>value(beer,X)</code> to the agent named rafael. This askOne is an
-  assynchronous ask since it
+  asynchronous ask since it
   does not suspend jomi's intention. If rafael has, for instance, the literal
   <code>value(beer,2)</code>
   in its belief base, this belief is automatically sent to jomi. Otherwise an event

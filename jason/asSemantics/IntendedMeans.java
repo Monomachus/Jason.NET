@@ -50,12 +50,12 @@ public class IntendedMeans implements Serializable {
     public IntendedMeans(Option opt, Trigger te) {
     	plan = (Plan)opt.getPlan().clone();
     	unif = (Unifier)opt.getUnifier().clone();
-    	Literal planLiteral = plan.getTriggerEvent().getLiteral();
+    	Literal planLiteral = plan.getTrigger().getLiteral();
     	if (planLiteral.hasAnnot()) {
     		planLiteral.getAnnots().apply(unif);
     	}
         if (te == null) {
-            trigger = plan.getTriggerEvent();
+            trigger = plan.getTrigger();
         } else {
             trigger = (Trigger)te.clone();
             trigger.getLiteral().apply(unif);

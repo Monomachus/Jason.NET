@@ -22,6 +22,7 @@ public class MAS2JParserTest extends TestCase {
         source.append("agents: ag1 [events=discard,intBels=newFocus,osfile=\"a/x.xml\"]; ag2 /home/agTest.asl agentClass mypkg.MyAgent #2; ag3 at \"x.edu\"; auctionner agentArchClass AuctionnerGUI;");
         source.append("directives: md1=mypkg.DebugDirective; md2=mypkg.LogDirective;");
         source.append("classpath: \"x.jar\"; \"../../\";");
+        source.append("aslsourcepath: \"kk\"; \".\";");
         source.append("}");
     	parser = new mas2j(new StringReader(source.toString()));
 	}

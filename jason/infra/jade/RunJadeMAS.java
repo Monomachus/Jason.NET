@@ -136,16 +136,15 @@ public class RunJadeMAS extends RunCentralisedMAS {
                 crtc = cc.createNewAgent(controllerName, JadeExecutionControl.class.getName(), new Object[] { controlClass });
             }
 
+            project.fixAgentsSrc(null);
+            
             // create the agents
             for (AgentParameters ap : project.getAgents()) {
                 try {
                     ap.setupDefault();
+
                     String agName = ap.name;
     
-                    String tmpAsSrc = ap.asSource.toString();
-                    if (!tmpAsSrc.startsWith(File.separator) && !project.getDirectory().equals("."+File.separator)) {
-                        tmpAsSrc = project.getDirectory() + tmpAsSrc;
-                    }                    
                     for (int cAg = 0; cAg < ap.qty; cAg++) {
                         String numberedAg = agName;
                         if (ap.qty > 1) numberedAg += (cAg + 1);

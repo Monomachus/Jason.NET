@@ -55,10 +55,11 @@ public class MAS2JProject {
 	private ClassParameters envClass = null; 
     private ClassParameters controlClass = null;
     private ClassParameters infrastructure = new ClassParameters("Centralised");
-    private String projectDir = "." + File.separator;
+    private String projectDir = ".";
     private File   projectFile = null;
 	private List<AgentParameters> agents = new ArrayList<AgentParameters>();
     private List<String> classpaths = new ArrayList<String>();
+    private List<String> sourcepaths = new ArrayList<String>();
     private Map<String,String> directiveClasses = new HashMap<String,String>();
     
     public static MAS2JProject parse(String file) {
@@ -80,13 +81,16 @@ public class MAS2JProject {
 	public void setDirectory(String d) {
 		if (d != null) {
 			projectDir = d;
-			if (projectDir.length() > 0) {
-				if (!projectDir.endsWith(File.separator)) {
-					projectDir += File.separator;
-				}
+			if (projectDir.endsWith(File.separator) || projectDir.endsWith("/")) {
+				projectDir = projectDir.substring(0,projectDir.length()-1);
 			}
 		}
 	}
+	
+	public boolean isDefaultDirectory() {
+		return projectDir.equals(".");
+	}
+	
 	public String getDirectory() {
 		return projectDir;
 	}
@@ -151,15 +155,22 @@ public class MAS2JProject {
 		Set<File> files = new HashSet<File>();
 		for (AgentParameters agp: agents) {
 			if (agp.asSource != null) {
-				String dir = projectDir + File.separator;
-				if (agp.asSource.toString().startsWith(File.separator)) {
-					dir = "";
-				}
-				files.add(new File(dir + agp.asSource));
+				files.add(agp.asSource);
 			}
 		}
 		return files;
 	}
+	
+	/** change the source of the agents using the source path information,
+	 *  also considers code from a jar file (if urlPrefix is not null) */
+    public void fixAgentsSrc(String urlPrefix) {
+		List<String> srcpath = getSourcePaths();
+		for (AgentParameters agp: agents) {
+			if (agp.asSource != null) {
+				agp.fixSrc(srcpath, urlPrefix);
+			}
+		}    	
+    }
 
 	public void addClassPath(String cp) {
 		if (cp.startsWith("\"")) {
@@ -170,6 +181,28 @@ public class MAS2JProject {
 
 	public List<String> getClassPaths() {
 		return classpaths;
+	}
+	
+	public void addSourcePath(String cp) {
+		if (cp.startsWith("\"")) {
+			cp = cp.substring(1,cp.length()-1);
+		}
+		sourcepaths.add(cp);
+	}
+
+	public List<String> getSourcePaths() {
+		List<String> r = new ArrayList<String>();
+		if (sourcepaths.isEmpty()) {
+			r.add(getDirectory());
+		}
+		for (String p: sourcepaths) {
+			if (isDefaultDirectory()) {
+				r.add(p);
+			} else {
+				r.add(getDirectory()+File.separator+p);
+			}
+		}
+		return r;
 	}
 
     public void addDirectiveClass(String id, ClassParameters classname) {
@@ -235,7 +268,16 @@ public class MAS2JProject {
             s.append("\n");
 		}
         
-        s.append("}");
+		// sourcepath
+		if (sourcepaths.size() > 0) {
+			s.append("    aslsourcepath: ");
+			for (String cp: sourcepaths) {
+				s.append("\""+cp+"\"; ");
+			}
+            s.append("\n");
+		}
+
+		s.append("}");
 
 		return s.toString();
 	}

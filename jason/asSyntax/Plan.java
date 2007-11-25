@@ -120,7 +120,12 @@ public class Plan extends SourceInfo implements Cloneable, Serializable {
         }
     }
     
+    /** @deprecated use getTrigger */
     public Trigger getTriggerEvent() {
+        return tevent;
+    }
+
+    public Trigger getTrigger() {
         return tevent;
     }
     
@@ -215,7 +220,7 @@ public class Plan extends SourceInfo implements Cloneable, Serializable {
         return toASString();
     }
     
-    /** returns this plan in a string compliant with AS syntax */
+    /** returns this plan in a string complaint with AS syntax */
     public String toASString() {
         return (((label == null) ? "" : "@" + label + " ") + 
                tevent + ((context == null) ? "" : " : " + context) + 

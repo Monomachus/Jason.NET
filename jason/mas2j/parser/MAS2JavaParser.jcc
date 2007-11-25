@@ -77,7 +77,7 @@ public class mas2j {
 		launcher.writeScripts(false);
 
         int step = 1;
-        System.out.println("To run your MAS, just type \"cd bin; ant\".");
+        System.out.println("To run your MAS, just type \"ant -f bin/build.xml\"");
         //System.out.println("  1. chmod u+x *.sh");
       } catch(Exception e){
 		System.err.println("mas2j: parsing errors found... \n" + e);
@@ -107,6 +107,7 @@ TOKEN : {
 |  <AT:          "at">
 |  <INFRA:       "infrastructure" >
 |  <CLASSPATH:   "classpath" >
+|  <SOURCEPATH:  "aslSourcePath" >
 
 |  <ASOEE:       "events" >
 |  <ASOEEV:      ("discard"|"requeue"|"retrieve") >
@@ -172,6 +173,8 @@ MAS2JProject mas() :           { Token soc; }
   directives()
   
   classpath()
+  
+  sourcepath()
 
   "}"
                             { return project; }
@@ -321,13 +324,20 @@ void control() :            { Token host =  null; }
 
 void classpath() :          { Token cp; }
 {
-
   [ <CLASSPATH> ":" 
     ( cp = <STRING> ";"     { project.addClassPath(cp.image); }
     )+
   ]
-
 }
+
+void sourcepath() :         { Token cp; }
+{
+  [ <SOURCEPATH> ":" 
+    ( cp = <STRING> ";"     { project.addSourcePath(cp.image); }
+    )+
+  ]
+}
+
 
 void directives() :         {  Token directiveId; ClassParameters directiveClass = null;  }
 {

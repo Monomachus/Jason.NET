@@ -592,7 +592,7 @@ public class TransitionSystem {
                 BodyLiteral g = im.removeCurrentStep(); 
                 // make the TE of finished plan ground and unify that
                 // with goal in the body
-                Literal tel = topIM.getPlan().getTriggerEvent().getLiteral();
+                Literal tel = topIM.getPlan().getTrigger().getLiteral();
                 tel.apply(topIM.unif);
                 im.unif.unifies(tel, g.getLiteralFormula());
             }

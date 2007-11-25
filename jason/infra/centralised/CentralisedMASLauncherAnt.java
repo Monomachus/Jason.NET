@@ -106,7 +106,7 @@ public class CentralisedMASLauncherAnt implements MASLauncherInfraTier {
     public void stopMAS() {
         try {
             // creating this file will stop the MAS, the runner checks for this file creation
-            File stop = new File(project.getDirectory()+RunCentralisedMAS.stopMASFileName);
+            File stop = new File(project.getDirectory()+File.separator+RunCentralisedMAS.stopMASFileName);
             stop.createNewFile();
         } catch (Exception e) {
             System.err.println("Error stoping RunCentMAS: " + e);
@@ -141,13 +141,13 @@ public class CentralisedMASLauncherAnt implements MASLauncherInfraTier {
             script = replaceMarks(script, debug);
 
             // create bin dir
-            File bindirfile = new File(project.getDirectory()+bindir);
+            File bindirfile = new File(project.getDirectory()+File.separator+bindir);
             if (!bindirfile.exists()) {
                 bindirfile.mkdirs();
             }
                 
             // write the script
-            FileWriter out = new FileWriter(project.getDirectory() + bindir + "build.xml");
+            FileWriter out = new FileWriter(project.getDirectory() + File.separator + bindir + "build.xml");
             out.write(script);
             out.close();
             return true;
@@ -211,7 +211,7 @@ public class CentralisedMASLauncherAnt implements MASLauncherInfraTier {
     }
 
     protected boolean hasCBuild() {
-    	return new File(project.getDirectory() + bindir + "c-build.xml").exists();
+    	return new File(project.getDirectory() + File.separator + bindir + "c-build.xml").exists();
     }
 
 }

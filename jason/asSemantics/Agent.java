@@ -101,6 +101,7 @@ public class Agent {
                 setASLSrc(asSrc);
     
                 if (asSrc.startsWith(Include.CRPrefix)) {
+                	// loads the class from a jar file (for example)
                 	parseAS(Agent.class.getResource(asSrc.substring(Include.CRPrefix.length())).openStream());
                 } else {
     	            // check whether source is an URL string
@@ -172,7 +173,7 @@ public class Agent {
             logger.fine("as2j: AgentSpeak program '" + asURL + "' parsed successfully!");
             return true;
         } catch (IOException e) {
-            logger.log(Level.SEVERE, "as2j: the AgentSpeak source file was not found", e);
+            logger.log(Level.SEVERE, "as2j: the AgentSpeak source file '"+asURL+"' was not found!");
         } catch (Exception e) {
             logger.log(Level.SEVERE, "as2j: error parsing \"" + asURL + "\"", e);
         }
@@ -186,7 +187,7 @@ public class Agent {
             logger.fine("as2j: AgentSpeak program '" + asFileName + "' parsed successfully!");
             return true;
         } catch (FileNotFoundException e) {
-            logger.log(Level.SEVERE, "as2j: the AgentSpeak source file was not found", e);
+            logger.log(Level.SEVERE, "as2j: the AgentSpeak source file '"+asFileName+"' was not found!");
         } catch (Exception e) {
             logger.log(Level.SEVERE, "as2j: error parsing \"" + asFileName + "\"", e);
         }

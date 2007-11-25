@@ -75,7 +75,7 @@ public class SaciAgArch extends saci.Agent implements AgArchInfraTier {
     private Logger   logger;
 
     /**
-     * Method used by SACI to initialize the agent:
+     * Method used by SACI to initialise the agent:
      * args[0] is the agent architecture class, 
      * args[1] is the user Agent class,
      * args[2] is the user BB class,

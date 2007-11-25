@@ -43,7 +43,7 @@ import jason.asSyntax.Trigger.TEOperator;
   case <i>G</i> was triggered by <code>!!G</code> (and therefore
   not a subgoal, as happens also when an "achieve" performative is used),
   the generated event is <code>-!G</code>.  A literal <i>G</i>
-  is a goal if there is a trigerring event <code>+!G</code> in any plan within
+  is a goal if there is a triggering event <code>+!G</code> in any plan within
   any intention; also note that intentions can be suspended hence appearing
   in sets E, PA, or PI of the agent's circumstance as well.
 

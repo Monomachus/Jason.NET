@@ -43,7 +43,7 @@ import jason.asSyntax.Trigger.TEType;
   
   <p>Description: remove goals <i>G</i> from the agent circumstance as if a plan
   for such goal had successfully finished. <i>G</i>
-  is a goal if there is a trigerring event <code>+!G</code> in any plan within any
+  is a goal if there is a triggering event <code>+!G</code> in any plan within any
   intention; also note that intentions can be suspended hence appearing
   in E, PA, or PI as well.
 

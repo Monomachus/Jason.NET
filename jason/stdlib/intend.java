@@ -43,7 +43,7 @@ import jason.asSyntax.Trigger.TEType;
   <p>Internal action: <b><code>.intend(<i>I</i>)</code></b>.
   
   <p>Description: checks if <i>I</i> is an intention: <i>I</i> is an intention
-  if there is a trigerring event <code>+!I</code> in any plan within an
+  if there is a triggering event <code>+!I</code> in any plan within an
   intention; just note that intentions can be suspended and appear in E, PA,
   and PI as well.
   

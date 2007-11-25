@@ -42,7 +42,7 @@ import jason.asSyntax.Trigger.TEType;
   <p>Internal action: <b><code>.drop_intention(<i>I</i>)</code></b>.
   
   <p>Description: removes intentions <i>I</i> from the set of
-  intentions of the agent (suspended intetions are also considered).
+  intentions of the agent (suspended intentions are also considered).
   No event is produced.
 
   <p>Example:<ul> 

@@ -20,7 +20,7 @@ public class JadeMASLauncherAnt extends CentralisedMASLauncherAnt implements MAS
 
     protected String replaceMarks(String script, boolean debug) {
         // create sniffer file
-        File sFile = new File(project.getDirectory()+snifferConfFile);
+        File sFile = new File(project.getDirectory()+File.separator+snifferConfFile);
         try {
             sFile.delete();
             if (Config.get().getBoolean(Config.JADE_SNIFFER)) {

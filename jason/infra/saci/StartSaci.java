@@ -97,7 +97,7 @@ class StartSaci extends Thread {
     }
 
     protected boolean hasCBuild() {
-        return new File(project.getDirectory()+ CentralisedMASLauncherAnt.bindir+"c-build.xml").exists();
+        return new File(project.getDirectory()+ File.separator+ CentralisedMASLauncherAnt.bindir+"c-build.xml").exists();
     }
 
 	synchronized void stopWaitSaciOk() {

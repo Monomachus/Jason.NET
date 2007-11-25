@@ -4,7 +4,6 @@ import jason.mas2j.AgentParameters;
 import jason.mas2j.MAS2JProject;
 import jason.mas2j.parser.mas2j;
 
-import java.io.File;
 import java.io.StringReader;
 import java.util.HashSet;
 import java.util.Set;
@@ -48,6 +47,8 @@ public class JasonProjectSideKickParser extends sidekick.SideKickParser {
         try {
             	mas2j parser = new mas2j(new StringReader(text));
             	MAS2JProject project = parser.mas();
+            	project.setDirectory(buf.getDirectory());
+            	project.fixAgentsSrc(null);
             	
             	// create nodes 
             	pd = new SideKickParsedData(buf.getName());
@@ -60,10 +61,7 @@ public class JasonProjectSideKickParser extends sidekick.SideKickParser {
             		jid.listModel.clear();
             	}
             	for (AgentParameters ap: project.getAgents()) {
-            		if (!ap.asSource.toString().startsWith(File.separator)) {
-            			ap.asSource = new File(buf.getDirectory() + ap.asSource); // add project directory in the AP
-            		}
-            	    pd.root.add(new ProjectAsset("", ap.name, buf, AG_TYPE).createTreeNode());
+            	    pd.root.add(new ProjectAsset("", ap.name + " ("+ap.asSource+")", buf, AG_TYPE).createTreeNode());
                 	
                     for (JasonID jid: jasonPluginInstance) {
                 		jid.listModel.addElement(ap);

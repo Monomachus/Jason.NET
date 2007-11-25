@@ -41,6 +41,7 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.StringReader;
 import java.util.Iterator;
@@ -313,7 +314,6 @@ public class JasonID extends JPanel implements EBComponent, RunProjectListener {
 
     /** returns the current MAS2J project */
     private Buffer getProjectBuffer() {
-
         if (view.getBuffer().getPath().endsWith(MAS2JProject.EXT)) {
             return view.getBuffer();
         }
@@ -362,6 +362,7 @@ public class JasonID extends JPanel implements EBComponent, RunProjectListener {
             MAS2JProject project = parser.mas();
             project.setDirectory(projectBufffer.getDirectory());
             project.setProjectFile(new File(projectBufffer.getPath()));
+            project.fixAgentsSrc(null);
             textArea.append(" parsed successfully!\n");
             return project;
 
@@ -384,10 +385,15 @@ public class JasonID extends JPanel implements EBComponent, RunProjectListener {
             Iterator<File> iASfile = project.getAllASFiles().iterator();
             while (iASfile.hasNext()) {
                 asFile = iASfile.next();
-                textArea.append("Parsing AgentSpeak file '" + asFile.getName() + "'...");
-                jason.asSyntax.parser.as2j parser = new jason.asSyntax.parser.as2j(new FileReader(asFile));
-                parser.agent(null);
-                textArea.append(" parsed successfully!\n");
+                try {
+	                textArea.append("Parsing AgentSpeak file '" + asFile.getName() + "'...");
+	                jason.asSyntax.parser.as2j parser = new jason.asSyntax.parser.as2j(new FileReader(asFile));
+	                parser.agent(null);
+	                textArea.append(" parsed successfully!\n");
+                } catch (FileNotFoundException ex) {
+                    textArea.append(" error: file '"+asFile+"' not found!");
+                    return false;
+                }
             }
             return true;
 
@@ -402,7 +408,7 @@ public class JasonID extends JPanel implements EBComponent, RunProjectListener {
         } catch (TokenMgrError ex) {
             textArea.append("\nmas2j: error parsing tokens ... \n" + ex + "\n");
         } catch (Exception ex) {
-            textArea.append("Error: " + ex);
+            textArea.append("\nError: " + ex);
             ex.printStackTrace();
         }
         return false;

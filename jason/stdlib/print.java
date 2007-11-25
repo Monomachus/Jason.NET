@@ -48,7 +48,7 @@ import jason.asSemantics.InternalAction;
   <p>Example:<ul> 
 
   <li> <code>.print(1,X,"bla")</code>: prints out to the console the
-  concatenation of the string representatons of the number 1, of the value of
+  concatenation of the string representations of the number 1, of the value of
   variable X, and the string "bla".</li>
 
   </ul>

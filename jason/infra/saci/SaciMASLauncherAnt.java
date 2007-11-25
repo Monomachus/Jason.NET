@@ -101,7 +101,7 @@ public class SaciMASLauncherAnt extends CentralisedMASLauncherAnt implements MAS
 
     public void writeSaciXMLScript(boolean debug) {
         try {
-            String file = project.getDirectory() + project.getSocName() + ".xml";
+            String file = project.getDirectory() + File.separator+ project.getSocName() + ".xml";
             writeSaciXMLScript(new PrintStream(new FileOutputStream(file)), debug);
         } catch (Exception e) {
             System.err.println("Error writing XML script!" + e);
@@ -144,6 +144,8 @@ public class SaciMASLauncherAnt extends CentralisedMASLauncherAnt implements MAS
         }
         out.println("\t/>");
 
+        project.fixAgentsSrc(null);
+        
         // agents
         for (AgentParameters agp: project.getAgents()) {
             out.println(getAgSaciXMLScript(agp, debug, project.getControlClass() != null));
@@ -194,7 +196,11 @@ public class SaciMASLauncherAnt extends CentralisedMASLauncherAnt implements MAS
         }
         String sBBClass = tmpBBClass.toString().replace('\"','$');
 
-        File tmpAsSrc = new File(project.getDirectory() + File.separator + agp.asSource);
+        String fname = agp.asSource.toString();
+        if (!fname.startsWith(File.separator)) {
+        	fname = project.getDirectory() + File.separator + fname;
+        }
+        File tmpAsSrc = new File(fname);
         s.append("\n\t\targs=\"" + tmpAgArchClass.className + " " + tmpAgClass.className +
                 " '" + sBBClass + "' " +
                 " '" + tmpAsSrc.getAbsolutePath() + "'" + getSaciOptsStr(agp, debug, forceSync) + "\"");

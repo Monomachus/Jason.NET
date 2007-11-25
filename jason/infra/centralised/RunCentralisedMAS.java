@@ -317,19 +317,15 @@ public class RunCentralisedMAS {
         int nbAg = 0;
         Agent pag = null;
         
+        project.fixAgentsSrc(urlPrefix);
+        
         // create the agents
         for (AgentParameters ap : project.getAgents()) {
             try {
                 ap.setupDefault();
-
+                
                 String agName = ap.name;
 
-                String tmpAsSrc = ap.asSource.toString();
-                if (!tmpAsSrc.startsWith(File.separator) && !project.getDirectory().equals("."+File.separator)) {
-                    tmpAsSrc = project.getDirectory() + tmpAsSrc;
-                }
-                tmpAsSrc = urlPrefix + tmpAsSrc;
-                
                 for (int cAg = 0; cAg < ap.qty; cAg++) {
                     nbAg++;
                     
@@ -351,7 +347,7 @@ public class RunCentralisedMAS {
                         agArch.initAg(ap.archClass.className, pag, this);
                     } else {
                         // normal creation
-                        agArch.initAg(ap.archClass.className, ap.agClass.className, ap.bbClass, tmpAsSrc, ap.getAsSetts(debug, project.getControlClass() != null), this);
+                        agArch.initAg(ap.archClass.className, ap.agClass.className, ap.bbClass, ap.asSource.toString(), ap.getAsSetts(debug, project.getControlClass() != null), this);
                     }
                     addAg(agArch);
                     
@@ -582,13 +578,11 @@ public class RunCentralisedMAS {
         JFrame frame = new JFrame("Project "+project.getSocName()+" sources");
         JTabbedPane pane = new JTabbedPane();
         frame.getContentPane().add(pane);
+        project.fixAgentsSrc(urlPrefix);
+
         for (AgentParameters ap : project.getAgents()) {
             try {
-                String tmpAsSrc = ap.asSource.toString();
-                if (!tmpAsSrc.startsWith(File.separator) && !project.getDirectory().equals("."+File.separator)) {
-                    tmpAsSrc = project.getDirectory() + tmpAsSrc;
-                }
-                tmpAsSrc = urlPrefix + tmpAsSrc;
+            	String tmpAsSrc = ap.asSource.toString();
                 
                 // read sources
                 InputStream in = null;

@@ -124,18 +124,18 @@ public class PlanLibrary implements Iterable<Plan> {
 
         planLabels.put(p.getLabel().getFunctor(), p);
 
-        if (p.getTriggerEvent().getLiteral().isVar()) {
+        if (p.getTrigger().getLiteral().isVar()) {
             varPlans.add(p);
             // add plan p in all entries
             for (List<Plan> lp: relPlans.values()) {
                 lp.add(p);
             }
         } else {
-            List<Plan> codesList = relPlans.get(p.getTriggerEvent().getPredicateIndicator());
+            List<Plan> codesList = relPlans.get(p.getTrigger().getPredicateIndicator());
             if (codesList == null) {
                 codesList = new ArrayList<Plan>();
                 codesList.addAll(varPlans);
-                relPlans.put(p.getTriggerEvent().getPredicateIndicator(), codesList);
+                relPlans.put(p.getTrigger().getPredicateIndicator(), codesList);
             }
             codesList.add(p);
         }
@@ -204,18 +204,18 @@ public class PlanLibrary implements Iterable<Plan> {
         // remove it from plans' list
         plans.remove(p);
 
-        if (p.getTriggerEvent().getLiteral().isVar()) {
+        if (p.getTrigger().getLiteral().isVar()) {
             varPlans.remove(p);
             // remove p from all entries
             for (List<Plan> lp: relPlans.values()) {
                 lp.remove(p);
             }
         } else {
-            List<Plan> codesList = relPlans.get(p.getTriggerEvent().getPredicateIndicator());
+            List<Plan> codesList = relPlans.get(p.getTrigger().getPredicateIndicator());
             codesList.remove(p);
             if (codesList.isEmpty()) {
                 // no more plans for this TE
-                relPlans.remove(p.getTriggerEvent().getPredicateIndicator());
+                relPlans.remove(p.getTrigger().getPredicateIndicator());
             }
         }
         return p;
@@ -260,7 +260,7 @@ public class PlanLibrary implements Iterable<Plan> {
 		Element eplans = (Element) document.createElement("plans");
 		String lastFunctor = null;
 		for (Plan p: plans) {
-			String currentFunctor = p.getTriggerEvent().getLiteral().getFunctor();
+			String currentFunctor = p.getTrigger().getLiteral().getFunctor();
 			if (lastFunctor != null && !currentFunctor.equals(lastFunctor)) {
 				eplans.appendChild((Element) document.createElement("new-set-of-plans"));
 			}
