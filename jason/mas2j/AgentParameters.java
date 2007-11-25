@@ -1,13 +1,11 @@
 package jason.mas2j;
 
 import jason.architecture.AgArch;
-import jason.asSemantics.Agent;
 import jason.asSyntax.directives.Include;
 import jason.bb.DefaultBeliefBase;
 import jason.runtime.Settings;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -47,46 +45,15 @@ public class AgentParameters {
     
     /** fix source of the asl code based on aslsourcepath, also considers code from a jar file (if urlPrefix is not null) */
     public boolean fixSrc(List<String> srcpath, String urlPrefix) {
-    	if (urlPrefix == null || urlPrefix.length() == 0) {
-        	if (asSource.exists()) {
-        		return true;
-        	} else if (srcpath != null) {
-        		for (String path: srcpath) {
-    				File newname = new File(path + File.separator + asSource.toString());
-    				if (newname.exists()) {
-    					try {
-							asSource = newname.getCanonicalFile();
-	    					return true;
-						} catch (IOException e) {
-							e.printStackTrace();
-						}
-    				}
-    			}
-        	}
+    	String r = Include.checkPathAndFixWithSourcePath(asSource.toString(), srcpath, urlPrefix);
+    	if (r != null) {
+    		asSource = new File(r);
+    		return true;
     	} else {
-	    	if (testURLSrc(urlPrefix + asSource)) {
-	    		return true;
-	    	} else if (srcpath != null) {
-	    		for (String path: srcpath) {
-					String newname = urlPrefix + path + File.separator + asSource;
-					if (testURLSrc(newname)) {
-						asSource = new File(newname);
-						return true;
-					}
-				}
-	    	}
+    		return false;
     	}
-    	return false;
     }
     
-    private boolean testURLSrc(String asSrc) {
-    	try {
-    		Agent.class.getResource(asSrc.substring(Include.CRPrefix.length())).openStream();
-    		return true;
-    	} catch (Exception e) {}
-    	return false;
-    }
-
     public void setAgClass(String c) {
         if (c != null) agClass = new ClassParameters(c);
     }

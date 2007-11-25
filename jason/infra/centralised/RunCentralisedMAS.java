@@ -25,6 +25,7 @@ package jason.infra.centralised;
 
 import jason.JasonException;
 import jason.asSemantics.Agent;
+import jason.asSyntax.directives.DirectiveProcessor;
 import jason.asSyntax.directives.Include;
 import jason.control.ExecutionControlGUI;
 import jason.mas2j.AgentParameters;
@@ -318,6 +319,9 @@ public class RunCentralisedMAS {
         Agent pag = null;
         
         project.fixAgentsSrc(urlPrefix);
+        
+        // set the aslSrcPath in the include
+        ((Include)DirectiveProcessor.getDirective("include")).setSourcePath(project.getSourcePaths());
         
         // create the agents
         for (AgentParameters ap : project.getAgents()) {

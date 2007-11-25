@@ -31,6 +31,8 @@ import jade.wrapper.AgentController;
 import jade.wrapper.ContainerController;
 import jade.wrapper.StaleProxyException;
 import jason.JasonException;
+import jason.asSyntax.directives.DirectiveProcessor;
+import jason.asSyntax.directives.Include;
 import jason.control.ExecutionControlGUI;
 import jason.infra.centralised.RunCentralisedMAS;
 import jason.jeditplugin.Config;
@@ -137,6 +139,9 @@ public class RunJadeMAS extends RunCentralisedMAS {
             }
 
             project.fixAgentsSrc(null);
+
+            // set the aslSrcPath in the include
+            ((Include)DirectiveProcessor.getDirective("include")).setSourcePath(project.getSourcePaths());
             
             // create the agents
             for (AgentParameters ap : project.getAgents()) {
