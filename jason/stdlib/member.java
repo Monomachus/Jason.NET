@@ -7,8 +7,7 @@ import jason.asSemantics.Unifier;
 import jason.asSyntax.ListTerm;
 import jason.asSyntax.Term;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Iterator;
 
 /**
 
@@ -44,15 +43,45 @@ import java.util.List;
 public class member extends DefaultInternalAction {
     
     @Override
-    public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
+    public Object execute(TransitionSystem ts, final Unifier un, Term[] args) throws Exception {
         try {
-            Term member = args[0];
-
             if (!args[1].isList()) {
                 throw new JasonException("The second parameter ('" + args[1] + "') to the internal action 'member' is not a list!");
             }
-            ListTerm lt = (ListTerm)args[1];
 
+            final Term member = args[0];
+            final Iterator<Term> i = ((ListTerm)args[1]).iterator();
+
+            return new Iterator<Unifier>() {
+            	Unifier c = null; // the current response (which is an unifier)
+            	
+            	public boolean hasNext() {
+            		if (c == null) // the first call of hasNext should find the first response 
+            			find();
+            		return c != null; 
+        		}
+
+            	public Unifier next() {
+            		if (c == null) find();
+            		Unifier b = c;
+            		find(); // find next response
+            		return b;
+            	}
+            	
+            	void find() {
+                    while (i.hasNext()) {
+                        c = (Unifier)un.clone();
+                    	if (c.unifiesNoUndo(member, i.next()))
+                    		return; // member found in the list, c is the current response
+                    }
+                    c = null; // no member is found, 
+            	}
+
+            	public void remove() {}
+            };
+            
+            /* -- old version of the implementation
+             * -- problem: even if the user wants only the first member, if search all
             List<Unifier> answers = new ArrayList<Unifier>();
             Unifier newUn = (Unifier)un.clone(); // clone un so as not to change it
             for (Term t: lt) {
@@ -63,6 +92,7 @@ public class member extends DefaultInternalAction {
                 }
             }                
             return answers.iterator();
+            */
         } catch (ArrayIndexOutOfBoundsException e) {
             throw new JasonException("The internal action 'member' has not received two arguments.");
         } catch (Exception e) {

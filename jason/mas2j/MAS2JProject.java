@@ -228,11 +228,14 @@ public class MAS2JProject {
 	public String toString() {
         StringBuilder s = new StringBuilder("MAS " + getSocName() + " {\n");
 		s.append("   infrastructure: "+getInfrastructure()+"\n");
-		s.append("   environment: "+getEnvClass());
-		if (envClass.host != null) {
-			s.append(" at "+envClass.host);
+		
+		if (! getEnvClass().className.equals(jason.environment.Environment.class.getName())) {
+			s.append("   environment: "+getEnvClass());
+			if (envClass.host != null) {
+				s.append(" at "+envClass.host);
+			}
+			s.append("\n");
 		}
-		s.append("\n");
 		
 		if (getControlClass() != null) {
 			s.append("   executionControl: "+getControlClass());
@@ -270,7 +273,7 @@ public class MAS2JProject {
         
 		// sourcepath
 		if (sourcepaths.size() > 0) {
-			s.append("    aslsourcepath: ");
+			s.append("    aslSourcePath: ");
 			for (String cp: sourcepaths) {
 				s.append("\""+cp+"\"; ");
 			}

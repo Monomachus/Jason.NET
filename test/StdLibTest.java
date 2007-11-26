@@ -241,9 +241,10 @@ public class StdLibTest extends TestCase {
         }
     }
 
-    public void testSubString() {
+    @SuppressWarnings("unchecked")
+	public void testSubString() {
         StringTerm s1 = new StringTermImpl("a");
-        StringTerm s2 = new StringTermImpl("bbacc");
+        StringTerm s2 = new StringTermImpl("bbacca");
 
         Term t1 = DefaultTerm.parse("a(10)");
         Term t2 = DefaultTerm.parse("[1,b(xxx,a(10))]");
@@ -253,13 +254,16 @@ public class StdLibTest extends TestCase {
         Unifier u = new Unifier();
         try {
             assertTrue((Boolean)new jason.stdlib.substring().execute(null, u, new Term[] { s1, s2 }));
-            assertTrue((Boolean)new jason.stdlib.substring().execute(null, u, new Term[] { s1, s2 , X}));
-            assertEquals(u.get("X").toString(), "2");
+            Iterator<Unifier> i = (Iterator)new jason.stdlib.substring().execute(null, u, new Term[] { s1, s2 , X});
+            assertEquals(i.next().get("X").toString(), "2");
+            assertEquals(i.next().get("X").toString(), "5");
+            assertFalse(i.hasNext());
 
             assertTrue((Boolean)new jason.stdlib.substring().execute(null, u, new Term[] { t1, t2}));
-            u = new Unifier();
-            assertTrue((Boolean)new jason.stdlib.substring().execute(null, u, new Term[] { t1, t2, X}));
-            assertEquals(u.get("X").toString(), "9");
+            i = (Iterator)new jason.stdlib.substring().execute(null, new Unifier(), new Term[] { t1, t2, X});
+            assertTrue(i.hasNext());
+            assertEquals(i.next().get("X").toString(), "9");
+            assertFalse(i.hasNext());
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -294,7 +298,7 @@ public class StdLibTest extends TestCase {
     }
     
     @SuppressWarnings("unchecked")
-    public void testMembe() throws Exception {
+    public void testMember() throws Exception {
         ListTerm l1 = ListTermImpl.parseList("[a,b,c]");
         Term ta = DefaultTerm.parse("a");
         Term td = DefaultTerm.parse("d");
@@ -330,6 +334,9 @@ public class StdLibTest extends TestCase {
         assertTrue(iteratorSize(i) == 3);
         i = (Iterator<Unifier>)new jason.stdlib.member().execute(null, u, new Term[] { tx, l1});
         assertEquals(i.next().get("X").toString(),"a");
+        assertEquals(i.next().get("X").toString(),"b");
+        assertEquals(i.next().get("X").toString(),"c");
+        assertFalse(i.hasNext());
 
         // test member(b(X),[a(1),b(2),c(3),b(4)])
         l2 = DefaultTerm.parse("[a(1),b(2),c(3),b(4)]");
