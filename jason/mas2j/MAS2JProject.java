@@ -204,6 +204,10 @@ public class MAS2JProject {
 		}
 		return r;
 	}
+	
+	public void removeSourcePath(int index) {
+		sourcepaths.remove(index);
+	}
 
     public void addDirectiveClass(String id, ClassParameters classname) {
         directiveClasses.put(id, classname.className);
