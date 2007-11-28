@@ -150,7 +150,7 @@ public class MASConsoleGUI {
         append(null, s);
     }
 
-    synchronized public void append(String agName, String s) {
+    public void append(String agName, String s) {
     	try {
             if (!frame.isVisible()) {
                 frame.setVisible(true);

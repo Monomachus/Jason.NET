@@ -165,7 +165,7 @@ public class send extends DefaultInternalAction {
         // send the message
         try {
             if (to.isList()) {
-                if (m.isAsk()) {
+                if (m.isAsk() && args.length > 3) {
                     throw new JasonException("Cannot send 'ask' to a list of receivers!");                                                   
                 } else {
                     for (Term t: (ListTerm)to) {
