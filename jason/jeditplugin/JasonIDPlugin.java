@@ -62,7 +62,7 @@ public class JasonIDPlugin extends EBPlugin {
                  * //Log.log(Log.DEBUG,this,"Add to dock"); //JasonID jid =
                  * (JasonID)d.getDockableWindow(NAME); //jid.start(); } } else {
                  */
-                SwingUtilities.invokeLater(new Thread() {
+                SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         d.addDockableWindow(NAME);
                     }
@@ -71,19 +71,23 @@ public class JasonIDPlugin extends EBPlugin {
         }
 
         if (msg != null && msg instanceof BufferUpdate) {
-            BufferUpdate bu = (BufferUpdate) msg;
+            final BufferUpdate bu = (BufferUpdate) msg;
             if ((bu.getWhat() == BufferUpdate.LOADED || bu.getWhat() == BufferUpdate.CREATED)) {
                 if (bu.getBuffer().getPath().endsWith(MAS2JProject.EXT)) {
                     //bu.getBuffer().setProperty("sidekick.parser", JasonProjectSideKickParser.ID);
 
                     if (Config.get().getBoolean(Config.CLOSEALL) && org.gjt.sp.jedit.jEdit.getViews().length > 0) {
-                        // close all other files
-                        Buffer[] bufs = org.gjt.sp.jedit.jEdit.getBuffers();
-                        for (int i = 0; i < bufs.length; i++) {
-                            if (!bufs[i].equals(bu.getBuffer())) {
-                                org.gjt.sp.jedit.jEdit.closeBuffer(org.gjt.sp.jedit.jEdit.getViews()[0], bufs[i]);
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                // close all other files
+                                Buffer[] bufs = org.gjt.sp.jedit.jEdit.getBuffers();
+                                for (int i = 0; i < bufs.length; i++) {
+                                    if (!bufs[i].equals(bu.getBuffer())) {
+                                        org.gjt.sp.jedit.jEdit.closeBuffer(org.gjt.sp.jedit.jEdit.getViews()[0], bufs[i]);
+                                    }
+                                }
                             }
-                        }
+                        });
                     }
                 }
                 //if (bu.getBuffer().getPath().endsWith(MAS2JProject.AS_EXT)) {

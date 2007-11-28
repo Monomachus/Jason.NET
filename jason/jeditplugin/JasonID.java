@@ -337,7 +337,8 @@ public class JasonID extends JPanel implements EBComponent, RunProjectListener {
     }
 
     private void saveAll() {
-        Buffer[] bufs = org.gjt.sp.jedit.jEdit.getBuffers();
+    	
+    	Buffer[] bufs = org.gjt.sp.jedit.jEdit.getBuffers();
         for (int i = 0; i < bufs.length; i++) {
             if (bufs[i].isDirty()) {
                 bufs[i].save(view, null);
