@@ -109,24 +109,34 @@ public class RunJadeMAS extends RunCentralisedMAS {
 
     }
 
-    protected void startContainer() {
-        // source based on jade.Boot
-        ProfileImpl profile = new BootProfileImpl(prepareArgs(Config.get().getJadeArrayArgs()));
-        Runtime.instance().setCloseVM(true); // Exit the JVM when there are no more containers around
-        if (profile.getBooleanProperty(Profile.MAIN, true)) 
-            cc = Runtime.instance().createMainContainer(profile);
-        else
-            cc = Runtime.instance().createAgentContainer(profile);
+    protected boolean startContainer() {
+    	try {
+	        // source based on jade.Boot
+	        ProfileImpl profile = new BootProfileImpl(prepareArgs(Config.get().getJadeArrayArgs()));
+	        Runtime.instance().setCloseVM(true); // Exit the JVM when there are no more containers around
+	        if (profile.getBooleanProperty(Profile.MAIN, true)) 
+	            cc = Runtime.instance().createMainContainer(profile);
+	        else
+	            cc = Runtime.instance().createAgentContainer(profile);
+	        return cc != null;
+    	} catch (Throwable e) {
+    		logger.warning("Error starting JADE:"+e);
+    		return false;
+    	}
     }
     
     @Override
     protected void createAg(MAS2JProject project, boolean debug) throws JasonException {
+        if (!startContainer()) return;
         try {
-            startContainer();
-            
             // create environment
             logger.fine("Creating environment " + project.getEnvClass());
             envc = cc.createNewAgent(environmentName, JadeEnvironment.class.getName(), new Object[] { project.getEnvClass() });
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Error creating the environment: ", e);
+            return;
+        }
+        try {
 
             // create controller
             ClassParameters controlClass = project.getControlClass();
@@ -180,6 +190,7 @@ public class RunJadeMAS extends RunCentralisedMAS {
 
     @Override
     protected void startAgs() {
+    	if (envc == null) return;
         try {
             envc.start();
             
