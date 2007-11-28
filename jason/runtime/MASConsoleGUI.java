@@ -51,7 +51,7 @@ public class MASConsoleGUI {
 
     private boolean              isTabbed          = false;
 
-    /** for sigleton pattern */
+    /** for singleton pattern */
     public static MASConsoleGUI get() {
         if (masConsole == null) {
             masConsole = new MASConsoleGUI("MAS Console");
@@ -69,7 +69,7 @@ public class MASConsoleGUI {
     private JTextArea           output;
     private JPanel              pBt     = null;
     private OutputStreamAdapter out;
-    private boolean     inPause = false;
+    private boolean             inPause = false;
 
     private MASConsoleGUI(String title) {
         String tabbed = LogManager.getLogManager().getProperty(isTabbedPropField);
@@ -139,8 +139,7 @@ public class MASConsoleGUI {
             while (inPause) {
                 wait();
             }
-        } catch (Exception e) {
-        }
+        } catch (Exception e) { }
     }
 
     public boolean isPause() {
@@ -151,22 +150,21 @@ public class MASConsoleGUI {
         append(null, s);
     }
 
-    public void append(String agName, String s) {
-        try {
+    synchronized public void append(String agName, String s) {
+    	try {
             if (!frame.isVisible()) {
                 frame.setVisible(true);
             }
             if (inPause) {
                 waitNotPause();
             }
-            if (isTabbed) {
+            if (isTabbed && agName != null) {
                 JTextArea ta = agsTextArea.get(agName);
-                if (ta == null && agName != null) {
+                if (ta == null) {
                     ta = new JTextArea();
                     ta.setEditable(false);
                     agsTextArea.put(agName, ta);
                     tabPane.add(agName, new JScrollPane(ta));
-
                 }
                 if (ta != null) { // no new TA was created
                     // print out
@@ -189,7 +187,10 @@ public class MASConsoleGUI {
             synchronized (this) {
                 output.append(s);
             }
-        } catch (Exception e) { }
+        } catch (Exception e) {
+        	close();
+        	System.out.println(e); 
+        }
     }
 
     public void close() {

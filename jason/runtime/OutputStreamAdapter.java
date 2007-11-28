@@ -45,7 +45,6 @@ public class OutputStreamAdapter extends PrintStream {
     
     public void setAsDefaultOut() {
         originalOut = System.out;
-    	//System.out.println("Original output is "+originalOut);
         originalErr = System.err;
         System.setOut(this);
         System.setErr(this);
@@ -58,7 +57,6 @@ public class OutputStreamAdapter extends PrintStream {
         if (originalErr != null) {
             System.setErr(originalErr);
         }
-    	//System.out.println("Original output restored to "+originalOut);
     }
     
     
