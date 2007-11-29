@@ -20,7 +20,12 @@ public class mas2j implements mas2jConstants {
       mas2j parser;
       MAS2JProject project = new MAS2JProject();
 
-      if (args.length==1) {
+      if (args.length == 0) {
+                System.out.println("mas2j: usage must be:");
+                System.out.println("      java mas2j <MASConfFile>");
+                System.out.println("Output to file build.xml");
+        return;
+      } else {
         name = args[0];
         System.err.println("mas2j: reading from file " + name + " ..." );
                 try {
@@ -29,27 +34,30 @@ public class mas2j implements mas2jConstants {
                   System.err.println("mas2j: file \"" + name + "\" not found.");
                   return;
         }
-      } else {
-                System.out.println("mas2j: usage must be:");
-                System.out.println("      java mas2j <MASConfFile>");
-                System.out.println("Output to file build.xml");
-        return;
       }
+
+      boolean runmas   = args.length >= 2 && args[1].equals("run");
+      boolean debugmas = args.length >= 2 && args[1].equals("debug");
+      if (debugmas) runmas = true;
 
       // parsing
       try {
                 project = parser.mas();
                 Config.get().fix();
-        project.setDirectory(new File(".").getAbsolutePath());
-        project.setProjectFile(new File(name));
+                File file = new File(name);
+        File directory = file.getAbsoluteFile().getParentFile();
+        project.setDirectory(directory.toString());
+        project.setProjectFile(file);
                 System.out.println("mas2j: "+name+" parsed successfully!\n");
                 MASLauncherInfraTier launcher = project.getInfrastructureFactory().createMASLauncher();
                 launcher.setProject(project);
-                launcher.writeScripts(false);
+                launcher.writeScripts(debugmas);
 
-        int step = 1;
-        System.out.println("To run your MAS, just type \"ant -f bin/build.xml\"");
-        //System.out.println("  1. chmod u+x *.sh");
+                if (runmas) {
+                    new Thread(launcher, "MAS-Launcher").start();
+                } else {
+                System.out.println("To run your MAS, just type \"ant -f bin/build.xml\"");
+            }
       } catch(Exception e){
                 System.err.println("mas2j: parsing errors found... \n" + e);
       }
