@@ -36,6 +36,8 @@ public class Message {
     
     private static int idCount = 1;
     
+    public final static String[] knownPerformatives = {"tell","untell","achieve","unachieve","askOne","askAll","tellHow", "untellHow","askHow"};
+    
     public Message() {
     }
 
@@ -75,6 +77,14 @@ public class Message {
 		return ilForce.equals("untell");
 	}
 
+	public boolean isKnownPerformative() {
+	    for (String s: knownPerformatives) {
+	        if (ilForce.equals(s)) 
+	            return true;
+	    }
+	    return false;
+	}
+	
 	public void setPropCont(Object o) {
 		propCont = o;
 	}

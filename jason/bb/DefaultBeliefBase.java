@@ -35,7 +35,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -73,8 +72,31 @@ public class DefaultBeliefBase implements BeliefBase {
 
     @SuppressWarnings("unchecked")
 	public Iterator<Literal> getPercepts() {
-    	// returns a clone so that the caller can not change the percepts
-        return ((Set<Literal>)percepts.clone()).iterator();
+        final Iterator<Literal> i = percepts.iterator();
+        return new Iterator<Literal>() {
+            Literal current = null;
+            public boolean hasNext() {
+                return i.hasNext();
+            }
+            public Literal next() {
+                current = i.next(); 
+                return current;
+            }
+            public void remove() {
+                if (current == null) {
+                    logger.warning("Trying to remove a perception, but the the next() from the iterator is not called before!");
+                }
+                // remove from percepts
+                i.remove();
+                
+                // remove the percept annot
+                current.delAnnot(BeliefBase.TPercept);
+                
+                // and also remove from the BB
+                removeFromEntry(current);
+            }
+        };
+        //return ((Set<Literal>)percepts.clone()).iterator();        
     }
 
     public boolean add(Literal l) {
@@ -85,7 +107,6 @@ public class DefaultBeliefBase implements BeliefBase {
         return add(l, index != 0);
     }
     
-    @SuppressWarnings("unchecked")
 	protected boolean add(Literal l, boolean addInEnd) {
         if (l.equals(Literal.LTrue) || l.equals(Literal.LFalse)) {
             logger.log(Level.SEVERE, "Error: <true> or <false> can not be added as beliefs.");
@@ -103,20 +124,13 @@ public class DefaultBeliefBase implements BeliefBase {
                 return true;
             }
         } else {
-            try {
-                // minimise the allocation space of terms
-                if (l.getTerms() != null)
-                    ((ArrayList) l.getTerms()).trimToSize();
-            } catch (Exception e) {
-                logger.log(Level.SEVERE, "Error trimming literal's terms!", e);
-            }
-
             BelEntry entry = belsMap.get(l.getPredicateIndicator());
             if (entry == null) {
                 entry = new BelEntry();
                 belsMap.put(l.getPredicateIndicator(), entry);
             }
             entry.add(l, addInEnd);
+            
             // add it in the percepts list
             if (l.hasAnnot(TPercept)) {
                 percepts.add(l);
@@ -126,7 +140,6 @@ public class DefaultBeliefBase implements BeliefBase {
         }
         return false;
     }
-
     
     public boolean remove(Literal l) {
         Literal bl = contains(l);
@@ -137,17 +150,7 @@ public class DefaultBeliefBase implements BeliefBase {
                     percepts.remove(bl);
                 }
                 boolean result = bl.delAnnot(l); // note that l annots can be empty, in this case, nothing is deleted!
-                if (!bl.hasSource()) {
-                    PredicateIndicator key = l.getPredicateIndicator();
-                    BelEntry entry = belsMap.get(key);
-                    entry.remove(bl);
-                    if (entry.isEmpty()) {
-                        belsMap.remove(key);
-                    }
-                    size--;
-                    result = true;
-                }
-                return result;
+                return removeFromEntry(bl) || result;
             }
         } else {
             if (logger.isLoggable(Level.FINE)) logger.fine("Does not contain " + l + " in " + belsMap);
@@ -155,6 +158,20 @@ public class DefaultBeliefBase implements BeliefBase {
         return false;
     }
 
+    private boolean removeFromEntry(Literal l) {
+        if (!l.hasSource()) {
+            PredicateIndicator key = l.getPredicateIndicator();
+            BelEntry entry = belsMap.get(key);
+            entry.remove(l);
+            if (entry.isEmpty()) {
+                belsMap.remove(key);
+            }
+            size--;
+            return true;
+        } else {
+            return false;
+        }
+    }
 
     public Iterator<Literal> iterator() {
         final Iterator<BelEntry> ibe = belsMap.values().iterator();
@@ -244,7 +261,16 @@ public class DefaultBeliefBase implements BeliefBase {
         final private List<Literal> list = new LinkedList<Literal>(); // maintains the order of the bels
         final private Map<LiteralWrapper,Literal> map = new HashMap<LiteralWrapper,Literal>(); // to fastly find contents, from literal do list index
         
+        @SuppressWarnings("unchecked")
         public void add(Literal l, boolean addInEnd) {
+            try {
+                // minimise the allocation space of terms
+                if (l.getTerms() != null)
+                    ((ArrayList) l.getTerms()).trimToSize();
+            } catch (Exception e) {
+                logger.log(Level.SEVERE, "Error trimming literal's terms!", e);
+            }
+            
             map.put(new LiteralWrapper(l), l);
             if (addInEnd) {
                 list.add(l);

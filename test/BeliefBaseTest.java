@@ -334,7 +334,7 @@ public class BeliefBaseTest extends TestCase {
         assertEquals(ag.findBel(Literal.parseLiteral("k(X,c)"), new Unifier()).toString(), "k(20,c)");
     }
     
-    public void testPercept() {
+    public void testPercept1() {
         BeliefBase bb = new DefaultBeliefBase();
         assertTrue(bb.add(Literal.parseLiteral("a[source(percept)]")));
         assertTrue(bb.add(Literal.parseLiteral("a[ag1]")));
@@ -354,6 +354,30 @@ public class BeliefBaseTest extends TestCase {
         // to remove the only source, should remove all belief
         assertEquals(bb.size(),0);
         assertEquals(iteratorSize(bb.getPercepts()),0);
+    }
+    
+    public void testPercept2() {
+        BeliefBase bb = new DefaultBeliefBase();
+        assertTrue(bb.add(Literal.parseLiteral("p1[source(percept),source(ag1)]")));
+        assertTrue(bb.add(Literal.parseLiteral("p2[source(percept),a1]")));
+        assertEquals(iteratorSize(bb.getPercepts()),2);
+        
+        Iterator<Literal> i = bb.getPercepts();
+        Literal l = i.next();
+        i.remove();
+        assertEquals(l.toString(),"p1[source(ag1)]");
+        
+        assertEquals(1,iteratorSize(bb.getPercepts()));
+        assertEquals(2,bb.size());
+        
+
+        i = bb.getPercepts();
+        l = i.next(); // get the p2
+        i.remove();
+        assertEquals(l.toString(),"p2[a1]");
+
+        assertEquals(0,iteratorSize(bb.getPercepts()));
+        assertEquals(1,bb.size());
     }
     
     

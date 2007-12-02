@@ -734,6 +734,9 @@ public class TransitionSystem {
 
     // only add External Event if it is relevant in respect to the PlanLibrary
     public void updateEvents(Event e) {
+        // Note: we have to add events even if they are not relevant to
+        // a) allow the user to override selectOption and then provide an "unknown" plan; or then
+        // b) create the failure event (it is done by SelRelPlan)
         if (e.isInternal() || C.hasListener() || ag.getPL().isRelevant(e.trigger.getPredicateIndicator())) {
             C.addEvent(e);
             if (logger.isLoggable(Level.FINE)) logger.fine("Added event " + e);

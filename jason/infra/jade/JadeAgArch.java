@@ -16,6 +16,7 @@ import jason.asSemantics.ActionExec;
 import jason.asSemantics.TransitionSystem;
 import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Literal;
+import jason.asSyntax.StringTermImpl;
 import jason.asSyntax.Term;
 import jason.infra.centralised.RunCentralisedMAS;
 import jason.mas2j.AgentParameters;
@@ -238,10 +239,6 @@ public class JadeAgArch extends JadeAg implements AgArchInfraTier {
                         continue;
                     }
                     
-                    if (m.getLanguage() == null || !m.getLanguage().equals("AgentSpeak")) {
-                        logger.warning("Ignoring message where language is not AgentSpeak "+m);
-                        continue;
-                    }
                     String ilForce   = aclToKqml(m.getPerformative());
                     String sender    = m.getSender().getLocalName();
                     String replyWith = m.getReplyWith();
@@ -252,7 +249,16 @@ public class JadeAgArch extends JadeAg implements AgArchInfraTier {
     				try {
     					propCont = m.getContentObject();
     				} catch (UnreadableException e) {
-                        propCont = m.getContent();
+                        if (m.getLanguage() == null || !m.getLanguage().equals("AgentSpeak")) {
+                            // not AS messages are treated as string 
+                            propCont = new StringTermImpl(m.getContent());
+                            
+                            // also remembers conversation ID
+                            if (!replyWith.equals("noid") && m.getConversationId() != null)
+                                conversationIds.put(replyWith, m.getConversationId());
+                        } else {
+                            propCont = m.getContent();
+                        }
     				}
                     if (propCont != null) {
                         jason.asSemantics.Message im = new jason.asSemantics.Message(ilForce, sender, getLocalName(), propCont, replyWith);

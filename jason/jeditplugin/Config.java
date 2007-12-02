@@ -149,9 +149,12 @@ public class Config extends Properties {
 
     public String[] getJadeArrayArgs() {
         List<String> ls = new ArrayList<String>();
-        StringTokenizer t = new StringTokenizer(getProperty(JADE_ARGS));
-        while (t.hasMoreTokens()) {
-            ls.add(t.nextToken());
+        String jadeargs = getProperty(JADE_ARGS);
+        if (jadeargs != null && jadeargs.length() > 0) {
+            StringTokenizer t = new StringTokenizer(jadeargs);
+            while (t.hasMoreTokens()) {
+                ls.add(t.nextToken());
+            }
         }
         String[] as = new String[ls.size()];
         for (int i=0; i<ls.size(); i++) {

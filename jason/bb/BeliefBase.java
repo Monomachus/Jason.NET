@@ -56,7 +56,11 @@ public interface BeliefBase extends Iterable<Literal>, Cloneable {
     /** Called just before the end of MAS execution */
     public void stop();
     
-    /** Adds a belief in the end of the BB, returns true if succeed */
+    /** Adds a belief in the end of the BB, returns true if succeed.
+     *  The annots of l may be changed to reflect what was changed in the BB,
+     *  for example, if l is p[a,b] in a BB with p[a], l will be changed to
+     *  p[b] to produce the event +p[b], since only the annotation b is changed
+     *  in the BB. */
     public boolean add(Literal l);
 
     /** Adds a belief in the BB at <i>index</i> position, returns true if succeed */

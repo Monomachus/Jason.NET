@@ -16,7 +16,7 @@ public class <IA_NAME> extends DefaultInternalAction {
             logger.info("not implemented!");
             return true;
         } catch (Exception e) {
-            logger.warning("Error in internal action '<IA_NAME>'! "+e);
+            logger.warning("Error in internal action '<PCK>.<IA_NAME>'! "+e);
         }
         return false;
     }

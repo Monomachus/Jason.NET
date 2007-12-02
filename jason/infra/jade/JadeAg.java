@@ -13,6 +13,8 @@ import jason.asSyntax.Term;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -39,6 +41,8 @@ public abstract class JadeAg extends Agent {
     protected static int rwid = 0; // reply-with counter
     protected boolean running = true;
     
+    protected Map<String,String> conversationIds = new HashMap<String,String>();
+    
     @Override
     public void doDelete() {
         running = false;
@@ -52,6 +56,12 @@ public abstract class JadeAg extends Agent {
     public void sendMsg(Message m) throws Exception {
         ACLMessage acl = jasonToACL(m);
         acl.addReceiver(new AID(m.getReceiver(), AID.ISLOCALNAME));
+        if (m.getInReplyTo() != null) {
+            String convid = conversationIds.get(m.getInReplyTo());
+            if (convid != null) {
+                acl.setConversationId(convid);
+            }
+        }
         send(acl);
     }
 
@@ -119,7 +129,7 @@ public abstract class JadeAg extends Agent {
         return acl;
 	}
 	
-	private int kqmlToACL(String p) {
+	public static int kqmlToACL(String p) {
 		if (p.equals("tell")) {
 			return ACLMessage.INFORM;
 		} else if (p.equals("askOne")) {
@@ -140,10 +150,10 @@ public abstract class JadeAg extends Agent {
 			return UNTELLHOW;
 		}
 		
-		return ACLMessage.UNKNOWN;			
+		return ACLMessage.getInteger(p);			
 	}
 	
-	protected String aclToKqml(int p) {
+	public static String aclToKqml(int p) {
 		switch(p) {
 		case ACLMessage.INFORM:	return "tell"; 
 		case ACLMessage.QUERY_REF: return "askOne";
@@ -155,7 +165,7 @@ public abstract class JadeAg extends Agent {
 		case TELLHOW: return "tellHow";
 		case UNTELLHOW: return "untellHow";
 		}
-		return "unknown";		
+		return ACLMessage.getPerformative(p).toLowerCase().replaceAll("-", "_");	
 	}
 	
 }

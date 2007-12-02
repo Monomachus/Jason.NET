@@ -327,7 +327,6 @@ public class Agent {
         return ts;
     }
 
-    // Accessing the agent's belief base and plans
     public BeliefBase getBB() {
         return bb;
     }
@@ -362,6 +361,18 @@ public class Agent {
                 }
             }
             if (!wasPerceived) {
+                // new version (it is sure that l is in BB, only clone l when the event is relevant)
+                perceptsInBB.remove(); // remove l as perception from BB
+                
+                if (ts.getC().hasListener() || pl.isRelevant(l.getPredicateIndicator())) {
+                    l = (Literal)l.clone();
+                    l.clearAnnots();
+                    l.addAnnot(BeliefBase.TPercept);
+                    ts.getC().addEvent(new Event(new Trigger(TEOperator.del, TEType.belief, l), Intention.EmptyInt));
+                }
+        
+                /*
+                // old version
                 // can not delete l, but l[source(percept)]
                 l = (Literal)l.clone();
                 l.clearAnnots();
@@ -369,10 +380,11 @@ public class Agent {
 	            if (bb.remove(l)) {
 	                ts.updateEvents(new Event(new Trigger(TEOperator.del, TEType.belief, l), Intention.EmptyInt));
 	            }
+	            */
             }
         }
 
-        // addBel only adds a belief when appropriate
+        // BUF only adds a belief when appropriate
         // checking all percepts for new beliefs
         for (Literal lp : percepts) {
             try {

@@ -36,9 +36,8 @@ public class mas2j implements mas2jConstants {
         }
       }
 
-      boolean runmas   = args.length >= 2 && args[1].equals("run");
       boolean debugmas = args.length >= 2 && args[1].equals("debug");
-      if (debugmas) runmas = true;
+      boolean runmas   = debugmas || args.length >= 2 && args[1].equals("run");
 
       // parsing
       try {
