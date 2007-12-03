@@ -172,5 +172,5 @@ public class ListTermTest extends TestCase {
         ListTerm lt5 = ListTermImpl.parseList("[a|[b,c]]");
         assertEquals(lt5.size(),3);
         assertEquals(lt5.getTail(), null);
-    }
+    }    
 }

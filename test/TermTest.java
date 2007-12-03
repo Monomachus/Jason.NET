@@ -569,6 +569,58 @@ public class TermTest extends TestCase {
         l1.apply(u);
         assertEquals(l1.toString(), "calc(32,33,33)");
     }
+
+    public void testAddAnnots() {
+    	Literal p1 = Literal.parseLiteral("p1");
+    	Literal p2 = Literal.parseLiteral("p2[a1,a2]");
+    	Literal p3 = Literal.parseLiteral("p3[a2,a3,a4,a5,a6,a7,a8]");
+    	
+    	p1.addAnnots(Literal.parseLiteral("p").getAnnots());
+    	assertEquals(null, p1.getAnnots());
+    	
+    	p1.addAnnots(p2.getAnnots());
+    	assertEquals(p1.getAnnots(),p2.getAnnots());
+    	
+    	p1.addAnnots(p3.getAnnots());
+    	assertEquals(8,p1.getAnnots().size());
+    }
+    
+    public void testGetSources() {
+    	Literal p1 = Literal.parseLiteral("p1");
+    	assertEquals(0, p1.getSources().size());
+    	
+    	assertEquals(1, Literal.parseLiteral("p2[source(a)]").getSources().size());
+
+    	Literal p2 = Literal.parseLiteral("p2[a1,source(ag1),a2,source(ag2),source(ag3)]");
+    	assertEquals(3, p2.getSources().size());
+    	
+    	assertEquals("[ag1,ag2,ag3]",p2.getSources().toString());	
+    }
+    
+    public void testImportAnnots() {
+    	Literal p1 = Literal.parseLiteral("p1");
+    	Literal p2 = Literal.parseLiteral("p2[a1,a2]");
+    	Literal p3 = Literal.parseLiteral("p3[a2,a3,a4,a5,a6,a7,a8]");
+    	
+    	assertTrue(p1.importAnnots(p2));
+    	assertEquals(2,p1.getAnnots().size());
+    	assertEquals(2,p2.getAnnots().size());
+
+    	assertFalse(p1.importAnnots(p2));
+    	assertEquals(2,p1.getAnnots().size());
+    	assertEquals(0,p2.getAnnots().size());
+    	
+    	assertTrue(p1.importAnnots(p3));
+    	assertEquals(8,p1.getAnnots().size());
+    	assertEquals(6,p3.getAnnots().size());
+
+    	assertFalse(p1.importAnnots(p3));
+    	assertFalse(p1.importAnnots(p2));
+    	
+    	assertTrue(p2.importAnnots(p1));
+
+    	assertEquals(8,p2.getAnnots().size());
+    }
     
 	public static void main(String[] a) {
 		new TermTest().testAnnotsUnify7();

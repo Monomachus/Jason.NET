@@ -588,7 +588,8 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
         return value != null && getValue().isList() && ((ListTerm) getValue()).contains(o);
     }
 
-    public boolean containsAll(Collection c) {
+    @SuppressWarnings("unchecked")
+	public boolean containsAll(Collection c) {
         return value != null && getValue().isList() && ((ListTerm) getValue()).containsAll(c);
     }
 
@@ -648,14 +649,16 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
             return false;
     }
 
-    public boolean removeAll(Collection c) {
+    @SuppressWarnings("unchecked")
+	public boolean removeAll(Collection c) {
         if (value != null && getValue().isList())
             return ((ListTerm) getValue()).removeAll(c);
         else
             return false;
     }
 
-    public boolean retainAll(Collection c) {
+    @SuppressWarnings("unchecked")
+	public boolean retainAll(Collection c) {
         if (value != null && getValue().isList())
             return ((ListTerm) getValue()).retainAll(c);
         else

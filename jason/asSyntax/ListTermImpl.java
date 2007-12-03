@@ -42,8 +42,8 @@ import org.w3c.dom.Element;
  * Represents a list node as in prolog .(t1,.(t2,.(t3,.))).
  * 
  * Each nth-ListTerm has both a term and the next ListTerm.
- * The last ListTem is a emptyListTerm (term==null).
- * In lists with tail ([a|X]), next is the Tail (next=X).
+ * The last ListTem is an empty ListTerm (term==null).
+ * In lists terms with a tail ([a|X]), next is the Tail (next==X, term==a).
  *
  * @author jomi
  */
@@ -174,9 +174,9 @@ public class ListTermImpl extends Structure implements ListTerm {
 	}
 
 	public boolean isGround() {
-	    Iterator i = iterator();
+	    Iterator<Term> i = iterator();
 		while (i.hasNext()) {
-			Term t = (Term)i.next();
+			Term t = i.next();
 			if (!t.isGround()) {
 				return false;
 			}
@@ -347,6 +347,7 @@ public class ListTermImpl extends Structure implements ListTerm {
 	public boolean add(Term o) {
 		return append((Term)o) != null;
 	}
+	@SuppressWarnings("unchecked")
 	public boolean addAll(Collection c) {
 		ListTerm lt = this; // where to add
 		Iterator i = c.iterator();
@@ -355,6 +356,7 @@ public class ListTermImpl extends Structure implements ListTerm {
 		}
 		return true;
 	}
+	@SuppressWarnings("unchecked")
 	public boolean addAll(int index, Collection c) {
 		Iterator i = c.iterator();
 		int p = index;
@@ -378,6 +380,7 @@ public class ListTermImpl extends Structure implements ListTerm {
 		return false;
 	}
 
+	@SuppressWarnings("unchecked")
 	public boolean containsAll(Collection c) {
 		boolean r = true;
 		Iterator i = c.iterator();
@@ -487,6 +490,7 @@ public class ListTermImpl extends Structure implements ListTerm {
 		return false;
 	}
 
+	@SuppressWarnings("unchecked")
 	public boolean removeAll(Collection c) {
 		boolean r = true;
 		Iterator i = c.iterator();
@@ -496,6 +500,7 @@ public class ListTermImpl extends Structure implements ListTerm {
 		return r;
 	}
 
+	@SuppressWarnings("unchecked")
 	public boolean retainAll(Collection c) {
 		boolean r = true;
 		Iterator i = iterator();

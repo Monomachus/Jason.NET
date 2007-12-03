@@ -55,7 +55,12 @@ public class Pred extends Structure {
 
     public Pred(Pred p) {
         this((Structure) p);
-        copyAnnot(p);
+
+        if (p.annots != null) {
+            annots = (ListTerm) p.getAnnots().clone();
+        } else {
+            annots = null;
+        }
     }
 
     public static Pred parsePred(String sPred) {
@@ -119,8 +124,11 @@ public class Pred extends Structure {
 
     public void addAnnots(List<Term> l) {
         if (l == null) return;
+        if (annots == null) annots = new ListTermImpl();
+        ListTerm tail = annots.getLast();
         for (Term t : l) {
-            addAnnot(t);
+            if (!annots.contains(t)) 
+            	tail = tail.append(t);
         }
     }
 
@@ -146,27 +154,34 @@ public class Pred extends Structure {
         return annots.contains(t);
     }
 
-    /** returns true if the pred has at leat one annot */
+    /** returns true if the pred has at least one annot */
     public boolean hasAnnot() {
         return annots != null && !annots.isEmpty();
     }
 
     /**
-     * "import" Annotations from another Predicate <i>p</i>. p will only
-     * contain the annots actually imported (for Event), for example:
-     * +b[a,b] in BB +b[b,c] will generate event <+b[a]>.
+     * "import" annots from another predicate <i>p</i>. p will be changed
+     * to contain only the annots actually imported (for Event), 
+     * for example:
+     *     p    = b[a,b] 
+     *     this = b[b,c] 
+     *     after import, p = b[a] 
+     * It is used to generate event <+b[a]>.
      * 
      * @return true if some annot was imported.
      */
     public boolean importAnnots(Pred p) {
     	boolean imported = false;
         if (p.hasAnnot()) {
+            if (annots == null) annots = new ListTermImpl();
+            ListTerm tail = annots.getLast();
+            
 	        Iterator<Term> i = p.getAnnots().iterator();
 	        while (i.hasNext()) {
 	            Term t = i.next();
 	            // p will only contain the annots actually added (for Event)
-	            if (!hasAnnot(t)) {
-	                addAnnot((Term) t.clone());
+	            if (!annots.contains(t)) {
+	            	tail = tail.append((Term) t.clone());
 	                imported = true;
 	            } else {
 	                // Remove what is not new from p
@@ -190,14 +205,6 @@ public class Pred extends Structure {
 	        }
         }
         return removed;
-    }
-
-    public void copyAnnot(Pred p) {
-        if (p.annots != null) {
-            annots = (ListTerm) p.getAnnots().clone();
-        } else {
-            annots = null;
-        }
     }
 
     /** returns true if all this predicate annots are in p's annots */
@@ -302,11 +309,12 @@ public class Pred extends Structure {
     public ListTerm getSources() {
         ListTerm ls = new ListTermImpl();
         if (annots != null) {
+            ListTerm tail = ls;
             for (Term ta : annots) {
                 if (ta.isStructure()) {
                     Structure tas = (Structure)ta;
                     if (tas.getFunctor().equals("source")) {
-                        ls.add(tas.getTerm(0));
+                        tail = tail.append(tas.getTerm(0));
                     }
                 }
             }
@@ -402,8 +410,7 @@ public class Pred extends Structure {
     }
 
     public String toString() {
-        String s;
-        s = super.toString();
+        String s = super.toString();
         if (hasAnnot())  s += annots.toString();
         return s;
     }
