@@ -11,6 +11,7 @@ import jason.asSyntax.DefaultTerm;
 import jason.asSyntax.ListTerm;
 import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Literal;
+import jason.asSyntax.NumberTermImpl;
 import jason.asSyntax.Plan;
 import jason.asSyntax.Pred;
 import jason.asSyntax.StringTerm;
@@ -347,6 +348,32 @@ public class StdLibTest extends TestCase {
         i = (Iterator<Unifier>)new jason.stdlib.member().execute(null, u, new Term[] { tb, l2});
         assertEquals(i.next().get("X").toString(),"2");
         assertEquals(i.next().get("X").toString(),"4");
+    }
+
+    public void testDelete() throws Exception {
+        ListTerm l1 = ListTermImpl.parseList("[a,b,a,c,a]");
+        Term ta = DefaultTerm.parse("a");
+        VarTerm v = new VarTerm("X");
+        
+        // test delete(a,[a,b,a,c,a])
+        Unifier u = new Unifier();
+        assertTrue((Boolean)new jason.stdlib.delete().execute(null, u, new Term[] { ta, l1, v}));
+        assertEquals("[b,c]",u.get("X").toString());
+        
+        // test delete(3,[a,b,a,c,a])
+        u = new Unifier();
+        assertTrue((Boolean)new jason.stdlib.delete().execute(null, u, new Term[] { new NumberTermImpl(3), l1, v}));
+        assertEquals("[a,b,a,a]",u.get("X").toString());
+
+        // test delete(3,"abaca")
+        u = new Unifier();
+        assertTrue((Boolean)new jason.stdlib.delete().execute(null, u, new Term[] { new NumberTermImpl(3), new StringTermImpl("abaca"), v}));
+        assertEquals("\"abaa\"",u.get("X").toString());
+
+        // test delete("a","abaca")
+        u = new Unifier();
+        assertTrue((Boolean)new jason.stdlib.delete().execute(null, u, new Term[] { new StringTermImpl("a"), new StringTermImpl("abaca"), v}));
+        assertEquals("\"bc\"",u.get("X").toString());
     }
 
     @SuppressWarnings("unchecked")

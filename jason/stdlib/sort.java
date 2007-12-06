@@ -67,6 +67,7 @@ import java.util.Collections;
   </ul>
 
   @see jason.stdlib.concat
+  @see jason.stdlib.delete
   @see jason.stdlib.length
   @see jason.stdlib.member
   @see jason.stdlib.nth

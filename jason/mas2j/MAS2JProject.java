@@ -259,7 +259,7 @@ public class MAS2JProject {
 
         // directives
         if (directiveClasses.size() > 0) {
-            s.append("    directives: ");
+            s.append("   directives: ");
             for (String d: directiveClasses.keySet()) {
                 s.append(d+"="+directiveClasses.get(d)+"; ");
             }
@@ -268,7 +268,7 @@ public class MAS2JProject {
         
 		// classpath
 		if (classpaths.size() > 0) {
-			s.append("    classpath: ");
+			s.append("   classpath: ");
 			for (String cp: classpaths) {
 				s.append("\""+cp+"\"; ");
 			}
@@ -277,7 +277,7 @@ public class MAS2JProject {
         
 		// sourcepath
 		if (sourcepaths.size() > 0) {
-			s.append("    aslSourcePath: ");
+			s.append("   aslSourcePath: ");
 			for (String cp: sourcepaths) {
 				s.append("\""+cp+"\"; ");
 			}

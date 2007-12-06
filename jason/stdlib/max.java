@@ -37,12 +37,13 @@ numbers &lt; atoms &lt; structures &lt; lists
 
 </ul>
 
-@see jason.stdlib.concat
-@see jason.stdlib.length
-@see jason.stdlib.member
-@see jason.stdlib.nth
-@see jason.stdlib.sort
-@see jason.stdlib.min
+  @see jason.stdlib.concat
+  @see jason.stdlib.delete
+  @see jason.stdlib.length
+  @see jason.stdlib.member
+  @see jason.stdlib.nth
+  @see jason.stdlib.sort
+  @see jason.stdlib.min
 
 */
 public class max extends min {

@@ -81,7 +81,7 @@ public class ExecutionControlGUI extends ExecutionControl {
     
     private int countCycles = 0; // cycles since last "Run"
     private int maxCycles = 0;   // cycles to run
-    private boolean waitAllAgs     = false; // run cycles in all agentes
+    private boolean waitAllAgs     = false; // run cycles in all agents
     private boolean waitSelectedAg = false; // run cycles in selected agent
     private boolean breakpoint     = false;
 
@@ -98,7 +98,12 @@ public class ExecutionControlGUI extends ExecutionControl {
 		initComponents();
 	}
 
-	// Inteface components
+	@Override
+    public void init(String[] args) {
+	    setListOfAgsFromInfra();
+    }
+	
+	// Interface components
 	JFrame     frame;
     JTextField jTfSteps = null;
     JComboBox  jCbWho = null;
@@ -283,6 +288,16 @@ public class ExecutionControlGUI extends ExecutionControl {
         show.put("plan-details", false);
 	}
 
+	void setListOfAgsFromInfra() {
+	    try {
+    	    for (String ag: getExecutionControlInfraTier().getRuntimeServices().getAgentsName()) {
+    	        listModel.addElement(ag);
+    	    }
+	    } catch (Exception e) {
+	        System.err.println("Error getting list of agents from infrasructure. "+e);
+	    }
+	}
+	
     @SuppressWarnings("unchecked")
     private void setupSlider() {
         int size = getCycleNumber();

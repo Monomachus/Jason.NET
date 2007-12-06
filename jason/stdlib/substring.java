@@ -23,7 +23,7 @@ import jason.asSyntax.Term;
   <p>Parameters:<ul>
   <li>+ substring (any term).<br/>
   <li>+ string (any term).<br/>
-  <li>+- position (optional -- integer): the position of
+  <li>+/- position (optional -- integer): the position of
   the string where the sub-string occurs. 
   </ul>
 
@@ -38,6 +38,7 @@ import jason.asSyntax.Term;
   </ul>
 
   @see jason.stdlib.concat
+  @see jason.stdlib.delete
   @see jason.stdlib.length
 
 */

@@ -50,11 +50,13 @@ import jason.asSyntax.Term;
   </ul>
 
   @see jason.stdlib.concat
+  @see jason.stdlib.delete
+  @see jason.stdlib.max
   @see jason.stdlib.member
+  @see jason.stdlib.min
   @see jason.stdlib.sort
   @see jason.stdlib.nth
-  @see jason.stdlib.max
-  @see jason.stdlib.min
+  @see jason.stdlib.sort
 
  */
 public class length extends DefaultInternalAction {

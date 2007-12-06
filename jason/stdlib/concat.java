@@ -39,7 +39,7 @@ import jason.asSyntax.Term;
 
   <p>Parameters:<ul>
   <li>+ arg[0] ... + arg[n-1] (any term): the terms to be concatenated.<br/>
-  <li>+- arg[n]: the result of the concatenation. 
+  <li>+/- arg[n]: the result of the concatenation. 
   </ul>
   Parameters that are not string are concatenated using the toString method of
   their class.
@@ -52,6 +52,7 @@ import jason.asSyntax.Term;
   <li> <code>.concat([a,b,c],[d,e],[f,g],X)</code>: <code>X</code> unifies with <code>[a,b,c,d,e,f,g]</code>.
   </ul>
 
+  @see jason.stdlib.delete
   @see jason.stdlib.length
   @see jason.stdlib.member
   @see jason.stdlib.sort
