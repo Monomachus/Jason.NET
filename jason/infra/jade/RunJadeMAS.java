@@ -113,11 +113,11 @@ public class RunJadeMAS extends RunCentralisedMAS {
     	try {
 	        // source based on jade.Boot
 	        ProfileImpl profile = new BootProfileImpl(prepareArgs(Config.get().getJadeArrayArgs()));
-	        Runtime.instance().setCloseVM(true); // Exit the JVM when there are no more containers around
 	        if (profile.getBooleanProperty(Profile.MAIN, true)) 
 	            cc = Runtime.instance().createMainContainer(profile);
 	        else
 	            cc = Runtime.instance().createAgentContainer(profile);
+	        //Runtime.instance().setCloseVM(true); // Exit the JVM when there are no more containers around
 	        return cc != null;
     	} catch (Throwable e) {
     		logger.warning("Error starting JADE:"+e);
@@ -214,6 +214,7 @@ public class RunJadeMAS extends RunCentralisedMAS {
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error stopping system.", e);            
         }
+        System.exit(0);
     }
     
     // CODE FROM jade.Boot
