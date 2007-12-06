@@ -4,7 +4,7 @@ import jason.asSyntax.*;
 import jason.environment.*;
 import java.util.logging.*;
 
-public class <ENV_NAME> extends jason.environment.Environment {
+public class <ENV_NAME> extends Environment {
 
     private Logger logger = Logger.getLogger("<PROJECT_NAME>."+<ENV_NAME>.class.getName());
 
