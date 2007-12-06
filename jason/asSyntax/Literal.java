@@ -265,7 +265,7 @@ public class Literal extends Pred implements LogicalFormula {
     public String getErrorMsg() {
     	String line = (getSrcLine() >= 0 ? ":"+getSrcLine() : "");
     	String ia   = (isInternalAction() ? " internal action" : "");
-        return "Error in "+ia+"'"+this+"' ("+ getSrc() + line + ")";    	
+        return "Error in "+ia+" '"+this+"' ("+ getSrc() + line + ")";    	
     }
     
     @Override
