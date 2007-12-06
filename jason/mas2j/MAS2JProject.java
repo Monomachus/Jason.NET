@@ -31,7 +31,9 @@ import jason.jeditplugin.Config;
 
 import java.io.File;
 import java.io.FileReader;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -230,15 +232,21 @@ public class MAS2JProject {
     }
 	
 	public String toString() {
-        StringBuilder s = new StringBuilder("MAS " + getSocName() + " {\n");
-		s.append("   infrastructure: "+getInfrastructure()+"\n");
+        StringBuilder s = new StringBuilder();
+        
+        s.append("/*\n");
+        s.append("    Jason Project\n\n");
+        s.append("    -- create on "+new SimpleDateFormat("MMMM dd, yyyy").format(new Date())+"\n");
+        s.append("*/\n\n");
+        s.append("MAS " + getSocName() + " {\n");
+		s.append("   infrastructure: "+getInfrastructure()+"\n\n");
 		
 		if (! getEnvClass().className.equals(jason.environment.Environment.class.getName())) {
 			s.append("   environment: "+getEnvClass());
 			if (envClass.host != null) {
 				s.append(" at "+envClass.host);
 			}
-			s.append("\n");
+			s.append("\n\n");
 		}
 		
 		if (getControlClass() != null) {
@@ -246,7 +254,7 @@ public class MAS2JProject {
 			if (getControlClass().host != null) {
 				s.append(" at "+getControlClass().host);
 			}
-			s.append("\n");
+			s.append("\n\n");
 		}
 		
 		// agents
@@ -256,6 +264,7 @@ public class MAS2JProject {
 			s.append("       "+i.next());
 			s.append("\n");
 		}
+        s.append("\n");
 
         // directives
         if (directiveClasses.size() > 0) {
