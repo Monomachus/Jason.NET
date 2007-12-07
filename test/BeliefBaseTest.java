@@ -364,8 +364,9 @@ public class BeliefBaseTest extends TestCase {
         
         Iterator<Literal> i = bb.getPercepts();
         Literal l = i.next();
+        while (!l.getFunctor().equals("p1")) l = i.next();
         i.remove();
-        assertEquals(l.toString(),"p1[source(ag1)]");
+        assertEquals("p1[source(ag1)]",l.toString());
         
         assertEquals(1,iteratorSize(bb.getPercepts()));
         assertEquals(2,bb.size());
@@ -374,7 +375,7 @@ public class BeliefBaseTest extends TestCase {
         i = bb.getPercepts();
         l = i.next(); // get the p2
         i.remove();
-        assertEquals(l.toString(),"p2[a1]");
+        assertEquals("p2[a1]",l.toString());
 
         assertEquals(0,iteratorSize(bb.getPercepts()));
         assertEquals(1,bb.size());
