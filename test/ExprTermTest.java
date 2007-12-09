@@ -100,6 +100,11 @@ public class ExprTermTest extends TestCase {
         Literal l = Literal.parseLiteral("~p(t1,t2)[a1,a2]");
         assertEquals(l.getAsListOfTerms().size(), 3);
 
+        l = Literal.parseLiteral("p(t1,t2)");
+        assertEquals(l.getAsListOfTerms().size(), 3);    
+        assertEquals(((ListTerm)l.getAsListOfTerms().get(1)).size(), 2);    
+        assertEquals(((ListTerm)l.getAsListOfTerms().get(2)).size(), 0);    
+
         ListTerm lt1 = ListTermImpl.parseList("[~p,[t1,t2],[a1,a2]]");
         assertTrue(l.equals(Literal.newFromListOfTerms(lt1)));
         ListTerm lt2 = ListTermImpl.parseList("[p,[t1,t2],[a1,a2]]");

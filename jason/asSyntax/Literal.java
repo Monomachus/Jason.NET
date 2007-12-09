@@ -319,7 +319,11 @@ public class Literal extends Pred implements LogicalFormula {
 		ListTerm lt = new ListTermImpl();
 		lt.addAll(getTerms());
 		l.add(lt);
-		l.add((ListTerm)getAnnots().clone());
+		if (hasAnnot()) {
+		    l.add((ListTerm)getAnnots().clone());
+		} else {
+		    l.add(new ListTermImpl());
+		}
 		return l;
 	}
 
