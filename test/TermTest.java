@@ -75,10 +75,10 @@ public class TermTest extends TestCase {
 		//System.out.println(new Term("pos")+"="+l3+" --> "+new Term("pos").equals(l3));
 
 		assertFalse(new Pred("pos").equals(l3));
-		assertTrue(new Pred("pos").equalsAsTerm(l3));
+		assertTrue(new Pred("pos").equalsAsStructure(l3));
 		Pred panot = new Pred("pos");
 		panot.addAnnot(new Structure("bla"));
-		assertTrue(l3.equalsAsTerm(panot));
+		assertTrue(l3.equalsAsStructure(panot));
 		
 		// basic VarTerm test
 		assertTrue(new VarTerm("X").equals(new VarTerm("X")));
@@ -328,6 +328,22 @@ public class TermTest extends TestCase {
         assertEquals(u.get("R").toString(),"[b,c,d]");
     }    
     
+    public void testApplyAnnots() {
+        Term t1 = DefaultTerm.parse("p[a,X,c,d]");
+        Unifier u = new Unifier();
+        u.unifies(new VarTerm("X"), new Atom("z"));
+        t1.apply(u);
+        assertEquals("p[a,z,c,d]",t1.toString());
+        
+        t1 = DefaultTerm.parse("p[X,b,c,d]");
+        t1.apply(u);
+        assertEquals("p[z,b,c,d]",t1.toString());
+
+        t1 = DefaultTerm.parse("p[a,b,c,X]");
+        t1.apply(u);
+        assertEquals("p[a,b,c,z]",t1.toString());
+    }
+    
     public void testTrigger() {
 		Pred p1 = new Pred("pos");
 
@@ -395,6 +411,10 @@ public class TermTest extends TestCase {
         assertTrue(new Unifier().unifies(Literal.parseLiteral("c(20)"), Literal.parseLiteral("c(20)")));
         assertTrue(new Unifier().unifies(Literal.parseLiteral("c(X)"), Literal.parseLiteral("c(20)")));
 		
+        assertTrue(new Unifier().unifies(Literal.parseLiteral("c(t)"), Literal.parseLiteral("c(t)")));
+        assertTrue(new Unifier().unifies(Literal.parseLiteral("~c(t)"), Literal.parseLiteral("~c(t)")));
+        assertFalse(new Unifier().unifies(Literal.parseLiteral("c(t)"), Literal.parseLiteral("~c(t)")));
+        assertFalse(new Unifier().unifies(Literal.parseLiteral("~c(t)"), Literal.parseLiteral("c(t)")));
 	}
 	
 	public void testSubsetAnnot() {
@@ -576,7 +596,7 @@ public class TermTest extends TestCase {
     	Literal p3 = Literal.parseLiteral("p3[a2,a3,a4,a5,a6,a7,a8]");
     	
     	p1.addAnnots(Literal.parseLiteral("p").getAnnots());
-    	assertEquals(null, p1.getAnnots());
+    	assertFalse(p1.hasAnnot());
     	
     	p1.addAnnots(p2.getAnnots());
     	assertEquals(p1.getAnnots(),p2.getAnnots());

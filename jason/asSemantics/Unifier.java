@@ -31,7 +31,6 @@ import jason.asSyntax.Trigger;
 import jason.asSyntax.VarTerm;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -139,13 +138,13 @@ public class Unifier implements Cloneable {
 	        if (np1.isVar() && np1.hasAnnot()) {
 	        	Term np1vl = function.get((VarTerm) np1);
 	        	if (np1vl.isPred()) {
-	        		((Pred) np1vl).setAnnots(null);
+	        		((Pred) np1vl).clearAnnots();
 	        	}
 	        }
 	        if (np2.isVar() && np2.hasAnnot()) {
 	        	Term np2vl = function.get((VarTerm) np2);
 	        	if (np2vl.isPred()) {
-	        		((Pred)np2vl).setAnnots(null);
+	        		((Pred)np2vl).clearAnnots();
 	        	}
 	        }
         }
@@ -240,64 +239,57 @@ public class Unifier implements Cloneable {
         
         // if any of the terms is not a structure (is a number or a
         // string), they must be equal
-        if (!t1g.isStructure() || !t2g.isStructure()) {
+        if (!t1g.isStructure() || !t2g.isStructure())
         	return t1g.equals(t2g);
-        }
 
         // both terms are structures
 
-        // if both are literal, they must have the same negated
-        if (t1g.isLiteral() && t2g.isLiteral() && ((Literal)t1g).negated() != ((Literal)t2g).negated()) {
-        	return false;
-        }
-        	
-        // if one term is literal and the other not, the literal should not be negated
-        if (t1g.isLiteral() && !t2g.isLiteral() && ((Literal)t1g).negated()) {
-        	return false;
-        }
-        if (t2g.isLiteral() && !t1g.isLiteral() && ((Literal)t2g).negated()) {
-        	return false;
-        }
-        
-        // if the first term is a predicate and the second not, the first should not have annots 
-        if (t1g.isPred() && !t2g.isPred() && ((Pred)t1g).hasAnnot()) {
-        	return false;
-        }
-        
-        // if both are predicates, the first's annots must be subset of the second's annots
-        if (t1g.isPred() && t2g.isPred()) {
-        	if ( ! ((Pred)t1g).hasSubsetAnnot((Pred)t2g, this)) {
-        		return false;
-        	}
-        }
-        
         Structure t1s = (Structure)t1g;
         Structure t2s = (Structure)t2g;
-        
-        List<Term> t1gts = t1s.getTerms();
-        List<Term> t2gts = t2s.getTerms();
 
         // different arities
-        if ((t1gts == null && t2gts != null) || (t1gts != null && t2gts == null)) {
+        final int ts = t1s.getArity();
+        if (ts != t2s.getArity())
             return false;
-        }
-        if (t1s.getArity() != t2s.getArity()) {
-            return false;
-        }
+        
+        final boolean t1islit = t1g.isLiteral();
+        final boolean t2islit = t2g.isLiteral();
+        final boolean t1isneg = t1islit && ((Literal)t1g).negated();
+        final boolean t2isneg = t2islit && ((Literal)t2g).negated();
+
+        // if both are literal, they must have the same negated
+        if (t1islit && t2islit && t1isneg != t2isneg)
+        	return false;
+        	
+        // if one term is literal and the other not, the literal should not be negated
+        if (t1islit && !t2islit && t1isneg)
+        	return false;
+        if (t2islit && !t1islit && t2isneg)
+        	return false;
+        
+        // if the first term is a predicate and the second not, the first should not have annots 
+        if (t1g.isPred() && !t2g.isPred() && ((Pred)t1g).hasAnnot())
+        	return false;
         
         // different functor
-        if (t1s.getFunctor() != null && !t1s.getFunctor().equals(t2s.getFunctor())) {
+        if (t1s.getFunctor() != null && !t1s.getFunctor().equals(t2s.getFunctor()))
             return false;
-        }
-    
+        
         // unify inner terms
         // do not use iterator! (see ListTermImpl class)
-        final int ts = t1s.getArity();
         for (int i = 0; i < ts; i++) {
             if (!unifiesNoUndo(t1s.getTerm(i), t2s.getTerm(i))) {
                 return false;
             }
         }
+
+        // if both are predicates, the first's annots must be subset of the second's annots
+        if (t1g.isPred() && t2g.isPred()) {
+            if ( ! ((Pred)t1g).hasSubsetAnnot((Pred)t2g, this)) {
+                return false;
+            }
+        }
+        
         return true;
     }
 

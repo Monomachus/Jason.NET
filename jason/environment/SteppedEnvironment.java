@@ -112,6 +112,7 @@ public class SteppedEnvironment extends Environment {
     
     @Override
     public void scheduleAction(String agName, Structure action, Object infraData) {
+        if (!isRunning()) return;
 		ActRequest newRequest = new ActRequest(agName, action, requiredStepsForAction(agName, action), infraData);
 
 		boolean startNew = false;
@@ -174,6 +175,7 @@ public class SteppedEnvironment extends Environment {
     }	
 	
     private void startNewStep() {
+        if (!isRunning()) return;
     	synchronized (requests) {
 
 			//logger.info("#"+requests.size());

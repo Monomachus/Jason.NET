@@ -54,13 +54,18 @@ public class Pred extends Structure {
     }
 
     public Pred(Pred p) {
-        this((Structure) p);
+        super(p);
 
         if (p.annots != null) {
             annots = (ListTerm) p.getAnnots().clone();
         } else {
             annots = null;
         }
+    }
+
+    /** to be used by atom */
+    protected Pred(String functor, boolean createTerms) {
+        super(functor, createTerms);
     }
 
     public static Pred parsePred(String sPred) {
@@ -96,14 +101,8 @@ public class Pred extends Structure {
     public boolean apply(Unifier u) {
     	boolean r = super.apply(u);
         if (annots != null) {
-            Iterator<ListTerm> i = annots.listTermIterator();
-            while (i.hasNext()) {
-                ListTerm lt = i.next();
-                lt.getTerm().apply(u);
-                if (lt.isTail()) {
-                    lt.getNext().apply(u);
-                }
-            }
+            boolean ra = annots.apply(u);
+            r = r || ra;
         }
         return r;
     }
@@ -374,7 +373,7 @@ public class Pred extends Structure {
     }
 
     
-    public boolean equalsAsTerm(Object p) {
+    public boolean equalsAsStructure(Object p) { // this method must be in this class, do not move (I do not remember why!)
         return super.equals((Term) p);
     }
 
@@ -395,8 +394,10 @@ public class Pred extends Structure {
                 if (c != 0) return c;
             }
 
-            if (getAnnots().size() < tAsPred.getAnnots().size()) return -1;
-            if (getAnnots().size() > tAsPred.getAnnots().size()) return 1;
+            final int ats = getAnnots().size();
+            final int ots = tAsPred.getAnnots().size(); 
+            if (ats < ots) return -1;
+            if (ats > ots) return 1;
         }
         return 0;
     }

@@ -197,8 +197,8 @@ public class BeliefBaseTest extends TestCase {
         assertFalse(c.hasSubsetAnnot(inBB));
         assertFalse(c.equals(l1));
         //System.out.println(c+" "+c.getClass().getName());
-        assertTrue(c.equalsAsTerm(l1));
-        assertTrue(l1.equalsAsTerm(c));
+        assertTrue(c.equalsAsStructure(l1));
+        assertTrue(l1.equalsAsStructure(c));
         assertTrue(bb.add(c));
         assertFalse(bb.add(c));
         
@@ -236,8 +236,8 @@ public class BeliefBaseTest extends TestCase {
 		b1.apply(u);
 		//System.out.println("b1="+b1);
 		//System.out.println("test 1");
-		assertTrue(b1.equalsAsTerm(Literal.parseLiteral("seen([a,b])")));
-		assertTrue(b1.equalsAsTerm(s));
+		assertTrue(b1.equalsAsStructure(Literal.parseLiteral("seen([a,b])")));
+		assertTrue(b1.equalsAsStructure(s));
 		assertTrue(bb.remove(b1));
 	}
 	

@@ -57,6 +57,11 @@ public class Literal extends Pred implements LogicalFormula {
 		super(functor);
 	}
 
+	/** to be used by atom */
+    protected Literal(String functor, boolean createTerms) {
+        super(functor, createTerms);
+    }
+
 	/** if pos == true, the literal is positive, otherwise it is negative */
 	public Literal(boolean pos, String functor) {
 		super(functor);
@@ -312,13 +317,9 @@ public class Literal extends Pred implements LogicalFormula {
 		ListTerm l = new ListTermImpl();
 		l.add(new Literal(type, getFunctor()));
 		ListTerm lt = new ListTermImpl();
-		if (getTerms() != null) lt.addAll(getTerms());
+		lt.addAll(getTerms());
 		l.add(lt);
-		if (hasAnnot()) {
-			l.add((ListTerm)getAnnots().clone());
-		} else {
-			l.add(new ListTermImpl());
-		}
+		l.add((ListTerm)getAnnots().clone());
 		return l;
 	}
 

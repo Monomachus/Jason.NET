@@ -23,6 +23,7 @@
 
 package jason.asSyntax;
 
+import jason.asSemantics.Unifier;
 import jason.asSyntax.parser.as2j;
 
 import java.io.StringReader;
@@ -45,7 +46,7 @@ import org.w3c.dom.Element;
  * The last ListTem is an empty ListTerm (term==null).
  * In lists terms with a tail ([a|X]), next is the Tail (next==X, term==a).
  *
- * @author jomi
+ * @author Jomi
  */
 public class ListTermImpl extends Structure implements ListTerm {
 	
@@ -55,8 +56,10 @@ public class ListTermImpl extends Structure implements ListTerm {
 	private Term term;
 	private Term next;
 	
+	// TODO: use "." as the functor of lists
+	
 	public ListTermImpl() {
-		super((String)null);
+		super((String)null, false);
 	}
 
     public static ListTerm parseList(String sList) {
@@ -141,6 +144,7 @@ public class ListTermImpl extends Structure implements ListTerm {
 	
 	/** return the this ListTerm elements (0=Term, 1=ListTerm) */
 	public List<Term> getTerms() {
+        logger.warning("Do not use getTerms in lists!");
 		List<Term> l = new ArrayList<Term>(2);
 		if (term != null) l.add(term);
 		if (next != null) l.add(next);
@@ -174,16 +178,27 @@ public class ListTermImpl extends Structure implements ListTerm {
 	}
 
 	public boolean isGround() {
-	    Iterator<Term> i = iterator();
-		while (i.hasNext()) {
-			Term t = i.next();
-			if (!t.isGround()) {
-				return false;
-			}
-		}
-		return true;
+        if (isEmpty()) {
+            return true;
+        } else if (isTail()) {
+            return false;
+        } else if (term != null && term.isGround()) {
+            return getNext().isGround();
+        }
+        return false;
 	}
-	
+
+    public boolean apply(Unifier u) {
+        if (isEmpty()) {
+            return false;
+        } else if (term != null) {
+            boolean rn = term.apply(u);
+            boolean rt = getNext().apply(u);
+            return rn || rt;
+        }
+        return false;
+    }
+
 	public boolean isTail() {
 		return next != null && next.isVar();
 	}
@@ -419,6 +434,7 @@ public class ListTermImpl extends Structure implements ListTerm {
 	}
 	public ListIterator<Term> listIterator(final int startIndex) {
         final ListTermImpl list = this;
+        // TODO: use an array list to cache get values
         return new ListIterator<Term>() {
             int pos = startIndex;
             int last = -1;

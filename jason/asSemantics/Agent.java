@@ -354,7 +354,7 @@ public class Agent {
             	Literal t = ip.next();
             	
                 // if perception t is already in BB
-                if (l.equalsAsTerm(t) && l.negated() == t.negated()) {
+                if (l.equalsAsStructure(t) && l.negated() == t.negated()) {
                     wasPerceived = true;
                     ip.remove(); // remove in percepts, since it already is in BB
                     break;

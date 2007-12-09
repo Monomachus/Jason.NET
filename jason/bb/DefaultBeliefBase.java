@@ -265,11 +265,8 @@ public class DefaultBeliefBase implements BeliefBase {
         public void add(Literal l, boolean addInEnd) {
             try {
                 // minimise the allocation space of terms
-                if (l.getTerms() != null)
-                    ((ArrayList) l.getTerms()).trimToSize();
-            } catch (Exception e) {
-                logger.log(Level.SEVERE, "Error trimming literal's terms!", e);
-            }
+                if (!l.isAtom()) ((ArrayList) l.getTerms()).trimToSize();
+            } catch (Exception e) {}
             
             map.put(new LiteralWrapper(l), l);
             if (addInEnd) {
@@ -315,7 +312,7 @@ public class DefaultBeliefBase implements BeliefBase {
             final private Literal l;
             public LiteralWrapper(Literal l) { this.l = l; }
             public int hashCode() { return l.hashCode(); }
-            public boolean equals(Object o) { return o instanceof LiteralWrapper && l.equalsAsTerm(((LiteralWrapper)o).l); }
+            public boolean equals(Object o) { return o instanceof LiteralWrapper && l.equalsAsStructure(((LiteralWrapper)o).l); }
             public String toString() { return l.toString(); }
         }
     }

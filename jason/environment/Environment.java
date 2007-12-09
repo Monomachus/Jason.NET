@@ -56,8 +56,12 @@ import java.util.logging.Logger;
  */
 public class Environment { 
 
+    private static Logger logger = Logger.getLogger(Environment.class.getName());
+
 	private List<Literal> percepts = Collections.synchronizedList(new ArrayList<Literal>());
 	private Map<String,List<Literal>>  agPercepts = new ConcurrentHashMap<String, List<Literal>>();
+
+	private boolean isRunning = true;
 	
     /** the infrastructure tier for environment (Centralised, Saci, ...) */
 	private EnvironmentInfraTier environmentInfraTier = null;
@@ -66,8 +70,6 @@ public class Environment {
 	private Set<String> uptodateAgs = Collections.synchronizedSet(new HashSet<String>());
 
     protected ExecutorService executor; // the thread pool used to execute actions
-
-    private static Logger logger = Logger.getLogger(Environment.class.getName());
 
     /** creates an environment class with n threads to execute actions requited by the agents */
     public Environment(int n) {
@@ -98,9 +100,13 @@ public class Environment {
      * environment could override it.
      */
 	public void stop() {
+	    isRunning = false;
         executor.shutdownNow();
 	}
 	
+	public boolean isRunning() {
+	    return isRunning;
+	}
 	
 	/**
 	 * Sets the infrastructure tier of the environment (saci, jade, centralised, ...)

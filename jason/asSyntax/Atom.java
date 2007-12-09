@@ -23,14 +23,16 @@
 
 package jason.asSyntax;
 
-import jason.*;
-import java.util.*;
-import java.util.logging.*;
+import jason.JasonException;
+
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Represents an atom (a structure with no arguments), it is an
  * immutable object.  It extends Literal, so can be used in place of a
- * Literal, but does not allow operations on terms and annotations.
+ * Literal, but does not allow operations on terms.
  */
 public final class Atom extends Literal {
 
@@ -38,7 +40,7 @@ public final class Atom extends Literal {
     private static Logger logger = Logger.getLogger(Atom.class.getName());
 
     public Atom(String functor) {
-        super(functor);
+        super(functor, false);
 		if (functor == null) {
             logger.log(Level.SEVERE, "Functor of an Atom should not be null!",new JasonException(""));
 		}
@@ -86,7 +88,12 @@ public final class Atom extends Literal {
     public boolean isGround() {
         return true;
     }
-
+	
+	@Override
+	public boolean hasTerm() {
+	    return false;
+	}
+	
     @Override
     public boolean equals(Object o) {
         if (o == null) return false;

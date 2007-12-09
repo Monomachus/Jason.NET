@@ -49,8 +49,10 @@ public class Structure extends DefaultTerm {
     private static Logger logger = Logger.getLogger(Structure.class.getName());
 
 	private final String functor; // immutable field
-    private List<Term> terms = null;
+    private List<Term> terms;
 
+    protected PredicateIndicator predicateIndicatorCache = null; // to not compute it all the time (is is called many many times)
+    
     public Structure(String functor) {
         //if (functor != null && Character.isUpperCase(functor.charAt(0))) {
         //    logger.warning("Are you sure you want to create a structure that begins with uppercase ("+functor+")? Should it be a VarTerm instead?");
@@ -58,14 +60,22 @@ public class Structure extends DefaultTerm {
         //if (functor != null && functor.charAt(0) == '~') {
         //    logger.warning("A functor should not start with ~ ("+functor+")!");
         //}
+        //this.functor = (functor == null ? null : functor.intern()); // it does not improve performance in test i did!
         this.functor = functor;
+        this.terms = new ArrayList<Term>(5);
     }
-
+    
     public Structure(Structure t) {
         functor = t.getFunctor();
         setTerms(t.getDeepCopyOfTerms());
         setSrcLine(t.getSrcLine());
         setSrc(t.getSrc());
+    }
+
+    /** to be used by list term and atom */
+    protected Structure(String functor, boolean createTerms) {
+        //this.functor = (functor == null ? null : functor.intern()); 
+        this.functor = functor;
     }
 
     public static Structure parse(String sTerm) {
@@ -82,8 +92,6 @@ public class Structure extends DefaultTerm {
         return functor;
     }
 
-    protected PredicateIndicator predicateIndicatorCache = null; // to not compute it all the time (is is called many many times)
-    
     /** returns functor symbol "/" arity */
     public PredicateIndicator getPredicateIndicator() {
         if (predicateIndicatorCache == null) {
@@ -105,7 +113,7 @@ public class Structure extends DefaultTerm {
         }
         return result;
     }
-    
+
     public boolean equals(Object t) {
         if (t == null) return false;
         if (t == this) return true;
@@ -118,8 +126,7 @@ public class Structure extends DefaultTerm {
 
             if (getFunctor() == null && tAsStruct.getFunctor() != null) return false;
             if (getFunctor() != null && !getFunctor().equals(tAsStruct.getFunctor())) return false;
-            if (getTerms() == null && tAsStruct.getTerms() == null) return true;
-            if (getTerms() == null || tAsStruct.getTerms() == null) return false;
+            //if (getFunctor() != tAsStruct.getFunctor()) return false;
 
             final int ts = getArity(); 
             if (ts != tAsStruct.getArity()) return false;
@@ -146,16 +153,20 @@ public class Structure extends DefaultTerm {
 		if (isList() && t.isList()) {
 			ListTerm l1 = (ListTerm)this;
 			ListTerm l2 = (ListTerm)t;
-			if (l1.size() > l2.size()) return 1;
-			if (l2.size() > l1.size()) return -1;
+			final int l1s = l1.size();
+			final int l2s = l2.size();
+			if (l1s > l2s) return 1;
+			if (l2s > l1s) return -1;
 		}
 
 		// both are list with same size,
 		// or none are list
         Structure tAsStruct = (Structure)t;
 
-        if (getArity() < tAsStruct.getArity()) return -1;
-        else if (getArity() > tAsStruct.getArity()) return 1;
+        final int ma = getArity();
+        final int oa = tAsStruct.getArity();
+        if (ma < oa) return -1;
+        if (ma > oa) return 1;
 
         int c;
         if (getFunctor() != null && tAsStruct.getFunctor() != null) {
@@ -163,7 +174,7 @@ public class Structure extends DefaultTerm {
             if (c != 0) return c;
         }
 
-        for (int i=0; i<getArity() && i<tAsStruct.getArity(); i++) {
+        for (int i=0; i<ma && i<oa; i++) {
             c = getTerm(i).compareTo(tAsStruct.getTerm(i));
             if (c != 0) return c;
         }
@@ -193,7 +204,6 @@ public class Structure extends DefaultTerm {
 
     public void addTerm(Term t) {
     	if (t == null) return;
-        if (terms == null) terms = new ArrayList<Term>();
         terms.add(t);
         predicateIndicatorCache = null;
         resetHashCodeCache();
@@ -204,8 +214,7 @@ public class Structure extends DefaultTerm {
             addTerm(t);
         }
     }
-
-    
+ 
     public void setTerms(List<Term> l) {
         terms = l;
         predicateIndicatorCache = null;
@@ -219,7 +228,7 @@ public class Structure extends DefaultTerm {
      
     /** returns the i-th term (first term is 0) */
     public Term getTerm(int i) {
-        if (terms != null && terms.size() > i) {
+        if (terms.size() > i) {
             return terms.get(i);
         } else {
             return null;
@@ -227,11 +236,7 @@ public class Structure extends DefaultTerm {
     }
 
     public int getArity() {
-        if (terms != null) {
-            return terms.size();
-        } else {
-            return 0;
-        }
+        return terms.size();
     }
     
     /** @deprecated use getArity */
@@ -244,19 +249,14 @@ public class Structure extends DefaultTerm {
     }
     
     public boolean hasTerm() {
-    	return getArity() > 0;
+    	return getArity() > 0; // should use getArity to work for list/atom
     }
     
     public Term[] getTermsArray() {
-        Term ts[] = null;
-        if (getArity() == 0) {
-            ts = new Term[0];
-        } else {
-            final int size = getArity();
-            ts = new Term[size];
-            for (int i=0; i<size; i++) { // use "for" instead of iterator for ListTerm compatibility
-                ts[i] = getTerm(i);
-            }
+        final int size = getArity();
+        Term ts[] = new Term[size];
+        for (int i=0; i<size; i++) { // use "for" instead of iterator for ListTerm compatibility
+            ts[i] = getTerm(i);
         }
         return ts;
     }
@@ -268,7 +268,7 @@ public class Structure extends DefaultTerm {
     
 	@Override
 	public boolean isAtom() {
-		return getArity() == 0 && !isList();
+		return !hasTerm() && !isList();
 	}
 
     public boolean isGround() {
@@ -333,8 +333,6 @@ public class Structure extends DefaultTerm {
     }
 
     protected List<Term> getDeepCopyOfTerms() {
-        if (terms == null) return null;
-
         List<Term> l = new ArrayList<Term>(terms.size());
         for (Term ti: terms) {
             l.add((Term)ti.clone());
@@ -345,7 +343,7 @@ public class Structure extends DefaultTerm {
     public String toString() {
         StringBuilder s = new StringBuilder();
         if (functor != null) s.append(functor);
-        if (terms != null) {
+        if (getArity() > 0) {
             s.append("(");
             Iterator<Term> i = terms.iterator();
             while (i.hasNext()) {

@@ -33,9 +33,9 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /** 
- * Immutable class fot string terms.
+ * Immutable class for string terms.
  * 
- * @author jomi
+ * @author Jomi
  */
 public final class StringTermImpl extends DefaultTerm implements StringTerm {
 
