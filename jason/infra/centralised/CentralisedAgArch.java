@@ -264,7 +264,7 @@ public class CentralisedAgArch implements Runnable, AgArchInfraTier {
         }
     }
 
-    // Deafult procedure for checking messages, move message from local mbox to C.mbox
+    // Default procedure for checking messages, move message from local mbox to C.mbox
     public void checkMail() {
         Queue<Message> tsmb = userAgArch.getTS().getC().getMailBox();
         while (!mbox.isEmpty()) {
@@ -276,7 +276,7 @@ public class CentralisedAgArch implements Runnable, AgArchInfraTier {
 
     /** called by the TS to ask the execution of an action in the environment */
     public void act(ActionExec action, List<ActionExec> feedback) {
-        logger.info("doing: " + action.getActionTerm());
+        if (logger.isLoggable(Level.INFO)) logger.info("doing: " + action.getActionTerm());
         infraEnv.act(getAgName(), action);
     }
     
@@ -294,7 +294,7 @@ public class CentralisedAgArch implements Runnable, AgArchInfraTier {
     private boolean inWaitSyncMonitor = false;
 
     /**
-     * waits for a signal to continue the execution (used in synchronized
+     * waits for a signal to continue the execution (used in synchronised
      * execution mode)
      */
     private void waitSyncSignal() {
@@ -312,7 +312,7 @@ public class CentralisedAgArch implements Runnable, AgArchInfraTier {
 
     /**
      * inform this agent that it can continue, if it is in sync mode and
-     * wainting a signal
+     * waiting a signal
      */
     public void receiveSyncSignal() {
         try {
