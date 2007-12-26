@@ -451,6 +451,7 @@ public class Circumstance implements Serializable {
                 ints.appendChild(in.getAsDOM(document));
             }
         }
+        
         // pending intentions
         for (String wip : getPendingIntentions().keySet()) {
             Intention ip = getPendingIntentions().get(wip);
@@ -458,6 +459,19 @@ public class Circumstance implements Serializable {
                 e = ip.getAsDOM(document);
                 e.setAttribute("pending", wip);
                 ints.appendChild(e);
+            }
+        }
+        if (hasPendingAction()) {
+            for (int key : getPendingActions().keySet()) {
+                ActionExec ac = getPendingActions().get(key);
+                Intention aci = ac.getIntention();
+                if (getSelectedIntention() != null && getSelectedIntention().equals(aci)) {
+                    selIntEle.setAttribute("pending", ac.getActionTerm().toString());                    
+                } else if (aci != null) {
+                    e = aci.getAsDOM(document);
+                    e.setAttribute("pending", ac.getActionTerm().toString());
+                    ints.appendChild(e);
+                }
             }
         }
 

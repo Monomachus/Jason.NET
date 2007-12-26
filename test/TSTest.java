@@ -104,4 +104,19 @@ public class TSTest extends TestCase {
         */
         
     }
+    
+    public void testCustomSelOp() {
+        assertFalse(new Test1().hasCustomSelectOption());
+        assertTrue(new Test2().hasCustomSelectOption());
+    }
+    
+    class Test1 extends Agent {
+        public void t() {}
+    }
+    class Test2 extends Agent {
+        public Option selectOption(List<Option> options) {
+            return super.selectOption(options);
+        }
+    }
+    
 }

@@ -160,6 +160,14 @@ public class SteppedEnvironment extends Environment {
 		}
     }
 
+    public Structure getActionInSchedule(String agName) {
+        ActRequest inSchedule = requests.get(agName);
+        if (inSchedule != null) {
+            return inSchedule.action;
+        }
+        return null;
+    }
+    
 	/** 
 	 * Returns true when a new cycle can start, it normally 
 	 * holds when all agents are in the finishedAgs set.

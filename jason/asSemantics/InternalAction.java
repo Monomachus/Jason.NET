@@ -38,7 +38,7 @@ public interface InternalAction {
     
     /** Executes the internal action. It should return a Boolean or
      *  an Iterator<Unifier>. A true boolean return means that the IA was
-     *  successfuly executed. An Iterator result means that there is 
+     *  successfully executed. An Iterator result means that there is 
      *  more than one answer for this IA (e.g. see member internal action). */
     Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception;
 }

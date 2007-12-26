@@ -46,6 +46,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -63,6 +64,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
+
 
 /**
  * The Agent class has the belief base and plan library of an
@@ -82,8 +85,28 @@ public class Agent {
 
     private Map<String, InternalAction> internalActions = new HashMap<String, InternalAction>();
 
+    private boolean hasCustomSelOp = true;
+    
     private Logger logger = Logger.getLogger(Agent.class.getName());
 
+    public Agent() {
+        checkCustomSelectOption();
+    }
+
+    private void checkCustomSelectOption() {
+        hasCustomSelOp = false;
+        for (Method m: this.getClass().getMethods()) {
+            if (!m.getDeclaringClass().equals(Agent.class) && m.getName().equals("selectOption")) {
+                hasCustomSelOp = true;
+            }
+        }
+    }
+    
+    public boolean hasCustomSelectOption() {
+        return hasCustomSelOp;
+    }
+    
+    
     /** Creates the TS of this agent, parses its AS source, and sets its Settings */
     public TransitionSystem initAg(AgArch arch, BeliefBase bb, String asSrc, Settings stts) throws JasonException {
         // set the agent
@@ -126,7 +149,7 @@ public class Agent {
             throw new JasonException("Error creating the agent class! - " + e);
         }
     }
-    
+
     /** 
      *  Clone BB, PL, Circumstance. 
      *  A new TS is created (based on the cloned circumstance).

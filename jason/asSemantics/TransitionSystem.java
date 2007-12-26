@@ -284,7 +284,7 @@ public class TransitionSystem {
             confP.step = State.AddIM;
             if (logger.isLoggable(Level.FINE)) logger.fine("Selected option "+confP.C.SO+" for event "+confP.C.SE);
         } else {
-            logger.warning("** selectOption returned null.");
+            logger.warning("** selectOption returned null!");
             generateGoalDeletionFromEvent(); 
             // can't carry on, no applicable plan.
             confP.step = State.ProcAct;
@@ -633,6 +633,9 @@ public class TransitionSystem {
                 if (context == null) { // context is true
                     if (ap == null) ap = new LinkedList<Option>();
                     ap.add(opt);
+                    if (!ag.hasCustomSelectOption()) { // do not find other options if the default selectOption is used (the default gets the first option)
+                        return ap;
+                    }
                 } else {
                     boolean allUnifs = opt.getPlan().isAllUnifs();
                     Iterator<Unifier> r = context.logicalConsequence(ag, opt.getUnifier());
@@ -642,6 +645,9 @@ public class TransitionSystem {
                             
                             if (ap == null) ap = new LinkedList<Option>();
                             ap.add(opt);
+                            if (!ag.hasCustomSelectOption()) { // do not find other options if the default selectOption is used (the default gets the first option)
+                                return ap;
+                            }
                             
                             if (!allUnifs) break; // returns only the first unification
                             if (r.hasNext()) {
