@@ -56,10 +56,8 @@ public class ListTermImpl extends Structure implements ListTerm {
 	private Term term;
 	private Term next;
 	
-	// TODO: use "." as the functor of lists
-	
 	public ListTermImpl() {
-		super((String)null, false);
+		super(".", false);
 	}
 
     public static ListTerm parseList(String sList) {
@@ -362,6 +360,7 @@ public class ListTermImpl extends Structure implements ListTerm {
 	public boolean add(Term o) {
 		return append((Term)o) != null;
 	}
+
 	@SuppressWarnings("unchecked")
 	public boolean addAll(Collection c) {
 		ListTerm lt = this; // where to add
@@ -371,6 +370,7 @@ public class ListTermImpl extends Structure implements ListTerm {
 		}
 		return true;
 	}
+	
 	@SuppressWarnings("unchecked")
 	public boolean addAll(int index, Collection c) {
 		Iterator i = c.iterator();
@@ -434,7 +434,6 @@ public class ListTermImpl extends Structure implements ListTerm {
 	}
 	public ListIterator<Term> listIterator(final int startIndex) {
         final ListTermImpl list = this;
-        // TODO: use an array list to cache get values
         return new ListIterator<Term>() {
             int pos = startIndex;
             int last = -1;
@@ -544,12 +543,23 @@ public class ListTermImpl extends Structure implements ListTerm {
 	}
 
 	public Object[] toArray() {
-		return getAsList().toArray();
+		return toArray(new Object[0]);
 	}
 
     @SuppressWarnings("unchecked")
-	public Object[] toArray(Object[] arg0) {
-		return getAsList().toArray(arg0);
+	public <T> T[] toArray(T[] a) {
+    	final int s = size();
+        if (a.length < s)
+            a = (T[])java.lang.reflect.Array.newInstance(a.getClass().getComponentType(), s);
+
+		int i = 0;
+        for (Term t: this) {
+        	a[i++] = (T)t;
+        }
+        if (a.length > s)
+            a[s] = null;
+
+        return a;
 	}
     
     public Element getAsDOM(Document document) {

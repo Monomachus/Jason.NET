@@ -191,4 +191,12 @@ public class ListTermTest extends TestCase {
         l = ListTermImpl.parseList("[c|T]");
         assertFalse(l.isGround());
     }
+    
+    public void testToArray() {
+        ListTerm l = ListTermImpl.parseList("[c,b,a,x,y,d]");
+        Term[] a = l.toArray(new Term[0]);
+        assertEquals(a.length,l.size());
+        assertEquals("c",a[0].toString());
+        assertEquals("d",a[a.length-1].toString());
+    }
 }
