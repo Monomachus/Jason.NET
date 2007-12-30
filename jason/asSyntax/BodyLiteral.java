@@ -47,8 +47,7 @@ public class BodyLiteral extends SourceInfo implements Cloneable {
     public BodyLiteral(BodyType t, Literal l) {
         formula = (Literal) l.clone();
         formType = t;
-        setSrcLine(l.getSrcLine());
-        setSrc(l.getSrc());
+        setSrc(l);
         if (l.isInternalAction()) {
             formType = BodyType.internalAction;
         }

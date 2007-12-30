@@ -85,6 +85,10 @@ public class Unifier implements Cloneable {
         return te1.sameType(te2) && unifies(te1.getLiteral(), te2.getLiteral());
     }
 
+    public boolean unifiesNoUndo(Trigger te1, Trigger te2) {
+        return te1.sameType(te2) && unifiesNoUndo(te1.getLiteral(), te2.getLiteral());
+    }
+
     // ----- Unify for Predicates/Literals
     
     /** this version of unifies undo the variables' mapping 
@@ -165,8 +169,11 @@ public class Unifier implements Cloneable {
             t2g.apply(this);
         }
 
+        final boolean t1gisvar = t1g.isVar();
+        final boolean t2gisvar = t2g.isVar();
+        
         // both are vars
-        if (t1g.isVar() && t2g.isVar()) {
+        if (t1gisvar && t2gisvar) {
             VarTerm t1gv = (VarTerm) t1g;
             VarTerm t2gv = (VarTerm) t2g;
             
@@ -210,7 +217,7 @@ public class Unifier implements Cloneable {
         }
 
         // t1 is var that doesn't occur in t2
-        if (t1g.isVar()) {
+        if (t1gisvar) {
             VarTerm t1gv = (VarTerm) t1g;
             // if t1g is not free, must unify values
             Term t1vl = function.get(t1gv);
@@ -223,7 +230,7 @@ public class Unifier implements Cloneable {
         }
 
         // t2 is var that doesn't occur in t1
-        if (t2g.isVar()) {
+        if (t2gisvar) {
             VarTerm t2gv = (VarTerm) t2g;
             // if t1g is not free, must unify values
             Term t2vl = function.get(t2gv);

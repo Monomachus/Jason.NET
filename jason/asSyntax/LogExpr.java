@@ -105,9 +105,8 @@ public class LogExpr implements LogicalFormula {
     }
     
 	
-    public Iterator<Unifier> logicalConsequence(final Agent ag, Unifier un) {
+    public Iterator<Unifier> logicalConsequence(final Agent ag, final Unifier un) {
         try {
-	        final Iterator<Unifier> ileft;
 	        switch (op) {
 	        
 	        case not:
@@ -117,43 +116,47 @@ public class LogExpr implements LogicalFormula {
 	            break;
 	        
 	        case and:
-	            ileft = lhs.logicalConsequence(ag,un);
 	            return new Iterator<Unifier>() {
-	                Unifier current = null;
-	                Iterator<Unifier> iright = null;
+	                Iterator<Unifier> ileft   = lhs.logicalConsequence(ag,un);;
+                    Iterator<Unifier> iright  = null;
+	                Unifier           current = null;
+	                
 	                public boolean hasNext() {
-	                    if (current == null) get();
+	                    if (current == null) 
+	                        get();
 	                    return current != null;
 	                }
 	                public Unifier next() {
-	                    if (current == null) get();
+	                    if (current == null) 
+	                        get();
 	                    Unifier a = current;
 	                    current = null;
 	                    return a;
 	                }
 	                private void get() {
 	                    current = null;
-	                    while ((iright == null || !iright.hasNext()) && ileft.hasNext()) {
+	                    while ((iright == null || !iright.hasNext()) && ileft.hasNext())
 	                        iright = rhs.logicalConsequence(ag, ileft.next());
-	                    }
-	                    if (iright != null && iright.hasNext()) {
+	                    if (iright != null && iright.hasNext())
 	                        current = iright.next();
-	                    }
 	                }
 	                public void remove() {}
 	            };
 	            
 	        case or:
-	            ileft = lhs.logicalConsequence(ag,un);
-	            final Iterator<Unifier> iright = rhs.logicalConsequence(ag,un);
 	            return new Iterator<Unifier>() {
-	                Unifier current = null;
+	                Iterator<Unifier> ileft  = lhs.logicalConsequence(ag,un);
+	                Iterator<Unifier> iright = null;
+	                Unifier current          = null;
+	                
 	                public boolean hasNext() {
-	                    if (current == null) get();
+	                    if (current == null) 
+	                        get();
 	                    return current != null;
 	                }
 	                public Unifier next() {
-	                    if (current == null) get();
+	                    if (current == null) 
+	                        get();
 	                    Unifier a = current;
 	                    get();
 	                    return a;
@@ -162,8 +165,11 @@ public class LogExpr implements LogicalFormula {
 	                    current = null;
 	                    if (ileft.hasNext()) {
 	                        current = ileft.next();
-	                    } else if (iright.hasNext()) {
-	                        current = iright.next();
+	                    } else {
+	                        if (iright == null)
+	                            iright = rhs.logicalConsequence(ag,un);
+	                        if (iright.hasNext())
+	                            current = iright.next();
 	                    }
 	                }
 	                public void remove() {}

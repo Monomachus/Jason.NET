@@ -646,4 +646,22 @@ public class TermTest extends TestCase {
 		new TermTest().testAnnotsUnify7();
 	}
 
+	public void testGetTermsArray() {
+        Structure s2 = Structure.parse("a(1,2,3)");
+        Term[] a = s2.getTermsArray();
+        assertEquals(3,a.length);
+        assertEquals("1",a[0].toString());
+        assertEquals("3",a[2].toString());
+	}
+	
+	public void testIALiteral() {
+	    Literal l = Literal.parseLiteral(".print(a)");
+	    assertTrue(l.isInternalAction());
+	    
+	    l = Literal.parseLiteral("print(a)");
+        assertFalse(l.isInternalAction());
+
+        l = Literal.parseLiteral("p.rint(a)");
+        assertTrue(l.isInternalAction());
+	}
 }

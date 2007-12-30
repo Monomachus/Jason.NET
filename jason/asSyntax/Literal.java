@@ -90,10 +90,6 @@ public class Literal extends Pred implements LogicalFormula {
 		}
 	}
 
-	public boolean isInternalAction() {
-		return getFunctor() != null && getFunctor().indexOf('.') >= 0;
-	}
-	
     @Override
 	public boolean isLiteral() {
 		return true;
@@ -121,28 +117,7 @@ public class Literal extends Pred implements LogicalFormula {
      */
     @SuppressWarnings("unchecked")
     public Iterator<Unifier> logicalConsequence(final Agent ag, final Unifier un) {
-        if (isInternalAction()) {
-            try {
-            	// clone terms array
-                Term[] current = getTermsArray();
-                Term[] clone = new Term[current.length];
-                for (int i=0; i<clone.length; i++) {
-                    clone[i] = (Term)current[i].clone();
-                    clone[i].apply(un);
-                }
-
-            	// calls execute
-                Object oresult = ag.getIA(this).execute(ag.getTS(), un, clone);
-                if (oresult instanceof Boolean && (Boolean)oresult) {
-                    return LogExpr.createUnifIterator(un);
-                } else if (oresult instanceof Iterator) {
-                    return ((Iterator<Unifier>)oresult);
-                }
-            } catch (Exception e) {
-                logger.log(Level.SEVERE, getErrorMsg() + ": " +	e.getMessage(), e);
-            }
-            return LogExpr.EMPTY_UNIF_LIST.iterator();  // empty iterator for unifier
-        } else if (this.equals(LTrue)) {
+        if (this.equals(LTrue)) {
             return LogExpr.createUnifIterator(un);            
         } else if (this.equals(LFalse)) {
             return LogExpr.EMPTY_UNIF_LIST.iterator();            
@@ -269,8 +244,7 @@ public class Literal extends Pred implements LogicalFormula {
 
     public String getErrorMsg() {
     	String line = (getSrcLine() >= 0 ? ":"+getSrcLine() : "");
-    	String ia   = (isInternalAction() ? " internal action" : "");
-        return "Error in "+ia+" '"+this+"' ("+ getSrc() + line + ")";    	
+        return "Error in '"+this+"' ("+ getSrc() + line + ")";       
     }
     
     @Override
@@ -364,9 +338,6 @@ public class Literal extends Pred implements LogicalFormula {
     @Override
     public Element getAsDOM(Document document) {
         Element u = (Element) document.createElement("literal");
-        if (isInternalAction()) {
-            u.setAttribute("ia", isInternalAction()+"");
-        }
         if (negated()) {
             u.setAttribute("negated", negated()+"");
         }

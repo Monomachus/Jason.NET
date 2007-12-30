@@ -2,11 +2,11 @@
 package jason.asSyntax.parser;
 import java.util.*;
 import java.io.*;
-import jason.asSyntax.*;
-import jason.asSyntax.directives.*;
+import jason.*;
 import jason.asSemantics.*;
 import jason.bb.*;
-import jason.*;
+import jason.asSyntax.*;
+import jason.asSyntax.directives.*;
 import jason.asSyntax.ArithExpr.ArithmeticOp;
 import jason.asSyntax.LogExpr.LogicalOp;
 import jason.asSyntax.RelExpr.RelationalOp;

@@ -59,6 +59,8 @@ public class Trigger implements Cloneable {
 	private TEOperator operator = TEOperator.add;
     private TEType     type     = TEType.belief;
 	private Literal    literal;
+
+	private PredicateIndicator piCache = null;
 	
 	public Trigger(TEOperator op, TEType t, Literal l) {
 		literal = l;
@@ -122,8 +124,6 @@ public class Trigger implements Cloneable {
 	}
 
     
-	PredicateIndicator piCache = null;
-	
 	/** return [+|-][!|?] super.getFucntorArity */
 	public PredicateIndicator getPredicateIndicator() {
         if (piCache == null) {

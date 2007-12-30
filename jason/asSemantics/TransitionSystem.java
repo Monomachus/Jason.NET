@@ -51,7 +51,7 @@ import java.util.logging.Logger;
 
 public class TransitionSystem {
 
-    public enum State { StartRC, SelEv, RelPl, ApplPl, SelAppl, AddIM, ProcAct, SelInt, ExecInt, ClrInt }
+    public enum State { StartRC, SelEv, RelPl, ApplPl, SelAppl, FindOp, AddIM, ProcAct, SelInt, ExecInt, ClrInt }
     
     private Logger        logger     = null;
 
@@ -118,6 +118,7 @@ public class TransitionSystem {
         case RelPl:     applyRelPl();  break;
         case ApplPl:    applyApplPl(); break;
         case SelAppl:   applySelAppl(); break;
+        case FindOp:    applyFindOp(); break;
         case AddIM:     applyAddIM(); break;
         case ProcAct:   applyProcAct(); break;
         case SelInt:    applySelInt(); break;
@@ -207,7 +208,10 @@ public class TransitionSystem {
             // Rule SelEv1
             confP.C.SE = conf.ag.selectEvent(confP.C.getEvents());
             if (confP.C.SE != null) {
-                confP.step = State.RelPl;
+                if (ag.hasCustomSelectOption() || setts.verbose() == 2) // verbose == 2 means debug mode 
+                    confP.step = State.RelPl;
+                else 
+                    confP.step = State.FindOp;
                 return;
             }
         }
@@ -221,61 +225,50 @@ public class TransitionSystem {
         confP.C.RP = relevantPlans(conf.C.SE.trigger);
 
         // Rule Rel1
-        if (confP.C.RP != null || setts.retrieve()) { 
+        if (confP.C.RP != null || setts.retrieve()) 
             // retrieve is mainly for Coo-AgentSpeak
             confP.step = State.ApplPl;
-        }
-        // Rule Rel2
-        else {
-            confP.step = State.ProcAct; // default next step
-            if (conf.C.SE.trigger.isGoal()) {
-                logger.warning("Found a goal for which there is no relevant plan:" + conf.C.SE);
-                generateGoalDeletionFromEvent();
-            } else {
-                if (conf.C.SE.isInternal()) {
-                    // e.g. belief addition as internal event, just go ahead
-                    confP.C.SI = conf.C.SE.intention;
-                    updateIntention();
-                } else {
-                    // current event is external and irrelevant,
-                	// discart that event and select another one
-                	confP.step = State.SelEv;
-                }
-            }
-        }
+        else
+            applyRelApplPlRule2("relevant");
     }
-
+    
     private void applyApplPl() throws JasonException {
         confP.C.AP = applicablePlans(confP.C.RP);
 
         // Rule Appl1
-        if (confP.C.AP != null || setts.retrieve()) { 
+        if (confP.C.AP != null || setts.retrieve()) 
             // retrieve is mainly for Coo-AgentSpeak
             confP.step = State.SelAppl;
-        } else { 
+        else
+            applyRelApplPlRule2("applicable");
+    }
 
-            // Rule Appl2
-            if (conf.C.SE.trigger.isGoal()) {
-                // can't carry on, no applicable plan.
-                logger.warning("Found a goal for which there is no applicable plan:\n" + conf.C.SE);
-                generateGoalDeletionFromEvent(); 
-            }
-            // e.g. belief addition as internal event, just go ahead
-            // but note that the event was relevant, yet it is possible
-            // the programmer just wanted to add the belief and it was
-            // relevant by chance, so just carry on instead of dropping the
-            // intention
-            else if (conf.C.SE.isInternal()) {
+    private void applyRelApplPlRule2(String m) throws JasonException {
+        confP.step = State.ProcAct; // default next step
+        if (conf.C.SE.trigger.isGoal()) {
+            // can't carry on, no relevant/applicable plan.
+            logger.warning("Found a goal for which there is no "+m+" plan:" + conf.C.SE);
+            generateGoalDeletionFromEvent();
+        } else {
+            if (conf.C.SE.isInternal()) {
+                // e.g. belief addition as internal event, just go ahead
+                // but note that the event was relevant, yet it is possible
+                // the programmer just wanted to add the belief and it was
+                // relevant by chance, so just carry on instead of dropping the
+                // intention
                 confP.C.SI = conf.C.SE.intention;
                 updateIntention();
-            }
-            // if external, then needs to check settings
-            else if (setts.requeue()) {
+            } else if (setts.requeue()) {  
+                // if external, then needs to check settings
                 confP.C.addEvent(conf.C.SE);
+            } else {
+                // current event is external and irrelevant,
+                // discard that event and select another one
+                confP.step = State.SelEv;
             }
-            confP.step = State.ProcAct;
-        }
+        }        
     }
+    
 
     private void applySelAppl() throws JasonException {
         // Rule SelAppl
@@ -291,6 +284,40 @@ public class TransitionSystem {
         }
     }
 
+    /**
+     * This step is new in Jason 1.0.2 and replaces the steps RelPl->ApplPl->SelAppl when the user
+     * does not customise selectOption. This version does not create the RP and AP lists and thus 
+     * optimise the reasoning cycle. It searches for the first option and automatically selects it.
+     */
+    private void applyFindOp() throws JasonException {
+        confP.step = State.AddIM; // default next step
+
+        // get all relevant plans for the selected event
+        //Trigger te = (Trigger) conf.C.SE.trigger.clone();
+        List<Plan> candidateRPs = conf.ag.pl.getAllRelevant(conf.C.SE.trigger.getPredicateIndicator());
+        if (candidateRPs != null) {
+            for (Plan pl : candidateRPs) {
+                Unifier relUn = pl.isRelevant(conf.C.SE.trigger);
+                if (relUn != null) { // is relevant
+                    LogicalFormula context = pl.getContext();
+                    if (context == null) { // context is true
+                        confP.C.SO = new Option(pl, relUn);
+                        return;
+                    } else {
+                        Iterator<Unifier> r = context.logicalConsequence(ag, relUn);
+                        if (r != null && r.hasNext()) {
+                            confP.C.SO = new Option(pl, r.next());
+                            return;
+                        }
+                    } 
+                }
+            }
+        }
+        
+        // problem: no plan
+        applyRelApplPlRule2("relevant/applicable");
+    }
+    
     private void applyAddIM() throws JasonException {
         // create a new intended means
         IntendedMeans im = new IntendedMeans(conf.C.SO, conf.C.SE.getTrigger());
@@ -300,9 +327,8 @@ public class TransitionSystem {
             Intention intention = new Intention();
             intention.push(im);
             confP.C.addIntention(intention);
-        }
-        // Rule IntEv
-        else {
+        } else {
+            // Rule IntEv
             confP.C.SE.intention.push(im);
             confP.C.addIntention(confP.C.SE.intention);
         }
@@ -633,9 +659,6 @@ public class TransitionSystem {
                 if (context == null) { // context is true
                     if (ap == null) ap = new LinkedList<Option>();
                     ap.add(opt);
-                    if (!ag.hasCustomSelectOption()) { // do not find other options if the default selectOption is used (the default gets the first option)
-                        return ap;
-                    }
                 } else {
                     boolean allUnifs = opt.getPlan().isAllUnifs();
                     Iterator<Unifier> r = context.logicalConsequence(ag, opt.getUnifier());
@@ -645,9 +668,6 @@ public class TransitionSystem {
                             
                             if (ap == null) ap = new LinkedList<Option>();
                             ap.add(opt);
-                            if (!ag.hasCustomSelectOption()) { // do not find other options if the default selectOption is used (the default gets the first option)
-                                return ap;
-                            }
                             
                             if (!allUnifs) break; // returns only the first unification
                             if (r.hasNext()) {

@@ -126,8 +126,7 @@ public class suspend extends DefaultInternalAction {
                     C.removeEvent(e);                    
                     C.getPendingIntentions().put(k, i);
                 } else if (i == Intention.EmptyInt && un.unifies(e.getTrigger(), g)) { // the case of !!
-            		ts.getLogger().info("** NOT IMPLEMENTED ** (suspend of !!)");
-                	// TODO: what?
+            		ts.getLogger().warning("** NOT IMPLEMENTED ** (suspend of !!)");
                 }
             }
             return true;

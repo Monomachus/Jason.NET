@@ -76,18 +76,15 @@ public class Plan extends SourceInfo implements Cloneable, Serializable {
     
     public void setLabel(Pred p) {
         label = p;
-        if (p != null) {
-            // isAtomic = label.hasAnnot(TAtomic);
-            if (label.hasAnnot(TAtomic)) {
-                //properties.add(Annots.atomic);
-                isAtomic = true;
-            }
-            if (label.hasAnnot(TBreakPoint)) {
-                //properties.add(Annots.breakpoint);
-                hasBreakpoint = true;
-            }
-            if (label.hasAnnot(TAllUnifs)) {
-                isAllUnifs = true;
+        if (p != null && p.hasAnnot()) {
+            for (Term t: label.getAnnots()) {
+                if (t.equals(TAtomic))
+                    isAtomic = true;
+                if (t.equals(TBreakPoint))
+                    hasBreakpoint = true;
+                if (t.equals(TAllUnifs))
+                    isAllUnifs = true;
+                // if change here, also change the clone()!
             }
         }
     }
@@ -156,7 +153,7 @@ public class Plan extends SourceInfo implements Cloneable, Serializable {
         // annots in plan's TE must be a subset of the ones in the event!
         // (see definition of Unifier.unifies for 2 Preds)
         Unifier u = new Unifier();
-        if (u.unifies(tevent, te))
+        if (u.unifiesNoUndo(tevent, te))
             return u;
         else
             return null;
@@ -186,18 +183,22 @@ public class Plan extends SourceInfo implements Cloneable, Serializable {
     
     public Object clone() {
         Plan p = new Plan();
-        if (label != null) p.setLabel((Pred) label.clone());
-        
-        // tevent shouldn't be null!!!
-        p.tevent = (Trigger) tevent.clone();
-        
-        if (context != null) p.setContext((LogicalFormula) context.clone());
-        
-        List<BodyLiteral> copy = new LinkedList<BodyLiteral>(); // the plan will be "consumed" by remove(0), so linkedlist
-        for (BodyLiteral l : body) {
-            copy.add((BodyLiteral) l.clone());
+        if (label != null) { 
+            p.label = (Pred) label.clone();
+            p.isAtomic      = isAtomic;
+            p.hasBreakpoint = hasBreakpoint;
+            p.isAllUnifs    = isAllUnifs;
         }
-        p.setBody(copy);
+        
+        p.tevent = (Trigger)tevent.clone();
+        
+        if (context != null) 
+            p.context = (LogicalFormula)context.clone();
+        
+        p.body = new LinkedList<BodyLiteral>(); // the plan will be "consumed" by remove(0), so linkedlist
+        for (BodyLiteral l : body) {
+            p.body.add((BodyLiteral) l.clone());
+        }
         
         p.setSrc(this);
 

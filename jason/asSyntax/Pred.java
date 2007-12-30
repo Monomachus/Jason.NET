@@ -123,8 +123,13 @@ public class Pred extends Structure {
 
     public void addAnnots(List<Term> l) {
         if (l == null) return;
-        if (annots == null) annots = new ListTermImpl();
-        ListTerm tail = annots.getLast();
+        ListTerm tail;
+        if (annots == null) {
+            annots = new ListTermImpl();
+            tail = annots;
+        } else {
+            tail= annots.getLast();
+        }
         for (Term t : l) {
             if (!annots.contains(t)) 
             	tail = tail.append(t);

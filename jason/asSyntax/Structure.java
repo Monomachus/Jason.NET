@@ -68,8 +68,7 @@ public class Structure extends DefaultTerm {
     public Structure(Structure t) {
         functor = t.getFunctor();
         setTerms(t.getDeepCopyOfTerms());
-        setSrcLine(t.getSrcLine());
-        setSrc(t.getSrc());
+        setSrc(t);
     }
 
     /** to be used by list term and atom */
@@ -106,7 +105,7 @@ public class Structure extends DefaultTerm {
         if (functor != null) result = PRIME * result + functor.hashCode();
         final int ts = getArity();
         if (ts > 0) {
-            result = PRIME * result + getArity();
+            result = PRIME * result + ts;
             for (int i=0; i<ts; i++) {
                 result = PRIME * result + getTerm(i).hashCode();
             }
@@ -252,13 +251,10 @@ public class Structure extends DefaultTerm {
     	return getArity() > 0; // should use getArity to work for list/atom
     }
     
+    private static final Term[] emptyTermArray = new Term[0]; // just to have a type for toArray in the getTermsArray method
+    
     public Term[] getTermsArray() {
-        final int size = getArity();
-        Term ts[] = new Term[size];
-        for (int i=0; i<size; i++) { // use "for" instead of iterator for ListTerm compatibility
-            ts[i] = getTerm(i);
-        }
-        return ts;
+        return terms.toArray(emptyTermArray);
     }
 
     @Override

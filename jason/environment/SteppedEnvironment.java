@@ -44,11 +44,13 @@ public class SteppedEnvironment extends Environment {
     	
 	private int step = 0;   // step counter
     private int nbAgs = -1; // number of agents acting on the environment
-    private Map<String,ActRequest> requests = new HashMap<String,ActRequest>(); // actions to be executed
-    private Queue<ActRequest> overRequests = new LinkedList<ActRequest>(); // second action tentative in the step  
+    private Map<String,ActRequest> requests; // actions to be executed
+    private Queue<ActRequest> overRequests; // second action tentative in the step  
     private TimeOutThread timeoutThread = null;
     private long stepTimeout = 0;
-
+    private int  sleep = 0; // pause time between cycles
+    
+    
     private OverActionsPolicy overActPol = OverActionsPolicy.ignoreSecond;
     
     public SteppedEnvironment() {
@@ -66,9 +68,19 @@ public class SteppedEnvironment extends Environment {
     			logger.warning("The argument "+args[0]+" is not a valid number for step timeout");
     		}
     	}
-		
+    	
+    	// reset everything
+    	requests = new HashMap<String,ActRequest>();
+    	overRequests = new LinkedList<ActRequest>();
+		step = 0;
+        if (timeoutThread != null) timeoutThread.allAgFinished();
 		stepStarted(step);
     }
+
+    public void setSleep(int s) {
+        sleep = s;
+    }
+    
     
     @Override
     public void stop() {
@@ -118,7 +130,7 @@ public class SteppedEnvironment extends Environment {
 		boolean startNew = false;
 		
 		synchronized (requests) { // lock access to requests
-	    	if (nbAgs < 0) {
+	    	if (nbAgs < 0 || timeoutThread == null) {
 	    		// initialise dynamic information
 	    		// (must be in sync part, so that more agents do not start the timeout thread)
 	    		updateNumberOfAgents();
@@ -147,6 +159,14 @@ public class SteppedEnvironment extends Environment {
 					startNew = true;
 		    	}
     		}
+
+            if (startNew) {
+                if (sleep > 0) {
+                    try {
+                        Thread.sleep(sleep);
+                    } catch (InterruptedException e) {}
+                }
+            }
     	}
 		
 		if (startNew) {

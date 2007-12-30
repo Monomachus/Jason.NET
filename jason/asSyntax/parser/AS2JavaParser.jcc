@@ -33,11 +33,12 @@ PARSER_BEGIN(as2j)
 
   import java.util.*;
   import java.io.*;
-  import jason.asSyntax.*;
-  import jason.asSyntax.directives.*;
+
+  import jason.*;
   import jason.asSemantics.*;
   import jason.bb.*;
-  import jason.*;
+  import jason.asSyntax.*;
+  import jason.asSyntax.directives.*;
   import jason.asSyntax.ArithExpr.ArithmeticOp;
   import jason.asSyntax.LogExpr.LogicalOp;
   import jason.asSyntax.RelExpr.RelationalOp;
@@ -217,7 +218,11 @@ Literal literal() :  { Pred F; Token k; boolean type = Literal.LPos; }
 {
   ( ( [ <TK_NEG>              { type = Literal.LNeg; }
       ]
-      F=pred()                { return new Literal(type,F); }
+      F=pred()                { if (F.getFunctor().indexOf(".") < 0) 
+                                   return new Literal(type,F);
+                                else
+                                   return new InternalActionLiteral(F); 
+                              }
     )
   | k=<TK_TRUE>               { return Literal.LTrue; } 
   | k=<TK_FALSE>              { return Literal.LFalse; } 

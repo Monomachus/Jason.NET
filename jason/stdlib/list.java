@@ -39,9 +39,12 @@ public class list extends DefaultInternalAction {
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         try {
+            if (args.length > 1) throw new JasonException("The internal action 'list' has received more than one argument.");
             return args[0].isList();
         } catch (ArrayIndexOutOfBoundsException e) {
             throw new JasonException("The internal action 'list' has not received the required argument.");
+        } catch (JasonException j) {
+            throw j;
         } catch (Exception e) {
             throw new JasonException("Error in internal action 'list': " + e, e);
         }
