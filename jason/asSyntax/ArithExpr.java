@@ -34,7 +34,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
- * Represents and solve arithmetic expressions like "10 < 30".
+ * Represents and solve arithmetic expressions like "10 + 30".
  */
 public class ArithExpr extends DefaultTerm implements NumberTerm {
 
