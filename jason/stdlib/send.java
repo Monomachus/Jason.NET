@@ -155,7 +155,6 @@ public class send extends DefaultInternalAction {
         // (un)tell or unknown performative with 4 args is a reply to
         if ( (m.isTell() || m.isUnTell() || !m.isKnownPerformative()) && args.length > 3) {
             Term mid = args[3];
-            mid.apply(un);
             if (! mid.isAtom()) {
                 throw new JasonException("The Message ID ('"+mid+"') parameter of the internal action 'send' is not an atom!");
             }
@@ -193,7 +192,6 @@ public class send extends DefaultInternalAction {
             if (lastSendWasSynAsk && args.length == 5) {
                 // get the timeout deadline
                 Term tto = (Term)args[4];
-                tto.apply(un);
                 if (tto.isNumeric()) {
                     new CheckTimeout((long)((NumberTerm)tto).solve(), m.getMsgId(), ts.getC()).start(); 
                 } else {

@@ -218,10 +218,14 @@ Literal literal() :  { Pred F; Token k; boolean type = Literal.LPos; }
 {
   ( ( [ <TK_NEG>              { type = Literal.LNeg; }
       ]
-      F=pred()                { if (F.getFunctor().indexOf(".") < 0) 
-                                   return new Literal(type,F);
-                                else
-                                   return new InternalActionLiteral(F); 
+      F=pred()                { if (F.getFunctor().indexOf(".") >= 0) 
+                                   return new InternalActionLiteral(F);
+                                if (F.isAtom() && type == Literal.LPos) {
+                                   Atom a = new Atom(F.getFunctor());
+                                   a.setSrc(F);
+                                   return a;
+                                } 
+                                return new Literal(type,F);
                               }
     )
   | k=<TK_TRUE>               { return Literal.LTrue; } 
@@ -299,12 +303,12 @@ Pred pred() :       { Token K; Pred p; Term t; List l; ListTerm lt;}
   
   [
       "(" l = terms() 
-      ")"           { p.addTerms(l); }
+      ")"            { p.setTerms(l); }
   ]
   [ 
-      lt = list()   { p.setAnnots(lt); }
+      lt = list()    { p.setAnnots(lt); }
   ] 
-  { return p; }
+                     { return p; }
 }
 
 
@@ -320,16 +324,8 @@ List terms() : { List listTerms = new ArrayList(); Term v; }
 
 Term term() :       { Term u; Object o; }
 {
-  ( u=literal()     { Literal l = (Literal)u;
-                      if (l.isAtom() && !l.negated()) {
-                         Atom a = new Atom(l.getFunctor());
-                         a.setSrcLine(l.getSrcLine());
-                         a.setSrc(l.getSrc());
-                         return a;
-                      }
-                    }
-  | u=list()        
-  | o=arithm_expr() { return (Term)o; }
+  ( u=list()        
+  | o=arithm_expr() { return (Term)o; } // arithm expr includes literals
   | u=string()      
   )
   { return u; }
@@ -397,7 +393,6 @@ Object rel_expr() :
                                            }
 {
     (   op1 = arithm_expr()                
-      | op1 = literal()
       | op1 = string()
     )
                      
@@ -413,7 +408,6 @@ Object rel_expr() :
        )
 
        (   op2 = arithm_expr()        
-         | op2 = literal()
          | op2 = string()               
          | op2 = list()
        )
@@ -480,12 +474,12 @@ Object arithm_expr_factor():
 
 
 Object arithm_expr_simple():    
-                                { Token K; Object t; VarTerm v; NumberTermImpl n;}
+                                { Token K; Object t; VarTerm v; }
 {
- ( K = <NUMBER>                 { n = new NumberTermImpl(K.image); 
-                                  n.setSrcLine(K.beginLine); 
-                                  n.setSrc(asSource);
-                                  return n;
+ ( K = <NUMBER>                 { NumberTermImpl ni = new NumberTermImpl(K.image); 
+                                  ni.setSrcLine(K.beginLine); 
+                                  ni.setSrc(asSource);
+                                  return ni;
                                 }
  | "-" t = arithm_expr_simple() { if (!(t instanceof NumberTerm)) {
                                     throw new ParseException("operator '-' applied to argument not numeric or variable.");
@@ -494,7 +488,22 @@ Object arithm_expr_simple():
                                 }
  | "(" t = log_expr() ")"       { return t; }
  | v = var()                    { return v; }
+ | t = function()               { return t; }
  )
+}
+
+Term function():          { Literal l; }
+{
+   l = literal()
+                          { ArithFunction af = FunctionRegister.create(l.getFunctor());
+                            if (af == null || !af.checkArity(l.getArity())) {
+                               return l;
+                            } else {
+                              af.setSrc(l);
+                              af.setTerms(l.getTerms());
+                              return af;
+                            }
+                          } 
 }
 
 

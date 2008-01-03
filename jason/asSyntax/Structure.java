@@ -72,9 +72,11 @@ public class Structure extends DefaultTerm {
     }
 
     /** to be used by list term and atom */
-    protected Structure(String functor, boolean createTerms) {
+    protected Structure(String functor, int termsSize) {
         //this.functor = (functor == null ? null : functor.intern()); 
         this.functor = functor;
+        if (termsSize > 0)
+        	terms = new ArrayList<Term>(termsSize);
     }
 
     public static Structure parse(String sTerm) {

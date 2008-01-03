@@ -55,4 +55,7 @@ public class SourceInfo {
         return endSrcLine;
     }
 
+    public String getErrorMsg() {
+        return getSrc() + (getSrcLine() >= 0 ? ":"+getSrcLine() : "");       
+    }    
 }

@@ -169,6 +169,7 @@ public class BeliefBaseTest extends TestCase {
 		assertEquals(bb.size(), 1);
 		
 		l3 = Literal.parseLiteral("pos[source(ag1)]");
+		assertFalse(l2.isAtom());
 		assertTrue(bb.remove(l3));
 		
 		//System.out.println("removed "+l3);
@@ -187,7 +188,7 @@ public class BeliefBaseTest extends TestCase {
 
         VarTerm c = new VarTerm("C");
         Unifier u = new Unifier();
-        Literal l3 = Literal.parseLiteral("pos");
+        Literal l3 = new Literal("pos");
         u.unifies(c, l3);
         c.apply(u);
         c.addSource(Structure.parse("ag3"));
@@ -195,6 +196,8 @@ public class BeliefBaseTest extends TestCase {
         Literal inBB = bb.contains(c); 
         assertTrue(inBB != null);
         assertFalse(c.hasSubsetAnnot(inBB));
+        assertFalse(c.isVar());
+        //System.out.println(c.getValue().getClass().getName()+"="+l1);
         assertFalse(c.equals(l1));
         //System.out.println(c+" "+c.getClass().getName());
         assertTrue(c.equalsAsStructure(l1));
@@ -205,8 +208,8 @@ public class BeliefBaseTest extends TestCase {
         c = new VarTerm("C");
         VarTerm ca = new VarTerm("CA");
         u = new Unifier();
-        Literal l4 = Literal.parseLiteral("pos");
-        u.unifies(c, l4);
+        u.unifies(c, Literal.parseLiteral("pos"));
+        c.apply(u);
         try {
             new jason.stdlib.add_annot().execute(null, u, new Term[] { c, DefaultTerm.parse("source(ag4)"), ca });
         } catch (Exception e) {

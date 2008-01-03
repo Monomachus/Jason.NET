@@ -86,7 +86,6 @@ public class wait extends DefaultInternalAction {
             if (args[0].isNumeric()) {
                 // time in milliseconds
                 NumberTerm time = (NumberTerm)args[0];
-                time.apply(un);
                 timeout = (long) time.solve();
                 // Thread.sleep((long) time.solve());
             } else if (args[0].isString()) {
@@ -97,7 +96,6 @@ public class wait extends DefaultInternalAction {
 
                 if (args.length == 2) {
                     NumberTerm tot = (NumberTerm) args[1];
-                    tot.apply(un);
                     timeout = (long) tot.solve();
                 }
 

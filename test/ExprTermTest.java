@@ -1,5 +1,7 @@
 package test;
 
+import java.util.Collections;
+
 import jason.JasonException;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.ArithExpr;
@@ -134,4 +136,46 @@ public class ExprTermTest extends TestCase {
 
     }
 
+    public void testFuncAbs() {
+        NumberTerm nb = ArithExpr.parseExpr("(30-math.abs(X))/(2*math.abs(X))");
+        Unifier u = new Unifier();
+        u.unifies(new VarTerm("X"), new NumberTermImpl(-5));
+        nb.apply(u);
+        //System.out.println(nb+"="+nb.solve());
+        assertEquals(nb, new NumberTermImpl(2.5));
+        assertEquals(nb.clone(), new NumberTermImpl(2.5));
+    }
+    
+    public void testFuncMax() {
+        NumberTerm nb = ArithExpr.parseExpr("math.max(30-math.abs(X),2*math.abs(X))");
+        Unifier u = new Unifier();
+        u.unifies(new VarTerm("X"), new NumberTermImpl(-5));
+        nb.apply(u);
+        assertEquals(nb, new NumberTermImpl(25));
+        assertEquals(nb.clone(), new NumberTermImpl(25));
+
+        nb = ArithExpr.parseExpr("math.max([a,3,b(100),400,1])");
+        nb.apply(u);
+        assertEquals(nb, new NumberTermImpl(400));
+    }
+    
+    public void testSort() {
+        ListTerm l = ListTermImpl.parseList("[a(3),10,3,-1,math.abs(55),X+10,math.abs(X),math.max(X-1,X*30)]");
+        Unifier u = new Unifier();
+        u.unifies(new VarTerm("X"), new NumberTermImpl(-5));
+        l.apply(u);
+        Collections.sort(l);
+        assertEquals(l.toString(), "[-6,-1,3,5,5,10,55,a(3)]");    	
+    }
+    
+    public void testLength() {
+        NumberTerm nb = ArithExpr.parseExpr(".length(\"aaa\")");
+        Unifier u = new Unifier();
+        nb.apply(u);
+        assertEquals(nb, new NumberTermImpl(3));
+
+        nb = ArithExpr.parseExpr(".length([a,3,b(100),400,1])");
+        nb.apply(u);
+        assertEquals(nb, new NumberTermImpl(5));    	
+    }
 }

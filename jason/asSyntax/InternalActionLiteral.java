@@ -83,6 +83,7 @@ public class InternalActionLiteral extends Literal {
         return LogExpr.EMPTY_UNIF_LIST.iterator();  // empty iterator for unifier
     }   
 
+    @Override
     public String getErrorMsg() {
     	String line = (getSrcLine() >= 0 ? ":"+getSrcLine() : "");
         return "Error in internal action '"+this+"' ("+ getSrc() + line + ")";    	

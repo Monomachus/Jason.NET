@@ -64,7 +64,6 @@ public class broadcast extends DefaultInternalAction {
 
 		try {
 			ilf = args[0];
-            ilf.apply(un);
 			if (!ilf.isAtom()) {
 				throw new JasonException("The illocutionary force parameter of the internal action 'broadcast' is not an atom!");
 			}

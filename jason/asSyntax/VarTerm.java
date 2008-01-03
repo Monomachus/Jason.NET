@@ -156,7 +156,7 @@ public class VarTerm extends InternalActionLiteral implements NumberTerm, ListTe
             // System.out.println("cheking equals form "+tAsTerm.getFunctor()+"
             // and this "+this.getFunctor()+" my value "+vl);
             if (vl != null) {
-                // campare the values
+                // compare the values
                 return vl.equals(t);
             }
 

@@ -23,23 +23,16 @@
 
 package jason.asSyntax;
 
-import jason.asSemantics.Unifier;
-import jason.asSyntax.parser.as2j;
-
-import java.io.StringReader;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
  * Represents and solve arithmetic expressions like "10 + 30".
  */
-public class ArithExpr extends DefaultTerm implements NumberTerm {
+public class ArithExpr extends ArithFunction implements NumberTerm {
 
 	private static final long serialVersionUID = 1L;
-    private static Logger logger = Logger.getLogger(ArithExpr.class.getName());
+    //private static Logger logger = Logger.getLogger(ArithExpr.class.getName());
 	
 	public enum ArithmeticOp {
         none {
@@ -118,121 +111,63 @@ public class ArithExpr extends DefaultTerm implements NumberTerm {
         abstract double eval(double x, double y);
     }
 
-    private NumberTerm    lhs, rhs;
     private ArithmeticOp  op     = ArithmeticOp.none;
-    private NumberTerm    fValue = null; // value, when evaluated	
-
-    private ArithExpr() {
-        super();
-    }
 
     public ArithExpr(NumberTerm t1, ArithmeticOp oper, NumberTerm t2) {
-        lhs = t1;
+    	super(oper.toString(),2);
+    	addTerm(t1);
+    	addTerm(t2);
         op = oper;
-        rhs = t2;
     }
 
     public ArithExpr(ArithmeticOp oper, NumberTerm t1) {
+    	super(oper.toString(),1);
+    	addTerm(t1);
         op = oper;
-        lhs = t1;
+    }
+    
+    private ArithExpr(ArithExpr ae) { // for clone
+    	super(ae);
+    	op = ae.op;
     }
 
     /** returns some Term that can be evaluated as Number */
     public static NumberTerm parseExpr(String sExpr) {
-        as2j parser = new as2j(new StringReader(sExpr));
-        try {
-            return (NumberTerm) parser.arithm_expr();
-        } catch (Exception e) {
-            logger.log(Level.SEVERE, "Error parsing expression " + sExpr, e);
-            return null;
-        }
+    	return ArithFunction.parseExpr(sExpr);
     }
 
-    /** returns true if the expression was already evaluated */
-    public boolean isEvaluated() {
-        return lhs == null;
-    }
-    
-    /** 
-     *  Set the value of this expression by calling solve(). After this method execution,
-     *  the object behaviour is like a contant number.
-     */
-    public void evaluate() {
-    	fValue = new NumberTermImpl(solve());
-        lhs = null;
-        rhs = null;
-        super.resetHashCodeCache();
-    }
-    
-    public boolean apply(Unifier u) {
-    	if (isEvaluated()) return false;
-    	
-        getLHS().apply(u);
-        if (!isUnary()) {
-            getRHS().apply(u);
+	@Override
+	public double evaluate(Term[] args) {
+        double l = ((NumberTerm)args[0]).solve();
+        if (args.length == 1 && op == ArithmeticOp.minus) {
+            return -l;
+        } else {
+            double r = ((NumberTerm)args[1]).solve();
+            return op.eval(l, r);
         }
-        evaluate();
-        
-    	return true;
-    }
-    
+	}
+	
+	@Override
+	public boolean checkArity(int a) {
+		return a == 1 || a == 2;
+	}
     
     /** make a hard copy of the terms */
     public Object clone() {
         if (isEvaluated()) {
-            return fValue;
+            return getValue();
         } else {
-            ArithExpr t = new ArithExpr();
-            if (lhs != null) {
-                t.lhs = (NumberTerm) lhs.clone();
-            }
-
-            t.op = this.op;
-
-            if (rhs != null) {
-                t.rhs = (NumberTerm) rhs.clone();
-            }
-            return t;
+            return new ArithExpr(this);
         }
-    }
-
-    @Override
-    public boolean equals(Object t) {
-        if (t == null) return false;
-        if (isEvaluated()) return fValue.equals(t);
-        if (t instanceof ArithExpr) {
-            ArithExpr eprt = (ArithExpr) t;
-            if (lhs == null && eprt.lhs != null) return false;
-            if (lhs != null && !lhs.equals(eprt.lhs)) return false;
-            if (op != eprt.op) return false;
-            if (rhs == null && eprt.rhs != null) return false;
-            if (rhs != null && !rhs.equals(eprt.rhs)) return false;
-            return true;
-        }
-        return false;
-    }
-
-    @Override
-    public int compareTo(Term o) {
-        try {
-            NumberTerm st = (NumberTerm)o;
-            if (solve() > st.solve()) return 1;
-            if (solve() < st.solve()) return -1;
-        } catch (Exception e) {}
-        return 0;    
     }
 
     @Override
     protected int calcHashCode() {
-        if (isEvaluated()) return fValue.hashCode();
-        
-        final int PRIME = 31;
-        int code = PRIME * op.hashCode();
-        if (lhs != null) code = PRIME * code + lhs.hashCode();
-        if (rhs != null) code = PRIME * code + rhs.hashCode();
-        return code;
+    	if (isEvaluated()) 
+    		return getValue().hashCode();
+    	else
+    		return op.hashCode() + super.calcHashCode();
     }
-    
     
     /** gets the Operation of this Expression */
     public ArithmeticOp getOp() {
@@ -241,58 +176,27 @@ public class ArithExpr extends DefaultTerm implements NumberTerm {
 
     /** gets the LHS of this Expression */
     public NumberTerm getLHS() {
-        return lhs;
+        return (NumberTerm)getTerm(1);
     }
 
     /** gets the RHS of this Expression */
     public NumberTerm getRHS() {
-        return rhs;
-    }
-
-	@Override
-	public boolean isNumeric() {
-		return true;
-	}
-
-    @Override
-    public boolean isArithExpr() {
-        return !isEvaluated();
+        return (NumberTerm)getTerm(0);
     }
 
     public boolean isUnary() {
-        return rhs == null;
-    }
-
-    @Override
-    public boolean isGround() {
-        return isEvaluated() || (lhs.isGround() && (rhs == null || rhs.isGround()));
-    }
-
-    public double solve() {
-        if (isEvaluated()) {
-            // this expr already has a value
-            return fValue.solve();
-        }
-        double l = lhs.solve();
-        if (rhs == null && op == ArithmeticOp.minus) {
-            return -l;
-        } else if (rhs != null) {
-            double r = rhs.solve();
-            return op.eval(l, r);
-        }
-        logger.log(Level.SEVERE, "ERROR IN EXPRESION!");
-        return 0;
+        return getArity() == 1;
     }
 
     @Override
     public String toString() {
         if (isEvaluated()) {
-            return fValue.toString();
+            return getValue().toString();
         } else {
-            if (rhs == null) {
-                return "(" + op + lhs + ")";
+            if (isUnary()) {
+                return "(" + op + getTerm(0) + ")";
             } else {
-                return "(" + lhs + op + rhs + ")";
+                return "(" + getTerm(0) + op + getTerm(1) + ")";
             }
         }
     }
@@ -300,21 +204,21 @@ public class ArithExpr extends DefaultTerm implements NumberTerm {
     /** get as XML */
     public Element getAsDOM(Document document) {
         if (isEvaluated()) {
-            return fValue.getAsDOM(document);
+            return getValue().getAsDOM(document);
         } else {
             Element u = (Element) document.createElement("expression");
             u.setAttribute("type", "arithmetic");
             u.setAttribute("operator", op.toString());
             if (isUnary()) {
                 Element r = (Element) document.createElement("right");
-                r.appendChild(lhs.getAsDOM(document)); // put the left argument indeed!
+                r.appendChild(getTerm(0).getAsDOM(document)); // put the left argument indeed!
                 u.appendChild(r);
             } else {
                 Element l = (Element) document.createElement("left");
-                l.appendChild(lhs.getAsDOM(document));
+                l.appendChild(getTerm(0).getAsDOM(document));
                 u.appendChild(l);
                 Element r = (Element) document.createElement("right");
-                r.appendChild(rhs.getAsDOM(document));
+                r.appendChild(getTerm(1).getAsDOM(document));
                 u.appendChild(r);
             }
             return u;

@@ -64,8 +64,8 @@ public class Pred extends Structure {
     }
 
     /** to be used by atom */
-    protected Pred(String functor, boolean createTerms) {
-        super(functor, createTerms);
+    protected Pred(String functor, int termsSize) {
+        super(functor, termsSize);
     }
 
     public static Pred parsePred(String sPred) {

@@ -57,7 +57,7 @@ public class ListTermImpl extends Structure implements ListTerm {
 	private Term next;
 	
 	public ListTermImpl() {
-		super(".", false);
+		super(".", 0);
 	}
 
     public static ListTerm parseList(String sList) {

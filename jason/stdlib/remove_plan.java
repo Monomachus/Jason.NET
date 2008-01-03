@@ -85,7 +85,6 @@ public class remove_plan extends DefaultInternalAction {
             Structure source = new Atom("self");
         	if (args.length > 1) {
 				source = (Structure)args[1];
-				source.apply(un);
         	}
         	
         	if (label.isList()) { // arg[0] is a list

@@ -31,6 +31,7 @@ import jason.asSemantics.Unifier;
 import jason.asSyntax.ListTerm;
 import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Literal;
+import jason.asSyntax.Structure;
 import jason.asSyntax.Term;
 
 /**
@@ -74,13 +75,10 @@ public class add_annot extends DefaultInternalAction {
 			return un.unifies(result,args[2]);
 		} catch (ArrayIndexOutOfBoundsException e) {
 			throw new JasonException("The internal action 'add_annot' requires three arguments.");
-		} //finally {
-			//System.out.println("annot result = "+un);			
-		//}
+		}
 	}
 
 	public Term addAnnotToList(Unifier unif, Term l, Term annot) {
-		l.apply(unif);
 		if (l.isList()) {
 			ListTerm result = new ListTermImpl();
 			for (Term lTerm: (ListTerm)l) {
@@ -92,8 +90,12 @@ public class add_annot extends DefaultInternalAction {
 			return result;
 		} else {
 			try {
-				// if it can be parsed as a literal, OK to add annot
-				Literal result = Literal.parseLiteral(l.toString());
+				// if it can be parsed as a literal and is not an atom, OK to add annot
+				Literal result;
+				if (l.isAtom())
+					result = new Literal(((Structure)l).getFunctor());
+				else
+					result = Literal.parseLiteral(l.toString());
 				result.addAnnot(annot);
 				return result;
 			} catch (Exception e) {

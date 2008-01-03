@@ -48,9 +48,6 @@ public class dropGoal extends DefaultInternalAction {
         try {
 			ts.getLogger().info("Deprecated: use fail_goal or succeed_goal instead of .dropGoal.");
 
-			args[0].apply(un);
-        	args[1].apply(un);
-
             drop(ts, (Literal)args[0], args[1].equals(Literal.LTrue), un);
             return true;
         } catch (ArrayIndexOutOfBoundsException e) {

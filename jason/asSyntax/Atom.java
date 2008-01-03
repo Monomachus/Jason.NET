@@ -40,7 +40,7 @@ public final class Atom extends Literal {
     private static Logger logger = Logger.getLogger(Atom.class.getName());
 
     public Atom(String functor) {
-        super(functor, false);
+        super(functor, 0);
 		if (functor == null) {
             logger.log(Level.SEVERE, "Functor of an Atom should not be null!",new JasonException(""));
 		}
@@ -100,5 +100,11 @@ public final class Atom extends Literal {
         if (o == this) return true;
         if (o instanceof Structure) return getFunctor().equals(((Structure)o).getFunctor());
         return false;
+    }
+    
+    @Override
+    public boolean addAnnot(Term t) {
+    	logger.warning("You should not add annot '"+t+"' in atom "+this);
+    	return super.addAnnot(t);
     }
 }
