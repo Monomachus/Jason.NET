@@ -100,6 +100,11 @@ public class Literal extends Pred implements LogicalFormula {
 		return super.isAtom() && !negated();
 	}
 	
+	/** to be overridden by subclasses (as internal action) */
+	public boolean canBeAddedInBB() {
+		return true;
+	}
+	
 	public boolean negated() {
 		return type == LNeg;
 	}
@@ -345,6 +350,13 @@ public class Literal extends Pred implements LogicalFormula {
     	public TrueLiteral() {
     		super("true",1);
 		}
+
+    	@Override
+        public boolean canBeAddedInBB() {
+    		return false;
+    	}
+        
+    	@Override
         public Iterator<Unifier> logicalConsequence(final Agent ag, final Unifier un) {
         	return LogExpr.createUnifIterator(un);            
         }
@@ -355,6 +367,13 @@ public class Literal extends Pred implements LogicalFormula {
     	public FalseLiteral() {
     		super("false",1);
 		}
+
+    	@Override
+        public boolean canBeAddedInBB() {
+    		return false;
+    	}
+    	
+        @Override
         public Iterator<Unifier> logicalConsequence(final Agent ag, final Unifier un) {
         	return LogExpr.EMPTY_UNIF_LIST.iterator();            
         }

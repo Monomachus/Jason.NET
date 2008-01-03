@@ -59,6 +59,11 @@ public class InternalActionLiteral extends Literal {
 	public boolean isInternalAction() {
 		return true;
 	}
+
+    @Override
+    public boolean canBeAddedInBB() {
+		return false;
+	}
 	
     @SuppressWarnings("unchecked")
     public Iterator<Unifier> logicalConsequence(Agent ag, Unifier un) {

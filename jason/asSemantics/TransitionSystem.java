@@ -403,9 +403,15 @@ public class TransitionSystem {
 
         Literal body = null;
         
+        // clone and apply body
         if (h.getType() != BodyType.constraint && h.getType() != BodyType.test) { // constraint and test body may be not a literal
-            body = (Literal)h.getLiteralFormula().clone();
-            body.apply(u);
+        	Literal hl = h.getLiteralFormula(); 
+        	if (hl instanceof Atom) { 
+        		body = new Literal(hl.getFunctor());
+        	} else { 
+        		body = (Literal)hl.clone();
+        		body.apply(u);
+        	}
         }
 
         switch (h.getType()) {

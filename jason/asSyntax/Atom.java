@@ -24,6 +24,7 @@
 package jason.asSyntax;
 
 import jason.JasonException;
+import jason.asSemantics.Unifier;
 
 import java.util.List;
 import java.util.logging.Level;
@@ -48,6 +49,11 @@ public final class Atom extends Literal {
     
     public Object clone() {
 		return this; // since this object is immutable
+    }
+
+    @Override
+    public boolean apply(Unifier u) {
+    	return false;
     }
     
 	//
@@ -104,7 +110,7 @@ public final class Atom extends Literal {
     
     @Override
     public boolean addAnnot(Term t) {
-    	logger.warning("You should not add annot '"+t+"' in atom "+this);
+    	logger.log(Level.SEVERE, "You should not add annot '"+t+"' in atom "+this+"\n",new Exception());
     	return super.addAnnot(t);
     }
 }

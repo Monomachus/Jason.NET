@@ -539,6 +539,14 @@ public class VarTerm extends InternalActionLiteral implements NumberTerm, ListTe
     public boolean negated() {
         return value != null && getValue().isLiteral() && ((Literal) getValue()).negated();
     }
+    
+    @Override
+    public boolean canBeAddedInBB() {
+        if (value != null && getValue().isLiteral())
+            return ((Literal) getValue()).canBeAddedInBB();
+        else
+            return false;
+    }
 
     // ----------
     // ArithmeticExpression methods overridden

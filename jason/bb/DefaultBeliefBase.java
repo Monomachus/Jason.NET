@@ -46,7 +46,7 @@ import org.w3c.dom.Element;
  */
 public class DefaultBeliefBase implements BeliefBase {
 
-    private static Logger logger;
+    private static Logger logger = Logger.getLogger(DefaultBeliefBase.class.getSimpleName());
 
     /**
      * belsMap is a table where the key is the bel.getFunctorArity and the value
@@ -108,8 +108,8 @@ public class DefaultBeliefBase implements BeliefBase {
     }
     
 	protected boolean add(Literal l, boolean addInEnd) {
-        if (l.equals(Literal.LTrue) || l.equals(Literal.LFalse)) {
-            logger.log(Level.SEVERE, "Error: <true> or <false> can not be added as beliefs.");
+		if (!l.canBeAddedInBB()) {
+            logger.log(Level.SEVERE, "Error: '"+l+"' can not be added in the belief base.");
             return false;
         }
         
