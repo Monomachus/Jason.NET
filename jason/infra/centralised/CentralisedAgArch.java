@@ -238,7 +238,10 @@ public class CentralisedAgArch implements Runnable, AgArchInfraTier {
         CentralisedAgArch rec = masRunner.getAg(m.getReceiver());
         
         if (rec == null) {
-            throw new JasonException("Receiver '" + m.getReceiver() + "' does not exists! Could not send " + m);
+            if (isRunning())
+                throw new JasonException("Receiver '" + m.getReceiver() + "' does not exists! Could not send " + m);
+            else
+                return;
         }
         rec.receiveMsg(new Message(m)); // send a cloned message
 	

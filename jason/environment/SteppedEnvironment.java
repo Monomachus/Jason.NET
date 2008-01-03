@@ -251,7 +251,7 @@ public class SteppedEnvironment extends Environment {
 					startNewStep();
 		    	}
             } catch (Exception ie) {
-                if (!(ie instanceof InterruptedException)) {
+                if (isRunning() && !(ie instanceof InterruptedException)) {
                     logger.log(Level.WARNING, "act error!",ie);
                 }
             }
