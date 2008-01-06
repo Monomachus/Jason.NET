@@ -82,7 +82,7 @@ public class broadcast extends DefaultInternalAction {
 			ts.getUserAgArch().broadcast(m);
 			return true;
 		} catch (Exception e) {
-			throw new JasonException("Error broadcasting message " + pcnt);
+			throw new JasonException("Error broadcasting message " + pcnt, e);
 		}
 	}
 
