@@ -197,7 +197,7 @@ public class SaciMASLauncherAnt extends CentralisedMASLauncherAnt implements MAS
         String sBBClass = tmpBBClass.toString().replace('\"','$');
 
         String fname = agp.asSource.toString();
-        if (!fname.startsWith(File.separator)) {
+        if (!fname.startsWith(File.separator) && !fname.startsWith(project.getDirectory())) {
         	fname = project.getDirectory() + File.separator + fname;
         }
         File tmpAsSrc = new File(fname);
