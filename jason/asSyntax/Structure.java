@@ -67,11 +67,11 @@ public class Structure extends DefaultTerm {
     
     public Structure(Structure t) {
         functor = t.getFunctor();
-        setTerms(t.getDeepCopyOfTerms());
+        terms   = t.getDeepCopyOfTerms();
         setSrc(t);
     }
 
-    /** to be used by list term and atom */
+    /** to be used by list term and atom to not create the array list for terms */
     protected Structure(String functor, int termsSize) {
         //this.functor = (functor == null ? null : functor.intern()); 
         this.functor = functor;
@@ -106,11 +106,9 @@ public class Structure extends DefaultTerm {
         int result = 1;
         if (functor != null) result = PRIME * result + functor.hashCode();
         final int ts = getArity();
-        if (ts > 0) {
-            result = PRIME * result + ts;
-            for (int i=0; i<ts; i++) {
-                result = PRIME * result + getTerm(i).hashCode();
-            }
+        result = PRIME * result + ts;
+        for (int i=0; i<ts; i++) {
+        	result = PRIME * result + getTerm(i).hashCode();
         }
         return result;
     }

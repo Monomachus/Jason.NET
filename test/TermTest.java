@@ -540,17 +540,6 @@ public class TermTest extends TestCase {
         assertEquals(u.size(),0);
     }
 
-    public void testAtom() {
-    	Atom a = new Atom("a");
-    	try {
-    		//a.addTerm(new Atom("b"));
-    	} catch (Exception e) {}
-    	assertEquals(a.getArity(), 0);
-    	a.addAnnot(new Atom("b"));
-    	assertEquals(a.getAnnots().size(), 1);
-    	assertEquals(a.toString(),"a[b]");
-    }
-    
     public void testMakeVarAnnon1() {
     	Literal l1 = Literal.parseLiteral("likes(jane,X,peter)");
     	Literal l2 = Literal.parseLiteral("likes(X,Y,Y)");
@@ -663,5 +652,12 @@ public class TermTest extends TestCase {
 
         l = Literal.parseLiteral("p.rint(a)");
         assertTrue(l.isInternalAction());
+	}
+	
+	
+	public void testCloneStructureFromAtom() {
+		Structure s = new Structure(new Atom("b"));
+		assertFalse(s.isArithExpr());
+		assertEquals(0,s.getArity());
 	}
 }

@@ -26,6 +26,7 @@ package jason.asSyntax;
 import jason.JasonException;
 import jason.asSemantics.Unifier;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -98,6 +99,13 @@ public final class Atom extends Literal {
 	@Override
 	public boolean hasTerm() {
 	    return false;
+	}
+	
+	@Override
+	protected List<Term> getDeepCopyOfTerms() {
+		// this method exists to make the Structure(Structure) constructor to work with 
+		// an Atom as parameter
+		return new ArrayList<Term>(2);
 	}
 	
     @Override

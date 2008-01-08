@@ -258,7 +258,7 @@ public class Agent {
                 b = new Rule(b,Literal.LTrue);
             }
             
-            // does not do BRF for rules (and so do produce events +bel for rules)
+            // does not do BRF for rules (and so do not produce events +bel for rules)
             if (b.isRule()) {
             	getBB().add(b);
             } else {
