@@ -81,7 +81,10 @@ public final class StringTermImpl extends DefaultTerm implements StringTerm {
 	}
 
  	public int length() {
-		return value.length();
+ 		if (value == null)
+ 			return 0;
+ 		else
+ 			return value.length();
 	}
 
     @Override
@@ -97,7 +100,10 @@ public final class StringTermImpl extends DefaultTerm implements StringTerm {
 
     @Override
     protected int calcHashCode() {
-        return value.hashCode();
+    	if (value == null)
+    		return 0;
+    	else
+    		return value.hashCode();
     }
 	
 	public String toString() {
