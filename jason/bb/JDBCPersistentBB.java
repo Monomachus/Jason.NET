@@ -366,7 +366,7 @@ public class JDBCPersistentBB extends DefaultBeliefBase {
                     }
                 };
             } catch (SQLException e) {
-                logger.log(Level.SEVERE, "SQL Error", e);
+                logger.log(Level.SEVERE, "SQL Error in getRelevant for "+l, e);
             }
         }
         return null;
@@ -544,7 +544,10 @@ public class JDBCPersistentBB extends DefaultBeliefBase {
             q.append(and + COL_NEG + " = " + l.negated());
         }
         //System.out.println(q.toString());
-        return q.toString();
+        if (and.length() > 0) // add nothing in the clausule 
+            return q.toString();
+        else
+            return "";
     }
 
     /** returns the SQL command to insert l into the DB */

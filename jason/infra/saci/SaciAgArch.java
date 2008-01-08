@@ -271,7 +271,7 @@ public class SaciAgArch extends saci.Agent implements AgArchInfraTier {
 
     // Default perception assumes Complete and Accurate sensing.
     // In the case of the SACI Architecture, the results of requests
-    // for action execution is also recieved here.
+    // for action execution is also received here.
 
     @SuppressWarnings("unchecked")
     public List perceive() {
