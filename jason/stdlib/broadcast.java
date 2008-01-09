@@ -72,10 +72,6 @@ public class broadcast extends DefaultInternalAction {
 		} catch (ArrayIndexOutOfBoundsException e) {
 			throw new JasonException("The internal action 'broadcast' has not received two arguments.");
 		}
-		if (!pcnt.isGround()) {
-			throw new JasonException("The content of the message '" + pcnt + "' is not ground!");
-		}
-
 		Message m = new Message(ilf.toString(), null, null, pcnt);
 
 		try {
