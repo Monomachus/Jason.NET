@@ -1,16 +1,18 @@
 package jason.asSyntax.directives;
 
 import jason.asSemantics.Agent;
-import jason.asSyntax.ArithFunction;
+import jason.asSemantics.ArithFunction;
+import jason.asSyntax.ArithFunctionTerm;
 import jason.asSyntax.Pred;
 import jason.asSyntax.StringTerm;
 import jason.functions.Abs;
+import jason.functions.Count;
 import jason.functions.Length;
 import jason.functions.Max;
 import jason.functions.Min;
-import jason.functions.Random;
 import jason.functions.Round;
 import jason.functions.Sqrt;
+import jason.functions.Random;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -36,28 +38,34 @@ public class FunctionRegister implements Directive {
         addFunction(Random.class);
         addFunction(Round.class);
         addFunction(Sqrt.class);
+        addFunction(Count.class);
     }
         
     public static void addFunction(Class<? extends ArithFunction> c) {
 		try {
-			ArithFunction af = c.newInstance(); 
-	    	functions.put(af.getFunctor(),c);
+			ArithFunction af = c.newInstance();
+			if (functions.get(af.getName()) != null)
+			    logger.warning("Registering the function "+af.getName()+"  twice! The first register is lost.");
+	    	functions.put(af.getName(),c);
 		} catch (Exception e) {
 			logger.log(Level.SEVERE, "Error registering function "+c.getName(),e);
 		}
     }
+    
     public static Class<? extends ArithFunction> getFunction(String id) {
         return functions.get(id);
     }
+    
     public static Class<? extends ArithFunction> removeFunction(String id) {
         return functions.remove(id);
     }
     
-    public static ArithFunction create(String id) {
+    public static ArithFunctionTerm create(String id) {
     	Class<? extends ArithFunction> c = functions.get(id);
     	if (c != null) {
     		try {
-    			return c.newInstance();    			
+                ArithFunction af = c.newInstance(); 
+    			return new ArithFunctionTerm(af);    			
     		} catch (Exception e) {
     			logger.log(Level.SEVERE, "Error creating function class",e);
     		}

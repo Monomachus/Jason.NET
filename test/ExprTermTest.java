@@ -1,10 +1,11 @@
 package test;
 
-import java.util.Collections;
-
 import jason.JasonException;
+import jason.asSemantics.Agent;
+import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.ArithExpr;
+import jason.asSyntax.ArithFunctionTerm;
 import jason.asSyntax.ListTerm;
 import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Literal;
@@ -12,6 +13,9 @@ import jason.asSyntax.NumberTerm;
 import jason.asSyntax.NumberTermImpl;
 import jason.asSyntax.RelExpr;
 import jason.asSyntax.VarTerm;
+
+import java.util.Collections;
+
 import junit.framework.TestCase;
 
 /** JUnit test case for syntax package */
@@ -21,7 +25,7 @@ public class ExprTermTest extends TestCase {
         super.setUp();
     }
 
-    public void testSolve() {
+    public void testSolve() throws Exception {
         NumberTerm nb;
         nb = ArithExpr.parseExpr("3");
         assertEquals(nb.solve(),3.0);
@@ -177,5 +181,19 @@ public class ExprTermTest extends TestCase {
         nb = ArithExpr.parseExpr(".length([a,3,b(100),400,1])");
         nb.apply(u);
         assertEquals(nb, new NumberTermImpl(5));    	
+    }
+    
+    public void testCount() throws Exception {
+        Agent ag = new Agent();
+        ag.setTS(new TransitionSystem(ag, null, null, null));
+        ag.getBB().add(Literal.parseLiteral("b(10)"));
+        ag.getBB().add(Literal.parseLiteral("a(x)"));
+        ag.getBB().add(Literal.parseLiteral("b(20)"));
+        assertEquals(3, ag.getBB().size());
+        
+        ArithFunctionTerm nb = (ArithFunctionTerm)ArithExpr.parseExpr(".count(b(_))");
+        nb.setAgent(ag);
+        nb.apply(new Unifier());
+        assertEquals(2.0,nb.solve());
     }
 }

@@ -218,7 +218,7 @@ public class Agent {
         return false;
     }
 
-    void parseAS(InputStream asIn) throws ParseException, JasonException {
+    public void parseAS(InputStream asIn) throws ParseException, JasonException {
         as2j parser = new as2j(asIn);
         parser.agent(this);
     }

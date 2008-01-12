@@ -35,11 +35,11 @@ public final class NumberTermImpl extends DefaultTerm implements NumberTerm {
 	private static final long serialVersionUID = 1L;
     private static Logger logger = Logger.getLogger(NumberTermImpl.class.getName());
 
-	private final double fValue;
+	private final double value;
 	
 	public NumberTermImpl() {
 		super();
-		fValue = 0;
+		value = 0;
 	}
 	
 	public NumberTermImpl(String sn) {
@@ -49,19 +49,19 @@ public final class NumberTermImpl extends DefaultTerm implements NumberTerm {
 		} catch (Exception e) {
 			logger.log(Level.SEVERE,"Error setting number term value from "+sn,e);
 		}
-		fValue = t;
+		value = t;
 	}
 	
 	public NumberTermImpl(double vl) {
-		fValue = vl;
+		value = vl;
 	}
 	
 	public NumberTermImpl(NumberTermImpl t) {
-		fValue = t.solve();
+		value = t.solve();
 	}
 
 	public double solve() {
-		return fValue;
+		return value;
 	}
 
 	public Object clone() {
@@ -82,8 +82,9 @@ public final class NumberTermImpl extends DefaultTerm implements NumberTerm {
 			if (st.isVar() || st.isArithExpr()) 
                 return false;
             else
-                //return Double.doubleToLongBits(solve()) == Double.doubleToLongBits(st.solve());
-                return solve() == st.solve();
+                try {
+                    return solve() == st.solve();
+                } catch (Exception e) { }
 		} 
 		return false;
 	}
@@ -104,11 +105,11 @@ public final class NumberTermImpl extends DefaultTerm implements NumberTerm {
     }
 
 	public String toString() {
-		long r = Math.round(fValue);
-		if (fValue == (double)r) {
+		long r = Math.round(value);
+		if (value == (double)r) {
 			return String.valueOf(r);
 		} else {
-			return String.valueOf(fValue);
+			return String.valueOf(value);
 		}
 	}
     

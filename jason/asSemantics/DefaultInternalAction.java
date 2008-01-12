@@ -2,6 +2,8 @@ package jason.asSemantics;
 
 import jason.asSyntax.Term;
 
+import java.io.Serializable;
+
 /**
  * Default implementation of the internal action interface (it simply returns false 
  * for the interface methods).
@@ -10,8 +12,10 @@ import jason.asSyntax.Term;
  * 
  * @author Jomi
  */
-public class DefaultInternalAction implements InternalAction {
+public class DefaultInternalAction implements InternalAction, Serializable {
     
+    private static final long serialVersionUID = 1L;
+
     public boolean suspendIntention() {
         return false;
     }

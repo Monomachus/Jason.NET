@@ -167,7 +167,7 @@ public class VarTermTest extends TestCase {
     }
 
     // test when a var is ground with a Number
-    public void testVarTermAsNumber() {
+    public void testVarTermAsNumber() throws Exception {
         VarTerm k = new VarTerm("K");
         Unifier u = new Unifier();
         NumberTermImpl n = new NumberTermImpl(10);

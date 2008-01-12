@@ -18,9 +18,11 @@
 
   public class as2j implements as2jConstants {
     private String asSource = null;
+    private Agent  curAg    = null;
 
 /* AgentSpeak Grammar */
   final public void agent(Agent a) throws ParseException, jason.JasonException {
+                         curAg = a;
                          Agent   na;
     label_1:
     while (true) {
@@ -57,7 +59,7 @@
         break;
       case 30:
         na = directive(a);
-                         // import bels, plans and initial goals from agent a
+                         // import bels, plans and initial goals from agent na
                          if (a != null && na != null) a.importComponents(na);
         break;
       default:
@@ -966,12 +968,13 @@
   final public Term function() throws ParseException {
                             Literal l;
     l = literal();
-                            ArithFunction af = FunctionRegister.create(l.getFunctor());
+                            ArithFunctionTerm af = FunctionRegister.create(l.getFunctor());
                             if (af == null || !af.checkArity(l.getArity())) {
                                {if (true) return l;}
                             } else {
                               af.setSrc(l);
                               af.setTerms(l.getTerms());
+                              af.setAgent(curAg);
                               {if (true) return af;}
                             }
     throw new Error("Missing return statement in function");
@@ -1028,12 +1031,6 @@
     try { return !jj_3_2(); }
     catch(LookaheadSuccess ls) { return true; }
     finally { jj_save(1, xla); }
-  }
-
-  final private boolean jj_3R_38() {
-    if (jj_scan_token(TK_NOT)) return true;
-    if (jj_3R_33()) return true;
-    return false;
   }
 
   final private boolean jj_3R_33() {
@@ -1232,13 +1229,13 @@
     return false;
   }
 
-  final private boolean jj_3R_64() {
-    if (jj_scan_token(34)) return true;
+  final private boolean jj_3R_41() {
+    if (jj_scan_token(STRING)) return true;
     return false;
   }
 
-  final private boolean jj_3R_41() {
-    if (jj_scan_token(STRING)) return true;
+  final private boolean jj_3R_64() {
+    if (jj_scan_token(34)) return true;
     return false;
   }
 
@@ -1285,6 +1282,11 @@
     return false;
   }
 
+  final private boolean jj_3R_27() {
+    if (jj_3R_21()) return true;
+    return false;
+  }
+
   final private boolean jj_3R_30() {
     Token xsp;
     xsp = jj_scanpos;
@@ -1295,11 +1297,6 @@
     if (jj_3R_37()) return true;
     }
     }
-    return false;
-  }
-
-  final private boolean jj_3R_27() {
-    if (jj_3R_21()) return true;
     return false;
   }
 
@@ -1527,6 +1524,12 @@
 
   final private boolean jj_3R_39() {
     if (jj_3R_42()) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_38() {
+    if (jj_scan_token(TK_NOT)) return true;
+    if (jj_3R_33()) return true;
     return false;
   }
 

@@ -1,7 +1,8 @@
 package jason.functions;
 
 import jason.JasonException;
-import jason.asSyntax.ArithFunction;
+import jason.asSemantics.DefaultArithFunction;
+import jason.asSemantics.TransitionSystem;
 import jason.asSyntax.NumberTerm;
 import jason.asSyntax.Term;
 
@@ -15,21 +16,17 @@ import jason.asSyntax.Term;
    
   @author Jomi 
 */
-public class Sqrt extends ArithFunction  {
+public class Sqrt extends DefaultArithFunction  {
 
 	private static final long serialVersionUID = 1L;
-	public  static final String name = "math.sqrt";
 
-	public Sqrt() {
-		super(name,1);
-	}
-		
-	private Sqrt(Sqrt a) { // used by clone
-		super(a);
-	}
-	
+	public String getName() {
+        return "math.sqrt";
+    }
+    
+
 	@Override
-	public double evaluate(Term[] args) throws JasonException {
+	public double evaluate(TransitionSystem ts, Term[] args) throws Exception {
 		if (args[0].isNumeric()) {
 			double n = ((NumberTerm)args[0]).solve();
 			return Math.sqrt(n);
@@ -43,12 +40,4 @@ public class Sqrt extends ArithFunction  {
 		return a == 1;
 	}
 	
-	@Override
-	public Object clone() {
-        if (isEvaluated()) {
-            return getValue();
-        } else {
-        	return new Sqrt(this);
-        }
-	}
 }

@@ -48,6 +48,7 @@ PARSER_BEGIN(as2j)
 
   public class as2j {
     private String asSource = null;
+    private Agent  curAg    = null;
   }
 
 PARSER_END(as2j)
@@ -104,6 +105,7 @@ TOKEN : {
 
 void agent(Agent a) throws jason.JasonException :  
                        {
+                         curAg = a;
                          Agent   na;
                        }
 { 
@@ -111,7 +113,7 @@ void agent(Agent a) throws jason.JasonException :
     agent_component(a)
   |
     na = directive(a)
-                       { // import bels, plans and initial goals from agent a
+                       { // import bels, plans and initial goals from agent na
                          if (a != null && na != null) a.importComponents(na);
                        }
   )*
@@ -495,12 +497,13 @@ Object arithm_expr_simple():
 Term function():          { Literal l; }
 {
    l = literal()
-                          { ArithFunction af = FunctionRegister.create(l.getFunctor());
+                          { ArithFunctionTerm af = FunctionRegister.create(l.getFunctor());
                             if (af == null || !af.checkArity(l.getArity())) {
                                return l;
                             } else {
                               af.setSrc(l);
                               af.setTerms(l.getTerms());
+                              af.setAgent(curAg);
                               return af;
                             }
                           } 

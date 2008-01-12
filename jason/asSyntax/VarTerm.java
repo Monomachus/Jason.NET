@@ -553,7 +553,7 @@ public class VarTerm extends InternalActionLiteral implements NumberTerm, ListTe
     // Interface NumberTerm
     // ----------
 
-    public double solve() {
+    public double solve() throws Exception {
         if (hasValue() && value.isNumeric()) {
             return ((NumberTerm) value).solve();
         } else {

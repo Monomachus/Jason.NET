@@ -23,16 +23,22 @@
 
 package jason.asSyntax;
 
+import jason.asSyntax.parser.as2j;
+
+import java.io.StringReader;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
  * Represents and solve arithmetic expressions like "10 + 30".
  */
-public class ArithExpr extends ArithFunction implements NumberTerm {
+public class ArithExpr extends ArithFunctionTerm implements NumberTerm {
 
 	private static final long serialVersionUID = 1L;
-    //private static Logger logger = Logger.getLogger(ArithExpr.class.getName());
+    private static Logger logger = Logger.getLogger(ArithExpr.class.getName());
 	
 	public enum ArithmeticOp {
         none {
@@ -111,7 +117,7 @@ public class ArithExpr extends ArithFunction implements NumberTerm {
         abstract double eval(double x, double y);
     }
 
-    private ArithmeticOp  op     = ArithmeticOp.none;
+    private ArithmeticOp  op = ArithmeticOp.none;
 
     public ArithExpr(NumberTerm t1, ArithmeticOp oper, NumberTerm t2) {
     	super(oper.toString(),2);
@@ -133,23 +139,29 @@ public class ArithExpr extends ArithFunction implements NumberTerm {
 
     /** returns some Term that can be evaluated as Number */
     public static NumberTerm parseExpr(String sExpr) {
-    	return ArithFunction.parseExpr(sExpr);
+        as2j parser = new as2j(new StringReader(sExpr));
+        try {
+            return (NumberTerm) parser.arithm_expr();
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Error parsing expression " + sExpr, e);
+            return null;
+        }
     }
 
-	@Override
-	public double evaluate(Term[] args) {
-        double l = ((NumberTerm)args[0]).solve();
-        if (args.length == 1 && op == ArithmeticOp.minus) {
+    @Override
+    public double solve() throws Exception {
+        double l = ((NumberTerm)getTerm(0)).solve();
+        if (isUnary() && op == ArithmeticOp.minus) {
             return -l;
         } else {
-            double r = ((NumberTerm)args[1]).solve();
+            double r = ((NumberTerm)getTerm(1)).solve();
             return op.eval(l, r);
         }
-	}
-	
-	@Override
+    }
+
+    @Override
 	public boolean checkArity(int a) {
-		return a == 1 || a == 2;
+        return a == 1 || a == 2;
 	}
     
     /** make a hard copy of the terms */

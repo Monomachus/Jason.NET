@@ -1,7 +1,8 @@
 package jason.functions;
 
 import jason.JasonException;
-import jason.asSyntax.ArithFunction;
+import jason.asSemantics.DefaultArithFunction;
+import jason.asSemantics.TransitionSystem;
 import jason.asSyntax.ListTerm;
 import jason.asSyntax.NumberTerm;
 import jason.asSyntax.Term;
@@ -17,21 +18,16 @@ import jason.asSyntax.Term;
  
 @author Jomi 
 */
-public class Min extends ArithFunction  {
+public class Min extends DefaultArithFunction  {
 
 	private static final long serialVersionUID = 1L;
-	public  static final String name = "math.min";
 	
-	public Min() {
-		super(name,2);
-	}
-		
-	private Min(Min a) { // used by clone
-		super(a);
+	public String getName() {
+	    return "math.min";
 	}
 	
 	@Override
-	public double evaluate(Term[] args) throws JasonException {
+	public double evaluate(TransitionSystem ts, Term[] args) throws Exception {
 		if (args[0].isNumeric() && args[1].isNumeric()) {
 			double n0 = ((NumberTerm)args[0]).solve();
 			double n1 = ((NumberTerm)args[1]).solve();
@@ -47,20 +43,11 @@ public class Min extends ArithFunction  {
 			}
 			return min;
 		}
-		throw new JasonException(name+" is not implemented for type '"+args[0]+"'.");
+		throw new JasonException(getName()+" is not implemented for type '"+args[0]+"'.");
 	}
 
 	@Override
 	public boolean checkArity(int a) {
 		return a == 1 || a == 2;
-	}
-	
-	@Override
-	public Object clone() {
-        if (isEvaluated()) {
-            return getValue();
-        } else {
-        	return new Min(this);
-        }
 	}
 }

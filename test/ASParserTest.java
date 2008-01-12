@@ -35,7 +35,7 @@ public class ASParserTest extends TestCase {
         assertTrue(ag.parseAS("examples/auction/ag3.asl"));
     }
 
-    public void testLogicalExpr() {
+    public void testLogicalExpr() throws Exception {
         LogicalFormula t1 = LogExpr.parseExpr("(3 + 5) / 2 > 0");
         assertTrue(t1 != null);
         Iterator<Unifier> solve = ((RelExpr) t1).logicalConsequence(null, new Unifier());

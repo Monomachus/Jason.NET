@@ -1,7 +1,7 @@
 package jason.functions;
 
-import jason.JasonException;
-import jason.asSyntax.ArithFunction;
+import jason.asSemantics.DefaultArithFunction;
+import jason.asSemantics.TransitionSystem;
 import jason.asSyntax.NumberTerm;
 import jason.asSyntax.Term;
 
@@ -17,21 +17,16 @@ import jason.asSyntax.Term;
    
   @author Jomi 
 */
-public class Random extends ArithFunction  {
+public class Random extends DefaultArithFunction  {
 
 	private static final long serialVersionUID = 1L;
-	public  static final String name = "math.random";
 
-	public Random() {
-		super(name,1);
-	}
-		
-	private Random(Random a) { // used by clone
-		super(a);
-	}
-	
+    public String getName() {
+        return "math.random";
+    }
+    
 	@Override
-	public double evaluate(Term[] args) throws JasonException {
+	public double evaluate(TransitionSystem ts, Term[] args) throws Exception {
 		if (args.length == 1 && args[0].isNumeric()) {
 			return Math.random() * ((NumberTerm)args[0]).solve();
 		} else {
@@ -44,8 +39,4 @@ public class Random extends ArithFunction  {
 		return a == 0 || a == 1;
 	}
 	
-	@Override
-	public Object clone() {
-		return new Random(this);
-	}
 }

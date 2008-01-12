@@ -36,7 +36,7 @@ import java.util.Iterator;
 /**
   <p>Internal action: <b><code>.count</code></b>.
   
-  <p>Description: counts the number of occurrences of a particular `belief
+  <p>Description: counts the number of occurrences of a particular belief
   (pattern) in the agent's belief base.
   
   <p>Parameters:<ul>
