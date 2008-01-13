@@ -661,6 +661,14 @@ public class TermTest extends TestCase {
 		assertFalse(s.isArithExpr());
 		assertEquals(0,s.getArity());
 	}
+
+	public void testHasVar() {
+	    Literal l = Literal.parseLiteral("a(Test,X,Y,b(g([V1,X,V2,V1]),c))[b,source(Y),B,kk(_),oo(oo(OO))]");
+	    assertTrue(l.hasVar(new VarTerm("X")));
+        assertTrue(l.hasVar(new VarTerm("V2")));
+        assertTrue(l.hasVar(new VarTerm("OO")));
+        assertFalse(l.hasVar(new VarTerm("O")));
+	}
 	
 	public void testSingletonVars() {
 	    Literal l = Literal.parseLiteral("a(10)");

@@ -320,13 +320,10 @@ public class Structure extends DefaultTerm {
     }
 
     public boolean hasVar(VarTerm t) {
-        if (this.equals(t)) return true;
         final int size = getArity();
-        for (int i=0; i<size; i++) {
-            if (getTerm(i).hasVar(t)) {
+        for (int i=0; i<size; i++)
+            if (getTerm(i).hasVar(t))
                 return true;
-            }
-        }
         return false;
     }
 

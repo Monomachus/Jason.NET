@@ -348,11 +348,10 @@ public class VarTerm extends InternalActionLiteral implements NumberTerm, ListTe
 
     @Override
     public boolean hasVar(VarTerm t) {
-        if (value == null) {
-            return super.hasVar(t);
-        } else {
+        if (value == null)
+            return equals(t);
+        else
             return value.hasVar(t);
-        }
     }
     
     @Override

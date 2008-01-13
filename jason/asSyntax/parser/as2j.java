@@ -102,7 +102,7 @@
                          if (a != null) {
                             a.getPL().add(p);
                             // warning only not parsed files
-                            if (!parsedFiles.contains(a.getASLSrc())) {
+                            if (!parsedFiles.contains(asSource)) {
                                List<VarTerm> singletonVars = p.getSingletonVars();
                                if (singletonVars.size() > 0) {
                                   logger.warning("["+p.getSrc()+"] warning: the plan of line "+p.getBeginSrcLine()+" (te: '"+p.getTrigger()+"') has the following singleton variables: "+singletonVars);
