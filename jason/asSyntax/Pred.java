@@ -29,6 +29,7 @@ import jason.asSyntax.parser.as2j;
 import java.io.StringReader;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -161,6 +162,24 @@ public class Pred extends Structure {
     /** returns true if the pred has at least one annot */
     public boolean hasAnnot() {
         return annots != null && !annots.isEmpty();
+    }
+
+    @Override
+    public boolean hasVar(VarTerm t) {
+        if (super.hasVar(t)) return true;
+        if (annots != null)
+            for (Term v: annots)
+                if (v.equals(t)) 
+                    return true;
+        return false;
+    }
+    
+    @Override
+    public void countVars(Map<VarTerm, Integer> c) {
+        super.countVars(c);
+        if (annots != null)
+            for (Term t: annots)
+                t.countVars(c);
     }
 
     /**

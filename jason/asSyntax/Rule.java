@@ -23,6 +23,8 @@
 
 package jason.asSyntax;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -87,6 +89,19 @@ public class Rule extends Literal {
     
     public String toString() {
         return super.toString() + " :- " + body;
+    }
+
+    @Override
+    public boolean hasVar(VarTerm t) {
+        if (super.hasVar(t)) return true;
+        Map<VarTerm, Integer> c = new HashMap<VarTerm, Integer>();
+        body.countVars(c);
+        return c.containsKey(t);
+    }
+    
+    public void countVars(Map<VarTerm, Integer> c) {
+        super.countVars(c);
+        body.countVars(c);
     }
 
     /** get as XML */

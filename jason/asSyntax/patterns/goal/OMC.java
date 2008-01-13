@@ -32,10 +32,14 @@ public class OMC implements Directive {
             Agent newAg = sd.process(subDir, outerContent, innerContent); 
             if (newAg != null) {
                 // add +f : true <- .fail_goal(g).
-                newAg.getPL().add(Plan.parse("+"+fail+" <- .fail_goal("+goal+")."));
+                Plan pf = Plan.parse("+"+fail+" <- .fail_goal("+goal+").");
+                pf.setSrc(outerContent+"/"+directive);
+                newAg.getPL().add(pf);
 
                 // add -m : true <- .succeed_goal(g).
-                newAg.getPL().add(Plan.parse("-"+motivation+" <- .succeed_goal("+goal+")."));
+                Plan pm = Plan.parse("-"+motivation+" <- .succeed_goal("+goal+").");
+                pm.setSrc(outerContent+"/"+directive);
+                newAg.getPL().add(pm);
                 
                 return newAg;
             }

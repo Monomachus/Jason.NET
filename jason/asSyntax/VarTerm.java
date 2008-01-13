@@ -33,6 +33,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -346,11 +347,19 @@ public class VarTerm extends InternalActionLiteral implements NumberTerm, ListTe
     }
 
     @Override
-    public boolean hasVar(Term t) {
+    public boolean hasVar(VarTerm t) {
         if (value == null) {
             return super.hasVar(t);
         } else {
             return value.hasVar(t);
+        }
+    }
+    
+    @Override
+    public void countVars(Map<VarTerm, Integer> c) {
+        if (isVar()) {
+            int n = c.containsKey(this) ? c.get(this) : 0; 
+            c.put(this, n+1);            
         }
     }
 

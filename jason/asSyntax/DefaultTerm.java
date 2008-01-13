@@ -28,6 +28,7 @@ import jason.asSyntax.parser.as2j;
 
 import java.io.Serializable;
 import java.io.StringReader;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -63,8 +64,10 @@ public abstract class DefaultTerm extends SourceInfo implements Term, Serializab
     public boolean isStructure()      { return false; }
 	public boolean isAtom()           { return false; }
     public boolean isGround()         { return true; }
-    public boolean hasVar(Term t)     { return false; }
-
+    public boolean hasVar(VarTerm t)  { return false; }
+    
+    public void countVars(Map<VarTerm, Integer> c) {}
+    
     abstract public    Object clone();
     abstract protected int    calcHashCode();
     

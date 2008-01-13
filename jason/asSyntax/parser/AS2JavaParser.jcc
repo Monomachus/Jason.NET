@@ -33,6 +33,7 @@ PARSER_BEGIN(as2j)
 
   import java.util.*;
   import java.io.*;
+  import java.util.logging.*;
 
   import jason.*;
   import jason.asSemantics.*;
@@ -49,6 +50,10 @@ PARSER_BEGIN(as2j)
   public class as2j {
     private String asSource = null;
     private Agent  curAg    = null;
+    
+    private static Logger logger = Logger.getLogger("aslparser");
+    private static Set<String> parsedFiles = new HashSet<String>();
+    
   }
 
 PARSER_END(as2j)
@@ -118,6 +123,9 @@ void agent(Agent a) throws jason.JasonException :
                        }
   )*
   <EOF>
+                       {
+                         if (a != null) parsedFiles.add(a.getASLSrc());
+                       }
 }
 
 void agent_component(Agent a) throws jason.JasonException :  
@@ -132,7 +140,17 @@ void agent_component(Agent a) throws jason.JasonException :
   |
     g = initial_goal() { if (a != null) a.addInitialGoal(g); } 
   |
-    p = plan()         { if (a != null) a.getPL().add(p); }
+    p = plan()         { if (a != null) {
+                            a.getPL().add(p); 
+                            // warning only not parsed files
+                            if (!parsedFiles.contains(asSource)) {
+                               List<VarTerm> singletonVars = p.getSingletonVars();
+                               if (singletonVars.size() > 0) {
+                                  logger.warning("["+p.getSrc()+"] warning: the plan of line "+p.getBeginSrcLine()+" (te: '"+p.getTrigger()+"') has the following singleton variables: "+singletonVars);
+                               }
+                            }
+                         }
+                       }
   )
 }
 
@@ -142,7 +160,15 @@ Literal belief() : { Literal h; Object t; }
 { 
     h=literal()
     [
-      ":-" t = log_expr()    { h = new Rule(h,(LogicalFormula)t); }
+      ":-" t = log_expr()    { h = new Rule(h,(LogicalFormula)t); 
+                               // warning only not parsed files
+                               if (!parsedFiles.contains(asSource)) {
+                                  List<VarTerm> singletonVars = h.getSingletonVars();
+                                  if (singletonVars.size() > 0) {
+                                     logger.warning("["+h.getSrc()+"] warning: the rule of line "+h.getBeginSrcLine()+" (head: '"+((Rule)h).headClone()+"') has the following singleton variables: "+singletonVars);                    
+                                  }
+                               }
+                             }
     ] 
     "."                      { return h; } 
 }

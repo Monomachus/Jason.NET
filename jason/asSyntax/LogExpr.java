@@ -31,6 +31,7 @@ import java.io.StringReader;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -231,6 +232,11 @@ public class LogExpr implements LogicalFormula {
         return null;
     }
 	
+    public void countVars(Map<VarTerm, Integer> c) {
+        if (lhs != null) lhs.countVars(c);
+        if (rhs != null) rhs.countVars(c);
+    }
+    
 	/** make a hard copy of the terms */
 	public Object clone() {
 		// do not call constructor with term parameter!

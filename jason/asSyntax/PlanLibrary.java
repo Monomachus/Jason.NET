@@ -115,7 +115,7 @@ public class PlanLibrary implements Iterable<Plan> {
                 throw new JasonException("There already is a plan with label " + p.getLabel());
             }
         }
-
+        
         // add label, if necessary
         if (p.getLabel() == null) setAutoLabel(p);
 

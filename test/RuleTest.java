@@ -5,8 +5,11 @@ import jason.asSemantics.Unifier;
 import jason.asSyntax.Literal;
 import jason.asSyntax.LogExpr;
 import jason.asSyntax.Rule;
+import jason.asSyntax.VarTerm;
 
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 import junit.framework.TestCase;
 
@@ -111,6 +114,21 @@ public class RuleTest extends TestCase {
         u = iun.next();
         assertEquals((int)Double.parseDouble(u.get("M").toString()),1);
     }    
+    
+    public void testHasVar() {
+        Rule r = new Rule(Literal.parseLiteral("a(X,Y)"), LogExpr.parseExpr("b(X) & c(Y,W) & d(Y,W,R)"));
+        
+        Map<VarTerm, Integer> c = new HashMap<VarTerm, Integer>();
+        r.countVars(c);
+        assertEquals(3,c.get(new VarTerm("Y")).intValue());
+        
+        assertEquals(1, r.getSingletonVars().size());
+        assertEquals("[R]", r.getSingletonVars().toString());
+        
+        assertTrue(r.hasVar(new VarTerm("X")));
+        assertTrue(r.hasVar(new VarTerm("W")));
+        assertFalse(r.hasVar(new VarTerm("III")));        
+    }
     
     
     @SuppressWarnings("unchecked")

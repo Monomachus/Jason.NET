@@ -5,6 +5,7 @@ import jason.asSemantics.Unifier;
 import jason.util.ToDOM;
 
 import java.util.Iterator;
+import java.util.Map;
 
 /**
  * Represents a logical formula (p, p & q, not p, 3 > X, ...) which can be 
@@ -26,6 +27,8 @@ public interface LogicalFormula extends Cloneable, ToDOM {
      *  Returns true if some variable was applied.  
      */
     public boolean apply(Unifier u);
+    
+    public void countVars(Map<VarTerm, Integer> c);
 
     public Object clone();
 }

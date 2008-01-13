@@ -600,6 +600,11 @@ public class Agent {
         return document;
     }
 
+    @Override
+    public String toString() {
+        return "Agent "+getASLSrc();
+    }
+    
     /** Gets the agent "mind" as XML */
     public Element getAsDOM(Document document) {
         Element ag = (Element) document.createElement("agent");

@@ -223,7 +223,7 @@ public class Unifier implements Cloneable {
             Term t1vl = function.get(t1gv);
             if (t1vl != null && !(t1vl instanceof VarsCluster)) {
                 return unifiesNoUndo(t1vl,t2g);
-            } else if (!t2g.hasVar(t1g)) {
+            } else if (!t2g.hasVar(t1gv)) {
                 return setVarValue(t1gv, t2g);
             }
             return false;
@@ -236,7 +236,7 @@ public class Unifier implements Cloneable {
             Term t2vl = function.get(t2gv);
             if (t2vl != null && !(t2vl instanceof VarsCluster)) {
                 return unifiesNoUndo(t2vl,t1g);
-            } else if (!t1g.hasVar(t2g)) {
+            } else if (!t1g.hasVar(t2gv)) {
                 return setVarValue(t2gv, t1g);
             } 
             return false;

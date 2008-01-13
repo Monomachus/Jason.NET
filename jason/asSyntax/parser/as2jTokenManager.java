@@ -2,6 +2,7 @@
 package jason.asSyntax.parser;
 import java.util.*;
 import java.io.*;
+import java.util.logging.*;
 import jason.*;
 import jason.asSemantics.*;
 import jason.bb.*;

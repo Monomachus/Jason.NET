@@ -11,14 +11,14 @@
 /* ---- tell performatives ---- */ 
 
 @kqmlReceivedTellStructure
-+!kqml_received(Sender, tell, Content, MsgId) 
++!kqml_received(Sender, tell, Content, _) 
    :  .structure(Content) & 
       .ground(Content) &
       not .list(Content)
    <- .add_annot(Content, source(Sender), CA); 
       +CA.
 @kqmlReceivedTellList
-+!kqml_received(Sender, tell, Content, MsgId) 
++!kqml_received(Sender, tell, Content, _) 
    :  .list(Content)
    <- !add_all_kqml_received(Sender,Content).
 
@@ -38,7 +38,7 @@
    <- !add_all_kqml_received(S,T).
       
 @kqmlReceivedUnTell
-+!kqml_received(Sender, untell, Content, MsgId)
++!kqml_received(Sender, untell, Content, _)
    <- .add_annot(Content, source(Sender), CA); 
       -CA.
 
@@ -46,12 +46,12 @@
 /* ---- achieve performatives ---- */ 
 
 @kqmlReceivedAchieve
-+!kqml_received(Sender, achieve, Content, MsgId)
++!kqml_received(Sender, achieve, Content, _)
    <- .add_annot(Content, source(Sender), CA); 
       !!CA.
 
 @kqmlReceivedUnAchieve[atomic]
-+!kqml_received(Sender, unachieve, Content, MsgId)
++!kqml_received(_, unachieve, Content, _)
    <- .drop_desire(Content).
 
 
@@ -83,13 +83,13 @@
 // of the plan (or a list of such strings)
 
 @kqmlReceivedTellHow
-+!kqml_received(Sender, tellHow, Content, MsgId)
++!kqml_received(Sender, tellHow, Content, _)
    <- .add_plan(Content, Sender).
 
 // In untellHow, content must be a plan's
 // label (or a list of labels)
 @kqmlReceivedUnTellHow
-+!kqml_received(Sender, untellHow, Content, MsgId)
++!kqml_received(Sender, untellHow, Content, _)
    <- .remove_plan(Content, Sender).
 
 // In askHow, content must be a string representing

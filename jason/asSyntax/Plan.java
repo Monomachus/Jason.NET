@@ -30,9 +30,11 @@ import java.io.Serializable;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -170,6 +172,23 @@ public class Plan extends SourceInfo implements Cloneable, Serializable {
             return tevent.equals(p.tevent) && body.equals(p.body);
         }
         return false;
+    }
+    
+    public List<VarTerm> getSingletonVars() {
+        Map<VarTerm, Integer> all  = new HashMap<VarTerm, Integer>();
+        tevent.getLiteral().countVars(all);
+        if (context != null) 
+            context.countVars(all);
+        if (body != null)
+            for (BodyLiteral bl: body)
+                bl.getLogicalFormula().countVars(all);
+
+        List<VarTerm> r = new ArrayList<VarTerm>();
+        for (VarTerm k: all.keySet()) {
+            if (all.get(k) == 1 && !k.isUnnamedVar())
+                r.add(k);
+        }
+        return r;
     }
     
     @Override

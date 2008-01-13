@@ -192,6 +192,8 @@ public class Structure extends DefaultTerm {
         resetHashCodeCache();
         return r;
     }
+    
+
 
     /** make a deep copy of the terms */
     public Object clone() {
@@ -317,7 +319,7 @@ public class Structure extends DefaultTerm {
         resetHashCodeCache();
     }
 
-    public boolean hasVar(Term t) {
+    public boolean hasVar(VarTerm t) {
         if (this.equals(t)) return true;
         final int size = getArity();
         for (int i=0; i<size; i++) {
@@ -326,6 +328,24 @@ public class Structure extends DefaultTerm {
             }
         }
         return false;
+    }
+
+    public List<VarTerm> getSingletonVars() {
+        Map<VarTerm, Integer> all  = new HashMap<VarTerm, Integer>();
+        countVars(all);
+        List<VarTerm> r = new ArrayList<VarTerm>();
+        for (VarTerm k: all.keySet()) {
+            if (all.get(k) == 1 && !k.isUnnamedVar())
+                r.add(k);
+        }
+        return r;
+    }
+
+    public void countVars(Map<VarTerm, Integer> c) {
+        final int tss = getArity();
+        for (int i = 0; i < tss; i++) {
+            getTerm(i).countVars(c);
+        }
     }
 
     protected List<Term> getDeepCopyOfTerms() {

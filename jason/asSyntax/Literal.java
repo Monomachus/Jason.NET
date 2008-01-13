@@ -276,7 +276,6 @@ public class Literal extends Pred implements LogicalFormula {
         return result;
     }
 
-	
 	/** returns [~] super.getPredicateIndicator */
 	@Override 
     public PredicateIndicator getPredicateIndicator() {

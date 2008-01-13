@@ -456,7 +456,7 @@ public class TransitionSystem {
                 im.unif = iu.next();
                 updateIntention();
             } else {
-                logger.info("Constraint "+h+" was not satisfied"+h.getSrcInfo()+".");
+                if (logger.isLoggable(Level.FINE)) logger.fine("Constraint "+h+" was not satisfied"+h.getSrcInfo()+".");
                 generateGoalDeletion();
             }
             break;

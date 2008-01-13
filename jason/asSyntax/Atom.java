@@ -28,6 +28,7 @@ import jason.asSemantics.Unifier;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -100,6 +101,14 @@ public final class Atom extends Literal {
 	public boolean hasTerm() {
 	    return false;
 	}
+	
+	@Override
+	public boolean hasVar(VarTerm t) {
+	    return false;
+	}
+	
+	@Override
+	public void countVars(Map<VarTerm, Integer> c) {}
 	
 	@Override
 	protected List<Term> getDeepCopyOfTerms() {

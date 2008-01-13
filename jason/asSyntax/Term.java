@@ -4,6 +4,7 @@ import jason.asSemantics.Unifier;
 import jason.util.ToDOM;
 
 import java.io.Serializable;
+import java.util.Map;
 
 /**
  * Common interface for all kind of terms
@@ -34,7 +35,9 @@ public interface Term extends Cloneable, Comparable<Term>, Serializable, ToDOM {
 
     public boolean isAtom();
 
-    public boolean hasVar(Term t);
+    public boolean hasVar(VarTerm t);
+    
+    public void countVars(Map<VarTerm, Integer> c);
 
     public Object clone();
 

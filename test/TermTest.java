@@ -11,6 +11,7 @@ import jason.asSyntax.Pred;
 import jason.asSyntax.Structure;
 import jason.asSyntax.Term;
 import jason.asSyntax.Trigger;
+import jason.asSyntax.Plan;
 import jason.asSyntax.VarTerm;
 import jason.asSyntax.Trigger.TEOperator;
 import jason.asSyntax.Trigger.TEType;
@@ -660,4 +661,45 @@ public class TermTest extends TestCase {
 		assertFalse(s.isArithExpr());
 		assertEquals(0,s.getArity());
 	}
+	
+	public void testSingletonVars() {
+	    Literal l = Literal.parseLiteral("a(10)");
+	    assertEquals(0, l.getSingletonVars().size());
+	    
+	    l = Literal.parseLiteral("a(X)");
+        assertEquals(1, l.getSingletonVars().size());
+
+        l = Literal.parseLiteral("a(X,X)");
+        assertEquals(0, l.getSingletonVars().size());
+
+        l = Literal.parseLiteral("a(X,Y,b(g(X),c))");
+        assertEquals(1, l.getSingletonVars().size());
+        assertEquals("Y", l.getSingletonVars().get(0).toString());
+
+        l = Literal.parseLiteral("a(X,Y,b(g(X),c))[b,source(Y)]");
+        assertEquals(0, l.getSingletonVars().size());
+        
+        l = Literal.parseLiteral("a(Test,X,Y,b(g(X),c))[b,source(Y),B,kk(U)]");
+        assertEquals(3, l.getSingletonVars().size());
+        
+        l = Literal.parseLiteral("a(Test,X,Y,b(g([V1,X,V2,V1]),c))[b,source(Y),B,kk(_)]");
+        assertEquals(3, l.getSingletonVars().size());
+
+        Plan p = Plan.parse("+e(X) : X > 10 <- .print(ok).");
+        assertEquals(0, p.getSingletonVars().size());
+        
+        p = Plan.parse("+e(x) : X > 10 <- .print(ok).");
+        assertEquals(1, p.getSingletonVars().size());
+        assertEquals("X", p.getSingletonVars().get(0).toString());
+
+        p = Plan.parse("+e(x) : a(X) & X > 10 <- .print(ok).");
+        assertEquals(0, p.getSingletonVars().size());
+        
+        p = Plan.parse("+e(x) : a(X) & X > 10 <- .print(W).");
+        assertEquals(1, p.getSingletonVars().size());
+        
+        p = Plan.parse("+e(x) : a(X) & X > 10 <- .print(_).");
+        assertEquals(0, p.getSingletonVars().size());
+	}	
+	
 }

@@ -29,6 +29,7 @@ import jason.asSyntax.parser.as2j;
 
 import java.io.StringReader;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -178,6 +179,10 @@ public class RelExpr implements LogicalFormula {
 		return t;
 	}
 	
+    public void countVars(Map<VarTerm, Integer> c) {
+        if (lhs != null) lhs.countVars(c);
+        if (rhs != null) rhs.countVars(c);
+    }
 
     @Override
 	public boolean equals(Object t) {
