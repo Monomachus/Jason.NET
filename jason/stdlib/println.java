@@ -52,7 +52,7 @@ public class println extends DefaultInternalAction {
         StringBuilder sout = new StringBuilder();
         try {
     	    if (ts.getSettings().logLevel() != Level.WARNING && args.length > 0) {
-    		sout = new StringBuilder("saying: ");
+    		sout = new StringBuilder();
     	    }
         } catch (Exception e) {}
 		
