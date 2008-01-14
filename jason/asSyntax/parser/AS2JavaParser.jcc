@@ -46,6 +46,7 @@ PARSER_BEGIN(as2j)
   import jason.asSyntax.BodyLiteral.BodyType;
   import jason.asSyntax.Trigger.TEOperator;
   import jason.asSyntax.Trigger.TEType;
+  import jason.jeditplugin.*;
 
   public class as2j {
     private String asSource = null;
@@ -53,6 +54,7 @@ PARSER_BEGIN(as2j)
     
     private static Logger logger = Logger.getLogger("aslparser");
     private static Set<String> parsedFiles = new HashSet<String>();
+    private static Config config = Config.get();
     
   }
 
@@ -143,7 +145,7 @@ void agent_component(Agent a) throws jason.JasonException :
     p = plan()         { if (a != null) {
                             a.getPL().add(p); 
                             // warning only not parsed files
-                            if (!parsedFiles.contains(asSource)) {
+                            if (config.getBoolean(Config.WARN_SING_VAR) && !parsedFiles.contains(asSource)) {
                                List<VarTerm> singletonVars = p.getSingletonVars();
                                if (singletonVars.size() > 0) {
                                   logger.warning("["+p.getSrc()+"] warning: the plan of line "+p.getBeginSrcLine()+" (te: '"+p.getTrigger()+"') has the following singleton variables: "+singletonVars);
@@ -162,7 +164,7 @@ Literal belief() : { Literal h; Object t; }
     [
       ":-" t = log_expr()    { h = new Rule(h,(LogicalFormula)t); 
                                // warning only not parsed files
-                               if (!parsedFiles.contains(asSource)) {
+                               if (config.getBoolean(Config.WARN_SING_VAR) && !parsedFiles.contains(asSource)) {
                                   List<VarTerm> singletonVars = h.getSingletonVars();
                                   if (singletonVars.size() > 0) {
                                      logger.warning("["+h.getSrc()+"] warning: the rule of line "+h.getBeginSrcLine()+" (head: '"+((Rule)h).headClone()+"') has the following singleton variables: "+singletonVars);                    

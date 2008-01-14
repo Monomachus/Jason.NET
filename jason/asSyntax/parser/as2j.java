@@ -16,6 +16,7 @@
   import jason.asSyntax.BodyLiteral.BodyType;
   import jason.asSyntax.Trigger.TEOperator;
   import jason.asSyntax.Trigger.TEType;
+  import jason.jeditplugin.*;
 
   public class as2j implements as2jConstants {
     private String asSource = null;
@@ -23,6 +24,7 @@
 
     private static Logger logger = Logger.getLogger("aslparser");
     private static Set<String> parsedFiles = new HashSet<String>();
+    private static Config config = Config.get();
 
 /* AgentSpeak Grammar */
   final public void agent(Agent a) throws ParseException, jason.JasonException {
@@ -102,7 +104,7 @@
                          if (a != null) {
                             a.getPL().add(p);
                             // warning only not parsed files
-                            if (!parsedFiles.contains(asSource)) {
+                            if (config.getBoolean(Config.WARN_SING_VAR) && !parsedFiles.contains(asSource)) {
                                List<VarTerm> singletonVars = p.getSingletonVars();
                                if (singletonVars.size() > 0) {
                                   logger.warning("["+p.getSrc()+"] warning: the plan of line "+p.getBeginSrcLine()+" (te: '"+p.getTrigger()+"') has the following singleton variables: "+singletonVars);
@@ -127,7 +129,7 @@
       t = log_expr();
                                h = new Rule(h,(LogicalFormula)t);
                                // warning only not parsed files
-                               if (!parsedFiles.contains(asSource)) {
+                               if (config.getBoolean(Config.WARN_SING_VAR) && !parsedFiles.contains(asSource)) {
                                   List<VarTerm> singletonVars = h.getSingletonVars();
                                   if (singletonVars.size() > 0) {
                                      logger.warning("["+h.getSrc()+"] warning: the rule of line "+h.getBeginSrcLine()+" (head: '"+((Rule)h).headClone()+"') has the following singleton variables: "+singletonVars);
@@ -1054,30 +1056,6 @@
     finally { jj_save(1, xla); }
   }
 
-  final private boolean jj_3R_63() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_68()) {
-    jj_scanpos = xsp;
-    if (jj_3R_69()) {
-    jj_scanpos = xsp;
-    if (jj_3R_70()) {
-    jj_scanpos = xsp;
-    if (jj_3R_71()) return true;
-    }
-    }
-    }
-    return false;
-  }
-
-  final private boolean jj_3R_43() {
-    if (jj_3R_47()) return true;
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_63()) jj_scanpos = xsp;
-    return false;
-  }
-
   final private boolean jj_3R_31() {
     if (jj_3R_30()) return true;
     return false;
@@ -1551,6 +1529,30 @@
 
   final private boolean jj_3R_68() {
     if (jj_scan_token(54)) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_63() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_68()) {
+    jj_scanpos = xsp;
+    if (jj_3R_69()) {
+    jj_scanpos = xsp;
+    if (jj_3R_70()) {
+    jj_scanpos = xsp;
+    if (jj_3R_71()) return true;
+    }
+    }
+    }
+    return false;
+  }
+
+  final private boolean jj_3R_43() {
+    if (jj_3R_47()) return true;
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_63()) jj_scanpos = xsp;
     return false;
   }
 

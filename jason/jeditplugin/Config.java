@@ -76,6 +76,7 @@ public class Config extends Properties {
     public static final String SHELL_CMD     = "shellCommand";
     public static final String CLOSEALL      = "closeAllBeforeOpenMAS2J";
     public static final String CHECK_VERSION = "checkLatestVersion";
+    public static final String WARN_SING_VAR = "warnSingletonVars";
 
     private static Config      singleton     = null;
 

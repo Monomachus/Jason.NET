@@ -14,6 +14,7 @@ import jason.asSyntax.RelExpr.RelationalOp;
 import jason.asSyntax.BodyLiteral.BodyType;
 import jason.asSyntax.Trigger.TEOperator;
 import jason.asSyntax.Trigger.TEType;
+import jason.jeditplugin.*;
 
 public class as2jTokenManager implements as2jConstants
 {

@@ -55,6 +55,7 @@ public class JasonIDOptionPanel extends AbstractOptionPane  {
 	//JCheckBox  insideJIDECBox;
 	JCheckBox  closeAllCBox;
     JCheckBox  checkVersionCBox;
+    JCheckBox  warnSingVarsCBox;
 
 	JTextField saciTF;
 	JTextField jadeJarTF;
@@ -112,7 +113,14 @@ public class JasonIDOptionPanel extends AbstractOptionPane  {
         checkVersionCBox = new JCheckBox("Check for new Jason versions on startup", false);
         checkVersionPanel.add(checkVersionCBox);
         jasonHomePanel.add(checkVersionPanel);
-    	pop.add(jasonHomePanel);
+        
+        // warn sing vars 
+        JPanel wsvPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        warnSingVarsCBox = new JCheckBox("Print out warnings about singleton variables in plans and rules", false);
+        wsvPanel.add(warnSingVarsCBox);
+        jasonHomePanel.add(wsvPanel);
+
+        pop.add(jasonHomePanel);
     	
 
     	// java home
@@ -259,6 +267,7 @@ public class JasonIDOptionPanel extends AbstractOptionPane  {
     	//insideJIDECBox.setSelected(userProperties.runAsInternalTread());
     	closeAllCBox.setSelected(userProperties.getBoolean(Config.CLOSEALL));
         checkVersionCBox.setSelected(userProperties.getBoolean(Config.CHECK_VERSION));
+        warnSingVarsCBox.setSelected(userProperties.getBoolean(Config.WARN_SING_VAR));
         jadeSnifferCB.setSelected(userProperties.getBoolean(Config.JADE_SNIFFER));        
         jadeRmaCB.setSelected(userProperties.getBoolean(Config.JADE_RMA));        
 	}
@@ -312,6 +321,7 @@ public class JasonIDOptionPanel extends AbstractOptionPane  {
 		//userProperties.put(Config.RUN_AS_THREAD, insideJIDECBox.isSelected()+"");
 		userProperties.put(Config.CLOSEALL, closeAllCBox.isSelected()+"");
         userProperties.put(Config.CHECK_VERSION, checkVersionCBox.isSelected()+"");
+        userProperties.put(Config.WARN_SING_VAR, warnSingVarsCBox.isSelected()+"");
         userProperties.put(Config.JADE_SNIFFER, jadeSnifferCB.isSelected()+"");
         userProperties.put(Config.JADE_RMA, jadeRmaCB.isSelected()+"");
 		userProperties.store();
