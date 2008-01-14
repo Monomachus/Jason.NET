@@ -38,8 +38,8 @@ public class UnnamedVar extends VarTerm {
         super("_" + (varCont++));
     }
 
-    private UnnamedVar(String name) {
-        super(name);
+    public UnnamedVar(String name) {
+        super( name.length() == 1 ? "_" + (varCont++) : name);
     }
 
     public Object clone() {

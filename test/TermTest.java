@@ -680,6 +680,9 @@ public class TermTest extends TestCase {
         l = Literal.parseLiteral("a(X,X)");
         assertEquals(0, l.getSingletonVars().size());
 
+        l = Literal.parseLiteral("a(_X,_Y,_X)");
+        assertEquals(0, l.getSingletonVars().size());
+
         l = Literal.parseLiteral("a(X,Y,b(g(X),c))");
         assertEquals(1, l.getSingletonVars().size());
         assertEquals("Y", l.getSingletonVars().get(0).toString());

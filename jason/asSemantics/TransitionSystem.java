@@ -490,7 +490,7 @@ public class TransitionSystem {
 	                Trigger te = new Trigger(TEOperator.add, TEType.test, body);
 	                if (ag.getPL().isRelevant(te.getPredicateIndicator())) {
 	                    Event evt = new Event(te, conf.C.SI);
-	                    logger.info("Test Goal '" + h + "' failed as simple query. Generating internal event for it: "+te);
+	                    if (logger.isLoggable(Level.FINE)) logger.fine("Test Goal '" + h + "' failed as simple query. Generating internal event for it: "+te);
 	                    conf.C.addEvent(evt);
 	                    confP.step = State.StartRC;
 	                    fail = false;

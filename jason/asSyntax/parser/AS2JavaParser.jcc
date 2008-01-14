@@ -100,7 +100,7 @@ TOKEN : {
 
 // Identifiers
 |  <ATOM      : (<LC_LETTER> | "." <CHAR>) (<CHAR> | "." <CHAR>)*>
-|  <UNNAMEDVAR: ("_" (["0"-"9"])*) >
+|  <UNNAMEDVAR: ("_" (<CHAR>)*) >
 |  <CHAR      : (<LETTER> | <DIGIT> | "_")>
 |  <LETTER    : ( <LC_LETTER> | <UP_LETTER> )>
 |  <LC_LETTER : ["a"-"z"]>
@@ -371,7 +371,7 @@ ListTermImpl list() : { ListTermImpl lt = new ListTermImpl(); ListTerm last;
   ( "," f=term()          { last = last.append(f); }
   )*
   [ "|"  ( K=<VAR>        { last.setNext(new VarTerm(K.image)); }
-         | K=<UNNAMEDVAR> { last.setNext(new UnnamedVar()); }
+         | K=<UNNAMEDVAR> { last.setNext(new UnnamedVar(K.image)); }
          | f=list()       { last = last.concat((ListTerm)f); }
          )           
   ]
@@ -541,7 +541,7 @@ Term function():          { Literal l; }
 VarTerm var():      { Token K; VarTerm v; ListTerm lt; }
 {
  ( K = <VAR>        { v = new VarTerm(K.image); v.setSrcLine(K.beginLine); v.setSrc(asSource);}
- | K = <UNNAMEDVAR> { v = new UnnamedVar(); }
+ | K = <UNNAMEDVAR> { v = new UnnamedVar(K.image); }
  )
  [ 
    lt = list()      { v.setAnnots(lt); }
