@@ -23,6 +23,7 @@
 
 package jason.asSyntax;
 
+import jason.JasonException;
 import jason.asSemantics.Agent;
 import jason.asSemantics.Unifier;
 import jason.asSemantics.VarsCluster;
@@ -562,12 +563,10 @@ public class VarTerm extends InternalActionLiteral implements NumberTerm, ListTe
     // ----------
 
     public double solve() throws Exception {
-        if (hasValue() && value.isNumeric()) {
+        if (hasValue() && value.isNumeric())
             return ((NumberTerm) value).solve();
-        } else {
-            logger.warning("Error getting numerical value of VarTerm " + this);
-        }
-        return 0;
+        else
+            throw new JasonException("Error getting numerical value of VarTerm " + this + " (the variable probably hasn't an unified value).");
     }
 
     // ----------
