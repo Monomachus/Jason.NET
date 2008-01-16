@@ -20,6 +20,10 @@ import java.util.Iterator;
   
   </ul>
   
+  <b>Bug</b>: this function does not work when the agent is cloned,
+  and so does not work in centralised/tread pool infrastructure.
+  Use the internal action in this infrastructure.
+
   @see jason.stdlib.count 
 
   @author Jomi 

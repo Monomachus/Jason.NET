@@ -75,15 +75,13 @@ public class VarTerm extends InternalActionLiteral implements NumberTerm, ListTe
 
     public Object clone() {
         if (value != null) {
-            return (Term) value.clone();
+            return value.clone();
         } else {
             // do not call constructor with term parameter!
             VarTerm t = new VarTerm(super.getFunctor());
-            t.setSrcLine(this.getSrcLine());
-            t.setSrc(this.getSrc());
-            if (hasAnnot()) {
+            t.setSrc(this);
+            if (hasAnnot())
                 t.setAnnots((ListTerm) getAnnots().clone());
-            }
             return t;
         }
     }
@@ -563,10 +561,12 @@ public class VarTerm extends InternalActionLiteral implements NumberTerm, ListTe
     // ----------
 
     public double solve() throws Exception {
-        if (hasValue() && value.isNumeric())
+        if (value != null && value.isNumeric())
             return ((NumberTerm) value).solve();
+        else if (hasValue())
+            throw new JasonException("Error getting numerical value of VarTerm " + super.getFunctor() + ", the variable ("+value+") value is not a number.");
         else
-            throw new JasonException("Error getting numerical value of VarTerm " + this + " (the variable probably hasn't an unified value).");
+            throw new JasonException("Error getting numerical value of VarTerm " + this + ", the variable hasn't a value.");
     }
 
     // ----------

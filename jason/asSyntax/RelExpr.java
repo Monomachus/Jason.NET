@@ -107,12 +107,12 @@ public class RelExpr extends BinaryStructure implements LogicalFormula {
                 	}
                 } else {
                 
-	                // first is var, second is list, var is assigned to l tranformed in literal
+	                // first is var, second is list, var is assigned to l transformed in literal
 	                if (p.isVar() && l.isList() && un.unifies(p, Literal.newFromListOfTerms(l))) {
 	                    return LogExpr.createUnifIterator(un);
 	                }
 	                
-	                // first is literal, second is var, var is assigned to l tranformed in list
+	                // first is literal, second is var, var is assigned to l transformed in list
 	                if (p.isLiteral() && l.isVar() && un.unifies(p.getAsListOfTerms(), l)) {
 	                    return LogExpr.createUnifIterator(un);
 	                }

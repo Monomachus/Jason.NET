@@ -479,7 +479,7 @@ public class TransitionSystem {
         // Rule Test
         case test:
             LogicalFormula f = h.getLogicalFormula();
-            if (f instanceof Term) ((Term)f).apply(u);
+            f.apply(u);
             if (conf.ag.believes(f, u)) {
                 updateIntention();
             } else {
