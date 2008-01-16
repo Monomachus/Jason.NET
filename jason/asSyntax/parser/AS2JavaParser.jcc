@@ -308,9 +308,11 @@ BodyLiteral body_formula() :  { Literal A; Token k;
   // actions or expressions
   rel = rel_expr()
                        { if (rel instanceof Literal) {
-                          return new BodyLiteral(formType, (Literal)rel);
+                            return new BodyLiteral(formType, (Literal)rel); // action
+                         } else if (rel instanceof RelExpr) {
+                            return new BodyLiteral((RelExpr)rel); // constraint 
                          } else {
-                          return new BodyLiteral((RelExpr)rel); 
+                            throw new ParseException("A body formula should be an action or a constraint (RelExpr).");
                          }
                        }
  )

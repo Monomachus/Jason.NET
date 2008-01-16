@@ -5,7 +5,6 @@ import jason.asSemantics.Unifier;
 import jason.util.ToDOM;
 
 import java.util.Iterator;
-import java.util.Map;
 
 /**
  * Represents a logical formula (p, p & q, not p, 3 > X, ...) which can be 
@@ -13,7 +12,7 @@ import java.util.Map;
  * 
  * @author Jomi
  */
-public interface LogicalFormula extends Cloneable, ToDOM {
+public interface LogicalFormula extends Term, Cloneable, ToDOM {
     /**
      * Checks whether the formula is a
      * logical consequence of the belief base.
@@ -22,13 +21,4 @@ public interface LogicalFormula extends Cloneable, ToDOM {
      */
     public Iterator<Unifier> logicalConsequence(Agent ag, Unifier un);
 
-    /** 
-     *  Applies variables's values in an unifier to the variables in the formula.
-     *  Returns true if some variable was applied.  
-     */
-    public boolean apply(Unifier u);
-    
-    public void countVars(Map<VarTerm, Integer> c);
-
-    public Object clone();
 }

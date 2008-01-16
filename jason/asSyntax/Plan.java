@@ -137,11 +137,11 @@ public class Plan extends SourceInfo implements Cloneable, Serializable {
     }
     
     public boolean isAtomic() {
-        return isAtomic; //properties.contains(Annots.atomic);
+        return isAtomic;
     }
     
     public boolean hasBreakpoint() {
-        return hasBreakpoint;//properties.contains(Annots.breakpoint);
+        return hasBreakpoint;
     }
 
     public boolean isAllUnifs() {
@@ -181,7 +181,7 @@ public class Plan extends SourceInfo implements Cloneable, Serializable {
             context.countVars(all);
         if (body != null)
             for (BodyLiteral bl: body)
-                bl.getLogicalFormula().countVars(all);
+            	bl.getLogicalFormula().countVars(all);
 
         List<VarTerm> r = new ArrayList<VarTerm>();
         for (VarTerm k: all.keySet()) {

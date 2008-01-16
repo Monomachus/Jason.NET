@@ -27,7 +27,7 @@ import jason.JasonException;
 import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
-import jason.asSyntax.Literal;
+import jason.asSyntax.LogicalFormula;
 import jason.asSyntax.NumberTermImpl;
 import jason.asSyntax.Term;
 
@@ -41,7 +41,9 @@ import java.util.Iterator;
   
   <p>Parameters:<ul>
   
-  <li>+ belief (literal): the belief to be counted.<br/>
+  <li>+ query (logical formula): the formula used to count literals in the belief base;
+  is has the same syntax as the plan context.
+  <br/>
   
   <li>+/- quantity (number): the number of occurrences of the belief.<br/>
   
@@ -51,6 +53,10 @@ import java.util.Iterator;
 
   <li> <code>.count(a(2,_),N)</code>: counts the number of beliefs
   that unify with <code>a(2,_)</code>; <code>N</code> unifies with
+  this quantity.</li>
+
+  <li> <code>.count((a(2,X)& X>10),N)</code>: counts the number of beliefs
+  that unify with <code>a(2,X)</code> and X > 10; <code>N</code> unifies with
   this quantity.</li>
 
   <li> <code>.count(a(2,_),5)</code>: succeeds if the BB has exactly 5
@@ -65,10 +71,9 @@ public class count extends DefaultInternalAction {
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         try {
-            Literal bel = (Literal)args[0]; // Literal.parseLiteral(args[0].toString());
+            LogicalFormula logExpr = (LogicalFormula)args[0];
             int n = 0;
-            // find all "bel" entries in the belief base and builds up a list with them
-            Iterator<Unifier> iu = bel.logicalConsequence(ts.getAg(), un);
+            Iterator<Unifier> iu = logExpr.logicalConsequence(ts.getAg(), un);
             while (iu.hasNext()) {
                 iu.next();
                 n++;

@@ -103,8 +103,7 @@ public class Structure extends DefaultTerm {
 
     protected int calcHashCode() {
         final int PRIME = 7;
-        int result = 1;
-        if (functor != null) result = PRIME * result + functor.hashCode();
+        int result = PRIME + functor.hashCode();
         final int ts = getArity();
         result = PRIME * result + ts;
         for (int i=0; i<ts; i++) {
@@ -123,7 +122,7 @@ public class Structure extends DefaultTerm {
             // if t is a VarTerm, uses var's equals
             if (tAsStruct.isVar()) return ((VarTerm)t).equals(this);
 
-            if (getFunctor() == null && tAsStruct.getFunctor() != null) return false;
+            // if (getFunctor() == null && tAsStruct.getFunctor() != null) return false;
             if (getFunctor() != null && !getFunctor().equals(tAsStruct.getFunctor())) return false;
             //if (getFunctor() != tAsStruct.getFunctor()) return false;
 

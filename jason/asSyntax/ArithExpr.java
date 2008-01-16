@@ -124,12 +124,15 @@ public class ArithExpr extends ArithFunctionTerm implements NumberTerm {
     	addTerm(t1);
     	addTerm(t2);
         op = oper;
+		if (t1 instanceof SourceInfo) setSrc((SourceInfo)t1);
+		else if (t2 instanceof SourceInfo) setSrc((SourceInfo)t2);        
     }
 
     public ArithExpr(ArithmeticOp oper, NumberTerm t1) {
     	super(oper.toString(),1);
     	addTerm(t1);
         op = oper;
+		if (t1 instanceof SourceInfo) setSrc((SourceInfo)t1);
     }
     
     private ArithExpr(ArithExpr ae) { // for clone
@@ -173,14 +176,6 @@ public class ArithExpr extends ArithFunctionTerm implements NumberTerm {
         }
     }
 
-    @Override
-    protected int calcHashCode() {
-    	if (isEvaluated()) 
-    		return getValue().hashCode();
-    	else
-    		return op.hashCode() + super.calcHashCode();
-    }
-    
     /** gets the Operation of this Expression */
     public ArithmeticOp getOp() {
         return op;

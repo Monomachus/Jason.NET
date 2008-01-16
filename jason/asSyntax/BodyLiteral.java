@@ -55,15 +55,13 @@ public class BodyLiteral extends SourceInfo implements Cloneable {
 
     public BodyLiteral(RelExpr re) {
         formula = (LogicalFormula) re.clone();
-        setSrcLine(re.getSrcLine());
-        setSrc(re.getSrc());
+        setSrc(re);
         formType = BodyType.constraint;
     }
 
     public BodyLiteral(LogExpr le) {
         formula = (LogicalFormula) le.clone();
-        setSrcLine(le.getSrcLine());
-        setSrc(le.getSrc());
+        setSrc(le);
         formType = BodyType.test;
     }
 
@@ -82,18 +80,6 @@ public class BodyLiteral extends SourceInfo implements Cloneable {
         return formula;
     }
 
-    // used with arithmetic expressions
-    public void addTerm(Term t) {
-        ((Literal)formula).addTerm(t);
-    }
-
-    public String getSrcInfo() {
-    	String line = "";
-    	if (getSrcLine() >= 0)   line = ":"+getSrcLine();
-        if (getSrc() != null) line = getSrc()+line;
-    	return " ("+line+")";
-    }
-    
     @Override
     public boolean equals(Object o) {
         if (o != null && o instanceof BodyLiteral) {

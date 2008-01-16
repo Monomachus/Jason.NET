@@ -59,8 +59,8 @@ public class ASParserTest extends TestCase {
         t1 = LogExpr.parseExpr("-2 > -3");
         assertTrue(t1 != null);
         RelExpr r1 = (RelExpr) t1;
-        NumberTerm lt1 = (NumberTerm)r1.getLHS();
-        NumberTerm rt1 = (NumberTerm)r1.getRHS();
+        NumberTerm lt1 = (NumberTerm)r1.getTerm(0);
+        NumberTerm rt1 = (NumberTerm)r1.getTerm(1);
         assertEquals(lt1.solve(),-2.0);
         assertEquals(rt1.solve(),-3.0);
         //System.out.println(lt1.getClass().getName()+"="+lt1.compareTo(rt1));

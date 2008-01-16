@@ -456,7 +456,7 @@ public class TransitionSystem {
                 im.unif = iu.next();
                 updateIntention();
             } else {
-                if (logger.isLoggable(Level.FINE)) logger.fine("Constraint "+h+" was not satisfied"+h.getSrcInfo()+".");
+                if (logger.isLoggable(Level.FINE)) logger.fine("Constraint "+h+" was not satisfied ("+h.getErrorMsg()+").");
                 generateGoalDeletion();
             }
             break;
@@ -479,7 +479,7 @@ public class TransitionSystem {
         // Rule Test
         case test:
             LogicalFormula f = h.getLogicalFormula();
-            f.apply(u);
+            if (f instanceof Term) ((Term)f).apply(u);
             if (conf.ag.believes(f, u)) {
                 updateIntention();
             } else {
@@ -497,7 +497,7 @@ public class TransitionSystem {
 	                } 
             	}
                 if (fail) {
-                    logger.info("Test '"+h+"' failed"+h.getSrcInfo()+".");
+                    if (logger.isLoggable(Level.FINE)) logger.fine("Test '"+h+"' failed ("+h.getErrorMsg()+").");
                     generateGoalDeletion();
                 }
             }

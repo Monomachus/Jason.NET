@@ -29,7 +29,7 @@ import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.ListTerm;
 import jason.asSyntax.ListTermImpl;
-import jason.asSyntax.Literal;
+import jason.asSyntax.LogicalFormula;
 import jason.asSyntax.Term;
 
 import java.util.Iterator;
@@ -48,7 +48,9 @@ import java.util.Iterator;
   <li>+ term (variable or structure): the variable or structure whose
   instances will "populate" the list.<br/>
   
-  <li>+ query (literal): the literal to match against the belief base.<br/>
+  <li>+ query (logical formula): the formula used to find literals in the belief base;
+  is has the same syntax as the plan context.
+  <br/>
 
   <li>+/- result (list): the resulting populated list.<br/>
   
@@ -65,6 +67,8 @@ import java.util.Iterator;
   <li> <code>.findall(c(Y,X),b(X,Y),L)</code>: <code>L</code> unifies
   with <code>[c(2,1),c(4,3),c(6,5)]</code>.</li>
 
+  <li> <code>.findall(r(X,V1,V2), (a(X) & b(V1,V2) & V1*V2 < X), L)</code>: <code>L</code> unifies
+  with <code>[r(30,1,2),r(30,3,4),r(20,1,2),r(20,3,4)]</code>.</li>
   </ul>
 
 
@@ -76,16 +80,16 @@ public class findall extends DefaultInternalAction {
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         try {
             Term var = args[0];
-            Literal bel = (Literal)args[1];
+            LogicalFormula logExpr = (LogicalFormula)args[1];
 
-            // find all 'bel' entries in the belief base and builds up a list with them
             ListTerm all = new ListTermImpl();
-            Iterator<Unifier> iu = bel.logicalConsequence(ts.getAg(), un);
+            ListTerm tail = all;
+            Iterator<Unifier> iu = logExpr.logicalConsequence(ts.getAg(), un);
             while (iu.hasNext()) {
                 Unifier nu = iu.next();
                 Term vl = (Term) var.clone();
                 vl.apply(nu);
-                all.add(vl);
+                tail = tail.append(vl);
             }
             Term list = args[2];
             return un.unifies(list, all);

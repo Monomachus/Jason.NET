@@ -51,13 +51,13 @@ public class ArithFunctionTerm extends Structure implements NumberTerm {
 	}
 	
 	@Override
-	public boolean isStructure() {
-		return false;
-	}
-
-	@Override
 	public boolean isNumeric() {
 		return true;
+	}
+	
+	@Override
+	public boolean isStructure() {
+		return false;
 	}
 
     @Override

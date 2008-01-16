@@ -23,7 +23,6 @@
 
 package jason.asSyntax;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -94,9 +93,7 @@ public class Rule extends Literal {
     @Override
     public boolean hasVar(VarTerm t) {
         if (super.hasVar(t)) return true;
-        Map<VarTerm, Integer> c = new HashMap<VarTerm, Integer>();
-        body.countVars(c);
-        return c.containsKey(t);
+        return body.hasVar(t);
     }
     
     public void countVars(Map<VarTerm, Integer> c) {

@@ -4,7 +4,7 @@ import jason.JasonException;
 import jason.asSemantics.DefaultArithFunction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
-import jason.asSyntax.Literal;
+import jason.asSyntax.LogicalFormula;
 import jason.asSyntax.Term;
 
 import java.util.Iterator;
@@ -37,10 +37,9 @@ public class Count extends DefaultArithFunction  {
 	    if (ts == null) {
             throw new JasonException("The TransitionSystem parameter of the function '.count' can not be null.");
 	    }
-        Literal bel = (Literal)args[0]; // Literal.parseLiteral(args[0].toString());
+        LogicalFormula logExpr = (LogicalFormula)args[0];
         int n = 0;
-        // find all "bel" entries in the belief base and builds up a list with them
-        Iterator<Unifier> iu = bel.logicalConsequence(ts.getAg(), new Unifier());
+        Iterator<Unifier> iu = logExpr.logicalConsequence(ts.getAg(), new Unifier());
         while (iu.hasNext()) {
             iu.next();
             n++;

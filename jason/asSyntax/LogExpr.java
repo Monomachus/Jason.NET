@@ -31,7 +31,6 @@ import java.io.StringReader;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -42,7 +41,7 @@ import org.w3c.dom.Element;
 /** 
  *  Represents a logical formula with some logical operator ("&amp;",  "|", "not").
  */
-public class LogExpr implements LogicalFormula {
+public class LogExpr extends BinaryStructure implements LogicalFormula {
 
 	private static final long serialVersionUID = 1L;
     private static Logger logger = Logger.getLogger(LogExpr.class.getName());
@@ -56,69 +55,31 @@ public class LogExpr implements LogicalFormula {
 		or     { public String toString() { return " | "; } };
 	}
 
-	private  LogicalFormula lhs, rhs;
-	private  LogicalOp      op = LogicalOp.none;
-	
-	public LogExpr() {
-		super();
-	}
+	private  LogicalOp op = LogicalOp.none;
 	
 	public LogExpr(LogicalFormula f1, LogicalOp oper, LogicalFormula f2) {
-		lhs = f1;
+		super(f1, oper.toString(), f2);
 		op = oper;
-		rhs = f2;
 	}
 
 	public LogExpr(LogicalOp oper, LogicalFormula f) {
+		super(oper.toString(),(Term)f);
 		op = oper;
-		rhs = f;
 	}
-
-	public boolean apply(Unifier u) {
-		boolean r1 = true, r2 = true;
-		if (lhs != null) r1 = lhs.apply(u);
-		if (rhs != null) r2 = rhs.apply(u);
-		return r1 && r2;
-	}
-	
-	public int getSrcLine() {
-		int l = -1;
-		if (lhs != null)          l = getSrcLine(lhs);
-		if (rhs != null && l < 0) l = getSrcLine(rhs);
-		return l;
-	}
-    private int getSrcLine(LogicalFormula f) {
-        if (f instanceof Term)    return ((Term)f).getSrcLine();
-        if (f instanceof LogExpr) return ((LogExpr)f).getSrcLine();
-        return -1;
-    }
-    
-    public String getSrc() {
-        String s = null;
-        if (lhs != null)              s = getSrc(lhs);
-        if (rhs != null && s != null) s = getSrc(rhs);
-        return s;     
-    }    
-    private String getSrc(LogicalFormula f) {
-        if (f instanceof Term)    return ((Term)f).getSrc();
-        if (f instanceof LogExpr) return ((LogExpr)f).getSrc();
-        return null;
-    }
-    
 	
     public Iterator<Unifier> logicalConsequence(final Agent ag, final Unifier un) {
         try {
 	        switch (op) {
 	        
 	        case not:
-	            if (!rhs.logicalConsequence(ag,un).hasNext()) {
+	            if (!getLHS().logicalConsequence(ag,un).hasNext()) {
 	                return createUnifIterator(un);
 	            }
 	            break;
 	        
 	        case and:
 	            return new Iterator<Unifier>() {
-	                Iterator<Unifier> ileft   = lhs.logicalConsequence(ag,un);;
+	                Iterator<Unifier> ileft   = getLHS().logicalConsequence(ag,un);;
                     Iterator<Unifier> iright  = null;
 	                Unifier           current = null;
 	                
@@ -137,7 +98,7 @@ public class LogExpr implements LogicalFormula {
 	                private void get() {
 	                    current = null;
 	                    while ((iright == null || !iright.hasNext()) && ileft.hasNext())
-	                        iright = rhs.logicalConsequence(ag, ileft.next());
+	                        iright = getRHS().logicalConsequence(ag, ileft.next());
 	                    if (iright != null && iright.hasNext())
 	                        current = iright.next();
 	                }
@@ -146,7 +107,7 @@ public class LogExpr implements LogicalFormula {
 	            
 	        case or:
 	            return new Iterator<Unifier>() {
-	                Iterator<Unifier> ileft  = lhs.logicalConsequence(ag,un);
+	                Iterator<Unifier> ileft  = getLHS().logicalConsequence(ag,un);
 	                Iterator<Unifier> iright = null;
 	                Unifier current          = null;
 	                
@@ -168,7 +129,7 @@ public class LogExpr implements LogicalFormula {
 	                        current = ileft.next();
 	                    } else {
 	                        if (iright == null)
-	                            iright = rhs.logicalConsequence(ag,un);
+	                            iright = getRHS().logicalConsequence(ag,un);
 	                        if (iright.hasNext())
 	                            current = iright.next();
 	                    }
@@ -177,21 +138,19 @@ public class LogExpr implements LogicalFormula {
 	            };
 	        }
 	    } catch (Exception e) {
-    		String slhs = "is null";
-    		if (lhs != null) {
-    			Iterator<Unifier> i = lhs.logicalConsequence(ag,un);
-    			if (i != null) {
-    				slhs = "";
-    				while (i.hasNext()) {
-    					slhs += i.next().toString()+", ";
-    				}
-    			} else {
-    				slhs = "iterator is null";
-    			}
-    		} 
-    		String srhs = "is null";
-    		if (lhs != null) {
-    			Iterator<Unifier> i = rhs.logicalConsequence(ag,un);
+    		String slhs = "is null ";
+			Iterator<Unifier> i = getLHS().logicalConsequence(ag,un);
+			if (i != null) {
+				slhs = "";
+				while (i.hasNext()) {
+					slhs += i.next().toString()+", ";
+				}
+			} else {
+				slhs = "iterator is null";
+			}
+    		String srhs = "is null ";
+    		if (!isUnary()) {
+    			i = getRHS().logicalConsequence(ag,un);
     			if (i != null) {
     				srhs = "";
     				while (i.hasNext()) {
@@ -232,44 +191,16 @@ public class LogExpr implements LogicalFormula {
         return null;
     }
 	
-    public void countVars(Map<VarTerm, Integer> c) {
-        if (lhs != null) lhs.countVars(c);
-        if (rhs != null) rhs.countVars(c);
-    }
-    
 	/** make a hard copy of the terms */
 	public Object clone() {
 		// do not call constructor with term parameter!
-		LogExpr t = new LogExpr();
-        t.op = this.op;
-		if (lhs != null) t.lhs = (LogicalFormula) lhs.clone();
-		if (rhs != null) t.rhs = (LogicalFormula) rhs.clone();
-		return t;
+		if (isUnary())
+			return new LogExpr(op, (LogicalFormula)getTerm(0).clone());
+		else
+			return new LogExpr((LogicalFormula)getTerm(0).clone(), op, (LogicalFormula)getTerm(1).clone());
 	}
 	
 
-    @Override
-	public boolean equals(Object t) {
-		if (t != null && t instanceof LogExpr) {
-			LogExpr eprt = (LogExpr)t;
-			if (lhs == null && eprt.lhs != null) return false;
-			if (lhs != null && !lhs.equals(eprt.lhs)) return false;
-			if (op != eprt.op) return false;
-			if (rhs == null && eprt.rhs != null) return false;
-			if (rhs != null && !rhs.equals(eprt.rhs)) return false;
-			return true;
-		} 
-		return false;
-	}
-
-    @Override
-    public int hashCode() {
-        int code = op.hashCode();
-        if (lhs != null) code += lhs.hashCode();
-        if (rhs != null) code += rhs.hashCode();
-        return code;
-    }	
-    
 	/** gets the Operation of this Expression */
 	public LogicalOp getOp() {
 		return op;
@@ -277,43 +208,18 @@ public class LogExpr implements LogicalFormula {
 	
 	/** gets the LHS of this Expression */
 	public LogicalFormula getLHS() {
-		return lhs;
+		return (LogicalFormula)getTerm(0);
 	}
 	
 	/** gets the RHS of this Expression */
 	public LogicalFormula getRHS() {
-		return rhs;
-	}
-	
-	public boolean isUnary() {
-		return lhs == null;
-	}
-
-	
-    @Override
-    public String toString() {
-		if (lhs == null) {
-			return op+"("+rhs+")";
-		} else {
-			return "("+lhs+op+rhs+")";
-		}
+		return (LogicalFormula)getTerm(1);
 	}
 
     /** get as XML */
     public Element getAsDOM(Document document) {
-        Element u = (Element) document.createElement("expression");
+        Element u = super.getAsDOM(document);
         u.setAttribute("type","logical");
-        u.setAttribute("operator", op.toString());
-        if (lhs != null) {
-            Element l = (Element) document.createElement("left");
-            l.appendChild(lhs.getAsDOM(document));
-            u.appendChild(l);
-        }
-        if (rhs != null) {
-            Element r = (Element) document.createElement("right");
-            r.appendChild(rhs.getAsDOM(document));
-            u.appendChild(r);
-        }
         return u;
     }
 }

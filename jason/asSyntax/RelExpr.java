@@ -29,7 +29,6 @@ import jason.asSyntax.parser.as2j;
 
 import java.io.StringReader;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -53,9 +52,9 @@ import org.w3c.dom.Element;
  *      X is [~p, [t1, t2], [a1,a2]]
  * </ul>
  * 
- * @author jomi
+ * @author Jomi
  */
-public class RelExpr implements LogicalFormula {
+public class RelExpr extends BinaryStructure implements LogicalFormula {
 
 	private static final long serialVersionUID = 1L;
     private static Logger logger = Logger.getLogger(RelExpr.class.getName());
@@ -72,43 +71,16 @@ public class RelExpr implements LogicalFormula {
 		literalBuilder { public String toString() { return " =.. "; } };
 	}
 
-    private Term         lhs, rhs;
 	private RelationalOp op = RelationalOp.none;
 
-	public RelExpr() {
-		super();
-	}
-	
 	public RelExpr(Term t1, RelationalOp oper, Term t2) {
-		lhs = t1;
+		super(t1,oper.toString(),t2);
 		op = oper;
-		rhs = t2;
 	}
     
-	public boolean apply(Unifier u) {
-		boolean r1 = true, r2 = true;
-		if (lhs != null) r1 = lhs.apply(u);
-		if (rhs != null) r2 = rhs.apply(u);
-		return r1 && r2;
-	}
-
-	public int getSrcLine() {
-		int l = -1;
-		if (lhs != null)          l = lhs.getSrcLine();
-		if (rhs != null && l < 0) l = rhs.getSrcLine();
-		return l;
-	}
-    
-    public String getSrc() {
-        String s = null;
-        if (lhs != null)              s = lhs.getSrc();
-        if (rhs != null && s != null) s = rhs.getSrc();
-        return s;     
-    }
-	
     public Iterator<Unifier> logicalConsequence(final Agent ag, Unifier un) {
-        Term xp = (Term)lhs.clone();
-        Term yp = (Term)rhs.clone();
+        Term xp = (Term)getTerm(0).clone();
+        Term yp = (Term)getTerm(1).clone();
         xp.apply(un);
         yp.apply(un);
 
@@ -146,7 +118,7 @@ public class RelExpr implements LogicalFormula {
 	                }
 
 	                // both are vars, error
-	                logger.log(Level.SEVERE, "Both arguments of "+lhs+" =.. "+rhs+" are variables!");
+	                logger.log(Level.SEVERE, "Both arguments of "+getTerm(0)+" =.. "+getTerm(1)+" are variables!");
                 }
 
             } catch (Exception e) {
@@ -171,74 +143,17 @@ public class RelExpr implements LogicalFormula {
 	
 	/** make a hard copy of the terms */
 	public Object clone() {
-		// do not call constructor with term parameter!
-		RelExpr t = new RelExpr();
-        t.op = this.op;
-		if (lhs != null) t.lhs = (Term) lhs.clone();
-		if (rhs != null) t.rhs = (Term) rhs.clone();
-		return t;
+		return  new RelExpr((Term)getTerm(0).clone(), op, (Term)getTerm(1).clone());
 	}
-	
-    public void countVars(Map<VarTerm, Integer> c) {
-        if (lhs != null) lhs.countVars(c);
-        if (rhs != null) rhs.countVars(c);
-    }
-
-    @Override
-	public boolean equals(Object t) {
-		if (t != null && t instanceof RelExpr) {
-			RelExpr eprt = (RelExpr)t;
-			if (lhs == null && eprt.lhs != null) return false;
-			if (lhs != null && !lhs.equals(eprt.lhs)) return false;
-			if (op != eprt.op) return false;
-			if (rhs == null && eprt.rhs != null) return false;
-			if (rhs != null && !rhs.equals(eprt.rhs)) return false;
-			return true;
-		}
-        return false;
-	}
-
-    @Override
-    public int hashCode() {
-        int code = op.hashCode();
-        if (lhs != null) code += lhs.hashCode();
-        if (rhs != null) code += rhs.hashCode();
-        return code;
-    }
 	
 	/** gets the Operation of this Expression */
 	public RelationalOp getOp() {
 		return op;
 	}
-	
-	/** gets the LHS of this Expression */
-	public Term getLHS() {
-		return lhs;
-	}
-	
-	/** gets the RHS of this Expression */
-	public Term getRHS() {
-		return rhs;
-	}
-	
-	public String toString() {
-		return "("+lhs+op+rhs+")";
-	}
-    
-    
     /** get as XML */
     public Element getAsDOM(Document document) {
-        Element u = (Element) document.createElement("expression");
+        Element u = super.getAsDOM(document);
         u.setAttribute("type","relational");
-        u.setAttribute("operator", op.toString());
-        if (rhs!=null) {
-            Element l = (Element) document.createElement("left");
-            l.appendChild(lhs.getAsDOM(document));
-            u.appendChild(l);
-        }
-        Element r = (Element) document.createElement("right");
-        r.appendChild(rhs.getAsDOM(document));
-        u.appendChild(r);
         return u;
     }
 }
