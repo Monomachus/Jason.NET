@@ -83,7 +83,7 @@ public class ArithFunctionTerm extends Structure implements NumberTerm {
     
     @Override
     protected List<Term> getDeepCopyOfTerms() {
-        if (getTerms() == null || getArity() == 0)
+        if (getArity() == 0)
             return new ArrayList<Term>(2);
         else
             return super.getDeepCopyOfTerms();

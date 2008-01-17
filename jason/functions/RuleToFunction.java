@@ -4,6 +4,7 @@ import jason.JasonException;
 import jason.asSemantics.DefaultArithFunction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
+import jason.asSyntax.InternalActionLiteral;
 import jason.asSyntax.Literal;
 import jason.asSyntax.NumberTerm;
 import jason.asSyntax.Term;
@@ -39,7 +40,11 @@ public class RuleToFunction extends DefaultArithFunction  {
 	@Override
 	public double evaluate(TransitionSystem ts, Term[] args) throws Exception {
 	    // create a literal to perform the query
-	    Literal r = new Literal(rule);
+	    Literal r;
+	    if (rule.indexOf(".") > 0) // is internal action
+	        r = new InternalActionLiteral(rule);
+	    else
+	        r = new Literal(rule);
 	    for (Term t: args)
 	        r.addTerm(t);
 	    VarTerm answer = new VarTerm("__RuleToFunctionResult");

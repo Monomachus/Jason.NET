@@ -236,7 +236,10 @@ public class Structure extends DefaultTerm {
     }
 
     public int getArity() {
-        return terms.size();
+        if (terms == null)
+            return 0;
+        else
+            return terms.size();
     }
     
     /** @deprecated use getArity */
@@ -345,7 +348,7 @@ public class Structure extends DefaultTerm {
     }
 
     protected List<Term> getDeepCopyOfTerms() {
-        List<Term> l = new ArrayList<Term>(terms.size());
+        List<Term> l = new ArrayList<Term>(getArity());
         for (Term ti: terms) {
             l.add((Term)ti.clone());
         }
