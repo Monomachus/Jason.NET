@@ -18,8 +18,6 @@ import jason.asSyntax.Term;
 */
 public class Abs extends DefaultArithFunction  {
 
-	private static final long serialVersionUID = 1L;
-
 	public String getName() {
 	    return "math.abs";
 	}

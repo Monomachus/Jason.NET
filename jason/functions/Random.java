@@ -19,8 +19,6 @@ import jason.asSyntax.Term;
 */
 public class Random extends DefaultArithFunction  {
 
-	private static final long serialVersionUID = 1L;
-
     public String getName() {
         return "math.random";
     }

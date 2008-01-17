@@ -10,7 +10,7 @@ import jason.asSyntax.Term;
 import java.util.Iterator;
 
 /** 
-  <p>Function: <b><code>.count(N)</code></b>: counts the number of occurrences of a particular belief
+  <p>Function: <b><code>.count(B)</code></b>: counts the number of occurrences of a particular belief
   (pattern) in the agent's belief base, as the internal action .count.
 
   <p>Example:<ul> 
@@ -29,8 +29,6 @@ import java.util.Iterator;
   @author Jomi 
 */
 public class Count extends DefaultArithFunction  {
-
-	private static final long serialVersionUID = 1L;
 
 	public String getName() {
 	    return ".count";

@@ -7,27 +7,22 @@ import jason.asSyntax.NumberTerm;
 import jason.asSyntax.Term;
 
 /** 
-  <p>Function: <b><code>math.sqrt(N)</code></b>: encapsulates java Math.sqrt(N);
-  returns the correctly rounded positive square root of N.
+  <p>Function: <b><code>math.log(N)</code></b>: encapsulates java Math.log(N),
+  returns the natural logarithm (base e) of N.
   
-  <p>Example:<ul>
-  <li> <code>math.sqrt(9)</code>: returns 3.</li>
-  </ul>
-   
   @author Jomi 
 */
-public class Sqrt extends DefaultArithFunction  {
+public class log extends DefaultArithFunction  {
 
 	public String getName() {
-        return "math.sqrt";
-    }
-    
-
+	    return "math.log";
+	}
+	
 	@Override
 	public double evaluate(TransitionSystem ts, Term[] args) throws Exception {
 		if (args[0].isNumeric()) {
 			double n = ((NumberTerm)args[0]).solve();
-			return Math.sqrt(n);
+			return Math.log(n);
 		} else {
 			throw new JasonException("The argument '"+args[0]+"' is not numeric!");
 		}

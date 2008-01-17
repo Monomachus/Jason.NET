@@ -13,6 +13,11 @@ import jason.functions.Min;
 import jason.functions.Round;
 import jason.functions.Sqrt;
 import jason.functions.Random;
+import jason.functions.ceil;
+import jason.functions.e;
+import jason.functions.floor;
+import jason.functions.log;
+import jason.functions.pi;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -39,6 +44,11 @@ public class FunctionRegister implements Directive {
         addFunction(Round.class);
         addFunction(Sqrt.class);
         addFunction(Count.class);
+        addFunction(pi.class);
+        addFunction(e.class);
+        addFunction(floor.class);
+        addFunction(ceil.class);
+        addFunction(log.class);
     }
         
     public static void addFunction(Class<? extends ArithFunction> c) {
