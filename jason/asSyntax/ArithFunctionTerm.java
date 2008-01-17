@@ -1,10 +1,12 @@
 package jason.asSyntax;
 
 import jason.JasonException;
+import jason.asSemantics.Agent;
 import jason.asSemantics.ArithFunction;
 import jason.asSemantics.Unifier;
-import jason.asSemantics.Agent;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -73,6 +75,18 @@ public class ArithFunctionTerm extends Structure implements NumberTerm {
     @Override
     public boolean isGround() {
         return isEvaluated() || super.isGround();
+    }
+
+    public boolean isUnary() {
+        return getArity() == 1;
+    }
+    
+    @Override
+    protected List<Term> getDeepCopyOfTerms() {
+        if (getTerms() == null || getArity() == 0)
+            return new ArrayList<Term>(2);
+        else
+            return super.getDeepCopyOfTerms();
     }
 
     /**

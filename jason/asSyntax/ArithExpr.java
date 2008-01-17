@@ -191,10 +191,6 @@ public class ArithExpr extends ArithFunctionTerm implements NumberTerm {
         return (NumberTerm)getTerm(0);
     }
 
-    public boolean isUnary() {
-        return getArity() == 1;
-    }
-
     @Override
     public String toString() {
         if (isEvaluated()) {
