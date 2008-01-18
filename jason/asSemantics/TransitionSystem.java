@@ -28,15 +28,14 @@ import jason.architecture.AgArch;
 import jason.asSyntax.Atom;
 import jason.asSyntax.BodyLiteral;
 import jason.asSyntax.DefaultTerm;
+import jason.asSyntax.InternalActionLiteral;
 import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Literal;
 import jason.asSyntax.LogicalFormula;
 import jason.asSyntax.Plan;
 import jason.asSyntax.PlanLibrary;
-import jason.asSyntax.Pred;
 import jason.asSyntax.Term;
 import jason.asSyntax.Trigger;
-import jason.asSyntax.BodyLiteral.BodyType;
 import jason.asSyntax.Trigger.TEOperator;
 import jason.asSyntax.Trigger.TEType;
 import jason.bb.BeliefBase;
@@ -288,6 +287,8 @@ public class TransitionSystem {
      * This step is new in Jason 1.0.2 and replaces the steps RelPl->ApplPl->SelAppl when the user
      * does not customise selectOption. This version does not create the RP and AP lists and thus 
      * optimise the reasoning cycle. It searches for the first option and automatically selects it.
+     * 
+     * @since 1.0.2
      */
     private void applyFindOp() throws JasonException {
         confP.step = State.AddIM; // default next step
@@ -401,30 +402,24 @@ public class TransitionSystem {
         Unifier     u = im.unif;
         BodyLiteral h = im.getCurrentStep(); 
 
-        Literal body = null;
+        h.getLogicalFormula().apply(u);
         
-        // clone and apply body
-        if (h.getType() != BodyType.constraint && h.getType() != BodyType.test) { // constraint and test body may be not a literal
-        	Literal hl = h.getLiteralFormula(); 
-        	if (hl instanceof Atom) { 
-        		body = new Literal(hl.getFunctor());
-        	} else { 
-        		body = (Literal)hl.clone();
-        		body.apply(u);
-        	}
+        Literal body = null;
+        if (h.getLogicalFormula() instanceof Literal) {
+            body = h.getLiteralFormula();
         }
 
         switch (h.getType()) {
 
         // Rule Action
         case action:
-            confP.C.A = new ActionExec((Pred) body, conf.C.SI);
+            confP.C.A = new ActionExec(body, conf.C.SI);
             break;
 
         case internalAction:
             boolean ok = false;
             try {
-                InternalAction ia = ag.getIA(body);
+                InternalAction ia = ((InternalActionLiteral)body).getIA(ag);
                 Object oresult = ia.execute(this, u, body.getTermsArray());
                 if (oresult != null) {
                     ok = oresult instanceof Boolean && (Boolean)oresult;
@@ -451,7 +446,7 @@ public class TransitionSystem {
             break;
 
         case constraint:
-            Iterator<Unifier> iu = ((LogicalFormula)h.getLogicalFormula().clone()).logicalConsequence(ag, u);
+            Iterator<Unifier> iu = h.getLogicalFormula().logicalConsequence(ag, u);
             if (iu.hasNext()) {
                 im.unif = iu.next();
                 updateIntention();
@@ -464,6 +459,7 @@ public class TransitionSystem {
         // Rule Achieve
         case achieve:
             // free variables in an event cannot conflict with those in the plan
+            body = (Literal)body.clone();
             body.makeVarsAnnon();
             conf.C.addAchvGoal(body, conf.C.SI);
             confP.step = State.StartRC;
@@ -471,6 +467,7 @@ public class TransitionSystem {
 
         // Rule Achieve as a New Focus (the !! operator)
         case achieveNF:
+            body = (Literal)body.clone();
             body.makeVarsAnnon();
             conf.C.addAchvGoal(body, Intention.EmptyInt);
             updateIntention();
@@ -479,7 +476,6 @@ public class TransitionSystem {
         // Rule Test
         case test:
             LogicalFormula f = h.getLogicalFormula();
-            f.apply(u);
             if (conf.ag.believes(f, u)) {
                 updateIntention();
             } else {
@@ -510,6 +506,8 @@ public class TransitionSystem {
             if (!body.hasAnnot()) {
                 // do not add source(self) in case the
                 // programmer set some annotation
+                if (body instanceof Atom)
+                    body = new Literal(body.getFunctor());                
                 body.addAnnot(BeliefBase.TSelf);
             }
             Literal bc = (Literal)body.clone();
@@ -530,6 +528,8 @@ public class TransitionSystem {
             if (!body.hasSource()) {
                 // do not add source(self) in case the
                 // programmer set the source
+                if (body instanceof Atom)
+                    body = new Literal(body.getFunctor());                
                 body.addAnnot(BeliefBase.TSelf);
             }
 
@@ -556,6 +556,8 @@ public class TransitionSystem {
             if (!body.hasAnnot()) {
                 // do not add source(self) in case the
                 // programmer set some annotation
+                if (body instanceof Atom)
+                    body = new Literal(body.getFunctor());                
                 body.addAnnot(BeliefBase.TSelf);
             }
 

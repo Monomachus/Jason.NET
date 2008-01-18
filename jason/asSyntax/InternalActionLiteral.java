@@ -24,6 +24,7 @@
 package jason.asSyntax;
 
 import jason.asSemantics.Agent;
+import jason.asSemantics.InternalAction;
 import jason.asSemantics.Unifier;
 
 import java.util.Iterator;
@@ -41,18 +42,24 @@ public class InternalActionLiteral extends Literal {
 
 	private static final long serialVersionUID = 1L;
     private static Logger logger = Logger.getLogger(InternalActionLiteral.class.getName());
-
-	/** creates a positive literal */
+    
+    private InternalAction ia = null; // reference to the object that implements the internal action
+    
 	public InternalActionLiteral(String functor) {
 		super(functor);
 	}
 
+	// used by clone
 	public InternalActionLiteral(InternalActionLiteral l) {
 		super((Literal) l);
+		this.ia = l.ia;
 	}
 
-	public InternalActionLiteral(Pred p) {
+	// used by the parser
+	public InternalActionLiteral(Pred p, Agent ag) {
         super(true,p);
+        if (ag != null)
+            try { ia = ag.getIA(this); } catch (Exception e) { }
     }
 
     @Override
@@ -75,8 +82,8 @@ public class InternalActionLiteral extends Literal {
                 clone[i].apply(un);
             }
 
-        	// calls execute
-            Object oresult = ag.getIA(this).execute(ag.getTS(), un, clone);
+        	// calls IA's execute method
+            Object oresult = getIA(ag).execute(ag.getTS(), un, clone);
             if (oresult instanceof Boolean && (Boolean)oresult) {
                 return LogExpr.createUnifIterator(un);
             } else if (oresult instanceof Iterator) {
@@ -88,6 +95,12 @@ public class InternalActionLiteral extends Literal {
         return LogExpr.EMPTY_UNIF_LIST.iterator();  // empty iterator for unifier
     }   
 
+    public InternalAction getIA(Agent ag) throws Exception {
+        if (ia == null)
+            ia = ag.getIA(this);
+        return ia;
+    }
+    
     @Override
     public String getErrorMsg() {
     	String line = (getSrcLine() >= 0 ? ":"+getSrcLine() : "");

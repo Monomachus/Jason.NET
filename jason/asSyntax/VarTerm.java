@@ -126,7 +126,7 @@ public class VarTerm extends InternalActionLiteral implements NumberTerm, ListTe
     }
 
     public boolean apply(Unifier u) {
-        if (!hasValue()) {
+        if (value == null) {
             Term vl = u.get(this);
             // System.out.println("applying="+t+"="+vl+" un="+this);
             if (vl != null && !(vl instanceof VarsCluster)) {

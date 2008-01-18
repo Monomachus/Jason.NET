@@ -40,6 +40,8 @@ import jason.asSyntax.parser.ParseException;
 import jason.asSyntax.parser.as2j;
 import jason.bb.BeliefBase;
 import jason.bb.DefaultBeliefBase;
+import jason.functions.Count;
+import jason.functions.RuleToFunction;
 import jason.runtime.Settings;
 
 import java.io.File;
@@ -85,7 +87,8 @@ public class Agent {
     private List<Literal>      initialBels  = new ArrayList<Literal>(); // initial beliefs in the source code
 
     private Map<String, InternalAction> internalActions = new HashMap<String, InternalAction>();
-
+    private Map<String, ArithFunction>  functions       = new HashMap<String, ArithFunction>();
+    
     private boolean hasCustomSelOp = true;
     
     private Logger logger = Logger.getLogger(Agent.class.getName());
@@ -107,7 +110,6 @@ public class Agent {
         return hasCustomSelOp;
     }
     
-    
     /** Creates the TS of this agent, parses its AS source, and sets its Settings */
     public TransitionSystem initAg(AgArch arch, BeliefBase bb, String asSrc, Settings stts) throws JasonException {
         // set the agent
@@ -118,7 +120,7 @@ public class Agent {
             if (bb != null) {
                 this.bb = bb;
             }
-
+            initDefaultFunctions();
             setTS(new TransitionSystem(this, new Circumstance(), stts, arch));
 
             if (asSrc != null) {
@@ -164,7 +166,7 @@ public class Agent {
     	a.bb = (BeliefBase)this.bb.clone();
     	a.pl = (PlanLibrary)this.pl.clone();
     	a.aslSource = this.aslSource;
-    	
+    	a.initDefaultFunctions();
         a.setTS(new TransitionSystem(a, (Circumstance)this.getTS().getC().clone(), this.getTS().getSettings(), arch));
 
     	return a;
@@ -234,6 +236,38 @@ public class Agent {
         }
         return objIA;
     }
+    
+    public void initDefaultFunctions() {
+        addFunction(Count.class);
+    }
+ 
+    /** register a function implemented in Java */
+    public void addFunction(Class<? extends ArithFunction> c) {
+        try {
+            ArithFunction af = c.newInstance();
+            if (functions.get(af.getName()) != null)
+                logger.warning("Registering the function "+af.getName()+"  twice! The first register is lost.");
+            functions.put(af.getName(),af);
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Error registering function "+c.getName(),e);
+        }
+    }
+     
+    /** register a function implemented in AS (by a rule, literal, or internal action) */
+    public void addFunction(String literal, int arity) {
+        try {
+            if (functions.get(literal) != null)
+                logger.warning("Registering the function "+literal+"  twice! The first register is lost.");
+            functions.put(literal, new RuleToFunction(literal, arity));
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Error registering function "+literal,e);
+        }
+    }
+    
+    public ArithFunction getFunction(String id) {
+        return functions.get(id);
+    }
+
     
     public void addInitialGoal(Literal g) {
     	initialGoals.add(g);

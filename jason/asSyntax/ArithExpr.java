@@ -23,6 +23,7 @@
 
 package jason.asSyntax;
 
+import jason.asSemantics.Agent;
 import jason.asSyntax.parser.as2j;
 
 import java.io.StringReader;
@@ -142,7 +143,14 @@ public class ArithExpr extends ArithFunctionTerm implements NumberTerm {
 
     /** returns some Term that can be evaluated as Number */
     public static NumberTerm parseExpr(String sExpr) {
+        return parseExpr(null, sExpr);
+    }
+
+    /** returns some Term that can be evaluated as Number */
+    public static NumberTerm parseExpr(Agent ag, String sExpr) {
         as2j parser = new as2j(new StringReader(sExpr));
+        if (ag != null)
+            parser.setAg(ag);
         try {
             return (NumberTerm) parser.arithm_expr();
         } catch (Exception e) {

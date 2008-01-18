@@ -117,6 +117,11 @@ public final class Atom extends Literal {
 		return new ArrayList<Term>(2);
 	}
 	
+	@Override
+	public Term[] getTermsArray() {
+	    return new Term[0];
+	}
+	
     @Override
     public boolean equals(Object o) {
         if (o == null) return false;

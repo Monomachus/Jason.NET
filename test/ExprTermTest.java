@@ -185,13 +185,16 @@ public class ExprTermTest extends TestCase {
     
     public void testCount() throws Exception {
         Agent ag = new Agent();
+        ag.initDefaultFunctions();
+        assertTrue(ag.getFunction(".count") != null);
+        assertTrue(ag.getFunction(".count").checkArity(1));
         ag.setTS(new TransitionSystem(ag, null, null, null));
         ag.getBB().add(Literal.parseLiteral("b(10)"));
         ag.getBB().add(Literal.parseLiteral("a(x)"));
         ag.getBB().add(Literal.parseLiteral("b(20)"));
         assertEquals(3, ag.getBB().size());
         
-        ArithFunctionTerm nb = (ArithFunctionTerm)ArithExpr.parseExpr(".count(b(_))");
+        ArithFunctionTerm nb = (ArithFunctionTerm)ArithExpr.parseExpr(ag,".count(b(_))");
         nb.setAgent(ag);
         nb.apply(new Unifier());
         assertEquals(2.0,nb.solve());

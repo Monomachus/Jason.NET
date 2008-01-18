@@ -180,6 +180,7 @@ public class Structure extends DefaultTerm {
         return 0;
     }
 
+    
     public boolean apply(Unifier u) {
     	boolean r = false;
         // do not use iterator! (see ListTermImpl class)
@@ -188,7 +189,8 @@ public class Structure extends DefaultTerm {
         	boolean tr = getTerm(i).apply(u); 
             r = r || tr;
         }
-        resetHashCodeCache();
+        if (r)
+            resetHashCodeCache();
         return r;
     }
     
@@ -315,9 +317,8 @@ public class Structure extends DefaultTerm {
 
     public void makeTermsAnnon() {
         final int size = getArity();
-        for (int i=0; i<size; i++) {
+        for (int i=0; i<size; i++)
             setTerm(i,new UnnamedVar());
-        }
         resetHashCodeCache();
     }
 
@@ -342,22 +343,22 @@ public class Structure extends DefaultTerm {
 
     public void countVars(Map<VarTerm, Integer> c) {
         final int tss = getArity();
-        for (int i = 0; i < tss; i++) {
+        for (int i = 0; i < tss; i++)
             getTerm(i).countVars(c);
-        }
     }
 
     protected List<Term> getDeepCopyOfTerms() {
-        List<Term> l = new ArrayList<Term>(getArity());
-        for (Term ti: terms) {
-            l.add((Term)ti.clone());
-        }
+        final int tss = getArity();
+        List<Term> l = new ArrayList<Term>(tss);
+        for (int i = 0; i < tss; i++)
+            l.add((Term)getTerm(i).clone());
         return l;
     }
     
     public String toString() {
         StringBuilder s = new StringBuilder();
-        if (functor != null) s.append(functor);
+        if (functor != null) 
+            s.append(functor);
         if (getArity() > 0) {
             s.append("(");
             Iterator<Term> i = terms.iterator();

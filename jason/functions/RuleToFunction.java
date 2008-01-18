@@ -14,23 +14,28 @@ import java.util.Iterator;
 
 /** 
 
-   Wraps a rule into a function.
+   Wraps a rule into a function. For example the rule
+     sum(X,Y,Z) :- Z = X+Y.
+   is wrapped in a function sum(X,Y). 
    
-  @author Jomi 
+   <p>To define sum as
+   a function the user should register it using a
+   directive in the ASL code:
+     { register_function("sum",2) }
+   where sum is the name of the rule (or literal, or
+   internal action) and 2 is the function's arity.
+      
+   @author Jomi 
 */
 public class RuleToFunction extends DefaultArithFunction  {
 
-    private String rule  = null;
-    private int    arity = -1;
+    private final String literal;
+    private final int    arity;
     
-    public void setRule(String r) {
-        rule = r;
+    public RuleToFunction(String literal, int arity) {
+        this.literal = literal;
+        this.arity = arity;
     }
-    
-    public void setArity(int a) { 
-        arity = a; 
-    }
-    
     
     @Override
     public boolean checkArity(int a) {
@@ -41,10 +46,10 @@ public class RuleToFunction extends DefaultArithFunction  {
 	public double evaluate(TransitionSystem ts, Term[] args) throws Exception {
 	    // create a literal to perform the query
 	    Literal r;
-	    if (rule.indexOf(".") > 0) // is internal action
-	        r = new InternalActionLiteral(rule);
+	    if (literal.indexOf(".") > 0) // is internal action
+	        r = new InternalActionLiteral(literal);
 	    else
-	        r = new Literal(rule);
+	        r = new Literal(literal);
 	    for (Term t: args)
 	        r.addTerm(t);
 	    VarTerm answer = new VarTerm("__RuleToFunctionResult");

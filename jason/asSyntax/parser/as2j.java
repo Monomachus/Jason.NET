@@ -26,6 +26,8 @@
     private static Set<String> parsedFiles = new HashSet<String>();
     private static Config config = Config.get();
 
+    public void setAg(Agent ag) { curAg = ag; }
+
 /* AgentSpeak Grammar */
   final public void agent(Agent a) throws ParseException, jason.JasonException {
                          curAg = a;
@@ -335,7 +337,7 @@
       }
       F = pred();
                                 if (F.getFunctor().indexOf(".") >= 0)
-                                   {if (true) return new InternalActionLiteral(F);}
+                                   {if (true) return new InternalActionLiteral(F, curAg);}
                                 if (F.isAtom() && type == Literal.LPos) {
                                    Atom a = new Atom(F.getFunctor());
                                    a.setSrc(F);
@@ -993,14 +995,21 @@
   final public Term function() throws ParseException {
                             Literal l;
     l = literal();
-                            ArithFunctionTerm af = FunctionRegister.create(l.getFunctor());
+                            ArithFunction af = null;
+                            if (curAg != null)
+                               // try to find the function in agent registry
+                               af = curAg.getFunction(l.getFunctor());
+                            if (af == null || !af.checkArity(l.getArity()))
+                               // try global function
+                               af = FunctionRegister.getFunction(l.getFunctor());
                             if (af == null || !af.checkArity(l.getArity())) {
                                {if (true) return l;}
                             } else {
-                              af.setSrc(l);
-                              af.setTerms(l.getTerms());
-                              af.setAgent(curAg);
-                              {if (true) return af;}
+                               ArithFunctionTerm at = new ArithFunctionTerm(af);
+                               at.setSrc(l);
+                               at.setTerms(l.getTerms());
+                               at.setAgent(curAg);
+                               {if (true) return at;}
                             }
     throw new Error("Missing return statement in function");
   }
@@ -1058,6 +1067,11 @@
     finally { jj_save(1, xla); }
   }
 
+  final private boolean jj_3R_41() {
+    if (jj_scan_token(STRING)) return true;
+    return false;
+  }
+
   final private boolean jj_3R_31() {
     if (jj_3R_30()) return true;
     return false;
@@ -1072,18 +1086,23 @@
     return false;
   }
 
+  final private boolean jj_3R_27() {
+    if (jj_3R_21()) return true;
+    return false;
+  }
+
   final private boolean jj_3R_65() {
     if (jj_scan_token(35)) return true;
     return false;
   }
 
-  final private boolean jj_3R_41() {
-    if (jj_scan_token(STRING)) return true;
+  final private boolean jj_3R_64() {
+    if (jj_scan_token(34)) return true;
     return false;
   }
 
-  final private boolean jj_3R_64() {
-    if (jj_scan_token(34)) return true;
+  final private boolean jj_3R_26() {
+    if (jj_scan_token(UNNAMEDVAR)) return true;
     return false;
   }
 
@@ -1099,6 +1118,11 @@
 
   final private boolean jj_3R_37() {
     if (jj_3R_41()) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_25() {
+    if (jj_scan_token(VAR)) return true;
     return false;
   }
 
@@ -1120,8 +1144,15 @@
     return false;
   }
 
-  final private boolean jj_3R_27() {
-    if (jj_3R_21()) return true;
+  final private boolean jj_3R_18() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_25()) {
+    jj_scanpos = xsp;
+    if (jj_3R_26()) return true;
+    }
+    xsp = jj_scanpos;
+    if (jj_3R_27()) jj_scanpos = xsp;
     return false;
   }
 
@@ -1145,28 +1176,6 @@
 
   final private boolean jj_3R_23() {
     if (jj_scan_token(TK_TRUE)) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_26() {
-    if (jj_scan_token(UNNAMEDVAR)) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_25() {
-    if (jj_scan_token(VAR)) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_18() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_25()) {
-    jj_scanpos = xsp;
-    if (jj_3R_26()) return true;
-    }
-    xsp = jj_scanpos;
-    if (jj_3R_27()) jj_scanpos = xsp;
     return false;
   }
 

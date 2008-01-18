@@ -56,6 +56,8 @@ PARSER_BEGIN(as2j)
     private static Set<String> parsedFiles = new HashSet<String>();
     private static Config config = Config.get();
     
+    public void setAg(Agent ag) { curAg = ag; }
+    
   }
 
 PARSER_END(as2j)
@@ -249,7 +251,7 @@ Literal literal() :  { Pred F; Token k; boolean type = Literal.LPos; }
   ( ( [ <TK_NEG>              { type = Literal.LNeg; }
       ]
       F=pred()                { if (F.getFunctor().indexOf(".") >= 0) 
-                                   return new InternalActionLiteral(F);
+                                   return new InternalActionLiteral(F, curAg);
                                 if (F.isAtom() && type == Literal.LPos) {
                                    Atom a = new Atom(F.getFunctor());
                                    a.setSrc(F);
@@ -527,14 +529,21 @@ Object arithm_expr_simple():
 Term function():          { Literal l; }
 {
    l = literal()
-                          { ArithFunctionTerm af = FunctionRegister.create(l.getFunctor());
+                          { ArithFunction af = null;
+                            if (curAg != null)
+                               // try to find the function in agent registry
+                               af = curAg.getFunction(l.getFunctor());
+                            if (af == null || !af.checkArity(l.getArity()))
+                               // try global function
+                               af = FunctionRegister.getFunction(l.getFunctor());
                             if (af == null || !af.checkArity(l.getArity())) {
                                return l;
                             } else {
-                              af.setSrc(l);
-                              af.setTerms(l.getTerms());
-                              af.setAgent(curAg);
-                              return af;
+                               ArithFunctionTerm at = new ArithFunctionTerm(af);
+                               at.setSrc(l);
+                               at.setTerms(l.getTerms());
+                               at.setAgent(curAg);
+                               return at;
                             }
                           } 
 }

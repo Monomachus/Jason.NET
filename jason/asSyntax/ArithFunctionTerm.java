@@ -5,8 +5,6 @@ import jason.asSemantics.Agent;
 import jason.asSemantics.ArithFunction;
 import jason.asSemantics.Unifier;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -81,14 +79,6 @@ public class ArithFunctionTerm extends Structure implements NumberTerm {
         return getArity() == 1;
     }
     
-    @Override
-    protected List<Term> getDeepCopyOfTerms() {
-        if (getArity() == 0)
-            return new ArrayList<Term>(2);
-        else
-            return super.getDeepCopyOfTerms();
-    }
-
     /**
      * Does a "normal" apply and then solve the expression and store the result,
      * so future calls of solve do not need to compute the value again

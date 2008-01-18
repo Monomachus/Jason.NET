@@ -60,20 +60,19 @@ public class Plan extends SourceInfo implements Cloneable, Serializable {
     private boolean isAllUnifs = false;
     private boolean hasBreakpoint = false;
     
+    // used by clone
     public Plan() {
     }
     
-    public Plan(Trigger te, LogicalFormula ct, ArrayList<BodyLiteral> bd) {
+    // used by parser
+    public Plan(Pred label, Trigger te, LogicalFormula ct, List<BodyLiteral> bd) {
         tevent = te;
+        setLabel(label);
         setContext(ct);
-        setBody(bd);
-    }
-    
-    public Plan(Pred lb, Trigger te, LogicalFormula ct, ArrayList<BodyLiteral> bd) {
-        tevent = te;
-        setLabel(lb);
-        setContext(ct);
-        setBody(bd);
+        if (bd == null)
+            body = Collections.emptyList();
+        else
+            body = bd;
     }
     
     public void setLabel(Pred p) {
@@ -97,16 +96,8 @@ public class Plan extends SourceInfo implements Cloneable, Serializable {
     
     public void setContext(LogicalFormula le) {
         context = le;
-        if (le != null && le instanceof Literal && ((Literal) le).equals(Literal.LTrue)) {
+        if (Literal.LTrue.equals(le))
             context = null;
-        }
-    }
-    
-    public void setBody(List<BodyLiteral> bd) {
-        if (bd == null)
-            body = Collections.emptyList();
-        else
-            body = bd;
     }
     
     public static Plan parse(String sPlan) {
@@ -203,7 +194,7 @@ public class Plan extends SourceInfo implements Cloneable, Serializable {
     public Object clone() {
         Plan p = new Plan();
         if (label != null) { 
-            p.label = (Pred) label.clone();
+            p.label         = (Pred) label.clone();
             p.isAtomic      = isAtomic;
             p.hasBreakpoint = hasBreakpoint;
             p.isAllUnifs    = isAllUnifs;
@@ -213,6 +204,28 @@ public class Plan extends SourceInfo implements Cloneable, Serializable {
         
         if (context != null) 
             p.context = (LogicalFormula)context.clone();
+        
+        p.body = new LinkedList<BodyLiteral>(); // the plan will be "consumed" by remove(0), so linkedlist
+        for (BodyLiteral l : body) {
+            p.body.add((BodyLiteral) l.clone());
+        }
+        
+        p.setSrc(this);
+
+        return p;
+    }
+
+    public Plan cloneBodyOnly() {
+        Plan p = new Plan();
+        if (label != null) { 
+            p.label         = label;
+            p.isAtomic      = isAtomic;
+            p.hasBreakpoint = hasBreakpoint;
+            p.isAllUnifs    = isAllUnifs;
+        }
+        
+        p.tevent = (Trigger)tevent.clone();
+        p.context = context;
         
         p.body = new LinkedList<BodyLiteral>(); // the plan will be "consumed" by remove(0), so linkedlist
         for (BodyLiteral l : body) {
