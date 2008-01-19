@@ -295,7 +295,7 @@ public class TransitionSystem {
 
         // get all relevant plans for the selected event
         //Trigger te = (Trigger) conf.C.SE.trigger.clone();
-        List<Plan> candidateRPs = conf.ag.pl.getAllRelevant(conf.C.SE.trigger.getPredicateIndicator());
+        List<Plan> candidateRPs = conf.ag.pl.getAllRelevant(conf.C.SE.trigger);
         if (candidateRPs != null) {
             for (Plan pl : candidateRPs) {
                 Unifier relUn = pl.isRelevant(conf.C.SE.trigger);
@@ -484,7 +484,7 @@ public class TransitionSystem {
             		body = (Literal)f;
 	                body.makeVarsAnnon();
 	                Trigger te = new Trigger(TEOperator.add, TEType.test, body);
-	                if (ag.getPL().isRelevant(te.getPredicateIndicator())) {
+	                if (ag.getPL().isRelevant(te)) {
 	                    Event evt = new Event(te, conf.C.SI);
 	                    if (logger.isLoggable(Level.FINE)) logger.fine("Test Goal '" + h + "' failed as simple query. Generating internal event for it: "+te);
 	                    conf.C.addEvent(evt);
@@ -644,7 +644,7 @@ public class TransitionSystem {
     public List<Option> relevantPlans(Trigger teP) throws JasonException {
         Trigger te = (Trigger) teP.clone();
         List<Option> rp = null;
-        List<Plan> candidateRPs = conf.ag.pl.getAllRelevant(te.getPredicateIndicator());
+        List<Plan> candidateRPs = conf.ag.pl.getAllRelevant(te);
         if (candidateRPs != null) {
             for (Plan pl : candidateRPs) {
                 Unifier relUn = pl.isRelevant(te);
@@ -771,7 +771,7 @@ public class TransitionSystem {
         // Note: we have to add events even if they are not relevant to
         // a) allow the user to override selectOption and then provide an "unknown" plan; or then
         // b) create the failure event (it is done by SelRelPlan)
-        if (e.isInternal() || C.hasListener() || ag.getPL().isRelevant(e.trigger.getPredicateIndicator())) {
+        if (e.isInternal() || C.hasListener() || ag.getPL().isRelevant(e.trigger)) {
             C.addEvent(e);
             if (logger.isLoggable(Level.FINE)) logger.fine("Added event " + e);
         }
@@ -846,14 +846,14 @@ public class TransitionSystem {
         Trigger failTrigger = new Trigger(TEOperator.del, tevent.getType(), tevent.getLiteral());
     	if (i != Intention.EmptyInt) {
 	        ListIterator<IntendedMeans> ii = i.iterator();
-	        while (!getAg().getPL().isRelevant(failTrigger.getPredicateIndicator()) && ii.hasPrevious()) {
+	        while (!getAg().getPL().isRelevant(failTrigger) && ii.hasPrevious()) {
 	            IntendedMeans im = ii.previous();
 	            tevent = im.getTrigger();
 	            failTrigger = new Trigger(TEOperator.del, tevent.getType(), tevent.getLiteral());
 	        }
     	}
         // if some failure handling plan is found
-        if (tevent.isGoal() && getAg().getPL().isRelevant(failTrigger.getPredicateIndicator())) {
+        if (tevent.isGoal() && getAg().getPL().isRelevant(failTrigger)) {
             return new Event(failTrigger, i);
         }
         return null;

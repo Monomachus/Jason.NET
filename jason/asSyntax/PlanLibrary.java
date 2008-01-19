@@ -124,25 +124,29 @@ public class PlanLibrary implements Iterable<Plan> {
 
         planLabels.put(p.getLabel().getFunctor(), p);
 
-        if (p.getTrigger().getLiteral().isVar()) {
+        Trigger pte = p.getTrigger();
+        if (pte.getLiteral().isVar()) {
             varPlans.add(p);
             // add plan p in all entries
-            for (List<Plan> lp: relPlans.values()) {
-                lp.add(p);
-            }
+            for (List<Plan> lp: relPlans.values())
+            	if (!lp.isEmpty() && lp.get(0).getTrigger().sameType(pte)) // only add if same type
+            		lp.add(p);
         } else {
-            List<Plan> codesList = relPlans.get(p.getTrigger().getPredicateIndicator());
+            List<Plan> codesList = relPlans.get(pte.getPredicateIndicator());
             if (codesList == null) {
                 codesList = new ArrayList<Plan>();
-                codesList.addAll(varPlans);
-                relPlans.put(p.getTrigger().getPredicateIndicator(), codesList);
+                // copy plans from var plans
+                for (Plan vp: varPlans)
+                	if (vp.getTrigger().sameType(pte))
+                		codesList.add(vp);
+                relPlans.put(pte.getPredicateIndicator(), codesList);
             }
             codesList.add(p);
         }
 
         plans.add(p);
     }
-
+    
 	public void addAll(PlanLibrary pl) throws JasonException {
 		for (Plan p: pl) { 
 			add(p);
@@ -207,9 +211,8 @@ public class PlanLibrary implements Iterable<Plan> {
         if (p.getTrigger().getLiteral().isVar()) {
             varPlans.remove(p);
             // remove p from all entries
-            for (List<Plan> lp: relPlans.values()) {
+            for (List<Plan> lp: relPlans.values())
                 lp.remove(p);
-            }
         } else {
             List<Plan> codesList = relPlans.get(p.getTrigger().getPredicateIndicator());
             codesList.remove(p);
@@ -221,16 +224,18 @@ public class PlanLibrary implements Iterable<Plan> {
         return p;
     }
 
-    public boolean isRelevant(PredicateIndicator pi) {
-        List<Plan> l = getAllRelevant(pi);
-        return l != null && l.size() > 0;
+    public boolean isRelevant(Trigger te) {
+        List<Plan> l = getAllRelevant(te);
+        return l != null && ! l.isEmpty();
     }
 
-
-    public List<Plan> getAllRelevant(PredicateIndicator pi) {
-    	List<Plan> l = relPlans.get(pi);
-    	if ((l == null || l.size() == 0) && varPlans.size() > 0) { // no rel plan, try varPlan
-    		l = varPlans;
+    public List<Plan> getAllRelevant(Trigger te) {
+    	List<Plan> l = relPlans.get(te.getPredicateIndicator());
+    	if ((l == null || l.isEmpty()) && !varPlans.isEmpty()) {  // no rel plan, try varPlan
+    		l = new ArrayList<Plan>();
+    		for (Plan p: varPlans)
+    			if (p.getTrigger().sameType(te))
+    				l.add(p);
     	}
     	return l;
     }

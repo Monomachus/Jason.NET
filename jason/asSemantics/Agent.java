@@ -423,11 +423,12 @@ public class Agent {
                 // new version (it is sure that l is in BB, only clone l when the event is relevant)
                 perceptsInBB.remove(); // remove l as perception from BB
                 
-                if (ts.getC().hasListener() || pl.isRelevant(l.getPredicateIndicator())) {
+                Trigger te = new Trigger(TEOperator.del, TEType.belief, l);
+                if (ts.getC().hasListener() || pl.isRelevant(te)) {
                     l = (Literal)l.clone();
                     l.clearAnnots();
                     l.addAnnot(BeliefBase.TPercept);
-                    ts.getC().addEvent(new Event(new Trigger(TEOperator.del, TEType.belief, l), Intention.EmptyInt));
+                    ts.getC().addEvent(new Event(te, Intention.EmptyInt));
                 }
         
                 /*
