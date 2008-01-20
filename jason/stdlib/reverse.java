@@ -23,63 +23,63 @@
 
 package jason.stdlib;
 
+import jason.JasonException;
 import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.ListTerm;
-import jason.asSyntax.NumberTerm;
-import jason.asSyntax.NumberTermImpl;
 import jason.asSyntax.StringTerm;
+import jason.asSyntax.StringTermImpl;
 import jason.asSyntax.Term;
 
 /**
+  <p>Internal action: <b><code>.reverse</code></b>.
 
-  <p>Internal action: <b><code>.length</code></b>.
-
-  <p>Description: gets the length of strings or lists. 
+  <p>Description: reverses strings or lists. 
 
   <p>Parameters:<ul>
-  <li>+ argument (string or list): the term whose length is to be determined.<br/>
-  <li>+/- length (number). 
+  <li>+ arg[0] (list or string): the list to be reversed.<br/>
+  <li>+/- arg[1]: the result. 
   </ul>
 
   <p>Examples:<ul>
-  <li> <code>.length("abc",X)</code>: <code>X</code> unifies with 3.
-  <li> <code>.length([a,b],X)</code>: <code>X</code> unifies with 2.
-  <li> <code>.length("a",2)</code>: false.
+  <li> <code>.reverse("abc",X)</code>: <code>X</code> unifies with "cba".
+  <li> <code>.reverse("[a,b,c]",X)</code>: <code>X</code> unifies with "[c,b,a]".
+  <li> <code>.reverse("[a,b,c|T]",X)</code>: <code>X</code> unifies with "[c,b,a|T]".
   </ul>
 
   @see jason.stdlib.concat
   @see jason.stdlib.delete
+  @see jason.stdlib.length
+  @see jason.stdlib.nth
   @see jason.stdlib.max
   @see jason.stdlib.member
   @see jason.stdlib.min
   @see jason.stdlib.sort
-  @see jason.stdlib.nth
-  @see jason.stdlib.sort
-  @see jason.stdlib.reverse
+  @see jason.stdlib.substring
 
-  @see jason.functions.Length function version
-  
- */
-public class length extends DefaultInternalAction {
+*/
+public class reverse extends DefaultInternalAction {
 
-    @Override
-    public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
-        Term l1 = args[0];
-        Term l2 = args[1];
+	@Override
+	public Object execute(TransitionSystem ts, Unifier un, Term[] args)	throws Exception {
+		
+	    if (args[0].isList()) {
+            // list reverse
+			if (!args[1].isVar() && !args[1].isList())
+				throw new JasonException("The last argument of reverse '"+args[1]+"'is not a list nor a variable.");
+			
+			return un.unifies(((ListTerm)args[0]).reverse(), args[1]);
+        
+	    } else {
+            // string reverse
+            if (!args[1].isVar() && !args[1].isString())
+                throw new JasonException("The last argument of reverse '"+args[1]+"' is not a string nor a variable.");
+            String vl = args[0].toString();
+            if (args[0].isString())
+                vl = ((StringTerm)args[0]).getString();
 
-        NumberTerm size = null;
-        if (l1.isList()) {
-            ListTerm lt = (ListTerm) l1;
-            size = new NumberTermImpl(lt.size());
-        } else if (l1.isString()) {
-            StringTerm st = (StringTerm) l1;
-            size = new NumberTermImpl(st.getString().length());
-        }
-        if (size != null) {
-            return un.unifies(l2, size);
-        }
-        return false;
-    }
+            return un.unifies(new StringTermImpl(new StringBuilder(vl).reverse().toString()), args[1]);
+		}
+	}
 }

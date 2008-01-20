@@ -22,9 +22,9 @@ import java.util.Iterator;
   
   <b>Bug</b>: this function does not work when the agent is cloned,
   and so does not work in centralised/tread pool infrastructure.
-  Use the internal action in this infrastructure.
+  Use the internal action version for this infrastructure.
 
-  @see jason.stdlib.count 
+  @see jason.stdlib.count internal action version
 
   @author Jomi 
 */

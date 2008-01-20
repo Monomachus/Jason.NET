@@ -44,6 +44,7 @@ numbers &lt; atoms &lt; structures &lt; lists
   @see jason.stdlib.nth
   @see jason.stdlib.sort
   @see jason.stdlib.min
+  @see jason.stdlib.reverse
 
 */
 public class max extends min {

@@ -727,13 +727,20 @@ public class VarTerm extends InternalActionLiteral implements NumberTerm, ListTe
         else
             return null;
     }
-
     public ListTerm concat(ListTerm lt) {
         if (value != null && getValue().isList())
             return ((ListTerm) getValue()).concat(lt);
         else
             return null;
     }
+
+    public ListTerm reverse() {
+        if (value != null && getValue().isList())
+            return ((ListTerm) getValue()).reverse();
+        else
+            return null;
+    }
+
 
     public List<Term> getAsList() {
         if (value != null && getValue().isList())

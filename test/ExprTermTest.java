@@ -195,7 +195,6 @@ public class ExprTermTest extends TestCase {
         assertEquals(3, ag.getBB().size());
         
         ArithFunctionTerm nb = (ArithFunctionTerm)ArithExpr.parseExpr(ag,".count(b(_))");
-        nb.setAgent(ag);
         nb.apply(new Unifier());
         assertEquals(2.0,nb.solve());
     }

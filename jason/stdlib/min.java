@@ -51,6 +51,7 @@ numbers &lt; atoms &lt; structures &lt; lists
   @see jason.stdlib.nth
   @see jason.stdlib.sort
   @see jason.stdlib.max
+  @see jason.stdlib.reverse
 
 */
 public class min extends DefaultInternalAction {

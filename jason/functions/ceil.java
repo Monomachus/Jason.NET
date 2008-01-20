@@ -17,6 +17,10 @@ import jason.asSyntax.Term;
   </ul>
    
   @author Jomi 
+  
+   @see jason.functions.floor
+   @see jason.functions.Random
+  
 */
 public class ceil extends DefaultArithFunction  {
 

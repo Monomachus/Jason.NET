@@ -16,7 +16,11 @@ import jason.asSyntax.Term;
   <li> <code>math.floor(3.9)</code>: returns 3.</li>
   </ul>
    
-  @author Jomi 
+  @author Jomi
+   
+  @see jason.functions.Random
+  @see jason.functions.ceil
+  
 */
 public class floor extends DefaultArithFunction  {
 

@@ -15,7 +15,7 @@ import jason.asSyntax.Term;
   <li> <code>.length([a,b,c])</code>: returns 3.</li>
   </ul>
    
-  @see jason.stdlib.length 
+  @see jason.stdlib.length internal action version
    
   @author Jomi 
 */

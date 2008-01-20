@@ -199,4 +199,22 @@ public class ListTermTest extends TestCase {
         assertEquals("c",a[0].toString());
         assertEquals("d",a[a.length-1].toString());
     }
+    
+    public void testReverse() {
+        ListTerm l = ListTermImpl.parseList("[]");
+        assertEquals(l, l.reverse());
+        assertFalse( l == l.reverse()); // should be cloned
+        assertEquals("[]",l.reverse().toString());
+        
+        l = ListTermImpl.parseList("[a]");
+        assertEquals(l, l.reverse());
+        assertFalse( l == l.reverse()); // should be cloned
+        assertEquals("[a]",l.reverse().toString());
+
+        l = ListTermImpl.parseList("[a,b,c]");
+        assertEquals("[c,b,a]",l.reverse().toString());
+
+        l = ListTermImpl.parseList("[a,b,c|T]");
+        assertEquals("[c,b,a|T]",l.reverse().toString());
+    }
 }

@@ -30,7 +30,7 @@ import jason.asSyntax.*;
   @see jason.stdlib.sort
   @see jason.stdlib.max
   @see jason.stdlib.min
-
+  @see jason.stdlib.reverse
 */
 
 public class nth extends DefaultInternalAction {

@@ -40,6 +40,7 @@ import jason.asSyntax.Term;
   @see jason.stdlib.concat
   @see jason.stdlib.delete
   @see jason.stdlib.length
+  @see jason.stdlib.reverse
 
 */
 public class substring extends DefaultInternalAction {

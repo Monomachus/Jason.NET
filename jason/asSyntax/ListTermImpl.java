@@ -59,6 +59,12 @@ public class ListTermImpl extends Structure implements ListTerm {
 	public ListTermImpl() {
 		super(".", 0);
 	}
+	
+	private ListTermImpl(Term t, Term n) {
+	    super(".",0);
+	    term = t;
+	    next = n;
+	}
 
     public static ListTerm parseList(String sList) {
         as2j parser = new as2j(new StringReader(sList));
@@ -214,11 +220,10 @@ public class ListTermImpl extends Structure implements ListTerm {
 	
 	/** set the tail of this list */
 	public void setTail(VarTerm v) {
-		if (getNext().isEmpty()) {
+		if (getNext().isEmpty())
 			next = v;
-		} else {
+		else
 			getNext().setTail(v);
-		}
 	}
 	
 	/** get the last ListTerm of this List */
@@ -233,8 +238,8 @@ public class ListTermImpl extends Structure implements ListTerm {
 	
 	
 	/** 
-	 * add a term in the end of the list
-	 * @return the ListTerm where the term was added
+	 * Adds a term in the end of the list
+	 * @return the ListTerm where the term was added (i.e. the last ListTerm of the list)
 	 */
 	public ListTerm append(Term t) {
 		if (isEmpty()) {
@@ -251,7 +256,7 @@ public class ListTermImpl extends Structure implements ListTerm {
 
 	
 	/** 
-     * Add a list in the end of this list.
+     * Adds a list in the end of this list.
 	 * This method do not clone <i>lt</i>.
 	 * @return the last ListTerm of the new list
 	 */
@@ -266,6 +271,25 @@ public class ListTermImpl extends Structure implements ListTerm {
 		}
 		return lt.getLast();
 	}
+	
+	/**
+	 * Creates a new (cloned) list with the same elements of this list, but in the reversed order.
+	 * The Tail remains the Tail: reverse([a,b|T]) = [b,a|T].
+	 */
+	public ListTerm reverse() {
+	    return reverse_internal(new ListTermImpl());
+	}
+    private ListTerm reverse_internal(ListTerm r) {
+        if (isEmpty()) {
+            return r;
+        } else if (isTail()) {
+            r = new ListTermImpl((Term)term.clone(), r);
+            r.setTail((VarTerm)next.clone());
+            return r;
+        } else {
+            return ((ListTermImpl)next).reverse_internal( new ListTermImpl((Term)term.clone(), r) );
+        }
+    }
 
 	
 	/** returns an iterator where each element is a ListTerm */
@@ -317,10 +341,8 @@ public class ListTermImpl extends Structure implements ListTerm {
 	 */
     public List<Term> getAsList() {
         List<Term> l = new ArrayList<Term>();
-        Iterator<Term> i = iterator();
-        while (i.hasNext()) {
-            l.add( i.next() );
-        }
+        for (Term t: this) 
+            l.add(t);
         return l;
     }
 
@@ -348,9 +370,7 @@ public class ListTermImpl extends Structure implements ListTerm {
 	
 	public void add(int index, Term o) {
         if (index == 0) {
-            ListTermImpl n = new ListTermImpl();
-            n.term = this.term;
-            n.next = this.next;
+            ListTermImpl n = new ListTermImpl(term,next);
             this.term = o;
             this.next = n;
         } else if (index > 0 && getNext() != null) {

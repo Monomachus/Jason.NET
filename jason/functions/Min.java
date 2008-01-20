@@ -17,6 +17,8 @@ import jason.asSyntax.Term;
 </ul>
  
 @author Jomi 
+
+@see jason.functions.Max
 */
 public class Min extends DefaultArithFunction  {
 

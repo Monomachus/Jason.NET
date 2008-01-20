@@ -73,6 +73,7 @@ import java.util.Collections;
   @see jason.stdlib.nth
   @see jason.stdlib.max
   @see jason.stdlib.min
+  @see jason.stdlib.reverse
 
 */
 public class sort extends DefaultInternalAction {

@@ -60,6 +60,7 @@ import jason.asSyntax.Term;
   @see jason.stdlib.nth
   @see jason.stdlib.max
   @see jason.stdlib.min
+  @see jason.stdlib.reverse
 
 */
 public class concat extends DefaultInternalAction {
