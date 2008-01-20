@@ -1,5 +1,6 @@
 package test;
 
+import jason.architecture.AgArch;
 import jason.asSemantics.Agent;
 import jason.asSemantics.Circumstance;
 import jason.asSemantics.IntendedMeans;
@@ -21,6 +22,7 @@ import jason.asSyntax.Term;
 import jason.asSyntax.Trigger;
 import jason.asSyntax.VarTerm;
 import jason.bb.BeliefBase;
+import jason.infra.centralised.CentralisedAgArch;
 import jason.stdlib.add_annot;
 import jason.stdlib.add_plan;
 import jason.stdlib.fail_goal;
@@ -95,6 +97,9 @@ public class StdLibTest extends TestCase {
     public void testFindAll() {
         Agent ag = new Agent();
         ag.setLogger(null);
+        AgArch arch = new AgArch();
+        arch.setArchInfraTier(new CentralisedAgArch());
+        ag.setTS(new TransitionSystem(ag, null, null, arch));
         
         Literal l1 = Literal.parseLiteral("a(10,x)");
         assertFalse(l1.hasSource());
@@ -103,8 +108,6 @@ public class StdLibTest extends TestCase {
         ag.addBel(Literal.parseLiteral("a(30,x)"));
         assertEquals(ag.getBB().size(),3);
         
-        TransitionSystem ts = new TransitionSystem(ag, null, null, null);
-
         Unifier u = new Unifier();
         Term X = DefaultTerm.parse("f(X)");
         Literal c = Literal.parseLiteral("a(X,x)");
@@ -112,7 +115,7 @@ public class StdLibTest extends TestCase {
         VarTerm L = new VarTerm("L");
         // System.out.println(ag.getPS().getAllRelevant(Trigger.parseTrigger(ste.getFunctor())));
         try {
-            assertTrue((Boolean)new jason.stdlib.findall().execute(ts, u, new Term[] { X, c, L }));
+            assertTrue((Boolean)new jason.stdlib.findall().execute(ag.getTS(), u, new Term[] { X, c, L }));
         } catch (Exception e) {
             e.printStackTrace();
         }

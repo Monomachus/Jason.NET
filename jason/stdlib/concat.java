@@ -73,12 +73,11 @@ public class concat extends DefaultInternalAction {
 			if (!args[args.length-1].isVar() && !args[args.length-1].isList()) {
 				throw new JasonException("Last argument of concat '"+args[args.length-1]+"'is not a list nor a variable.");
 			}
-            ListTerm result = (ListTerm)args[0];
+            ListTerm result = (ListTerm)args[0].clone();
             for (int i=1; i<args.length-1; i++) {
-    			if (!args[i].isList()) {
+    			if (!args[i].isList())
     				throw new JasonException("arg["+i+"] is not a list in concat.");
-    			}
-                result.concat((ListTerm)args[i]);
+                result.concat((ListTerm)args[i].clone());
             }
 			return un.unifies(result, args[args.length-1]);
 

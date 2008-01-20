@@ -91,8 +91,7 @@ public class findall extends DefaultInternalAction {
                 vl.apply(nu);
                 tail = tail.append(vl);
             }
-            Term list = args[2];
-            return un.unifies(list, all);
+            return un.unifies(args[2], all);
         } catch (ArrayIndexOutOfBoundsException e) {
             throw new JasonException("The internal action 'findall' has not received three arguments.");
         } catch (Exception e) {

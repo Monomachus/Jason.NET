@@ -24,6 +24,7 @@
 package jason.asSyntax;
 
 import jason.JasonException;
+import jason.architecture.AgArch;
 import jason.asSemantics.Agent;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.parser.as2j;
@@ -125,30 +126,36 @@ public class Literal extends Pred implements LogicalFormula {
         final Literal lclone = (Literal)this.clone();
         lclone.apply(un);
         final Iterator<Literal> il = ag.getBB().getRelevant(lclone);
-
         if (il == null) // no relevant bels
             return LogExpr.EMPTY_UNIF_LIST.iterator();
-
+        
         return new Iterator<Unifier>() {
             Unifier           current = null;
             Iterator<Unifier> ruleIt = null; // current rule solutions iterator
             Rule              rule; // current rule
             Literal           lcloneAnnon = null; // a copy of lclone with makeVarsAnnon
+            AgArch            arch = ag.getTS().getUserAgArch();
+            boolean           needsUpdate = true;
             
             public boolean hasNext() {
-                if (current == null) get();
+                if (needsUpdate)
+                    get();
                 return current != null;
             }
 
             public Unifier next() {
-                if (current == null) get();
+                if (needsUpdate)
+                    get();
                 Unifier a = current;
-                current = null;
+                if (current != null)
+                    needsUpdate = true;
                 return a;
             }
 
             private void get() {
-                current = null;
+                needsUpdate = false;
+                current     = null;
+                if (!arch.isRunning()) return;
                 
                 // try rule iterator
                 while (ruleIt != null && ruleIt.hasNext()) {

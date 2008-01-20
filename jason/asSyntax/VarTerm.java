@@ -43,7 +43,7 @@ import org.w3c.dom.Element;
 
 /**
  * Represents a variable Term: like X (starts with upper case). It may have a
- * value, afert {@link Unifier}.apply.
+ * value, after {@link Unifier}.apply.
  * 
  * @author jomi
  */

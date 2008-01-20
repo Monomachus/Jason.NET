@@ -132,6 +132,7 @@ public class ListTermImpl extends Structure implements ListTerm {
 	
 	
 	// for unifier compatibility
+    @Override
 	public int getArity() {
 		if (isEmpty()) {
 			return 0;
@@ -139,12 +140,21 @@ public class ListTermImpl extends Structure implements ListTerm {
 			return 2; // term and next
 		}
 	}
+	
 	// for unifier compatibility
+    @Override
 	public Term getTerm(int i) {
 		if (i == 0) return term;
 		if (i == 1) return next;
 		return null;
 	}
+
+	// for unifier compatibility
+	@Override
+	public void setTerm(int i, Term t) {
+        if (i == 0) term = t;
+        if (i == 1) System.out.println("Should not set next of list!");
+    }
 	
 	/** return the this ListTerm elements (0=Term, 1=ListTerm) */
 	public List<Term> getTerms() {

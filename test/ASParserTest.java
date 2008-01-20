@@ -1,6 +1,8 @@
 package test;
 
+import jason.architecture.AgArch;
 import jason.asSemantics.Agent;
+import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.BodyLiteral;
 import jason.asSyntax.LogExpr;
@@ -9,6 +11,7 @@ import jason.asSyntax.NumberTerm;
 import jason.asSyntax.Plan;
 import jason.asSyntax.RelExpr;
 import jason.asSyntax.parser.as2j;
+import jason.infra.centralised.CentralisedAgArch;
 
 import java.io.StringReader;
 import java.util.Iterator;
@@ -25,6 +28,9 @@ public class ASParserTest extends TestCase {
     public void testKQML() {
         Agent ag = new Agent();
         ag.setLogger(null);
+        AgArch arch = new AgArch();
+        arch.setArchInfraTier(new CentralisedAgArch());
+        ag.setTS(new TransitionSystem(ag, null, null, arch));
 
         assertTrue(ag.parseAS("src/asl/kqmlPlans.asl"));
         assertTrue(ag.parseAS("examples/auction/ag1.asl"));

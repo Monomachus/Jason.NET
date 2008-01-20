@@ -293,7 +293,7 @@ public class Structure extends DefaultTerm {
      * 
      * @param changes is the map of replacements
      */
-    public void makeVarsAnnon(Map<VarTerm,UnnamedVar> changes) {
+    private void makeVarsAnnon(Map<VarTerm,UnnamedVar> changes) {
         final int size = getArity();
         for (int i=0; i<size; i++) {
             Term ti = getTerm(i);

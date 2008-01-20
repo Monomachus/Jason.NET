@@ -135,4 +135,8 @@ public final class Atom extends Literal {
     	logger.log(Level.SEVERE, "You should not add annot '"+t+"' in atom "+this+"\n",new Exception());
     	return super.addAnnot(t);
     }
+    
+    @Override public void makeTermsAnnon() { }
+    @Override public void makeVarsAnnon() { }
+    
 }

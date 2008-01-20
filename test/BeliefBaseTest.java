@@ -1,7 +1,9 @@
 package test;
 
+import jason.architecture.AgArch;
 import jason.asSemantics.Agent;
 import jason.asSemantics.Intention;
+import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.Atom;
 import jason.asSyntax.DefaultTerm;
@@ -17,6 +19,7 @@ import jason.asSyntax.VarTerm;
 import jason.bb.BeliefBase;
 import jason.bb.DefaultBeliefBase;
 import jason.bb.JDBCPersistentBB;
+import jason.infra.centralised.CentralisedAgArch;
 
 import java.util.Iterator;
 import java.util.List;
@@ -246,7 +249,11 @@ public class BeliefBaseTest extends TestCase {
 	
 	public void testRemWithUnnamedVar() {
 		Agent ag = new Agent();
-		ag.getBB().add(Literal.parseLiteral("pos(2,3)"));
+        AgArch arch = new AgArch();
+        arch.setArchInfraTier(new CentralisedAgArch());
+        ag.setTS(new TransitionSystem(ag, null, null, arch));
+
+        ag.getBB().add(Literal.parseLiteral("pos(2,3)"));
 		Unifier u = new Unifier();
 
 		Literal l = Literal.parseLiteral("pos(_,_)");
@@ -260,6 +267,10 @@ public class BeliefBaseTest extends TestCase {
     @SuppressWarnings("unused")
     public void testLogCons() {
         Agent ag = new Agent();
+        AgArch arch = new AgArch();
+        arch.setArchInfraTier(new CentralisedAgArch());
+        ag.setTS(new TransitionSystem(ag, null, null, arch));
+
         ag.getBB().add(Literal.parseLiteral("a(10)"));
         ag.getBB().add(Literal.parseLiteral("a(20)"));
         ag.getBB().add(Literal.parseLiteral("b(20,10)"));
@@ -287,7 +298,6 @@ public class BeliefBaseTest extends TestCase {
         texpr = LogExpr.parseExpr("not a(10)");
         assertFalse(texpr.logicalConsequence(ag, new Unifier()).hasNext());
         
-        
         // test and
         texpr = LogExpr.parseExpr("a(X) & c(Y) & a(Z)");
         iun = texpr.logicalConsequence(ag, new Unifier());
@@ -297,7 +307,7 @@ public class BeliefBaseTest extends TestCase {
             //System.out.println(u);
             c++;
         }
-        assertEquals(c,8);
+        assertEquals(8,c);
         
         // test or
         texpr = LogExpr.parseExpr("a(X) | c(Y)");
@@ -311,6 +321,17 @@ public class BeliefBaseTest extends TestCase {
         assertEquals(c,4);
         
         // test rel
+        texpr = LogExpr.parseExpr("a(X) & a(Y) & X > 10");
+        iun = texpr.logicalConsequence(ag, new Unifier());
+        c = 0;
+        while (iun.hasNext()) {
+            Unifier u = iun.next();
+            c++;
+        }
+        assertEquals(2,c);
+
+        // test rel
+        //texpr = LogExpr.parseExpr("a(X) & a(Y) & Y > X");
         texpr = LogExpr.parseExpr("a(X) & a(Y) & Y > X");
         iun = texpr.logicalConsequence(ag, new Unifier());
         c = 0;
@@ -318,7 +339,7 @@ public class BeliefBaseTest extends TestCase {
             Unifier u = iun.next();
             c++;
         }
-        assertEquals(c,1);
+        assertEquals(1,c);
 
         texpr = LogExpr.parseExpr("a(X) & a(Y) & X <= Y");
         iun = texpr.logicalConsequence(ag, new Unifier());
@@ -327,7 +348,7 @@ public class BeliefBaseTest extends TestCase {
             Unifier u = iun.next();
             c++;
         }
-        assertEquals(c,3);
+        assertEquals(3,c);
         
         ag.getBB().add(Literal.parseLiteral("k(20,c)"));
         ag.getBB().add(Literal.parseLiteral("k(10,b)"));
@@ -500,6 +521,10 @@ public class BeliefBaseTest extends TestCase {
     @SuppressWarnings("unchecked")
 	public void testBelBRF() {
         Agent ag = new Agent();
+        AgArch arch = new AgArch();
+        arch.setArchInfraTier(new CentralisedAgArch());
+        ag.setTS(new TransitionSystem(ag, null, null, arch));
+
         ag.getBB().add(Literal.parseLiteral("a(10)"));
         ag.getBB().add(Literal.parseLiteral("a(20)[a]"));
         ag.getBB().add(Literal.parseLiteral("a(30)[a,b]"));

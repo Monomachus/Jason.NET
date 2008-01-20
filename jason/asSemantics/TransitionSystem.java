@@ -78,29 +78,29 @@ public class TransitionSystem {
         C      = c;
         agArch = ar;
 
-        if (s == null) {
+        if (s == null)
             setts = new Settings();
-        } else {
+        else
             setts = s;
-        }
 
+        if (C == null)
+            C = new Circumstance();
+        
         // we need to initialise this "aliases"
         conf = confP = this;
 
         nrcslbr = setts.nrcbp(); // to do BR to start with
 
         setLogger(agArch);
-        if (setts != null) {
+        if (setts != null)
             logger.setLevel(setts.logLevel());
-        }
     }
 
     public void setLogger(AgArch arch) {
-        if (arch != null) {
+        if (arch != null)
             logger = Logger.getLogger(TransitionSystem.class.getName() + "." + arch.getAgName());
-        } else {
+        else
             logger = Logger.getLogger(TransitionSystem.class.getName());
-        }
     }
 
     /** ******************************************************************* */

@@ -82,21 +82,24 @@ public class LogExpr extends BinaryStructure implements LogicalFormula {
 	                Iterator<Unifier> ileft   = getLHS().logicalConsequence(ag,un);;
                     Iterator<Unifier> iright  = null;
 	                Unifier           current = null;
+	                boolean           needsUpdate = true;
 	                
 	                public boolean hasNext() {
-	                    if (current == null) 
+	                    if (needsUpdate) 
 	                        get();
 	                    return current != null;
 	                }
 	                public Unifier next() {
-	                    if (current == null) 
+	                    if (needsUpdate)
 	                        get();
 	                    Unifier a = current;
-	                    current = null;
+	                    if (current != null)
+	                        needsUpdate = true;
 	                    return a;
 	                }
 	                private void get() {
-	                    current = null;
+	                    needsUpdate = false;
+	                    current     = null;
 	                    while ((iright == null || !iright.hasNext()) && ileft.hasNext())
 	                        iright = getRHS().logicalConsequence(ag, ileft.next());
 	                    if (iright != null && iright.hasNext())
@@ -125,9 +128,9 @@ public class LogExpr extends BinaryStructure implements LogicalFormula {
 	                }
 	                private void get() {
 	                    current = null;
-	                    if (ileft.hasNext()) {
+	                    if (ileft.hasNext()) 
 	                        current = ileft.next();
-	                    } else {
+	                    else {
 	                        if (iright == null)
 	                            iright = getRHS().logicalConsequence(ag,un);
 	                        if (iright.hasNext())

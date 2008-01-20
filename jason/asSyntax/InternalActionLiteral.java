@@ -74,23 +74,25 @@ public class InternalActionLiteral extends Literal {
 	
     @SuppressWarnings("unchecked")
     public Iterator<Unifier> logicalConsequence(Agent ag, Unifier un) {
-        try {
-        	// clone terms array
-            Term[] clone = getTermsArray();
-            for (int i=0; i<clone.length; i++) {
-                clone[i] = (Term)clone[i].clone();
-                clone[i].apply(un);
+        if (ag.getTS().getUserAgArch().isRunning()) {
+            try {
+            	// clone terms array
+                Term[] clone = getTermsArray();
+                for (int i=0; i<clone.length; i++) {
+                    clone[i] = (Term)clone[i].clone();
+                    clone[i].apply(un);
+                }
+    
+            	// calls IA's execute method
+                Object oresult = getIA(ag).execute(ag.getTS(), un, clone);
+                if (oresult instanceof Boolean && (Boolean)oresult) {
+                    return LogExpr.createUnifIterator(un);
+                } else if (oresult instanceof Iterator) {
+                    return ((Iterator<Unifier>)oresult);
+                }
+            } catch (Exception e) {
+                logger.log(Level.SEVERE, getErrorMsg() + ": " +	e.getMessage(), e);
             }
-
-        	// calls IA's execute method
-            Object oresult = getIA(ag).execute(ag.getTS(), un, clone);
-            if (oresult instanceof Boolean && (Boolean)oresult) {
-                return LogExpr.createUnifIterator(un);
-            } else if (oresult instanceof Iterator) {
-                return ((Iterator<Unifier>)oresult);
-            }
-        } catch (Exception e) {
-            logger.log(Level.SEVERE, getErrorMsg() + ": " +	e.getMessage(), e);
         }
         return LogExpr.EMPTY_UNIF_LIST.iterator();  // empty iterator for unifier
     }   
