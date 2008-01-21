@@ -36,8 +36,8 @@ public class AboutGUI {
 	    "License along with this library; if not, write to the Free Software\n"+
 	    "Foundation, Inc., 59 Temple Place, Suite 330,\nBoston, MA  02111-1307  USA\n\n"+
 		"About the image: \"Jason\" by Gustave Moreau (1865).\n"+
-		"Copyright Photo RMN (Agence Photographique de la Réunion des\n"+
-		"Musées Nationaux, France). Photograph by Hervé Lewandowski.\n\n"+
+		"Copyright Photo RMN (Agence Photographique de la Reunion des\n"+
+		"Musees Nationaux, France). Photograph by Herve Lewandowski.\n\n"+
 	    "To contact the authors:\n"+
 	    "http://www.dur.ac.uk/r.bordini\n"+
 	    "http://www.inf.furb.br/~jomi",

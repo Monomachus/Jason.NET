@@ -481,7 +481,7 @@ public class TransitionSystem {
             } else {
             	boolean fail = true;
             	if (f instanceof Literal) { // generate event when using literal in the test (no events for log. expr. like ?(a & b)
-            		body = (Literal)f;
+            		body = (Literal)f.clone();
 	                body.makeVarsAnnon();
 	                Trigger te = new Trigger(TEOperator.add, TEType.test, body);
 	                if (ag.getPL().isRelevant(te)) {
@@ -601,7 +601,7 @@ public class TransitionSystem {
 
         // remove the finished IM from the top of the intention
         IntendedMeans topIM = i.pop();
-        if (logger.isLoggable(Level.FINE)) logger.fine("Returning from IM "+topIM.getPlan().getLabel());
+        if (logger.isLoggable(Level.FINE)) logger.fine("Returning from IM "+topIM.getPlan().getLabel()+", te="+topIM.getPlan().getTrigger());
         
         // if finished a failure handling IM ...
         if (im.getTrigger().isGoal() && !im.getTrigger().isAddition() && i.size() > 0) {
@@ -620,10 +620,10 @@ public class TransitionSystem {
             }
         }
         if (!i.isFinished()) {
-            im = i.peek(); // +!s
+            im = i.peek(); // +!s or +?s
             if (!im.isFinished()) {
-                // removes !b
-                BodyLiteral g = im.removeCurrentStep(); 
+                // removes !b or ?s
+                BodyLiteral g = im.removeCurrentStep();
                 // make the TE of finished plan ground and unify that
                 // with goal in the body
                 Literal tel = topIM.getPlan().getTrigger().getLiteral();
