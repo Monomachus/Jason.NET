@@ -58,6 +58,10 @@ import jason.asSyntax.Term;
   @see jason.stdlib.sort
   @see jason.stdlib.substring
 
+  @see jason.stdlib.difference
+  @see jason.stdlib.intersection
+  @see jason.stdlib.union
+
 */
 public class reverse extends DefaultInternalAction {
 

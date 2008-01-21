@@ -46,6 +46,10 @@ numbers &lt; atoms &lt; structures &lt; lists
   @see jason.stdlib.min
   @see jason.stdlib.reverse
 
+  @see jason.stdlib.difference
+  @see jason.stdlib.intersection
+  @see jason.stdlib.union
+
 */
 public class max extends min {
 

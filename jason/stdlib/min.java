@@ -53,6 +53,10 @@ numbers &lt; atoms &lt; structures &lt; lists
   @see jason.stdlib.max
   @see jason.stdlib.reverse
 
+  @see jason.stdlib.difference
+  @see jason.stdlib.intersection
+  @see jason.stdlib.union
+
 */
 public class min extends DefaultInternalAction {
 

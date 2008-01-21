@@ -62,6 +62,10 @@ import jason.asSyntax.Term;
   @see jason.stdlib.min
   @see jason.stdlib.reverse
 
+  @see jason.stdlib.difference
+  @see jason.stdlib.intersection
+  @see jason.stdlib.union
+
 */
 public class concat extends DefaultInternalAction {
 

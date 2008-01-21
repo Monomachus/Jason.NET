@@ -40,6 +40,10 @@ import java.util.Iterator;
   @see jason.stdlib.min
   @see jason.stdlib.reverse
 
+  @see jason.stdlib.difference
+  @see jason.stdlib.intersection
+  @see jason.stdlib.union
+
 */
 public class member extends DefaultInternalAction {
     

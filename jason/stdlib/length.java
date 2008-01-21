@@ -59,6 +59,10 @@ import jason.asSyntax.Term;
   @see jason.stdlib.sort
   @see jason.stdlib.reverse
 
+  @see jason.stdlib.difference
+  @see jason.stdlib.intersection
+  @see jason.stdlib.union
+
   @see jason.functions.Length function version
   
  */

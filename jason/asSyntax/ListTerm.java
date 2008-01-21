@@ -25,6 +25,10 @@ public interface ListTerm extends java.util.List<Term>, Term {
     public ListTerm concat(ListTerm lt);
     public ListTerm reverse();
     
+    public ListTerm union(ListTerm lt);
+    public ListTerm intersection(ListTerm lt);
+    public ListTerm difference(ListTerm lt);
+    
     public Iterator<ListTerm> listTermIterator();
     public List<Term> getAsList();
 }

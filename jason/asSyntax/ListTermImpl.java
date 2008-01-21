@@ -32,6 +32,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -301,8 +303,49 @@ public class ListTermImpl extends Structure implements ListTerm {
         }
     }
 
-	
-	/** returns an iterator where each element is a ListTerm */
+    /** returns a new (cloned) list representing the set resulting of the union of this list and lt. */
+    public ListTerm union(ListTerm lt) {
+        Set<Term> set = new TreeSet<Term>();
+        set.addAll(lt);
+        set.addAll(this);
+
+        // copy the set to a new list
+        ListTerm result = new ListTermImpl();
+        ListTerm tail = result;
+        for (Term t: set)
+            tail = tail.append((Term)t.clone());
+        return result;
+    }
+
+    /** returns a new (cloned) list representing the set resulting of the intersection of this list and lt. */
+    public ListTerm intersection(ListTerm lt) {
+        Set<Term> set = new TreeSet<Term>();
+        set.addAll(lt);
+        set.retainAll(this);
+
+        // copy the set to a new list
+        ListTerm result = new ListTermImpl();
+        ListTerm tail = result;
+        for (Term t: set)
+            tail = tail.append((Term)t.clone());
+        return result;
+    }
+    
+    /** returns a new (cloned) list representing the set resulting of the difference of this list and lt. */
+    public ListTerm difference(ListTerm lt) {
+        Set<Term> set = new TreeSet<Term>();
+        set.addAll(this);
+        set.removeAll(lt);
+
+        // copy the set to a new list
+        ListTerm result = new ListTermImpl();
+        ListTerm tail = result;
+        for (Term t: set)
+            tail = tail.append((Term)t.clone());
+        return result;
+    }
+
+    /** returns an iterator where each element is a ListTerm */
 	public Iterator<ListTerm> listTermIterator() {
 		final ListTermImpl lt = this;
 		return new Iterator<ListTerm>() {

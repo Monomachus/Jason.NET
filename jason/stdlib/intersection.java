@@ -21,7 +21,6 @@
 //
 //----------------------------------------------------------------------------
 
-
 package jason.stdlib;
 
 import jason.JasonException;
@@ -31,72 +30,50 @@ import jason.asSemantics.Unifier;
 import jason.asSyntax.ListTerm;
 import jason.asSyntax.Term;
 
-import java.util.Collections;
-
 /**
+  <p>Internal action: <b><code>.intersection(S1,S2,S3)</code></b>.
 
-  <p>Internal action: <b><code>.sort</code></b>.
-
-  <p>Description: sorts a list of terms. The "natural" order for each type of
-  terms is used. Between different types of terms, the following order is
-  used:<br>
-
-  numbers &lt; atoms &lt; structures &lt; lists 
+  <p>Description: S3 is the intersection of the sets S1 and S2 (represented by lists).
+  The result set is sorted.  
 
   <p>Parameters:<ul>
-  <li>+   unordered list (list): the list the be sorted.<br/>
-  <li>+/- ordered list (list): the sorted list. 
+  <li>+ arg[0] (a list).<br/>
+  <li>+ arg[1] (a list).<br/>
+  <li>+/- arg[2]: the result of the intersection. 
   </ul>
 
   <p>Examples:<ul>
-  
-  <li> <code>.sort([c,a,b],X)</code>: <code>X</code> unifies with
-  <code>[a,b,c]</code>.
-
-  <li>
-  <code>.sort([b,c,10,g,casa,f(10),[3,4],5,[3,10],f(4)],X)</code>:
-  <code>X</code> unifies with
-  <code>[5,10,b,c,casa,g,f(4),f(10),[3,4],[3,10]]</code>.
-
-  <li>
-  <code>.sort([3,2,5],[2,3,5])</code>: true.
-
-  <li>
-  <code>.sort([3,2,5],[a,b,c])</code>: false.
-
+  <li> <code>.intersection("[a,b,c]","[b,e]",X)</code>: <code>X</code> unifies with "[b]".
+  <li> <code>.intersection("[a,b,a,c]","[f,e,a,c]",X)</code>: <code>X</code> unifies with "[a,c]".
   </ul>
 
   @see jason.stdlib.concat
   @see jason.stdlib.delete
   @see jason.stdlib.length
   @see jason.stdlib.member
+  @see jason.stdlib.sort
+  @see jason.stdlib.substring
   @see jason.stdlib.nth
   @see jason.stdlib.max
   @see jason.stdlib.min
   @see jason.stdlib.reverse
-
+  
   @see jason.stdlib.difference
-  @see jason.stdlib.intersection
   @see jason.stdlib.union
-
 */
-public class sort extends DefaultInternalAction {
-    
-    @Override
-    public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
-        try {
-            ListTerm l1 = (ListTerm) args[0].clone();
-            if (l1.isVar()) {
-            	throw new JasonException("The first argument of .sort should not be a free variable.");
-            }
-            Collections.sort(l1);
-            return un.unifies(l1, args[1]);
-        } catch (ArrayIndexOutOfBoundsException e) {
-            throw new JasonException("The internal action 'sort' has not received two arguments.");
-        } catch (JasonException e) {
-        	throw e;
-        } catch (Exception e) {
-            throw new JasonException("Error in internal action 'sort': " + e, e);
-        }    
-    }
+public class intersection extends DefaultInternalAction {
+
+	@Override
+	public Object execute(TransitionSystem ts, Unifier un, Term[] args)	throws Exception {
+		
+	    if (!args[0].isList())
+            throw new JasonException("First argument of intersection '"+args[0]+"'is not a list.");
+        if (!args[1].isList())
+            throw new JasonException("Second argument of intersection '"+args[1]+"'is not a list.");
+        
+        if (!args[2].isVar() && !args[2].isList())
+			throw new JasonException("Last argument of intersection '"+args[2]+"'is not a list nor a variable.");
+
+		return un.unifies(args[2], ((ListTerm)args[0]).intersection( (ListTerm)args[1]) );
+	}
 }

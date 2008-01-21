@@ -217,4 +217,46 @@ public class ListTermTest extends TestCase {
         l = ListTermImpl.parseList("[a,b,c|T]");
         assertEquals("[c,b,a|T]",l.reverse().toString());
     }
+    
+    public void testUnion() {
+        ListTerm l1 = ListTermImpl.parseList("[]");
+        ListTerm l2 = ListTermImpl.parseList("[a,b,c]");
+        ListTerm l3 = ListTermImpl.parseList("[a,b,d,e]");
+        
+        ListTerm l4 = l1.union(l2);
+        assertEquals("[a,b,c]", l4.toString());
+        assertEquals(l2,l4);
+        
+        ListTerm l = l4.union(l3);
+        assertEquals(5, l.size());
+        
+        assertEquals(l2.union(l3), l3.union(l2));
+    }
+
+    public void testIntersectoin() {
+        ListTerm l1 = ListTermImpl.parseList("[]");
+        ListTerm l2 = ListTermImpl.parseList("[c,a,b,c]");
+        ListTerm l3 = ListTermImpl.parseList("[b,a,d,e]");
+        
+        ListTerm l4 = l1.intersection(l2);
+        assertEquals("[]", l4.toString());
+        assertEquals(l1,l4);
+        assertEquals(l1.intersection(l2),l2.intersection(l1));
+        
+        ListTerm l = l2.intersection(l3);
+        assertEquals("[a,b]", l.toString());
+    }
+    
+    public void testDifference() {
+        ListTerm l1 = ListTermImpl.parseList("[]");
+        ListTerm l2 = ListTermImpl.parseList("[c,a,b,c]");
+        ListTerm l3 = ListTermImpl.parseList("[b,a,d,e]");
+        
+        assertEquals("[c]", l2.difference(l3).toString());
+        assertEquals("[d,e]", l3.difference(l2).toString());
+        assertEquals("[a,b,c]", l2.difference(l1).toString());
+        assertEquals("[a,b,d,e]", l3.difference(l1).toString());
+        assertEquals("[]", l1.difference(l2).toString());
+    }
+
 }

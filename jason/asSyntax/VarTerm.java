@@ -741,6 +741,26 @@ public class VarTerm extends InternalActionLiteral implements NumberTerm, ListTe
             return null;
     }
 
+    public ListTerm union(ListTerm lt) {
+        if (value != null && getValue().isList())
+            return ((ListTerm) getValue()).union(lt);
+        else
+            return null;
+    }
+
+    public ListTerm intersection(ListTerm lt) {
+        if (value != null && getValue().isList())
+            return ((ListTerm) getValue()).intersection(lt);
+        else
+            return null;
+    }
+
+    public ListTerm difference(ListTerm lt) {
+        if (value != null && getValue().isList())
+            return ((ListTerm) getValue()).difference(lt);
+        else
+            return null;
+    }
 
     public List<Term> getAsList() {
         if (value != null && getValue().isList())

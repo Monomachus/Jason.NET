@@ -17,6 +17,7 @@ import jason.functions.e;
 import jason.functions.floor;
 import jason.functions.log;
 import jason.functions.pi;
+import jason.functions.time;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -47,6 +48,7 @@ public class FunctionRegister implements Directive {
         addFunction(floor.class);
         addFunction(ceil.class);
         addFunction(log.class);
+        addFunction(time.class);
     }
     
     /** register a function implemented in Java */
