@@ -308,13 +308,7 @@ public class ListTermImpl extends Structure implements ListTerm {
         Set<Term> set = new TreeSet<Term>();
         set.addAll(lt);
         set.addAll(this);
-
-        // copy the set to a new list
-        ListTerm result = new ListTermImpl();
-        ListTerm tail = result;
-        for (Term t: set)
-            tail = tail.append((Term)t.clone());
-        return result;
+        return setToList(set);
     }
 
     /** returns a new (cloned) list representing the set resulting of the intersection of this list and lt. */
@@ -322,13 +316,7 @@ public class ListTermImpl extends Structure implements ListTerm {
         Set<Term> set = new TreeSet<Term>();
         set.addAll(lt);
         set.retainAll(this);
-
-        // copy the set to a new list
-        ListTerm result = new ListTermImpl();
-        ListTerm tail = result;
-        for (Term t: set)
-            tail = tail.append((Term)t.clone());
-        return result;
+        return setToList(set);
     }
     
     /** returns a new (cloned) list representing the set resulting of the difference of this list and lt. */
@@ -336,15 +324,18 @@ public class ListTermImpl extends Structure implements ListTerm {
         Set<Term> set = new TreeSet<Term>();
         set.addAll(this);
         set.removeAll(lt);
+        return setToList(set);
+    }
 
-        // copy the set to a new list
+    // copy the set to a new list
+    private ListTerm setToList(Set<Term> set) {
         ListTerm result = new ListTermImpl();
         ListTerm tail = result;
         for (Term t: set)
             tail = tail.append((Term)t.clone());
         return result;
-    }
 
+    }
     /** returns an iterator where each element is a ListTerm */
 	public Iterator<ListTerm> listTermIterator() {
 		final ListTermImpl lt = this;
