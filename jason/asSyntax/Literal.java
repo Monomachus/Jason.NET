@@ -27,6 +27,7 @@ import jason.JasonException;
 import jason.architecture.AgArch;
 import jason.asSemantics.Agent;
 import jason.asSemantics.Unifier;
+import jason.asSyntax.parser.ParseException;
 import jason.asSyntax.parser.as2j;
 
 import java.io.StringReader;
@@ -90,6 +91,9 @@ public class Literal extends Pred implements LogicalFormula {
 			return null;
 		}
 	}
+    public static Literal tryParsingLiteral(String sLiteral) throws ParseException {
+        return new as2j(new StringReader(sLiteral)).literal();
+    }
 
     @Override
 	public boolean isLiteral() {

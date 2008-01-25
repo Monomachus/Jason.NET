@@ -32,6 +32,7 @@ package jason.asSyntax;
  *    a type (<empty>, !, or ?);
  *    a literal
  */
+import jason.asSyntax.parser.ParseException;
 import jason.asSyntax.parser.as2j;
 
 import java.io.StringReader;
@@ -71,12 +72,16 @@ public class Trigger implements Cloneable {
 	public static Trigger parseTrigger(String sTe) {
 		as2j parser = new as2j(new StringReader(sTe));
 		try {
-			return parser.trigger(); 
+		    return parser.trigger(); 
 		} catch (Exception e) {
 			logger.log(Level.SEVERE,"Error parsing trigger" + sTe,e);
 			return null;
 		}
 	}
+
+    public static Trigger tryParsingTrigger(String sTe) throws ParseException {
+        return new as2j(new StringReader(sTe)).trigger();
+    }
 
 	public void setTrigOp(TEOperator op) {
 		operator = op;

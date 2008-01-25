@@ -47,9 +47,25 @@
 
 @kqmlReceivedAchieve
 +!kqml_received(Sender, achieve, Content, _)
+    : not .list(Content)
    <- .add_annot(Content, source(Sender), CA); 
       !!CA.
+@kqmlReceivedAchieveList
++!kqml_received(Sender, achieve, Content, _)
+    : .list(Content)
+   <- !add_all_kqml_achieve(Sender,Content).
 
+	  
+@kqmlReceivedAchieveList1
++!add_all_kqml_achieve(_,[]).   
+
+@kqmlReceivedAchieveList2
++!add_all_kqml_achieve(Sender,[H|T])
+   <- .add_annot(H, source(Sender), CA);
+      !!CA;
+      !add_all_kqml_achieve(Sender,T).
+
+	  
 @kqmlReceivedUnAchieve[atomic]
 +!kqml_received(_, unachieve, Content, _)
    <- .drop_desire(Content).

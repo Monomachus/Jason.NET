@@ -10,6 +10,7 @@ import jason.asSyntax.StringTerm;
 import jason.asSyntax.StringTermImpl;
 import jason.asSyntax.Structure;
 import jason.asSyntax.Trigger;
+import jason.asSyntax.parser.ParseException;
 
 import java.util.List;
 import java.util.PriorityQueue;
@@ -24,7 +25,7 @@ public class TSTest extends TestCase {
         super.setUp();
     }
 
-    public void testRelevant() {
+    public void testRelevant() throws ParseException {
         Agent ag = new Agent();
         Circumstance c = new Circumstance();
         StringTerm pt1 = new StringTermImpl("@t1 +a(X) : g(10) <- .print(\"ok 10\").");

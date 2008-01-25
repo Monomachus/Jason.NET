@@ -61,6 +61,20 @@ public class Event implements Serializable {
     public boolean isInternal() {
         return intention != Intention.EmptyInt;
     }
+    
+    @Override
+    public boolean equals(Object o) {
+        if (o == null) return false;
+        if (o == this) return true;
+        if (o instanceof Event) {
+            Event oe = (Event)o;
+            if (this.intention == null && oe.intention != null) return false;
+            if (this.intention != null && !this.intention.equals(oe.intention)) return false;
+                
+            return this.trigger.equals(oe.trigger);
+        }
+        return false;
+    }
 
     public Object clone() {
         Trigger   tc = (trigger   == null ? null : (Trigger)trigger.clone());

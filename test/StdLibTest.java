@@ -21,6 +21,7 @@ import jason.asSyntax.Structure;
 import jason.asSyntax.Term;
 import jason.asSyntax.Trigger;
 import jason.asSyntax.VarTerm;
+import jason.asSyntax.parser.ParseException;
 import jason.bb.BeliefBase;
 import jason.infra.centralised.CentralisedAgArch;
 import jason.stdlib.add_annot;
@@ -274,7 +275,7 @@ public class StdLibTest extends TestCase {
         }
     }
     
-    public void testDropGoal1() {
+    public void testDropGoal1() throws ParseException {
         assertEquals(intention1.size(), 4);
         Trigger g = Trigger.parseTrigger("+!g1");
         assertTrue(intention1.dropGoal(g, new Unifier()));

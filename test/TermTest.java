@@ -15,6 +15,7 @@ import jason.asSyntax.Plan;
 import jason.asSyntax.VarTerm;
 import jason.asSyntax.Trigger.TEOperator;
 import jason.asSyntax.Trigger.TEType;
+import jason.asSyntax.parser.ParseException;
 import jason.bb.BeliefBase;
 
 import java.util.Collections;
@@ -352,7 +353,7 @@ public class TermTest extends TestCase {
 		p1.addTerm(new VarTerm("Y"));
 	}
 	
-	public void testTriggetAnnot() {
+	public void testTriggetAnnot() throws ParseException {
 		Literal content = Literal.parseLiteral("~alliance");
 		content.addSource(new Structure("ag1"));
 		Literal received = new Literal(Literal.LPos, new Pred("received"));

@@ -26,6 +26,8 @@ package jason.asSyntax;
 
 
 import jason.JasonException;
+import jason.asSyntax.Trigger.TEOperator;
+import jason.asSyntax.Trigger.TEType;
 import jason.bb.BeliefBase;
 
 import java.util.ArrayList;
@@ -240,7 +242,7 @@ public class PlanLibrary implements Iterable<Plan> {
     	return l;
     }
 
-    public static final Trigger TE_IDLE = Trigger.parseTrigger("+!idle");
+    public static final Trigger TE_IDLE = new Trigger(TEOperator.add, TEType.achieve, new Literal("idle"));
 
     public List<Plan> getIdlePlans() {
         return relPlans.get(TE_IDLE.getPredicateIndicator());

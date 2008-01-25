@@ -49,6 +49,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Reader;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -91,7 +92,7 @@ public class Agent {
     
     private boolean hasCustomSelOp = true;
     
-    private Logger logger = Logger.getLogger(Agent.class.getName());
+    protected Logger logger = Logger.getLogger(Agent.class.getName());
 
     public Agent() {
         checkCustomSelectOption();
@@ -117,9 +118,9 @@ public class Agent {
             setLogger(arch);
             logger.setLevel(stts.logLevel());
 
-            if (bb != null) {
+            if (bb != null)
                 this.bb = bb;
-            }
+            
             initDefaultFunctions();
             setTS(new TransitionSystem(this, new Circumstance(), stts, arch));
 
@@ -137,15 +138,15 @@ public class Agent {
     	            	parseAS(asSrc);
     	            }
                 }
-                
-                // kqml Plans at the end of the ag PS
-                setASLSrc("kqmlPlans.asl");
-                parseAS(JasonException.class.getResource("/asl/kqmlPlans.asl"));
-                setASLSrc(asSrc);
-    
-                addInitialBelsInBB();
-                addInitialGoalsInTS();
             }
+                
+            // kqml Plans at the end of the ag PS
+            setASLSrc("kqmlPlans.asl");
+            parseAS(JasonException.class.getResource("/asl/kqmlPlans.asl"));
+            setASLSrc(asSrc);
+
+            addInitialBelsInBB();
+            addInitialGoalsInTS();
             return ts;
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error creating the agent class!", e);
@@ -188,7 +189,8 @@ public class Agent {
     }
     
     public void setASLSrc(String file) {
-        if (file.startsWith("."+File.separator)) file = file.substring(2);
+        if (file != null && file.startsWith("."+File.separator)) 
+            file = file.substring(2);
         aslSource = file;    	
     }
 
@@ -221,6 +223,10 @@ public class Agent {
     }
 
     public void parseAS(InputStream asIn) throws ParseException, JasonException {
+        as2j parser = new as2j(asIn);
+        parser.agent(this);
+    }
+    public void parseAS(Reader asIn) throws ParseException, JasonException {
         as2j parser = new as2j(asIn);
         parser.agent(this);
     }

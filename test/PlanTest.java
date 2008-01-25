@@ -4,6 +4,7 @@ import jason.JasonException;
 import jason.asSyntax.Plan;
 import jason.asSyntax.PlanLibrary;
 import jason.asSyntax.Trigger;
+import jason.asSyntax.parser.ParseException;
 
 import java.util.List;
 
@@ -24,7 +25,7 @@ public class PlanTest extends TestCase {
         assertTrue(p3.hasBreakpoint());
     }
     
-    public void testRelevant() throws JasonException {
+    public void testRelevant() throws JasonException, ParseException {
     	PlanLibrary pl = new PlanLibrary();
     	pl.add(Plan.parse("+p(0) <- .print(a)."));
     	pl.add(Plan.parse("+p(X) : X > 0 <- .print(a)."));
