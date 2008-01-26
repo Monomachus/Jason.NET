@@ -396,6 +396,10 @@ public class Agent {
         return bb;
     }
 
+    protected void setPL(PlanLibrary pl) {
+    	this.pl = pl;
+    }
+    
     public PlanLibrary getPL() {
         return pl;
     }
