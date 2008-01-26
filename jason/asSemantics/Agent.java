@@ -396,7 +396,7 @@ public class Agent {
         return bb;
     }
 
-    protected void setPL(PlanLibrary pl) {
+    public void setPL(PlanLibrary pl) {
     	this.pl = pl;
     }
     
