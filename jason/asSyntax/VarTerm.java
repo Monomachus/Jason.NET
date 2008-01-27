@@ -110,8 +110,8 @@ public class VarTerm extends InternalActionLiteral implements NumberTerm, ListTe
             return false;
         }
 
+        vl = (Term)vl.clone();
         if (vl.isPred() && this.hasAnnot()) { // if this var has annots, add them in the value's annots (Experimental)
-        	vl = (Term)vl.clone();
         	((Pred)vl).addAnnots(this.getAnnots());
         }
         
@@ -131,7 +131,7 @@ public class VarTerm extends InternalActionLiteral implements NumberTerm, ListTe
             // System.out.println("applying="+t+"="+vl+" un="+this);
             if (vl != null && !(vl instanceof VarsCluster)) {
                 setValue(vl);
-                vl.apply(u); // in case t has var args
+                value.apply(u); // in case t has var args
                 return true;
             }
         } else {

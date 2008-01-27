@@ -25,6 +25,7 @@ package jason.asSyntax;
 
 import jason.asSemantics.Agent;
 import jason.asSemantics.Unifier;
+import jason.asSyntax.parser.ParseException;
 import jason.asSyntax.parser.as2j;
 
 import java.io.StringReader;
@@ -192,6 +193,9 @@ public class LogExpr extends BinaryStructure implements LogicalFormula {
             logger.log(Level.SEVERE,"Error parsing expression "+sExpr,e);
         }
         return null;
+    }
+    public static LogicalFormula tryParsingLogExpr(String sExpr) throws ParseException {
+        return (LogicalFormula)new as2j(new StringReader(sExpr)).log_expr();
     }
 	
 	/** make a hard copy of the terms */

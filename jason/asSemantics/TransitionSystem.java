@@ -405,9 +405,8 @@ public class TransitionSystem {
         h.getLogicalFormula().apply(u);
         
         Literal body = null;
-        if (h.getLogicalFormula() instanceof Literal) {
+        if (h.getLogicalFormula() instanceof Literal)
             body = h.getLiteralFormula();
-        }
 
         switch (h.getType()) {
 
@@ -433,16 +432,16 @@ public class TransitionSystem {
                     }
                 }
 
-                if (ok && !ia.suspendIntention()) {
+                if (ok && !ia.suspendIntention())
                     updateIntention();
-                }
+                
             } catch (Exception e) {
                 logger.log(Level.SEVERE, body.getErrorMsg()+": "+ e.getMessage(), e);
                 ok = false;
             }
-            if (!ok) {
+            if (!ok)
                 generateGoalDeletion();
-            }
+
             break;
 
         case constraint:
@@ -535,9 +534,8 @@ public class TransitionSystem {
 
             // calculate focus
             Intention newfocus = Intention.EmptyInt;
-            if (setts.sameFocus()) {
+            if (setts.sameFocus())
                 newfocus = conf.C.SI;
-            }
 
             // call BRF
             result = ag.brf(body,null,conf.C.SI); // the intention is not the new focus
@@ -562,9 +560,8 @@ public class TransitionSystem {
             }
 
             newfocus = Intention.EmptyInt;
-            if (setts.sameFocus()) {
+            if (setts.sameFocus())
                 newfocus = conf.C.SI;
-            }
 
             // call BRF
             result = ag.brf(null,body, conf.C.SI); // the intention is not the new focus
@@ -583,9 +580,9 @@ public class TransitionSystem {
 
     public void applyClrInt(Intention i) throws JasonException {
         // Rule ClrInt
-        if (i == null) {
+        if (i == null)
             return;
-        }
+        
         if (i.isFinished()) {
             // intention finished, remove it
             confP.C.removeIntention(i);

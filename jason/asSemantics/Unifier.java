@@ -142,13 +142,17 @@ public class Unifier implements Cloneable {
 	        if (np1.isVar() && np1.hasAnnot()) {
 	        	Term np1vl = function.get((VarTerm) np1);
 	        	if (np1vl.isPred()) {
-	        		((Pred) np1vl).clearAnnots();
+	        	    Pred pvl = (Pred)np1vl.clone(); 
+	        		pvl.clearAnnots();
+	        		function.put((VarTerm) np1, pvl);
 	        	}
 	        }
 	        if (np2.isVar() && np2.hasAnnot()) {
 	        	Term np2vl = function.get((VarTerm) np2);
 	        	if (np2vl.isPred()) {
-	        		((Pred)np2vl).clearAnnots();
+                    Pred pvl = (Pred)np2vl.clone(); 
+                    pvl.clearAnnots();
+                    function.put((VarTerm) np2, pvl);
 	        	}
 	        }
         }
@@ -221,12 +225,12 @@ public class Unifier implements Cloneable {
             VarTerm t1gv = (VarTerm) t1g;
             // if t1g is not free, must unify values
             Term t1vl = function.get(t1gv);
-            if (t1vl != null && !(t1vl instanceof VarsCluster)) {
+            if (t1vl != null && !(t1vl instanceof VarsCluster))
                 return unifiesNoUndo(t1vl,t2g);
-            } else if (!t2g.hasVar(t1gv)) {
+            else if (!t2g.hasVar(t1gv))
                 return setVarValue(t1gv, t2g);
-            }
-            return false;
+            else
+                return false;
         }
 
         // t2 is var that doesn't occur in t1
@@ -234,12 +238,12 @@ public class Unifier implements Cloneable {
             VarTerm t2gv = (VarTerm) t2g;
             // if t1g is not free, must unify values
             Term t2vl = function.get(t2gv);
-            if (t2vl != null && !(t2vl instanceof VarsCluster)) {
+            if (t2vl != null && !(t2vl instanceof VarsCluster))
                 return unifiesNoUndo(t2vl,t1g);
-            } else if (!t1g.hasVar(t2gv)) {
+            else if (!t1g.hasVar(t2gv))
                 return setVarValue(t2gv, t1g);
-            } 
-            return false;
+            else
+                return false;
         }
 
         // both terms are not vars
@@ -284,18 +288,14 @@ public class Unifier implements Cloneable {
         
         // unify inner terms
         // do not use iterator! (see ListTermImpl class)
-        for (int i = 0; i < ts; i++) {
-            if (!unifiesNoUndo(t1s.getTerm(i), t2s.getTerm(i))) {
+        for (int i = 0; i < ts; i++)
+            if (!unifiesNoUndo(t1s.getTerm(i), t2s.getTerm(i)))
                 return false;
-            }
-        }
 
         // if both are predicates, the first's annots must be subset of the second's annots
-        if (t1g.isPred() && t2g.isPred()) {
-            if ( ! ((Pred)t1g).hasSubsetAnnot((Pred)t2g, this)) {
+        if (t1g.isPred() && t2g.isPred())
+            if ( ! ((Pred)t1g).hasSubsetAnnot((Pred)t2g, this))
                 return false;
-            }
-        }
         
         return true;
     }
@@ -305,12 +305,11 @@ public class Unifier implements Cloneable {
         Term currentVl = function.get(vt);
         if (currentVl != null && currentVl instanceof VarsCluster) {
             VarsCluster cluster = (VarsCluster) currentVl;
-            for (VarTerm cvt : cluster) {
-                function.put(cvt, (Term) value.clone());
-            }
+            for (VarTerm cvt : cluster)
+                function.put(cvt, value); //(Term) value.clone());
         } else {
             // no value in cluster
-            function.put((VarTerm) vt.clone(), (Term) value.clone());
+            function.put((VarTerm) vt.clone(), value); //(Term) value.clone());
         }
         return true;
     }
@@ -329,9 +328,8 @@ public class Unifier implements Cloneable {
 
     /** add all unifications from u */
     public void compose(Unifier u) {
-        for (VarTerm k: u.function.keySet()) {
+        for (VarTerm k: u.function.keySet())
             function.put( (VarTerm)k.clone(), (Term)u.function.get(k).clone());
-        }
     }
     
     @SuppressWarnings("unchecked")

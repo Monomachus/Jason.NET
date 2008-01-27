@@ -165,7 +165,10 @@ public class ListTermTest extends TestCase {
 		l6.concat(ListTermImpl.parseList("[d]"));
 
 		ListTerm lf = ListTermImpl.parseList("[c,b,a,x,y,d]");
-		assertTrue(u.unifies(l5,lf));
+        assertTrue(u.unifies(l6,lf));
+
+		lf = ListTermImpl.parseList("[c,b,a,x,y]");
+        assertTrue(u.unifies(l5,lf));
 	}
     
     public void testTail() {

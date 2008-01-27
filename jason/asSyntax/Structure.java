@@ -24,6 +24,7 @@
 package jason.asSyntax;
 
 import jason.asSemantics.Unifier;
+import jason.asSyntax.parser.ParseException;
 import jason.asSyntax.parser.as2j;
 
 import java.io.StringReader;
@@ -87,6 +88,9 @@ public class Structure extends DefaultTerm {
             logger.log(Level.SEVERE,"Error parsing structure " + sTerm,e);
             return null;
         }
+    }
+    public static Structure tryParsingStructure(String sTerm) throws ParseException {
+        return (Structure) new as2j(new StringReader(sTerm)).term();
     }
     
     public String getFunctor() {

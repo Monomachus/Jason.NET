@@ -83,13 +83,14 @@ public class VarTermTest extends TestCase {
         ListTerm lt = ListTermImpl.parseList("[a,B,a(B)]");
         u = new Unifier();
         u.unifies(new VarTerm("B"), new Structure("oi"));
-        u.unifies(v1, lt);
-        v1.apply(u);
-        lt = (ListTerm) v1.getValue();
-        Iterator<Term> i = lt.iterator();
+        u.unifies(v1, lt); // L = [a,B,a(B)]
+        v1.apply(u);      
+        ListTerm vlt = (ListTerm) v1.getValue();
+        assertFalse(vlt.equals(lt)); // the apply in var should not change the orginal list
+        Iterator<Term> i = vlt.iterator();
         i.next();
         i.next();
-        Term third = (Term) i.next();
+        Term third = i.next();
         Term toi1 = DefaultTerm.parse("a(oi)");
         Term toi2 = DefaultTerm.parse("a(B)");
         toi2.apply(u);
@@ -231,11 +232,11 @@ public class VarTermTest extends TestCase {
         Pred p1 = Pred.parsePred("p(t1,t2)[a,c]");
         // X[a,b,c] = p[a,c] nok
         assertFalse(u.unifies(v1, p1));
-        assertEquals(p1.toString(),"p(t1,t2)[a,c]");
+        assertEquals("p(t1,t2)[a,c]",p1.toString());
 
         // p[a,c] = X[a,b,c] ok (X is p)
         assertTrue(u.unifies(p1, v1));
-        assertEquals(p1.toString(),"p(t1,t2)[a,c]");
+        assertEquals("p(t1,t2)[a,c]",p1.toString());
         assertEquals(u.get("X").toString(), "p(t1,t2)");
 
         p1.addAnnot(new Structure("b"));

@@ -68,7 +68,7 @@ public class CentralisedAgArch implements Runnable, AgArchInfraTier {
     private String          agName  = "";
     private boolean         running = true;
     private Queue<Message>  mbox    = new ConcurrentLinkedQueue<Message>();	
-    protected Logger        logger;
+    protected Logger        logger  = Logger.getLogger(CentralisedAgArch.class.getName());
     
     private static List<MsgListener> msgListeners = null;
     public static void addMsgListener(MsgListener l) {
@@ -207,7 +207,7 @@ public class CentralisedAgArch implements Runnable, AgArchInfraTier {
             if (!userAgArch.getTS().getSettings().isSync()) {
                 logger.fine("Entering in sleep mode....");
                 synchronized (sleepSync) {
-                    sleepSync.wait(1000); // wait for messages
+                    sleepSync.wait(500); // wait for messages
                 }
             }
         } catch (InterruptedException e) {
@@ -225,9 +225,7 @@ public class CentralisedAgArch implements Runnable, AgArchInfraTier {
     // Default perception assumes Complete and Accurate sensing.
     public List<Literal> perceive() {
         List<Literal> percepts = infraEnv.getUserEnvironment().getPercepts(getAgName());
-        if (logger.isLoggable(Level.FINE) && percepts != null) {
-            logger.fine("percepts: " + percepts);
-        }
+        if (logger.isLoggable(Level.FINE) && percepts != null) logger.fine("percepts: " + percepts);
         return percepts;
     }
 
@@ -286,7 +284,7 @@ public class CentralisedAgArch implements Runnable, AgArchInfraTier {
     /** called the the environment when the action was executed */
     public void actionExecuted(ActionExec action) {
         userAgArch.getTS().getC().addFeedbackAction(action);
-        wake();        
+        wake();
     }
 
     public boolean canSleep() {

@@ -51,13 +51,15 @@ public class CentralisedEnvironment implements EnvironmentInfraTier {
 	
     public CentralisedEnvironment(ClassParameters userEnvArgs, RunCentralisedMAS masRunner) throws JasonException {
         this.masRunner = masRunner;
-        try { 
-			userEnv = (Environment) getClass().getClassLoader().loadClass(userEnvArgs.className).newInstance();
-			userEnv.setEnvironmentInfraTier(this);
-			userEnv.init(userEnvArgs.getParametersArray());
-        } catch (Exception e) {
-            logger.log(Level.SEVERE,"Error in Centralised MAS environment creation",e);
-            throw new JasonException("The user environment class instantiation '"+userEnvArgs+"' has failed!"+e.getMessage());
+        if (userEnvArgs != null) {
+            try {
+    			userEnv = (Environment) getClass().getClassLoader().loadClass(userEnvArgs.className).newInstance();
+    			userEnv.setEnvironmentInfraTier(this);
+    			userEnv.init(userEnvArgs.getParametersArray());
+            } catch (Exception e) {
+                logger.log(Level.SEVERE,"Error in Centralised MAS environment creation",e);
+                throw new JasonException("The user environment class instantiation '"+userEnvArgs+"' has failed!"+e.getMessage());
+            }
         }
     }
 	
@@ -71,6 +73,9 @@ public class CentralisedEnvironment implements EnvironmentInfraTier {
 		userEnv.stop();
 	}
 
+	public void setUserEnvironment(Environment env) {
+	    userEnv = env;
+	}
     public Environment getUserEnvironment() {
         return userEnv;
     }
