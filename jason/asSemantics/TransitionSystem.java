@@ -276,7 +276,7 @@ public class TransitionSystem {
             confP.step = State.AddIM;
             if (logger.isLoggable(Level.FINE)) logger.fine("Selected option "+confP.C.SO+" for event "+confP.C.SE);
         } else {
-            logger.warning("** selectOption returned null!");
+            logger.fine("** selectOption returned null!");
             generateGoalDeletionFromEvent(); 
             // can't carry on, no applicable plan.
             confP.step = State.ProcAct;
