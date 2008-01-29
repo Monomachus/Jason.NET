@@ -455,7 +455,7 @@ public class JDBCPersistentBB extends DefaultBeliefBase {
                 break;
 
             default:
-                if (sc.trim().length() == 0) {
+                if (sc == null || sc.trim().length() == 0) {
                     parsed = new StringTermImpl("");
                 } else if (Character.isUpperCase(sc.charAt(0))) {
                     // there is no var at BB
@@ -463,10 +463,9 @@ public class JDBCPersistentBB extends DefaultBeliefBase {
                 } else {
                     parsed = DefaultTerm.parse(sc);
                     
-                    // if the parsed term is not equals to sc, try as string
-                    if (!parsed.toString().equals(sc)) {
+                    // if the parsed term is not equals to sc, try it as string
+                    if (!parsed.toString().equals(sc))
                         parsed = DefaultTerm.parse(sc = "\"" + sc + "\"");
-                    }
                 }
                 break;
             }
