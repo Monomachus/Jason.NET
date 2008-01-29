@@ -44,9 +44,6 @@ public final class Atom extends Literal {
 
     public Atom(String functor) {
         super(functor, 0);
-		if (functor == null) {
-            logger.log(Level.SEVERE, "Functor of an Atom should not be null!",new JasonException(""));
-		}
     }
     
     public Object clone() {
@@ -138,5 +135,9 @@ public final class Atom extends Literal {
     
     @Override public void makeTermsAnnon() { }
     @Override public void makeVarsAnnon() { }
-    
+
+    @Override
+    protected int calcHashCode() {
+        return getFunctor().hashCode();
+    }
 }

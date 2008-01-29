@@ -72,7 +72,8 @@ public abstract class DefaultTerm extends SourceInfo implements Term, Serializab
     abstract protected int    calcHashCode();
     
     public int hashCode() {
-        if (hashCodeCache == null) hashCodeCache = calcHashCode();
+        if (hashCodeCache == null) 
+            hashCodeCache = calcHashCode();
         return hashCodeCache;
     }
 

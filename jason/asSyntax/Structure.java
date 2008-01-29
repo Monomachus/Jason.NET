@@ -62,6 +62,8 @@ public class Structure extends DefaultTerm {
         //    logger.warning("A functor should not start with ~ ("+functor+")!");
         //}
         //this.functor = (functor == null ? null : functor.intern()); // it does not improve performance in test i did!
+        if (functor == null)
+            logger.log(Level.WARNING, "A structure functor should not be null!", new Exception());
         this.functor = functor;
         this.terms = new ArrayList<Term>(5);
     }
@@ -75,6 +77,8 @@ public class Structure extends DefaultTerm {
     /** to be used by list term and atom to not create the array list for terms */
     protected Structure(String functor, int termsSize) {
         //this.functor = (functor == null ? null : functor.intern()); 
+        if (functor == null)
+            logger.log(Level.WARNING, "A structure functor should not be null!", new Exception());
         this.functor = functor;
         if (termsSize > 0)
         	terms = new ArrayList<Term>(termsSize);
@@ -106,13 +110,10 @@ public class Structure extends DefaultTerm {
     }
 
     protected int calcHashCode() {
-        final int PRIME = 7;
-        int result = PRIME + functor.hashCode();
+        int result = functor.hashCode();
         final int ts = getArity();
-        result = PRIME * result + ts;
-        for (int i=0; i<ts; i++) {
-        	result = PRIME * result + getTerm(i).hashCode();
-        }
+        for (int i=0; i<ts; i++)
+        	result = 7 * result + getTerm(i).hashCode();
         return result;
     }
 
@@ -124,18 +125,20 @@ public class Structure extends DefaultTerm {
             Structure tAsStruct = (Structure)t;
 
             // if t is a VarTerm, uses var's equals
-            if (tAsStruct.isVar()) return ((VarTerm)t).equals(this);
+            if (tAsStruct.isVar()) 
+                return ((VarTerm)t).equals(this);
 
-            // if (getFunctor() == null && tAsStruct.getFunctor() != null) return false;
-            if (getFunctor() != null && !getFunctor().equals(tAsStruct.getFunctor())) return false;
-            //if (getFunctor() != tAsStruct.getFunctor()) return false;
+            final int ts = getArity();
+            if (ts != tAsStruct.getArity()) 
+                return false;
 
-            final int ts = getArity(); 
-            if (ts != tAsStruct.getArity()) return false;
+            if (!getFunctor().equals(tAsStruct.getFunctor())) 
+                return false;
 
-            for (int i=0; i<ts; i++) {
-                if (!getTerm(i).equals(tAsStruct.getTerm(i))) return false;
-            }
+            for (int i=0; i<ts; i++)
+                if (!getTerm(i).equals(tAsStruct.getTerm(i))) 
+                    return false;
+
             return true;
         } 
         return false;

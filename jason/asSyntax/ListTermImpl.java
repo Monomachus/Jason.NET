@@ -55,15 +55,16 @@ public class ListTermImpl extends Structure implements ListTerm {
 	private static final long serialVersionUID = 1L;
     private static Logger logger = Logger.getLogger(ListTermImpl.class.getName());
 
+    public static final String LIST_FUNCTOR = ".";
 	private Term term;
 	private Term next;
 	
 	public ListTermImpl() {
-		super(".", 0);
+		super(LIST_FUNCTOR, 0);
 	}
 	
 	private ListTermImpl(Term t, Term n) {
-	    super(".",0);
+	    super(LIST_FUNCTOR, 0);
 	    term = t;
 	    next = n;
 	}

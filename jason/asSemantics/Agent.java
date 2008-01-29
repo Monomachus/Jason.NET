@@ -529,7 +529,7 @@ public class Agent {
         List<Literal>[] result = null;
         try {
 	        if (beliefToAdd != null) {
-	        	if (logger.isLoggable(Level.FINE)) logger.fine("adding " + beliefToAdd);
+	        	if (logger.isLoggable(Level.FINE)) logger.fine("adding belief " + beliefToAdd);
 	            
 	            if (getBB().add(beliefToAdd)) {
 	            	result = new List[2];
