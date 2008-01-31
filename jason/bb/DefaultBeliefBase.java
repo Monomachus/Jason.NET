@@ -35,6 +35,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -57,7 +58,7 @@ public class DefaultBeliefBase implements BeliefBase {
     private int size = 0;
 
     /** set of beliefs with percept annot, used to improve performance of buf */
-    HashSet<Literal> percepts = new HashSet<Literal>();
+    protected Set<Literal> percepts = new HashSet<Literal>();
 
     public void init(Agent ag, String[] args) {
     	logger = Logger.getLogger(ag.getTS().getUserAgArch().getAgName() + "-"+DefaultBeliefBase.class.getSimpleName());

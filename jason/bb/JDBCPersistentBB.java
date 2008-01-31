@@ -91,7 +91,7 @@ public class JDBCPersistentBB extends DefaultBeliefBase {
     }
     
     // map of bels in DB
-    Map<PredicateIndicator, ResultSetMetaData> belsDB = new HashMap<PredicateIndicator, ResultSetMetaData>();
+    protected Map<PredicateIndicator, ResultSetMetaData> belsDB = new HashMap<PredicateIndicator, ResultSetMetaData>();
 
     @Override
     public void init(Agent ag, String[] args) {
