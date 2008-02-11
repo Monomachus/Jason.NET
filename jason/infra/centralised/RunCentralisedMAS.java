@@ -28,6 +28,7 @@ import jason.asSemantics.Agent;
 import jason.asSyntax.directives.DirectiveProcessor;
 import jason.asSyntax.directives.Include;
 import jason.control.ExecutionControlGUI;
+import jason.jeditplugin.Config;
 import jason.mas2j.AgentParameters;
 import jason.mas2j.ClassParameters;
 import jason.mas2j.MAS2JProject;
@@ -96,6 +97,7 @@ public class RunCentralisedMAS {
         	if (RunCentralisedMAS.class.getResource("/"+defaultProjectFileName) != null) {
         		projectFileName = defaultProjectFileName;
         		readFromJAR = true;
+        		Config.get(false); // to void to call fix/store the configuration in this case everything is read from a jar/jnlp file
         	} else {
         		System.err.println("You should inform the MAS project file.");
         		System.exit(1);

@@ -81,11 +81,16 @@ public class Config extends Properties {
     private static Config      singleton     = null;
 
     public static Config get() {
+        return get(true);
+    }
+    public static Config get(boolean tryToFixConfig) {
         if (singleton == null) {
             singleton = new Config();
             if (!singleton.load()) {
-            	singleton.fix();
-            	singleton.store();
+                if (tryToFixConfig) {
+                    singleton.fix();
+                    singleton.store();
+                }
             }
         }
         return singleton;
@@ -388,10 +393,12 @@ public class Config extends Properties {
                 if (jarFile != null && checkJar(jarFile)) {
                     System.out.println("found at " + jarFile);
                     put(jarEntry, jarFile);
+                    return;
                 } else {
                     put(jarEntry, File.separator);
                 }
             }
+            System.out.println(jarName+" not found");
         }
 
     }
