@@ -5,5 +5,5 @@ package jason.asSyntax;
 public interface NumberTerm extends Term {
 
     /** returns the numeric value of the term */
-    public double solve() throws Exception;
+    public double solve();
 }

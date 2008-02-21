@@ -160,7 +160,7 @@ public class ArithExpr extends ArithFunctionTerm implements NumberTerm {
     }
 
     @Override
-    public double solve() throws Exception {
+    public double solve() {
         double l = ((NumberTerm)getTerm(0)).solve();
         if (isUnary() && op == ArithmeticOp.minus) {
             return -l;

@@ -1,6 +1,5 @@
 package jason.asSyntax;
 
-import jason.JasonException;
 import jason.asSemantics.Agent;
 import jason.asSemantics.ArithFunction;
 import jason.asSemantics.Unifier;
@@ -107,13 +106,18 @@ public class ArithFunctionTerm extends Structure implements NumberTerm {
     }
     
     /** computes the value for this arithmetic function (as defined in the NumberTerm interface) */
-	public double solve() throws Exception {
+	public double solve() {
 		if (isEvaluated())
 			return value.solve();
 		else if (function != null)
-		    return function.evaluate((agent == null ? null : agent.getTS()),getTermsArray());
+            try {
+                return function.evaluate((agent == null ? null : agent.getTS()),getTermsArray());
+            } catch (Exception e) {
+                logger.log(Level.SEVERE, getErrorMsg()+ " -- error in evaluate!", e);
+            }
         else 
-            throw new JasonException(getErrorMsg()+ " -- the function can not be evalutated, it has no function assigned to it!");
+            logger.log(Level.SEVERE, getErrorMsg()+ " -- the function can not be evalutated, it has no function assigned to it!", new Exception());
+		return 0;
 	}
 
     public boolean checkArity(int a) {
