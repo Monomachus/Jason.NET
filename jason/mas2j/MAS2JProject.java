@@ -236,7 +236,7 @@ public class MAS2JProject {
         
         s.append("/*\n");
         s.append("    Jason Project\n\n");
-        s.append("    -- create on "+new SimpleDateFormat("MMMM dd, yyyy").format(new Date())+"\n");
+        s.append("    -- created on "+new SimpleDateFormat("MMMM dd, yyyy").format(new Date())+"\n");
         s.append("*/\n\n");
         s.append("MAS " + getSocName() + " {\n");
 		s.append("   infrastructure: "+getInfrastructure()+"\n\n");
