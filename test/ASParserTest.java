@@ -114,8 +114,8 @@ public class ASParserTest extends TestCase {
         String 
         source =  " b(10). ";
         source += " { begin bc(at(X,Y), ebdg(at(X,Y))) } \n";
-        source += "    +!at(X,Y) : b(X) <- go(X,Y). ";
-        source += "    +!at(X,Y) : not b(X) <- go(3,Y). ";
+        source += "    +!at(X,Y) : b(X) <- go(X,Y). \n";
+        source += "    +!at(X,Y) : not b(X) <- go(3,Y). \n";
         source += " { end }";
 
 

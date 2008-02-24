@@ -112,50 +112,99 @@ TOKEN : {
 
 /* AgentSpeak Grammar */
 
-void agent(Agent a) throws jason.JasonException :  
-                       {
-                         curAg = a;
-                         Agent   na;
-                       }
+/*   agent ::= bels goals plans
+
+     returns true if achieved the end of file
+     returns false if achieved a "{ end }" directive  
+*/
+boolean agent(Agent a) throws jason.JasonException :  
+                              { Literal b;
+                                Literal g;
+                                Plan    p;
+                                curAg = a;
+                                if (a != null) asSource = a.getASLSrc();
+                                boolean endDir = false;
+                              }
 { 
-  ( 
-    agent_component(a)
-  |
-    na = directive(a)
-                       { // import bels, plans and initial goals from agent na
-                         if (a != null && na != null) a.importComponents(na);
-                       }
+  ( endDir = directive(a)     { if (endDir) return false; }  )*
+  
+  // beliefs
+  ( b = belief()              { if (a != null) a.addInitialBel(b); }
+    ( endDir = directive(a)   { if (endDir) return false; }  )*
   )*
+
+  // initial goals
+  ( g = initial_goal()        { if (a != null) a.addInitialGoal(g); } 
+    ( endDir = directive(a)   { if (endDir) return false; }  )*
+  )*
+
+  // plans and rules
+  ( p = plan()                { if (a != null) {
+                                   a.getPL().add(p); 
+                                   // warning only not parsed files
+                                   if (config.getBoolean(Config.WARN_SING_VAR) && !parsedFiles.contains(asSource)) {
+                                      List<VarTerm> singletonVars = p.getSingletonVars();
+                                      if (singletonVars.size() > 0) {
+                                         logger.warning("["+p.getSrc()+"] warning: the plan of line "+p.getBeginSrcLine()+" (te: '"+p.getTrigger()+"') has the following singleton variables: "+singletonVars);
+                                      }
+                                   }
+                                }
+                              }
+    ( b = belief()            { if (a != null) {
+                                  if (b.isRule()) {
+                                      a.addInitialBel(b);
+                                      logger.warning("["+b.getSrc()+"] warning: avoid to mix belief base components with plans (as the rule '"+b+"' at line "+p.getBeginSrcLine()+".");
+                                  } else {
+                                      throw new ParseException("["+b.getSrc()+":"+b.getBeginSrcLine()+"] The belief '"+b+"' is not in the begin of the source code!");
+                                  }                                   
+                                }
+                              } 
+    )*
+    ( endDir = directive(a)   { if (endDir) return false; }  )*
+    
+  )*
+  
   <EOF>
-                       {
-                         if (a != null) parsedFiles.add(a.getASLSrc());
-                       }
+                              {
+                                if (a != null) parsedFiles.add(a.getASLSrc());
+                                return true;
+                              }
 }
 
-void agent_component(Agent a) throws jason.JasonException :  
-                       { Literal b;
-                         Literal g;
-                         Plan    p;
-                         if (a != null) asSource = a.getASLSrc();
-                       }
+/* Directive 
+
+   returns true if the directive is "{ end }", false otherwise
+*/
+boolean directive(Agent outerAg) throws jason.JasonException : 
+                              { 
+                                Pred dir = null;
+                                Agent resultOfDirective = null;
+                                boolean isEOF = false;
+                              }
 {
-  ( 
-    b = belief()       { if (a != null) a.addInitialBel(b); }
+  ( LOOKAHEAD(4)
+    "{" <TK_BEGIN> dir = pred() "}"
+                              { Agent innerAg = new Agent(); } 
+     	isEOF = agent(innerAg)
+                              { if (isEOF) 
+                                   throw new ParseException("The directive '{ begin "+dir+"}' does not end with '{ end }'.");
+                                else
+                                   resultOfDirective = DirectiveProcessor.process(dir, outerAg, innerAg); 
+                              }
   |
-    g = initial_goal() { if (a != null) a.addInitialGoal(g); } 
-  |
-    p = plan()         { if (a != null) {
-                            a.getPL().add(p); 
-                            // warning only not parsed files
-                            if (config.getBoolean(Config.WARN_SING_VAR) && !parsedFiles.contains(asSource)) {
-                               List<VarTerm> singletonVars = p.getSingletonVars();
-                               if (singletonVars.size() > 0) {
-                                  logger.warning("["+p.getSrc()+"] warning: the plan of line "+p.getBeginSrcLine()+" (te: '"+p.getTrigger()+"') has the following singleton variables: "+singletonVars);
-                               }
-                            }
-                         }
-                       }
+    "{" dir = pred() "}"
+                              { if (dir.toString().equals("end"))
+                                   return true;
+                                else
+                                   resultOfDirective = DirectiveProcessor.process(dir, outerAg, null); 
+                              }
   )
+                              { if (resultOfDirective != null && outerAg != null) {
+                                  // import bels, plans and initial goals from agent resultOfDirective
+                                  outerAg.importComponents(resultOfDirective);
+                                }
+                                return false;
+                              }
 }
 
 
@@ -181,27 +230,7 @@ Literal belief() : { Literal h; Object t; }
 /* Initial goals */
 Literal initial_goal() : { Literal g; }
 {
-  "!" g=literal() "."    {  return g; } 
-}
-
-
-/* Directive */
-Agent directive(Agent outerAg) throws jason.JasonException : 
-                     { 
-                        Pred dir = null;
-                     }
-{
-  ( LOOKAHEAD(4)
-    "{" dir = pred() "}"
-                     { return DirectiveProcessor.process(dir, outerAg, null); }
-  | 
-    "{" <TK_BEGIN> dir = pred() "}"
-                     { Agent dirAg = new Agent(); } 
-                     
-     	( agent_component(dirAg) )*
-    "{" <TK_END> "}"
-                     { return DirectiveProcessor.process(dir, outerAg, dirAg); }
-  )
+  "!" g=literal() "."    { return g; } 
 }
 
 
