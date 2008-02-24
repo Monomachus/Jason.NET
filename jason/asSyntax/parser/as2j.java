@@ -154,7 +154,8 @@
                                 if (a != null) {
                                   if (b.isRule()) {
                                       a.addInitialBel(b);
-                                      logger.warning("["+b.getSrc()+"] warning: avoid to mix belief base components with plans (as the rule '"+b+"' at line "+p.getBeginSrcLine()+".");
+                                      if (!parsedFiles.contains(asSource))
+                                         logger.warning("["+b.getSrc()+"] warning: avoid to mix belief base components with plans (as the rule '"+b+"' at line "+p.getBeginSrcLine()+".");
                                   } else {
                                       {if (true) throw new ParseException("["+b.getSrc()+":"+b.getBeginSrcLine()+"] The belief '"+b+"' is not in the begin of the source code!");}
                                   }
@@ -1119,14 +1120,6 @@
     finally { jj_save(1, xla); }
   }
 
-  final private boolean jj_3_1() {
-    if (jj_scan_token(27)) return true;
-    if (jj_scan_token(TK_BEGIN)) return true;
-    if (jj_3R_11()) return true;
-    if (jj_scan_token(28)) return true;
-    return false;
-  }
-
   final private boolean jj_3R_21() {
     if (jj_3R_26()) return true;
     return false;
@@ -1421,6 +1414,11 @@
     return false;
   }
 
+  final private boolean jj_3R_53() {
+    if (jj_scan_token(47)) return true;
+    return false;
+  }
+
   final private boolean jj_3R_23() {
     Token xsp;
     xsp = jj_scanpos;
@@ -1431,11 +1429,6 @@
     if (jj_3R_29()) return true;
     }
     }
-    return false;
-  }
-
-  final private boolean jj_3R_53() {
-    if (jj_scan_token(47)) return true;
     return false;
   }
 
@@ -1617,6 +1610,14 @@
 
   final private boolean jj_3R_41() {
     if (jj_3R_42()) return true;
+    return false;
+  }
+
+  final private boolean jj_3_1() {
+    if (jj_scan_token(27)) return true;
+    if (jj_scan_token(TK_BEGIN)) return true;
+    if (jj_3R_11()) return true;
+    if (jj_scan_token(28)) return true;
     return false;
   }
 

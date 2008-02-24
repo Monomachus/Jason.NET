@@ -153,7 +153,8 @@ boolean agent(Agent a) throws jason.JasonException :
     ( b = belief()            { if (a != null) {
                                   if (b.isRule()) {
                                       a.addInitialBel(b);
-                                      logger.warning("["+b.getSrc()+"] warning: avoid to mix belief base components with plans (as the rule '"+b+"' at line "+p.getBeginSrcLine()+".");
+                                      if (!parsedFiles.contains(asSource))
+                                         logger.warning("["+b.getSrc()+"] warning: avoid to mix belief base components with plans (as the rule '"+b+"' at line "+p.getBeginSrcLine()+".");
                                   } else {
                                       throw new ParseException("["+b.getSrc()+":"+b.getBeginSrcLine()+"] The belief '"+b+"' is not in the begin of the source code!");
                                   }                                   
