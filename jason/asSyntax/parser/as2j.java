@@ -155,7 +155,7 @@
                                   if (b.isRule()) {
                                       a.addInitialBel(b);
                                       if (!parsedFiles.contains(asSource))
-                                         logger.warning("["+b.getSrc()+"] warning: avoid to mix belief base components with plans (as the rule '"+b+"' at line "+p.getBeginSrcLine()+".");
+                                         logger.warning("["+b.getSrc()+"] warning: avoid to mix rules and plans ('"+b+"' at line "+p.getBeginSrcLine()+".");
                                   } else {
                                       {if (true) throw new ParseException("["+b.getSrc()+":"+b.getBeginSrcLine()+"] The belief '"+b+"' is not in the begin of the source code!");}
                                   }

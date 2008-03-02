@@ -1,5 +1,8 @@
 package jason.runtime;
 
+import jason.JasonException;
+import jason.architecture.AgArch;
+import jason.asSemantics.Agent;
 import jason.mas2j.ClassParameters;
 
 import java.util.Set;
@@ -23,6 +26,17 @@ public interface RuntimeServicesInfraTier {
      * null, null, null);
      */
     public boolean createAgent(String agName, String agSource, String agClass, String archClass, ClassParameters bbPars, Settings stts) throws Exception;
+
+    /**
+     * Clones an agent
+     * 
+     * @param source: the used as source of beliefs, plans, ...
+     * @param archClassName: the architecture that will be used 
+     * @param agName: the name of the clone
+     * @return the agent arch created
+     * @throws JasonException
+     */
+    public AgArch clone(Agent source, String archClassName, String agName) throws JasonException;
 
     /**
      * Kills the agent named <i>agName</i>. The stopAg() method, in

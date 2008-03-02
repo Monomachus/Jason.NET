@@ -1,5 +1,6 @@
 package jason.infra.saci;
 
+import jason.JasonException;
 import jason.architecture.AgArch;
 import jason.asSemantics.Agent;
 import jason.bb.DefaultBeliefBase;
@@ -78,6 +79,11 @@ public class SaciRuntimeServices implements RuntimeServicesInfraTier {
         }
         return false;
     }
+    
+    public AgArch clone(Agent source, String archClassName, String agName) throws JasonException {
+        throw new JasonException("clone for SACI is not implemented!");
+    }
+    
 
     @SuppressWarnings("unchecked")
     public Set getAgentsName() {

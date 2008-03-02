@@ -1,5 +1,8 @@
 package jason.infra.centralised;
 
+import jason.JasonException;
+import jason.architecture.AgArch;
+import jason.asSemantics.Agent;
 import jason.mas2j.AgentParameters;
 import jason.mas2j.ClassParameters;
 import jason.runtime.RuntimeServicesInfraTier;
@@ -41,8 +44,8 @@ public class CentralisedRuntimeServices implements RuntimeServicesInfraTier {
         CentralisedAgArch agArch = new CentralisedAgArch();
         agArch.setAgName(agName);
         agArch.initAg(ap.archClass.className, ap.agClass.className, ap.bbClass, agSource, stts, masRunner);
-        agArch.setEnvInfraTier(RunCentralisedMAS.getRunner().getEnvironmentInfraTier());
-        agArch.setControlInfraTier(RunCentralisedMAS.getRunner().getControllerInfraTier());
+        agArch.setEnvInfraTier(masRunner.getEnvironmentInfraTier());
+        agArch.setControlInfraTier(masRunner.getControllerInfraTier());
         masRunner.addAg(agArch);
         
         // create the agent thread
@@ -52,6 +55,23 @@ public class CentralisedRuntimeServices implements RuntimeServicesInfraTier {
 
         logger.fine("Agent " + agName + " created!");
         return true;
+    }
+    
+    public AgArch clone(Agent source, String archClassName, String agName) throws JasonException {
+        // create a new infra arch
+        CentralisedAgArch agArch = new CentralisedAgArch();
+        agArch.setAgName(agName);
+        agArch.setEnvInfraTier(masRunner.getEnvironmentInfraTier());
+        agArch.setControlInfraTier(masRunner.getControllerInfraTier());
+        masRunner.addAg(agArch);
+        
+        agArch.initAg(archClassName, source, masRunner);
+        
+        // create the agent thread
+        Thread agThread = new Thread(agArch);
+        agArch.setThread(agThread);
+        agThread.start(); 
+        return agArch.getUserAgArch();
     }
 
     public Set<String> getAgentsName() {

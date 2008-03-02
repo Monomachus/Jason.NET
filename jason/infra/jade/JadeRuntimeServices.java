@@ -7,6 +7,8 @@ import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.wrapper.AgentController;
 import jade.wrapper.ContainerController;
 import jade.wrapper.ControllerException;
+import jason.JasonException;
+import jason.architecture.AgArch;
 import jason.mas2j.AgentParameters;
 import jason.mas2j.ClassParameters;
 import jason.runtime.RuntimeServicesInfraTier;
@@ -53,6 +55,10 @@ public class JadeRuntimeServices implements RuntimeServicesInfraTier {
             logger.log(Level.SEVERE, "Error creating agent " + agName, e);
         }
         return false;
+    }
+
+    public AgArch clone(jason.asSemantics.Agent source, String archClassName, String agName) throws JasonException {
+        throw new JasonException("clone for JADE is not implemented!");
     }
 
     @SuppressWarnings("unchecked")
@@ -131,4 +137,5 @@ public class JadeRuntimeServices implements RuntimeServicesInfraTier {
             }.start();
         }
     }
+
 }

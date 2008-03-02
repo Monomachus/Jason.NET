@@ -365,7 +365,7 @@ public class SaciAgArch extends saci.Agent implements AgArchInfraTier {
         return msaci;
     }
 
-    // Deafult procedure for checking messages
+    // Default procedure for checking messages
     public void checkMail() {
         if (!running) {
             return;
@@ -417,9 +417,8 @@ public class SaciAgArch extends saci.Agent implements AgArchInfraTier {
 
     // Default acting on the environment
     public void act(ActionExec action, List<ActionExec> feedback) {
-        if (!running) {
-            return;
-        }
+        if (!running) return;
+        
         TransitionSystem ts = userAgArch.getTS();
         try {
             Term acTerm = action.getActionTerm();
@@ -470,7 +469,7 @@ public class SaciAgArch extends saci.Agent implements AgArchInfraTier {
 
     /**
      * inform this agent that it can continue, if it is in sync mode and
-     * wainting a signal
+     * waiting a signal
      */
     private void receiveSyncSignal() {
         if (userAgArch.getTS().getSettings().isSync()) {

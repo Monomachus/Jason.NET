@@ -194,6 +194,7 @@ public class MASConsoleGUI {
     }
 
     public void close() {
+        setPause(false);
         if (masConsole != null && masConsole.frame != null)
             masConsole.frame.setVisible(false);
         if (out != null)

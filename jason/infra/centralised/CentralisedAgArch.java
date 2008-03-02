@@ -278,7 +278,8 @@ public class CentralisedAgArch implements Runnable, AgArchInfraTier {
     /** called by the TS to ask the execution of an action in the environment */
     public void act(ActionExec action, List<ActionExec> feedback) {
         if (logger.isLoggable(Level.FINE)) logger.info("doing: " + action.getActionTerm());
-        infraEnv.act(getAgName(), action);
+        if (isRunning())
+            infraEnv.act(getAgName(), action);
     }
     
     /** called the the environment when the action was executed */

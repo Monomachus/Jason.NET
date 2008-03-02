@@ -554,7 +554,23 @@ public class RunCentralisedMAS {
     }
 
     public void finish() {
+        
         try {
+            // creates a thread that guarantees system.exit(0) in 5 seconds
+            // (the stop of agents can  block)
+            new Thread() {
+                public void run() {
+                    try {
+                        sleep(5000);
+                    } catch (InterruptedException e) {}
+                    System.exit(0);
+                }
+            }.start();
+            
+            if (MASConsoleGUI.hasConsole()) { // should close first! (case where console is in pause)
+                MASConsoleGUI.get().close();
+            }
+
             if (control != null) {
                 control.stop();
                 control = null;
@@ -565,10 +581,6 @@ public class RunCentralisedMAS {
             }
             
             stopAgs();
-
-            if (MASConsoleGUI.hasConsole()) {
-                MASConsoleGUI.get().close();
-            }
 
             runner = null;
 
