@@ -46,7 +46,7 @@ import org.w3c.dom.Element;
  * 
  * @author jomi
  */
-public class VarTerm extends InternalActionLiteral implements NumberTerm, ListTerm, StringTerm {
+public class VarTerm extends InternalActionLiteral implements NumberTerm, ListTerm, StringTerm, ObjectTerm {
 
     private static final long serialVersionUID = 1L;
     private static Logger logger = Logger.getLogger(VarTerm.class.getName());
@@ -828,6 +828,8 @@ public class VarTerm extends InternalActionLiteral implements NumberTerm, ListTe
             return -1;
     }
 
+    
+    
     // -----------------------
     // StringTerm interface implementation
     // -----------------------
@@ -844,6 +846,17 @@ public class VarTerm extends InternalActionLiteral implements NumberTerm, ListTe
             return ((StringTerm) getValue()).length();
         else
             return -1;
+    }
+
+    // -----------------------
+    // ObjectTerm interface implementation
+    // -----------------------
+
+    public Object getObject() {
+        if (value != null && getValue() instanceof ObjectTerm)
+            return ((ObjectTerm) getValue()).getObject();
+        else
+            return null;
     }
 
     /** get as XML */
