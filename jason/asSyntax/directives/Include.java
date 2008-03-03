@@ -21,6 +21,8 @@ public class Include implements Directive {
 
     static Logger logger = Logger.getLogger(Include.class.getName());
     public static final String CRPrefix = "ClassResource:";
+
+    private List<String> aslSourcePath = null;
     
     public Agent process(Pred directive, Agent outerContent, Agent innerContent) {
     	String file = ((StringTerm)directive.getTerm(0)).getString();
@@ -39,8 +41,10 @@ public class Include implements Directive {
 	    			int posSlash = outerPrefix.lastIndexOf("/");
 
 	    			List<String> newpath = new ArrayList<String>();
-	        		newpath.add(outerPrefix.substring(CRPrefix.length()+1,posSlash));
-	        		newpath.addAll(aslSourcePath);
+	    			if (outerPrefix.indexOf("/") != posSlash) { // has only one slash
+	    			    newpath.add(outerPrefix.substring(CRPrefix.length()+1,posSlash));
+	    			}
+                    newpath.addAll(aslSourcePath);
 	    			
 	    			file = checkPathAndFixWithSourcePath(file, newpath, CRPrefix+"/");
 	    			in = Agent.class.getResource(file.substring(CRPrefix.length())).openStream();
@@ -72,8 +76,6 @@ public class Include implements Directive {
         return null;
     }
 
-    private List<String> aslSourcePath = null;
-    
     public void setSourcePath(List<String> sp) {
     	aslSourcePath = sp;
     }
