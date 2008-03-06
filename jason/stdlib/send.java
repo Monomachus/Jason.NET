@@ -115,6 +115,11 @@ import jason.asSyntax.Term;
 */
 public class send extends DefaultInternalAction {
     
+    @Override
+    public boolean canBeUsedInContext() {
+        return false;
+    }
+
     private boolean lastSendWasSynAsk = false; 
     
     @Override

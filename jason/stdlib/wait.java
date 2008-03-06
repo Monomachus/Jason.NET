@@ -79,6 +79,11 @@ public class wait extends DefaultInternalAction {
     //static Logger logger = Logger.getLogger(wait.class.getName());
 
     @Override
+    public boolean canBeUsedInContext() {
+        return false;
+    }
+
+    @Override
     public Object execute(final TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         long timeout = -1;
         Trigger te = null;

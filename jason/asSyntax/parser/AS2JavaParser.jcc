@@ -57,6 +57,31 @@ PARSER_BEGIN(as2j)
     private static Config config = Config.get();
     
     public void setAg(Agent ag) { curAg = ag; }
+    private String getSourceRef(Object o) {
+        if (o instanceof SourceInfo) {
+           SourceInfo s = (SourceInfo)o;
+    	   return "["+s.getSrc()+":"+s.getBeginSrcLine()+"]";
+        } else {
+           return "";
+        }  
+    }
+	private InternalActionLiteral checkInternalActionsInContext(LogicalFormula f, Agent ag) throws Exception {
+	    if (f != null) {
+	        if (f instanceof InternalActionLiteral) {
+	            InternalActionLiteral ial = (InternalActionLiteral)f;
+	            if (! ial.getIA(ag).canBeUsedInContext())
+	               return ial;
+	        } else if (f instanceof LogExpr) {
+	            LogExpr le = (LogExpr)f;
+	            InternalActionLiteral ial = checkInternalActionsInContext(le.getLHS(), ag); 
+	            if (ial != null) 
+	                return ial;
+	            if (!le.isUnary())
+	                return checkInternalActionsInContext(le.getRHS(), ag);
+	        }
+        }
+        return null;
+    }
     
   }
 
@@ -156,7 +181,7 @@ boolean agent(Agent a) throws jason.JasonException :
                                       if (!parsedFiles.contains(asSource))
                                          logger.warning("["+b.getSrc()+"] warning: avoid to mix rules and plans ('"+b+"' at line "+p.getBeginSrcLine()+".");
                                   } else {
-                                      throw new ParseException("["+b.getSrc()+":"+b.getBeginSrcLine()+"] The belief '"+b+"' is not in the begin of the source code!");
+                                      throw new ParseException(getSourceRef(b)+" The belief '"+b+"' is not in the begin of the source code!");
                                   }                                   
                                 }
                               } 
@@ -188,7 +213,7 @@ boolean directive(Agent outerAg) throws jason.JasonException :
                               { Agent innerAg = new Agent(); } 
      	isEOF = agent(innerAg)
                               { if (isEOF) 
-                                   throw new ParseException("The directive '{ begin "+dir+"}' does not end with '{ end }'.");
+                                   throw new ParseException(getSourceRef(dir)+" The directive '{ begin "+dir+"}' does not end with '{ end }'.");
                                 else
                                    resultOfDirective = DirectiveProcessor.process(dir, outerAg, innerAg); 
                               }
@@ -247,6 +272,10 @@ Plan plan() :         { Token k; Pred L = null;
     [ k = "<-" plan_body(B)      { if (start == -1) start = k.beginLine; } ]  
     k = "."                      { if (start == -1) start = k.beginLine; } 
                    { end = k.beginLine;
+                     InternalActionLiteral ial = null;
+                     try { ial = checkInternalActionsInContext((LogicalFormula)C, curAg); } catch (Exception e) {}
+                     if (ial != null)
+                        throw new ParseException(getSourceRef(ial)+" The internal action '"+ial+"' can not be used in plan's context!");
                      Plan p = new Plan(L,T,(LogicalFormula)C,B);
                      p.setSrcLines(start,end);
                      p.setSrc(asSource);
@@ -280,8 +309,13 @@ Literal literal() :  { Pred F; Token k; boolean type = Literal.LPos; }
 {
   ( ( [ <TK_NEG>              { type = Literal.LNeg; }
       ]
-      F=pred()                { if (F.getFunctor().indexOf(".") >= 0) 
-                                   return new InternalActionLiteral(F, curAg);
+      F=pred()                { if (F.getFunctor().indexOf(".") >= 0) {
+								   try {
+								      return new InternalActionLiteral(F, curAg);
+                                   } catch (Exception e) {
+                                      throw new ParseException(getSourceRef(F)+" The internal action class for '"+F+"' was not found!");                    
+                                   }
+                                }
                                 if (F.isAtom() && type == Literal.LPos) {
                                    Atom a = new Atom(F.getFunctor());
                                    a.setSrc(F);
@@ -332,7 +366,7 @@ BodyLiteral body_formula() :  { Literal A; Token k;
                        { if (formType == BodyType.test && L instanceof LogExpr) {
                             return new BodyLiteral((LogExpr)L);  // used in ?(a & b)
                          } else {
-                            throw new ParseException("(<logical formula>) can be used only with test goal.");
+                            throw new ParseException(getSourceRef(L)+" (<logical formula>) can be used only with test goal.");
                          }
                        }
    )
@@ -344,7 +378,7 @@ BodyLiteral body_formula() :  { Literal A; Token k;
                          } else if (rel instanceof RelExpr) {
                             return new BodyLiteral((RelExpr)rel); // constraint 
                          } else {
-                            throw new ParseException("A body formula should be an action or a constraint (RelExpr).");
+                            throw new ParseException(getSourceRef(rel)+" A body formula should be an action or a constraint (RelExpr).");
                          }
                        }
  )
@@ -490,10 +524,10 @@ Object arithm_expr() :        { Object t1, t2; ArithmeticOp op;}
    | "-"                      { op = ArithmeticOp.minus;}
    )
    t2 = arithm_expr()         { if (!(t1 instanceof NumberTerm)) {
-                                   throw new ParseException("ArithExpr: first operand is not numeric or variable.");
+                                   throw new ParseException(getSourceRef(t1)+" ArithExpr: first operand '"+t1+"' is not numeric or variable.");
                                 }
                                 if (!(t2 instanceof NumberTerm)) {
-                                   throw new ParseException("ArithExpr: second operand is not numeric or variable.");
+                                   throw new ParseException(getSourceRef(t2)+" ArithExpr: second operand '"+t2+"' is not numeric or variable.");
                                 }
                                 return new ArithExpr((NumberTerm)t1, op, (NumberTerm)t2); 
                               }
@@ -509,10 +543,10 @@ Object arithm_expr_trm() :      { Object t1, t2; ArithmeticOp op;}
    | <TK_INTMOD>                { op = ArithmeticOp.mod; }
    )
    t2 = arithm_expr_trm()       { if (!(t1 instanceof NumberTerm)) {
-                                    throw new ParseException("ArithTerm: first operand is not numeric or variable.");
+                                    throw new ParseException(getSourceRef(t1)+" ArithTerm: first operand '"+t1+"' is not numeric or variable.");
                                   }
                                   if (!(t2 instanceof NumberTerm)) {
-                                    throw new ParseException("ArithTerm: second operand is not numeric or variable.");
+                                    throw new ParseException(getSourceRef(t2)+" ArithTerm: second operand '"+t2+"' is not numeric or variable.");
                                   }
                                   return new ArithExpr((NumberTerm)t1, op, (NumberTerm)t2); 
                                 }
@@ -526,10 +560,10 @@ Object arithm_expr_factor():
 [  ( "**"                       { op = ArithmeticOp.pow; }
    )
    t2 = arithm_expr_factor()    { if (!(t1 instanceof NumberTerm)) {
-                                    throw new ParseException("ArithFactor: first operand is not numeric or variable.");
+                                    throw new ParseException(getSourceRef(t1)+" ArithFactor: first operand '"+t1+"' is not numeric or variable.");
                                   }
                                   if (!(t2 instanceof NumberTerm)) {
-                                    throw new ParseException("ArithFactor: second operand is not numeric or variable.");
+                                    throw new ParseException(getSourceRef(t2)+" ArithFactor: second operand '"+t2+"' is not numeric or variable.");
                                   }
                                   return new ArithExpr((NumberTerm)t1, op, (NumberTerm)t2); 
                                 }
@@ -546,7 +580,7 @@ Object arithm_expr_simple():
                                   return ni;
                                 }
  | "-" t = arithm_expr_simple() { if (!(t instanceof NumberTerm)) {
-                                    throw new ParseException("operator '-' applied to argument not numeric or variable.");
+                                    throw new ParseException(getSourceRef(t)+" The argument '"+t+"' of operator '-' is not numeric or variable.");
                                   }
                                   return new ArithExpr(ArithmeticOp.minus, (NumberTerm)t); 
                                 }
@@ -598,3 +632,4 @@ StringTerm string():{ Token k; StringTermImpl s; }
                       return s;
                     } 
 }
+

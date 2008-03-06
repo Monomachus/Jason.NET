@@ -56,10 +56,10 @@ public class InternalActionLiteral extends Literal {
 	}
 
 	// used by the parser
-	public InternalActionLiteral(Pred p, Agent ag) {
+	public InternalActionLiteral(Pred p, Agent ag) throws Exception {
         super(true,p);
         if (ag != null)
-            try { ia = ag.getIA(this); } catch (Exception e) { }
+            ia = ag.getIA(this);
     }
 
     @Override
@@ -98,7 +98,7 @@ public class InternalActionLiteral extends Literal {
     }   
 
     public InternalAction getIA(Agent ag) throws Exception {
-        if (ia == null)
+        if (ia == null && ag != null)
             ia = ag.getIA(this);
         return ia;
     }

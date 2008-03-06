@@ -36,6 +36,9 @@ public interface InternalAction {
         intention where the IA is called */
     boolean suspendIntention();
     
+    /** Return true if the internal action can be used in plans' context */
+    boolean canBeUsedInContext();
+    
     /** Executes the internal action. It should return a Boolean or
      *  an Iterator<Unifier>. A true boolean return means that the IA was
      *  successfully executed. An Iterator result means that there is 

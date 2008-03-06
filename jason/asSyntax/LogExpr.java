@@ -232,4 +232,5 @@ public class LogExpr extends BinaryStructure implements LogicalFormula {
         u.setAttribute("type","logical");
         return u;
     }
+    
 }

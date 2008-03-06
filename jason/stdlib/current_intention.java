@@ -84,6 +84,11 @@ import jason.asSyntax.Term;
 public class current_intention extends DefaultInternalAction {
 
     @Override
+    public boolean canBeUsedInContext() {
+        return false;
+    }
+
+    @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         try {
             return un.unifies(ts.getC().getSelectedIntention().getAsTerm(), args[0]);

@@ -124,18 +124,19 @@ public class Agent {
             initDefaultFunctions();
             setTS(new TransitionSystem(this, new Circumstance(), stts, arch));
 
+            boolean parsingOk = true;
             if (asSrc != null) {
                 setASLSrc(asSrc);
     
                 if (asSrc.startsWith(Include.CRPrefix)) {
                 	// loads the class from a jar file (for example)
-                	parseAS(Agent.class.getResource(asSrc.substring(Include.CRPrefix.length())).openStream());
+                    parseAS(Agent.class.getResource(asSrc.substring(Include.CRPrefix.length())).openStream());
                 } else {
     	            // check whether source is an URL string
     	            try {
-    	            	parseAS(new URL(asSrc));
+    	                parsingOk = parseAS(new URL(asSrc));
     	            } catch (MalformedURLException e) {
-    	            	parseAS(asSrc);
+    	                parsingOk = parseAS(asSrc);
     	            }
                 }
             }
@@ -144,9 +145,10 @@ public class Agent {
             setASLSrc("kqmlPlans.asl");
             parseAS(JasonException.class.getResource("/asl/kqmlPlans.asl"));
             setASLSrc(asSrc);
-
-            addInitialBelsInBB();
-            addInitialGoalsInTS();
+            if (parsingOk) {
+                addInitialBelsInBB();
+                addInitialGoalsInTS();
+            }
             return ts;
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error creating the agent class!", e);
@@ -202,6 +204,8 @@ public class Agent {
             return true;
         } catch (IOException e) {
             logger.log(Level.SEVERE, "as2j: the AgentSpeak source file '"+asURL+"' was not found!");
+        } catch (ParseException e) {
+            logger.log(Level.SEVERE, "as2j: parsing error: " + e.getMessage());
         } catch (Exception e) {
             logger.log(Level.SEVERE, "as2j: error parsing \"" + asURL + "\"", e);
         }
@@ -216,6 +220,8 @@ public class Agent {
             return true;
         } catch (FileNotFoundException e) {
             logger.log(Level.SEVERE, "as2j: the AgentSpeak source file '"+asFileName+"' was not found!");
+        } catch (ParseException e) {
+            logger.log(Level.SEVERE, "as2j: parsing error:" + e.getMessage());
         } catch (Exception e) {
             logger.log(Level.SEVERE, "as2j: error parsing \"" + asFileName + "\"", e);
         }

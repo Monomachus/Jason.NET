@@ -19,6 +19,10 @@ public class DefaultInternalAction implements InternalAction, Serializable {
     public boolean suspendIntention() {
         return false;
     }
+    
+    public boolean canBeUsedInContext() {
+        return true;
+    }
 
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         return false;

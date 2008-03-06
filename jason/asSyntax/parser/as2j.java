@@ -27,6 +27,31 @@
     private static Config config = Config.get();
 
     public void setAg(Agent ag) { curAg = ag; }
+    private String getSourceRef(Object o) {
+        if (o instanceof SourceInfo) {
+           SourceInfo s = (SourceInfo)o;
+           return "["+s.getSrc()+":"+s.getBeginSrcLine()+"]";
+        } else {
+           return "";
+        }
+    }
+        private InternalActionLiteral checkInternalActionsInContext(LogicalFormula f, Agent ag) throws Exception {
+            if (f != null) {
+                if (f instanceof InternalActionLiteral) {
+                    InternalActionLiteral ial = (InternalActionLiteral)f;
+                    if (! ial.getIA(ag).canBeUsedInContext())
+                       return ial;
+                } else if (f instanceof LogExpr) {
+                    LogExpr le = (LogExpr)f;
+                    InternalActionLiteral ial = checkInternalActionsInContext(le.getLHS(), ag);
+                    if (ial != null)
+                        return ial;
+                    if (!le.isUnary())
+                        return checkInternalActionsInContext(le.getRHS(), ag);
+                }
+        }
+        return null;
+    }
 
 /* AgentSpeak Grammar */
 
@@ -157,7 +182,7 @@
                                       if (!parsedFiles.contains(asSource))
                                          logger.warning("["+b.getSrc()+"] warning: avoid to mix rules and plans ('"+b+"' at line "+p.getBeginSrcLine()+".");
                                   } else {
-                                      {if (true) throw new ParseException("["+b.getSrc()+":"+b.getBeginSrcLine()+"] The belief '"+b+"' is not in the begin of the source code!");}
+                                      {if (true) throw new ParseException(getSourceRef(b)+" The belief '"+b+"' is not in the begin of the source code!");}
                                   }
                                 }
       }
@@ -197,7 +222,7 @@
                                 Agent innerAg = new Agent();
       isEOF = agent(innerAg);
                                 if (isEOF)
-                                   {if (true) throw new ParseException("The directive '{ begin "+dir+"}' does not end with '{ end }'.");}
+                                   {if (true) throw new ParseException(getSourceRef(dir)+" The directive '{ begin "+dir+"}' does not end with '{ end }'.");}
                                 else
                                    resultOfDirective = DirectiveProcessor.process(dir, outerAg, innerAg);
     } else {
@@ -301,6 +326,13 @@
     k = jj_consume_token(30);
                                    if (start == -1) start = k.beginLine;
                      end = k.beginLine;
+                     InternalActionLiteral ial = null;
+                     try {
+                             ial = checkInternalActionsInContext((LogicalFormula)C, curAg);
+                     } catch (Exception e) {}
+                     if (ial != null) {
+                        {if (true) throw new ParseException(getSourceRef(ial)+" The internal action '"+ial+"' can not be used in plan's context!");}
+                     }
                      Plan p = new Plan(L,T,(LogicalFormula)C,B);
                      p.setSrcLines(start,end);
                      p.setSrc(asSource);
@@ -389,8 +421,13 @@
         ;
       }
       F = pred();
-                                if (F.getFunctor().indexOf(".") >= 0)
-                                   {if (true) return new InternalActionLiteral(F, curAg);}
+                                if (F.getFunctor().indexOf(".") >= 0) {
+                                                                   try {
+                                                                      {if (true) return new InternalActionLiteral(F, curAg);}
+                                   } catch (Exception e) {
+                                      {if (true) throw new ParseException(getSourceRef(F)+" The internal action class for '"+F+"' was not found!");}
+                                   }
+                                }
                                 if (F.isAtom() && type == Literal.LPos) {
                                    Atom a = new Atom(F.getFunctor());
                                    a.setSrc(F);
@@ -495,7 +532,7 @@
                          if (formType == BodyType.test && L instanceof LogExpr) {
                             {if (true) return new BodyLiteral((LogExpr)L);}  // used in ?(a & b)
                          } else {
-                            {if (true) throw new ParseException("(<logical formula>) can be used only with test goal.");}
+                            {if (true) throw new ParseException(getSourceRef(L)+" (<logical formula>) can be used only with test goal.");}
                          }
         break;
       default:
@@ -524,7 +561,7 @@
                          } else if (rel instanceof RelExpr) {
                             {if (true) return new BodyLiteral((RelExpr)rel);} // constraint 
                          } else {
-                            {if (true) throw new ParseException("A body formula should be an action or a constraint (RelExpr).");}
+                            {if (true) throw new ParseException(getSourceRef(rel)+" A body formula should be an action or a constraint (RelExpr).");}
                          }
         break;
       default:
@@ -911,10 +948,10 @@
       }
       t2 = arithm_expr();
                                 if (!(t1 instanceof NumberTerm)) {
-                                   {if (true) throw new ParseException("ArithExpr: first operand is not numeric or variable.");}
+                                   {if (true) throw new ParseException(getSourceRef(t1)+" ArithExpr: first operand '"+t1+"' is not numeric or variable.");}
                                 }
                                 if (!(t2 instanceof NumberTerm)) {
-                                   {if (true) throw new ParseException("ArithExpr: second operand is not numeric or variable.");}
+                                   {if (true) throw new ParseException(getSourceRef(t2)+" ArithExpr: second operand '"+t2+"' is not numeric or variable.");}
                                 }
                                 {if (true) return new ArithExpr((NumberTerm)t1, op, (NumberTerm)t2);}
       break;
@@ -959,10 +996,10 @@
       }
       t2 = arithm_expr_trm();
                                   if (!(t1 instanceof NumberTerm)) {
-                                    {if (true) throw new ParseException("ArithTerm: first operand is not numeric or variable.");}
+                                    {if (true) throw new ParseException(getSourceRef(t1)+" ArithTerm: first operand '"+t1+"' is not numeric or variable.");}
                                   }
                                   if (!(t2 instanceof NumberTerm)) {
-                                    {if (true) throw new ParseException("ArithTerm: second operand is not numeric or variable.");}
+                                    {if (true) throw new ParseException(getSourceRef(t2)+" ArithTerm: second operand '"+t2+"' is not numeric or variable.");}
                                   }
                                   {if (true) return new ArithExpr((NumberTerm)t1, op, (NumberTerm)t2);}
       break;
@@ -984,10 +1021,10 @@
                                   op = ArithmeticOp.pow;
       t2 = arithm_expr_factor();
                                   if (!(t1 instanceof NumberTerm)) {
-                                    {if (true) throw new ParseException("ArithFactor: first operand is not numeric or variable.");}
+                                    {if (true) throw new ParseException(getSourceRef(t1)+" ArithFactor: first operand '"+t1+"' is not numeric or variable.");}
                                   }
                                   if (!(t2 instanceof NumberTerm)) {
-                                    {if (true) throw new ParseException("ArithFactor: second operand is not numeric or variable.");}
+                                    {if (true) throw new ParseException(getSourceRef(t2)+" ArithFactor: second operand '"+t2+"' is not numeric or variable.");}
                                   }
                                   {if (true) return new ArithExpr((NumberTerm)t1, op, (NumberTerm)t2);}
       break;
@@ -1013,7 +1050,7 @@
       jj_consume_token(35);
       t = arithm_expr_simple();
                                   if (!(t instanceof NumberTerm)) {
-                                    {if (true) throw new ParseException("operator '-' applied to argument not numeric or variable.");}
+                                    {if (true) throw new ParseException(getSourceRef(t)+" The argument '"+t+"' of operator '-' is not numeric or variable.");}
                                   }
                                   {if (true) return new ArithExpr(ArithmeticOp.minus, (NumberTerm)t);}
       break;
@@ -1118,85 +1155,6 @@
     try { return !jj_3_2(); }
     catch(LookaheadSuccess ls) { return true; }
     finally { jj_save(1, xla); }
-  }
-
-  final private boolean jj_3R_21() {
-    if (jj_3R_26()) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_20() {
-    if (jj_scan_token(39)) return true;
-    if (jj_3R_41()) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_77() {
-    if (jj_3R_23()) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_76() {
-    if (jj_3R_77()) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_75() {
-    if (jj_3R_24()) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_74() {
-    if (jj_scan_token(39)) return true;
-    if (jj_3R_25()) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_73() {
-    if (jj_scan_token(35)) return true;
-    if (jj_3R_66()) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_11() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_scan_token(20)) {
-    jj_scanpos = xsp;
-    if (jj_scan_token(14)) {
-    jj_scanpos = xsp;
-    if (jj_scan_token(15)) return true;
-    }
-    }
-    xsp = jj_scanpos;
-    if (jj_3R_20()) jj_scanpos = xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_21()) jj_scanpos = xsp;
-    return false;
-  }
-
-  final private boolean jj_3R_72() {
-    if (jj_scan_token(NUMBER)) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_66() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_72()) {
-    jj_scanpos = xsp;
-    if (jj_3R_73()) {
-    jj_scanpos = xsp;
-    if (jj_3R_74()) {
-    jj_scanpos = xsp;
-    if (jj_3R_75()) {
-    jj_scanpos = xsp;
-    if (jj_3R_76()) return true;
-    }
-    }
-    }
-    }
-    return false;
   }
 
   final private boolean jj_3R_67() {
@@ -1371,11 +1329,6 @@
     return false;
   }
 
-  final private boolean jj_3R_35() {
-    if (jj_scan_token(TK_NEG)) return true;
-    return false;
-  }
-
   final private boolean jj_3R_59() {
     if (jj_scan_token(53)) return true;
     return false;
@@ -1396,16 +1349,13 @@
     return false;
   }
 
-  final private boolean jj_3R_27() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_35()) jj_scanpos = xsp;
-    if (jj_3R_11()) return true;
+  final private boolean jj_3R_55() {
+    if (jj_scan_token(49)) return true;
     return false;
   }
 
-  final private boolean jj_3R_55() {
-    if (jj_scan_token(49)) return true;
+  final private boolean jj_3R_35() {
+    if (jj_scan_token(TK_NEG)) return true;
     return false;
   }
 
@@ -1419,21 +1369,16 @@
     return false;
   }
 
-  final private boolean jj_3R_23() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_27()) {
-    jj_scanpos = xsp;
-    if (jj_3R_28()) {
-    jj_scanpos = xsp;
-    if (jj_3R_29()) return true;
-    }
-    }
+  final private boolean jj_3R_52() {
+    if (jj_scan_token(46)) return true;
     return false;
   }
 
-  final private boolean jj_3R_52() {
-    if (jj_scan_token(46)) return true;
+  final private boolean jj_3R_27() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_35()) jj_scanpos = xsp;
+    if (jj_3R_11()) return true;
     return false;
   }
 
@@ -1460,6 +1405,19 @@
     }
     }
     }
+    }
+    }
+    return false;
+  }
+
+  final private boolean jj_3R_23() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_27()) {
+    jj_scanpos = xsp;
+    if (jj_3R_28()) {
+    jj_scanpos = xsp;
+    if (jj_3R_29()) return true;
     }
     }
     return false;
@@ -1613,11 +1571,90 @@
     return false;
   }
 
+  final private boolean jj_3R_21() {
+    if (jj_3R_26()) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_20() {
+    if (jj_scan_token(39)) return true;
+    if (jj_3R_41()) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_77() {
+    if (jj_3R_23()) return true;
+    return false;
+  }
+
   final private boolean jj_3_1() {
     if (jj_scan_token(27)) return true;
     if (jj_scan_token(TK_BEGIN)) return true;
     if (jj_3R_11()) return true;
     if (jj_scan_token(28)) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_76() {
+    if (jj_3R_77()) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_75() {
+    if (jj_3R_24()) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_74() {
+    if (jj_scan_token(39)) return true;
+    if (jj_3R_25()) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_73() {
+    if (jj_scan_token(35)) return true;
+    if (jj_3R_66()) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_11() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_scan_token(20)) {
+    jj_scanpos = xsp;
+    if (jj_scan_token(14)) {
+    jj_scanpos = xsp;
+    if (jj_scan_token(15)) return true;
+    }
+    }
+    xsp = jj_scanpos;
+    if (jj_3R_20()) jj_scanpos = xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_21()) jj_scanpos = xsp;
+    return false;
+  }
+
+  final private boolean jj_3R_72() {
+    if (jj_scan_token(NUMBER)) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_66() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_72()) {
+    jj_scanpos = xsp;
+    if (jj_3R_73()) {
+    jj_scanpos = xsp;
+    if (jj_3R_74()) {
+    jj_scanpos = xsp;
+    if (jj_3R_75()) {
+    jj_scanpos = xsp;
+    if (jj_3R_76()) return true;
+    }
+    }
+    }
+    }
     return false;
   }
 
