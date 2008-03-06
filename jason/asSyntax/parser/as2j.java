@@ -156,7 +156,7 @@
                                    if (config.getBoolean(Config.WARN_SING_VAR) && !parsedFiles.contains(asSource)) {
                                       List<VarTerm> singletonVars = p.getSingletonVars();
                                       if (singletonVars.size() > 0) {
-                                         logger.warning("["+p.getSrc()+"] warning: the plan of line "+p.getBeginSrcLine()+" (te: '"+p.getTrigger()+"') has the following singleton variables: "+singletonVars);
+                                         logger.warning(getSourceRef(p)+" warning: the plan for event '"+p.getTrigger()+"' has the following singleton variables: "+singletonVars);
                                       }
                                    }
                                 }
@@ -180,7 +180,7 @@
                                   if (b.isRule()) {
                                       a.addInitialBel(b);
                                       if (!parsedFiles.contains(asSource))
-                                         logger.warning("["+b.getSrc()+"] warning: avoid to mix rules and plans ('"+b+"' at line "+p.getBeginSrcLine()+".");
+                                         logger.warning(getSourceRef(b)+" warning: avoid to mix rules and plans ('"+b+"').");
                                   } else {
                                       {if (true) throw new ParseException(getSourceRef(b)+" The belief '"+b+"' is not in the begin of the source code!");}
                                   }
@@ -263,7 +263,7 @@
                                if (config.getBoolean(Config.WARN_SING_VAR) && !parsedFiles.contains(asSource)) {
                                   List<VarTerm> singletonVars = h.getSingletonVars();
                                   if (singletonVars.size() > 0) {
-                                     logger.warning("["+h.getSrc()+"] warning: the rule of line "+h.getBeginSrcLine()+" (head: '"+((Rule)h).headClone()+"') has the following singleton variables: "+singletonVars);
+                                     logger.warning(getSourceRef(h)+" warning: the rule with head '"+((Rule)h).headClone()+"' has the following singleton variables: "+singletonVars);
                                   }
                                }
       break;
@@ -327,12 +327,9 @@
                                    if (start == -1) start = k.beginLine;
                      end = k.beginLine;
                      InternalActionLiteral ial = null;
-                     try {
-                             ial = checkInternalActionsInContext((LogicalFormula)C, curAg);
-                     } catch (Exception e) {}
-                     if (ial != null) {
+                     try { ial = checkInternalActionsInContext((LogicalFormula)C, curAg); } catch (Exception e) {}
+                     if (ial != null)
                         {if (true) throw new ParseException(getSourceRef(ial)+" The internal action '"+ial+"' can not be used in plan's context!");}
-                     }
                      Plan p = new Plan(L,T,(LogicalFormula)C,B);
                      p.setSrcLines(start,end);
                      p.setSrc(asSource);

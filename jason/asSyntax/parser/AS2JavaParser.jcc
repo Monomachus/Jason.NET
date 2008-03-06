@@ -170,7 +170,7 @@ boolean agent(Agent a) throws jason.JasonException :
                                    if (config.getBoolean(Config.WARN_SING_VAR) && !parsedFiles.contains(asSource)) {
                                       List<VarTerm> singletonVars = p.getSingletonVars();
                                       if (singletonVars.size() > 0) {
-                                         logger.warning("["+p.getSrc()+"] warning: the plan of line "+p.getBeginSrcLine()+" (te: '"+p.getTrigger()+"') has the following singleton variables: "+singletonVars);
+                                         logger.warning(getSourceRef(p)+" warning: the plan for event '"+p.getTrigger()+"' has the following singleton variables: "+singletonVars);
                                       }
                                    }
                                 }
@@ -179,7 +179,7 @@ boolean agent(Agent a) throws jason.JasonException :
                                   if (b.isRule()) {
                                       a.addInitialBel(b);
                                       if (!parsedFiles.contains(asSource))
-                                         logger.warning("["+b.getSrc()+"] warning: avoid to mix rules and plans ('"+b+"' at line "+p.getBeginSrcLine()+".");
+                                         logger.warning(getSourceRef(b)+" warning: avoid to mix rules and plans ('"+b+"').");
                                   } else {
                                       throw new ParseException(getSourceRef(b)+" The belief '"+b+"' is not in the begin of the source code!");
                                   }                                   
@@ -244,7 +244,7 @@ Literal belief() : { Literal h; Object t; }
                                if (config.getBoolean(Config.WARN_SING_VAR) && !parsedFiles.contains(asSource)) {
                                   List<VarTerm> singletonVars = h.getSingletonVars();
                                   if (singletonVars.size() > 0) {
-                                     logger.warning("["+h.getSrc()+"] warning: the rule of line "+h.getBeginSrcLine()+" (head: '"+((Rule)h).headClone()+"') has the following singleton variables: "+singletonVars);                    
+                                     logger.warning(getSourceRef(h)+" warning: the rule with head '"+((Rule)h).headClone()+"' has the following singleton variables: "+singletonVars);                    
                                   }
                                }
                              }

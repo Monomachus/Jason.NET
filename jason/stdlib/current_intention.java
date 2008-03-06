@@ -71,6 +71,14 @@ import jason.asSyntax.Term;
 
   </ul>
 
+  <p>Notes:<ul> 
+
+  <li>In case this internal action is used in the <i>body</i> of a plan, the intention that 
+      are executing the plan is used.</li>
+  <li>In case this internal action is used in the <i>context</i> of a plan, the intention that 
+      produced the event is used.</li>
+  </ul>
+
   @see jason.stdlib.intend
   @see jason.stdlib.desire
   @see jason.stdlib.drop_all_desires
