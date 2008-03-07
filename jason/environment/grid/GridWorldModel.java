@@ -6,7 +6,25 @@ import java.util.Random;
 
 /**
  * Simple model for a grid world (with agents and obstacles).
- * Every agent gets an identification (a integer from 0 to the number of ag - 1).
+ * 
+ * <p>Every agent gets an identification (a integer from 0 to the number of ag - 1).
+ * The relation of this identification with agent's name should be done
+ * in the environment class and is application dependent.
+ *  
+ * <p>Every type of object in the environment is represented by a bit mask: 
+ * an agent    is 000010; 
+ * an obstacle is 000100; .... 
+ * New types of objects should follow this pattern,
+ * for example, GOLD = 8 (001000), ENEMY=16 (010000), ...  
+ * A place with two object is represented by the OR between the masks:
+ * an agent and a gold is 001010.
+ * 
+ * <p>Limitations:
+ * <ul>
+ * <li>The number of agents can not change dynamically</li>
+ * <li>Two agents can not share the same place. More generally, 
+ *     two objects with the same "mask" can not share a place.</li>
+ * </ul>
  * 
  * @author Jomi
  */
