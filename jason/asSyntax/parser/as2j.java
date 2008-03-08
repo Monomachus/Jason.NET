@@ -526,10 +526,13 @@
         jj_consume_token(39);
         L = log_expr();
         jj_consume_token(40);
-                         if (formType == BodyType.test && L instanceof LogExpr) {
-                            {if (true) return new BodyLiteral((LogExpr)L);}  // used in ?(a & b)
+                         if (formType == BodyType.test) {
+                            if (L instanceof LogicalFormula)
+                               {if (true) return new BodyLiteral(BodyType.test, (LogicalFormula)L);}  // used in ?(a & b)
+                            else
+                               {if (true) throw new ParseException(getSourceRef(L)+" The argument in ?(<logical formula>) is not a logical formula.");}
                          } else {
-                            {if (true) throw new ParseException(getSourceRef(L)+" (<logical formula>) can be used only with test goal.");}
+                            {if (true) throw new ParseException(getSourceRef(L)+" Constructions like (<logical formula>) are possible only for test goal: ?(<logical formula>).");}
                          }
         break;
       default:
@@ -556,7 +559,7 @@
                          if (rel instanceof Literal) {
                             {if (true) return new BodyLiteral(formType, (Literal)rel);} // action
                          } else if (rel instanceof RelExpr) {
-                            {if (true) return new BodyLiteral((RelExpr)rel);} // constraint 
+                            {if (true) return new BodyLiteral(BodyType.constraint, (RelExpr)rel);} // constraint 
                          } else {
                             {if (true) throw new ParseException(getSourceRef(rel)+" A body formula should be an action or a constraint (RelExpr).");}
                          }
@@ -1227,6 +1230,16 @@
     return false;
   }
 
+  final private boolean jj_3R_69() {
+    if (jj_scan_token(55)) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_68() {
+    if (jj_scan_token(54)) return true;
+    return false;
+  }
+
   final private boolean jj_3_2() {
     Token xsp;
     xsp = jj_scanpos;
@@ -1251,16 +1264,6 @@
     if (jj_3R_19()) return true;
     }
     }
-    return false;
-  }
-
-  final private boolean jj_3R_69() {
-    if (jj_scan_token(55)) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_68() {
-    if (jj_scan_token(54)) return true;
     return false;
   }
 
@@ -1351,11 +1354,6 @@
     return false;
   }
 
-  final private boolean jj_3R_35() {
-    if (jj_scan_token(TK_NEG)) return true;
-    return false;
-  }
-
   final private boolean jj_3R_54() {
     if (jj_scan_token(48)) return true;
     return false;
@@ -1371,11 +1369,8 @@
     return false;
   }
 
-  final private boolean jj_3R_27() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_35()) jj_scanpos = xsp;
-    if (jj_3R_11()) return true;
+  final private boolean jj_3R_35() {
+    if (jj_scan_token(TK_NEG)) return true;
     return false;
   }
 
@@ -1407,16 +1402,11 @@
     return false;
   }
 
-  final private boolean jj_3R_23() {
+  final private boolean jj_3R_27() {
     Token xsp;
     xsp = jj_scanpos;
-    if (jj_3R_27()) {
-    jj_scanpos = xsp;
-    if (jj_3R_28()) {
-    jj_scanpos = xsp;
-    if (jj_3R_29()) return true;
-    }
-    }
+    if (jj_3R_35()) jj_scanpos = xsp;
+    if (jj_3R_11()) return true;
     return false;
   }
 
@@ -1427,6 +1417,19 @@
 
   final private boolean jj_3R_47() {
     if (jj_3R_50()) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_23() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_27()) {
+    jj_scanpos = xsp;
+    if (jj_3R_28()) {
+    jj_scanpos = xsp;
+    if (jj_3R_29()) return true;
+    }
+    }
     return false;
   }
 

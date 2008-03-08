@@ -176,9 +176,8 @@ public class Agent {
     }
     
     public void setLogger(AgArch arch) {
-        if (arch != null) {
+        if (arch != null)
             logger = Logger.getLogger(Agent.class.getName() + "." + arch.getAgName());
-        }
     }
 
     public Logger getLogger() {
@@ -293,7 +292,6 @@ public class Agent {
     
     /** add the initial beliefs in BB and produce the corresponding events */
     public void addInitialBelsInBB() {
-        Unifier u = new Unifier();
         // Once beliefs are stored in a Stack in the BB, insert them in inverse order
         for (int i=initialBels.size()-1; i >=0; i--) {
             Literal b = initialBels.get(i);
@@ -301,16 +299,14 @@ public class Agent {
             // if l is not a rule and has free vars (like l(X)), convert it into a rule like "l(X) :- true."
             if (!b.isRule() && !b.isGround())
                 b = new Rule(b,Literal.LTrue);
-            else 
-                b.apply(u); // to solve arithmetic expressions
-                
-            
+
+            b.apply(new Unifier()); // to solve arithmetic expressions
+                            
             // does not do BRF for rules (and so do not produce events +bel for rules)
-            if (b.isRule()) {
+            if (b.isRule())
             	getBB().add(b);
-            } else {
+            else
             	addBel(b);
-            }
         }
         initialBels.clear();
     }

@@ -363,10 +363,13 @@ BodyLiteral body_formula() :  { Literal A; Token k;
    ( A = literal()     { return new BodyLiteral(formType,A); }
    | v = var()         { return new BodyLiteral(formType,v); } // used in communication "+C"
    | "(" L = log_expr() ")" 
-                       { if (formType == BodyType.test && L instanceof LogExpr) {
-                            return new BodyLiteral((LogExpr)L);  // used in ?(a & b)
-                         } else {
-                            throw new ParseException(getSourceRef(L)+" (<logical formula>) can be used only with test goal.");
+                       { if (formType == BodyType.test) {
+                            if (L instanceof LogicalFormula)
+                               return new BodyLiteral(BodyType.test, (LogicalFormula)L);  // used in ?(a & b)
+                            else
+                               throw new ParseException(getSourceRef(L)+" The argument in ?(<logical formula>) is not a logical formula.");
+                         } else { 
+                            throw new ParseException(getSourceRef(L)+" Constructions like (<logical formula>) are possible only for test goal: ?(<logical formula>).");
                          }
                        }
    )
@@ -376,7 +379,7 @@ BodyLiteral body_formula() :  { Literal A; Token k;
                        { if (rel instanceof Literal) {
                             return new BodyLiteral(formType, (Literal)rel); // action
                          } else if (rel instanceof RelExpr) {
-                            return new BodyLiteral((RelExpr)rel); // constraint 
+                            return new BodyLiteral(BodyType.constraint, (RelExpr)rel); // constraint 
                          } else {
                             throw new ParseException(getSourceRef(rel)+" A body formula should be an action or a constraint (RelExpr).");
                          }

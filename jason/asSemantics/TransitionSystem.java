@@ -36,6 +36,7 @@ import jason.asSyntax.Plan;
 import jason.asSyntax.PlanLibrary;
 import jason.asSyntax.Term;
 import jason.asSyntax.Trigger;
+import jason.asSyntax.VarTerm;
 import jason.asSyntax.Trigger.TEOperator;
 import jason.asSyntax.Trigger.TEType;
 import jason.bb.BeliefBase;
@@ -479,7 +480,7 @@ public class TransitionSystem {
                 updateIntention();
             } else {
             	boolean fail = true;
-            	if (f instanceof Literal) { // generate event when using literal in the test (no events for log. expr. like ?(a & b)
+            	if (f instanceof Literal && !(f instanceof VarTerm)) { // generate event when using literal in the test (no events for log. expr. like ?(a & b) or ?(X))
             		body = (Literal)f.clone();
 	                body.makeVarsAnnon();
 	                Trigger te = new Trigger(TEOperator.add, TEType.test, body);
@@ -537,6 +538,9 @@ public class TransitionSystem {
             if (setts.sameFocus())
                 newfocus = conf.C.SI;
 
+            // rename free vars
+            body.makeVarsAnnon();
+            
             // call BRF
             result = ag.brf(body,null,conf.C.SI); // the intention is not the new focus
             if (result != null) { // really add something

@@ -44,25 +44,21 @@ public class BodyLiteral extends SourceInfo implements Cloneable {
     private LogicalFormula  formula;
     private BodyType        formType;
     
+    /** used of actions, internal actions, test goals, achieve goals, adds, removes */
     public BodyLiteral(BodyType t, Literal l) {
         formula = (Literal) l.clone();
         formType = t;
-        setSrc(l);
-        if (l.isInternalAction()) {
+        if (l.isInternalAction())
             formType = BodyType.internalAction;
-        }
+        setSrc(l);
     }
 
-    public BodyLiteral(RelExpr re) {
-        formula = (LogicalFormula) re.clone();
-        setSrc(re);
-        formType = BodyType.constraint;
-    }
-
-    public BodyLiteral(LogExpr le) {
-        formula = (LogicalFormula) le.clone();
-        setSrc(le);
-        formType = BodyType.test;
+    /** used for test goals and constraints (the argument is a logical formula) */
+    public BodyLiteral(BodyType t, LogicalFormula lf) {
+        formula = (LogicalFormula) lf.clone();
+        formType = t;
+        if (lf instanceof SourceInfo)
+            setSrc((SourceInfo)lf);
     }
 
     public BodyType getType() {
@@ -95,10 +91,8 @@ public class BodyLiteral extends SourceInfo implements Cloneable {
     }
 
     public Object clone() {
-        if (formType == BodyType.constraint) {
-            return new BodyLiteral((RelExpr)formula);
-        } else if (formula instanceof LogExpr) {
-            return new BodyLiteral((LogExpr)formula);
+        if (formType == BodyType.test || formType == BodyType.constraint) {
+            return new BodyLiteral(formType, formula);
         } else {
             return new BodyLiteral(formType, (Literal)formula);
         }

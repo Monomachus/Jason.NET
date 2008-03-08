@@ -44,17 +44,29 @@ import java.util.logging.Level;
 public class println extends DefaultInternalAction {
 
     protected String getNewLine() {
-	return "\n";
+        return "\n";
     }
 	
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
+        String sout = argsToString(args);
+        
+        if (ts != null && ts.getSettings().logLevel() != Level.WARNING) {
+            ts.getLogger().info(sout.toString());
+        } else {
+            System.out.print(sout.toString() + getNewLine());
+        }
+        
+        return true;
+    }
+
+    protected String argsToString(Term[] args) {
         StringBuilder sout = new StringBuilder();
-        try {
-    	    if (ts.getSettings().logLevel() != Level.WARNING && args.length > 0) {
-    		sout = new StringBuilder();
-    	    }
-        } catch (Exception e) {}
+        //try {
+    	//    if (ts.getSettings().logLevel() != Level.WARNING && args.length > 0) {
+    	//        sout = new StringBuilder();
+    	//    }
+        //} catch (Exception e) {}
 		
         for (int i = 0; i < args.length; i++) {
 			if (args[i].isString()) {
@@ -69,13 +81,6 @@ public class println extends DefaultInternalAction {
 				}
 			}
         }
-        
-        if (ts != null && ts.getSettings().logLevel() != Level.WARNING) {
-            ts.getLogger().info(sout.toString());
-        } else {
-            System.out.print(sout.toString() + getNewLine());
-        }
-        
-        return true;
+        return sout.toString();
     }
 }
