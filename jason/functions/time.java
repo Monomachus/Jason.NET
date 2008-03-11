@@ -6,7 +6,7 @@ import jason.asSyntax.Term;
 
 /** 
   <p>Function: <b><code>system.time</code></b>: encapsulates java System.currentTimeMillis(),
-  returns the current time in miliseconds.
+  returns the current time in milliseconds.
   
   @author Jomi 
 */

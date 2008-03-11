@@ -51,20 +51,32 @@ public class FunctionRegister implements Directive {
         addFunction(time.class);
     }
     
-    /** register a function implemented in Java */
-    public static void addFunction(Class<? extends ArithFunction> c) {
-		try {
-			ArithFunction af = c.newInstance();
-			if (functions.get(af.getName()) != null)
-			    logger.warning("Registering the function "+af.getName()+"  twice! The first register is lost.");
-			functions.put(af.getName(),af);
-		} catch (Exception e) {
-			logger.log(Level.SEVERE, "Error registering function "+c.getName(),e);
-		}
+    private static void addFunction(Class<? extends ArithFunction> c) {
+        try {
+            ArithFunction af = c.newInstance();
+            functions.put(af.getName(), af);
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Error registering function "+c.getName(),e);
+        }
+    }
+
+    public static String checkFunctionName(String fName) {
+        if (functions.get(fName) != null)
+            return "Can not register the function "+fName+"  twice!";
+        else if (fName.indexOf(".") < 0)
+            return "The function "+fName+" was not registered! A function must have a '.' in its name.";
+        else if (fName.startsWith(".")) 
+            return "The function "+fName+" was not registered! An user function name can not start with '.'.";
+        else 
+            return null;
     }
     
-    public static ArithFunction getFunction(String id) {
-        return functions.get(id);
+    public static ArithFunction getFunction(String function, int arity) {
+        ArithFunction af = functions.get(function);
+        if (af != null && af.checkArity(arity))
+            return af;
+        else
+            return null;
     }
     
     @SuppressWarnings("unchecked")
@@ -74,9 +86,11 @@ public class FunctionRegister implements Directive {
     	    if (directive.getArity() == 1) {
     	        // it is implemented in java
                 outerContent.addFunction((Class<ArithFunction>)Class.forName(id));
-    	    } else if (directive.getArity() == 2) {
+    	    } else if (directive.getArity() == 3) {
     	        // is is implemented in AS
-    	        outerContent.addFunction(id, (int)((NumberTerm)directive.getTerm(1)).solve());
+    	        int arity = (int)((NumberTerm)directive.getTerm(1)).solve();
+                String predicate = ((StringTerm)directive.getTerm(2)).getString();
+    	        outerContent.addFunction(id, arity, predicate);
     	    } else {
     	        // error
                 logger.log(Level.SEVERE, "Wrong number of arguments for register_function "+directive);

@@ -21,8 +21,9 @@ import java.util.Iterator;
    <p>To define sum as
    a function the user should register it using a
    directive in the ASL code:
-     { register_function("sum",2) }
-   where sum is the name of the rule (or literal, or
+     { register_function("myf.sum",2,"sum") }
+   where myf.sum is the name of the function,
+   sum is the name of the rule (or literal, or
    internal action) and 2 is the function's arity.
       
    @author Jomi 
@@ -67,4 +68,7 @@ public class RuleToFunction extends DefaultArithFunction  {
 	        throw new JasonException("No solution for found for rule "+r);
 	}
 	
+	public String toString() { 
+	    return "function wrapper for "+literal+"/"+arity;
+	}
 }

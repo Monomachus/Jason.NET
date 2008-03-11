@@ -82,7 +82,16 @@ PARSER_BEGIN(as2j)
         }
         return null;
     }
-    
+    private ArithFunction getArithFunction(Structure l) {
+        ArithFunction af = null;
+        if (curAg != null)
+           // try to find the function in agent register
+           af = curAg.getFunction(l.getFunctor(), l.getArity());
+        if (af == null)
+           // try global function
+           af = FunctionRegister.getFunction(l.getFunctor(), l.getArity());
+        return af;
+    } 
   }
 
 PARSER_END(as2j)
@@ -313,7 +322,8 @@ Literal literal() :  { Pred F; Token k; boolean type = Literal.LPos; }
 								   try {
 								      return new InternalActionLiteral(F, curAg);
                                    } catch (Exception e) {
-                                      throw new ParseException(getSourceRef(F)+" The internal action class for '"+F+"' was not found!");                    
+                                      if (getArithFunction(F) == null) // it is not a registered function
+                                      	 throw new ParseException(getSourceRef(F)+" The internal action class for '"+F+"' was not found!");
                                    }
                                 }
                                 if (F.isAtom() && type == Literal.LPos) {
@@ -513,7 +523,12 @@ Object rel_expr() :
          | op2 = list()
        )
 
-                                           { return new RelExpr((Term)op1, operator, (Term)op2); }
+                                           { if ( ((Term)op1).isInternalAction() && operator != RelationalOp.literalBuilder)
+                                                throw new ParseException(getSourceRef(op1)+" RelExpr: operand '"+op1+"' can not be an internal action.");
+                                             if ( ((Term)op2).isInternalAction() && operator != RelationalOp.literalBuilder)
+                                                throw new ParseException(getSourceRef(op2)+" RelExpr: operand '"+op2+"' can not be an internal action.");                                             
+                                             return new RelExpr((Term)op1, operator, (Term)op2); 
+                                           }
     ]
                                            { return op1; }
 }
@@ -596,14 +611,8 @@ Object arithm_expr_simple():
 Term function():          { Literal l; }
 {
    l = literal()
-                          { ArithFunction af = null;
-                            if (curAg != null)
-                               // try to find the function in agent registry
-                               af = curAg.getFunction(l.getFunctor());
-                            if (af == null || !af.checkArity(l.getArity()))
-                               // try global function
-                               af = FunctionRegister.getFunction(l.getFunctor());
-                            if (af == null || !af.checkArity(l.getArity())) {
+                          { ArithFunction af = getArithFunction(l);
+                            if (af == null) {
                                return l;
                             } else {
                                ArithFunctionTerm at = new ArithFunctionTerm(af);

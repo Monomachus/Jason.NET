@@ -35,6 +35,7 @@ import jason.asSyntax.Structure;
 import jason.asSyntax.Trigger;
 import jason.asSyntax.Trigger.TEOperator;
 import jason.asSyntax.Trigger.TEType;
+import jason.asSyntax.directives.FunctionRegister;
 import jason.asSyntax.directives.Include;
 import jason.asSyntax.parser.ParseException;
 import jason.asSyntax.parser.as2j;
@@ -249,34 +250,54 @@ public class Agent {
     }
     
     public void initDefaultFunctions() {
-        addFunction(Count.class);
+        addFunction(Count.class, false);
     }
  
-    /** register a function implemented in Java */
+    /** register an arithmetic function implemented in Java */
     public void addFunction(Class<? extends ArithFunction> c) {
+        addFunction(c,true);
+    }
+    /** register an arithmetic function implemented in Java */
+    private void addFunction(Class<? extends ArithFunction> c, boolean user) {
         try {
             ArithFunction af = c.newInstance();
-            if (functions.get(af.getName()) != null)
-                logger.warning("Registering the function "+af.getName()+"  twice! The first register is lost.");
-            functions.put(af.getName(),af);
+            String error = null;
+            if (user)
+                error = FunctionRegister.checkFunctionName(af.getName());
+            if (error != null)
+                logger.warning(error);
+            else
+                functions.put(af.getName(),af);
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error registering function "+c.getName(),e);
         }
     }
      
-    /** register a function implemented in AS (by a rule, literal, or internal action) */
-    public void addFunction(String literal, int arity) {
+    /** register an arithmetic function implemented in AS (by a rule, literal, or internal action) */
+    public void addFunction(String function, int arity, String literal) {
         try {
-            if (functions.get(literal) != null)
-                logger.warning("Registering the function "+literal+"  twice! The first register is lost.");
-            functions.put(literal, new RuleToFunction(literal, arity));
+            String error = FunctionRegister.checkFunctionName(function);
+            if (error != null)
+                logger.warning(error);
+            else
+                functions.put(function, new RuleToFunction(literal, arity));
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error registering function "+literal,e);
         }
     }
     
-    public ArithFunction getFunction(String id) {
-        return functions.get(id);
+    /** get the object the implements the arithmetic function <i>function/arity</i>,  
+     *  either global (like math.max) or local (like .count).
+     */
+    public ArithFunction getFunction(String function, int arity) {
+        ArithFunction af = functions.get(function);
+        if (af == null || !af.checkArity(arity))
+            // try global function
+            af = FunctionRegister.getFunction(function, arity);
+        if (af != null && af.checkArity(arity))
+            return af;
+        else 
+            return null;
     }
 
     
