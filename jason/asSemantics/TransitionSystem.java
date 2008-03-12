@@ -36,7 +36,6 @@ import jason.asSyntax.Plan;
 import jason.asSyntax.PlanLibrary;
 import jason.asSyntax.Term;
 import jason.asSyntax.Trigger;
-import jason.asSyntax.VarTerm;
 import jason.asSyntax.Trigger.TEOperator;
 import jason.asSyntax.Trigger.TEType;
 import jason.bb.BeliefBase;
@@ -480,17 +479,19 @@ public class TransitionSystem {
                 updateIntention();
             } else {
             	boolean fail = true;
-            	if (f instanceof Literal && !(f instanceof VarTerm)) { // generate event when using literal in the test (no events for log. expr. like ?(a & b) or ?(X))
+            	if (f instanceof Literal) { // generate event when using literal in the test (no events for log. expr. like ?(a & b))
             		body = (Literal)f.clone();
-	                body.makeVarsAnnon();
-	                Trigger te = new Trigger(TEOperator.add, TEType.test, body);
-	                if (ag.getPL().isRelevant(te)) {
-	                    Event evt = new Event(te, conf.C.SI);
-	                    if (logger.isLoggable(Level.FINE)) logger.fine("Test Goal '" + h + "' failed as simple query. Generating internal event for it: "+te);
-	                    conf.C.addEvent(evt);
-	                    confP.step = State.StartRC;
-	                    fail = false;
-	                } 
+            		if (body.isLiteral()) { // in case body is a var with content that is not a literal (note the VarTerm pass in the instanceof Literal)
+    	                body.makeVarsAnnon();
+    	                Trigger te = new Trigger(TEOperator.add, TEType.test, body);
+    	                if (ag.getPL().isRelevant(te)) {
+    	                    Event evt = new Event(te, conf.C.SI);
+    	                    if (logger.isLoggable(Level.FINE)) logger.fine("Test Goal '" + h + "' failed as simple query. Generating internal event for it: "+te);
+    	                    conf.C.addEvent(evt);
+    	                    confP.step = State.StartRC;
+    	                    fail = false;
+    	                }
+            		}
             	}
                 if (fail) {
                     if (logger.isLoggable(Level.FINE)) logger.fine("Test '"+h+"' failed ("+h.getErrorMsg()+").");
