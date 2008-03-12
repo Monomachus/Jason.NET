@@ -367,13 +367,13 @@ public class Structure extends DefaultTerm {
         if (functor != null) 
             s.append(functor);
         if (getArity() > 0) {
-            s.append("(");
+            s.append('(');
             Iterator<Term> i = terms.iterator();
             while (i.hasNext()) {
                 s.append(i.next());
-                if (i.hasNext()) s.append(",");
+                if (i.hasNext()) s.append(',');
             }
-            s.append(")");
+            s.append(')');
         }
         return s.toString();
     }

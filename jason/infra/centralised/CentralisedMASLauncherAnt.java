@@ -183,7 +183,26 @@ public class CentralisedMASLauncherAnt implements MASLauncherInfraTier {
 
 		// add classpath defined in the project .mas2j
 		for (String cp: project.getClassPaths()) {
-			lib += "        <pathelement location=\""+cp+"\"/>\n";
+		    int apos = cp.indexOf("*"); 
+		    if (apos < 0) {
+		        lib += "        <pathelement location=\""+cp+"\"/>\n";
+		    } else {
+		        String dir   = "${basedir}";
+                String files = cp;
+		        int spos = cp.lastIndexOf(File.separator);
+		        if (spos >= 0 && spos < apos) {
+		            dir   = cp.substring(0,spos);
+		            files = cp.substring(spos+1);
+		        } else {
+		            spos = cp.lastIndexOf(File.separator+"**"); 
+	                if (spos >= 0 && spos < apos) {
+	                    dir   = cp.substring(0,spos);
+	                    files = cp.substring(spos+1);
+	                }
+                }
+
+	            lib += "        <fileset dir=\""+dir+"\" >  <include name=\""+files+"\" /> </fileset>\n";		        
+		    }
 		}
 
         script = replace(script, "<PATH-LIB>", lib);

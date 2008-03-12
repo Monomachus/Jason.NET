@@ -399,13 +399,13 @@ public class ListTermImpl extends Structure implements ListTerm {
 			ListTerm lt = i.next();
 			s.append( lt.getTerm() );
 			if (lt.isTail()) {
-				s.append("|");
+				s.append('|');
 				s.append(lt.getNext());
 			} else if (i.hasNext()) {
-				s.append(",");
+				s.append(',');
 			}
 		}
-		s.append("]");
+		s.append(']');
 		return s.toString();
 	}
 

@@ -42,9 +42,10 @@ public class MASConsoleLogFormatter extends java.util.logging.Formatter {
 			StringWriter sw = new StringWriter();
 			PrintWriter pw = new PrintWriter(sw);
 			l.getThrown().printStackTrace(pw);
-			s.append("\n"+sw);
+			s.append('\n');
+			s.append(sw);
 		}
-		s.append("\n");
+		s.append('\n');
 		return s.toString();
 	}
 	
