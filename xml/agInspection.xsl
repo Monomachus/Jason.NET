@@ -95,6 +95,7 @@
                         <hr/>
                         <table cellspacing="0" cellpadding="2">
                             <xsl:for-each select="literal">
+                                <xsl:sort select="structure/@functor" />
                                 <tr style="{$trh-style}">
                                     <td style="text-align: left">
                                         <span style="color: {$bc}">
