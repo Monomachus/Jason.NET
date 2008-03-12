@@ -192,8 +192,7 @@ public class ExprTermTest extends TestCase {
         arch.setArchInfraTier(new CentralisedAgArch());
         ag.setTS(new TransitionSystem(ag, null, null, arch));
 
-        assertTrue(ag.getFunction(".count") != null);
-        assertTrue(ag.getFunction(".count").checkArity(1));
+        assertTrue(ag.getFunction(".count",1) != null);
         ag.getBB().add(Literal.parseLiteral("b(10)"));
         ag.getBB().add(Literal.parseLiteral("a(x)"));
         ag.getBB().add(Literal.parseLiteral("b(20)"));
