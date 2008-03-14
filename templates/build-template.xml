@@ -25,10 +25,9 @@
 <PATH-LIB>
     </path>
 
-    <!-- tasks the user can override in its c-build.xml -->
+    <!-- tasks the user can override in his/her c-build.xml script -->
     <target name="user-init">
     </target>
-    
     <target name="user-end">
     </target>
 
