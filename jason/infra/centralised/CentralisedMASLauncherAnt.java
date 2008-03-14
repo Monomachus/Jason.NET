@@ -129,10 +129,10 @@ public class CentralisedMASLauncherAnt implements MASLauncherInfraTier {
 
     /** write the scripts necessary to run the project */
     public boolean writeScripts(boolean debug) {
-        if (hasCBuild()) {
-            System.out.println("The build.xml file is not being created, the user c-build.xml file is used instead.");
-            return true; // if the user has a c-build.xml file, use his build
-        }
+        //if (hasCBuild()) {
+        //    System.out.println("The build.xml file is not being created, the user c-build.xml file is used instead.");
+        //    return true; // if the user has a c-build.xml file, use his build
+        //}
 
         try {
             String script = Config.get().getTemplate("build-template.xml");

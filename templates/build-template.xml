@@ -25,6 +25,13 @@
 <PATH-LIB>
     </path>
 
+    <!-- tasks the user can override in its c-build.xml -->
+    <target name="user-init">
+    </target>
+    
+    <target name="user-end">
+    </target>
+
     <target name="init">
         <mkdir dir="${build.dir}" />
     </target>
@@ -76,12 +83,14 @@
 
     <target name="run" depends="compile" >
         <echo message="Running project ${ant.project.name}" />
+        <antcall target="user-init" />
         <java classname="<PROJECT-RUNNER-CLASS>"
               failonerror="true" fork="yes" dir="${basedir}" >
             <classpath refid="project.classpath"/>
             <arg line="${mas2j.project.file} ${debug} <RUN-ARGS>"/>
             <jvmarg line="-Xmx750M"/>    
         </java>
+        <antcall target="user-end" />
     </target>
 
     <target name="clean" >
