@@ -345,6 +345,27 @@ public class Pred extends Structure {
         return ls;
     }
 
+    /**
+     * returns all annots with the specified functor e.g.: from annots
+     * [t(a), t(b), source(tom)]
+     * and functor "t",
+     * it returns [t(a),t(b)]
+     */
+    public ListTerm getAnnots(String functor) {
+        ListTerm ls = new ListTermImpl();
+        if (annots != null) {
+        	ListTerm tail = ls;
+            for (Term ta : annots) {
+            	if (ta.isStructure()) {
+            		if (((Structure)ta).getFunctor().equals(functor)) {
+            			tail = tail.append(ta);
+            		}
+            	}
+            }
+        }
+        return ls;
+    }
+
     /** deletes all sources annotations */
     public void delSources() {
         if (annots != null) {
