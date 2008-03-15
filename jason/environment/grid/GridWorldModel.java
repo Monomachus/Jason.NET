@@ -108,6 +108,10 @@ public class GridWorldModel {
         return c;
     }
     
+    public void set(int value, int x, int y) {
+        data[x][y] = value;
+        if (view != null) view.update(x,y);
+    }
     
     public void add(int value, Location l) {
         add(value, l.x, l.y);
