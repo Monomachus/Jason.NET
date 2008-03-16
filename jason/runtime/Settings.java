@@ -190,7 +190,7 @@ public class Settings {
 	   	 return java.util.logging.Level.INFO;
    }
     
-    /** returns true if the execution is synchronized */
+    /** returns true if the execution is synchronised */
     public boolean isSync() {
     	return sync;
     }
