@@ -43,6 +43,7 @@ public class TermTest extends TestCase {
 		assertFalse(t1.equals(t2));
 		
 		t2.addTerm(new Atom("a"));
+		assertEquals(new Atom("a"),new Atom("a"));
 		assertTrue(t1.equals(t2));
         assertTrue(t2.equals(t1));
         assertEquals(t1.hashCode(),t2.hashCode());

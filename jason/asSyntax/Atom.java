@@ -131,8 +131,7 @@ public final class Atom extends Literal {
         if (o == this) return true;
         if (o instanceof Structure) {
         	Structure s = (Structure)o;
-        	if (!getFunctor().equals(s.getFunctor())) return false;
-        	return s.isAtom();
+        	return s.isAtom() && getFunctor().equals(s.getFunctor());
         }
         return false;
     }

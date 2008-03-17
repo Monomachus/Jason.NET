@@ -33,6 +33,7 @@
 
     <target name="init">
         <mkdir dir="${build.dir}" />
+        <antcall target="user-init" />
     </target>
 
     <target name="compile" depends="init">
@@ -82,7 +83,6 @@
 
     <target name="run" depends="compile" >
         <echo message="Running project ${ant.project.name}" />
-        <antcall target="user-init" />
         <java classname="<PROJECT-RUNNER-CLASS>"
               failonerror="true" fork="yes" dir="${basedir}" >
             <classpath refid="project.classpath"/>

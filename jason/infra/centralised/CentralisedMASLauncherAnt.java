@@ -187,14 +187,15 @@ public class CentralisedMASLauncherAnt implements MASLauncherInfraTier {
 		    if (apos < 0) {
 		        lib += "        <pathelement location=\""+cp+"\"/>\n";
 		    } else {
+		        cp = cp.replaceAll("\\\\", "/");
 		        String dir   = "${basedir}";
                 String files = cp;
-		        int spos = cp.lastIndexOf(File.separator);
+		        int spos = cp.lastIndexOf("/");
 		        if (spos >= 0 && spos < apos) {
 		            dir   = cp.substring(0,spos);
 		            files = cp.substring(spos+1);
 		        } else {
-		            spos = cp.lastIndexOf(File.separator+"**"); 
+		            spos = cp.lastIndexOf("/**"); 
 	                if (spos >= 0 && spos < apos) {
 	                    dir   = cp.substring(0,spos);
 	                    files = cp.substring(spos+1);
