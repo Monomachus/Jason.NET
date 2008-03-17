@@ -404,6 +404,35 @@ public class Pred extends Structure {
         return false;
     }
 
+    
+    /**
+     * Replaces all variables of the term for unnamed variables (_).
+     * 
+     * @param changes is the map of replacements
+     */
+    @Override
+    protected void makeVarsAnnon(Map<VarTerm,UnnamedVar> changes) {
+        if (annots != null) {
+        	Iterator<ListTerm> i = annots.listTermIterator();
+        	while (i.hasNext()) {
+        		ListTerm lt = i.next();
+        		Term ta = lt.getTerm();
+                if (ta.isVar()) {
+                	// replace ta to an unnamed var
+                	UnnamedVar uv = changes.get(ta);
+                	if (uv == null) {
+                		uv = new UnnamedVar();
+                		changes.put((VarTerm)ta, uv);
+                	}
+                	lt.setTerm(uv);
+                } else if (ta.isStructure()) {
+                	((Structure)ta).makeVarsAnnon(changes);
+                }
+            }
+        }
+        super.makeVarsAnnon(changes);
+    }
+    
     @Override
     public boolean equals(Object o) {
         if (o == null) return false;

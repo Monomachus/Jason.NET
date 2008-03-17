@@ -48,6 +48,8 @@ public class Structure extends DefaultTerm {
 
 	private static final long serialVersionUID = 1L;
     private static Logger logger = Logger.getLogger(Structure.class.getName());
+    protected static final Term[] emptyTermArray = new Term[0]; // just to have a type for toArray in the getTermsArray method
+    
 
 	private final String functor; // immutable field
     private List<Term> terms;
@@ -237,11 +239,7 @@ public class Structure extends DefaultTerm {
      
     /** returns the i-th term (first term is 0) */
     public Term getTerm(int i) {
-        if (terms.size() > i) {
-            return terms.get(i);
-        } else {
-            return null;
-        }
+    	return terms.get(i);
     }
 
     public int getArity() {
@@ -264,8 +262,6 @@ public class Structure extends DefaultTerm {
     	return getArity() > 0; // should use getArity to work for list/atom
     }
     
-    private static final Term[] emptyTermArray = new Term[0]; // just to have a type for toArray in the getTermsArray method
-    
     public Term[] getTermsArray() {
         return terms.toArray(emptyTermArray);
     }
@@ -277,7 +273,7 @@ public class Structure extends DefaultTerm {
     
 	@Override
 	public boolean isAtom() {
-		return !hasTerm() && !isList();
+		return !hasTerm();
 	}
 
     public boolean isGround() {
@@ -300,7 +296,7 @@ public class Structure extends DefaultTerm {
      * 
      * @param changes is the map of replacements
      */
-    private void makeVarsAnnon(Map<VarTerm,UnnamedVar> changes) {
+    protected void makeVarsAnnon(Map<VarTerm,UnnamedVar> changes) {
         final int size = getArity();
         for (int i=0; i<size; i++) {
             Term ti = getTerm(i);

@@ -33,9 +33,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Represents an atom (a structure with no arguments), it is an
+ * Represents an atom (a structure with no arguments, e.g. "tell", "a"), it is an
  * immutable object.  It extends Literal, so can be used in place of a
- * Literal, but does not allow operations on terms.
+ * Literal, but does not allow operations on terms/atoms and can not be negated.
  */
 public final class Atom extends Literal {
 
@@ -113,17 +113,27 @@ public final class Atom extends Literal {
 		// an Atom as parameter
 		return new ArrayList<Term>(2);
 	}
-	
+
 	@Override
 	public Term[] getTermsArray() {
-	    return new Term[0];
+	    return emptyTermArray;
+	}
+	
+	@Override
+	public void setNegated(boolean b) {
+    	logger.log(Level.SEVERE, "You should not negate the atom "+this+"\n",new Exception());
+		super.setNegated(b);
 	}
 	
     @Override
     public boolean equals(Object o) {
         if (o == null) return false;
         if (o == this) return true;
-        if (o instanceof Structure) return getFunctor().equals(((Structure)o).getFunctor());
+        if (o instanceof Structure) {
+        	Structure s = (Structure)o;
+        	if (!getFunctor().equals(s.getFunctor())) return false;
+        	return s.isAtom();
+        }
         return false;
     }
     

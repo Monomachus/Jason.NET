@@ -85,7 +85,10 @@ public class Literal extends Pred implements LogicalFormula {
 	public static Literal parseLiteral(String sLiteral) {
 		as2j parser = new as2j(new StringReader(sLiteral));
 		try {
-			return parser.literal();
+			Literal l = parser.literal();
+			if (l instanceof Atom) // force the result as literal
+				l = new Literal(l.getFunctor());
+			return l;
 		} catch (Exception e) {
 			logger.log(Level.SEVERE,"Error parsing literal " + sLiteral,e);
 			return null;
@@ -356,9 +359,9 @@ public class Literal extends Pred implements LogicalFormula {
 
     
     @SuppressWarnings("serial")
-    static class TrueLiteral extends Literal {
+    static final class TrueLiteral extends Literal {
     	public TrueLiteral() {
-    		super("true",1);
+    		super("true",0);
 		}
 
     	@Override
@@ -373,9 +376,9 @@ public class Literal extends Pred implements LogicalFormula {
     }
     
     @SuppressWarnings("serial")
-	static class FalseLiteral extends Literal {
+	static final class FalseLiteral extends Literal {
     	public FalseLiteral() {
-    		super("false",1);
+    		super("false",0);
 		}
 
     	@Override

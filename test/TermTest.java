@@ -7,11 +7,11 @@ import jason.asSyntax.ListTerm;
 import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Literal;
 import jason.asSyntax.NumberTermImpl;
+import jason.asSyntax.Plan;
 import jason.asSyntax.Pred;
 import jason.asSyntax.Structure;
 import jason.asSyntax.Term;
 import jason.asSyntax.Trigger;
-import jason.asSyntax.Plan;
 import jason.asSyntax.VarTerm;
 import jason.asSyntax.Trigger.TEOperator;
 import jason.asSyntax.Trigger.TEType;
@@ -19,6 +19,8 @@ import jason.asSyntax.parser.ParseException;
 import jason.bb.BeliefBase;
 
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import junit.framework.TestCase;
 
@@ -72,8 +74,7 @@ public class TermTest extends TestCase {
 		
         Term tpos = new Atom("pos");
 		assertFalse(l3.equals(tpos));
-		assertTrue(tpos.equals(l3));
-		assertTrue(new Atom("pos").equals(l3));
+		assertFalse(tpos.equals(l3));
 		//System.out.println(new Term("pos")+"="+l3+" --> "+new Term("pos").equals(l3));
 
 		assertFalse(new Pred("pos").equals(l3));
@@ -579,6 +580,15 @@ public class TermTest extends TestCase {
         assertEquals(l2.toString(), "calc(32,33,33)");
         l1.apply(u);
         assertEquals(l1.toString(), "calc(32,33,33)");
+    }
+
+    public void testMakeVarAnnon3() {
+    	Literal l1 = Literal.parseLiteral("calc(AgY,X)[vl(X),source(AgY),bla(Y),X]");
+    	l1.makeVarsAnnon();
+    	Map<VarTerm, Integer> v = new HashMap<VarTerm, Integer>();
+    	l1.countVars(v);
+    	assertEquals(3, v.size());
+    	assertEquals("vl("+l1.getTerm(1)+")",l1.getAnnots("vl").get(0).toString());
     }
 
     public void testAddAnnots() {

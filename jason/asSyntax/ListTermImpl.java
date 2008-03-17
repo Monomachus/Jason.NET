@@ -182,6 +182,11 @@ public class ListTermImpl extends Structure implements ListTerm {
 		}
 	}
 	
+	@Override
+	public boolean isAtom() {
+		return false;
+	}
+
     @Override
     public boolean isList() {
 		return true;
