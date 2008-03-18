@@ -85,10 +85,7 @@ public class Literal extends Pred implements LogicalFormula {
 	public static Literal parseLiteral(String sLiteral) {
 		as2j parser = new as2j(new StringReader(sLiteral));
 		try {
-			Literal l = parser.literal();
-			if (l instanceof Atom) // force the result as literal
-				l = new Literal(l.getFunctor());
-			return l;
+		    return parser.literal();
 		} catch (Exception e) {
 			logger.log(Level.SEVERE,"Error parsing literal " + sLiteral,e);
 			return null;
