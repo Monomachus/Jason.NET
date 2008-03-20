@@ -1,5 +1,6 @@
 package test;
 
+import jason.RevisionFailedException;
 import jason.architecture.AgArch;
 import jason.asSemantics.Agent;
 import jason.asSemantics.Intention;
@@ -519,7 +520,7 @@ public class BeliefBaseTest extends TestCase {
     
     
     @SuppressWarnings("unchecked")
-	public void testBelBRF() {
+	public void testBelBRF() throws RevisionFailedException {
         Agent ag = new Agent();
         AgArch arch = new AgArch();
         arch.setArchInfraTier(new CentralisedAgArch());

@@ -1,5 +1,6 @@
 package test;
 
+import jason.RevisionFailedException;
 import jason.architecture.AgArch;
 import jason.asSemantics.Agent;
 import jason.asSemantics.Circumstance;
@@ -95,7 +96,7 @@ public class StdLibTest extends TestCase {
                 "[ok(10)[source(rafa)],[ok(20)[source(rafa)],ok(30)[source(rafa)],[ok(40)[source(rafa)],ok(50)[source(rafa)],ok(60)[source(rafa)]]]]");
     }
 
-    public void testFindAll() {
+    public void testFindAll() throws RevisionFailedException {
         Agent ag = new Agent();
         ag.setLogger(null);
         AgArch arch = new AgArch();

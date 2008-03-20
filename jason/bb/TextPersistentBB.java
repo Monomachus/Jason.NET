@@ -1,5 +1,6 @@
 package jason.bb;
 
+import jason.RevisionFailedException;
 import jason.asSemantics.Agent;
 import jason.asSyntax.Literal;
 
@@ -21,11 +22,15 @@ public class TextPersistentBB extends DefaultBeliefBase {
     File file = null;
 
     public void init(Agent ag, String[] args) {
-        file = new File(ag.getTS().getUserAgArch().getAgName() + ".bb");
-        logger.fine("reading from file " + file);
-        if (file.exists()) {
-            ag.parseAS(file.getAbsolutePath());
-            ag.addInitialBelsInBB();
+        try {
+            file = new File(ag.getTS().getUserAgArch().getAgName() + ".bb");
+            logger.fine("reading from file " + file);
+            if (file.exists()) {
+                ag.parseAS(file.getAbsolutePath());
+                    ag.addInitialBelsInBB();
+            }
+        } catch (RevisionFailedException e) {
+            logger.log(Level.SEVERE,"Error in init.",e);
         }
     }
 

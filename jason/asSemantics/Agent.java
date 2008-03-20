@@ -24,6 +24,7 @@
 package jason.asSemantics;
 
 import jason.JasonException;
+import jason.RevisionFailedException;
 import jason.architecture.AgArch;
 import jason.asSyntax.Atom;
 import jason.asSyntax.Literal;
@@ -312,7 +313,7 @@ public class Agent {
     }
     
     /** add the initial beliefs in BB and produce the corresponding events */
-    public void addInitialBelsInBB() {
+    public void addInitialBelsInBB() throws RevisionFailedException {
         // Once beliefs are stored in a Stack in the BB, insert them in inverse order
         for (int i=initialBels.size()-1; i >=0; i--) {
             Literal b = initialBels.get(i);
@@ -544,7 +545,7 @@ public class Agent {
      * nothing change, returns null.
      */
     @SuppressWarnings("unchecked")
-    public List<Literal>[] brf(Literal beliefToAdd, Literal beliefToDel,  Intention i) {
+    public List<Literal>[] brf(Literal beliefToAdd, Literal beliefToDel,  Intention i) throws RevisionFailedException {
         // This class does not implement belief revision! It
         // is supposed that a subclass will do it.
         // It simply add/del the belief.
@@ -595,7 +596,7 @@ public class Agent {
      * events. If <i>bel</i> has no source, add
      * <code>source(self)</code>. (the belief is not cloned!)
      */
-    public boolean addBel(Literal bel) {
+    public boolean addBel(Literal bel) throws RevisionFailedException {
         if (!bel.hasSource()) {
         	if (bel instanceof Atom)
         		bel = new Literal(bel.getFunctor());
@@ -614,7 +615,7 @@ public class Agent {
      * If the agent believes in <i>bel</i>, removes it (calling brf)
      * and generate the event.
      */
-    public boolean delBel(Literal bel) {
+    public boolean delBel(Literal bel) throws RevisionFailedException {
         List<Literal>[] result = brf(null, bel, Intention.EmptyInt);
         if (result != null && ts != null) {
             ts.updateEvents(result, Intention.EmptyInt);
@@ -627,7 +628,7 @@ public class Agent {
     /** Removes all occurrences of <i>bel</i> in BB. 
         If <i>un</i> is null, an empty Unifier is used. 
      */
-    public void abolish(Literal bel, Unifier un) {
+    public void abolish(Literal bel, Unifier un) throws RevisionFailedException {
         List<Literal> toDel = new ArrayList<Literal>();
         
         Iterator<Literal> il = getBB().getRelevant(bel);

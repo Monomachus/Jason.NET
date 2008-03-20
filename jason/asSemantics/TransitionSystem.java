@@ -24,6 +24,7 @@
 package jason.asSemantics;
 
 import jason.JasonException;
+import jason.RevisionFailedException;
 import jason.architecture.AgArch;
 import jason.asSyntax.Atom;
 import jason.asSyntax.BodyLiteral;
@@ -516,10 +517,15 @@ public class TransitionSystem {
             // to delete, create events as external to avoid that
             // remove/add create two events for the same intention
 
-            List<Literal>[] result = ag.brf(null, bc, conf.C.SI); // the intention is not the new focus
-            if (result != null) { // really delete something
-                // generate events
-                updateEvents(result,Intention.EmptyInt);
+            try {
+                List<Literal>[] result = ag.brf(null, bc, conf.C.SI); // the intention is not the new focus
+                if (result != null) { // really delete something
+                    // generate events
+                    updateEvents(result,Intention.EmptyInt);
+                }
+            } catch (RevisionFailedException re) {
+                generateGoalDeletion();
+                break;
             }
 
             // add the belief, so no break;
@@ -543,15 +549,19 @@ public class TransitionSystem {
             body.makeVarsAnnon();
             
             // call BRF
-            result = ag.brf(body,null,conf.C.SI); // the intention is not the new focus
-            if (result != null) { // really add something
-                // generate events
-                updateEvents(result,newfocus);
-                if (!setts.sameFocus()) {
-                    updateIntention();
-                }                    
-            } else {
-                updateIntention();                    
+            try {
+                List<Literal>[] result = ag.brf(body,null,conf.C.SI); // the intention is not the new focus
+                if (result != null) { // really add something
+                    // generate events
+                    updateEvents(result,newfocus);
+                    if (!setts.sameFocus()) {
+                        updateIntention();
+                    }                    
+                } else {
+                    updateIntention();                    
+                }
+            } catch (RevisionFailedException re) {
+                generateGoalDeletion();
             }
             break;
             
@@ -569,16 +579,20 @@ public class TransitionSystem {
                 newfocus = conf.C.SI;
 
             // call BRF
-            result = ag.brf(null,body, conf.C.SI); // the intention is not the new focus
-            if (result != null) { // really change something
-                // generate events
-                updateEvents(result,newfocus);
-                if (!setts.sameFocus()) {
-                    updateIntention();
-                }                    
-            } else {
-                updateIntention();                    
-            }
+            try {
+                List<Literal>[] result = ag.brf(null,body, conf.C.SI); // the intention is not the new focus
+                if (result != null) { // really change something
+                    // generate events
+                    updateEvents(result,newfocus);
+                    if (!setts.sameFocus()) {
+                        updateIntention();
+                    }                    
+                } else {
+                    updateIntention();                    
+                }
+            } catch (RevisionFailedException re) {
+                generateGoalDeletion();
+            }            
             break;
         }
     }
@@ -790,7 +804,7 @@ public class TransitionSystem {
     	}
     }
 
-    
+    /** generate a failure event for the current intention */
     private void generateGoalDeletion() throws JasonException {
         IntendedMeans im = conf.C.SI.peek();
         if (im.isGoalAdd()) {
