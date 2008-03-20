@@ -406,6 +406,8 @@
       jj_consume_token(-1);
       throw new ParseException();
     }
+                 if (F instanceof Atom)
+                    F = new Literal(F.getFunctor()); // trigger literal must be a literal and not an atom
                  {if (true) return new Trigger(teOp,teType,F);}
     throw new Error("Missing return statement in function");
   }
@@ -1166,28 +1168,6 @@
     finally { jj_save(1, xla); }
   }
 
-  final private boolean jj_3R_19() {
-    if (jj_scan_token(39)) return true;
-    if (jj_3R_25()) return true;
-    if (jj_scan_token(40)) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_18() {
-    if (jj_3R_24()) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_17() {
-    if (jj_3R_23()) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_22() {
-    if (jj_scan_token(34)) return true;
-    return false;
-  }
-
   final private boolean jj_3R_71() {
     if (jj_scan_token(TK_INTMOD)) return true;
     return false;
@@ -1664,6 +1644,28 @@
     Token xsp;
     xsp = jj_scanpos;
     if (jj_3R_67()) jj_scanpos = xsp;
+    return false;
+  }
+
+  final private boolean jj_3R_19() {
+    if (jj_scan_token(39)) return true;
+    if (jj_3R_25()) return true;
+    if (jj_scan_token(40)) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_18() {
+    if (jj_3R_24()) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_17() {
+    if (jj_3R_23()) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_22() {
+    if (jj_scan_token(34)) return true;
     return false;
   }
 

@@ -310,7 +310,10 @@ Trigger trigger() :
   
   ( F=literal()
   | F=var()
-  )            { return new Trigger(teOp,teType,F); }
+  )            { if (F instanceof Atom) 
+                    F = new Literal(F.getFunctor()); // trigger literal must be a literal and not an atom
+                 return new Trigger(teOp,teType,F); 
+               }
 }
 
 /* Literal */
