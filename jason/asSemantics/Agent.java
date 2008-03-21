@@ -26,7 +26,6 @@ package jason.asSemantics;
 import jason.JasonException;
 import jason.RevisionFailedException;
 import jason.architecture.AgArch;
-import jason.asSyntax.Atom;
 import jason.asSyntax.Literal;
 import jason.asSyntax.LogicalFormula;
 import jason.asSyntax.Plan;
@@ -598,8 +597,6 @@ public class Agent {
      */
     public boolean addBel(Literal bel) throws RevisionFailedException {
         if (!bel.hasSource()) {
-        	if (bel instanceof Atom)
-        		bel = new Literal(bel.getFunctor());
             bel.addAnnot(BeliefBase.TSelf);
         }
         List<Literal>[] result = brf(bel, null, Intention.EmptyInt);

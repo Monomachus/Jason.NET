@@ -68,6 +68,11 @@ public class InternalActionLiteral extends Literal {
 	}
 
     @Override
+    public boolean isAtom() {
+        return false;
+    }
+    
+    @Override
     public boolean canBeAddedInBB() {
 		return false;
 	}

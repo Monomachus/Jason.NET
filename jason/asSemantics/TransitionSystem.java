@@ -508,8 +508,6 @@ public class TransitionSystem {
             if (!body.hasAnnot()) {
                 // do not add source(self) in case the
                 // programmer set some annotation
-                if (body instanceof Atom)
-                    body = new Literal(body.getFunctor());                
                 body.addAnnot(BeliefBase.TSelf);
             }
             Literal bc = (Literal)body.clone();
@@ -535,8 +533,6 @@ public class TransitionSystem {
             if (!body.hasSource()) {
                 // do not add source(self) in case the
                 // programmer set the source
-                if (body instanceof Atom)
-                    body = new Literal(body.getFunctor());                
                 body.addAnnot(BeliefBase.TSelf);
             }
 
@@ -569,8 +565,6 @@ public class TransitionSystem {
             if (!body.hasAnnot()) {
                 // do not add source(self) in case the
                 // programmer set some annotation
-                if (body instanceof Atom)
-                    body = new Literal(body.getFunctor());                
                 body.addAnnot(BeliefBase.TSelf);
             }
 

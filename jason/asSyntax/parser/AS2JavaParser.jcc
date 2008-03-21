@@ -310,10 +310,7 @@ Trigger trigger() :
   
   ( F=literal()
   | F=var()
-  )            { if (F instanceof Atom) 
-                    F = new Literal(F.getFunctor()); // trigger literal must be a literal and not an atom
-                 return new Trigger(teOp,teType,F); 
-               }
+  )            { return new Trigger(teOp,teType,F); }
 }
 
 /* Literal */
@@ -329,11 +326,6 @@ Literal literal() :  { Pred F; Token k; boolean type = Literal.LPos; }
                                       	 throw new ParseException(getSourceRef(F)+" The internal action class for '"+F+"' was not found!");
                                    }
                                 }
-                                if (F.isAtom() && type == Literal.LPos) {
-                                   Atom a = new Atom(F.getFunctor());
-                                   a.setSrc(F);
-                                   return a;
-                                } 
                                 return new Literal(type,F);
                               }
     )
@@ -436,10 +428,17 @@ List terms() : { List listTerms = new ArrayList(); Term v; }
 }
 
 
-Term term() :       { Term u; Object o; }
+Term term() :       { Term u; Object o; Atom a; }
 {
   ( u=list()        
-  | o=arithm_expr() { return (Term)o; } // arithm expr includes literals
+  | o=arithm_expr() { u = (Term)o;            // arithm expr includes literals/atoms/structures
+                      if (u.isAtom()) {
+                         a = new Atom( ((Structure)u).getFunctor());
+                         a.setSrc(u);
+                         return a;
+                      }
+                      return u; 
+                    } 
   | u=string()      
   )
   { return u; }

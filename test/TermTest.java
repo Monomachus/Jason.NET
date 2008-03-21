@@ -725,4 +725,17 @@ public class TermTest extends TestCase {
         assertEquals(0, p.getSingletonVars().size());
 	}	
 	
+	
+	public void testAtomParsing() {
+	    Literal l = Literal.parseLiteral("b");
+	    assertFalse(l instanceof Atom);
+	    
+	    l = Literal.parseLiteral("b(10,a,c(10,x))[ant1,source(c)]");
+	    assertTrue(l.getTerm(1) instanceof Atom);
+        assertFalse(l.getTerm(2) instanceof Atom);
+        assertTrue(l.getAnnots().get(0) instanceof Atom);
+        
+        l =  Literal.parseLiteral("b(a.r)"); // internal actions should not be atoms
+        assertFalse(l.getTerm(0) instanceof Atom);
+	}
 }

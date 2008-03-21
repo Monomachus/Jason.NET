@@ -39,6 +39,11 @@ public class RuleToFunction extends DefaultArithFunction  {
     }
     
     @Override
+    public String getName() {
+        return super.getName()+"_{"+literal+"}";
+    }
+    
+    @Override
     public boolean checkArity(int a) {
         return a == arity;
     }

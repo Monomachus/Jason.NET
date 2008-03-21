@@ -35,7 +35,7 @@ public class ArithFunctionTerm extends Structure implements NumberTerm {
     
 	public ArithFunctionTerm(ArithFunction function) {
 		super(function.getName(), 2);
-        this.function = function;		
+        this.function = function;	
 	}
 
 	public ArithFunctionTerm(ArithFunctionTerm af) {
@@ -52,6 +52,11 @@ public class ArithFunctionTerm extends Structure implements NumberTerm {
 	@Override
 	public boolean isNumeric() {
 		return true;
+	}
+	
+	@Override
+	public boolean isAtom() {
+	    return false;
 	}
 	
 	@Override

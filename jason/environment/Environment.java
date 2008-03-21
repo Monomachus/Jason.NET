@@ -25,7 +25,6 @@
 package jason.environment;
 
 import jason.asSemantics.Unifier;
-import jason.asSyntax.Atom;
 import jason.asSyntax.Literal;
 import jason.asSyntax.Structure;
 
@@ -172,7 +171,6 @@ public class Environment {
 	public void addPercept(Literal per) {
 		if (per != null) {
 			if (! percepts.contains(per)) {
-				if (per instanceof Atom) per = new Literal(per.getFunctor());
 				percepts.add(per);
 				uptodateAgs.clear();
 			}
@@ -240,7 +238,6 @@ public class Environment {
 			} 
 			if (! agl.contains(per)) {
 				uptodateAgs.remove(agName);
-				if (per instanceof Atom) per = new Literal(per.getFunctor());
 				agl.add(per);
 			}
 		}

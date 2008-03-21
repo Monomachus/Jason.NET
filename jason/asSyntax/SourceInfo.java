@@ -21,6 +21,10 @@ public class SourceInfo {
         beginSrcLine = o.beginSrcLine;
         endSrcLine   = o.endSrcLine;
     }
+    public void setSrc(Object o) {
+        if (o instanceof SourceInfo)
+            setSrc((SourceInfo)o);
+    }
     
     public void setSrc(String asSource) {
         source = asSource;
