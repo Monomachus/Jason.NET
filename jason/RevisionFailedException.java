@@ -19,14 +19,6 @@
 // http://www.dur.ac.uk/r.bordini
 // http://www.inf.furb.br/~jomi
 //
-// CVS information:
-//   $Date: 2007-02-19 16:53:54 +0100 (Mon, 19 Feb 2007) $
-//   $Revision: 751 $
-//   $Log$
-//   Revision 1.3  2005/08/12 22:26:08  jomifred
-//   add cvs keywords
-//
-//
 //----------------------------------------------------------------------------
 
 package jason;
