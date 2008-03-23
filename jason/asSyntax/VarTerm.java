@@ -46,7 +46,7 @@ import org.w3c.dom.Element;
  * 
  * @author jomi
  */
-public class VarTerm extends InternalActionLiteral implements NumberTerm, ListTerm, StringTerm, ObjectTerm {
+public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm, ObjectTerm {
 
     private static final long serialVersionUID = 1L;
     private static Logger logger = Logger.getLogger(VarTerm.class.getName());
@@ -110,9 +110,10 @@ public class VarTerm extends InternalActionLiteral implements NumberTerm, ListTe
         }
 
         vl = (Term)vl.clone();
-        if (vl.isPred() && this.hasAnnot()) { // if this var has annots, add them in the value's annots (Experimental)
-        	((Pred)vl).addAnnots(this.getAnnots());
-        }
+        // The below does not conform the rules in manual
+        //if (vl.isPred() && this.hasAnnot()) { // if this var has annots, add them in the value's annots (Experimental)
+        //	((Pred)vl).addAnnots(this.getAnnots());
+        //}
         
         value = vl;        
         resetHashCodeCache();
@@ -224,6 +225,9 @@ public class VarTerm extends InternalActionLiteral implements NumberTerm, ListTe
                 c.apply(un);
                 if (c.hasValue() && c.getValue() instanceof LogicalFormula) {
                     return ((LogicalFormula)c.getValue()).logicalConsequence(ag, un);
+                } else {
+                    // the variable is still a Var, find all bels that unify.
+                    return super.logicalConsequence(ag, un);                
                 }
             }
         }

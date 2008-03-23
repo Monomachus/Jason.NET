@@ -1,5 +1,9 @@
 package test;
 
+import jason.RevisionFailedException;
+import jason.architecture.AgArch;
+import jason.asSemantics.Agent;
+import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.ArithExpr;
 import jason.asSyntax.DefaultTerm;
@@ -16,6 +20,7 @@ import jason.asSyntax.ArithExpr.ArithmeticOp;
 import jason.asSyntax.parser.SimpleCharStream;
 import jason.asSyntax.parser.Token;
 import jason.asSyntax.parser.as2jTokenManager;
+import jason.infra.centralised.CentralisedAgArch;
 
 import java.io.StringReader;
 import java.util.Iterator;
@@ -287,6 +292,7 @@ public class VarTermTest extends TestCase {
     	assertFalse(u.unifies(v2, Literal.parseLiteral("open[source(a)]")));
     }
 
+    /*
     public void testVarWithAnnots5() {
     	// P -> open[source(a)]
     	// P[source(self)]
@@ -297,7 +303,37 @@ public class VarTermTest extends TestCase {
     	v1.apply(u);
     	assertEquals(v1.getAnnots().size(), 2);
     }
+    */
+    
+    
+    public void testVarWithAnnotsInLogCons() throws RevisionFailedException {
+        Agent ag = new Agent();
+        AgArch arch = new AgArch();
+        arch.setArchInfraTier(new CentralisedAgArch());
+        ag.setTS(new TransitionSystem(ag, null, null, arch));
 
+        ag.addBel(Literal.parseLiteral("b1[b]"));
+        ag.addBel(Literal.parseLiteral("b2[d]"));
+        
+        Unifier u = new Unifier();
+        VarTerm v1 = VarTerm.parseVar("P[d]");
+        assertEquals(2, iteratorSize(ag.getBB().getRelevant(v1)));
+        Iterator<Unifier> i = v1.logicalConsequence(ag, u);
+        assertTrue(i.hasNext());
+        u = i.next(); // u = {P[d]=b2}
+        v1.apply(u);
+        assertEquals("b2",v1.toString());
+    }
+    
+    @SuppressWarnings("unchecked")
+    private int iteratorSize(Iterator i) {
+        int c = 0;
+        while (i.hasNext()) {
+            i.next();
+            c++;
+        }
+        return c;
+    }
 
     public static void main(String[] a) {
         new VarTermTest().testVarWithAnnots3();
