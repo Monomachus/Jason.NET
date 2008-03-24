@@ -86,6 +86,10 @@ public class RunCentralisedMAS {
 
     public JButton                   btDebug;
     
+    public RunCentralisedMAS() {
+        runner = this;
+    }
+    
     public static void main(String[] args) {
         runner = new RunCentralisedMAS();
         runner.init(args);

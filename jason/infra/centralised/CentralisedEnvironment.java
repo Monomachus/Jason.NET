@@ -44,7 +44,7 @@ public class CentralisedEnvironment implements EnvironmentInfraTier {
 
     /** the user customisation class for the environment */
 	private Environment userEnv;
-	private RunCentralisedMAS masRunner = null;
+	private RunCentralisedMAS masRunner = RunCentralisedMAS.getRunner();
 	private boolean running = true;
     
     private static Logger logger = Logger.getLogger(CentralisedEnvironment.class.getName());

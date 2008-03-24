@@ -125,11 +125,8 @@ public class Literal extends Pred implements LogicalFormula {
      * 
      * Returns an iterator for all unifiers that are logCons.
      */
-    @SuppressWarnings("unchecked")
     public Iterator<Unifier> logicalConsequence(final Agent ag, final Unifier un) {
-        final Literal lclone = (Literal)this.clone();
-        lclone.apply(un);
-        final Iterator<Literal> il = ag.getBB().getRelevant(lclone);
+        final Iterator<Literal> il = ag.getBB().getRelevant(this);
         if (il == null) // no relevant bels
             return LogExpr.EMPTY_UNIF_LIST.iterator();
         
@@ -137,7 +134,7 @@ public class Literal extends Pred implements LogicalFormula {
             Unifier           current = null;
             Iterator<Unifier> ruleIt = null; // current rule solutions iterator
             Rule              rule; // current rule
-            Literal           lcloneAnnon = null; // a copy of lclone with makeVarsAnnon
+            Literal           cloneAnnon = null; // a copy of the literal with makeVarsAnnon
             AgArch            arch = ag.getTS().getUserAgArch();
             boolean           needsUpdate = true;
             
@@ -169,7 +166,7 @@ public class Literal extends Pred implements LogicalFormula {
                     rhead.apply(ruleUn);
                     
                     Unifier unC = (Unifier) un.clone();
-                    if (unC.unifiesNoUndo(lclone, rhead)) {
+                    if (unC.unifiesNoUndo(Literal.this, rhead)) {
                         current = unC;
                         return;
                     }
@@ -185,12 +182,13 @@ public class Literal extends Pred implements LogicalFormula {
                         // make its vars anonymous, 
                         // it is used to define what will be the unifier used
                         // inside the rule.
-                        if (lcloneAnnon == null) {
-                            lcloneAnnon = (Literal)lclone.clone();
-                            lcloneAnnon.makeVarsAnnon();
+                        if (cloneAnnon == null) {
+                            cloneAnnon = (Literal)Literal.this.clone();
+                            cloneAnnon.apply(un);
+                            cloneAnnon.makeVarsAnnon();
                         }
                         Unifier ruleUn = new Unifier();
-                        if (ruleUn.unifiesNoUndo(lcloneAnnon, rule)) { // the rule head unifies with the literal
+                        if (ruleUn.unifiesNoUndo(cloneAnnon, rule)) { // the rule head unifies with the literal
                             ruleIt = rule.getBody().logicalConsequence(ag,ruleUn);
                             get();
                             if (current != null) { // if it get a value
@@ -198,35 +196,8 @@ public class Literal extends Pred implements LogicalFormula {
                             }
                         }
                     } else {
-                        /* -- the problem below was solved by translating test_rule(A,A) to test_rule(A,A):-true.
-                        if (!b.isGround()) {
-                            // All the code below is necessary for situations like
-                            //    test_rule(A,A).
-                            //    !test(test_wrong_value).
-                            //    +!test(A) : test_rule(Test,test_right_value) <- .println("Test = ",Test).
-                            // where a local variable has the same name as a variable in the belief.
-                            //
-                            // So, the solution is
-                            // 1. create a new empy unifier to unify lclone with b 
-                            //                                           ; lclone is test_rule(Test,test_right_value)
-                            //                                           ; b is test_rule(A,A)
-                            //                                           ; u is {A=test_right_value, Test=test_right_value}
-                            //                                           ; note the value of A in this unifier
-                            // 2. create another clone b of lclone to apply this
-                            //    unifier u                              ; c after apply is test_rule(test_right_value,test_right_value)
-                            // 3. create the result unifier as a clone of the current (un)
-                            // 4. using the new unifier, unify lclone and
-                            //    b to get only the value of Test and not the A
-                            //    in the result unifier
-                            Unifier u = new Unifier();
-                            if (u.unifies(lclone, b)) {
-                                b = (Literal)lclone.clone();
-                                b.apply(u);
-                            }
-                        }
-                        */
                         Unifier u = (Unifier) un.clone();
-                        if (u.unifiesNoUndo(lclone, b)) {
+                        if (u.unifiesNoUndo(Literal.this, b)) {
                             current = u;
                             return;
                         }

@@ -60,7 +60,7 @@ public class CentralisedAgArch implements Runnable, AgArchInfraTier {
 
 	protected CentralisedEnvironment    infraEnv     = null;
     private CentralisedExecutionControl infraControl = null;
-    private RunCentralisedMAS		    masRunner    = null;
+    private RunCentralisedMAS		    masRunner    = RunCentralisedMAS.getRunner();
 
     /** The user implementation of the architecture */
     protected AgArch        userAgArch;

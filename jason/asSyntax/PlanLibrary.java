@@ -183,7 +183,14 @@ public class PlanLibrary implements Iterable<Plan> {
     	return plans.iterator();
     }
 
-
+    /** remove all plans */
+    public void clear() {
+        planLabels.clear();
+        plans.clear();
+        varPlans.clear();
+        relPlans.clear();
+    }
+    
     /** 
 	 * Remove a plan represented by the label <i>pLabel</i>.
 	 * In case the plan has many sources, only the plan's source is removed. 

@@ -136,8 +136,11 @@ public class Unifier implements Cloneable {
         boolean ok = unifyTerms(t1g, t2g);
 
         // if np1 is a var that was unified, clear its annots, as in
-        //      X[An] = p(1)[a]
-        // X is mapped to p(1) and not p(1)[a]
+        //      X[An] = p(1)[a,b]
+        // X is mapped to p(1) and not p(1)[a,b]
+        // (if the user wants the "remaining" annots, s/he should write
+        //      X[An|R] = p(1)[a,b]
+        // X = p(1), An = a, R=[b]
         if (ok && np1 != null) { // they are predicates
 	        if (np1.isVar() && np1.hasAnnot()) {
 	        	Term np1vl = function.get((VarTerm) np1);
@@ -306,10 +309,10 @@ public class Unifier implements Cloneable {
         if (currentVl != null && currentVl instanceof VarsCluster) {
             VarsCluster cluster = (VarsCluster) currentVl;
             for (VarTerm cvt : cluster)
-                function.put(cvt, value); //(Term) value.clone());
+                function.put(cvt, value); //(Term) value.clone()); // the clone is done in apply
         } else {
             // no value in cluster
-            function.put((VarTerm) vt.clone(), value); //(Term) value.clone());
+            function.put((VarTerm) vt.clone(), value); //(Term) value.clone());  // the clone is done in apply
         }
         return true;
     }

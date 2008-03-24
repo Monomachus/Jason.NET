@@ -6,6 +6,7 @@ import jason.asSemantics.Agent;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.ArithExpr;
+import jason.asSyntax.Atom;
 import jason.asSyntax.DefaultTerm;
 import jason.asSyntax.ListTerm;
 import jason.asSyntax.ListTermImpl;
@@ -268,6 +269,11 @@ public class VarTermTest extends TestCase {
     	// X[a,b] = Y[a] - not ok
     	u = new Unifier();
     	assertFalse(u.unifies(v2, v1));
+
+    	assertTrue(u.unifies(v1, v2));
+    	assertTrue(u.unifies(new Atom("vvv"), v1));
+    	v1.apply(u);
+    	assertEquals("vvv", v1.toString());
     }
 
     public void testVarWithAnnots3() {
@@ -276,7 +282,7 @@ public class VarTermTest extends TestCase {
     	VarTerm v2 = VarTerm.parseVar("Y[a,c|R]");
     	Unifier u = new Unifier();
     	assertTrue(u.unifies(v1, v2));
-        assertEquals(u.get("R").toString(),"[b,d]");
+        assertEquals("[b,d]",u.get("R").toString());
     }
     
     public void testVarWithAnnots4() {
@@ -290,6 +296,19 @@ public class VarTermTest extends TestCase {
     	VarTerm v2 = VarTerm.parseVar("X[source(self)]");
     	u = new Unifier();
     	assertFalse(u.unifies(v2, Literal.parseLiteral("open[source(a)]")));
+    }
+
+    public void testVarWithAnnots5() {
+        // X[A|R] = p(1)[a,b,c] - ok and 
+        // X = p(1), A = a, R=[b,c]
+        VarTerm v = VarTerm.parseVar("X[A|R]");
+        Unifier u = new Unifier();
+        assertTrue(u.unifies(v, Literal.parseLiteral("p(1)[a,b,c]")));
+        assertEquals("[b,c]", u.get("R").toString());
+        assertEquals("a", u.get("A").toString());
+        assertEquals("p(1)", u.get(v).toString());
+        v.apply(u);
+        assertEquals("p(1)", v.toString());
     }
 
     /*

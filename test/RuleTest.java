@@ -107,8 +107,7 @@ public class RuleTest extends TestCase {
         // min([C|T],V,M) :- C < V & min(T,C,M).
         // min([_|T],V,M) :- min(T,V,M).
         //ag.getBB().add(Literal.parseLiteral("min([],M,M)"));
-        ag.getBB().add(new Rule(Literal.parseLiteral("min([],M,M)"), 
-                LogExpr.parseExpr(".println(fim,M)")));
+        ag.getBB().add(new Rule(Literal.parseLiteral("min([],M,M)"), Literal.LTrue));
         ag.getBB().add(new Rule(Literal.parseLiteral("min([op(C)|T], op(V), M)"), 
                 LogExpr.parseExpr("C < V & min(T,op(C),M)")));
         ag.getBB().add(new Rule(Literal.parseLiteral("min([op(C)|T], op(V), M)"), 
