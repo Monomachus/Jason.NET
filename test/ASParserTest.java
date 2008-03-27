@@ -181,22 +181,18 @@ public class ASParserTest extends TestCase {
         File[] files = dir.listFiles();
         if (files != null) {
             for (File f: files) {
-                if (f.isDirectory()) {
-                    parseDir(f);
-                } else if (f.getName().endsWith(MAS2JProject.AS_EXT)) {
-                    try {
+                try {
+                    if (f.isDirectory()) {
+                        parseDir(f);
+                    } else if (f.getName().endsWith(MAS2JProject.AS_EXT)) {
                         as2j parser = new as2j(new FileInputStream(f));
                         parser.agent((Agent)null);
-                    } catch (Exception e) {
-                        fail("Error parsing "+f);
-                    }
-                } else if (f.getName().endsWith(MAS2JProject.EXT)) {
-                    try {
+                    } else if (f.getName().endsWith(MAS2JProject.EXT)) {
                         mas2j parser = new mas2j(new FileInputStream(f));
                         parser.mas();
-                    } catch (Exception e) {
-                        fail("Error parsing "+f);
                     }
+                } catch (Exception e) {
+                    fail("Error parsing "+f);
                 }
             }
         }

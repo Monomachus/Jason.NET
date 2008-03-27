@@ -351,7 +351,7 @@ Literal literal() :  { Pred F; Token k; boolean type = Literal.LPos; }
 
 
 /* Plan body */
-void plan_body(ArrayList bd) : { BodyLiteral F; }
+void plan_body(List bd) :  { BodyLiteral F; }
 {
   F=body_formula()         { if (! F.getLogicalFormula().equals(Literal.LTrue)) {
                                bd.add(F);
@@ -362,16 +362,10 @@ void plan_body(ArrayList bd) : { BodyLiteral F; }
 }
 
 
-BodyLiteral body_formula() :  { Literal A; Token k;
-                                BodyType formType = BodyType.action;
-                                Object L;
-                                Object rel; VarTerm v;
-                              }
+BodyLiteral body_formula() : 
+                       { BodyType formType = BodyType.action;  Object B; }
 {
- 
- ( LOOKAHEAD(4)
-   // goals and belief updates
-   (  "!"              { formType = BodyType.achieve; }
+   [  "!"              { formType = BodyType.achieve; }
     | "!!"             { formType = BodyType.achieveNF; }
     | "?"              { formType = BodyType.test; }
     | "+"              { formType = BodyType.addBel; }
@@ -379,37 +373,29 @@ BodyLiteral body_formula() :  { Literal A; Token k;
         ["+"           { formType = BodyType.delAddBel; }
         ]
       ) 
-   )
-   ( A = literal()     { return new BodyLiteral(formType,A); }
-   | v = var()         { return new BodyLiteral(formType,v); } // used in communication "+C"
-   | "(" L = log_expr() ")" 
-                       { if (formType == BodyType.test) {
-                            if (L instanceof LogicalFormula)
-                               return new BodyLiteral(BodyType.test, (LogicalFormula)L);  // used in ?(a & b)
-                            else
-                               throw new ParseException(getSourceRef(L)+" The argument in ?(<logical formula>) is not a logical formula.");
-                         } else { 
-                            throw new ParseException(getSourceRef(L)+" Constructions like (<logical formula>) are possible only for test goal: ?(<logical formula>).");
-                         }
-                       }
-   )
- |
-  // actions or expressions
-  rel = rel_expr()
-                       { if (rel instanceof Literal) {
-                            return new BodyLiteral(formType, (Literal)rel); // action
-                         } else if (rel instanceof RelExpr) {
-                            return new BodyLiteral(BodyType.constraint, (RelExpr)rel); // constraint 
+   ]
+   
+   B = log_expr()
+                       { if (B instanceof Literal) {
+                            return new BodyLiteral(formType, (Literal)B); 
+                         } else if (formType == BodyType.action && B instanceof RelExpr) {
+                            return new BodyLiteral(BodyType.constraint, (RelExpr)B); // constraint 
                          } else {
-                            throw new ParseException(getSourceRef(rel)+" A body formula should be an action or a constraint (RelExpr).");
+	                        if (formType == BodyType.test) {
+	                           if (B instanceof LogicalFormula)
+	                              return new BodyLiteral(BodyType.test, (LogicalFormula)B);  // used in ?(a & b)
+	                           else
+	                              throw new ParseException(getSourceRef(B)+" The argument for ? is not a logical formula.");
+	                        } else { 
+                               throw new ParseException(getSourceRef(B)+" Unknown body formula.");
+	                        }
                          }
                        }
- )
 }
 
 
 /* Annotated Formulae */
-Pred pred() :       { Token K; Pred p; Term t; List l; ListTerm lt;}
+Pred pred() :       { Token K; Pred p; List l; ListTerm lt;}
 {
   (
    K=<ATOM>
