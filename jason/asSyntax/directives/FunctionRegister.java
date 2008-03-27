@@ -81,6 +81,8 @@ public class FunctionRegister implements Directive {
     
     @SuppressWarnings("unchecked")
 	public Agent process(Pred directive, Agent outerContent, Agent innerContent) {
+        if (outerContent == null)
+            return null;
     	try {
     	    String id = ((StringTerm)directive.getTerm(0)).getString();
     	    if (directive.getArity() == 1) {

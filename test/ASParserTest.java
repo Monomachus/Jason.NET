@@ -12,7 +12,11 @@ import jason.asSyntax.Plan;
 import jason.asSyntax.RelExpr;
 import jason.asSyntax.parser.as2j;
 import jason.infra.centralised.CentralisedAgArch;
+import jason.mas2j.MAS2JProject;
+import jason.mas2j.parser.mas2j;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.StringReader;
 import java.util.Iterator;
 
@@ -157,5 +161,44 @@ public class ASParserTest extends TestCase {
         //}
         assertTrue(a.getPL().getPlans().size() == 5);
         
+    }
+    
+    public void testParsingAllSources() {
+        parseDir(new File("./examples"));
+        parseDir(new File("./demos"));
+        parseDir(new File("./applications/jason-moise"));
+        parseDir(new File("./applications/jason-team"));
+        parseDir(new File("./doc/mini-tutorial"));        
+        parseDir(new File("../Jason-applications/examples-site-jBook"));
+        parseDir(new File("../Jason-applications/Tests"));
+    }
+    
+    public void parseDir(File dir) {
+        if (!dir.exists())
+            return;
+        if (dir.getName().endsWith(".svn"))
+            return;
+        File[] files = dir.listFiles();
+        if (files != null) {
+            for (File f: files) {
+                if (f.isDirectory()) {
+                    parseDir(f);
+                } else if (f.getName().endsWith(MAS2JProject.AS_EXT)) {
+                    try {
+                        as2j parser = new as2j(new FileInputStream(f));
+                        parser.agent((Agent)null);
+                    } catch (Exception e) {
+                        fail("Error parsing "+f);
+                    }
+                } else if (f.getName().endsWith(MAS2JProject.EXT)) {
+                    try {
+                        mas2j parser = new mas2j(new FileInputStream(f));
+                        parser.mas();
+                    } catch (Exception e) {
+                        fail("Error parsing "+f);
+                    }
+                }
+            }
+        }
     }
 }

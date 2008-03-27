@@ -25,9 +25,11 @@ public class Include implements Directive {
     private List<String> aslSourcePath = null;
     
     public Agent process(Pred directive, Agent outerContent, Agent innerContent) {
+        if (outerContent == null)
+            return null;
     	String file = ((StringTerm)directive.getTerm(0)).getString();
         try {
-        	String outerPrefix = outerContent.getASLSrc(); // the source file that has the include directive
+            String outerPrefix = outerContent.getASLSrc(); // the source file that has the include directive
 	    	InputStream in;
 	    	if (outerContent != null && outerPrefix != null) {
 	    		// check if the outer is URL
@@ -69,7 +71,7 @@ public class Include implements Directive {
             logger.fine("as2j: AgentSpeak program '"+file+"' parsed successfully!");
             return ag;
         } catch (FileNotFoundException e) {
-            logger.log(Level.SEVERE,"The included file '"+file+"' was not found! (it is being included in the agent "+outerContent.getASLSrc()+")");
+            logger.log(Level.SEVERE,"The included file '"+file+"' was not found! (it is being included in the agent '"+outerContent.getASLSrc()+"')");
         } catch (Exception e) {
             logger.log(Level.SEVERE,"as2j: error parsing \"" + file + "\"", e);
         }
