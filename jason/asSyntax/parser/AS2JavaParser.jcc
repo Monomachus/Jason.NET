@@ -287,13 +287,13 @@ Literal initial_goal() : { Literal g; }
 /* Plan */
 Plan plan() :         { Token k; Pred L = null; 
                         Trigger T; Object C = null; 
-                        ArrayList B = new ArrayList(); 
+                        BodyLiteral B = null; 
                         int start = -1, end;}
 {
     [ k = <TK_LABEL_AT> L=pred()  { start = k.beginLine; }   ]
     T=trigger()         
     [ k = ":"  C=log_expr()      { if (start == -1) start = k.beginLine; } ] 
-    [ k = "<-" plan_body(B)      { if (start == -1) start = k.beginLine; } ]  
+    [ k = "<-" B = plan_body()   { if (start == -1) start = k.beginLine; } ]  
     k = "."                      { if (start == -1) start = k.beginLine; } 
                    { end = k.beginLine;
                      InternalActionLiteral ial = null;
@@ -303,8 +303,9 @@ Plan plan() :         { Token k; Pred L = null;
                      Plan p = new Plan(L,T,(LogicalFormula)C,B);
                      p.setSrcLines(start,end);
                      p.setSrc(asSource);
-                     return p;}
+                     return p;
                    }
+}
 
 /* Trigger */
 Trigger trigger() : 
@@ -351,14 +352,19 @@ Literal literal() :  { Pred F; Token k; boolean type = Literal.LPos; }
 
 
 /* Plan body */
-void plan_body(List bd) :  { BodyLiteral F; }
+BodyLiteral plan_body() :  { BodyLiteral F; BodyLiteral R = null; }
 {
-  F=body_formula()         { if (! F.getLogicalFormula().equals(Literal.LTrue)) {
-                               bd.add(F);
-                             } 
-                           }
+  F = body_formula()       
                  
-  [ ";" plan_body(bd) ]
+  [ ";" R = plan_body() ]
+                           { if (F.getTerm().equals(Literal.LTrue))
+                                return R;
+                             if (R == null)
+                                F.setNext(new BodyLiteral());
+                             else 
+                                F.setNext(R);
+                             return F;
+                           }
 }
 
 
@@ -377,13 +383,15 @@ BodyLiteral body_formula() :
    
    B = log_expr()
                        { if (B instanceof Literal) {
+                            if ( ((Literal)B).isInternalAction() )
+                               formType = BodyType.internalAction;
                             return new BodyLiteral(formType, (Literal)B); 
                          } else if (formType == BodyType.action && B instanceof RelExpr) {
                             return new BodyLiteral(BodyType.constraint, (RelExpr)B); // constraint 
                          } else {
 	                        if (formType == BodyType.test) {
 	                           if (B instanceof LogicalFormula)
-	                              return new BodyLiteral(BodyType.test, (LogicalFormula)B);  // used in ?(a & b)
+	                              return new BodyLiteral(BodyType.test, (Term)B);  // used in ?(a & b)
 	                           else
 	                              throw new ParseException(getSourceRef(B)+" The argument for ? is not a logical formula.");
 	                        } else { 

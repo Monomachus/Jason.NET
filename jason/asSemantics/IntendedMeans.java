@@ -70,16 +70,18 @@ public class IntendedMeans implements Serializable {
     	// used for clone
     }
 
-    /** removes the current action of the IM */
-    public BodyLiteral removeCurrentStep() {
-        if (!plan.getBody().isEmpty())
-            return plan.getBody().remove(0);
-        else
+    /** removes the current action of the IM and returns the term of the body */
+    public Term removeCurrentStep() {
+        BodyLiteral current = plan.getBody();
+        if (current.isEmpty()) {
             return null;
+        } else {
+            return current.remove(0);
+        }
     }
 
     public BodyLiteral getCurrentStep() {
-        return plan.getBody().get(0);
+        return plan.getBody();
     }
 
     
@@ -127,9 +129,9 @@ public class IntendedMeans implements Serializable {
         Structure im = new Structure("im");
         im.addTerm(new StringTermImpl(plan.getLabel().toString()));
         ListTerm lt = new ListTermImpl();
-        for (BodyLiteral bd: plan.getBody()) {
-            BodyLiteral c = (BodyLiteral)bd.clone();
-            c.getLogicalFormula().apply(unif);
+        for (Term bd: plan.getBody()) {
+            Term c = (Term)bd.clone();
+            c.apply(unif);
             lt.add(new StringTermImpl(c.toString()));
         }
         im.addTerm(lt);

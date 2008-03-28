@@ -26,8 +26,13 @@ package jason.asSyntax;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-/** Represents an item of a plan body (achieve, test, action, ...) */
-public class BodyLiteral extends SourceInfo implements Cloneable {
+/** 
+ * Represents a plan body item (achieve, test, action, ...) and its successors, 
+ * it is thus like a list term.
+ *  
+ * @author Jomi  
+ */
+public class BodyLiteral extends ListTermImpl implements Cloneable {
 
     public enum BodyType {
         action {          public String toString() { return ""; }},
@@ -41,24 +46,15 @@ public class BodyLiteral extends SourceInfo implements Cloneable {
         constraint {      public String toString() { return ""; }}
     }
 
-    private LogicalFormula  formula;
     private BodyType        formType;
     
-    /** used of actions, internal actions, test goals, achieve goals, adds, removes */
-    public BodyLiteral(BodyType t, Literal l) {
-        formula = (Literal) l.clone();
-        formType = t;
-        if (l.isInternalAction())
-            formType = BodyType.internalAction;
-        setSrc(l);
+    public BodyLiteral() {
     }
-
-    /** used for test goals and constraints (the argument is a logical formula) */
-    public BodyLiteral(BodyType t, LogicalFormula lf) {
-        formula = (LogicalFormula) lf.clone();
+    
+    public BodyLiteral(BodyType t, Term b) {
+        setTerm(b);
+        setSrc(b);
         formType = t;
-        if (lf instanceof SourceInfo)
-            setSrc((SourceInfo)lf);
     }
 
     public BodyType getType() {
@@ -66,40 +62,55 @@ public class BodyLiteral extends SourceInfo implements Cloneable {
     }
 
     public Literal getLiteralFormula() {
-        if (formula instanceof Literal)
-            return (Literal)formula;
+        Term t = getTerm();
+        if (t instanceof Literal)
+            return (Literal)t;
         else 
             return null;
     }
     
-    public LogicalFormula getLogicalFormula() {
-        return formula;
-    }
-
     @Override
     public boolean equals(Object o) {
-        if (o != null && o instanceof BodyLiteral) {
-            BodyLiteral b = (BodyLiteral) o;
-            return formType == b.formType && formula.equals(b.formula);
+        if (o == null) return false;
+        if (o == this) return true;
+        if (o instanceof BodyLiteral) {
+            BodyLiteral b = (BodyLiteral)o;
+            return formType == b.formType && super.equals(o);
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return formType.hashCode() + formula.hashCode();
+        return formType.hashCode() + super.hashCode();
     }
 
     public Object clone() {
-        if (formType == BodyType.test || formType == BodyType.constraint) {
-            return new BodyLiteral(formType, formula);
+        BodyLiteral c;
+        Term t = getTerm();
+        if (t == null) { // empty body
+            c = new BodyLiteral();
         } else {
-            return new BodyLiteral(formType, (Literal)formula);
+            c = new BodyLiteral(formType, (Term)t.clone());
+            c.setNext((Term)getNext().clone());
         }
+        return c;
     }
 
+    @Override
+    protected void setValuesFrom(ListTerm lt) {
+        super.setValuesFrom(lt);
+        formType = ((BodyLiteral)lt).formType;
+    }
+    
+    
     public String toString() {
-        return formType + formula.toString();
+        if (isEmpty()) 
+            return "";
+        else if (getNext().isEmpty())
+            return formType.toString() + getTerm() + ".";
+        else
+            return formType.toString() + getTerm() + "; " + getNext();
     }
 
     /** get as XML */
@@ -108,7 +119,7 @@ public class BodyLiteral extends SourceInfo implements Cloneable {
         if (formType.toString().length() > 0) {
             u.setAttribute("type", formType.toString());
         }
-        u.appendChild(formula.getAsDOM(document));
+        u.appendChild( ((Structure)getTerm()).getAsDOM(document));
         return u;
     }
 }

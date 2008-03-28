@@ -1,11 +1,14 @@
 package test;
 
 import jason.JasonException;
+import jason.asSyntax.BodyLiteral;
+import jason.asSyntax.ListTerm;
 import jason.asSyntax.Plan;
 import jason.asSyntax.PlanLibrary;
 import jason.asSyntax.Trigger;
 import jason.asSyntax.parser.ParseException;
 
+import java.util.Iterator;
 import java.util.List;
 
 import junit.framework.TestCase;
@@ -46,5 +49,35 @@ public class PlanTest extends TestCase {
 
     	pls = pl.getAllRelevant(Trigger.parseTrigger("+bla"));
     	assertEquals(0, pls.size());	
+    }
+    
+    public void testParser() {
+        Plan p = Plan.parse("+te : a & b <- a1; a2; .print(a); !g1; !!g2; ?test1; 10 > 3; +b1; -b2; -+b3.");
+        p = (Plan)p.clone();
+        Iterator<ListTerm> i = p.getBody().listTermIterator();
+        assertEquals( BodyLiteral.BodyType.action, ((BodyLiteral)i.next()).getType());
+        assertEquals( BodyLiteral.BodyType.action, ((BodyLiteral)i.next()).getType());
+        assertEquals( BodyLiteral.BodyType.internalAction, ((BodyLiteral)i.next()).getType());
+        assertEquals( BodyLiteral.BodyType.achieve, ((BodyLiteral)i.next()).getType());
+        assertEquals( BodyLiteral.BodyType.achieveNF, ((BodyLiteral)i.next()).getType());
+        assertEquals( BodyLiteral.BodyType.test, ((BodyLiteral)i.next()).getType());
+        assertEquals( BodyLiteral.BodyType.constraint, ((BodyLiteral)i.next()).getType());
+        assertEquals( BodyLiteral.BodyType.addBel, ((BodyLiteral)i.next()).getType());
+        assertEquals( BodyLiteral.BodyType.delBel, ((BodyLiteral)i.next()).getType());
+        assertEquals( BodyLiteral.BodyType.delAddBel, ((BodyLiteral)i.next()).getType());
+        assertFalse(i.hasNext());
+    }
+
+    public void testDelete() {
+        Plan p = Plan.parse("+te : a & b <- !a1; ?a2; .print(a); !g1.");
+        assertEquals(4, p.getBody().size());
+        p.getBody().remove(0);
+        assertEquals(3, p.getBody().size());
+        assertEquals(BodyLiteral.BodyType.test, p.getBody().getType());
+        p.getBody().remove(0); // 2
+        p.getBody().remove(0); // 1
+        assertEquals(1, p.getBody().size());
+        p.getBody().remove(0); // 1
+        assertTrue(p.getBody().isEmpty());
     }
 }

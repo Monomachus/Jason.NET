@@ -45,7 +45,7 @@ public abstract class BinaryStructure extends Structure {
 	public BinaryStructure(String id, Term arg) {
 		super(id,1);
 		addTerm( arg );
-		if (arg instanceof SourceInfo) setSrc((SourceInfo)arg);
+		setSrc(arg);
 	}
 	
 	public boolean isUnary() {

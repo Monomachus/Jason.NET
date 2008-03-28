@@ -127,10 +127,10 @@ public class ListTermImpl extends Structure implements ListTerm {
 	}
 	
 	public ListTerm getNext() {
-		try {
+	    if (next instanceof ListTerm)
 			return (ListTerm)next;
-		} catch (Exception e){}
-		return null;
+	    else
+	        return null;
 	}
 	
 	
@@ -544,12 +544,16 @@ public class ListTermImpl extends Structure implements ListTerm {
         };
 	}
 
+	protected void setValuesFrom(ListTerm lt) {
+        this.term = lt.getTerm();
+        this.next = lt.getNext();
+	}
+	
 	public Term remove(int index) {
 		if (index == 0) {
 			Term bt = this.term;
 			if (getNext() != null) {
-				this.term = getNext().getTerm();
-				this.next = (Term)getNext().getNext();
+			    setValuesFrom(getNext());
 			} else {
 				clear();
 			}
@@ -563,8 +567,7 @@ public class ListTermImpl extends Structure implements ListTerm {
 	public boolean remove(Object o) {
 		if (term != null && term.equals(o)) {
 			if (getNext() != null) {
-				this.term = getNext().getTerm();
-				this.next = (Term)getNext().getNext();
+                setValuesFrom(getNext());
 			} else {
 				clear();
 			}

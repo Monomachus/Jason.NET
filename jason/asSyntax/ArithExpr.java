@@ -133,7 +133,7 @@ public class ArithExpr extends ArithFunctionTerm implements NumberTerm {
     	super(oper.toString(),1);
     	addTerm(t1);
         op = oper;
-		if (t1 instanceof SourceInfo) setSrc((SourceInfo)t1);
+		setSrc(t1);
     }
     
     private ArithExpr(ArithExpr ae) { // for clone

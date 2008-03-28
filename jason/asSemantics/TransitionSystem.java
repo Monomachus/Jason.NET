@@ -35,6 +35,7 @@ import jason.asSyntax.Literal;
 import jason.asSyntax.LogicalFormula;
 import jason.asSyntax.Plan;
 import jason.asSyntax.PlanLibrary;
+import jason.asSyntax.Structure;
 import jason.asSyntax.Term;
 import jason.asSyntax.Trigger;
 import jason.asSyntax.Trigger.TEOperator;
@@ -158,15 +159,15 @@ public class TransitionSystem {
                 //    .send(ag1,askOne, value, X)
                 // if the answer was tell 3, unifies X=3
                 // if the answer was untell 3, unifies X=false
-                BodyLiteral send = intention.peek().removeCurrentStep();
+                Structure send = (Structure)intention.peek().removeCurrentStep();
                 if (m.isUnTell()) {
-                    if (send.getLiteralFormula().getTerm(1).toString().equals("askOne")) {
+                    if (send.getTerm(1).toString().equals("askOne")) {
                         content = Literal.LFalse;
                     } else { // the .send is askAll
                         content = new ListTermImpl(); // the answer is an empty list
                     }
                 }
-                if (intention.peek().getUnif().unifies(send.getLiteralFormula().getTerm(3), content)) {
+                if (intention.peek().getUnif().unifies(send.getTerm(3), content)) {
                     getC().addIntention(intention);
                 } else {
                     conf.C.SI = intention;
@@ -402,12 +403,13 @@ public class TransitionSystem {
         }
         Unifier     u = im.unif;
         BodyLiteral h = im.getCurrentStep(); 
-
-        h.getLogicalFormula().apply(u);
+        Term        bTerm = h.getTerm();
+        
+        bTerm.apply(u);
         
         Literal body = null;
-        if (h.getLogicalFormula() instanceof Literal)
-            body = h.getLiteralFormula();
+        if (bTerm instanceof Literal)
+            body = (Literal)bTerm;
 
         switch (h.getType()) {
 
@@ -446,7 +448,7 @@ public class TransitionSystem {
             break;
 
         case constraint:
-            Iterator<Unifier> iu = h.getLogicalFormula().logicalConsequence(ag, u);
+            Iterator<Unifier> iu = ((LogicalFormula)bTerm).logicalConsequence(ag, u);
             if (iu.hasNext()) {
                 im.unif = iu.next();
                 updateIntention();
@@ -475,7 +477,7 @@ public class TransitionSystem {
 
         // Rule Test
         case test:
-            LogicalFormula f = h.getLogicalFormula();
+            LogicalFormula f = (LogicalFormula)bTerm;
             if (conf.ag.believes(f, u)) {
                 updateIntention();
             } else {
@@ -633,12 +635,12 @@ public class TransitionSystem {
             im = i.peek(); // +!s or +?s
             if (!im.isFinished()) {
                 // removes !b or ?s
-                BodyLiteral g = im.removeCurrentStep();
+                Term g = im.removeCurrentStep();
                 // make the TE of finished plan ground and unify that
                 // with goal in the body
                 Literal tel = topIM.getPlan().getTrigger().getLiteral();
                 tel.apply(topIM.unif);
-                im.unif.unifies(tel, g.getLiteralFormula());
+                im.unif.unifies(tel, g);
             }
         }
 
@@ -699,69 +701,6 @@ public class TransitionSystem {
         }
         return ap;
     }
-
-    /*
-    class ApplPlanTimeOut extends Thread {
-        List<Option> ap = null;
-        List<Option> rp = null;
-    
-        boolean finish = false;
-        
-        List<Option> get(List<Option> rp) {
-        	this.rp = rp;
-        	start();
-        	waitEvaluation();
-        	return ap;
-        }
-        
-        synchronized void waitEvaluation() {
-        	try {
-        		if (!finish) {
-        			wait(3000); // wait 5 seconds for the evaluation!
-        			if (!finish) {
-        				logger.warning("*** Evaluation of appl plan do not finish in 3 seconds!"+C+"\bBB="+getAg().getBB());
-        			}
-        		}
-        		finish = true;
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-        }
-        
-        synchronized void finishEvaluation() {
-            finish = true;
-        	notify();
-        }
-        
-        public void run() {
-            for (Option opt: rp) {
-                LogicalFormula context = opt.plan.getContext();
-                if (context == null) { // context is true
-                    if (ap == null) ap = new LinkedList<Option>();
-                    ap.add(opt);
-                } else {
-                    boolean allUnifs = opt.getPlan().isAllUnifs();
-                    Iterator<Unifier> r = context.logicalConsequence(ag, opt.unif);
-                    if (r != null) {
-                        while (r.hasNext()) {
-                            opt.unif = r.next();
-                            
-                            if (ap == null) ap = new LinkedList<Option>();
-                            ap.add(opt);
-                            
-                            if (!allUnifs) break; // returns only the first unification
-                            if (r.hasNext()) {
-                                // create a new option for the next loop step
-                                opt = new Option((Plan)opt.plan.clone(), null);
-                            }
-                        }
-                    }
-                }
-	        }
-            finishEvaluation();
-        }
-    }
-    */
     
     public void updateEvents(List<Literal>[] result, Intention focus) {
         if (result == null) return;

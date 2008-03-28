@@ -40,7 +40,7 @@ public class ASParserTest extends TestCase {
         assertTrue(ag.parseAS("examples/auction/ag1.asl"));
         Plan p = ag.getPL().get("l__0");
         assertEquals(p.getBody().size(), 1);
-        assertEquals(p.getBody().get(0).getType(), BodyLiteral.BodyType.internalAction);
+        assertEquals(((BodyLiteral)p.getBody()).getType(), BodyLiteral.BodyType.internalAction);
         assertTrue(ag.parseAS("examples/auction/ag2.asl"));
         assertTrue(ag.parseAS("examples/auction/ag3.asl"));
     }

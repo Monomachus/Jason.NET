@@ -132,7 +132,7 @@ public class StdLibTest extends TestCase {
         StringTerm pt1 = new StringTermImpl("@t1 +a : g(10) <- .print(\"ok 10\").");
         Plan pa = ag.getPL().add(pt1, null);
         assertTrue(pa != null);
-        assertEquals(pa.toASString(),"@t1[source(self)] +a : g(10) <- .print(\"ok 10\").");
+        assertEquals("@t1[source(self)] +a : g(10) <- .print(\"ok 10\").", pa.toASString());
 
         ag.getPL().add(new StringTermImpl("@t2 +a : g(20) <- .print(\"ok 20\")."), new Structure("nosource"));
         ((Plan) ag.getPL().getPlans().get(1)).getLabel().addSource(new Structure("ag1"));

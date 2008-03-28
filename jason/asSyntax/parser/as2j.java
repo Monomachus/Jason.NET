@@ -314,7 +314,7 @@
   final public Plan plan() throws ParseException {
                         Token k; Pred L = null;
                         Trigger T; Object C = null;
-                        ArrayList B = new ArrayList();
+                        BodyLiteral B = null;
                         int start = -1, end;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case TK_LABEL_AT:
@@ -340,7 +340,7 @@
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case 33:
       k = jj_consume_token(33);
-      plan_body(B);
+      B = plan_body();
                                    if (start == -1) start = k.beginLine;
       break;
     default:
@@ -469,21 +469,26 @@
   }
 
 /* Plan body */
-  final public void plan_body(List bd) throws ParseException {
-                             BodyLiteral F;
+  final public BodyLiteral plan_body() throws ParseException {
+                             BodyLiteral F; BodyLiteral R = null;
     F = body_formula();
-                             if (! F.getLogicalFormula().equals(Literal.LTrue)) {
-                               bd.add(F);
-                             }
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case 37:
       jj_consume_token(37);
-      plan_body(bd);
+      R = plan_body();
       break;
     default:
       jj_la1[19] = jj_gen;
       ;
     }
+                             if (F.getTerm().equals(Literal.LTrue))
+                                {if (true) return R;}
+                             if (R == null)
+                                F.setNext(new BodyLiteral());
+                             else
+                                F.setNext(R);
+                             {if (true) return F;}
+    throw new Error("Missing return statement in function");
   }
 
   final public BodyLiteral body_formula() throws ParseException {
@@ -536,13 +541,15 @@
     }
     B = log_expr();
                          if (B instanceof Literal) {
+                            if ( ((Literal)B).isInternalAction() )
+                               formType = BodyType.internalAction;
                             {if (true) return new BodyLiteral(formType, (Literal)B);}
                          } else if (formType == BodyType.action && B instanceof RelExpr) {
                             {if (true) return new BodyLiteral(BodyType.constraint, (RelExpr)B);} // constraint 
                          } else {
                                 if (formType == BodyType.test) {
                                    if (B instanceof LogicalFormula)
-                                      {if (true) return new BodyLiteral(BodyType.test, (LogicalFormula)B);}  // used in ?(a & b)
+                                      {if (true) return new BodyLiteral(BodyType.test, (Term)B);}  // used in ?(a & b)
                                    else
                                       {if (true) throw new ParseException(getSourceRef(B)+" The argument for ? is not a logical formula.");}
                                 } else {
@@ -1156,6 +1163,11 @@
     finally { jj_save(0, xla); }
   }
 
+  final private boolean jj_3R_12() {
+    if (jj_scan_token(39)) return true;
+    return false;
+  }
+
   final private boolean jj_3_1() {
     if (jj_scan_token(27)) return true;
     if (jj_scan_token(TK_BEGIN)) return true;
@@ -1188,11 +1200,6 @@
 
   final private boolean jj_3R_13() {
     if (jj_3R_14()) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_12() {
-    if (jj_scan_token(39)) return true;
     return false;
   }
 

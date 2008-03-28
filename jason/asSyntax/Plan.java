@@ -29,10 +29,8 @@ import jason.asSyntax.parser.as2j;
 import java.io.Serializable;
 import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -54,7 +52,8 @@ public class Plan extends SourceInfo implements Cloneable, Serializable {
 	private Pred              label  = null;
     private Trigger           tevent = null;
     private LogicalFormula    context;
-    private List<BodyLiteral> body;
+    private BodyLiteral       body;
+    
     
     private boolean isAtomic = false;
     private boolean isAllUnifs = false;
@@ -65,12 +64,12 @@ public class Plan extends SourceInfo implements Cloneable, Serializable {
     }
     
     // used by parser
-    public Plan(Pred label, Trigger te, LogicalFormula ct, List<BodyLiteral> bd) {
+    public Plan(Pred label, Trigger te, LogicalFormula ct, BodyLiteral bd) {
         tevent = te;
         setLabel(label);
         setContext(ct);
         if (bd == null)
-            body = Collections.emptyList();
+            body = new BodyLiteral();
         else
             body = bd;
     }
@@ -123,7 +122,7 @@ public class Plan extends SourceInfo implements Cloneable, Serializable {
         return context;
     }
     
-    public List<BodyLiteral> getBody() {
+    public BodyLiteral getBody() {
         return body;
     }
     
@@ -170,9 +169,7 @@ public class Plan extends SourceInfo implements Cloneable, Serializable {
         tevent.getLiteral().countVars(all);
         if (context != null) 
             context.countVars(all);
-        if (body != null)
-            for (BodyLiteral bl: body)
-            	bl.getLogicalFormula().countVars(all);
+        body.countVars(all);
 
         List<VarTerm> r = new ArrayList<VarTerm>();
         for (VarTerm k: all.keySet()) {
@@ -187,7 +184,7 @@ public class Plan extends SourceInfo implements Cloneable, Serializable {
         int code = 37;
         if (context != null) code += context.hashCode();
         if (tevent != null)  code += tevent.hashCode();
-        if (body != null)    code += body.hashCode();
+        code += body.hashCode();
         return code;
     }
     
@@ -205,10 +202,7 @@ public class Plan extends SourceInfo implements Cloneable, Serializable {
         if (context != null) 
             p.context = (LogicalFormula)context.clone();
         
-        p.body = new LinkedList<BodyLiteral>(); // the plan will be "consumed" by remove(0), so linkedlist
-        for (BodyLiteral l : body) {
-            p.body.add((BodyLiteral) l.clone());
-        }
+        p.body = (BodyLiteral)body.clone();
         
         p.setSrc(this);
 
@@ -226,27 +220,11 @@ public class Plan extends SourceInfo implements Cloneable, Serializable {
         
         p.tevent = (Trigger)tevent.clone();
         p.context = context;
-        
-        p.body = new LinkedList<BodyLiteral>(); // the plan will be "consumed" by remove(0), so linkedlist
-        for (BodyLiteral l : body) {
-            p.body.add((BodyLiteral) l.clone());
-        }
+        p.body = (BodyLiteral)body.clone();
         
         p.setSrc(this);
 
         return p;
-    }
-    
-    private String listToString(List<BodyLiteral> l, String separator) {
-        StringBuffer s = new StringBuffer();
-        Iterator<BodyLiteral> i = l.iterator();
-        while (i.hasNext()) {
-            s.append(i.next().toString());
-            if (i.hasNext()) {
-                s.append(separator);
-            }
-        }
-        return s.toString();
     }
     
     public String toString() {
@@ -255,10 +233,9 @@ public class Plan extends SourceInfo implements Cloneable, Serializable {
     
     /** returns this plan in a string complaint with AS syntax */
     public String toASString() {
-        return (((label == null) ? "" : "@" + label + " ") + 
-               tevent + ((context == null) ? "" : " : " + context) + 
-               ((body.size() == 0) ? "" : " <- " + listToString(body, "; ")) + 
-               ".");
+        return ((label == null) ? "" : "@" + label + " ") + 
+               tevent + ((context == null) ? "" : " : " + context) +
+               " <- " + body;
     }
     
     /** get as XML */
@@ -279,8 +256,9 @@ public class Plan extends SourceInfo implements Cloneable, Serializable {
         
         if (body.size() > 0) {
             Element eb = (Element) document.createElement("body");
-            for (BodyLiteral bl : body) {
-                eb.appendChild(bl.getAsDOM(document));
+            Iterator<ListTerm> i = body.listTermIterator();
+            while (i.hasNext()) {
+                eb.appendChild(i.next().getAsDOM(document));
             }
             u.appendChild(eb);
         }

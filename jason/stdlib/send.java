@@ -31,7 +31,6 @@ import jason.asSemantics.Intention;
 import jason.asSemantics.Message;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
-import jason.asSyntax.BodyLiteral;
 import jason.asSyntax.ListTerm;
 import jason.asSyntax.NumberTerm;
 import jason.asSyntax.Pred;
@@ -238,8 +237,8 @@ public class send extends DefaultInternalAction {
                 Intention intention = c.getPendingIntentions().remove(idInPending);
                 if (intention != null) {
                     // unify "timeout" with the fourth parameter of .send
-                    BodyLiteral send = intention.peek().removeCurrentStep();
-                    intention.peek().getUnif().unifies(send.getLiteralFormula().getTerm(3), timeoutTerm);
+                    Structure send = (Structure)intention.peek().removeCurrentStep();
+                    intention.peek().getUnif().unifies(send.getTerm(3), timeoutTerm);
                     // add the intention back in C.I
                     c.addIntention(intention);
                 }
