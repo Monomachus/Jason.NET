@@ -1,11 +1,13 @@
 package test;
 
 import jason.JasonException;
+import jason.asSemantics.Unifier;
 import jason.asSyntax.BodyLiteral;
-import jason.asSyntax.ListTerm;
 import jason.asSyntax.Plan;
 import jason.asSyntax.PlanLibrary;
 import jason.asSyntax.Trigger;
+import jason.asSyntax.VarTerm;
+import jason.asSyntax.BodyLiteral.BodyType;
 import jason.asSyntax.parser.ParseException;
 
 import java.util.Iterator;
@@ -54,7 +56,7 @@ public class PlanTest extends TestCase {
     public void testParser() {
         Plan p = Plan.parse("+te : a & b <- a1; a2; .print(a); !g1; !!g2; ?test1; 10 > 3; +b1; -b2; -+b3.");
         p = (Plan)p.clone();
-        Iterator<ListTerm> i = p.getBody().listTermIterator();
+        Iterator<BodyLiteral> i = p.getBody().iterator();
         assertEquals( BodyLiteral.BodyType.action, ((BodyLiteral)i.next()).getType());
         assertEquals( BodyLiteral.BodyType.action, ((BodyLiteral)i.next()).getType());
         assertEquals( BodyLiteral.BodyType.internalAction, ((BodyLiteral)i.next()).getType());
@@ -80,4 +82,18 @@ public class PlanTest extends TestCase {
         p.getBody().remove(0); // 1
         assertTrue(p.getBody().isEmpty());
     }
+    
+    public void testUnifyBody() {
+        Plan p1 = Plan.parse("+te : a & b <- !a1; ?a2; .print(a); !g1.");
+        BodyLiteral bl = new BodyLiteral(BodyType.action, new VarTerm("A1"));
+        bl.add(new BodyLiteral(BodyType.action, new VarTerm("A2")));
+        bl.add(new BodyLiteral(BodyType.action, new VarTerm("A3")));
+        assertEquals(p1.getBody().getArity(), bl.getArity());
+        Unifier u = new Unifier();
+        assertTrue(u.unifies(p1.getBody(), bl));
+        assertEquals("a1", u.get("A1").toString());
+        assertEquals("a2", u.get("A2").toString());
+        assertEquals(".print(a); !g1", u.get("A3").toString());
+    }
+    
 }

@@ -1,40 +1,14 @@
-//----------------------------------------------------------------------------
-// Copyright (C) 2003  Rafael H. Bordini, Jomi F. Hubner, et al.
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
-// 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-// 
-// To contact the authors:
-// http://www.dur.ac.uk/r.bordini
-// http://www.inf.furb.br/~jomi
-//
-//----------------------------------------------------------------------------
-
 package jason.asSyntax;
+
+import java.util.Iterator;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-/** 
- * Represents a plan body item (achieve, test, action, ...) and its successors, 
- * it is thus like a list term.
- *  
- * @author Jomi  
- */
-public class BodyLiteral extends ListTermImpl implements Cloneable {
+public class BodyLiteral extends Structure implements Iterable<BodyLiteral> {
 
     public enum BodyType {
+        none {            public String toString() { return ""; }},
         action {          public String toString() { return ""; }},
         internalAction {  public String toString() { return ""; }},
         achieve {         public String toString() { return "!"; }},
@@ -46,27 +20,99 @@ public class BodyLiteral extends ListTermImpl implements Cloneable {
         constraint {      public String toString() { return ""; }}
     }
 
-    private BodyType        formType;
+    public static final String BODY_PLAN_FUNCTOR = ";";
+
+    private Term        term     = null; 
+    private BodyLiteral next     = null;
+    private BodyType    formType = BodyType.none;
     
+    /** constructor for empty plan body */
     public BodyLiteral() {
+        super(BODY_PLAN_FUNCTOR, 0);
     }
     
     public BodyLiteral(BodyType t, Term b) {
-        setTerm(b);
-        setSrc(b);
+        super(BODY_PLAN_FUNCTOR, 0);
+        term     = b;
         formType = t;
+        setSrc(b);
     }
 
+    public void setNext(BodyLiteral next) {
+        this.next = next;
+    }
+    public BodyLiteral getNext() {
+        return next;
+    }
+
+    public boolean isEmpty() {
+        return term == null;
+    }
+    
     public BodyType getType() {
         return formType;
     }
-
+    
+    public Term getTerm() {
+        return term;
+    }
+    
     public Literal getLiteralFormula() {
-        Term t = getTerm();
-        if (t instanceof Literal)
-            return (Literal)t;
+        if (term instanceof Literal)
+            return (Literal)term;
         else 
             return null;
+    }
+
+    public Iterator<BodyLiteral> iterator() {
+        return new Iterator<BodyLiteral>() {
+            BodyLiteral current = BodyLiteral.this;
+            public boolean hasNext() {
+                return current != null && current.term != null && current.next != null; 
+            }
+            public BodyLiteral next() {
+                BodyLiteral r = current;
+                if (current != null)
+                    current = current.next;
+                return r;
+            }
+            public void remove() { }
+        };
+    }
+
+    // Override some structure methods to work with unification/equals
+    @Override
+    public int getArity() {
+        if (term == null)
+            return 0;
+        else if (next == null)
+            return 1;
+        else
+            return 2;
+    }
+
+    @Override
+    public Term getTerm(int i) {
+        if (i == 0) return term;
+        if (i == 1) {
+            if (next != null && next.term.isVar() && next.next == null) 
+                // if next is the last VAR, return that var
+                return next.term;
+            else
+                return next;
+        }
+        return null;
+    }
+
+    @Override
+    public void setTerm(int i, Term t) {
+        if (i == 0) term = t;
+        if (i == 1) System.out.println("Should not set next of body literal!");
+    }
+
+    @Override
+    public boolean isPlanBody() {
+        return true;
     }
     
     @Override
@@ -81,36 +127,82 @@ public class BodyLiteral extends ListTermImpl implements Cloneable {
     }
 
     @Override
-    public int hashCode() {
-        return formType.hashCode() + super.hashCode();
+    public int calcHashCode() {
+        return formType.hashCode() + super.calcHashCode();
+    }
+
+    public boolean add(BodyLiteral bl) {
+        if (term == null)
+            swap(bl);
+        else if (next == null)
+            next = bl;
+        else 
+            next.add(bl);
+        return true;
+    }
+    
+    public boolean add(int index, BodyLiteral bl) {
+        if (index == 0) {
+            swap(bl);
+            this.next = bl;
+        } else { 
+            next.add(index - 1, bl);
+        }
+        return true;
+    }
+
+    public Term remove(int index) {
+        if (index == 0) {
+            if (next == null) {
+                term = null; // becomes an empty
+            } else {
+                Term oldvalue = term;
+                swap(next); // get values of text
+                next = next.next;
+                return oldvalue;
+            }
+            return this;
+        } else { 
+            return next.remove(index - 1);
+        }
+    }
+
+    public int size() {
+        if (term == null) 
+            return 0;
+        else if (next == null)
+            return 1;
+        else
+            return next.size() + 1;
+    }
+
+    private void swap(BodyLiteral bl) {
+        BodyType bt = this.formType;
+        this.formType = bl.formType;
+        bl.formType   = bt;
+
+        Term l = this.term;
+        this.term = bl.term;
+        bl.term   = l;
     }
 
     public Object clone() {
-        BodyLiteral c;
-        Term t = getTerm();
-        if (t == null) { // empty body
-            c = new BodyLiteral();
-        } else {
-            c = new BodyLiteral(formType, (Term)t.clone());
-            c.setNext((Term)getNext().clone());
-        }
+        if (term == null) // empty
+            return new BodyLiteral();
+
+        BodyLiteral c = new BodyLiteral(formType, (Term)term.clone());
+        if (next != null)
+            c.setNext((BodyLiteral)getNext().clone());
         return c;
     }
-
-    @Override
-    protected void setValuesFrom(ListTerm lt) {
-        super.setValuesFrom(lt);
-        formType = ((BodyLiteral)lt).formType;
-    }
-    
     
     public String toString() {
-        if (isEmpty()) 
+        if (term == null)
             return "";
-        else if (getNext().isEmpty())
-            return formType.toString() + getTerm() + ".";
+        else if (next == null)
+            return formType.toString() + term;
         else
-            return formType.toString() + getTerm() + "; " + getNext();
+            return formType.toString() + term + "; " + next;
     }
 
     /** get as XML */
@@ -119,7 +211,7 @@ public class BodyLiteral extends ListTermImpl implements Cloneable {
         if (formType.toString().length() > 0) {
             u.setAttribute("type", formType.toString());
         }
-        u.appendChild( ((Structure)getTerm()).getAsDOM(document));
+        u.appendChild( ((Structure)term).getAsDOM(document));
         return u;
     }
 }

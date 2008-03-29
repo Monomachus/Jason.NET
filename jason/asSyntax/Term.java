@@ -35,6 +35,8 @@ public interface Term extends Cloneable, Comparable<Term>, Serializable, ToDOM {
 
     public boolean isAtom();
 
+    public boolean isPlanBody();
+
     public boolean hasVar(VarTerm t);
     
     public void countVars(Map<VarTerm, Integer> c);

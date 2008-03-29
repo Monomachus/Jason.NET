@@ -171,7 +171,7 @@ boolean agent(Agent a) throws jason.JasonException :
                                 Literal g;
                                 Plan    p;
                                 curAg = a;
-                                if (a != null) asSource = a.getASLSrc();
+                                if (a != null && a.getASLSrc() != null) asSource = a.getASLSrc();
                                 boolean endDir = false;
                               }
 { 
@@ -229,6 +229,7 @@ boolean directive(Agent outerAg) throws jason.JasonException :
                               { 
                                 Pred dir = null;
                                 Agent resultOfDirective = null;
+                                Agent bakAg = curAg;
                                 boolean isEOF = false;
                               }
 {
@@ -253,6 +254,7 @@ boolean directive(Agent outerAg) throws jason.JasonException :
                                   // import bels, plans and initial goals from agent resultOfDirective
                                   outerAg.importComponents(resultOfDirective);
                                 }
+                                curAg = bakAg;
                                 return false;
                               }
 }
@@ -286,13 +288,14 @@ Literal initial_goal() : { Literal g; }
 
 /* Plan */
 Plan plan() :         { Token k; Pred L = null; 
-                        Trigger T; Object C = null; 
-                        BodyLiteral B = null; 
+                        Trigger T; 
+                        Object C = null; BodyLiteral bl = null;
+                        Object B = null; 
                         int start = -1, end;}
 {
     [ k = <TK_LABEL_AT> L=pred()  { start = k.beginLine; }   ]
     T=trigger()         
-    [ k = ":"  C=log_expr()      { if (start == -1) start = k.beginLine; } ] 
+    [ k = ":"  C = log_expr()    { if (start == -1) start = k.beginLine; } ] 
     [ k = "<-" B = plan_body()   { if (start == -1) start = k.beginLine; } ]  
     k = "."                      { if (start == -1) start = k.beginLine; } 
                    { end = k.beginLine;
@@ -300,7 +303,14 @@ Plan plan() :         { Token k; Pred L = null;
                      try { ial = checkInternalActionsInContext((LogicalFormula)C, curAg); } catch (Exception e) {}
                      if (ial != null)
                         throw new ParseException(getSourceRef(ial)+" The internal action '"+ial+"' can not be used in plan's context!");
-                     Plan p = new Plan(L,T,(LogicalFormula)C,B);
+                     if (B != null) {
+                        if (!(B instanceof BodyLiteral))
+                           throw new ParseException(getSourceRef(B)+" Unknown body formula:"+B);
+	                    bl = (BodyLiteral)B;
+	                    if (bl.getTerm().equals(Literal.LTrue))
+	                       bl = (BodyLiteral)bl.getNext();
+	                 }
+                     Plan p = new Plan(L,T,(LogicalFormula)C, bl);
                      p.setSrcLines(start,end);
                      p.setSrc(asSource);
                      return p;
@@ -352,23 +362,22 @@ Literal literal() :  { Pred F; Token k; boolean type = Literal.LPos; }
 
 
 /* Plan body */
-BodyLiteral plan_body() :  { BodyLiteral F; BodyLiteral R = null; }
+Object plan_body() :       { Object F; Object R = null; }
 {
   F = body_formula()       
                  
-  [ ";" R = plan_body() ]
-                           { if (F.getTerm().equals(Literal.LTrue))
-                                return R;
-                             if (R == null)
-                                F.setNext(new BodyLiteral());
-                             else 
-                                F.setNext(R);
+  [ ";"                    { if (!(F instanceof BodyLiteral)) throw new ParseException(getSourceRef(F)+" "+F+" is not a body literal!");  }
+    R = plan_body()        { if (!(R instanceof BodyLiteral)) throw new ParseException(getSourceRef(R)+" "+R+" is not a body literal!");  }
+  ]
+                           { if (F instanceof BodyLiteral && R instanceof BodyLiteral) {
+                                ((BodyLiteral)F).setNext( (BodyLiteral)R );
+                             }
                              return F;
                            }
 }
 
 
-BodyLiteral body_formula() : 
+Object body_formula() : 
                        { BodyType formType = BodyType.action;  Object B; }
 {
    [  "!"              { formType = BodyType.achieve; }
@@ -395,7 +404,7 @@ BodyLiteral body_formula() :
 	                           else
 	                              throw new ParseException(getSourceRef(B)+" The argument for ? is not a logical formula.");
 	                        } else { 
-                               throw new ParseException(getSourceRef(B)+" Unknown body formula.");
+                               return B;
 	                        }
                          }
                        }
@@ -440,9 +449,17 @@ List terms() : { List listTerms = new ArrayList(); Term v; }
 Term term() :          { Object o;}
 {
   ( o=list()        
-  | o=log_expr()       // log expr includes literals/atoms/structures 
+  | o=plan_body()       // plan_body includes literals/atoms/structures  
   )
-                       { return changeToAtom(o); }  
+                       { // if the result is a BodyLiteral action with size = 1, it is indeed a literal and not a body literal
+                         if (o instanceof BodyLiteral) {
+                            BodyLiteral bl = (BodyLiteral)o;
+                            if (bl.getType() == BodyType.action && bl.size() == 1) {
+                               o = bl.getTerm();
+                            }
+                         }
+                         return changeToAtom(o); 
+                       }  
 }
 
 
@@ -462,7 +479,7 @@ ListTermImpl list() :     { ListTermImpl lt = new ListTermImpl(); ListTerm last;
   "]"                     { return lt; } 
 }
 
-// term_in_list is the same as term, but log_expr must be enclosed by "("....")" to avoid problem with |
+// term_in_list is the same as term, but log_expr/plan_body must be enclosed by "("....")" to avoid problem with |
 Term term_in_list() :     { Object o; }
 {
   ( o=list()        

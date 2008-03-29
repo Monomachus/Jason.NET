@@ -280,8 +280,7 @@ public class ListTermImpl extends Structure implements ListTerm {
 	 */
 	public ListTerm concat(ListTerm lt) {
 		if (isEmpty()) {
-			term = lt.getTerm();
-			next = (Term)lt.getNext();
+		    setValuesFrom(lt);
 		} else if (((ListTerm)next).isEmpty() ) {
 			next = (Term)lt;
 		} else {
@@ -420,7 +419,7 @@ public class ListTermImpl extends Structure implements ListTerm {
 	
 	public void add(int index, Term o) {
         if (index == 0) {
-            ListTermImpl n = new ListTermImpl(term,next);
+            ListTerm n = new ListTermImpl(term,next);
             this.term = o;
             this.next = n;
         } else if (index > 0 && getNext() != null) {

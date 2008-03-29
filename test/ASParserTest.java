@@ -5,6 +5,7 @@ import jason.asSemantics.Agent;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.BodyLiteral;
+import jason.asSyntax.Literal;
 import jason.asSyntax.LogExpr;
 import jason.asSyntax.LogicalFormula;
 import jason.asSyntax.NumberTerm;
@@ -163,6 +164,19 @@ public class ASParserTest extends TestCase {
         
     }
     
+    public void testParsingPlanBody() {
+        Literal l = Literal.parseLiteral("p(a1;a2, a3, !g, ?b;.print(oi), 10)");
+        assertEquals(5,l.getArity());
+        assertTrue(l.getTerm(0) instanceof BodyLiteral);
+        assertTrue(l.getTerm(0).isPlanBody());
+
+        assertFalse(l.getTerm(1).isPlanBody());
+        assertTrue(l.getTerm(2).isPlanBody());
+        assertTrue(l.getTerm(3).isPlanBody());
+        assertFalse(l.getTerm(4).isPlanBody());
+
+    }
+    
     public void testParsingAllSources() {
         parseDir(new File("./examples"));
         parseDir(new File("./demos"));
@@ -192,7 +206,8 @@ public class ASParserTest extends TestCase {
                         parser.mas();
                     }
                 } catch (Exception e) {
-                    fail("Error parsing "+f);
+                    e.printStackTrace();
+                    fail("Error parsing "+f+": "+e);
                 }
             }
         }

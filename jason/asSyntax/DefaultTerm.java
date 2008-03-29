@@ -63,6 +63,7 @@ public abstract class DefaultTerm extends SourceInfo implements Term, Serializab
     public boolean isPred()           { return false; }
     public boolean isStructure()      { return false; }
 	public boolean isAtom()           { return false; }
+    public boolean isPlanBody()       { return false; }
     public boolean isGround()         { return true; }
     public boolean hasVar(VarTerm t)  { return false; }
     

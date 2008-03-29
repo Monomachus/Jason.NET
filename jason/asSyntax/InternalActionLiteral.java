@@ -117,7 +117,7 @@ public class InternalActionLiteral extends Literal {
 	public Object clone() {
         InternalActionLiteral c = new InternalActionLiteral(this);
         c.predicateIndicatorCache = this.predicateIndicatorCache;
-        c.hashCodeCache = this.hashCodeCache;
+        c.hashCodeCache           = this.hashCodeCache;
         return c;
 	}
 

@@ -31,6 +31,8 @@ import jason.mas2j.parser.ParseException;
 import jason.mas2j.parser.TokenMgrError;
 import jason.runtime.OutputStreamAdapter;
 import jason.util.asl2html;
+import jason.util.asl2tex;
+import jason.util.asl2xml;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -77,7 +79,6 @@ import org.gjt.sp.jedit.gui.RolloverButton;
 
 import errorlist.DefaultErrorSource;
 import errorlist.ErrorSource;
-import jason.util.*;
 
 public class JasonID extends JPanel implements EBComponent, RunProjectListener {
 
@@ -379,7 +380,7 @@ public class JasonID extends JPanel implements EBComponent, RunProjectListener {
         return null;
     }
 
-    private boolean parseProjectAS(MAS2JProject project) {
+    protected boolean parseProjectAS(MAS2JProject project) {
         // compile
         File asFile = null;
         try {
@@ -456,16 +457,14 @@ public class JasonID extends JPanel implements EBComponent, RunProjectListener {
                         max++;
                         try {
                             Thread.sleep(200);
-                        } catch (Exception e) {
-                        }
+                        } catch (Exception e) { }
                     }
                 }
 
                 MAS2JProject project = parseProject(b);
-                if (project == null || !parseProjectAS(project)) {
+                if (project == null) // || !parseProjectAS(project)) {
                     return;
-                }
-
+                
                 // launch the MAS
                 animation.start();
                 btStop.setEnabled(true);
@@ -636,9 +635,8 @@ public class JasonID extends JPanel implements EBComponent, RunProjectListener {
             return;
         }
         MAS2JProject project = parseProject(b);
-        if (project == null || !parseProjectAS(project)) {
+        if (project == null) // || !parseProjectAS(project)) {
         	return;
-        }
         CentralisedMASLauncherAnt script = new CentralisedMASLauncherAnt("jar");
         script.setProject(project);
         if (script.writeScripts(false)) {
@@ -653,9 +651,8 @@ public class JasonID extends JPanel implements EBComponent, RunProjectListener {
             return;
         }
         MAS2JProject project = parseProject(b);
-        if (project == null || !parseProjectAS(project)) {
+        if (project == null) // || !parseProjectAS(project)) {
         	return;
-        }
         CentralisedMASLauncherAnt script = new CentralisedMASLauncherAnt("jnlp");
         script.setProject(project);
         if (script.writeScripts(false)) {

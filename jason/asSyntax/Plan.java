@@ -30,7 +30,6 @@ import java.io.Serializable;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -235,7 +234,8 @@ public class Plan extends SourceInfo implements Cloneable, Serializable {
     public String toASString() {
         return ((label == null) ? "" : "@" + label + " ") + 
                tevent + ((context == null) ? "" : " : " + context) +
-               " <- " + body;
+               (body.isEmpty() ? "" : " <- " + body) +
+               ".";
     }
     
     /** get as XML */
@@ -256,10 +256,15 @@ public class Plan extends SourceInfo implements Cloneable, Serializable {
         
         if (body.size() > 0) {
             Element eb = (Element) document.createElement("body");
+            for (BodyLiteral bl: body) {
+                eb.appendChild(bl.getAsDOM(document));                
+            }
+            /*
             Iterator<ListTerm> i = body.listTermIterator();
             while (i.hasNext()) {
                 eb.appendChild(i.next().getAsDOM(document));
             }
+            */
             u.appendChild(eb);
         }
         
