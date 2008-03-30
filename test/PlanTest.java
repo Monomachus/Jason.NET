@@ -55,7 +55,7 @@ public class PlanTest extends TestCase {
     	assertEquals(0, pls.size());	
     }
     
-    public void testParser() {
+    public void testParser1() {
         Plan p = Plan.parse("+te : a & b <- a1; a2; .print(a); !g1; !!g2; ?test1; 10 > 3; +b1; -b2; -+b3.");
         p = (Plan)p.clone();
         Iterator<BodyLiteral> i = ((BodyLiteralImpl)p.getBody()).iterator();
@@ -72,7 +72,7 @@ public class PlanTest extends TestCase {
         assertEquals( BodyLiteral.BodyType.delAddBel, ((BodyLiteral)i.next()).getBodyType());
         assertFalse(i.hasNext());
     }
-
+    
     public void testDelete() {
         Plan p = Plan.parse("+te : a & b <- !a1; ?a2; .print(a); !g1.");
         assertEquals(4, p.getBody().getPlanSize());

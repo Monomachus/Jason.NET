@@ -449,15 +449,15 @@ List terms() : { List listTerms = new ArrayList(); Term v; }
 Term term() :          { Object o;}
 {
   ( o=list()        
-  | o=plan_body()       // plan_body includes literals/atoms/structures  
+  | o=log_expr()       //plan_body()       // plan_body includes literals/atoms/structures  
   )
                        { // if the result is a BodyLiteral action with size = 1, it is indeed a literal and not a body literal
-                         if (o instanceof BodyLiteral) {
+                         /*if (o instanceof BodyLiteral) {
                             BodyLiteral bl = (BodyLiteral)o;
                             if (bl.getBodyType() == BodyType.action && bl.getPlanSize() == 1) {
                                o = bl.getBodyTerm();
                             }
-                         }
+                         }*/
                          return changeToAtom(o); 
                        }  
 }
