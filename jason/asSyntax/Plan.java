@@ -68,7 +68,7 @@ public class Plan extends SourceInfo implements Cloneable, Serializable {
         setLabel(label);
         setContext(ct);
         if (bd == null)
-            body = new BodyLiteral();
+            body = new BodyLiteralImpl();
         else
             body = bd;
     }
@@ -234,7 +234,7 @@ public class Plan extends SourceInfo implements Cloneable, Serializable {
     public String toASString() {
         return ((label == null) ? "" : "@" + label + " ") + 
                tevent + ((context == null) ? "" : " : " + context) +
-               (body.isEmpty() ? "" : " <- " + body) +
+               (body.isEmptyBody() ? "" : " <- " + body) +
                ".";
     }
     
@@ -254,18 +254,8 @@ public class Plan extends SourceInfo implements Cloneable, Serializable {
             u.appendChild(ec);
         }
         
-        if (body.size() > 0) {
-            Element eb = (Element) document.createElement("body");
-            for (BodyLiteral bl: body) {
-                eb.appendChild(bl.getAsDOM(document));                
-            }
-            /*
-            Iterator<ListTerm> i = body.listTermIterator();
-            while (i.hasNext()) {
-                eb.appendChild(i.next().getAsDOM(document));
-            }
-            */
-            u.appendChild(eb);
+        if (!body.isEmptyBody()) {
+            u.appendChild(body.getAsDOM(document));
         }
         
         return u;

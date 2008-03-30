@@ -61,8 +61,9 @@ public class ActionExec implements Serializable {
     }
    
     public Structure getActionTerm() {
-    	return action;
+        return action;
     }
+    
     public Intention getIntention() {
     	return intention;
     }

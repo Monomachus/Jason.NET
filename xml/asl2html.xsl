@@ -65,6 +65,7 @@
     </xsl:template>
     
     <xsl:template match="body">
+        <xsl:param name="in-plan" select="'false'" />
         <xsl:for-each select="body-literal">
             <xsl:choose>
                 <xsl:when test="literal/@ia = 'true'">
@@ -86,8 +87,12 @@
                     <xsl:value-of select="@type"/><xsl:apply-templates />
                 </xsl:otherwise>        		
             </xsl:choose>
-            <xsl:if test="not(position()=last())">; <br/></xsl:if>
-            <xsl:if test="position()=last()">.</xsl:if>
+            <xsl:if test="not(position()=last())"> 
+                <xsl:text>; </xsl:text> 
+                <xsl:if test="$in-plan='true'"> 
+                    <br/>
+                </xsl:if>
+            </xsl:if>
         </xsl:for-each>
     </xsl:template>
     

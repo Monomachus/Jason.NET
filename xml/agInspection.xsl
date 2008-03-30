@@ -440,13 +440,15 @@
                 <tr>
                     <td width="20" />
                     <td width="20" style="vertical-align: top"><b>&lt;-</b></td>
-                    <td><xsl:apply-templates select="body" /></td>
+                    <td>
+                       <xsl:apply-templates select="body">
+                         <xsl:with-param name="in-plan" select="'true'" />
+                       </xsl:apply-templates>
+                    </td>
                 </tr>
             </table>
         </xsl:if>
-        <xsl:if test="count(body/body-literal) = 0">
-	    <xsl:text>.</xsl:text>
-	</xsl:if>
+        <xsl:text>.</xsl:text>
     </xsl:template>
     
     
@@ -467,6 +469,7 @@
     </xsl:template>
     
     <xsl:template match="body">
+        <xsl:param name="in-plan" select="'false'" />
         <xsl:for-each select="body-literal">
             <xsl:choose>
                 <xsl:when test="literal/@ia = 'true'">
@@ -489,7 +492,6 @@
                 </xsl:otherwise>        		
             </xsl:choose>
             <xsl:if test="not(position()=last())">; </xsl:if>
-            <xsl:if test="position()=last()">.</xsl:if>
         </xsl:for-each>
     </xsl:template>
     

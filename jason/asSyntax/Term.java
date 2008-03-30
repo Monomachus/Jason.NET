@@ -12,33 +12,20 @@ import java.util.Map;
 public interface Term extends Cloneable, Comparable<Term>, Serializable, ToDOM {
 
     public boolean isVar();
-
     public boolean isLiteral();
-    
     public boolean isRule();
-
     public boolean isList();
-
     public boolean isString();
-
     public boolean isInternalAction();
-
     public boolean isArithExpr();
-
     public boolean isNumeric();
-
     public boolean isPred();
-
     public boolean isGround();
-
     public boolean isStructure();
-
     public boolean isAtom();
-
     public boolean isPlanBody();
 
     public boolean hasVar(VarTerm t);
-    
     public void countVars(Map<VarTerm, Integer> c);
 
     public Object clone();
@@ -56,4 +43,6 @@ public interface Term extends Cloneable, Comparable<Term>, Serializable, ToDOM {
     
     public int getSrcLine();
     public String getSrc();
+    public String getErrorMsg(); // info for error messages 
+
 }

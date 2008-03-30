@@ -2,6 +2,7 @@ package jason.asSyntax.patterns.goal;
 
 import jason.asSemantics.Agent;
 import jason.asSyntax.BodyLiteral;
+import jason.asSyntax.BodyLiteralImpl;
 import jason.asSyntax.Literal;
 import jason.asSyntax.LogExpr;
 import jason.asSyntax.LogicalFormula;
@@ -52,10 +53,10 @@ public class EBDG implements Directive {
                 
                 // change body
                 // add +p__f(i,g)
-                BodyLiteral b1 = new BodyLiteral(BodyType.addBel, pi);
+                BodyLiteral b1 = new BodyLiteralImpl(BodyType.addBel, pi);
                 p.getBody().add(0, b1);
                 // add ?g
-                BodyLiteral b2 = new BodyLiteral(BodyType.test, (Literal)goal.clone());
+                BodyLiteral b2 = new BodyLiteralImpl(BodyType.test, (Literal)goal.clone());
                 p.getBody().add(b2);
                 newAg.getPL().add(p);
             }

@@ -46,7 +46,7 @@ import org.w3c.dom.Element;
  * 
  * @author jomi
  */
-public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm, ObjectTerm {
+public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm, ObjectTerm, BodyLiteral {
 
     private static final long serialVersionUID = 1L;
     private static Logger logger = Logger.getLogger(VarTerm.class.getName());
@@ -311,6 +311,11 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
     @Override
     public boolean isString() {
         return value != null && getValue().isString();
+    }
+    
+    @Override
+    public boolean isPlanBody() {
+        return value != null && getValue().isPlanBody();
     }
 
     @Override
@@ -862,6 +867,82 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
         else
             return null;
     }
+
+    // -----------------------
+    // BodyLiteral interface implementation
+    // -----------------------
+    
+    public BodyType getBodyType() {
+        if (value != null && getValue() instanceof BodyLiteral)
+            return ((BodyLiteral) getValue()).getBodyType();
+        else
+            return BodyType.none;
+    }
+    
+    public Term getBodyTerm() {
+        if (value != null && getValue() instanceof BodyLiteral)
+            return ((BodyLiteral) getValue()).getBodyTerm();
+        else
+            return null;
+    }
+    
+    public BodyLiteral getBodyNext() {
+        if (value != null && getValue() instanceof BodyLiteral)
+            return ((BodyLiteral) getValue()).getBodyNext();
+        else
+            return null;
+    }
+    
+    public boolean isEmptyBody() {
+        if (value != null && getValue() instanceof BodyLiteral)
+            return ((BodyLiteral) getValue()).isEmptyBody();
+        else
+            return true;
+    }
+    
+    public int getPlanSize() {
+        if (value != null && getValue() instanceof BodyLiteral)
+            return ((BodyLiteral) getValue()).getPlanSize();
+        else
+            return 0;
+    }
+
+    public void setBodyType(BodyType bt) {
+        if (value != null && getValue() instanceof BodyLiteral)
+            ((BodyLiteral) getValue()).setBodyType(bt);
+    }
+
+    public void setBodyTerm(Term t) {
+        if (value != null && getValue() instanceof BodyLiteral)
+            ((BodyLiteral) getValue()).setBodyTerm(t);
+    }
+    
+    public void setBodyNext(BodyLiteral bl) {
+        if (value != null && getValue() instanceof BodyLiteral)
+            ((BodyLiteral) getValue()).setBodyNext(bl);
+    }
+    
+    public boolean add(BodyLiteral bl) {
+        if (value != null && getValue() instanceof BodyLiteral)
+            return ((BodyLiteral) getValue()).add(bl);
+        else
+            return false;
+    }
+    
+    public boolean add(int index, BodyLiteral bl) {
+        if (value != null && getValue() instanceof BodyLiteral)
+            return ((BodyLiteral) getValue()).add(index, bl);
+        else
+            return false;
+    }
+    
+    public Term removeBody(int index) {    
+        if (value != null && getValue() instanceof BodyLiteral)
+            return ((BodyLiteral) getValue()).removeBody(index);
+        else
+            return null;
+    }
+    
 
     /** get as XML */
     public Element getAsDOM(Document document) {

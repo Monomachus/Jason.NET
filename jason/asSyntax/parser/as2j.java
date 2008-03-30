@@ -361,8 +361,8 @@
                         if (!(B instanceof BodyLiteral))
                            {if (true) throw new ParseException(getSourceRef(B)+" Unknown body formula:"+B);}
                             bl = (BodyLiteral)B;
-                            if (bl.getTerm().equals(Literal.LTrue))
-                               bl = (BodyLiteral)bl.getNext();
+                            if (bl.getBodyTerm().equals(Literal.LTrue))
+                               bl = (BodyLiteral)bl.getBodyNext();
                          }
                      Plan p = new Plan(L,T,(LogicalFormula)C, bl);
                      p.setSrcLines(start,end);
@@ -494,7 +494,7 @@
       ;
     }
                              if (F instanceof BodyLiteral && R instanceof BodyLiteral) {
-                                ((BodyLiteral)F).setNext( (BodyLiteral)R );
+                                ((BodyLiteral)F).setBodyNext( (BodyLiteral)R );
                              }
                              {if (true) return F;}
     throw new Error("Missing return statement in function");
@@ -552,13 +552,13 @@
                          if (B instanceof Literal) {
                             if ( ((Literal)B).isInternalAction() )
                                formType = BodyType.internalAction;
-                            {if (true) return new BodyLiteral(formType, (Literal)B);}
+                            {if (true) return new BodyLiteralImpl(formType, (Literal)B);}
                          } else if (formType == BodyType.action && B instanceof RelExpr) {
-                            {if (true) return new BodyLiteral(BodyType.constraint, (RelExpr)B);} // constraint 
+                            {if (true) return new BodyLiteralImpl(BodyType.constraint, (RelExpr)B);} // constraint 
                          } else {
                                 if (formType == BodyType.test) {
                                    if (B instanceof LogicalFormula)
-                                      {if (true) return new BodyLiteral(BodyType.test, (Term)B);}  // used in ?(a & b)
+                                      {if (true) return new BodyLiteralImpl(BodyType.test, (Term)B);}  // used in ?(a & b)
                                    else
                                       {if (true) throw new ParseException(getSourceRef(B)+" The argument for ? is not a logical formula.");}
                                 } else {
@@ -669,8 +669,8 @@
                          // if the result is a BodyLiteral action with size = 1, it is indeed a literal and not a body literal
                          if (o instanceof BodyLiteral) {
                             BodyLiteral bl = (BodyLiteral)o;
-                            if (bl.getType() == BodyType.action && bl.size() == 1) {
-                               o = bl.getTerm();
+                            if (bl.getBodyType() == BodyType.action && bl.getPlanSize() == 1) {
+                               o = bl.getBodyTerm();
                             }
                          }
                          {if (true) return changeToAtom(o);}

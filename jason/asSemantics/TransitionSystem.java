@@ -402,16 +402,15 @@ public class TransitionSystem {
             return;
         }
         Unifier     u = im.unif;
-        BodyLiteral h = im.getCurrentStep(); 
-        Term        bTerm = h.getTerm();
+        BodyLiteral h = im.getCurrentStep();
+        h.apply(u);
         
-        bTerm.apply(u);
-        
-        Literal body = null;
+        Literal body  = null;
+        Term    bTerm = h.getBodyTerm();
         if (bTerm instanceof Literal)
             body = (Literal)bTerm;
 
-        switch (h.getType()) {
+        switch (h.getBodyType()) {
 
         // Rule Action
         case action:
