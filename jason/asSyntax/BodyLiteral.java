@@ -25,7 +25,6 @@ public class BodyLiteral extends PlanBodyImpl {
     }
     
     private static PlanBody.BodyType oldToNew(BodyType old) {
-        // TODO: implement it!
         switch (old) {
         case action: return PlanBody.BodyType.action;
         case internalAction: return PlanBody.BodyType.internalAction;
