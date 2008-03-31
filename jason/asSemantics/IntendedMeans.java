@@ -24,8 +24,8 @@
 
 package jason.asSemantics;
 
-import jason.asSyntax.BodyLiteral;
-import jason.asSyntax.BodyLiteralImpl;
+import jason.asSyntax.PlanBody;
+import jason.asSyntax.PlanBodyImpl;
 import jason.asSyntax.ListTerm;
 import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Literal;
@@ -73,7 +73,7 @@ public class IntendedMeans implements Serializable {
 
     /** removes the current action of the IM and returns the term of the body */
     public Term removeCurrentStep() {
-        BodyLiteral current = plan.getBody();
+        PlanBody current = plan.getBody();
         if (current.isEmptyBody()) {
             return null;
         } else {
@@ -81,7 +81,7 @@ public class IntendedMeans implements Serializable {
         }
     }
 
-    public BodyLiteral getCurrentStep() {
+    public PlanBody getCurrentStep() {
         return plan.getBody();
     }
 
@@ -129,10 +129,10 @@ public class IntendedMeans implements Serializable {
     public Term getAsTerm() {
         Structure im = new Structure("im");
         im.addTerm(new StringTermImpl(plan.getLabel().toString()));
-        if (plan.getBody() instanceof BodyLiteralImpl) {
+        if (plan.getBody() instanceof PlanBodyImpl) {
             ListTerm lt = new ListTermImpl();
-            for (BodyLiteral bd: (BodyLiteralImpl)plan.getBody()) {
-                BodyLiteral c = (BodyLiteral)bd.clone();
+            for (PlanBody bd: (PlanBodyImpl)plan.getBody()) {
+                PlanBody c = (PlanBody)bd.clone();
                 c.apply(unif);
                 lt.add(new StringTermImpl(c.getBodyType().toString()+c.getBodyTerm()));
             }

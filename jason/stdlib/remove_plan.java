@@ -91,11 +91,11 @@ public class remove_plan extends DefaultInternalAction {
         		boolean r = true;
         		ListTerm lt = (ListTerm)args[0];
                 for (Term t: lt) {
-        			r = r && ts.getAg().getPL().removePlan((Structure)t, source);
+        			r = r && ts.getAg().getPL().remove((Structure)t, source);
         		}
         		return r;
         	} else { // args[0] is a plan label
-        		return ts.getAg().getPL().removePlan((Structure)label, source);
+        		return ts.getAg().getPL().remove((Structure)label, source);
         	}
         } catch (ArrayIndexOutOfBoundsException e) {
             throw new JasonException("The internal action 'remove_plan' has not received the required argument (a plan label or list of labels).");

@@ -4,7 +4,7 @@ import jason.architecture.AgArch;
 import jason.asSemantics.Agent;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
-import jason.asSyntax.BodyLiteral;
+import jason.asSyntax.PlanBody;
 import jason.asSyntax.LogExpr;
 import jason.asSyntax.LogicalFormula;
 import jason.asSyntax.NumberTerm;
@@ -40,7 +40,7 @@ public class ASParserTest extends TestCase {
         assertTrue(ag.parseAS("examples/auction/ag1.asl"));
         Plan p = ag.getPL().get("l__0");
         assertEquals(p.getBody().getPlanSize(), 1);
-        assertEquals(((BodyLiteral)p.getBody()).getBodyType(), BodyLiteral.BodyType.internalAction);
+        assertEquals(((PlanBody)p.getBody()).getBodyType(), PlanBody.BodyType.internalAction);
         assertTrue(ag.parseAS("examples/auction/ag2.asl"));
         assertTrue(ag.parseAS("examples/auction/ag3.asl"));
     }

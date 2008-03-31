@@ -1,7 +1,12 @@
 package jason.asSyntax;
 
-public interface BodyLiteral extends Term {
 
+/** 
+ * @deprecated use PlanBodyImpl instead.
+ */
+public class BodyLiteral extends PlanBodyImpl {
+
+    /** @deprecated Use BodyType of PlanBody instead */
     public enum BodyType {
         none {            public String toString() { return ""; }},
         action {          public String toString() { return ""; }},
@@ -15,19 +20,24 @@ public interface BodyLiteral extends Term {
         constraint {      public String toString() { return ""; }}
     }
 
-    public BodyType    getBodyType();
-    public Term        getBodyTerm();
-    public BodyLiteral getBodyNext();
-
-    public boolean     isEmptyBody();
-    public int         getPlanSize();
-
-    public void setBodyType(BodyType bt);
-    public void setBodyTerm(Term t);
-    public void setBodyNext(BodyLiteral bl);
+    public BodyLiteral(BodyType t, Term b) {
+        super(oldToNew(t),b);
+    }
     
-    
-    public boolean add(BodyLiteral bl);
-    public boolean add(int index, BodyLiteral bl);
-    public Term removeBody(int index);    
+    private static PlanBody.BodyType oldToNew(BodyType old) {
+        // TODO: implement it!
+        switch (old) {
+        case action: return PlanBody.BodyType.action;
+        case internalAction: return PlanBody.BodyType.internalAction;
+        case achieve: return PlanBody.BodyType.achieve;
+        case test: return PlanBody.BodyType.test;
+        case addBel: return PlanBody.BodyType.addBel;
+        case delBel: return PlanBody.BodyType.delBel;
+        case delAddBel: return PlanBody.BodyType.delAddBel;
+        case achieveNF: return PlanBody.BodyType.achieveNF;
+        case constraint: return PlanBody.BodyType.constraint;
+        }
+        return PlanBody.BodyType.none;
+    }
+
 }

@@ -11,7 +11,7 @@ import jason.asSyntax.directives.*;
 import jason.asSyntax.ArithExpr.ArithmeticOp;
 import jason.asSyntax.LogExpr.LogicalOp;
 import jason.asSyntax.RelExpr.RelationalOp;
-import jason.asSyntax.BodyLiteral.BodyType;
+import jason.asSyntax.PlanBody.BodyType;
 import jason.asSyntax.Trigger.TEOperator;
 import jason.asSyntax.Trigger.TEType;
 import jason.jeditplugin.*;

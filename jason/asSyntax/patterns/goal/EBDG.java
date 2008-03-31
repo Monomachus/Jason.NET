@@ -1,15 +1,15 @@
 package jason.asSyntax.patterns.goal;
 
 import jason.asSemantics.Agent;
-import jason.asSyntax.BodyLiteral;
-import jason.asSyntax.BodyLiteralImpl;
+import jason.asSyntax.PlanBody;
+import jason.asSyntax.PlanBodyImpl;
 import jason.asSyntax.Literal;
 import jason.asSyntax.LogExpr;
 import jason.asSyntax.LogicalFormula;
 import jason.asSyntax.NumberTermImpl;
 import jason.asSyntax.Plan;
 import jason.asSyntax.Pred;
-import jason.asSyntax.BodyLiteral.BodyType;
+import jason.asSyntax.PlanBody.BodyType;
 import jason.asSyntax.LogExpr.LogicalOp;
 import jason.asSyntax.directives.Directive;
 
@@ -53,10 +53,10 @@ public class EBDG implements Directive {
                 
                 // change body
                 // add +p__f(i,g)
-                BodyLiteral b1 = new BodyLiteralImpl(BodyType.addBel, pi);
+                PlanBody b1 = new PlanBodyImpl(BodyType.addBel, pi);
                 p.getBody().add(0, b1);
                 // add ?g
-                BodyLiteral b2 = new BodyLiteralImpl(BodyType.test, (Literal)goal.clone());
+                PlanBody b2 = new PlanBodyImpl(BodyType.test, (Literal)goal.clone());
                 p.getBody().add(b2);
                 newAg.getPL().add(p);
             }

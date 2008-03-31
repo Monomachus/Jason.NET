@@ -13,7 +13,7 @@
   import jason.asSyntax.ArithExpr.ArithmeticOp;
   import jason.asSyntax.LogExpr.LogicalOp;
   import jason.asSyntax.RelExpr.RelationalOp;
-  import jason.asSyntax.BodyLiteral.BodyType;
+  import jason.asSyntax.PlanBody.BodyType;
   import jason.asSyntax.Trigger.TEOperator;
   import jason.asSyntax.Trigger.TEType;
   import jason.jeditplugin.*;
@@ -316,7 +316,7 @@
   final public Plan plan() throws ParseException {
                         Token k; Pred L = null;
                         Trigger T;
-                        Object C = null; BodyLiteral bl = null;
+                        Object C = null; PlanBody bl = null;
                         Object B = null;
                         int start = -1, end;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -358,11 +358,11 @@
                      if (ial != null)
                         {if (true) throw new ParseException(getSourceRef(ial)+" The internal action '"+ial+"' can not be used in plan's context!");}
                      if (B != null) {
-                        if (!(B instanceof BodyLiteral))
+                        if (!(B instanceof PlanBody))
                            {if (true) throw new ParseException(getSourceRef(B)+" Unknown body formula:"+B);}
-                            bl = (BodyLiteral)B;
+                            bl = (PlanBody)B;
                             if (bl.getBodyTerm().equals(Literal.LTrue))
-                               bl = (BodyLiteral)bl.getBodyNext();
+                               bl = (PlanBody)bl.getBodyNext();
                          }
                      Plan p = new Plan(L,T,(LogicalFormula)C, bl);
                      p.setSrcLines(start,end);
@@ -485,16 +485,16 @@
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case 37:
       jj_consume_token(37);
-                             if (!(F instanceof BodyLiteral)) {if (true) throw new ParseException(getSourceRef(F)+" "+F+" is not a body literal!");}
+                             if (!(F instanceof PlanBody)) {if (true) throw new ParseException(getSourceRef(F)+" "+F+" is not a body literal!");}
       R = plan_body();
-                             if (!(R instanceof BodyLiteral)) {if (true) throw new ParseException(getSourceRef(R)+" "+R+" is not a body literal!");}
+                             if (!(R instanceof PlanBody)) {if (true) throw new ParseException(getSourceRef(R)+" "+R+" is not a body literal!");}
       break;
     default:
       jj_la1[19] = jj_gen;
       ;
     }
-                             if (F instanceof BodyLiteral && R instanceof BodyLiteral) {
-                                ((BodyLiteral)F).setBodyNext( (BodyLiteral)R );
+                             if (F instanceof PlanBody && R instanceof PlanBody) {
+                                ((PlanBody)F).setBodyNext( (PlanBody)R );
                              }
                              {if (true) return F;}
     throw new Error("Missing return statement in function");
@@ -552,13 +552,13 @@
                          if (B instanceof Literal) {
                             if ( ((Literal)B).isInternalAction() )
                                formType = BodyType.internalAction;
-                            {if (true) return new BodyLiteralImpl(formType, (Literal)B);}
+                            {if (true) return new PlanBodyImpl(formType, (Literal)B);}
                          } else if (formType == BodyType.action && B instanceof RelExpr) {
-                            {if (true) return new BodyLiteralImpl(BodyType.constraint, (RelExpr)B);} // constraint 
+                            {if (true) return new PlanBodyImpl(BodyType.constraint, (RelExpr)B);} // constraint 
                          } else {
                                 if (formType == BodyType.test) {
                                    if (B instanceof LogicalFormula)
-                                      {if (true) return new BodyLiteralImpl(BodyType.test, (Term)B);}  // used in ?(a & b)
+                                      {if (true) return new PlanBodyImpl(BodyType.test, (Term)B);}  // used in ?(a & b)
                                    else
                                       {if (true) throw new ParseException(getSourceRef(B)+" The argument for ? is not a logical formula.");}
                                 } else {
@@ -662,9 +662,9 @@
       jj_consume_token(-1);
       throw new ParseException();
     }
-                         // if the result is a BodyLiteral action with size = 1, it is indeed a literal and not a body literal
-                         /*if (o instanceof BodyLiteral) {
-                            BodyLiteral bl = (BodyLiteral)o;
+                         // if the result is a PlanBody action with size = 1, it is indeed a literal and not a body literal
+                         /*if (o instanceof PlanBody) {
+                            PlanBody bl = (PlanBody)o;
                             if (bl.getBodyType() == BodyType.action && bl.getPlanSize() == 1) {
                                o = bl.getBodyTerm();
                             }

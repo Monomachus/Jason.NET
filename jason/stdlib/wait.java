@@ -31,12 +31,12 @@ import jason.asSemantics.Intention;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.Atom;
-import jason.asSyntax.BodyLiteralImpl;
+import jason.asSyntax.PlanBodyImpl;
 import jason.asSyntax.NumberTerm;
 import jason.asSyntax.StringTerm;
 import jason.asSyntax.Term;
 import jason.asSyntax.Trigger;
-import jason.asSyntax.BodyLiteral.BodyType;
+import jason.asSyntax.PlanBody.BodyType;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -176,7 +176,7 @@ public class wait extends DefaultInternalAction {
                     si.peek().removeCurrentStep();
                     if (stopByTimeout && te != null) {
                         // fail the .wait
-                        si.peek().getPlan().getBody().add(0, new BodyLiteralImpl(BodyType.internalAction, new Atom(".fail")));
+                        si.peek().getPlan().getBody().add(0, new PlanBodyImpl(BodyType.internalAction, new Atom(".fail")));
                     } 
                     if (si.isSuspended()) { // if the intention was suspended by .suspend
                     	String k = suspend.SUSPENDED_INT+si.getId();

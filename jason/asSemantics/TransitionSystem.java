@@ -27,7 +27,7 @@ import jason.JasonException;
 import jason.RevisionFailedException;
 import jason.architecture.AgArch;
 import jason.asSyntax.Atom;
-import jason.asSyntax.BodyLiteral;
+import jason.asSyntax.PlanBody;
 import jason.asSyntax.DefaultTerm;
 import jason.asSyntax.InternalActionLiteral;
 import jason.asSyntax.ListTermImpl;
@@ -286,11 +286,11 @@ public class TransitionSystem {
     }
 
     /**
-     * This step is new in Jason 1.0.2 and replaces the steps RelPl->ApplPl->SelAppl when the user
+     * This step is new in Jason 1.1 and replaces the steps RelPl->ApplPl->SelAppl when the user
      * does not customise selectOption. This version does not create the RP and AP lists and thus 
      * optimise the reasoning cycle. It searches for the first option and automatically selects it.
      * 
-     * @since 1.0.2
+     * @since 1.1
      */
     private void applyFindOp() throws JasonException {
         confP.step = State.AddIM; // default next step
@@ -402,7 +402,7 @@ public class TransitionSystem {
             return;
         }
         Unifier     u = im.unif;
-        BodyLiteral h = im.getCurrentStep();
+        PlanBody h = im.getCurrentStep();
         h.apply(u);
         
         Literal body  = null;

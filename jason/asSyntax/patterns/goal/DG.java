@@ -1,12 +1,12 @@
 package jason.asSyntax.patterns.goal;
 
 import jason.asSemantics.Agent;
-import jason.asSyntax.BodyLiteral;
-import jason.asSyntax.BodyLiteralImpl;
+import jason.asSyntax.PlanBody;
+import jason.asSyntax.PlanBodyImpl;
 import jason.asSyntax.Literal;
 import jason.asSyntax.Plan;
 import jason.asSyntax.Pred;
-import jason.asSyntax.BodyLiteral.BodyType;
+import jason.asSyntax.PlanBody.BodyType;
 import jason.asSyntax.directives.Directive;
 
 import java.util.logging.Level;
@@ -32,7 +32,7 @@ public class DG implements Directive {
             
             // add ?g in the end of all inner plans
             for (Plan p: innerContent.getPL()) {
-                BodyLiteral b = new BodyLiteralImpl(BodyType.test, (Literal)goal.clone());
+                PlanBody b = new PlanBodyImpl(BodyType.test, (Literal)goal.clone());
                 p.getBody().add(b);
                 newAg.getPL().add(p);
             }

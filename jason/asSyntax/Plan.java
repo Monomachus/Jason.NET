@@ -51,7 +51,7 @@ public class Plan extends SourceInfo implements Cloneable, Serializable {
 	private Pred              label  = null;
     private Trigger           tevent = null;
     private LogicalFormula    context;
-    private BodyLiteral       body;
+    private PlanBody          body;
     
     
     private boolean isAtomic = false;
@@ -63,12 +63,12 @@ public class Plan extends SourceInfo implements Cloneable, Serializable {
     }
     
     // used by parser
-    public Plan(Pred label, Trigger te, LogicalFormula ct, BodyLiteral bd) {
+    public Plan(Pred label, Trigger te, LogicalFormula ct, PlanBody bd) {
         tevent = te;
         setLabel(label);
         setContext(ct);
         if (bd == null)
-            body = new BodyLiteralImpl();
+            body = new PlanBodyImpl();
         else
             body = bd;
     }
@@ -121,7 +121,7 @@ public class Plan extends SourceInfo implements Cloneable, Serializable {
         return context;
     }
     
-    public BodyLiteral getBody() {
+    public PlanBody getBody() {
         return body;
     }
     
@@ -201,7 +201,7 @@ public class Plan extends SourceInfo implements Cloneable, Serializable {
         if (context != null) 
             p.context = (LogicalFormula)context.clone();
         
-        p.body = (BodyLiteral)body.clone();
+        p.body = (PlanBody)body.clone();
         
         p.setSrc(this);
 
@@ -219,7 +219,7 @@ public class Plan extends SourceInfo implements Cloneable, Serializable {
         
         p.tevent = (Trigger)tevent.clone();
         p.context = context;
-        p.body = (BodyLiteral)body.clone();
+        p.body = (PlanBody)body.clone();
         
         p.setSrc(this);
 

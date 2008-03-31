@@ -2,14 +2,14 @@ package test;
 
 import jason.JasonException;
 import jason.asSemantics.Unifier;
-import jason.asSyntax.BodyLiteral;
-import jason.asSyntax.BodyLiteralImpl;
+import jason.asSyntax.PlanBody;
+import jason.asSyntax.PlanBodyImpl;
 import jason.asSyntax.Literal;
 import jason.asSyntax.Plan;
 import jason.asSyntax.PlanLibrary;
 import jason.asSyntax.Trigger;
 import jason.asSyntax.VarTerm;
-import jason.asSyntax.BodyLiteral.BodyType;
+import jason.asSyntax.PlanBody.BodyType;
 import jason.asSyntax.parser.ParseException;
 
 import java.util.Iterator;
@@ -58,18 +58,18 @@ public class PlanTest extends TestCase {
     public void testParser1() {
         Plan p = Plan.parse("+te : a & b <- a1; a2; .print(a); !g1; !!g2; ?test1; 10 > 3; +b1; -b2; -+b3.");
         p = (Plan)p.clone();
-        Iterator<BodyLiteral> i = ((BodyLiteralImpl)p.getBody()).iterator();
-        assertEquals( BodyLiteral.BodyType.action, ((BodyLiteral)i.next()).getBodyType());
-        assertEquals( BodyLiteral.BodyType.action, ((BodyLiteral)i.next()).getBodyType());
-        assertEquals( BodyLiteral.BodyType.internalAction, ((BodyLiteral)i.next()).getBodyType());
-        assertEquals( BodyLiteral.BodyType.achieve, ((BodyLiteral)i.next()).getBodyType());
-        assertEquals( BodyLiteral.BodyType.achieveNF, ((BodyLiteral)i.next()).getBodyType());
-        assertEquals( BodyLiteral.BodyType.test, ((BodyLiteral)i.next()).getBodyType());
-        assertEquals( BodyLiteral.BodyType.constraint, ((BodyLiteral)i.next()).getBodyType());
-        assertEquals( BodyLiteral.BodyType.addBel, ((BodyLiteral)i.next()).getBodyType());
-        assertEquals( BodyLiteral.BodyType.delBel, ((BodyLiteral)i.next()).getBodyType());
+        Iterator<PlanBody> i = ((PlanBodyImpl)p.getBody()).iterator();
+        assertEquals( PlanBody.BodyType.action, ((PlanBody)i.next()).getBodyType());
+        assertEquals( PlanBody.BodyType.action, ((PlanBody)i.next()).getBodyType());
+        assertEquals( PlanBody.BodyType.internalAction, ((PlanBody)i.next()).getBodyType());
+        assertEquals( PlanBody.BodyType.achieve, ((PlanBody)i.next()).getBodyType());
+        assertEquals( PlanBody.BodyType.achieveNF, ((PlanBody)i.next()).getBodyType());
+        assertEquals( PlanBody.BodyType.test, ((PlanBody)i.next()).getBodyType());
+        assertEquals( PlanBody.BodyType.constraint, ((PlanBody)i.next()).getBodyType());
+        assertEquals( PlanBody.BodyType.addBel, ((PlanBody)i.next()).getBodyType());
+        assertEquals( PlanBody.BodyType.delBel, ((PlanBody)i.next()).getBodyType());
         assertTrue(i.hasNext());
-        assertEquals( BodyLiteral.BodyType.delAddBel, ((BodyLiteral)i.next()).getBodyType());
+        assertEquals( PlanBody.BodyType.delAddBel, ((PlanBody)i.next()).getBodyType());
         assertFalse(i.hasNext());
     }
     
@@ -78,7 +78,7 @@ public class PlanTest extends TestCase {
         assertEquals(4, p.getBody().getPlanSize());
         p.getBody().removeBody(0);
         assertEquals(3, p.getBody().getPlanSize());
-        assertEquals(BodyLiteral.BodyType.test, p.getBody().getBodyType());
+        assertEquals(PlanBody.BodyType.test, p.getBody().getBodyType());
         p.getBody().removeBody(0); // 2
         p.getBody().removeBody(0); // 1
         assertEquals(1, p.getBody().getPlanSize());
@@ -87,7 +87,7 @@ public class PlanTest extends TestCase {
     }
     
     public void testEqualsBodyLiteral() {
-        BodyLiteral bl = new BodyLiteralImpl(BodyType.achieve, new Literal("g1"));
+        PlanBody bl = new PlanBodyImpl(BodyType.achieve, new Literal("g1"));
         VarTerm v = new VarTerm("X");
         Unifier u = new Unifier();
         // X = !g1
@@ -101,9 +101,9 @@ public class PlanTest extends TestCase {
     
     public void testUnifyBody() {
         Plan p1 = Plan.parse("+te : a & b <- !a1; ?a2; .print(a); !g1.");
-        BodyLiteral bl = new BodyLiteralImpl(BodyType.action, new VarTerm("A1"));
-        bl.add(new BodyLiteralImpl(BodyType.action, new VarTerm("A2")));
-        bl.add(new BodyLiteralImpl(BodyType.action, new VarTerm("A3")));
+        PlanBody bl = new PlanBodyImpl(BodyType.action, new VarTerm("A1"));
+        bl.add(new PlanBodyImpl(BodyType.action, new VarTerm("A2")));
+        bl.add(new PlanBodyImpl(BodyType.action, new VarTerm("A3")));
         //assertEquals(p1.getBody().getArity(), bl.getArity());
         Unifier u = new Unifier();
         assertTrue(u.unifies(p1.getBody(), bl));
