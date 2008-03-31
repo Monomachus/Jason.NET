@@ -297,7 +297,7 @@ public class TransitionSystem {
 
         // get all relevant plans for the selected event
         //Trigger te = (Trigger) conf.C.SE.trigger.clone();
-        List<Plan> candidateRPs = conf.ag.pl.getAllRelevant(conf.C.SE.trigger);
+        List<Plan> candidateRPs = conf.ag.pl.getCandidatePlans(conf.C.SE.trigger);
         if (candidateRPs != null) {
             for (Plan pl : candidateRPs) {
                 Unifier relUn = pl.isRelevant(conf.C.SE.trigger);
@@ -486,7 +486,7 @@ public class TransitionSystem {
             		if (body.isLiteral()) { // in case body is a var with content that is not a literal (note the VarTerm pass in the instanceof Literal)
     	                body.makeVarsAnnon();
     	                Trigger te = new Trigger(TEOperator.add, TEType.test, body);
-    	                if (ag.getPL().isRelevant(te)) {
+    	                if (ag.getPL().hasCandidatePlan(te)) {
     	                    Event evt = new Event(te, conf.C.SI);
     	                    if (logger.isLoggable(Level.FINE)) logger.fine("Test Goal '" + h + "' failed as simple query. Generating internal event for it: "+te);
     	                    conf.C.addEvent(evt);
@@ -655,7 +655,7 @@ public class TransitionSystem {
     public List<Option> relevantPlans(Trigger teP) throws JasonException {
         Trigger te = (Trigger) teP.clone();
         List<Option> rp = null;
-        List<Plan> candidateRPs = conf.ag.pl.getAllRelevant(te);
+        List<Plan> candidateRPs = conf.ag.pl.getCandidatePlans(te);
         if (candidateRPs != null) {
             for (Plan pl : candidateRPs) {
                 Unifier relUn = pl.isRelevant(te);
@@ -707,10 +707,12 @@ public class TransitionSystem {
         for (Literal ladd: result[0]) {
             Trigger te = new Trigger(TEOperator.add, TEType.belief, ladd);
             updateEvents(new Event(te, focus));
+            focus = Intention.EmptyInt;
         }
         for (Literal lrem: result[1]) {
             Trigger te = new Trigger(TEOperator.del, TEType.belief, lrem);
             updateEvents(new Event(te, focus));
+            focus = Intention.EmptyInt;
         }
     }
 
@@ -719,7 +721,7 @@ public class TransitionSystem {
         // Note: we have to add events even if they are not relevant to
         // a) allow the user to override selectOption and then provide an "unknown" plan; or then
         // b) create the failure event (it is done by SelRelPlan)
-        if (e.isInternal() || C.hasListener() || ag.getPL().isRelevant(e.trigger)) {
+        if (e.isInternal() || C.hasListener() || ag.getPL().hasCandidatePlan(e.trigger)) {
             C.addEvent(e);
             if (logger.isLoggable(Level.FINE)) logger.fine("Added event " + e);
         }
@@ -794,14 +796,14 @@ public class TransitionSystem {
         Trigger failTrigger = new Trigger(TEOperator.del, tevent.getType(), tevent.getLiteral());
     	if (i != Intention.EmptyInt) {
 	        ListIterator<IntendedMeans> ii = i.iterator();
-	        while (!getAg().getPL().isRelevant(failTrigger) && ii.hasPrevious()) {
+	        while (!getAg().getPL().hasCandidatePlan(failTrigger) && ii.hasPrevious()) {
 	            IntendedMeans im = ii.previous();
 	            tevent = im.getTrigger();
 	            failTrigger = new Trigger(TEOperator.del, tevent.getType(), tevent.getLiteral());
 	        }
     	}
         // if some failure handling plan is found
-        if (tevent.isGoal() && getAg().getPL().isRelevant(failTrigger)) {
+        if (tevent.isGoal() && getAg().getPL().hasCandidatePlan(failTrigger)) {
             return new Event(failTrigger, i);
         }
         return null;

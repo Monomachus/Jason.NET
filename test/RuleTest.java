@@ -119,7 +119,7 @@ public class RuleTest extends TestCase {
         assertEquals(u.get("M").toString(),"20");
 
         Literal cons = Literal.parseLiteral("min([op(5),op(3),op(8),op(1),op(40)],op(1000),op(M))");
-        Iterator<Literal> il = ag.getBB().getRelevant(cons);
+        Iterator<Literal> il = ag.getBB().getCandidateBeliefs(cons, null);
         assertEquals(3,iteratorSize(il));
         
         iun = cons.logicalConsequence(ag, new Unifier());

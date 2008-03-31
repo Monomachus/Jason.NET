@@ -119,7 +119,7 @@ public class BeliefBaseTest extends TestCase {
 		l5 = new Literal(true, new Pred("garb"));
 		l5.addTerm(new Structure("r1"));
 		assertTrue(bb.remove(l5));
-		assertEquals(bb.getRelevant(l5), null);
+		assertEquals(bb.getCandidateBeliefs(l5, null), null);
 		assertEquals(bb.size(), 3);
 
 		l4 = new Literal(true, new Pred("pos"));
@@ -127,7 +127,7 @@ public class BeliefBaseTest extends TestCase {
 		l4.addTerm(new Structure("6"));
 		l4.addAnnot(BeliefBase.TPercept);
 		assertTrue(bb.remove(l4));
-		assertEquals(iteratorSize(bb.getRelevant(l4)), 1);
+		assertEquals(iteratorSize(bb.getCandidateBeliefs(l4, null)), 1);
 		assertEquals(bb.size(), 2);
 		assertEquals(iteratorSize(bb.iterator()), 2);
 
@@ -141,7 +141,7 @@ public class BeliefBaseTest extends TestCase {
 		l4.addTerm(new Structure("2"));
 		l4.addAnnot(BeliefBase.TPercept);
 		assertTrue(bb.remove(l4));
-		assertEquals(bb.getRelevant(l4), null);
+		assertEquals(bb.getCandidateBeliefs(l4, null), null);
 		assertEquals(bb.size(), 1);
         assertEquals(iteratorSize(bb.getPercepts()), 1);
 
@@ -513,7 +513,7 @@ public class BeliefBaseTest extends TestCase {
         //while (ir.hasNext()) {
         //    System.out.println(ir.next());
         //}
-        assertEquals(iteratorSize(bb.getRelevant(Literal.parseLiteral("book_author(_,_)"))),5);
+        assertEquals(iteratorSize(bb.getCandidateBeliefs(Literal.parseLiteral("book_author(_,_)"),null)),5);
         
         bb.stop();
     }

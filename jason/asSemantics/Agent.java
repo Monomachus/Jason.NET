@@ -457,7 +457,7 @@ public class Agent {
                 perceptsInBB.remove(); // remove l as perception from BB
                 
                 Trigger te = new Trigger(TEOperator.del, TEType.belief, l);
-                if (ts.getC().hasListener() || pl.isRelevant(te)) {
+                if (ts.getC().hasListener() || pl.hasCandidatePlan(te)) {
                     l = (Literal)l.clone();
                     l.clearAnnots();
                     l.addAnnot(BeliefBase.TPercept);
@@ -519,7 +519,7 @@ public class Agent {
      * The unifier <i>un</i> is updated by the method.
      */
     public Literal findBel(Literal bel, Unifier un) {
-        Iterator<Literal> relB = bb.getRelevant(bel);
+        Iterator<Literal> relB = bb.getCandidateBeliefs(bel, un);
         if (relB != null) {
             while (relB.hasNext()) {
                 Literal b = relB.next();
@@ -628,7 +628,7 @@ public class Agent {
     public void abolish(Literal bel, Unifier un) throws RevisionFailedException {
         List<Literal> toDel = new ArrayList<Literal>();
         
-        Iterator<Literal> il = getBB().getRelevant(bel);
+        Iterator<Literal> il = getBB().getCandidateBeliefs(bel, un);
         if (il != null) {
             while (il.hasNext()) {
                 Literal inBB = il.next();

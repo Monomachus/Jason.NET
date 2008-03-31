@@ -336,7 +336,7 @@ public class VarTermTest extends TestCase {
         
         Unifier u = new Unifier();
         VarTerm v1 = VarTerm.parseVar("P[d]");
-        assertEquals(2, iteratorSize(ag.getBB().getRelevant(v1)));
+        assertEquals(2, iteratorSize(ag.getBB().getCandidateBeliefs(v1, null)));
         Iterator<Unifier> i = v1.logicalConsequence(ag, u);
         assertTrue(i.hasNext());
         u = i.next(); // u = {P[d]=b2}

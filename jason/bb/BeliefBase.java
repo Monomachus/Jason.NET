@@ -24,10 +24,11 @@
 package jason.bb;
 
 import jason.asSemantics.Agent;
+import jason.asSemantics.Unifier;
+import jason.asSyntax.DefaultTerm;
 import jason.asSyntax.Literal;
 import jason.asSyntax.PredicateIndicator;
 import jason.asSyntax.Term;
-import jason.asSyntax.DefaultTerm;
 
 import java.util.Iterator;
 
@@ -76,12 +77,18 @@ public interface BeliefBase extends Iterable<Literal>, Cloneable {
     /** 
      * Returns an iterator for all literals relevant for l's predicate
      * indicator, if l is a var, returns all beliefs.<br>
+     * 
+     * The unifier <i>u</i> may contain values for variables in <i>l</i>.
      *
      * Example, if BB={a(10),a(20),a(2,1),b(f)}, then
-     * <code>getRelevant(a(5))</code> = {{a(10),a(20)}.<br>
-     * if BB={a(10),a(20)}, then <code>getRelevant(X)</code> =
-     * {{a(10),a(20)}.
+     * <code>getCandidateBeliefs(a(5), {})</code> = {{a(10),a(20)}.<br>
+     * if BB={a(10),a(20)}, then <code>getCandidateBeliefs(X)</code> =
+     * {{a(10),a(20)}. The <code>getCandidateBeliefs(a(X), {X -> 5})</code> 
+     * should also return {{a(10),a(20)}.<br>
      */
+    public Iterator<Literal> getCandidateBeliefs(Literal l, Unifier u);
+    
+    /** @deprecated use getCandidateBeliefs(l,null) instead */
     public Iterator<Literal> getRelevant(Literal l);
 
     /**

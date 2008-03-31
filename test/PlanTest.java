@@ -42,16 +42,16 @@ public class PlanTest extends TestCase {
 
     	pl.add(Plan.parse("+!X <- .print(a)."));
     	
-    	List<Plan> pls = pl.getAllRelevant(Trigger.parseTrigger("+p(3)"));
+    	List<Plan> pls = pl.getCandidatePlans(Trigger.parseTrigger("+p(3)"));
     	assertEquals(2, pls.size());
 
-    	pls = pl.getAllRelevant(Trigger.parseTrigger("+!p(3)"));
+    	pls = pl.getCandidatePlans(Trigger.parseTrigger("+!p(3)"));
     	assertEquals(3, pls.size());	
 
-    	pls = pl.getAllRelevant(Trigger.parseTrigger("+!bla"));
+    	pls = pl.getCandidatePlans(Trigger.parseTrigger("+!bla"));
     	assertEquals(1, pls.size());	
 
-    	pls = pl.getAllRelevant(Trigger.parseTrigger("+bla"));
+    	pls = pl.getCandidatePlans(Trigger.parseTrigger("+bla"));
     	assertEquals(0, pls.size());	
     }
     

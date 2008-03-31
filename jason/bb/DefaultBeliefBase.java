@@ -24,6 +24,7 @@
 package jason.bb;
 
 import jason.asSemantics.Agent;
+import jason.asSemantics.Unifier;
 import jason.asSyntax.Literal;
 import jason.asSyntax.PredicateIndicator;
 
@@ -222,7 +223,7 @@ public class DefaultBeliefBase implements BeliefBase {
         }
     }
 
-    public Iterator<Literal> getRelevant(Literal l) {
+    public Iterator<Literal> getCandidateBeliefs(Literal l, Unifier u) {
         if (l.isVar()) {
             // all bels are relevant
             return iterator();
@@ -234,6 +235,11 @@ public class DefaultBeliefBase implements BeliefBase {
                 return null;
             }
         }
+    }
+    
+    /** @deprecated use getCandidateBeliefs(l,null) instead */ 
+    public Iterator<Literal> getRelevant(Literal l) {
+        return getCandidateBeliefs(l, null);
     }
 
     public String toString() {

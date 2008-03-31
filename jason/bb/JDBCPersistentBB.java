@@ -1,6 +1,7 @@
 package jason.bb;
 
 import jason.asSemantics.Agent;
+import jason.asSemantics.Unifier;
 import jason.asSyntax.DefaultTerm;
 import jason.asSyntax.ListTerm;
 import jason.asSyntax.ListTermImpl;
@@ -318,10 +319,10 @@ public class JDBCPersistentBB extends DefaultBeliefBase {
 
 
     @Override
-    public Iterator<Literal> getRelevant(Literal l) {
+    public Iterator<Literal> getCandidateBeliefs(Literal l, Unifier u) {
         final PredicateIndicator pi = l.getPredicateIndicator();
         if (belsDB.get(pi) == null)
-            return super.getRelevant(l);
+            return super.getCandidateBeliefs(l, u);
         
         if (l.isVar()) {
             // all bels are relevant

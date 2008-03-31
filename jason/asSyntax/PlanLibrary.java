@@ -233,12 +233,23 @@ public class PlanLibrary implements Iterable<Plan> {
         return p;
     }
 
+    /** @deprecated use hasCandidatePlan(te) instead */
     public boolean isRelevant(Trigger te) {
-        List<Plan> l = getAllRelevant(te);
+        return hasCandidatePlan(te);
+    }
+
+    public boolean hasCandidatePlan(Trigger te) {
+        List<Plan> l = getCandidatePlans(te);
         return l != null && ! l.isEmpty();
     }
 
+    
+    /** @deprecated use getCandidatePlans(te) instead */
     public List<Plan> getAllRelevant(Trigger te) {
+        return getCandidatePlans(te);
+    }
+    
+    public List<Plan> getCandidatePlans(Trigger te) {
     	List<Plan> l = relPlans.get(te.getPredicateIndicator());
     	if ((l == null || l.isEmpty()) && !varPlans.isEmpty()) {  // no rel plan, try varPlan
     		l = new ArrayList<Plan>();

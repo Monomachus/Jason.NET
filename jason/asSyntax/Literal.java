@@ -126,7 +126,7 @@ public class Literal extends Pred implements LogicalFormula {
      * Returns an iterator for all unifiers that are logCons.
      */
     public Iterator<Unifier> logicalConsequence(final Agent ag, final Unifier un) {
-        final Iterator<Literal> il = ag.getBB().getRelevant(this);
+        final Iterator<Literal> il = ag.getBB().getCandidateBeliefs(this, un);
         if (il == null) // no relevant bels
             return LogExpr.EMPTY_UNIF_LIST.iterator();
         
