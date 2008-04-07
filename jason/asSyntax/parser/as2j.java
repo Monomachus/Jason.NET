@@ -434,50 +434,6 @@
     throw new Error("Missing return statement in function");
   }
 
-/* Literal */
-  final public Literal literal() throws ParseException {
-                       Pred F; Token k; boolean type = Literal.LPos;
-    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case TK_NEG:
-    case TK_BEGIN:
-    case TK_END:
-    case ATOM:
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case TK_NEG:
-        jj_consume_token(TK_NEG);
-                                type = Literal.LNeg;
-        break;
-      default:
-        jj_la1[17] = jj_gen;
-        ;
-      }
-      F = pred();
-                                if (F.getFunctor().indexOf(".") >= 0) {
-                                                                   try {
-                                                                      {if (true) return new InternalActionLiteral(F, curAg);}
-                                   } catch (Exception e) {
-                                      if (getArithFunction(F) == null) // it is not a registered function
-                                         {if (true) throw new ParseException(getSourceRef(F)+" The internal action class for '"+F+"' was not found!");}
-                                   }
-                                }
-                                {if (true) return new Literal(type,F);}
-      break;
-    case TK_TRUE:
-      k = jj_consume_token(TK_TRUE);
-                                {if (true) return Literal.LTrue;}
-      break;
-    case TK_FALSE:
-      k = jj_consume_token(TK_FALSE);
-                                {if (true) return Literal.LFalse;}
-      break;
-    default:
-      jj_la1[18] = jj_gen;
-      jj_consume_token(-1);
-      throw new ParseException();
-    }
-    throw new Error("Missing return statement in function");
-  }
-
 /* Plan body */
   final public Object plan_body() throws ParseException {
                              Object F; Object R = null;
@@ -490,7 +446,7 @@
                              if (!(R instanceof PlanBody)) {if (true) throw new ParseException(getSourceRef(R)+" "+R+" is not a body literal!");}
       break;
     default:
-      jj_la1[19] = jj_gen;
+      jj_la1[17] = jj_gen;
       ;
     }
                              if (F instanceof PlanBody && R instanceof PlanBody) {
@@ -534,18 +490,18 @@
                          formType = BodyType.delAddBel;
           break;
         default:
-          jj_la1[20] = jj_gen;
+          jj_la1[18] = jj_gen;
           ;
         }
         break;
       default:
-        jj_la1[21] = jj_gen;
+        jj_la1[19] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
       break;
     default:
-      jj_la1[22] = jj_gen;
+      jj_la1[20] = jj_gen;
       ;
     }
     B = log_expr();
@@ -565,6 +521,50 @@
                                {if (true) return B;}
                                 }
                          }
+    throw new Error("Missing return statement in function");
+  }
+
+/* Literal */
+  final public Literal literal() throws ParseException {
+                       Pred F; Token k; boolean type = Literal.LPos;
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case TK_NEG:
+    case TK_BEGIN:
+    case TK_END:
+    case ATOM:
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case TK_NEG:
+        jj_consume_token(TK_NEG);
+                                type = Literal.LNeg;
+        break;
+      default:
+        jj_la1[21] = jj_gen;
+        ;
+      }
+      F = pred();
+                                if (F.getFunctor().indexOf(".") >= 0) {
+                                                                   try {
+                                                                      {if (true) return new InternalActionLiteral(F, curAg);}
+                                   } catch (Exception e) {
+                                      if (getArithFunction(F) == null) // it is not a registered function
+                                         {if (true) throw new ParseException(getSourceRef(F)+" The internal action class for '"+F+"' was not found!");}
+                                   }
+                                }
+                                {if (true) return new Literal(type,F);}
+      break;
+    case TK_TRUE:
+      k = jj_consume_token(TK_TRUE);
+                                {if (true) return Literal.LTrue;}
+      break;
+    case TK_FALSE:
+      k = jj_consume_token(TK_FALSE);
+                                {if (true) return Literal.LFalse;}
+      break;
+    default:
+      jj_la1[22] = jj_gen;
+      jj_consume_token(-1);
+      throw new ParseException();
+    }
     throw new Error("Missing return statement in function");
   }
 
@@ -1236,10 +1236,10 @@
       jj_la1_1();
    }
    private static void jj_la1_0() {
-      jj_la1_0 = new int[] {0x8000000,0x10cb00,0x8000000,0x80000000,0x8000000,0x10000,0x10cb00,0x8000000,0x8000000,0x20000000,0x10000,0x0,0x0,0x0,0x80000000,0x80000000,0x30cb80,0x800,0x10cb00,0x0,0x0,0x80000000,0x80000000,0x10c000,0x0,0x0,0x0,0x3acf80,0x0,0x200080,0x0,0x3acb80,0x3acb80,0x0,0x0,0x3acf80,0x3acb80,0x0,0x3acb80,0x0,0x0,0x0,0x3000,0x3000,0x0,0x32cb80,0x200080,0x0,};
+      jj_la1_0 = new int[] {0x8000000,0x10cb00,0x8000000,0x80000000,0x8000000,0x10000,0x10cb00,0x8000000,0x8000000,0x20000000,0x10000,0x0,0x0,0x0,0x80000000,0x80000000,0x30cb80,0x0,0x0,0x80000000,0x80000000,0x800,0x10cb00,0x10c000,0x0,0x0,0x0,0x3acf80,0x0,0x200080,0x0,0x3acb80,0x3acb80,0x0,0x0,0x3acf80,0x3acb80,0x0,0x3acb80,0x0,0x0,0x0,0x3000,0x3000,0x0,0x32cb80,0x200080,0x0,};
    }
    private static void jj_la1_1() {
-      jj_la1_1 = new int[] {0x0,0x0,0x0,0x0,0x0,0xc,0x0,0x0,0x0,0x0,0x0,0x1,0x2,0xc,0x10,0x10,0x0,0x0,0x0,0x20,0x4,0x5c,0x5c,0x0,0x80,0x400,0x200,0x488,0x200,0x400,0x800,0x488,0x488,0x800,0x2000,0x88,0x88,0x3fc000,0x488,0x3fc000,0xc,0xc,0xc00000,0xc00000,0x1000000,0x88,0x0,0x400,};
+      jj_la1_1 = new int[] {0x0,0x0,0x0,0x0,0x0,0xc,0x0,0x0,0x0,0x0,0x0,0x1,0x2,0xc,0x10,0x10,0x0,0x20,0x4,0x5c,0x5c,0x0,0x0,0x0,0x80,0x400,0x200,0x488,0x200,0x400,0x800,0x488,0x488,0x800,0x2000,0x88,0x88,0x3fc000,0x488,0x3fc000,0xc,0xc,0xc00000,0xc00000,0x1000000,0x88,0x0,0x400,};
    }
   final private JJCalls[] jj_2_rtns = new JJCalls[1];
   private boolean jj_rescan = false;

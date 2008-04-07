@@ -339,27 +339,6 @@ Trigger trigger() :
   )            { return new Trigger(teOp,teType,F); }
 }
 
-/* Literal */
-Literal literal() :  { Pred F; Token k; boolean type = Literal.LPos; }
-{
-  ( ( [ <TK_NEG>              { type = Literal.LNeg; }
-      ]
-      F=pred()                { if (F.getFunctor().indexOf(".") >= 0) {
-								   try {
-								      return new InternalActionLiteral(F, curAg);
-                                   } catch (Exception e) {
-                                      if (getArithFunction(F) == null) // it is not a registered function
-                                      	 throw new ParseException(getSourceRef(F)+" The internal action class for '"+F+"' was not found!");
-                                   }
-                                }
-                                return new Literal(type,F);
-                              }
-    )
-  | k=<TK_TRUE>               { return Literal.LTrue; } 
-  | k=<TK_FALSE>              { return Literal.LFalse; } 
-  )
-}
-
 
 /* Plan body */
 Object plan_body() :       { Object F; Object R = null; }
@@ -410,6 +389,27 @@ Object body_formula() :
                        }
 }
 
+
+/* Literal */
+Literal literal() :  { Pred F; Token k; boolean type = Literal.LPos; }
+{
+  ( ( [ <TK_NEG>              { type = Literal.LNeg; }
+      ]
+      F=pred()                { if (F.getFunctor().indexOf(".") >= 0) {
+								   try {
+								      return new InternalActionLiteral(F, curAg);
+                                   } catch (Exception e) {
+                                      if (getArithFunction(F) == null) // it is not a registered function
+                                      	 throw new ParseException(getSourceRef(F)+" The internal action class for '"+F+"' was not found!");
+                                   }
+                                }
+                                return new Literal(type,F);
+                              }
+    )
+  | k=<TK_TRUE>               { return Literal.LTrue; } 
+  | k=<TK_FALSE>              { return Literal.LFalse; } 
+  )
+}
 
 /* Annotated Formulae */
 Pred pred() :       { Token K; Pred p; List l; ListTerm lt;}
