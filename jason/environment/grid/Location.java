@@ -1,7 +1,7 @@
 package jason.environment.grid;
 
 public final class Location {
-    public int x, y;
+    public final int x, y;
     
     public Location(int x, int y) {
         this.x = x;
@@ -11,6 +11,16 @@ public final class Location {
 	/** calculates the Manhattan distance between two points */
     public int distance(Location l) {
         return Math.abs(x - l.x) + Math.abs(y - l.y);
+    }
+
+    /** calculates the Euclidean distance between two points */
+    public double distanceEuclidean(Location l) {
+        return Math.sqrt(Math.pow(x - l.x, 2) + Math.pow(y - l.y, 2));
+    }
+
+    /** returns Math.max( Math.abs(this.x - l.x) , Math.abs(this.y - l.y)) */
+    public int maxBorder(Location l) {
+        return Math.max( Math.abs(this.x - l.x) , Math.abs(this.y - l.y));
     }
 
     public  boolean isNeigbour(Location l) {
