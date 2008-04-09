@@ -131,6 +131,7 @@ public class Agent {
     
                 if (asSrc.startsWith(Include.CRPrefix)) {
                 	// loads the class from a jar file (for example)
+                	asSrc = asSrc.replaceAll("\\\\", "/");
                     parseAS(Agent.class.getResource(asSrc.substring(Include.CRPrefix.length())).openStream());
                 } else {
     	            // check whether source is an URL string
