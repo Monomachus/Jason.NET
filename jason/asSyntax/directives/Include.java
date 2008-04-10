@@ -27,7 +27,7 @@ public class Include implements Directive {
     public Agent process(Pred directive, Agent outerContent, Agent innerContent) {
         if (outerContent == null)
             return null;
-    	String file = ((StringTerm)directive.getTerm(0)).getString();
+    	String file = ((StringTerm)directive.getTerm(0)).getString().replaceAll("\\\\", "/");
         try {
             String outerPrefix = outerContent.getASLSrc(); // the source file that has the include directive
 	    	InputStream in;
@@ -38,7 +38,7 @@ public class Include implements Directive {
 	    			file = checkPathAndFixWithSourcePath(file, aslSourcePath, outerPrefix);
 	    			in = new URL(file).openStream();
 	    			
-	    		} if (outerPrefix.startsWith(CRPrefix)) { 
+	    		} if (outerPrefix.startsWith(CRPrefix)) {
 	    			// outer is loaded from a resource ("application".jar) file, used for java web start
 	    			int posSlash = outerPrefix.lastIndexOf("/");
 
@@ -89,7 +89,7 @@ public class Include implements Directive {
         		return f;
         	} else if (srcpath != null) {
         		for (String path: srcpath) {
-    				File newname = new File(path + File.separator + f.toString());
+    				File newname = new File(path + "/" + f.toString());
     				if (newname.exists()) {
     					try {
 							return newname.getCanonicalFile().toString();
@@ -104,7 +104,7 @@ public class Include implements Directive {
 	    		return urlPrefix + f;
 	    	} else if (srcpath != null) {
 	    		for (String path: srcpath) {
-					String newname = urlPrefix + path + File.separator + f;
+					String newname = urlPrefix + path + "/" + f;
 					if (testURLSrc(newname)) {
 						return newname;
 					}

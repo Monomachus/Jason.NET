@@ -2,6 +2,7 @@ package jason.util;
 
 import jason.asSemantics.Agent;
 
+import java.io.File;
 import java.io.StringReader;
 import java.io.StringWriter;
 
@@ -43,7 +44,7 @@ public class asl2xml  {
 
     Agent loadAg(String file)  throws Exception {
         Agent ag = new Agent();
-        if (ag.parseAS(file)) {
+        if (ag.parseAS(new File(file))) {
         	ag.setASLSrc(file);
         	ag.addInitialBelsInBB();
             return ag;

@@ -26,7 +26,7 @@ public class TextPersistentBB extends DefaultBeliefBase {
             file = new File(ag.getTS().getUserAgArch().getAgName() + ".bb");
             logger.fine("reading from file " + file);
             if (file.exists()) {
-                ag.parseAS(file.getAbsolutePath());
+                ag.parseAS(file.getAbsoluteFile());
                     ag.addInitialBelsInBB();
             }
         } catch (RevisionFailedException e) {

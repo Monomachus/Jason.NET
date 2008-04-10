@@ -127,18 +127,18 @@ public class Agent {
 
             boolean parsingOk = true;
             if (asSrc != null) {
+                asSrc = asSrc.replaceAll("\\\\", "/");
                 setASLSrc(asSrc);
     
                 if (asSrc.startsWith(Include.CRPrefix)) {
                 	// loads the class from a jar file (for example)
-                	asSrc = asSrc.replaceAll("\\\\", "/");
                     parseAS(Agent.class.getResource(asSrc.substring(Include.CRPrefix.length())).openStream());
                 } else {
     	            // check whether source is an URL string
     	            try {
     	                parsingOk = parseAS(new URL(asSrc));
     	            } catch (MalformedURLException e) {
-    	                parsingOk = parseAS(asSrc);
+    	                parsingOk = parseAS(new File(asSrc));
     	            }
                 }
             }
@@ -192,7 +192,7 @@ public class Agent {
     }
     
     public void setASLSrc(String file) {
-        if (file != null && file.startsWith("."+File.separator)) 
+        if (file != null && file.startsWith("./")) 
             file = file.substring(2);
         aslSource = file;    	
     }
@@ -214,17 +214,17 @@ public class Agent {
     }
 
     /** Adds beliefs and plans form a file */
-    public boolean parseAS(String asFileName) {
+    public boolean parseAS(File asFile) {
         try {
-            parseAS(new FileInputStream(asFileName));
-            logger.fine("as2j: AgentSpeak program '" + asFileName + "' parsed successfully!");
+            parseAS(new FileInputStream(asFile));
+            logger.fine("as2j: AgentSpeak program '" + asFile + "' parsed successfully!");
             return true;
         } catch (FileNotFoundException e) {
-            logger.log(Level.SEVERE, "as2j: the AgentSpeak source file '"+asFileName+"' was not found!");
+            logger.log(Level.SEVERE, "as2j: the AgentSpeak source file '"+asFile+"' was not found!");
         } catch (ParseException e) {
             logger.log(Level.SEVERE, "as2j: parsing error:" + e.getMessage());
         } catch (Exception e) {
-            logger.log(Level.SEVERE, "as2j: error parsing \"" + asFileName + "\"", e);
+            logger.log(Level.SEVERE, "as2j: error parsing \"" + asFile + "\"", e);
         }
         return false;
     }
