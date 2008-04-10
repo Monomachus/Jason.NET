@@ -37,7 +37,10 @@
     </target>
 
     <target name="compile" depends="init">
-        <javac srcdir="${basedir}" destdir="${build.dir}" debug="true" optimize="true" >
+        <condition property="srcdir" value="${basedir}/src/java" else="${basedir}" >
+            <available file="${basedir}/src/java" />
+        </condition>
+        <javac srcdir="${srcdir}" destdir="${build.dir}" debug="true" optimize="true" >
             <classpath refid="project.classpath"/>
         </javac>
     </target>
