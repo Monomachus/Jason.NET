@@ -33,7 +33,6 @@ import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.ListTerm;
 import jason.asSyntax.NumberTerm;
-import jason.asSyntax.Pred;
 import jason.asSyntax.StringTerm;
 import jason.asSyntax.Structure;
 import jason.asSyntax.Term;
@@ -141,9 +140,10 @@ public class send extends DefaultInternalAction {
             }
 	        
             // remove source annots in the content (in case it is a pred)
-            try {
-                ((Pred)pcnt).delSources();
-            } catch (Exception e) {}
+            // -- CHANGE: use nested annots 
+            //try {
+            //    ((Pred)pcnt).delSources();
+            //} catch (Exception e) {}
             
         } catch (ArrayIndexOutOfBoundsException e) {
             throw new JasonException("The internal action 'send' to '"+to+"' has not received three arguments.");

@@ -15,7 +15,7 @@
    :  .structure(Content) & 
       .ground(Content) &
       not .list(Content)
-   <- .add_annot(Content, source(Sender), CA); 
+   <- .add_nested_source(Content, Sender, CA); 
       +CA.
 @kqmlReceivedTellList
 +!kqml_received(Sender, tell, Content, _) 
@@ -29,7 +29,7 @@
 +!add_all_kqml_received(S,[H|T])
    :  .structure(H) & 
       .ground(H)
-   <- .add_annot(H, source(S), CA); 
+   <- .add_nested_source(H, Sender, CA); 
       +CA;
       !add_all_kqml_received(S,T).
 
@@ -39,7 +39,7 @@
       
 @kqmlReceivedUnTell
 +!kqml_received(Sender, untell, Content, _)
-   <- .add_annot(Content, source(Sender), CA); 
+   <- .add_nested_source(Content, Sender, CA); 
       -CA.
 
 
@@ -48,7 +48,7 @@
 @kqmlReceivedAchieve
 +!kqml_received(Sender, achieve, Content, _)
     : not .list(Content)
-   <- .add_annot(Content, source(Sender), CA); 
+   <- .add_nested_source(Content, Sender, CA); 
       !!CA.
 @kqmlReceivedAchieveList
 +!kqml_received(Sender, achieve, Content, _)
@@ -61,7 +61,7 @@
 
 @kqmlReceivedAchieveList2
 +!add_all_kqml_achieve(Sender,[H|T])
-   <- .add_annot(H, source(Sender), CA);
+   <- .add_nested_source(H, Sender, CA); 
       !!CA;
       !add_all_kqml_achieve(Sender,T).
 

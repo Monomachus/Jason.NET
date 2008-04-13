@@ -1,6 +1,7 @@
 package test;
 
 import jason.asSemantics.Unifier;
+import jason.asSyntax.Atom;
 import jason.asSyntax.ListTerm;
 import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Structure;
@@ -177,6 +178,15 @@ public class ListTermTest extends TestCase {
         assertEquals(lt5.getTail(), null);
     }
     
+    public void testTailUnify() {
+        ListTerm lt5 = ListTermImpl.parseList("[H|T]");
+        Unifier u = new Unifier();
+        u.unifies(new VarTerm("H"), new Atom("a"));
+        u.unifies(new VarTerm("T"), ListTermImpl.parseList("[b,c]"));
+        lt5.apply(u);
+        assertEquals("[a,b,c]",lt5.toString());
+    }
+
     public void testGround() {
         ListTerm l = ListTermImpl.parseList("[c,b,a,x,y,d]");
         assertTrue(l.isGround());

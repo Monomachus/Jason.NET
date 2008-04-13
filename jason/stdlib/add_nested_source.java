@@ -31,60 +31,61 @@ import jason.asSemantics.Unifier;
 import jason.asSyntax.ListTerm;
 import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Literal;
+import jason.asSyntax.Pred;
 import jason.asSyntax.Structure;
 import jason.asSyntax.Term;
 
 /**
-  <p>Internal action: <b><code>.add_annot</code></b>.
+  <p>Internal action: <b><code>.add_nested_source</code></b>.
   
-  <p>Description: adds an annotation to a literal.
+  <p>Description: adds a source annotation to a literal (used in communication).
   
   <p>Parameters:<ul>
   
-  <li>+ belief(s) (literal or list): the literal where the annotation
+  <li>+ belief(s) (literal or list): the literal where the source annotation
   is to be added. If this parameter is a list, all literals in the list
-  will have the annotation added.<br/>
+  will have the source added.<br/>
   
-  <li>+ annotation (structure): the annotation.<br/>
+  <li>+ source (atom): the source.<br/>
 
   <li>+/- annotated beliefs(s) (literal or list): this argument
-  unifies with the result of the annotation addition.<br/>
+  unifies with the result of the source addition.<br/>
 
   </ul>
   
   <p>Examples:<ul> 
 
-  <li> <code>.add_annot(a,source(jomi),B)</code>: <code>B</code>
+  <li> <code>.add_nested_source(a,jomi,B)</code>: <code>B</code>
   unifies with <code>a[source(jomi)]</code>.</li>
 
-  <li> <code>.add_annot(a,source(jomi),b[jomi])</code>: fails because
-  the result of the addition does not unify with the third argument.</li>
+  <li> <code>.add_nested_source(a[source(bob)],jomi,B)</code>: <code>B</code>
+  unifies with <code>a[source(jomi)[source(bob)]]</code>.</li>
 
-  <li> <code>.add_annot([a1,a2], source(jomi), B)</code>: <code>B</code>
+  <li> <code>.add_annot([a1,a2], jomi, B)</code>: <code>B</code>
   unifies with <code>[a1[source(jomi)], a2[source(jomi)]]</code>.</li>
 
   </ul>
-  
-  @see jason.stdlib.add_nested_source
+
+  @see jason.stdlib.add_annot
 
  */
-public class add_annot extends DefaultInternalAction {
+public class add_nested_source extends DefaultInternalAction {
 
     @Override
 	public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
 		try {
-			Term result = addAnnotToList(un, args[0], args[1]);
+			Term result = addAnnotToList(un, args[0], (Structure)args[1].clone());
 			return un.unifies(result,args[2]);
 		} catch (ArrayIndexOutOfBoundsException e) {
-			throw new JasonException("The internal action 'add_annot' requires three arguments.");
+			throw new JasonException("The internal action 'add_nested_source' requires three arguments.");
 		}
 	}
 
-	public Term addAnnotToList(Unifier unif, Term l, Term annot) {
+	public Term addAnnotToList(Unifier unif, Term l, Structure source) {
 		if (l.isList()) {
 			ListTerm result = new ListTermImpl();
 			for (Term lTerm: (ListTerm)l) {
-				Term t = addAnnotToList( unif, lTerm, annot);
+				Term t = addAnnotToList( unif, lTerm, source);
 				if (t != null) {
 					result.add(t);
 				}
@@ -98,7 +99,14 @@ public class add_annot extends DefaultInternalAction {
 					result = new Literal(((Structure)l).getFunctor());
 				else
 					result = Literal.parseLiteral(l.toString());
-				result.addAnnot(annot);
+				
+				// create the source annots
+				Pred ts = new Pred("source",1);
+	            ts.addTerm(source);
+	            ts.addAnnots(result.getAnnots("source"));
+	            
+	            result.delSources();
+				result.addAnnot(ts);
 				return result;
 			} catch (Exception e) {
 				// no problem, the content is not a pred (it is a number,

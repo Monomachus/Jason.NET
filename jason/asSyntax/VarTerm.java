@@ -111,9 +111,8 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
 
         vl = (Term)vl.clone(); // should clone here, since there is no cloning in unify
         // The below does not conform the rules in manual
-        //if (vl.isPred() && this.hasAnnot()) { // if this var has annots, add them in the value's annots (Experimental)
-        //	((Pred)vl).addAnnots(this.getAnnots());
-        //}
+        //if (vl.isPred() && this.hasAnnot())  // if this var has annots, add them in the value's annots (Experimental)
+        //    ((Pred)vl).addAnnots(this.getAnnots());
         
         value = vl;        
         resetHashCodeCache();
@@ -128,7 +127,7 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
     public boolean apply(Unifier u) {
         if (value == null) {
             Term vl = u.get(this);
-            // System.out.println("applying="+t+"="+vl+" un="+this);
+            //System.out.println("applying "+this+"="+vl+" un="+u);
             if (vl != null && !(vl instanceof VarsCluster)) {
                 setValue(vl);
                 value.apply(u); // in case t has var args
@@ -153,7 +152,7 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
         if (t == this) return true;
         if (t instanceof Term) {
             Term vl = getValue();
-            // System.out.println("cheking equals form "+tAsTerm.getFunctor()+"
+            // System.out.println("checking equals form "+tAsTerm.getFunctor()+"
             // and this "+this.getFunctor()+" my value "+vl);
             if (vl != null) {
                 // compare the values

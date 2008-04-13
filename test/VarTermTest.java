@@ -6,7 +6,6 @@ import jason.asSemantics.Agent;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.ArithExpr;
-import jason.asSyntax.Atom;
 import jason.asSyntax.DefaultTerm;
 import jason.asSyntax.ListTerm;
 import jason.asSyntax.ListTermImpl;
@@ -255,11 +254,13 @@ public class VarTermTest extends TestCase {
         // X[a,b,c] = p[a,c,b,d] ok (X is p)
         assertTrue(u.unifies(v1, p1));
         assertEquals(u.get("X").toString(), "p(t1,t2)");
+        v1.apply(u);
+        assertEquals("p(t1,t2)",v1.toString());
     }
 
     public void testVarWithAnnots2() {
     	// test vars annots
-    	
+
     	// X[a] = Y[a,b] - ok
     	VarTerm v1 = VarTerm.parseVar("X[a]");
     	VarTerm v2 = VarTerm.parseVar("Y[a,b]");
@@ -271,7 +272,7 @@ public class VarTermTest extends TestCase {
     	assertFalse(u.unifies(v2, v1));
 
     	assertTrue(u.unifies(v1, v2));
-    	assertTrue(u.unifies(new Atom("vvv"), v1));
+    	assertTrue(u.unifies(new Literal("vvv"), v1));
     	v1.apply(u);
     	assertEquals("vvv", v1.toString());
     }

@@ -65,7 +65,7 @@ public class Pred extends Structure {
     }
 
     /** to be used by atom */
-    protected Pred(String functor, int termsSize) {
+    public Pred(String functor, int termsSize) {
         super(functor, termsSize);
     }
 
@@ -123,7 +123,7 @@ public class Pred extends Structure {
     }
 
     public void addAnnots(List<Term> l) {
-        if (l == null) return;
+        if (l == null || l.isEmpty()) return;
         ListTerm tail;
         if (annots == null) {
             annots = new ListTermImpl();
@@ -309,7 +309,7 @@ public class Pred extends Structure {
      */
     public void addSource(Structure agName) {
         if (agName != null) {
-            Structure ts = new Structure("source");
+            Structure ts = new Structure("source", 1);
             ts.addTerm(agName);
             addAnnot(ts);
         }
