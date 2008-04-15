@@ -26,16 +26,16 @@
 +!add_all_kqml_received(_,[]).   
 
 @kqmlReceivedTellList2
-+!add_all_kqml_received(S,[H|T])
++!add_all_kqml_received(Sender,[H|T])
    :  .structure(H) & 
       .ground(H)
    <- .add_nested_source(H, Sender, CA); 
       +CA;
-      !add_all_kqml_received(S,T).
+      !add_all_kqml_received(Sender,T).
 
 @kqmlReceivedTellList3
-+!add_all_kqml_received(S,[_|T])
-   <- !add_all_kqml_received(S,T).
++!add_all_kqml_received(Sender,[_|T])
+   <- !add_all_kqml_received(Sender,T).
       
 @kqmlReceivedUnTell
 +!kqml_received(Sender, untell, Content, _)
