@@ -77,20 +77,21 @@ public class Literal extends Pred implements LogicalFormula {
 	}
 
 	public Literal(Literal l) {
-		super((Pred) l);
-		type = l.type;
+	    super((Pred) l);
+	    type = l.type;
 	}
 
 
 	public static Literal parseLiteral(String sLiteral) {
-		as2j parser = new as2j(new StringReader(sLiteral));
 		try {
-		    return parser.literal();
+			as2j parser = new as2j(new StringReader(sLiteral));
+			return parser.literal();
 		} catch (Exception e) {
 			logger.log(Level.SEVERE,"Error parsing literal " + sLiteral,e);
 			return null;
 		}
-	}
+    }
+	
     public static Literal tryParsingLiteral(String sLiteral) throws ParseException {
         return new as2j(new StringReader(sLiteral)).literal();
     }

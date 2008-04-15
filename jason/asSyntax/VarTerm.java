@@ -110,7 +110,13 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
         }
 
         vl = (Term)vl.clone(); // should clone here, since there is no cloning in unify
-        // The below does not conform the rules in manual
+        // TODO: decide whether to use var annots in apply
+        //   X = p[a]
+        //   !X[b]
+        // what's the event: 
+        //   +!p[a]
+        // or
+        //   +!p[a,b]
         //if (vl.isPred() && this.hasAnnot())  // if this var has annots, add them in the value's annots (Experimental)
         //    ((Pred)vl).addAnnots(this.getAnnots());
         

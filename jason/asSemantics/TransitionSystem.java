@@ -420,7 +420,7 @@ public class TransitionSystem {
         case internalAction:
             boolean ok = false;
             try {
-                InternalAction ia = ((InternalActionLiteral)body).getIA(ag);
+                InternalAction ia = ((InternalActionLiteral)bTerm).getIA(ag);
                 Object oresult = ia.execute(this, u, body.getTermsArray());
                 if (oresult != null) {
                     ok = oresult instanceof Boolean && (Boolean)oresult;
