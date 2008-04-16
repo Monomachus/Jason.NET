@@ -459,13 +459,13 @@ public class TransitionSystem {
 
         // Rule Achieve
         case achieve:
-            // free variables in an event cannot conflict with those in the plan
-            body = (Literal)body.clone();
             if (!body.hasSource()) {
                 // do not add source(self) in case the
                 // programmer set some annotation
                 body.addAnnot(BeliefBase.TSelf);
             }
+            // free variables in an event cannot conflict with those in the plan
+            body = (Literal)body.clone();
             body.makeVarsAnnon();
             conf.C.addAchvGoal(body, conf.C.SI);
             confP.step = State.StartRC;
@@ -473,12 +473,12 @@ public class TransitionSystem {
 
         // Rule Achieve as a New Focus (the !! operator)
         case achieveNF:
-            body = (Literal)body.clone();
             if (!body.hasSource()) {
                 // do not add source(self) in case the
                 // programmer set some annotation
                 body.addAnnot(BeliefBase.TSelf);
             }
+            body = (Literal)body.clone();
             body.makeVarsAnnon();
             conf.C.addAchvGoal(body, Intention.EmptyInt);
             updateIntention();
@@ -635,8 +635,13 @@ public class TransitionSystem {
             //   +!s: !b; !z
             // should became
             //   +!s: !z
-            im = i.pop(); // +!c above, old
-            while (!im.unif.unifies(topIM.getTrigger().getLiteral(), im.getTrigger().getLiteral()) && i.size() > 0) {
+        	im = i.peek();
+        	if (im.isFinished() || !im.unif.unifies(topIM.getTrigger().getLiteral(), im.getCurrentStep().getBodyTerm()))
+        		im = i.pop(); // +!c above
+        	
+            while (i.size() > 0 &&
+            	   !im.unif.unifies(topIM.getTrigger().getLiteral(), im.getTrigger().getLiteral()) &&
+            	   !im.unif.unifies(topIM.getTrigger().getLiteral(), im.getCurrentStep().getBodyTerm())) {
                 im = i.pop();
             }
         }
