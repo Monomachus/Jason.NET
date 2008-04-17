@@ -874,7 +874,7 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
     }
 
     // -----------------------
-    // BodyLiteral interface implementation
+    // PlanBody interface implementation
     // -----------------------
     
     public BodyType getBodyType() {
@@ -894,6 +894,13 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
     public PlanBody getBodyNext() {
         if (value != null && getValue() instanceof PlanBody)
             return ((PlanBody) getValue()).getBodyNext();
+        else
+            return null;
+    }
+    
+    public PlanBody getLastBody() {
+        if (value != null && getValue() instanceof PlanBody)
+            return ((PlanBody) getValue()).getLastBody();
         else
             return null;
     }
@@ -925,6 +932,18 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
     public void setBodyNext(PlanBody bl) {
         if (value != null && getValue() instanceof PlanBody)
             ((PlanBody) getValue()).setBodyNext(bl);
+    }
+    
+    public boolean isBodyTerm() {
+        if (value != null && getValue() instanceof PlanBody)
+            return ((PlanBody) getValue()).isBodyTerm();
+        else
+        	return false;
+    }
+    
+    public void setAsBodyTerm(boolean b) {
+        if (value != null && getValue() instanceof PlanBody)
+            ((PlanBody) getValue()).setAsBodyTerm(b);
     }
     
     public boolean add(PlanBody bl) {

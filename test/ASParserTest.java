@@ -4,11 +4,12 @@ import jason.architecture.AgArch;
 import jason.asSemantics.Agent;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
-import jason.asSyntax.PlanBody;
+import jason.asSyntax.Literal;
 import jason.asSyntax.LogExpr;
 import jason.asSyntax.LogicalFormula;
 import jason.asSyntax.NumberTerm;
 import jason.asSyntax.Plan;
+import jason.asSyntax.PlanBody;
 import jason.asSyntax.RelExpr;
 import jason.asSyntax.parser.as2j;
 import jason.infra.centralised.CentralisedAgArch;
@@ -164,18 +165,18 @@ public class ASParserTest extends TestCase {
     }
     
     public void testParsingPlanBody() {
-        // TODO: think about this
-        /*
-        Literal l = Literal.parseLiteral("p(a1;a2, a3, !g, ?b;.print(oi), 10)");
+        Literal l = Literal.parseLiteral("p( {a1(f);a2}, a3, {!g}, {?b;.print(oi) }, 10)");
+        assertEquals("p({ a1(f); a2 },a3,{ !g },{ ?b; .print(oi) },10)", l.toString());
         assertEquals(5,l.getArity());
-        assertTrue(l.getTerm(0) instanceof BodyLiteral);
+        assertTrue(l.getTerm(0) instanceof PlanBody);
         assertTrue(l.getTerm(0).isPlanBody());
+        PlanBody pb = (PlanBody)l.getTerm(0);
+        assertTrue(pb.isBodyTerm());
 
         assertFalse(l.getTerm(1).isPlanBody());
         assertTrue(l.getTerm(2).isPlanBody());
         assertTrue(l.getTerm(3).isPlanBody());
         assertFalse(l.getTerm(4).isPlanBody());
-        */
     }
     
     public void testParsingAllSources() {

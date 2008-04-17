@@ -289,8 +289,8 @@ Literal initial_goal() : { Literal g; }
 /* Plan */
 Plan plan() :         { Token k; Pred L = null; 
                         Trigger T; 
-                        Object C = null; PlanBody bl = null;
-                        Object B = null; 
+                        Object C = null; 
+                        PlanBody B = null;
                         int start = -1, end;}
 {
     [ k = <TK_LABEL_AT> L=pred()  { start = k.beginLine; }   ]
@@ -303,14 +303,13 @@ Plan plan() :         { Token k; Pred L = null;
                      try { ial = checkInternalActionsInContext((LogicalFormula)C, curAg); } catch (Exception e) {}
                      if (ial != null)
                         throw new ParseException(getSourceRef(ial)+" The internal action '"+ial+"' can not be used in plan's context!");
-                     if (B != null) {
-                        if (!(B instanceof PlanBody))
-                           throw new ParseException(getSourceRef(B)+" Unknown body formula:"+B);
-	                    bl = (PlanBody)B;
-	                    if (bl.getBodyTerm().equals(Literal.LTrue))
-	                       bl = (PlanBody)bl.getBodyNext();
-	                 }
-                     Plan p = new Plan(L,T,(LogicalFormula)C, bl);
+                     //if (B != null) {
+                        //if (!(B instanceof PlanBody))
+                        //   throw new ParseException(getSourceRef(B)+" Unknown body formula:"+B);
+	                    //bl = (PlanBody)B;
+	                 if (B != null && B.getBodyTerm().equals(Literal.LTrue))
+	                    B = (PlanBody)B.getBodyNext();
+                     Plan p = new Plan(L,T,(LogicalFormula)C, B);
                      p.setSrcLines(start,end);
                      p.setSrc(asSource);
                      return p;
@@ -341,17 +340,27 @@ Trigger trigger() :
 
 
 /* Plan body */
-Object plan_body() :       { Object F; Object R = null; }
+PlanBody plan_body() :     { Object F; PlanBody R = null; }
 {
   F = body_formula()       
                  
   [ ";"                    { if (!(F instanceof PlanBody)) throw new ParseException(getSourceRef(F)+" "+F+" is not a body literal!");  }
-    R = plan_body()        { if (!(R instanceof PlanBody)) throw new ParseException(getSourceRef(R)+" "+R+" is not a body literal!");  }
+    R = plan_body()        
   ]
-                           { if (F instanceof PlanBody && R instanceof PlanBody) {
-                                ((PlanBody)F).setBodyNext( (PlanBody)R );
+                           { if (F instanceof PlanBody) {
+                                ((PlanBody)F).setBodyNext( R );
                              }
-                             return F;
+                             return (PlanBody)F;
+                           }
+}
+
+PlanBody plan_body_term(): { PlanBody B = null; }
+{
+  "{"
+  B = plan_body()
+  "}"
+                           { B.setAsBodyTerm(true); 
+                             return B; 
                            }
 }
 
@@ -448,18 +457,11 @@ List terms() : { List listTerms = new ArrayList(); Term v; }
 
 Term term() :          { Object o;}
 {
-  ( o=list()        
-  | o=log_expr()       //plan_body()       // plan_body includes literals/atoms/structures  
+  ( o=list()           
+  | o=plan_body_term() 
+  | o=log_expr()       // log_expr includes literals/atoms/structures  
   )
-                       { // if the result is a PlanBody action with size = 1, it is indeed a literal and not a body literal
-                         /*if (o instanceof PlanBody) {
-                            PlanBody bl = (PlanBody)o;
-                            if (bl.getBodyType() == BodyType.action && bl.getPlanSize() == 1) {
-                               o = bl.getBodyTerm();
-                            }
-                         }*/
-                         return changeToAtom(o); 
-                       }  
+                       { return changeToAtom(o); }
 }
 
 
@@ -548,6 +550,7 @@ Object rel_expr() :
        (   op2 = arithm_expr()        
          | op2 = string()               
          | op2 = list()
+         | op2 = plan_body_term()
        )
 
                                            { if ( ((Term)op1).isInternalAction() && operator != RelationalOp.literalBuilder)

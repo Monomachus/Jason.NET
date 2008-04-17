@@ -316,8 +316,8 @@
   final public Plan plan() throws ParseException {
                         Token k; Pred L = null;
                         Trigger T;
-                        Object C = null; PlanBody bl = null;
-                        Object B = null;
+                        Object C = null;
+                        PlanBody B = null;
                         int start = -1, end;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case TK_LABEL_AT:
@@ -357,14 +357,13 @@
                      try { ial = checkInternalActionsInContext((LogicalFormula)C, curAg); } catch (Exception e) {}
                      if (ial != null)
                         {if (true) throw new ParseException(getSourceRef(ial)+" The internal action '"+ial+"' can not be used in plan's context!");}
-                     if (B != null) {
-                        if (!(B instanceof PlanBody))
-                           {if (true) throw new ParseException(getSourceRef(B)+" Unknown body formula:"+B);}
-                            bl = (PlanBody)B;
-                            if (bl.getBodyTerm().equals(Literal.LTrue))
-                               bl = (PlanBody)bl.getBodyNext();
-                         }
-                     Plan p = new Plan(L,T,(LogicalFormula)C, bl);
+                     //if (B != null) {
+                        //if (!(B instanceof PlanBody))
+                        //   throw new ParseException(getSourceRef(B)+" Unknown body formula:"+B);
+                            //bl = (PlanBody)B;
+                         if (B != null && B.getBodyTerm().equals(Literal.LTrue))
+                            B = (PlanBody)B.getBodyNext();
+                     Plan p = new Plan(L,T,(LogicalFormula)C, B);
                      p.setSrcLines(start,end);
                      p.setSrc(asSource);
                      {if (true) return p;}
@@ -435,24 +434,33 @@
   }
 
 /* Plan body */
-  final public Object plan_body() throws ParseException {
-                             Object F; Object R = null;
+  final public PlanBody plan_body() throws ParseException {
+                             Object F; PlanBody R = null;
     F = body_formula();
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case 37:
       jj_consume_token(37);
                              if (!(F instanceof PlanBody)) {if (true) throw new ParseException(getSourceRef(F)+" "+F+" is not a body literal!");}
       R = plan_body();
-                             if (!(R instanceof PlanBody)) {if (true) throw new ParseException(getSourceRef(R)+" "+R+" is not a body literal!");}
       break;
     default:
       jj_la1[17] = jj_gen;
       ;
     }
-                             if (F instanceof PlanBody && R instanceof PlanBody) {
-                                ((PlanBody)F).setBodyNext( (PlanBody)R );
+                             if (F instanceof PlanBody) {
+                                ((PlanBody)F).setBodyNext( R );
                              }
-                             {if (true) return F;}
+                             {if (true) return (PlanBody)F;}
+    throw new Error("Missing return statement in function");
+  }
+
+  final public PlanBody plan_body_term() throws ParseException {
+                             PlanBody B = null;
+    jj_consume_token(27);
+    B = plan_body();
+    jj_consume_token(28);
+                             B.setAsBodyTerm(true);
+                             {if (true) return B;}
     throw new Error("Missing return statement in function");
   }
 
@@ -642,6 +650,9 @@
     case 42:
       o = list();
       break;
+    case 27:
+      o = plan_body_term();
+      break;
     case VAR:
     case TK_TRUE:
     case TK_FALSE:
@@ -662,13 +673,6 @@
       jj_consume_token(-1);
       throw new ParseException();
     }
-                         // if the result is a PlanBody action with size = 1, it is indeed a literal and not a body literal
-                         /*if (o instanceof PlanBody) {
-                            PlanBody bl = (PlanBody)o;
-                            if (bl.getBodyType() == BodyType.action && bl.getPlanSize() == 1) {
-                               o = bl.getBodyTerm();
-                            }
-                         }*/
                          {if (true) return changeToAtom(o);}
     throw new Error("Missing return statement in function");
   }
@@ -940,6 +944,9 @@
       case 42:
         op2 = list();
         break;
+      case 27:
+        op2 = plan_body_term();
+        break;
       default:
         jj_la1[38] = jj_gen;
         jj_consume_token(-1);
@@ -1187,13 +1194,18 @@
     return false;
   }
 
-  final private boolean jj_3R_14() {
-    if (jj_scan_token(42)) return true;
+  final private boolean jj_3R_13() {
+    if (jj_3R_14()) return true;
     return false;
   }
 
   final private boolean jj_3R_12() {
     if (jj_scan_token(39)) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_14() {
+    if (jj_scan_token(42)) return true;
     return false;
   }
 
@@ -1214,11 +1226,6 @@
     return false;
   }
 
-  final private boolean jj_3R_13() {
-    if (jj_3R_14()) return true;
-    return false;
-  }
-
   public as2jTokenManager token_source;
   SimpleCharStream jj_input_stream;
   public Token token, jj_nt;
@@ -1236,7 +1243,7 @@
       jj_la1_1();
    }
    private static void jj_la1_0() {
-      jj_la1_0 = new int[] {0x8000000,0x10cb00,0x8000000,0x80000000,0x8000000,0x10000,0x10cb00,0x8000000,0x8000000,0x20000000,0x10000,0x0,0x0,0x0,0x80000000,0x80000000,0x30cb80,0x0,0x0,0x80000000,0x80000000,0x800,0x10cb00,0x10c000,0x0,0x0,0x0,0x3acf80,0x0,0x200080,0x0,0x3acb80,0x3acb80,0x0,0x0,0x3acf80,0x3acb80,0x0,0x3acb80,0x0,0x0,0x0,0x3000,0x3000,0x0,0x32cb80,0x200080,0x0,};
+      jj_la1_0 = new int[] {0x8000000,0x10cb00,0x8000000,0x80000000,0x8000000,0x10000,0x10cb00,0x8000000,0x8000000,0x20000000,0x10000,0x0,0x0,0x0,0x80000000,0x80000000,0x30cb80,0x0,0x0,0x80000000,0x80000000,0x800,0x10cb00,0x10c000,0x0,0x0,0x0,0x83acf80,0x0,0x200080,0x0,0x3acb80,0x3acb80,0x0,0x0,0x3acf80,0x3acb80,0x0,0x83acb80,0x0,0x0,0x0,0x3000,0x3000,0x0,0x32cb80,0x200080,0x0,};
    }
    private static void jj_la1_1() {
       jj_la1_1 = new int[] {0x0,0x0,0x0,0x0,0x0,0xc,0x0,0x0,0x0,0x0,0x0,0x1,0x2,0xc,0x10,0x10,0x0,0x20,0x4,0x5c,0x5c,0x0,0x0,0x0,0x80,0x400,0x200,0x488,0x200,0x400,0x800,0x488,0x488,0x800,0x2000,0x88,0x88,0x3fc000,0x488,0x3fc000,0xc,0xc,0xc00000,0xc00000,0x1000000,0x88,0x0,0x400,};

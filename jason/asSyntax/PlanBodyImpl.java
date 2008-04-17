@@ -20,8 +20,10 @@ public class PlanBodyImpl extends Structure implements PlanBody, Iterable<PlanBo
     public static final String BODY_PLAN_FUNCTOR = ";";
 
     private Term        term     = null; 
-    private PlanBody next     = null;
+    private PlanBody    next     = null;
     private BodyType    formType = BodyType.none;
+    
+    private boolean     isTerm = false;
     
     /** constructor for empty plan body */
     public PlanBodyImpl() {
@@ -58,6 +60,13 @@ public class PlanBodyImpl extends Structure implements PlanBody, Iterable<PlanBo
     }
     public void setBodyTerm(Term t) {
         term = t;
+    }
+    
+    public boolean isBodyTerm() {
+    	return isTerm;
+    }
+    public void setAsBodyTerm(boolean b) {
+    	isTerm = b;
     }
     
     @Override
@@ -152,12 +161,23 @@ public class PlanBodyImpl extends Structure implements PlanBody, Iterable<PlanBo
             next.add(bl);
         return true;
     }
+
+    public PlanBody getLastBody() {
+    	if (next == null)
+    		return this;
+    	else
+    		return next.getLastBody();
+    }
     
     public boolean add(int index, PlanBody bl) {
         if (index == 0) {
             swap(bl);
-            this.next = bl;
-        } else { 
+            PlanBody bak = this.next;
+            this.next = bl.getBodyNext();
+            PlanBody last = bl.getLastBody();
+            bl.setBodyNext(bak);
+            last.setBodyNext(bl);
+        } else if (next != null) { 
             next.add(index - 1, bl);
         }
         return true;
@@ -203,18 +223,29 @@ public class PlanBodyImpl extends Structure implements PlanBody, Iterable<PlanBo
             return new PlanBodyImpl();
 
         PlanBodyImpl c = new PlanBodyImpl(formType, (Term)term.clone());
+        c.isTerm = isTerm;
         if (next != null)
             c.setBodyNext((PlanBody)getBodyNext().clone());
         return c;
     }
     
     public String toString() {
-        if (term == null)
+        if (term == null) {
             return "";
-        else if (next == null)
-            return formType.toString() + term;
-        else
-            return formType.toString() + term + "; " + next;
+        } else {
+        	String b, e;
+        	if (isTerm) {
+        		b = "{ "; 
+        		e = " }";
+        	} else {
+        		b = ""; 
+        		e = "";
+        	}
+        	if (next == null)
+        		return b+formType.toString() + term+e;
+        	else
+        		return b+formType.toString() + term + "; " + next+e;
+        }
     }
 
     /** get as XML */

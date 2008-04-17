@@ -17,7 +17,7 @@ public interface PlanBody extends Term {
 
     public BodyType    getBodyType();
     public Term        getBodyTerm();
-    public PlanBody getBodyNext();
+    public PlanBody    getBodyNext();
 
     public boolean     isEmptyBody();
     public int         getPlanSize();
@@ -25,7 +25,10 @@ public interface PlanBody extends Term {
     public void setBodyType(BodyType bt);
     public void setBodyTerm(Term t);
     public void setBodyNext(PlanBody bl);
+    public PlanBody getLastBody();
     
+    public boolean isBodyTerm();
+    public void setAsBodyTerm(boolean b);    
     
     public boolean add(PlanBody bl);
     public boolean add(int index, PlanBody bl);
