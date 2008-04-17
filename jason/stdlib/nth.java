@@ -39,6 +39,13 @@ import jason.asSyntax.*;
 */
 
 public class nth extends DefaultInternalAction {
+	
+	private static InternalAction singleton = null;
+	public static InternalAction create() {
+		if (singleton == null) 
+			singleton = new nth();
+		return singleton;
+	}
 
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {

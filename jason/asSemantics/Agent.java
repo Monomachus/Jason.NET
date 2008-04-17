@@ -44,6 +44,7 @@ import jason.bb.DefaultBeliefBase;
 import jason.functions.Count;
 import jason.functions.RuleToFunction;
 import jason.runtime.Settings;
+import jason.stdlib.conditional;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -238,14 +239,24 @@ public class Agent {
         parser.agent(this);
     }
 
-    public InternalAction getIA(Structure action) throws Exception {
+    @SuppressWarnings("unchecked")
+	public InternalAction getIA(Structure action) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
         String iaName = action.getFunctor();
+        if (iaName.equals(".if"))
+        	return conditional.create();
         if (iaName.charAt(0) == '.')
             iaName = "jason.stdlib" + iaName;
         InternalAction objIA = internalActions.get(iaName);
         if (objIA == null) {
-            objIA = (InternalAction) Class.forName(iaName).newInstance();
-            internalActions.put(iaName, objIA);
+        	Class iaclass = Class.forName(iaName);
+        	try {
+        		// check if the class has "create" method -- singleton implementation
+        		Method create = iaclass.getMethod("create", (Class[])null);
+        		return (InternalAction)create.invoke(null, (Object[])null);
+        	} catch (Exception e) {}
+
+        	objIA = (InternalAction)iaclass.newInstance();
+    		internalActions.put(iaName, objIA);
         }
         return objIA;
     }

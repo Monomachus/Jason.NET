@@ -2,6 +2,7 @@ package jason.stdlib;
 
 import jason.JasonException;
 import jason.asSemantics.DefaultInternalAction;
+import jason.asSemantics.InternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.ListTerm;
@@ -59,6 +60,13 @@ numbers &lt; atoms &lt; structures &lt; lists
 
 */
 public class min extends DefaultInternalAction {
+	
+	private static InternalAction singleton = null;
+	public static InternalAction create() {
+		if (singleton == null) 
+			singleton = new min();
+		return singleton;
+	}
 
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {

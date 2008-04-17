@@ -26,6 +26,7 @@ package jason.stdlib;
 
 import jason.JasonException;
 import jason.asSemantics.DefaultInternalAction;
+import jason.asSemantics.InternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.ListTerm;
@@ -71,7 +72,14 @@ import jason.asSyntax.Term;
  */
 public class add_nested_source extends DefaultInternalAction {
 
-    @Override
+	private static InternalAction singleton = null;
+	public static InternalAction create() {
+		if (singleton == null) 
+			singleton = new add_nested_source();
+		return singleton;
+	}
+
+	@Override
 	public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
 		try {
 			Term result = addAnnotToList(un, args[0], (Structure)args[1].clone());

@@ -2,6 +2,7 @@ package jason.stdlib;
 
 import jason.JasonException;
 import jason.asSemantics.DefaultInternalAction;
+import jason.asSemantics.InternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.NumberTermImpl;
@@ -38,7 +39,14 @@ import java.util.GregorianCalendar;
  */
 public class date extends DefaultInternalAction {
 
-    /** date(YY,MM,DD) */
+	private static InternalAction singleton = null;
+	public static InternalAction create() {
+		if (singleton == null) 
+			singleton = new date();
+		return singleton;
+	}
+
+	/** date(YY,MM,DD) */
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         try {

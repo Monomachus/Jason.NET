@@ -28,6 +28,7 @@ import java.util.Iterator;
 import jason.JasonException;
 import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.IntendedMeans;
+import jason.asSemantics.InternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.LogicalFormula;
@@ -35,9 +36,15 @@ import jason.asSyntax.PlanBody;
 import jason.asSyntax.Term;
 
 // TODO: comments
-// TODO: find a way to change the name of the IA to .if
 public class conditional extends DefaultInternalAction {
 
+	private static InternalAction singleton = null;
+	public static InternalAction create() {
+		if (singleton == null) 
+			singleton = new conditional();
+		return singleton;
+	}
+	
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         try {
@@ -48,19 +55,18 @@ public class conditional extends DefaultInternalAction {
             PlanBody whattoadd = null;
             
             Iterator<Unifier> iu = logExpr.logicalConsequence(ts.getAg(), un);
-            if (iu.hasNext()) {
-            	// THEN
-            	un.compose(iu.next());
+            if (iu.hasNext()) {	// .if THEN
+	            if ( !args[1].isPlanBody())
+	        		throw new JasonException("The second argument of .if must be a plan body term.");
                 whattoadd = (PlanBody)args[1];
-            } else if (args.length == 3) {
-            	// ELSE
+            	un.compose(iu.next());
+            } else if (args.length == 3) { // .if ELSE
+	            if ( !args[2].isPlanBody())
+	        		throw new JasonException("The third argument of .if must be a plan body term.");
                 whattoadd = (PlanBody)args[2];
             }
 
             if (whattoadd != null) {
-	            if ( !whattoadd.isPlanBody())
-	        		throw new JasonException("The second and third arguments of .if must be a plan body term.");
-	
 	        	IntendedMeans im = ts.getC().getSelectedIntention().peek();
 	        	PlanBody ifia = im.getCurrentStep();
 	        	whattoadd.setAsBodyTerm(false);

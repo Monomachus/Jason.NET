@@ -24,6 +24,7 @@
 package jason.stdlib;
 
 import jason.asSemantics.DefaultInternalAction;
+import jason.asSemantics.InternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.Term;
@@ -44,7 +45,14 @@ import jason.asSyntax.Term;
  */
 public class fail extends DefaultInternalAction {
 
-    @Override
+	private static InternalAction singleton = null;
+	public static InternalAction create() {
+		if (singleton == null) 
+			singleton = new fail();
+		return singleton;
+	}
+
+	@Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         return false;
     }

@@ -1,5 +1,6 @@
 package jason.stdlib;
 
+import jason.asSemantics.InternalAction;
 import jason.asSyntax.Term;
 
 /**
@@ -52,6 +53,13 @@ numbers &lt; atoms &lt; structures &lt; lists
 
 */
 public class max extends min {
+	
+	private static InternalAction singleton = null;
+	public static InternalAction create() {
+		if (singleton == null) 
+			singleton = new max();
+		return singleton;
+	}
 
 	@Override
     protected boolean compare(Term a, Term t) {

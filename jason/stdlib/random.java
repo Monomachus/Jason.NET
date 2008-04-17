@@ -2,6 +2,7 @@ package jason.stdlib;
 
 import jason.JasonException;
 import jason.asSemantics.DefaultInternalAction;
+import jason.asSemantics.InternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.NumberTermImpl;
@@ -28,6 +29,13 @@ import java.util.Random;
 
 */
 public class random extends DefaultInternalAction {
+	
+	private static InternalAction singleton = null;
+	public static InternalAction create() {
+		if (singleton == null) 
+			singleton = new random();
+		return singleton;
+	}
     
     private Random random = new Random();    
 	

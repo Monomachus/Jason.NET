@@ -23,6 +23,7 @@
 package jason.stdlib;
 
 import jason.asSemantics.DefaultInternalAction;
+import jason.asSemantics.InternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.StringTerm;
@@ -43,6 +44,13 @@ import java.util.logging.Level;
 */
 public class println extends DefaultInternalAction {
 
+	private static InternalAction singleton = null;
+	public static InternalAction create() {
+		if (singleton == null) 
+			singleton = new println();
+		return singleton;
+	}
+	
     protected String getNewLine() {
         return "\n";
     }

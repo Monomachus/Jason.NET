@@ -171,12 +171,11 @@ public class PlanBodyImpl extends Structure implements PlanBody, Iterable<PlanBo
     
     public boolean add(int index, PlanBody bl) {
         if (index == 0) {
+        	PlanBody newpb = new PlanBodyImpl(this.formType, this.term);
+        	newpb.setBodyNext(next);
             swap(bl);
-            PlanBody bak = this.next;
             this.next = bl.getBodyNext();
-            PlanBody last = bl.getLastBody();
-            bl.setBodyNext(bak);
-            last.setBodyNext(bl);
+            this.getLastBody().setBodyNext(newpb);
         } else if (next != null) { 
             next.add(index - 1, bl);
         }

@@ -25,6 +25,7 @@ package jason.stdlib;
 
 import jason.JasonException;
 import jason.asSemantics.DefaultInternalAction;
+import jason.asSemantics.InternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.ListTerm;
@@ -70,6 +71,13 @@ import jason.asSyntax.Term;
   @see jason.stdlib.union
 */
 public class delete extends DefaultInternalAction {
+
+	private static InternalAction singleton = null;
+	public static InternalAction create() {
+		if (singleton == null) 
+			singleton = new delete();
+		return singleton;
+	}
 
 	@Override
 	public Object execute(TransitionSystem ts, Unifier un, Term[] args)	throws Exception {

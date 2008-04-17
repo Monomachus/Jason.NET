@@ -5,6 +5,7 @@ import java.util.Iterator;
 
 import jason.JasonException;
 import jason.asSemantics.DefaultInternalAction;
+import jason.asSemantics.InternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.NumberTermImpl;
@@ -44,6 +45,13 @@ import jason.asSyntax.Term;
 
 */
 public class substring extends DefaultInternalAction {
+	
+	private static InternalAction singleton = null;
+	public static InternalAction create() {
+		if (singleton == null) 
+			singleton = new substring();
+		return singleton;
+	}
 
     @Override
     public Object execute(TransitionSystem ts, final Unifier un, final Term[] args) throws Exception {
