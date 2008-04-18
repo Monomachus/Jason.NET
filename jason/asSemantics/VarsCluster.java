@@ -63,11 +63,11 @@ public class VarsCluster extends DefaultTerm implements Iterable<VarTerm> {
     private Unifier      u;
 		
     // used in clone
-	private VarsCluster(Unifier u) {
+	protected VarsCluster(Unifier u) {
 		this.u = u;
 	}
 
-	VarsCluster(VarTerm v1, VarTerm v2, Unifier u) {
+	protected VarsCluster(VarTerm v1, VarTerm v2, Unifier u) {
 		id = ++idCount;
 		this.u = u;
 		add(v1);
@@ -104,7 +104,7 @@ public class VarsCluster extends DefaultTerm implements Iterable<VarTerm> {
 		return false;
 	}
 
-	boolean hasValue() {
+	public boolean hasValue() {
 		return vars != null && !vars.isEmpty();
 	}
 

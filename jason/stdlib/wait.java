@@ -31,8 +31,9 @@ import jason.asSemantics.Intention;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.Atom;
-import jason.asSyntax.PlanBodyImpl;
+import jason.asSyntax.InternalActionLiteral;
 import jason.asSyntax.NumberTerm;
+import jason.asSyntax.PlanBodyImpl;
 import jason.asSyntax.StringTerm;
 import jason.asSyntax.Term;
 import jason.asSyntax.Trigger;
@@ -176,7 +177,7 @@ public class wait extends DefaultInternalAction {
                     si.peek().removeCurrentStep();
                     if (stopByTimeout && te != null) {
                         // fail the .wait
-                        si.peek().getPlan().getBody().add(0, new PlanBodyImpl(BodyType.internalAction, new Atom(".fail")));
+                        si.peek().getPlan().getBody().add(0, new PlanBodyImpl(BodyType.internalAction, new InternalActionLiteral(".fail")));
                     } 
                     if (si.isSuspended()) { // if the intention was suspended by .suspend
                     	String k = suspend.SUSPENDED_INT+si.getId();

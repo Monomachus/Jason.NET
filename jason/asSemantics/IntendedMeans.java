@@ -90,6 +90,10 @@ public class IntendedMeans implements Serializable {
     	return plan;
     }
     
+    public void setUnif(Unifier unif) {
+        this.unif = unif;
+    }
+    
     public Unifier getUnif() {
     	return unif;
     }

@@ -555,7 +555,7 @@
                                                                       {if (true) return new InternalActionLiteral(F, curAg);}
                                    } catch (Exception e) {
                                       if (getArithFunction(F) == null) // it is not a registered function
-                                         {if (true) throw new ParseException(getSourceRef(F)+" The internal action class for '"+F+"' was not found!");}
+                                         logger.warning(getSourceRef(F)+" The internal action class for '"+F+"' was not found!");
                                    }
                                 }
                                 {if (true) return new Literal(type,F);}

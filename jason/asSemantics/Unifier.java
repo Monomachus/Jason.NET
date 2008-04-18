@@ -41,7 +41,7 @@ public class Unifier implements Cloneable {
 
     private static Logger logger = Logger.getLogger(Unifier.class.getName());
 
-    private HashMap<VarTerm, Term> function = new HashMap<VarTerm, Term>();
+    protected HashMap<VarTerm, Term> function = new HashMap<VarTerm, Term>();
 
     /** 
      * @deprecated use t.apply(un) instead.
@@ -165,7 +165,7 @@ public class Unifier implements Cloneable {
     
     // ----- Unify for Terms
 
-    private boolean unifyTerms(Term t1g, Term t2g) {
+    protected boolean unifyTerms(Term t1g, Term t2g) {
         // if args are expressions, apply them and use their values
         if (t1g.isArithExpr()) {
             t1g = (Term) t1g.clone();
@@ -303,7 +303,7 @@ public class Unifier implements Cloneable {
         return true;
     }
 
-    private boolean setVarValue(VarTerm vt, Term value) {
+    protected boolean setVarValue(VarTerm vt, Term value) {
         // if the var has a cluster, set value for all cluster
         Term currentVl = function.get(vt);
         if (currentVl != null && currentVl instanceof VarsCluster) {

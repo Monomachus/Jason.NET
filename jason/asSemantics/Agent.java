@@ -252,10 +252,10 @@ public class Agent {
         	try {
         		// check if the class has "create" method -- singleton implementation
         		Method create = iaclass.getMethod("create", (Class[])null);
-        		return (InternalAction)create.invoke(null, (Object[])null);
-        	} catch (Exception e) {}
-
-        	objIA = (InternalAction)iaclass.newInstance();
+        		objIA = (InternalAction)create.invoke(null, (Object[])null);
+        	} catch (Exception e) {
+            	objIA = (InternalAction)iaclass.newInstance();        		
+        	}
     		internalActions.put(iaName, objIA);
         }
         return objIA;
