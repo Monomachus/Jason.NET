@@ -184,15 +184,14 @@ public class PlanBodyImpl extends Structure implements PlanBody, Iterable<PlanBo
 
     public Term removeBody(int index) {
         if (index == 0) {
+            Term oldvalue = term;
             if (next == null) {
                 term = null; // becomes an empty
             } else {
-                Term oldvalue = term;
                 swap(next); // get values of text
                 next = next.getBodyNext();
-                return oldvalue;
             }
-            return this;
+            return oldvalue;
         } else { 
             return next.removeBody(index - 1);
         }

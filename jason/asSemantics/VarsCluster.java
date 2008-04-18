@@ -67,7 +67,7 @@ public class VarsCluster extends DefaultTerm implements Iterable<VarTerm> {
 		this.u = u;
 	}
 
-	protected VarsCluster(VarTerm v1, VarTerm v2, Unifier u) {
+	public VarsCluster(VarTerm v1, VarTerm v2, Unifier u) {
 		id = ++idCount;
 		this.u = u;
 		add(v1);
