@@ -114,10 +114,7 @@ public class GridWorldView extends JFrame {
         }
         
         if ((model.data[x][y] & GridWorldModel.AGENT) != 0) {
-        	//int ag = ;
-        	//if (ag != -1) {
     		drawAgent(drawArea.getGraphics(), x, y, Color.blue, model.getAgAtPos(x, y));
-        	//}
         }
     }
     

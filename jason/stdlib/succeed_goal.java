@@ -108,7 +108,7 @@ public class succeed_goal extends DefaultInternalAction {
                 Trigger t = e.getTrigger();
                 if (i != Intention.EmptyInt && i.size() > 0) {
                     t = (Trigger) t.clone();
-                    t.getLiteral().apply(i.peek().getUnif());
+                    t.apply(i.peek().getUnif());
                 }
                 if (un.unifies(t, g)) {
                     dropInEvent(ts,e,i);

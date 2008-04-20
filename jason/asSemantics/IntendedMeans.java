@@ -49,11 +49,13 @@ public class IntendedMeans implements Serializable {
 	private   Trigger trigger; // the trigger which created this IM
     
     public IntendedMeans(Option opt, Trigger te) {
-    	plan = opt.getPlan().cloneBodyOnly();
+    	plan = opt.getPlan().cloneOnlyBody();
     	unif = opt.getUnifier(); //(Unifier)opt.getUnifier().clone();
     	Literal planLiteral = plan.getTrigger().getLiteral();
     	if (planLiteral.hasAnnot()) {
     		planLiteral.getAnnots().apply(unif);
+    		// TODO: why?
+    		// if the plans.TE is not change, we do not need to clone it in plan.cloneBodyOnly
     	}
         if (te == null) {
             trigger = plan.getTrigger();
@@ -63,6 +65,9 @@ public class IntendedMeans implements Serializable {
             // add annots of the trigger into the plan's te
             // so that the event +!g[source(ag1)] will add source(ag1)
             // in the TE of the plan
+            // TODO: why? -- in the TS.applyClrInt -- end of the method, the unification could be g,tel and not tel,g!
+            // (the plan trigger will be used latter to "return" values
+            // see TS.applyClrInt -- end of the method)
             planLiteral.addAnnots(trigger.getLiteral().getAnnots());
         }
     }
@@ -127,7 +132,7 @@ public class IntendedMeans implements Serializable {
     }
     
     public String toString() {
-        return plan + " : " + unif;
+        return plan + " / " + unif;
     }
 
     public Term getAsTerm() {

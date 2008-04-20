@@ -651,9 +651,13 @@ public class TransitionSystem {
                 // removes !b or ?s
                 Term g = im.removeCurrentStep();
                 // make the TE of finished plan ground and unify that
-                // with goal in the body
+                // with goal/test in the body (to "return" values).
+                // (it must the plan TE and not the IM.trigger because the
+                // vars have name only in the plan TE, in the IM.trigger
+                // they are anonymous)
                 Literal tel = topIM.getPlan().getTrigger().getLiteral();
                 tel.apply(topIM.unif);
+                // TODO: why not unifies(g,tel)?
                 im.unif.unifies(tel, g);
             }
         }

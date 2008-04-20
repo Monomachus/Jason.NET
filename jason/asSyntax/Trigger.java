@@ -32,6 +32,7 @@ package jason.asSyntax;
  *    a type (<empty>, !, or ?);
  *    a literal
  */
+import jason.asSemantics.Unifier;
 import jason.asSyntax.parser.ParseException;
 import jason.asSyntax.parser.as2j;
 
@@ -136,6 +137,10 @@ public class Trigger implements Cloneable {
         }
         return piCache;
     }
+	
+	public boolean apply(Unifier u) {
+		return literal.apply(u);
+	}
 
 	public Literal getLiteral() {
 		return literal;

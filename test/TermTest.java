@@ -379,7 +379,7 @@ public class TermTest extends TestCase {
 		Unifier u = new Unifier();
 		assertTrue(u.unifies(t1,t2));
 		//System.out.println(u);
-		t2.getLiteral().apply(u);
+		t2.apply(u);
 		//System.out.println("t2 with apply = "+t2);
 		
 		assertEquals(t1.toString(), t2.toString());

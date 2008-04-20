@@ -85,7 +85,7 @@ public class desire extends intend {
             Intention i = C.getSelectedEvent().getIntention(); 
             if (i != Intention.EmptyInt && i.size() > 0) {
                 t = (Trigger) t.clone();
-                t.getLiteral().apply(i.peek().getUnif());
+                t.apply(i.peek().getUnif());
             }
             if (un.unifies(t, teFromL)) {
                 return true;
@@ -97,7 +97,7 @@ public class desire extends intend {
             Intention i = ei.getIntention(); 
             if (i != Intention.EmptyInt && i.size() > 0) {
                 t = (Trigger) t.clone();
-                t.getLiteral().apply(i.peek().getUnif());
+                t.apply(i.peek().getUnif());
             }
             if (un.unifies(t, teFromL)) {
                 return true;

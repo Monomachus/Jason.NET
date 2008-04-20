@@ -208,7 +208,8 @@ public class Plan extends SourceInfo implements Cloneable, Serializable {
         return p;
     }
 
-    public Plan cloneBodyOnly() {
+    /** used to create a plan clone in a new IM */
+    public Plan cloneOnlyBody() {
         Plan p = new Plan();
         if (label != null) { 
             p.label         = label;

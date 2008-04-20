@@ -57,23 +57,22 @@ import java.io.File;
   from the source file in "/tmp/x.asl".</li>
 
   <li>
-  <code>.create_agent(bob,"x.asl", [agentClass(myp.MyAgent)])</code>:
+  <code>.create_agent(bob,"x.asl", [agentClass("myp.MyAgent")])</code>:
   creates the agent with customised agent class
   <code>myp.MyAgent</code>.</li>
 
-  <code>.create_agent(bob,"x.asl", [agentArchClass(myp.MyArch)])</code>:
+  <code>.create_agent(bob,"x.asl", [agentArchClass("myp.MyArch")])</code>:
   creates the agent with customised architecture class
   <code>myp.MyArch</code>.</li>
 
-  <code>.create_agent(bob,"x.asl", [beliefBaseClass(jason.bb.TextPersistentBB)])</code>:
+  <code>.create_agent(bob,"x.asl", [beliefBaseClass("jason.bb.TextPersistentBB")])</code>:
   creates the agent with customised belief base
   <code>jason.bb.TextPersistentBB</code>.</li>
 
-  <code>.create_agent(bob,"x.asl", [agentClass(myp.MyAgent),
-  agentArchClass(myp.MyArch),
-  beliefBaseClass(jason.bb.TextPersistentBB)])</code>: creates the
+  <code>.create_agent(bob,"x.asl", [agentClass("myp.MyAgent"),
+  agentArchClass("myp.MyArch"),
+  beliefBaseClass("jason.bb.TextPersistentBB")])</code>: creates the
   agent with agent, acrchitecture and belief base customised.</li>
-
 
   </ul>
 
@@ -104,11 +103,11 @@ public class create_agent extends DefaultInternalAction {
                     if (t.isStructure()) {
                         Structure s = (Structure)t;
                         if (s.getFunctor().equals("beliefBaseClass")) {
-                            bbPars = new ClassParameters((Structure)s.getTerm(0));
+                            bbPars = new ClassParameters(testString(s.getTerm(0)));
                         } else if (s.getFunctor().equals("agentClass")) {
-                            agClass = s.getTerm(0).toString();
+                            agClass = testString(s.getTerm(0)).toString();
                         } else if (s.getFunctor().equals("agentArchClass")) {
-                            agArchClass = s.getTerm(0).toString();
+                            agArchClass = testString(s.getTerm(0)).toString();
                         }
                     }
                 }
@@ -123,5 +122,13 @@ public class create_agent extends DefaultInternalAction {
         } catch (Exception e) {
             throw new JasonException("Error in internal action 'create_agent': " + e, e);
         }
+    }
+    
+    private Structure testString(Term t) {
+    	if (t.isStructure())
+    		return (Structure)t;
+    	if (t.isString())
+    		return Structure.parse(((StringTerm)t).getString());
+    	return null;
     }
 }
