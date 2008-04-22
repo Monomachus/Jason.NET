@@ -21,7 +21,7 @@ public class CheckVersion extends Thread {
     public static final String JasonSite = "http://jason.sf.net";
     String download;
     
-    int version;
+    String version;
     String release; 
     
     String getLatestVersion() {
@@ -30,10 +30,11 @@ public class CheckVersion extends Thread {
             Properties p = new Properties();
             p.load(new URL(JasonSite+"/latest.properties").openStream());
             download = p.getProperty("download");
-            version = Integer.parseInt(p.getProperty("version"));
+            version = p.getProperty("version");
             release = p.getProperty("release");
             return version + "." + release;
         } catch (Exception ex) {
+        	System.out.println(ex);
             return null;
         }
     }
