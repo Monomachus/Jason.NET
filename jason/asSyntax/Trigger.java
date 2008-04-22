@@ -145,6 +145,10 @@ public class Trigger implements Cloneable {
 	public Literal getLiteral() {
 		return literal;
 	}
+
+        public void setLiteral(Literal literal) {
+		this.literal = literal;
+	}
 	
 	public String toString() {
 		return operator.toString() + type + literal;
