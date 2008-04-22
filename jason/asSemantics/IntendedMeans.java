@@ -24,12 +24,11 @@
 
 package jason.asSemantics;
 
-import jason.asSyntax.PlanBody;
-import jason.asSyntax.PlanBodyImpl;
 import jason.asSyntax.ListTerm;
 import jason.asSyntax.ListTermImpl;
-import jason.asSyntax.Literal;
 import jason.asSyntax.Plan;
+import jason.asSyntax.PlanBody;
+import jason.asSyntax.PlanBodyImpl;
 import jason.asSyntax.StringTermImpl;
 import jason.asSyntax.Structure;
 import jason.asSyntax.Term;
@@ -51,12 +50,15 @@ public class IntendedMeans implements Serializable {
     public IntendedMeans(Option opt, Trigger te) {
     	plan = opt.getPlan().cloneOnlyBody();
     	unif = opt.getUnifier(); //(Unifier)opt.getUnifier().clone();
+        
+    	// REMOVED: experimental
+    	/*
     	Literal planLiteral = plan.getTrigger().getLiteral();
     	if (planLiteral.hasAnnot()) {
     		planLiteral.getAnnots().apply(unif);
     		// TODO: why?
-    		// if the plans.TE is not change, we do not need to clone it in plan.cloneBodyOnly
     	}
+    	*/
         if (te == null) {
             trigger = plan.getTrigger();
         } else {
@@ -65,10 +67,9 @@ public class IntendedMeans implements Serializable {
             // add annots of the trigger into the plan's te
             // so that the event +!g[source(ag1)] will add source(ag1)
             // in the TE of the plan
-            // TODO: why? -- in the TS.applyClrInt -- end of the method, the unification could be g,tel and not tel,g!
-            // (the plan trigger will be used latter to "return" values
-            // see TS.applyClrInt -- end of the method)
-            planLiteral.addAnnots(trigger.getLiteral().getAnnots());
+            // TODO: why? 
+            // REMOVED: experimental
+            //planLiteral.addAnnots(trigger.getLiteral().getAnnots());
         }
     }
     

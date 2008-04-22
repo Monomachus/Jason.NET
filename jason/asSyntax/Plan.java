@@ -218,9 +218,9 @@ public class Plan extends SourceInfo implements Cloneable, Serializable {
             p.isAllUnifs    = isAllUnifs;
         }
         
-        p.tevent = (Trigger)tevent.clone();
+        p.tevent  = (Trigger)tevent.clone();
         p.context = context;
-        p.body = (PlanBody)body.clone();
+        p.body    = (PlanBody)body.clone();
         
         p.setSrc(this);
 

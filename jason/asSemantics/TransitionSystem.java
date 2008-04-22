@@ -657,7 +657,6 @@ public class TransitionSystem {
                 // they are anonymous)
                 Literal tel = topIM.getPlan().getTrigger().getLiteral();
                 tel.apply(topIM.unif);
-                // TODO: why not unifies(g,tel)?
                 im.unif.unifies(tel, g);
             }
         }
