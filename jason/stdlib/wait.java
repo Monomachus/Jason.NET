@@ -33,6 +33,7 @@ import jason.asSemantics.Unifier;
 import jason.asSyntax.Atom;
 import jason.asSyntax.InternalActionLiteral;
 import jason.asSyntax.NumberTerm;
+import jason.asSyntax.PlanBody;
 import jason.asSyntax.PlanBodyImpl;
 import jason.asSyntax.StringTerm;
 import jason.asSyntax.Term;
@@ -108,8 +109,8 @@ public class wait extends DefaultInternalAction {
 
                 if (args.length == 2) {
                     timeout = (long) ((NumberTerm) args[1]).solve();
-                    if (args.length == 3 && args[2].toString().equals("nofail"));
-                    failontimeout = false;
+                    if (args.length == 3 && args[2].toString().equals("nofail"))
+                    	failontimeout = false;
                 }
 
             }
@@ -183,11 +184,12 @@ public class wait extends DefaultInternalAction {
                 // add SI again in C.I if it was not removed and this 
                 // wait was not dropped
                 if (c.getPendingIntentions().remove(sTE) == si && !c.getIntentions().contains(si) && !drop) {
-                    si.peek().removeCurrentStep();
                     if (stopByTimeout && te != null && failontimeout) {
                         // fail the .wait
-                        si.peek().getPlan().getBody().add(0, new PlanBodyImpl(BodyType.internalAction, new InternalActionLiteral(".fail")));
+                    	PlanBody body = si.peek().getPlan().getBody();
+                    	body.add(1, new PlanBodyImpl(BodyType.internalAction, new InternalActionLiteral(".fail")));
                     } 
+                    si.peek().removeCurrentStep();
                     if (si.isSuspended()) { // if the intention was suspended by .suspend
                     	String k = suspend.SUSPENDED_INT+si.getId();
                     	c.getPendingIntentions().put(k, si);

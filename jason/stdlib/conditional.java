@@ -70,10 +70,7 @@ public class conditional extends DefaultInternalAction {
 	        	IntendedMeans im = ts.getC().getSelectedIntention().peek();
 	        	PlanBody ifia = im.getCurrentStep();
 	        	whattoadd.setAsBodyTerm(false);
-	        	if (ifia.getPlanSize() == 1)
-	        		ifia.add(whattoadd);
-	        	else
-	        		ifia.add(1,whattoadd);
+	        	ifia.add(1,whattoadd);
             }
             return true;
         } catch (ArrayIndexOutOfBoundsException e) {

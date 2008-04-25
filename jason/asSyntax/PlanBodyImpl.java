@@ -153,9 +153,10 @@ public class PlanBodyImpl extends Structure implements PlanBody, Iterable<PlanBo
     }
 
     public boolean add(PlanBody bl) {
-        if (term == null)
+        if (term == null) {
             swap(bl);
-        else if (next == null)
+            this.next = bl.getBodyNext();
+        } else if (next == null)
             next = bl;
         else 
             next.add(bl);
@@ -178,6 +179,8 @@ public class PlanBodyImpl extends Structure implements PlanBody, Iterable<PlanBo
             this.getLastBody().setBodyNext(newpb);
         } else if (next != null) { 
             next.add(index - 1, bl);
+        } else {
+        	next = bl;
         }
         return true;
     }
