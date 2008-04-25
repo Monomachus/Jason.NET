@@ -99,8 +99,8 @@ public class ArithFunctionTerm extends Structure implements NumberTerm {
             } catch (Exception e) {
                 logger.log(Level.SEVERE, getErrorMsg()+ " -- "+ e);
             }
-    	} else {
-    		logger.warning(getErrorMsg()+ " -- this function has unground arguments and can not be evaluated!");
+    	//} else {
+    	//	logger.warning(getErrorMsg()+ " -- this function has unground arguments and can not be evaluated! Unifier is "+u);
     	}
     	
 		return false;

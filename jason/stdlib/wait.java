@@ -67,8 +67,12 @@ import java.util.logging.Level;
   <li> <code>.wait("+!g", 2000)</code>: suspend the intention until the goal
   <code>g</code> is triggered or 2 seconds have passed, whatever happens
   first. In case the event does not happens in two seconds, the internal action
-  fails.
+  fails. 
 
+  <li> <code>.wait("+!g", 2000, nofail)</code>: suspend the intention until the goal
+  <code>g</code> is triggered or 2 seconds have passed, whatever happens
+  first. In case the event does not happens in two seconds, the internal action does not
+  fail. 
   </ul>
 
   @see jason.stdlib.at
@@ -88,6 +92,8 @@ public class wait extends DefaultInternalAction {
     public Object execute(final TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         long timeout = -1;
         Trigger te = null;
+        
+        boolean failontimeout = true;
         try {
             if (args[0].isNumeric()) {
                 // time in milliseconds
@@ -101,8 +107,9 @@ public class wait extends DefaultInternalAction {
                 te = Trigger.parseTrigger(st.getString());
 
                 if (args.length == 2) {
-                    NumberTerm tot = (NumberTerm) args[1];
-                    timeout = (long) tot.solve();
+                    timeout = (long) ((NumberTerm) args[1]).solve();
+                    if (args.length == 3 && args[2].toString().equals("nofail"));
+                    failontimeout = false;
                 }
 
             }
@@ -110,7 +117,7 @@ public class wait extends DefaultInternalAction {
             ts.getLogger().log(Level.SEVERE, "Error at .wait.", e);
             return false;
         }
-        WaitEvent wet = new WaitEvent(te, un, ts, timeout);
+        WaitEvent wet = new WaitEvent(te, un, ts, timeout, failontimeout);
         wet.start();
         return true;
     }    
@@ -139,9 +146,10 @@ public class wait extends DefaultInternalAction {
         boolean          ok      = false;
         boolean          drop    = false;
         boolean          stopByTimeout = false;
+        boolean          failontimeout;
         long             timeout = -1;
         
-        WaitEvent(Trigger te, Unifier un, TransitionSystem ts, long to) {
+        WaitEvent(Trigger te, Unifier un, TransitionSystem ts, long to, boolean failontimeout) {
             super("wait "+te);
             this.te = te;
             this.un = un;
@@ -149,6 +157,7 @@ public class wait extends DefaultInternalAction {
             c = ts.getC();
             si = c.getSelectedIntention();
             this.timeout = to;
+            this.failontimeout = failontimeout;
 
             // register listener
             c.addEventListener(this);
@@ -175,7 +184,7 @@ public class wait extends DefaultInternalAction {
                 // wait was not dropped
                 if (c.getPendingIntentions().remove(sTE) == si && !c.getIntentions().contains(si) && !drop) {
                     si.peek().removeCurrentStep();
-                    if (stopByTimeout && te != null) {
+                    if (stopByTimeout && te != null && failontimeout) {
                         // fail the .wait
                         si.peek().getPlan().getBody().add(0, new PlanBodyImpl(BodyType.internalAction, new InternalActionLiteral(".fail")));
                     } 

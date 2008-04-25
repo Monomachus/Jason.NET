@@ -45,6 +45,7 @@ import jason.functions.Count;
 import jason.functions.RuleToFunction;
 import jason.runtime.Settings;
 import jason.stdlib.conditional;
+import jason.stdlib.loop;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -244,6 +245,8 @@ public class Agent {
         String iaName = action.getFunctor();
         if (iaName.equals(".if"))
         	return conditional.create();
+        if (iaName.equals(".while"))
+        	return loop.create();
         if (iaName.charAt(0) == '.')
             iaName = "jason.stdlib" + iaName;
         InternalAction objIA = internalActions.get(iaName);
