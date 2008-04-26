@@ -24,7 +24,7 @@
 package jason.infra.centralised;
 
 import jason.JasonException;
-import jason.ReceiverDoesNotExistException;
+import jason.ReceiverNotFoundException;
 import jason.architecture.AgArch;
 import jason.architecture.AgArchInfraTier;
 import jason.asSemantics.ActionExec;
@@ -231,14 +231,14 @@ public class CentralisedAgArch implements Runnable, AgArchInfraTier {
     }
 
     // this is used by the .send internal action in stdlib
-    public void sendMsg(Message m) throws ReceiverDoesNotExistException {
+    public void sendMsg(Message m) throws ReceiverNotFoundException {
         // actually send the message
         m.setSender(getAgName());
         CentralisedAgArch rec = masRunner.getAg(m.getReceiver());
         
         if (rec == null) {
             if (isRunning())
-                throw new ReceiverDoesNotExistException("Receiver '" + m.getReceiver() + "' does not exists! Could not send " + m);
+                throw new ReceiverNotFoundException("Receiver '" + m.getReceiver() + "' does not exists! Could not send " + m);
             else
                 return;
         }

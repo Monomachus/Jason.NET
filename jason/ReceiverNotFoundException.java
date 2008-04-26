@@ -25,18 +25,18 @@
 package jason;
 
 
-public class ReceiverDoesNotExistException extends java.lang.Exception {
+public class ReceiverNotFoundException extends java.lang.Exception {
     
 	private static final long serialVersionUID = 1L;
 
-    public ReceiverDoesNotExistException() {
+    public ReceiverNotFoundException() {
     }
     
-    public ReceiverDoesNotExistException(String msg) {
+    public ReceiverNotFoundException(String msg) {
         super(msg);
     }
 
-    public ReceiverDoesNotExistException(String msg, Exception cause) {
+    public ReceiverNotFoundException(String msg, Exception cause) {
         super(msg);
         initCause(cause);
     }
