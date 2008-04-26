@@ -94,7 +94,7 @@ public class drop_desire extends drop_intention {
                 t = (Trigger) t.clone();
                 t.apply(ei.getIntention().peek().getUnif());
             }
-            if (un.unifies(t, te)) {
+            if (un.copy().unifiesNoUndo(t, te)) {
                 // old implementation: t.setTrigType(Trigger.TEDel); // Just changing "+!g" to "-!g"
             	ie.remove();
             }

@@ -76,8 +76,12 @@ public class Structure extends DefaultTerm {
         setSrc(t);
     }
 
-    /** to be used by list term and atom to not create the array list for terms */
-    protected Structure(String functor, int termsSize) {
+    /** 
+     * Create a structure with a defined number of terms.
+     * 
+     * It is used by list term and atom to not create the array list for terms. 
+     */
+    public Structure(String functor, int termsSize) {
         //this.functor = (functor == null ? null : functor.intern()); 
         if (functor == null)
             logger.log(Level.WARNING, "A structure functor should not be null!", new Exception());

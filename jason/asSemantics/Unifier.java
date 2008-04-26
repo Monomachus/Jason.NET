@@ -348,6 +348,11 @@ public class Unifier implements Cloneable {
         }
     }
     
+    /** same as clone but with typed return */
+    public Unifier copy() {
+    	return (Unifier)clone();
+    }
+    
     public boolean equals(Object o) {
         if (o == null) return false;
         if (o == this) return true;

@@ -84,7 +84,7 @@ public class drop_intention extends DefaultInternalAction {
         Trigger g = new Trigger(TEOperator.add, TEType.achieve, l);
 
         for (Intention i: C.getIntentions()) {
-            if (i.hasTrigger(g, un)) {
+            if (i.hasTrigger(g, un.copy())) {
                 C.removeIntention(i);
             }
         }
@@ -92,7 +92,7 @@ public class drop_intention extends DefaultInternalAction {
         // intention may be suspended in E
         for (Event e: C.getEvents()) {
             Intention i = e.getIntention();
-            if (i != null && i.hasTrigger(g, un)) {
+            if (i != null && i.hasTrigger(g, un.copy())) {
                 C.removeEvent(e);
             }
         }
@@ -100,14 +100,14 @@ public class drop_intention extends DefaultInternalAction {
         // intention may be suspended in PA! (in the new semantics)
         for (ActionExec a: C.getPendingActions().values()) {
             Intention i = a.getIntention();
-            if (i.hasTrigger(g, un)) {
+            if (i.hasTrigger(g, un.copy())) {
                 C.dropPendingAction(i);
             }
         }
 
         // intention may be suspended in PI! (in the new semantics)
         for (Intention i: C.getPendingIntentions().values()) {
-            if (i != null && i.hasTrigger(g, un)) {
+            if (i != null && i.hasTrigger(g, un.copy())) {
                 C.dropPendingIntention(i);
             }
         }
