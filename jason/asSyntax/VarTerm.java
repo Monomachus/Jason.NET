@@ -368,9 +368,12 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
     
     @Override
     public void countVars(Map<VarTerm, Integer> c) {
-        if (isVar()) {
-            int n = c.containsKey(this) ? c.get(this) : 0; 
-            c.put(this, n+1);            
+        if (value == null) {
+            int n = c.containsKey(this) ? c.get(this) : 0;
+            c.put(this, n+1);
+            super.countVars(c);
+        } else {
+        	value.countVars(c);
         }
     }
 

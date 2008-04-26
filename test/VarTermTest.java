@@ -23,7 +23,9 @@ import jason.asSyntax.parser.as2jTokenManager;
 import jason.infra.centralised.CentralisedAgArch;
 
 import java.io.StringReader;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 import junit.framework.TestCase;
 
@@ -441,6 +443,13 @@ public class VarTermTest extends TestCase {
         v.apply(u);
         assertFalse(v.isVar());
         assertFalse(v.isGround());        
+    }
+    
+    public void testUnamedVarAnnots() {
+    	Term t = DefaultTerm.parse("_[scheme(Id)]");
+    	Map<VarTerm,Integer> c = new HashMap<VarTerm, Integer>();
+    	t.countVars(c);
+    	assertEquals(1,c.get(new VarTerm("Id")).intValue());
     }
     
     public void testUnifClone() {

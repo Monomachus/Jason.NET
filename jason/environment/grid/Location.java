@@ -23,7 +23,10 @@ public final class Location {
         return Math.max( Math.abs(this.x - l.x) , Math.abs(this.y - l.y));
     }
 
-    public  boolean isNeigbour(Location l) {
+    public boolean isInArea(Location tr, Location bl) {
+    	return x >= tr.x && x <= bl.x && y >= tr.y && y <= bl.y;
+    }
+    public boolean isNeigbour(Location l) {
         return 
             distance(l) == 1 ||
             equals(l) ||
