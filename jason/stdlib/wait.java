@@ -51,7 +51,11 @@ import java.util.logging.Level;
   <p>Description: suspend the intention for the time specified by <i>T</i> (in
   milliseconds) or until some event <i>E</i> happens. The events are
   strings in AgentSpeak syntax, e.g. <code>"+bel(33)"</code>,
-  <code>"+!go(X,Y)"</code>.
+  <code>"+!go(X,Y)"</code>. 
+  
+  Although the argument is a string, the variables
+  in the string will be unified with the event, i.e., the unifier have
+  values for X and Y after the execution of <code>.wait("+!go(X,Y)")</code>.
 
   <p>Parameters:<ul>
   <li><i>+ event</i> (string): the event to wait for.<br/>
