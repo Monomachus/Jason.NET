@@ -54,7 +54,7 @@ import java.util.logging.Level;
   <code>"+!go(X,Y)"</code>. 
   
   Although the argument is a string, the variables
-  in the string will be unified with the event, i.e., the unifier have
+  in the string will be unified with the event, i.e., the unifier might have
   values for X and Y after the execution of <code>.wait("+!go(X,Y)")</code>.
 
   <p>Parameters:<ul>
