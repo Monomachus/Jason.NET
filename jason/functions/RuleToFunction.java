@@ -56,8 +56,8 @@ public class RuleToFunction extends DefaultArithFunction  {
 	        r = new InternalActionLiteral(literal);
 	    else
 	        r = new Literal(literal);
-	    for (Term t: args)
-	        r.addTerm(t);
+	    
+	    r.addTerms(args);
 	    VarTerm answer = new VarTerm("__RuleToFunctionResult");
 	    r.addTerm(answer);
 	    

@@ -224,10 +224,20 @@ public class Structure extends DefaultTerm {
         resetHashCodeCache();
     }
     
+    public void addTerms(Term ... ts ) {
+    	for (Term t: ts) {
+            terms.add(t);
+    	}
+        predicateIndicatorCache = null;
+        resetHashCodeCache();
+    }
+
     public void addTerms(List<Term> l) {
         for (Term t: l) {
-            addTerm(t);
+            terms.add(t);
         }
+        predicateIndicatorCache = null;
+        resetHashCodeCache();
     }
  
     public void setTerms(List<Term> l) {

@@ -179,10 +179,11 @@ public class TransitionSystem {
 
                 // generate an event
                 Literal received = new Literal("kqml_received");
-                received.addTerm(new Atom(m.getSender()));
-                received.addTerm(new Atom(m.getIlForce()));
-                received.addTerm(content);
-                received.addTerm(new Atom(m.getMsgId()));
+                received.addTerms(
+                		new Atom(m.getSender()),
+                		new Atom(m.getIlForce()),
+                		content,
+                		new Atom(m.getMsgId()));
 
                 updateEvents(new Event(new Trigger(TEOperator.add, TEType.achieve, received), Intention.EmptyInt));
             }
