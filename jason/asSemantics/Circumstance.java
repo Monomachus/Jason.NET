@@ -441,8 +441,9 @@ public class Circumstance implements Serializable {
         // intentions
         Element ints = (Element) document.createElement("intentions");
         Element selIntEle = null;
-        if (getSelectedIntention() != null && !getSelectedIntention().isFinished()) {
-            selIntEle = getSelectedIntention().getAsDOM(document);
+        Intention ci = getSelectedIntention();
+        if (ci != null && !ci.isFinished()) {
+            selIntEle = ci.getAsDOM(document);
             selIntEle.setAttribute("selected", "true");
             ints.appendChild(selIntEle);
         }

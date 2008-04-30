@@ -26,6 +26,7 @@ package jason.asSyntax;
 import jason.asSemantics.Agent;
 import jason.asSemantics.InternalAction;
 import jason.asSemantics.Unifier;
+import jason.stdlib.foreach;
 import jason.stdlib.loop;
 
 import java.util.Iterator;
@@ -80,7 +81,7 @@ public class InternalActionLiteral extends Literal {
 
     @Override
     public boolean apply(Unifier u) {
-    	if (this.ia != null && this.ia instanceof loop)
+    	if (this.ia != null && (this.ia instanceof loop || this.ia instanceof foreach))
     		return false;
 		else 
 			return super.apply(u);

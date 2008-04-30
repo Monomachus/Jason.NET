@@ -41,61 +41,56 @@ import jason.asSyntax.PlanBody.BodyType;
 import java.util.Iterator;
 
 // TODO: comments
-public class loop extends DefaultInternalAction {
+public class foreach extends DefaultInternalAction {
 
 	private static InternalAction singleton = null;
 	public static InternalAction create() {
 		if (singleton == null) 
-			singleton = new loop();
+			singleton = new foreach();
 		return singleton;
 	}
 	
-    @Override
+    @SuppressWarnings("unchecked")
+	@Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         try {
-        	
-        	IntendedMeans im = ts.getC().getSelectedIntention().peek();
-        	PlanBody whileia = im.getCurrentStep();
+        	IntendedMeans im    = ts.getC().getSelectedIntention().peek();
+        	PlanBody      foria = im.getCurrentStep();
 
-        	// store a backup of the unifier for the next iteration
+        	Iterator<Unifier> iu;
         	
-            // if the IA has a backup unifier, use that (it is an object term)
             if (args.length != 3) {
 	            // first execution of while
             	if ( !(args[0] instanceof LogicalFormula))
-            		throw new JasonException("The first argument of .while must be a logical formula.");
+            		throw new JasonException("The first argument of .for must be a logical formula.");
 	            if ( !args[1].isPlanBody())
-	        		throw new JasonException("The second argument of .while must be a plan body term.");
+	        		throw new JasonException("The second argument of .for must be a plan body term.");
             	
-            	// add backup unifier in the IA
-	        	((Structure)whileia.getBodyTerm()).addTerm(new ObjectTermImpl(un.clone()));
+	        	// get the solutions for the loop
+	            LogicalFormula logExpr = (LogicalFormula)args[0];
+	            iu = logExpr.logicalConsequence(ts.getAg(), un.copy());
+	        	((Structure)foria.getBodyTerm()).addTerm(new ObjectTermImpl(iu));
             } else {
-            	// restore the unifier of previous iterations
-            	Unifier ubak = (Unifier)((ObjectTerm)args[2]).getObject();
-            	un.clear();
-            	un.compose(ubak);
+            	// restore the solutions
+            	iu = (Iterator<Unifier>)((ObjectTerm)args[2]).getObject();
             }
             
-            LogicalFormula logExpr = (LogicalFormula)args[0]; //.clone();
-            //logExpr.apply(un); // need to apply since the internal action literal for while does not apply
-            Iterator<Unifier> iu = logExpr.logicalConsequence(ts.getAg(), un); 
-            if (iu.hasNext()) {	
-	            
+            if (iu.hasNext()) {
+            	un.clear();
             	un.compose(iu.next());
-            	
-            	PlanBody whattoadd = (PlanBody)args[1]; //.clone(); 
-	            whattoadd.add(new PlanBodyImpl(BodyType.internalAction, (Term)whileia.getBodyTerm().clone())); //(PlanBody)whileia.clone()); // add the while after 
+            	PlanBody whattoadd = (PlanBody)args[1].clone(); 
+	            whattoadd.add(new PlanBodyImpl(BodyType.internalAction, (Term)foria.getBodyTerm().clone())); 
 	        	whattoadd.setAsBodyTerm(false);
-        		whileia.add(1,whattoadd);
-	        	//System.out.println("new body="+whileia.getBodyNext());
+	        	foria.add(1,whattoadd);
+	        	//System.out.println("new body="+foria.getBodyNext());
             }
             return true;
         } catch (ArrayIndexOutOfBoundsException e) {
-            throw new JasonException("The internal action 'while' has not received the required arguments.");
+            throw new JasonException("The internal action 'for' has not received the required arguments.");
         } catch (JasonException e) {
         	throw e;
         } catch (Exception e) {
-            throw new JasonException("Error in internal action 'while': " + e, e);
+            throw new JasonException("Error in internal action 'for': " + e, e);
         }
     }
 }

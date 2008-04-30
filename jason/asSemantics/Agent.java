@@ -45,6 +45,7 @@ import jason.functions.Count;
 import jason.functions.RuleToFunction;
 import jason.runtime.Settings;
 import jason.stdlib.conditional;
+import jason.stdlib.foreach;
 import jason.stdlib.loop;
 
 import java.io.File;
@@ -247,6 +248,8 @@ public class Agent {
         	return conditional.create();
         if (iaName.equals(".while"))
         	return loop.create();
+        if (iaName.equals(".for"))
+        	return foreach.create();
         if (iaName.charAt(0) == '.')
             iaName = "jason.stdlib" + iaName;
         InternalAction objIA = internalActions.get(iaName);
@@ -675,6 +678,8 @@ public class Agent {
             }
         }
         Document document = builder.newDocument();
+        document.appendChild(document.createProcessingInstruction("xml-stylesheet", "href='agInspection.xsl' type='text/xsl' "));
+
         Element ag = getAsDOM(document);
         document.appendChild(ag);
 

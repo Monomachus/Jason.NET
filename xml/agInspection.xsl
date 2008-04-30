@@ -27,8 +27,8 @@
     <xsl:param name="show-mb"    select="'true'" />
     <xsl:param name="show-plan"  select="'true'" />
     <xsl:param name="show-int"   select="'true'" />
-    <xsl:param name="show-plan-details"   select="'false'" />
-    <xsl:param name="show-int-details"    select="'false'" />
+    <xsl:param name="show-plan-details"   select="'true'" />
+    <xsl:param name="show-int-details"    select="'true'" />
     
     <xsl:output method="html" />
     <xsl:strip-space elements="*" />
