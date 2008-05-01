@@ -446,16 +446,17 @@ Pred pred() :       { Token K; Pred p; List l; ListTerm lt;}
 
 
 /* List of terms */
-List terms() : { List listTerms = new ArrayList(); Term v; }
+List terms() : { List listTerms = new ArrayList(); Term v; Object o; }
 {
   v=term()             { listTerms.add(v); } 
   ( "," v=term()       { listTerms.add(v); }
+  | o=plan_body_term() { listTerms.add(o); }
   )* 
                        { return listTerms; }
 }
 
 
-Term term() :          { Object o;}
+Term term() :          { Object o; }
 {
   ( o=list()           
   | o=plan_body_term() 

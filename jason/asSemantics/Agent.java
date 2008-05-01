@@ -479,6 +479,7 @@ public class Agent {
                     l = (Literal)l.clone();
                     l.clearAnnots();
                     l.addAnnot(BeliefBase.TPercept);
+                    te.setLiteral(l);
                     ts.getC().addEvent(new Event(te, Intention.EmptyInt));
                 }
         

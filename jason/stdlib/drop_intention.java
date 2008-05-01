@@ -81,34 +81,39 @@ public class drop_intention extends DefaultInternalAction {
     }
     
     public void dropInt(Circumstance C, Literal l, Unifier un) {
+        Unifier bak = un.copy();
+        
         Trigger g = new Trigger(TEOperator.add, TEType.achieve, l);
-
         for (Intention i: C.getIntentions()) {
-            if (i.hasTrigger(g, un.copy())) {
+            if (i.hasTrigger(g, un)) {
                 C.removeIntention(i);
+                un = bak.copy();
             }
         }
         
         // intention may be suspended in E
         for (Event e: C.getEvents()) {
             Intention i = e.getIntention();
-            if (i != null && i.hasTrigger(g, un.copy())) {
+            if (i != null && i.hasTrigger(g, un)) {
                 C.removeEvent(e);
+                un = bak.copy();
             }
         }
         
         // intention may be suspended in PA! (in the new semantics)
         for (ActionExec a: C.getPendingActions().values()) {
             Intention i = a.getIntention();
-            if (i.hasTrigger(g, un.copy())) {
+            if (i.hasTrigger(g, un)) {
                 C.dropPendingAction(i);
+                un = bak.copy();
             }
         }
 
         // intention may be suspended in PI! (in the new semantics)
         for (Intention i: C.getPendingIntentions().values()) {
-            if (i != null && i.hasTrigger(g, un.copy())) {
+            if (i != null && i.hasTrigger(g, un)) {
                 C.dropPendingIntention(i);
+                un = bak.copy();
             }
         }
     }

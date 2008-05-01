@@ -46,7 +46,10 @@ public class UnnamedVar extends VarTerm {
         if (hasValue()) {
             return getValue().clone();
         } else {
-        	return new UnnamedVar(getFunctor());
+            UnnamedVar newv = new UnnamedVar(getFunctor());
+            if (hasAnnot())
+                newv.addAnnots((ListTerm)this.getAnnots().clone());
+        	return newv;
         }
     }
 

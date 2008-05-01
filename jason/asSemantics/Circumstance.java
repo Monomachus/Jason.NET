@@ -487,8 +487,10 @@ public class Circumstance implements Serializable {
             if (getPendingActions().values().contains(getAction())) {
                 e.setAttribute("pending", "true");
             }
-            if (getFeedbackActions().contains(getAction())) {
-                e.setAttribute("feedback", "true");
+            synchronized (getFeedbackActions()) {
+                if (getFeedbackActions().contains(getAction())) {
+                    e.setAttribute("feedback", "true");
+                }
             }
             acts.appendChild(e);
         }
