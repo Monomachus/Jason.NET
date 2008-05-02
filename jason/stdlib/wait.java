@@ -33,6 +33,7 @@ import jason.asSemantics.Unifier;
 import jason.asSyntax.Atom;
 import jason.asSyntax.InternalActionLiteral;
 import jason.asSyntax.NumberTerm;
+import jason.asSyntax.NumberTermImpl;
 import jason.asSyntax.PlanBody;
 import jason.asSyntax.PlanBodyImpl;
 import jason.asSyntax.StringTerm;
@@ -74,11 +75,13 @@ import java.util.logging.Level;
   first. In case the event does not happens in two seconds, the internal action
   fails. 
 
-  <li> <code>.wait("+!g", 2000, nofail)</code>: suspend the intention until the goal
+  <li> <code>.wait("+!g", 2000, EventTime)</code>: suspend the intention until the goal
   <code>g</code> is triggered or 2 seconds have passed, whatever happens
-  first. In case the event does not happens in two seconds, the internal action does not
-  fail. 
-  </ul>
+  first. 
+  Hence this use of .wait has three arguments, in case the event does not happen in 
+  two seconds, the internal action does not fail (as in the previous example).
+  The third argument will be unified to the 
+  elapsed time (in miliseconds) from the start of .wait until the event or timeout. </ul>
 
   @see jason.stdlib.at
 
@@ -98,7 +101,7 @@ public class wait extends DefaultInternalAction {
         long timeout = -1;
         Trigger te = null;
         
-        boolean failontimeout = true;
+        Term elapseTime = null;
         try {
             if (args[0].isNumeric()) {
                 // time in milliseconds
@@ -111,18 +114,16 @@ public class wait extends DefaultInternalAction {
                 st.apply(un);
                 te = Trigger.parseTrigger(st.getString());
 
-                if (args.length == 2) {
+                if (args.length >= 2)
                     timeout = (long) ((NumberTerm) args[1]).solve();
-                    if (args.length == 3 && args[2].toString().equals("nofail"))
-                    	failontimeout = false;
-                }
-
+                if (args.length == 3)
+                	elapseTime = args[2];
             }
         } catch (Exception e) {
             ts.getLogger().log(Level.SEVERE, "Error at .wait.", e);
             return false;
         }
-        WaitEvent wet = new WaitEvent(te, un, ts, timeout, failontimeout);
+        WaitEvent wet = new WaitEvent(te, un, ts, timeout, elapseTime);
         wet.start();
         return true;
     }    
@@ -151,10 +152,11 @@ public class wait extends DefaultInternalAction {
         boolean          ok      = false;
         boolean          drop    = false;
         boolean          stopByTimeout = false;
-        boolean          failontimeout;
+        Term             elapseTimeTerm;
         long             timeout = -1;
+        long             elapseTime;
         
-        WaitEvent(Trigger te, Unifier un, TransitionSystem ts, long to, boolean failontimeout) {
+        WaitEvent(Trigger te, Unifier un, TransitionSystem ts, long to, Term elapseTimeTerm) {
             super("wait "+te);
             this.te = te;
             this.un = un;
@@ -162,7 +164,7 @@ public class wait extends DefaultInternalAction {
             c = ts.getC();
             si = c.getSelectedIntention();
             this.timeout = to;
-            this.failontimeout = failontimeout;
+            this.elapseTimeTerm = elapseTimeTerm;
 
             // register listener
             c.addEventListener(this);
@@ -188,12 +190,14 @@ public class wait extends DefaultInternalAction {
                 // add SI again in C.I if it was not removed and this 
                 // wait was not dropped
                 if (c.getPendingIntentions().remove(sTE) == si && !c.getIntentions().contains(si) && !drop) {
-                    if (stopByTimeout && te != null && failontimeout) {
+                    if (stopByTimeout && te != null && elapseTimeTerm == null) {
                         // fail the .wait
                     	PlanBody body = si.peek().getPlan().getBody();
                     	body.add(1, new PlanBodyImpl(BodyType.internalAction, new InternalActionLiteral(".fail")));
                     } 
                     si.peek().removeCurrentStep();
+                    if (elapseTimeTerm != null)
+                    	si.peek().getUnif().unifies(elapseTimeTerm, new NumberTermImpl(elapseTime));
                     if (si.isSuspended()) { // if the intention was suspended by .suspend
                     	String k = suspend.SUSPENDED_INT+si.getId();
                     	c.getPendingIntentions().put(k, si);
@@ -211,18 +215,18 @@ public class wait extends DefaultInternalAction {
 
         synchronized public void waitEvent() {
             long init = System.currentTimeMillis();
-            long pass = 0;
+            elapseTime = 0;
             while (!ok && !drop) {
                 try {
                     if (timeout == -1) {
                         wait();
                     } else {
-                        long to = timeout - pass;
+                        long to = timeout - elapseTime;
                         if (to <= 0)
                             to = 100;
                         wait(to);
-                        pass = System.currentTimeMillis() - init;
-                        if (pass >= timeout) {
+                        elapseTime = System.currentTimeMillis() - init;
+                        if (elapseTime >= timeout) {
                             stopByTimeout = true;
                             break;
                         }
@@ -233,6 +237,7 @@ public class wait extends DefaultInternalAction {
                     e.printStackTrace();
                 }
             }
+            //elapseTime = System.currentTimeMillis() - init;
         }
 
         synchronized public void eventAdded(Event e) {
@@ -250,12 +255,10 @@ public class wait extends DefaultInternalAction {
             }
         }
 
-        public void intentionAdded(Intention i) {  
-        }
+        public void intentionAdded(Intention i) { }
         
         public String toString() {
             return sTE;
         }
-
     }
 }
