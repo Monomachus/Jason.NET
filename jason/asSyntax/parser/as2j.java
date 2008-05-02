@@ -578,7 +578,7 @@
 
 /* Annotated Formulae */
   final public Pred pred() throws ParseException {
-                      Token K; Pred p; List l; ListTerm lt;
+                        Token K; Pred p; List l; ListTerm lt; PlanBody b;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case ATOM:
       K = jj_consume_token(ATOM);
@@ -594,64 +594,64 @@
       jj_consume_token(-1);
       throw new ParseException();
     }
-                       p = new Pred(K.image);
-                       p.setSrcLine(K.beginLine);
-                       p.setSrc(asSource);
+                         p = new Pred(K.image);
+                         p.setSrcLine(K.beginLine);
+                         p.setSrc(asSource);
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case 39:
       jj_consume_token(39);
       l = terms();
       jj_consume_token(40);
-                       p.setTerms(l);
+                         p.setTerms(l);
       break;
     default:
       jj_la1[24] = jj_gen;
       ;
     }
+    label_9:
+    while (true) {
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case 27:
+        ;
+        break;
+      default:
+        jj_la1[25] = jj_gen;
+        break label_9;
+      }
+      b = plan_body_term();
+                         p.addTerm(b);
+    }
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case 42:
       lt = list();
-                       p.setAnnots(lt);
+                         p.setAnnots(lt);
       break;
     default:
-      jj_la1[25] = jj_gen;
+      jj_la1[26] = jj_gen;
       ;
     }
-                       {if (true) return p;}
+                         {if (true) return p;}
     throw new Error("Missing return statement in function");
   }
 
 /* List of terms */
   final public List terms() throws ParseException {
-                 List listTerms = new ArrayList(); Term v; Object o;
+                 List listTerms = new ArrayList(); Term v; PlanBody o;
     v = term();
                          listTerms.add(v);
-    label_9:
+    label_10:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case 27:
       case 41:
         ;
         break;
       default:
-        jj_la1[26] = jj_gen;
-        break label_9;
-      }
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case 41:
-        jj_consume_token(41);
-        v = term();
-                         listTerms.add(v);
-        break;
-      case 27:
-        o = plan_body_term();
-                         listTerms.add(o);
-        break;
-      default:
         jj_la1[27] = jj_gen;
-        jj_consume_token(-1);
-        throw new ParseException();
+        break label_10;
       }
+      jj_consume_token(41);
+      v = term();
+                         listTerms.add(v);
     }
                          {if (true) return listTerms;}
     throw new Error("Missing return statement in function");
@@ -709,7 +709,7 @@
     case 42:
       f = term_in_list();
                             last = lt.append(f); lt.setSrcLine(f.getSrcLine()); lt.setSrc(f.getSrc());
-      label_10:
+      label_11:
       while (true) {
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case 41:
@@ -717,7 +717,7 @@
           break;
         default:
           jj_la1[29] = jj_gen;
-          break label_10;
+          break label_11;
         }
         jj_consume_token(41);
         f = term_in_list();
@@ -1199,30 +1199,40 @@
     finally { jj_save(0, xla); }
   }
 
+  final private boolean jj_3R_16() {
+    if (jj_scan_token(27)) return true;
+    return false;
+  }
+
   final private boolean jj_3_1() {
     if (jj_scan_token(27)) return true;
     if (jj_scan_token(TK_BEGIN)) return true;
-    if (jj_3R_11()) return true;
+    if (jj_3R_12()) return true;
     if (jj_scan_token(28)) return true;
     return false;
   }
 
-  final private boolean jj_3R_13() {
-    if (jj_3R_14()) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_12() {
-    if (jj_scan_token(39)) return true;
+  final private boolean jj_3R_15() {
+    if (jj_3R_17()) return true;
     return false;
   }
 
   final private boolean jj_3R_14() {
+    if (jj_3R_16()) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_13() {
+    if (jj_scan_token(39)) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_17() {
     if (jj_scan_token(42)) return true;
     return false;
   }
 
-  final private boolean jj_3R_11() {
+  final private boolean jj_3R_12() {
     Token xsp;
     xsp = jj_scanpos;
     if (jj_scan_token(20)) {
@@ -1233,9 +1243,13 @@
     }
     }
     xsp = jj_scanpos;
-    if (jj_3R_12()) jj_scanpos = xsp;
-    xsp = jj_scanpos;
     if (jj_3R_13()) jj_scanpos = xsp;
+    while (true) {
+      xsp = jj_scanpos;
+      if (jj_3R_14()) { jj_scanpos = xsp; break; }
+    }
+    xsp = jj_scanpos;
+    if (jj_3R_15()) jj_scanpos = xsp;
     return false;
   }
 
@@ -1256,10 +1270,10 @@
       jj_la1_1();
    }
    private static void jj_la1_0() {
-      jj_la1_0 = new int[] {0x8000000,0x10cb00,0x8000000,0x80000000,0x8000000,0x10000,0x10cb00,0x8000000,0x8000000,0x20000000,0x10000,0x0,0x0,0x0,0x80000000,0x80000000,0x30cb80,0x0,0x0,0x80000000,0x80000000,0x800,0x10cb00,0x10c000,0x0,0x0,0x8000000,0x8000000,0x83acf80,0x0,0x200080,0x0,0x3acb80,0x3acb80,0x0,0x0,0x3acf80,0x3acb80,0x0,0x83acb80,0x0,0x0,0x0,0x3000,0x3000,0x0,0x32cb80,0x200080,0x0,};
+      jj_la1_0 = new int[] {0x8000000,0x10cb00,0x8000000,0x80000000,0x8000000,0x10000,0x10cb00,0x8000000,0x8000000,0x20000000,0x10000,0x0,0x0,0x0,0x80000000,0x80000000,0x30cb80,0x0,0x0,0x80000000,0x80000000,0x800,0x10cb00,0x10c000,0x0,0x8000000,0x0,0x0,0x83acf80,0x0,0x200080,0x0,0x3acb80,0x3acb80,0x0,0x0,0x3acf80,0x3acb80,0x0,0x83acb80,0x0,0x0,0x0,0x3000,0x3000,0x0,0x32cb80,0x200080,0x0,};
    }
    private static void jj_la1_1() {
-      jj_la1_1 = new int[] {0x0,0x0,0x0,0x0,0x0,0xc,0x0,0x0,0x0,0x0,0x0,0x1,0x2,0xc,0x10,0x10,0x0,0x20,0x4,0x5c,0x5c,0x0,0x0,0x0,0x80,0x400,0x200,0x200,0x488,0x200,0x400,0x800,0x488,0x488,0x800,0x2000,0x88,0x88,0x3fc000,0x488,0x3fc000,0xc,0xc,0xc00000,0xc00000,0x1000000,0x88,0x0,0x400,};
+      jj_la1_1 = new int[] {0x0,0x0,0x0,0x0,0x0,0xc,0x0,0x0,0x0,0x0,0x0,0x1,0x2,0xc,0x10,0x10,0x0,0x20,0x4,0x5c,0x5c,0x0,0x0,0x0,0x80,0x0,0x400,0x200,0x488,0x200,0x400,0x800,0x488,0x488,0x800,0x2000,0x88,0x88,0x3fc000,0x488,0x3fc000,0xc,0xc,0xc00000,0xc00000,0x1000000,0x88,0x0,0x400,};
    }
   final private JJCalls[] jj_2_rtns = new JJCalls[1];
   private boolean jj_rescan = false;

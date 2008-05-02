@@ -421,7 +421,7 @@ Literal literal() :  { Pred F; Token k; boolean type = Literal.LPos; }
 }
 
 /* Annotated Formulae */
-Pred pred() :       { Token K; Pred p; List l; ListTerm lt;}
+Pred pred() :         { Token K; Pred p; List l; ListTerm lt; PlanBody b; }
 {
   (
    K=<ATOM>
@@ -429,28 +429,29 @@ Pred pred() :       { Token K; Pred p; List l; ListTerm lt;}
    K=<TK_BEGIN>
    |
    K=<TK_END>
-  )                  { p = new Pred(K.image);
-                       p.setSrcLine(K.beginLine);
-                       p.setSrc(asSource);
-                     } 
+  )                    { p = new Pred(K.image);
+                         p.setSrcLine(K.beginLine);
+                         p.setSrc(asSource);
+                       } 
   
   [
-      "(" l = terms() 
-      ")"            { p.setTerms(l); }
+    "(" l = terms() 
+    ")"                { p.setTerms(l); }
   ]
+  ( b=plan_body_term() { p.addTerm(b); }  
+  )*
   [ 
-      lt = list()    { p.setAnnots(lt); }
+    lt = list()        { p.setAnnots(lt); }
   ] 
-                     { return p; }
+                       { return p; }
 }
 
 
 /* List of terms */
-List terms() : { List listTerms = new ArrayList(); Term v; Object o; }
+List terms() : { List listTerms = new ArrayList(); Term v; PlanBody o; }
 {
   v=term()             { listTerms.add(v); } 
   ( "," v=term()       { listTerms.add(v); }
-  | o=plan_body_term() { listTerms.add(o); }
   )* 
                        { return listTerms; }
 }

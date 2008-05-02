@@ -250,6 +250,10 @@ public class Literal extends Pred implements LogicalFormula {
         c.hashCodeCache = this.hashCodeCache;
         return c;
 	}
+	
+	public Literal copy() {
+	    return (Literal)clone();
+	}
 
     
     @Override
