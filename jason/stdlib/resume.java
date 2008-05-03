@@ -78,6 +78,11 @@ public class resume extends DefaultInternalAction {
 	            	if (i.hasTrigger(g, un)) {
 	                	i.setSuspended(false);
 	            		ik.remove();
+	            		
+	            		// remove the IA .suspend in case of self-suspend
+	            		if (k.equals(suspend.SELF_SUSPENDED_INT)) {
+	            		    i.peek().removeCurrentStep();
+	            		}
                         
                         // add it back in I if not in PA
                         if (! C.getPendingActions().containsKey(i.getId())) {

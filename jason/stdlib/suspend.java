@@ -47,9 +47,10 @@ import jason.asSyntax.Trigger.TEType;
   is a goal if there is a triggering event <code>+!G</code> in any plan within
   any intention in I, E, PI, or PA.
 
-  <p>Example:<ul> 
+  <p>Examples:<ul> 
 
   <li> <code>.suspend(go(1,3))</code>: suspends intentions to go to the location 1,3.
+  <li> <code>.suspend</code>: suspends the current intention.
 
   </ul>
 
@@ -69,16 +70,31 @@ import jason.asSyntax.Trigger.TEType;
 public class suspend extends DefaultInternalAction {
 	
     boolean suspendIntention = false;
-    public static final String SUSPENDED_INT = "suspended-";
+    public static final String SUSPENDED_INT      = "suspended-";
+    public static final String SELF_SUSPENDED_INT = SUSPENDED_INT+"self";
 
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         try {
-            Trigger      g = new Trigger(TEOperator.add, TEType.achieve, (Literal)args[0]);
+            suspendIntention = false;
+            
             Circumstance C = ts.getC();
+
+            if (args.length == 0) {
+                // suspend the current intention
+                Intention i = C.getSelectedIntention();
+                suspendIntention = true;
+                i.setSuspended(true);
+                //i.peek().removeCurrentStep();
+                C.getPendingIntentions().put(SELF_SUSPENDED_INT, i); //
+                
+                return true;
+            }
+            
+            // use the argument to select the intention to suspend.
+            
+            Trigger      g = new Trigger(TEOperator.add, TEType.achieve, (Literal)args[0]);
         	String       k = SUSPENDED_INT+g.getLiteral();
-        	
-        	suspendIntention = false;
         	
             // ** Must test in PA/PI first since some actions (as .suspend) put intention in PI
             
@@ -106,16 +122,16 @@ public class suspend extends DefaultInternalAction {
                 }
             }
             
-            // dropping the current intention?
+            // suspending the current intention?
             Intention i = C.getSelectedIntention();
             if (i.hasTrigger(g, un)) {
         		suspendIntention = true;
                 i.setSuspended(true);
-                i.peek().removeCurrentStep();
-        		C.getPendingIntentions().put(k, i);
+                //i.peek().removeCurrentStep();
+        		C.getPendingIntentions().put(SELF_SUSPENDED_INT, i);
             }
                 
-            // dropping G in Events
+            // suspending G in Events
             for (Event e: C.getEvents()) {
                 i = e.getIntention();
                 if ( i != null && 
@@ -132,7 +148,7 @@ public class suspend extends DefaultInternalAction {
             return true;
             
         } catch (ArrayIndexOutOfBoundsException e) {
-            throw new JasonException("The internal action 'suspend' has not received one argument.");
+            throw new JasonException("The internal action 'suspend' has not received one argument.", e);
         } catch (Exception e) {
             throw new JasonException("Error in internal action 'suspend': " + e, e);
         }

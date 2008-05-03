@@ -88,7 +88,7 @@ public class drop_desire extends drop_intention {
         Trigger te = new Trigger(TEOperator.add, TEType.achieve, l);
         Iterator<Event> ie = C.getEvents().iterator();
         while (ie.hasNext()) {
-        	Event ei = ie.next();
+        	Event  ei = ie.next();
             Trigger t = ei.getTrigger();
             if (ei.getIntention() != Intention.EmptyInt) {
                 t = (Trigger) t.clone();

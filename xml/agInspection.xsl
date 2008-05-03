@@ -269,17 +269,21 @@
     <xsl:template match="intended-means">
         <tr>
             <td valign="top" style="{$td-style}">
+	        <xsl:apply-templates select="@trigger"/>
             <xsl:if test="$show-int-details='true'">
+                <!-- td valign="top" style="{$td-style}" -->
+                <br/>
                 <xsl:apply-templates select="plan"/>
-            </xsl:if>
-            <xsl:if test="$show-int-details='false'">
-                <xsl:apply-templates select="plan/trigger"/>
+                <!-- /td -->
             </xsl:if>
             </td>
-            <td valign="top" style="{$td-style}">
-                <xsl:text> </xsl:text><xsl:text> </xsl:text>
-                <xsl:apply-templates select="unifier"/>
-            </td>
+            
+            <xsl:if test="$show-int-details='true'">
+                <td valign="top" style="{$td-style}">
+                    <xsl:text> </xsl:text><xsl:text> </xsl:text>
+                    <xsl:apply-templates select="unifier"/>
+                </td>
+            </xsl:if>
         </tr>
     </xsl:template>
     

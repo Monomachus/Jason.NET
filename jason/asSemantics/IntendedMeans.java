@@ -154,6 +154,7 @@ public class IntendedMeans implements Serializable {
     /** get as XML */
 	public Element getAsDOM(Document document) {
 		Element eim = (Element) document.createElement("intended-means");
+		eim.setAttribute("trigger", trigger.toString());
 		if (plan != null) {
 			eim.appendChild(plan.getAsDOM(document));
 		}

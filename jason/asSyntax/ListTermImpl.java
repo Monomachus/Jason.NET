@@ -87,6 +87,10 @@ public class ListTermImpl extends Structure implements ListTerm {
 		return t;
 	}
 	
+	public ListTermImpl copy() {
+	    return (ListTermImpl)clone();
+	}
+	
 
     @Override
     public boolean equals(Object t) {

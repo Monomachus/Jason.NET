@@ -73,7 +73,7 @@ public class EBDG implements Directive {
             
             return newAg;
         } catch (Exception e) {
-            logger.log(Level.SEVERE,"Directive DG error.", e);
+            logger.log(Level.SEVERE,"Directive EBDG error.", e);
         }
         return null;
     }

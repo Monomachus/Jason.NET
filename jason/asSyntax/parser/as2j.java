@@ -203,8 +203,8 @@
                                 if (a != null) {
                                   if (b.isRule()) {
                                       a.addInitialBel(b);
-                                      if (!parsedFiles.contains(asSource))
-                                         logger.warning(getSourceRef(b)+" warning: avoid to mix rules and plans ('"+b+"').");
+                                      //if (!parsedFiles.contains(asSource))
+                                      //   logger.warning(getSourceRef(b)+" warning: avoid to mix rules and plans ('"+b+"').");
                                   } else {
                                       {if (true) throw new ParseException(getSourceRef(b)+" The belief '"+b+"' is not in the begin of the source code!");}
                                   }

@@ -41,7 +41,7 @@ import jason.asSyntax.Term;
   <p>Description: delete elements of strings or lists. 
 
   <p>Parameters:<ul>
-  <li>+ arg[0] (term, string, or number): if term, this arg is the element to be removed in the list (all ocurrences of the element will be removed); 
+  <li>+ arg[0] (term, string, or number): if term, this arg is the element to be removed in the list (all occurrences of the element will be removed); 
                                           if string, this arg is the substring to be removed (the second arg should be a string);
                                           if number, this arg is the position in the list/string of the element/character to be removed.<br/>
   <li>+ arg[1] (list or string): the list/string where to delete. 
@@ -94,7 +94,7 @@ public class delete extends DefaultInternalAction {
             
             // first element as term
             if (args[1].isList()) {
-                return un.unifies(args[2], deleteFromList(args[0],(ListTerm)args[1]));
+                return un.unifies(args[2], deleteFromList(args[0],(ListTerm)args[1], un.copy()));
             }
             throw new JasonException("Incorrect use of the internal action '.delete' (see documentation).");
         } catch (ArrayIndexOutOfBoundsException e) {
@@ -104,11 +104,15 @@ public class delete extends DefaultInternalAction {
         }
 	}
 	
-	ListTerm deleteFromList(Term element, ListTerm l) {
+	ListTerm deleteFromList(Term element, ListTerm l, Unifier un) {
+	    Unifier bak = un;
 	    ListTerm r = new ListTermImpl();
 	    ListTerm last = r;
 	    for (Term t: l) {
-	        if (!t.equals(element))
+	        boolean u = un.unifies(element, t); 
+	        if (u)
+	            un = bak.copy();
+	        else
 	            last = last.append(t);
 	    }
 	    return r;

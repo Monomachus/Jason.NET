@@ -30,6 +30,7 @@ import jason.stdlib.foreach;
 import jason.stdlib.loop;
 
 import java.util.Iterator;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -87,6 +88,21 @@ public class InternalActionLiteral extends Literal {
 			return super.apply(u);
     }
     
+    @Override
+    public void countVars(Map<VarTerm, Integer> c) {
+        super.countVars(c);
+        if (this.ia != null && this.ia instanceof jason.stdlib.wait) {
+            // count the vars of first arg
+            if (getTerm(0).isString()) {
+                try {
+                    Trigger te = Trigger.parseTrigger( ((StringTerm)getTerm(0)).getString() );
+                    te.getLiteral().countVars(c);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
     
     @SuppressWarnings("unchecked")
     public Iterator<Unifier> logicalConsequence(Agent ag, Unifier un) {
