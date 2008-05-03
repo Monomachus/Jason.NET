@@ -137,7 +137,6 @@ public class ListTermImpl extends Structure implements ListTerm {
 	        return null;
 	}
 	
-	
 	// for unifier compatibility
     @Override
 	public int getArity() {
@@ -160,7 +159,7 @@ public class ListTermImpl extends Structure implements ListTerm {
 	@Override
 	public void setTerm(int i, Term t) {
         if (i == 0) term = t;
-        if (i == 1) System.out.println("Should not set next of list!");
+        if (i == 1) next = t;
     }
 	
 	/** return the this ListTerm elements (0=Term, 1=ListTerm) */

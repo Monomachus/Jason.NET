@@ -27,6 +27,8 @@ public class ObjectTermImpl extends DefaultTerm implements ObjectTerm {
 
     @Override
     public boolean equals(Object o) {
+        if (this.o == null) return false;
+        if (o == null) return false;
         return this.o.equals(o);
     }
     
