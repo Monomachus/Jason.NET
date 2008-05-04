@@ -508,7 +508,7 @@
     
     <xsl:template match="rule">
         <xsl:apply-templates select="head"/>
-        <xsl:text><font color="black"><b> :- </b></font></xsl:text>
+        <font color="black"><b><xsl:text> :- </xsl:text></b></font>
         <table>
             <tr>
                 <td width="20" />
@@ -519,7 +519,7 @@
 
     <xsl:template match="literal">
         <xsl:if test="@negated = 'true'">
-            <xsl:text><b>~</b></xsl:text>
+            <b><xsl:text>~</xsl:text></b>
         </xsl:if>
         <xsl:apply-templates  />
     </xsl:template>
@@ -567,7 +567,7 @@
     <xsl:template match="list-term">
         <xsl:text>[</xsl:text>
         <xsl:for-each select="*">
-            <xsl:text><xsl:value-of select="@sep"/></xsl:text>
+            <xsl:value-of select="@sep"/>
             <xsl:apply-templates select="." />
         </xsl:for-each>
         <xsl:text>]</xsl:text>
