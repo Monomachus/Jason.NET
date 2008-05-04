@@ -679,7 +679,7 @@ public class Agent {
             }
         }
         Document document = builder.newDocument();
-        document.appendChild(document.createProcessingInstruction("xml-stylesheet", "href='agInspection.xsl' type='text/xsl' "));
+        document.appendChild(document.createProcessingInstruction("xml-stylesheet", "href='http://jason.sf.net/xml/agInspection.xsl' type='text/xsl' "));
 
         Element ag = getAsDOM(document);
         document.appendChild(ag);
