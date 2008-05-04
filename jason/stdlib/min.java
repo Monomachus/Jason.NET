@@ -87,7 +87,7 @@ public class min extends DefaultInternalAction {
         			min = t;
         		}
         	}
-            return un.unifies(args[1], min);
+            return un.unifies(args[1], (Term)min.clone());
         } catch (ArrayIndexOutOfBoundsException e) {
             throw new JasonException("The internal action 'max/min' has not received two arguments.");
         } catch (JasonException e) {

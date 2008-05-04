@@ -113,7 +113,7 @@ public class delete extends DefaultInternalAction {
 	        if (u)
 	            un = bak.copy();
 	        else
-	            last = last.append(t);
+	            last = last.append((Term)t.clone());
 	    }
 	    return r;
 	}
@@ -124,7 +124,7 @@ public class delete extends DefaultInternalAction {
         int i = 0;
         for (Term t: l) {
             if ((i++) != index)
-                last = last.append(t);
+                last = last.append((Term)t.clone());
         }
         return r;
     }
