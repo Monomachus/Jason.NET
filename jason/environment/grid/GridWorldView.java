@@ -56,8 +56,10 @@ public class GridWorldView extends JFrame {
     
     /** updates only one position of the grid */
     public void update(int x, int y) {
-        drawEmpty(drawArea.getGraphics(), x, y);
-        draw(drawArea.getGraphics(), x, y);
+        Graphics g = drawArea.getGraphics();
+        if (g == null) return;
+        drawEmpty(g, x, y);
+        draw(g, x, y);
     }
 
     public void drawObstacle(Graphics g, int x, int y) {
