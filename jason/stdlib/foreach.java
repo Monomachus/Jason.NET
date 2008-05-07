@@ -38,7 +38,9 @@ import jason.asSyntax.Structure;
 import jason.asSyntax.Term;
 import jason.asSyntax.PlanBody.BodyType;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 // TODO: comments
 public class foreach extends DefaultInternalAction {
@@ -66,9 +68,14 @@ public class foreach extends DefaultInternalAction {
 	            if ( !args[1].isPlanBody())
 	        		throw new JasonException("The second argument of .for must be a plan body term.");
             	
-	        	// get the solutions for the loop
+	        	// get all solutions for the loop
+	            // Note: you should get all solutions here, otherwise I concurrent modification will occur for the iterator 
 	            LogicalFormula logExpr = (LogicalFormula)args[0];
 	            iu = logExpr.logicalConsequence(ts.getAg(), un.copy());
+	            List<Unifier> allsol = new ArrayList<Unifier>();
+	            while (iu.hasNext())
+	                allsol.add(iu.next());
+	            iu = allsol.iterator();
 	        	((Structure)foria.getBodyTerm()).addTerm(new ObjectTermImpl(iu));
             } else {
             	// restore the solutions
