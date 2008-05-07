@@ -226,6 +226,8 @@ public class Structure extends DefaultTerm {
     
     public void delTerm(int index) {
     	terms.remove(index);
+        predicateIndicatorCache = null;
+        resetHashCodeCache();
     }
     
     public void addTerms(Term ... ts ) {

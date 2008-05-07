@@ -335,8 +335,13 @@ public class Unifier implements Cloneable {
             function.put( (VarTerm)k.clone(), (Term)u.function.get(k).clone());
     }
     
-    @SuppressWarnings("unchecked")
     public Object clone() {
+        return copy();
+    }
+    
+    /** same as clone but with typed return */
+    @SuppressWarnings("unchecked")
+    public Unifier copy() {
         try {
             Unifier newUn = new Unifier();
             newUn.function = (HashMap)function.clone();
@@ -346,11 +351,6 @@ public class Unifier implements Cloneable {
             logger.log(Level.SEVERE, "Error cloning unifier.",e);
             return null;
         }
-    }
-    
-    /** same as clone but with typed return */
-    public Unifier copy() {
-    	return (Unifier)clone();
     }
     
     public boolean equals(Object o) {

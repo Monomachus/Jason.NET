@@ -648,14 +648,14 @@ public class Agent {
      */
     public void abolish(Literal bel, Unifier un) throws RevisionFailedException {
         List<Literal> toDel = new ArrayList<Literal>();
-        
+        if (un == null) un = new Unifier();
         Iterator<Literal> il = getBB().getCandidateBeliefs(bel, un);
         if (il != null) {
             while (il.hasNext()) {
                 Literal inBB = il.next();
                 if (!inBB.isRule()) {
                     // need to clone unifier since it is changed in previous iteration
-                    Unifier unC = (un == null ? new Unifier() : un.copy());
+                    Unifier unC = un.copy();
                     if (unC.unifiesNoUndo(bel, inBB)) {
                         toDel.add(inBB);
                     }
