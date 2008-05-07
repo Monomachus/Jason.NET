@@ -224,6 +224,10 @@ public class Structure extends DefaultTerm {
         resetHashCodeCache();
     }
     
+    public void delTerm(int index) {
+    	terms.remove(index);
+    }
+    
     public void addTerms(Term ... ts ) {
     	for (Term t: ts) {
             terms.add(t);
