@@ -79,7 +79,7 @@ public class desire extends intend {
     public boolean desires(Circumstance C, Literal l, Unifier un) {
         Trigger teFromL = new Trigger(TEOperator.add, TEType.achieve, l);
 
-        // we need to check the slected event in this cycle (already removed from E)
+        // we need to check the selected event in this cycle (already removed from E)
         if (C.getSelectedEvent() != null) {
             Trigger t = C.getSelectedEvent().getTrigger();
             Intention i = C.getSelectedEvent().getIntention(); 
@@ -87,7 +87,7 @@ public class desire extends intend {
                 t = (Trigger) t.clone();
                 t.apply(i.peek().getUnif());
             }
-            if (un.unifies(t, teFromL)) {
+            if (un.unifies(teFromL, t)) {
                 return true;
             }
         }
@@ -99,7 +99,7 @@ public class desire extends intend {
                 t = (Trigger) t.clone();
                 t.apply(i.peek().getUnif());
             }
-            if (un.unifies(t, teFromL)) {
+            if (un.unifies(teFromL, t)) {
                 return true;
             }
         }

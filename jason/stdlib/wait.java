@@ -237,7 +237,6 @@ public class wait extends DefaultInternalAction {
                     e.printStackTrace();
                 }
             }
-            //elapseTime = System.currentTimeMillis() - init;
         }
 
         synchronized public void eventAdded(Event e) {
