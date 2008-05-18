@@ -40,6 +40,10 @@
 		    <END>]</END>
 		</SPAN>
 
+		<SEQ TYPE="OPERATOR">if</SEQ>
+		<SEQ TYPE="OPERATOR">while</SEQ>
+		<SEQ TYPE="OPERATOR">for</SEQ>
+
 		<!-- special reserved words and operators -->
  		<SEQ TYPE="LITERAL2">true</SEQ>
 		<SEQ TYPE="OPERATOR">not</SEQ>
@@ -206,6 +210,11 @@
 		    <END>]</END>
 		</SPAN>
 
+		<SEQ TYPE="OPERATOR">if</SEQ>
+		<SEQ TYPE="OPERATOR">while</SEQ>
+		<SEQ TYPE="OPERATOR">for</SEQ>
+
+
 		<!-- special reserved words and operators -->
  		<SEQ TYPE="LITERAL2">true</SEQ>
 		<SEQ TYPE="OPERATOR">not</SEQ>
@@ -354,6 +363,11 @@
         	<BEGIN>"</BEGIN>
             <END>"</END>
         </SPAN>
+
+		<SEQ TYPE="OPERATOR">if</SEQ>
+		<SEQ TYPE="OPERATOR">while</SEQ>
+		<SEQ TYPE="OPERATOR">for</SEQ>
+
 
 	<!-- Reserved Terms -->
  		<SEQ TYPE="LITERAL2">true</SEQ>

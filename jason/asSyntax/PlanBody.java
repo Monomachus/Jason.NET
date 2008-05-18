@@ -32,5 +32,5 @@ public interface PlanBody extends Term {
     
     public boolean add(PlanBody bl);
     public boolean add(int index, PlanBody bl);
-    public Term removeBody(int index);    
+    public Term removeBody(int index);  
 }

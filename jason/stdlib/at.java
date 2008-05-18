@@ -31,7 +31,6 @@ import jason.asSemantics.Event;
 import jason.asSemantics.Intention;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
-import jason.asSyntax.Atom;
 import jason.asSyntax.StringTerm;
 import jason.asSyntax.Term;
 import jason.asSyntax.Trigger;
@@ -72,7 +71,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class at extends DefaultInternalAction {
 
-    public static final Atom atAtom = new Atom(".at"); 
+    public static final String atAtom = ".at"; 
      
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {

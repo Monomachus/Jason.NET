@@ -30,7 +30,6 @@ import jason.asSemantics.Event;
 import jason.asSemantics.Intention;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
-import jason.asSyntax.Atom;
 import jason.asSyntax.InternalActionLiteral;
 import jason.asSyntax.NumberTerm;
 import jason.asSyntax.NumberTermImpl;
@@ -88,7 +87,7 @@ import java.util.logging.Level;
  */
 public class wait extends DefaultInternalAction {
 
-    public static final Atom waitAtom = new Atom(".wait"); 
+    public static final String waitAtom = ".wait"; 
     //static Logger logger = Logger.getLogger(wait.class.getName());
 
     @Override

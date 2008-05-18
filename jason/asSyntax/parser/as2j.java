@@ -314,7 +314,8 @@
 
 /* Plan */
   final public Plan plan() throws ParseException {
-                        Token k; Pred L = null;
+                        Token k;
+                        Pred L = null;
                         Trigger T;
                         Object C = null;
                         PlanBody B = null;
@@ -357,10 +358,6 @@
                      try { ial = checkInternalActionsInContext((LogicalFormula)C, curAg); } catch (Exception e) {}
                      if (ial != null)
                         {if (true) throw new ParseException(getSourceRef(ial)+" The internal action '"+ial+"' can not be used in plan's context!");}
-                     //if (B != null) {
-                        //if (!(B instanceof PlanBody))
-                        //   throw new ParseException(getSourceRef(B)+" Unknown body formula:"+B);
-                            //bl = (PlanBody)B;
                          if (B != null && B.getBodyTerm().equals(Literal.LTrue))
                             B = (PlanBody)B.getBodyNext();
                      Plan p = new Plan(L,T,(LogicalFormula)C, B);
@@ -534,7 +531,7 @@
 
 /* Literal */
   final public Literal literal() throws ParseException {
-                       Pred F; Token k; boolean type = Literal.LPos;
+                                Pred F; Token k; boolean type = Literal.LPos;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case TK_NEG:
     case TK_BEGIN:
@@ -550,6 +547,20 @@
         ;
       }
       F = pred();
+                                                if (F.getFunctor().equals("if")) {
+                                                               Pred c = new Pred(".conditional");
+                                                               c.setTerms(F.getTerms());
+                                                               F = c;
+                                                            } else if (F.getFunctor().equals("while")) {
+                                                               Pred c = new Pred(".loop");
+                                                               c.setTerms(F.getTerms());
+                                                               F = c;
+                                                            } else if (F.getFunctor().equals("for")) {
+                                                               Pred c = new Pred(".foreach");
+                                                               c.setTerms(F.getTerms());
+                                                               F = c;
+                                                            }
+
                                 if (F.getFunctor().indexOf(".") >= 0) {
                                                                    try {
                                                                       {if (true) return new InternalActionLiteral(F, curAg);}
@@ -1199,8 +1210,8 @@
     finally { jj_save(0, xla); }
   }
 
-  final private boolean jj_3R_16() {
-    if (jj_scan_token(27)) return true;
+  final private boolean jj_3R_15() {
+    if (jj_3R_17()) return true;
     return false;
   }
 
@@ -1212,8 +1223,8 @@
     return false;
   }
 
-  final private boolean jj_3R_15() {
-    if (jj_3R_17()) return true;
+  final private boolean jj_3R_16() {
+    if (jj_scan_token(27)) return true;
     return false;
   }
 

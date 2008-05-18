@@ -62,7 +62,7 @@ public class InternalActionLiteral extends Literal {
 	public InternalActionLiteral(Pred p, Agent ag) throws Exception {
         super(true,p);
         if (ag != null)
-            ia = ag.getIA(this);
+            ia = ag.getIA(getFunctor());
     }
 	
     @Override
@@ -131,7 +131,7 @@ public class InternalActionLiteral extends Literal {
 
     public InternalAction getIA(Agent ag) throws Exception {
         if (ia == null && ag != null)
-            ia = ag.getIA(this);
+            ia = ag.getIA(getFunctor());
         return ia;
     }
     

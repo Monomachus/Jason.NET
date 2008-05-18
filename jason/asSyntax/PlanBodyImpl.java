@@ -154,6 +154,7 @@ public class PlanBodyImpl extends Structure implements PlanBody, Iterable<PlanBo
 
     public boolean add(PlanBody bl) {
         if (term == null) {
+            bl = (PlanBody)bl.clone();
             swap(bl);
             this.next = bl.getBodyNext();
         } else if (next == null)

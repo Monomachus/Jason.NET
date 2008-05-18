@@ -31,7 +31,6 @@ import jason.asSyntax.LogicalFormula;
 import jason.asSyntax.Plan;
 import jason.asSyntax.PlanLibrary;
 import jason.asSyntax.Rule;
-import jason.asSyntax.Structure;
 import jason.asSyntax.Trigger;
 import jason.asSyntax.Trigger.TEOperator;
 import jason.asSyntax.Trigger.TEType;
@@ -44,9 +43,6 @@ import jason.bb.DefaultBeliefBase;
 import jason.functions.Count;
 import jason.functions.RuleToFunction;
 import jason.runtime.Settings;
-import jason.stdlib.conditional;
-import jason.stdlib.foreach;
-import jason.stdlib.loop;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -242,14 +238,7 @@ public class Agent {
     }
 
     @SuppressWarnings("unchecked")
-	public InternalAction getIA(Structure action) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
-        String iaName = action.getFunctor();
-        if (iaName.equals(".if"))
-        	return conditional.create();
-        if (iaName.equals(".while"))
-        	return loop.create();
-        if (iaName.equals(".for"))
-        	return foreach.create();
+	public InternalAction getIA(String iaName) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
         if (iaName.charAt(0) == '.')
             iaName = "jason.stdlib" + iaName;
         InternalAction objIA = internalActions.get(iaName);
