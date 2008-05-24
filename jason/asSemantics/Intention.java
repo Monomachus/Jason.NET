@@ -129,18 +129,20 @@ public class Intention implements Serializable, Comparable<Intention> {
     
     /** returns the IntendedMeans with TE = g, returns null if there isn't one */
     public IntendedMeans getIM(Trigger g, Unifier u) {
-        for (IntendedMeans im : intendedMeans) {
+        for (IntendedMeans im : intendedMeans)
         	//System.out.println(g + " = "+ im.getTrigger()+" = "+u.unifies(g, im.getTrigger()));
-            if (u.unifies(g, im.getTrigger())) {
+            if (u.unifies(g, im.getTrigger()))
                 return im;
-            }
-        }
         return null;
     }
     
     /** returns true if the intention has an IM where TE = g, using u to verify equality */
     public boolean hasTrigger(Trigger g, Unifier u) {
-        return getIM(g,u) != null;
+        //return getIM(g,u) != null;
+        for (IntendedMeans im : intendedMeans)
+            if (u.unifies(g, im.getTrigger()))
+                return true;
+        return false;
     }
 
     /** remove all IMs until the IM with trigger te */

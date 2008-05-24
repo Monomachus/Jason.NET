@@ -111,7 +111,7 @@ public class drop_intention extends DefaultInternalAction {
 
         // intention may be suspended in PI! (in the new semantics)
         for (Intention i: C.getPendingIntentions().values()) {
-            if (i != null && i.hasTrigger(g, un)) {
+            if (i.hasTrigger(g, un)) {
                 C.dropPendingIntention(i);
                 un = bak.copy();
             }
