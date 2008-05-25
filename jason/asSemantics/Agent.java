@@ -457,7 +457,7 @@ public class Agent {
                 // if perception t is already in BB
                 if (l.equalsAsStructure(t) && l.negated() == t.negated()) {
                     wasPerceived = true;
-                    ip.remove(); // remove in percepts, since it already is in BB
+                    // ip.remove(); // remove in percepts, since it already is in BB [can not be removed, since annots in this percepts should be added in BB/Jason team for AC, for example, use annots in perceptions]
                     break;
                 }
             }
