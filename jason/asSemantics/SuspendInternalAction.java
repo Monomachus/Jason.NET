@@ -15,18 +15,17 @@ import java.util.concurrent.TimeUnit;
 
 /** 
 
-  This class can be used in place of DefaultInternalAction to create synchronous IA.
-
-  A sync. IA is one that suspend the intention that uses it until some event. 
+  This class can be used in place of DefaultInternalAction to create IA that
+  suspend/resume the intention.
 
   Example: a plan should to ask something to an user and wait until he/she answer some.
   If DefaultInternalAction is used for that, all the agent thread is suspended until
-  the answer. With SynchronousInternalAction, only the intention using the IA is
+  the answer. With SuspendInternalAction, only the intention using the IA is
   suspended. See demos/gui/gui1.  
 
   @author jomi
 */
-public abstract class SynchronousInternalAction implements InternalAction {
+public abstract class SuspendInternalAction implements InternalAction {
 
     protected ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     private   static int               actcount  = 0;
