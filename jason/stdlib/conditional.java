@@ -35,7 +35,7 @@ import jason.asSyntax.LogicalFormula;
 import jason.asSyntax.PlanBody;
 import jason.asSyntax.Term;
 
-// TODO: comments
+/** Implementation of if (see manual for more information) */
 public class conditional extends DefaultInternalAction {
 
 	private static InternalAction singleton = null;

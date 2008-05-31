@@ -42,7 +42,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-// TODO: comments
+/** Implementation of for (see manual for more information) */
 public class foreach extends DefaultInternalAction {
 
 	private static InternalAction singleton = null;

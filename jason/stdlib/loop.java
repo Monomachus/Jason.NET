@@ -40,7 +40,7 @@ import jason.asSyntax.PlanBody.BodyType;
 
 import java.util.Iterator;
 
-// TODO: comments
+/** Implementation of while (see manual for more information) */
 public class loop extends DefaultInternalAction {
 
 	private static InternalAction singleton = null;
