@@ -83,7 +83,7 @@ public class member extends DefaultInternalAction {
             	
             	void find() {
                     while (i.hasNext()) {
-                        c = (Unifier)un.clone();
+                        c = un.copy();
                     	if (c.unifiesNoUndo(member, i.next()))
                     		return; // member found in the list, c is the current response
                     }
@@ -108,6 +108,8 @@ public class member extends DefaultInternalAction {
             */
         } catch (ArrayIndexOutOfBoundsException e) {
             throw new JasonException("The internal action 'member' has not received two arguments.");
+        } catch (JasonException e) {
+            throw e;
         } catch (Exception e) {
             throw new JasonException("Error in internal action 'member': " + e, e);
         }

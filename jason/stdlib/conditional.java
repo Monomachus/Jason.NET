@@ -35,7 +35,34 @@ import jason.asSyntax.LogicalFormula;
 import jason.asSyntax.PlanBody;
 import jason.asSyntax.Term;
 
-/** Implementation of if (see manual for more information) */
+/** 
+Implementation of <b>if</b>. 
+
+<p>Syntax:
+<pre>
+  if ( <i>logical formula</i> ) {
+     <i>plan_body1</i>
+  [ } else { <i>plan_body2</i> ]
+  };
+</pre>
+</p>
+
+<p>if <i>logical formula</i> holds, <i>plan_body1</i> is executed; 
+otherwise, <i>plan_body2</i> is executed.</p>
+
+<p>Example:
+<pre>
++event : context
+  <- ....
+     if (vl(X) & X > 10) { // where vl(X) is a belief
+       .print("value > 10")
+     };
+     ....
+</pre>
+The unification is changed by the evaluation of the logical formula, i.e., X might have a value after if.
+</p>
+
+*/
 public class conditional extends DefaultInternalAction {
 
 	private static InternalAction singleton = null;
@@ -49,7 +76,7 @@ public class conditional extends DefaultInternalAction {
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         try {
         	if ( !(args[0] instanceof LogicalFormula))
-        		throw new JasonException("The first argument of .if must be a logical formula.");
+        		throw new JasonException("The first argument of if must be a logical formula.");
         	
             LogicalFormula logExpr = (LogicalFormula)args[0];
             PlanBody whattoadd = null;
@@ -57,12 +84,12 @@ public class conditional extends DefaultInternalAction {
             Iterator<Unifier> iu = logExpr.logicalConsequence(ts.getAg(), un);
             if (iu.hasNext()) {	// .if THEN
 	            if ( !args[1].isPlanBody())
-	        		throw new JasonException("The second argument of .if must be a plan body term.");
+	        		throw new JasonException("The second argument of if must be a plan body term.");
                 whattoadd = (PlanBody)args[1];
             	un.compose(iu.next());
             } else if (args.length == 3) { // .if ELSE
 	            if ( !args[2].isPlanBody())
-	        		throw new JasonException("The third argument of .if must be a plan body term.");
+	        		throw new JasonException("The third argument of if must be a plan body term.");
                 whattoadd = (PlanBody)args[2];
             }
 
@@ -74,11 +101,11 @@ public class conditional extends DefaultInternalAction {
             }
             return true;
         } catch (ArrayIndexOutOfBoundsException e) {
-            throw new JasonException("The internal action 'if' has not received the required arguments.");
+            throw new JasonException("The 'if' has not received the required arguments.");
         } catch (JasonException e) {
-        	throw e;
+            throw e;
         } catch (Exception e) {
-            throw new JasonException("Error in internal action 'if': " + e, e);
+            throw new JasonException("Error in 'if': " + e, e);
         }
     }
 }

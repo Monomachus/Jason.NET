@@ -27,6 +27,8 @@ import java.util.Random;
 
   </ul>
 
+  @see jason.functions.Random function version
+
 */
 public class random extends DefaultInternalAction {
 	

@@ -42,7 +42,42 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-/** Implementation of for (see manual for more information) */
+/** 
+Implementation of <b>for</b>. 
+
+<p>Syntax:
+<pre>
+  for ( <i>logical formula</i> ) {
+     <i>plan_body</i>
+  };
+</pre>
+</p>
+
+<p>for all unifications of <i>logical formula</i>, the <i>plan_body</i> is executed.</p>
+
+<p>Example:
+<pre>
++event : context
+  <- ....
+     for ( vl(X) ) {
+        .print(X)     // print all values of X
+     };
+     for ( .member(X,[a,b,c]) ) {
+        .print(X)    // print all members of the list
+     };
+     for ( .range(I,1,10) ) {
+        .print(I)    // print all values from 1 to 10
+     };
+     ....
+</pre>
+The unification resulted from the evaluation of the logical formula is used only inside the loop,
+i.e., the unification after the for is the same as before.
+</p>
+
+@see jason.stdlib.loop while
+
+*/
+
 public class foreach extends DefaultInternalAction {
 
 	private static InternalAction singleton = null;
@@ -64,9 +99,9 @@ public class foreach extends DefaultInternalAction {
             if (args.length != 3) {
 	            // first execution of while
             	if ( !(args[0] instanceof LogicalFormula))
-            		throw new JasonException("The first argument of .for must be a logical formula.");
+            		throw new JasonException("The first argument of for must be a logical formula.");
 	            if ( !args[1].isPlanBody())
-	        		throw new JasonException("The second argument of .for must be a plan body term.");
+	        		throw new JasonException("The second argument of for must be a plan body term.");
             	
 	        	// get all solutions for the loop
 	            // Note: you should get all solutions here, otherwise I concurrent modification will occur for the iterator 
@@ -93,11 +128,11 @@ public class foreach extends DefaultInternalAction {
             }
             return true;
         } catch (ArrayIndexOutOfBoundsException e) {
-            throw new JasonException("The internal action 'for' has not received the required arguments.");
+            throw new JasonException("'for' has not received the required arguments.");
         } catch (JasonException e) {
         	throw e;
         } catch (Exception e) {
-            throw new JasonException("Error in internal action 'for': " + e, e);
+            throw new JasonException("Error in 'for': " + e, e);
         }
     }
 }

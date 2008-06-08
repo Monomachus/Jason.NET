@@ -53,7 +53,7 @@ Provides all default internal actions of Jason.
 </ul>
 
 
-<h2>List</h2>
+<h2>Lists and Sets</h2>
 <ul>
   <li>{@link jason.stdlib.member}: list members. </li>
   <li>{@link jason.stdlib.length}: size of lists. </li>
@@ -61,16 +61,17 @@ Provides all default internal actions of Jason.
   <li>{@link jason.stdlib.concat}: concat lists. </li>
   <li>{@link jason.stdlib.delete}: delete members of a lists. </li>
   
-  <li>{@link jason.stdlib.difference}: difference of sets. </li>
-  <li>{@link jason.stdlib.intersection}: intersection of sets. </li>
-  <li>{@link jason.stdlib.union}: union of sets. </li>
-
   <li>{@link jason.stdlib.reverse}: reverse lists. </li>
   <li>{@link jason.stdlib.nth}: nth element of a lists. </li>
   <li>{@link jason.stdlib.max}: maximum value of a lists. </li>
   <li>{@link jason.stdlib.min}: minimum value of a lists. </li>
   <li>{@link jason.stdlib.sort}: sort lists. </li>
   <li>{@link jason.stdlib.list}: check whether an argument is a list.</li>
+
+  <li>{@link jason.stdlib.difference}: difference of sets. </li>
+  <li>{@link jason.stdlib.intersection}: intersection of sets. </li>
+  <li>{@link jason.stdlib.union}: union of sets. </li>
+
 </ul>
 
 
@@ -83,6 +84,14 @@ Provides all default internal actions of Jason.
   <li>{@link jason.stdlib.substring}: test substrings of strings. </li>
   <li>{@link jason.stdlib.string}: check whether an argument is a string.</li>
 </ul>
+
+<h2>Execution control</h2>
+<ul>
+  <li>{@link jason.stdlib.conditional}: implementation of <b>if</b>.</li>
+  <li>{@link jason.stdlib.loop}: implementation of <b>while</b>.</li>
+  <li>{@link jason.stdlib.foreach}: implementation of <b>for</b>.</li>
+</ul>
+
 
 <h2>Meta programming</h2>
 <ul>
@@ -111,17 +120,8 @@ Provides all default internal actions of Jason.
   <li>{@link jason.stdlib.time}: get the current time.</li>
   <li>{@link jason.stdlib.fail}: an action that always fails.</li>
   <li>{@link jason.stdlib.perceive}: force perception.</li>
+  <li>{@link jason.stdlib.range}: backtrack values in a range (used in <b>for</b>).</li>
 </ul>
-
-
-<!--h2>Related Documentation</h2>
-
-For overviews, tutorials, examples, guides, and tool documentation, please see:
-<ul>
-  <li><a href="">##### REFER TO NON-SPEC DOCUMENTATION HERE #####</a>
-</ul>
-
--->
 
 </body>
 </html>

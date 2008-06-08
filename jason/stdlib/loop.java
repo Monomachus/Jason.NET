@@ -40,7 +40,36 @@ import jason.asSyntax.PlanBody.BodyType;
 
 import java.util.Iterator;
 
-/** Implementation of while (see manual for more information) */
+/** 
+Implementation of <b>while</b>. 
+
+<p>Syntax:
+<pre>
+  while ( <i>logical formula</i> ) {
+     <i>plan_body</i>
+  };
+</pre>
+</p>
+
+<p>while <i>logical formula</i> holds, the <i>plan_body</i> is executed.</p>
+
+<p>Example:
+<pre>
++event : context
+  <- ....
+     while(vl(X) & X > 10) { // where vl(X) is a belief
+       .print("value > 10");
+        -+vl(X+1)
+     };
+     ....
+</pre>
+The unification resulted from the evaluation of the logical formula is used only inside the loop,
+i.e., the unification after the while is the same as before.
+</p>
+
+@see jason.stdlib.foreach for
+
+*/
 public class loop extends DefaultInternalAction {
 
 	private static InternalAction singleton = null;
@@ -63,9 +92,9 @@ public class loop extends DefaultInternalAction {
             if (args.length != 3) {
 	            // first execution of while
             	if ( !(args[0] instanceof LogicalFormula))
-            		throw new JasonException("The first argument of .while must be a logical formula.");
+            		throw new JasonException("The first argument of while must be a logical formula.");
 	            if ( !args[1].isPlanBody())
-	        		throw new JasonException("The second argument of .while must be a plan body term.");
+	        		throw new JasonException("The second argument of while must be a plan body term.");
             	
             	// add backup unifier in the IA
 	        	((Structure)whileia.getBodyTerm()).addTerm(new ObjectTermImpl(un.clone()));
@@ -91,11 +120,11 @@ public class loop extends DefaultInternalAction {
             }
             return true;
         } catch (ArrayIndexOutOfBoundsException e) {
-            throw new JasonException("The internal action 'while' has not received the required arguments.");
+            throw new JasonException("'while' has not received the required arguments.");
         } catch (JasonException e) {
         	throw e;
         } catch (Exception e) {
-            throw new JasonException("Error in internal action 'while': " + e, e);
+            throw new JasonException("Error in 'while': " + e, e);
         }
     }
 }

@@ -344,6 +344,7 @@ public class ListTermImpl extends Structure implements ListTerm {
         return result;
 
     }
+
     /** returns an iterator where each element is a ListTerm */
 	public Iterator<ListTerm> listTermIterator() {
 		final ListTermImpl lt = this;
