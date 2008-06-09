@@ -1,16 +1,10 @@
 package jason.asSemantics;
 
-import jason.asSemantics.Circumstance;
-import jason.asSemantics.Intention;
-import jason.asSemantics.InternalAction;
-import jason.asSemantics.TransitionSystem;
 import jason.asSyntax.InternalActionLiteral;
 import jason.asSyntax.PlanBody;
 import jason.asSyntax.PlanBodyImpl;
 import jason.asSyntax.PlanBody.BodyType;
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 /** 
@@ -27,8 +21,7 @@ import java.util.concurrent.TimeUnit;
 */
 public abstract class SuspendInternalAction implements InternalAction {
 
-    protected ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-    private   static int               actcount  = 0;
+    private static int actcount  = 0;
     
     public boolean canBeUsedInContext() {
         return false;
@@ -54,7 +47,7 @@ public abstract class SuspendInternalAction implements InternalAction {
         
         if (timeout > 0) {
             // schedule a future test of the end of the action
-            scheduler.schedule( new Runnable() {
+            ts.getAg().getScheduler().schedule( new Runnable() {
                 public void run() {
                     // finish the IA by timeout
                     if (C.getPendingIntentions().get(key) != null) { // test if the intention is still there

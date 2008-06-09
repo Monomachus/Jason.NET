@@ -40,9 +40,7 @@ import jason.asSyntax.Term;
 import jason.asSyntax.Trigger;
 import jason.asSyntax.PlanBody.BodyType;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
 /**
@@ -99,14 +97,12 @@ public class wait extends DefaultInternalAction {
     public Object execute(final TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         long timeout = -1;
         Trigger te = null;
-        
-        Term elapseTime = null;
+        Term elapsedTime = null;
         try {
             if (args[0].isNumeric()) {
                 // time in milliseconds
                 NumberTerm time = (NumberTerm)args[0];
                 timeout = (long) time.solve();
-                // Thread.sleep((long) time.solve());
             } else if (args[0].isString()) {
                 // wait for event
                 StringTerm st = (StringTerm) args[0];
@@ -116,15 +112,14 @@ public class wait extends DefaultInternalAction {
                 if (args.length >= 2)
                     timeout = (long) ((NumberTerm) args[1]).solve();
                 if (args.length == 3)
-                	elapseTime = args[2];
+                	elapsedTime = args[2];
             }
+            new WaitEvent(te, un, ts, timeout, elapsedTime);
+            return true;
         } catch (Exception e) {
             ts.getLogger().log(Level.SEVERE, "Error at .wait.", e);
-            return false;
         }
-        WaitEvent wet = new WaitEvent(te, un, ts, timeout, elapseTime);
-        wet.start();
-        return true;
+        return false;
     }    
 
     @Override
@@ -132,38 +127,24 @@ public class wait extends DefaultInternalAction {
         return true;
     } 
     
-    private List<WaitEvent> threads = Collections.synchronizedList(new ArrayList<WaitEvent>());
-    
-    public void stopAllWaits() {
-        for (WaitEvent t: threads) {
-            t.interrupt();
-        }
-    }
-
-
-    class WaitEvent extends Thread implements CircumstanceListener {
-        Trigger          te;
-        String           sTE; // a string version of TE
-        Unifier          un;
-        Intention        si;
-        TransitionSystem ts;
-        Circumstance     c;
-        boolean          ok      = false;
-        boolean          drop    = false;
-        boolean          stopByTimeout = false;
-        Term             elapseTimeTerm;
-        long             timeout = -1;
-        long             elapseTime;
+    class WaitEvent implements CircumstanceListener { 
+        private Trigger          te;
+        private String           sTE; // a string version of TE
+        private Unifier          un;
+        private Intention        si;
+        private TransitionSystem ts;
+        private Circumstance     c;
+        private boolean          dropped = false;
+        private Term             elapsedTimeTerm;
+        private long             startTime;
         
-        WaitEvent(Trigger te, Unifier un, TransitionSystem ts, long to, Term elapseTimeTerm) {
-            super("wait "+te);
+        WaitEvent(Trigger te, Unifier un, TransitionSystem ts, long timeout, Term elapsedTimeTerm) {
             this.te = te;
             this.un = un;
             this.ts = ts;
             c = ts.getC();
             si = c.getSelectedIntention();
-            this.timeout = to;
-            this.elapseTimeTerm = elapseTimeTerm;
+            this.elapsedTimeTerm = elapsedTimeTerm;
 
             // register listener
             c.addEventListener(this);
@@ -176,27 +157,34 @@ public class wait extends DefaultInternalAction {
             sTE = si.getId()+"/"+sTE;
             c.getPendingIntentions().put(sTE, si);
             
-            threads.add(this);
+            startTime = System.currentTimeMillis();
+
+            if (timeout > 0) {
+                ts.getAg().getScheduler().schedule(new Runnable() {
+                    public void run() {
+                        resume(true);
+                    }
+                }, timeout, TimeUnit.MILLISECONDS);
+            }
         }
 
-        public void run() {
+        void resume(boolean stopByTimeout) {
             try {
-                waitEvent();
-
                 // unregister (for not to receive intentionAdded again)
                 c.removeEventListener(this);
 
-                // add SI again in C.I if it was not removed and this 
-                // wait was not dropped
-                if (c.getPendingIntentions().remove(sTE) == si && !c.getIntentions().contains(si) && !drop) {
-                    if (stopByTimeout && te != null && elapseTimeTerm == null) {
+                // add SI again in C.I if it was not removed and this wait was not dropped
+                if (c.getPendingIntentions().remove(sTE) == si && !c.getIntentions().contains(si) && !dropped) {
+                    if (stopByTimeout && te != null && elapsedTimeTerm == null) {
                         // fail the .wait
                     	PlanBody body = si.peek().getPlan().getBody();
                     	body.add(1, new PlanBodyImpl(BodyType.internalAction, new InternalActionLiteral(".fail")));
                     } 
                     si.peek().removeCurrentStep();
-                    if (elapseTimeTerm != null)
-                    	si.peek().getUnif().unifies(elapseTimeTerm, new NumberTermImpl(elapseTime));
+                    if (elapsedTimeTerm != null) {
+                        long elapsedTime = System.currentTimeMillis() - startTime;
+                    	un.unifies(elapsedTimeTerm, new NumberTermImpl(elapsedTime));
+                    }
                     if (si.isSuspended()) { // if the intention was suspended by .suspend
                     	String k = suspend.SUSPENDED_INT+si.getId();
                     	c.getPendingIntentions().put(k, si);
@@ -204,52 +192,21 @@ public class wait extends DefaultInternalAction {
                     	c.addIntention(si);
                     }
                 }
-
             } catch (Exception e) {
                 ts.getLogger().log(Level.SEVERE, "Error at .wait thread", e);
-            } finally {
-                threads.remove(this);
             }
         }
 
-        synchronized public void waitEvent() {
-            long init = System.currentTimeMillis();
-            elapseTime = 0;
-            while (!ok && !drop) {
-                try {
-                    if (timeout == -1) {
-                        wait();
-                    } else {
-                        long to = timeout - elapseTime;
-                        if (to <= 0)
-                            to = 100;
-                        wait(to);
-                        elapseTime = System.currentTimeMillis() - init;
-                        if (elapseTime >= timeout) {
-                            stopByTimeout = true;
-                            break;
-                        }
-                    }
-                } catch (InterruptedException e)  {
-                    drop = true;
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+        public void eventAdded(Event e) {
+            if (te != null && !dropped && un.unifies(te, e.getTrigger())) {
+                resume(false);
             }
         }
 
-        synchronized public void eventAdded(Event e) {
-            if (te != null && !drop && un.unifies(te, e.getTrigger())) {
-                ok = true;
-                notifyAll();
-            }
-        }
-
-        synchronized public void intentionDropped(Intention i) {
+        public void intentionDropped(Intention i) {
             if (i.equals(si)) {
-                ok = false;
-                drop = true;
-                notifyAll();
+                dropped = true;
+                resume(false);
             }
         }
 

@@ -60,6 +60,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -91,6 +93,9 @@ public class Agent {
     private Map<String, ArithFunction>  functions       = new HashMap<String, ArithFunction>();
     
     private boolean hasCustomSelOp = true;
+    
+    private ScheduledExecutorService scheduler = null; 
+
     
     protected Logger logger = Logger.getLogger(Agent.class.getName());
 
@@ -156,6 +161,13 @@ public class Agent {
             throw new JasonException("Error creating the agent class! - " + e);
         }
     }
+    
+    public void stopAg() {
+        bb.stop();
+        
+        if (scheduler != null) 
+            scheduler.shutdownNow();
+    }
 
     /** 
      *  Clone BB, PL, Circumstance. 
@@ -184,6 +196,13 @@ public class Agent {
     public Logger getLogger() {
         return logger;
     }
+    
+    public ScheduledExecutorService getScheduler() {
+        if (scheduler == null)
+            scheduler = Executors.newScheduledThreadPool(1);
+        return scheduler;
+    }
+    
 
     /** Returns the .asl file source used to create this agent */
     public String getASLSrc() {

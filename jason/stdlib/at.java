@@ -37,6 +37,7 @@ import jason.asSyntax.Trigger;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 /**
   <p>Internal action: <b><code>.at</code></b>.
@@ -74,12 +75,11 @@ public class at extends DefaultInternalAction {
     public static final String atAtom = ".at"; 
      
     @Override
-    public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
+    public Object execute(final TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         try {
-	        StringTerm time  = (StringTerm)args[0];
-	        StringTerm sevent = (StringTerm)args[1];
-			Trigger te = Trigger.parseTrigger(sevent.getString());
-			String  stime = time.getString();
+	        StringTerm time   = (StringTerm)args[0];
+			String     stime  = time.getString();
+            StringTerm sevent = (StringTerm)args[1];
 
 			// parse time
 			long deadline = -1;
@@ -118,9 +118,10 @@ public class at extends DefaultInternalAction {
 			if (deadline == -1) {
                 throw new JasonException("The time parameter ('"+time+"') of the internal action 'at' did not parse correctly!");            	
 			}
+			
+			Trigger te = Trigger.parseTrigger(sevent.getString());
 
-			new CheckDeadline(deadline, te, ts.getC()).start(); 
-
+            ts.getAg().getScheduler().schedule(new CheckDeadline(te, ts.getC()), deadline, TimeUnit.MILLISECONDS);
 			return true;
         } catch (ArrayIndexOutOfBoundsException e) {
             throw new JasonException("The internal action 'at' has not received two arguments.");
@@ -128,39 +129,38 @@ public class at extends DefaultInternalAction {
     }
 	
 	private static int idCount = 0;
-	private Map<Integer,CheckDeadline> threads = new ConcurrentHashMap<Integer,CheckDeadline>();
+	private Map<Integer,CheckDeadline> ats = new ConcurrentHashMap<Integer,CheckDeadline>();
     
-    public void stopAllWaits() {
-    	for (CheckDeadline t: threads.values()) {
-            t.interrupt();
-    	}
+    public void cancelAts() {
+    	for (CheckDeadline t: ats.values())
+            t.cancel();
     }
     
-	class CheckDeadline extends Thread {
+	class CheckDeadline implements Runnable {
         		
 		private int     id = 0;
-        private long    deadline = 0;
         private Event   event;
         private Circumstance c;
+        private boolean cancelled = false;
         
-        public CheckDeadline(long d, Trigger te, Circumstance c) {
+        public CheckDeadline(Trigger te, Circumstance c) {
         	idCount++;
         	this.id = idCount;
-            this.deadline = d;
             this.event = new Event(te, Intention.EmptyInt);
             this.c = c;
-            
-            threads.put(id, this);
+            ats.put(id, this);
         }
         
-        synchronized public void run() {
+        void cancel() {
+            cancelled = true; 
+        }
+
+        public void run() {
             try {
-                wait(deadline);
-                // add event to Circumstance.Events
-                c.addEvent(event);
-            } catch (InterruptedException e) {             	
+                if (!cancelled)
+                    c.addEvent(event);
             } finally {
-            	threads.remove(id);
+            	ats.remove(id);
             }
         }
     }

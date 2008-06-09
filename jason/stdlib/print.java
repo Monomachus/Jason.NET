@@ -61,7 +61,7 @@ public class print extends println implements InternalAction {
 	private static InternalAction singleton = null;
 	public static InternalAction create() {
 		if (singleton == null) 
-			singleton = new println();
+			singleton = new print();
 		return singleton;
 	}
 	
