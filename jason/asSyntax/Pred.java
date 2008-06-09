@@ -308,23 +308,29 @@ public class Pred extends Structure {
      * Adds a source annotation like "source(<i>agName</i>)".
      */
     public void addSource(Structure agName) {
-        if (agName != null) {
-            Structure ts = new Structure("source", 1);
-            ts.addTerm(agName);
-            addAnnot(ts);
-        }
+        if (agName != null)
+            addAnnot(createSource(agName));
     }
 
     /** deletes "source(<i>agName</i>)" */
     public boolean delSource(Structure agName) {
-        if (annots != null) {
-            Structure ts = new Structure("source");
-            ts.addTerm(agName);
-            return annots.remove(ts);
-        }
-        return false;
+        if (annots != null)
+            return annots.remove(createSource(agName));
+        else
+        	return false;
     }
 
+    public static Term createSource(String source) {
+    	Structure s = new Structure("source",1);
+    	s.addTerm(new Atom(source));
+    	return s;
+    }
+    public static Term createSource(Structure source) {
+    	Structure s = new Structure("source",1);
+    	s.addTerm(source);
+    	return s;
+    }
+    
     /**
      * returns the sources of this Pred as a new list. e.g.: from annots
      * [source(a), source(b)], it returns [a,b]
