@@ -15,6 +15,7 @@ import jason.asSyntax.NumberTermImpl;
 import jason.asSyntax.Pred;
 import jason.asSyntax.Structure;
 import jason.asSyntax.Term;
+import jason.asSyntax.UnnamedVar;
 import jason.asSyntax.VarTerm;
 import jason.asSyntax.ArithExpr.ArithmeticOp;
 import jason.asSyntax.parser.SimpleCharStream;
@@ -23,8 +24,11 @@ import jason.asSyntax.parser.as2jTokenManager;
 import jason.infra.centralised.CentralisedAgArch;
 
 import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import junit.framework.TestCase;
@@ -484,5 +488,16 @@ public class VarTermTest extends TestCase {
         
         x.apply(u);
         assertEquals(x.toString(), "10");
-    }    
+    }
+    
+    public void testUnnamedvarsorder() {
+        // the order is important for the "return" of plans/rules (where makeVarAnnon is used)
+        // the most recently created unnamed vars should come first
+        List<UnnamedVar> l = new ArrayList<UnnamedVar>();
+        l.add(new UnnamedVar(5));
+        l.add(new UnnamedVar(6));
+        l.add(new UnnamedVar(11));
+        Collections.sort(l);
+        assertEquals("[_5, _6, _11]", l.toString());
+    }
 }

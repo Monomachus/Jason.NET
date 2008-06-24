@@ -33,17 +33,21 @@ public class UnnamedVar extends VarTerm {
 	private static final long serialVersionUID = 1L;
 
 	private static int varCont = 1;
-
+	private int myId;
+	
     public UnnamedVar() {
-        super(createNewName());
+        super("_" + (varCont++));
+        myId = varCont;
     }
 
     public UnnamedVar(String name) {
         super( name.length() == 1 ? "_" + (varCont++) : name);
+        myId = varCont;
     }
-    
-    public static String createNewName() {
-    	return "_" + (varCont++);
+
+    public UnnamedVar(int id) {
+        super("_" + id);
+        myId = id;
     }
 
     public Object clone() {
@@ -51,9 +55,25 @@ public class UnnamedVar extends VarTerm {
             return getValue().clone();
         } else {
             UnnamedVar newv = new UnnamedVar(getFunctor());
+            newv.myId = this.myId;
             if (hasAnnot())
                 newv.addAnnots((ListTerm)this.getAnnots().clone());
         	return newv;
+        }
+    }
+    
+    public int compareTo(Term t) {
+        if (hasValue()) {
+            return super.compareTo(t);
+        } else if (t instanceof UnnamedVar) {
+            if (myId > ((UnnamedVar)t).myId)
+                return 1;
+            else if (myId < ((UnnamedVar)t).myId)
+                return -1;
+            else
+                return 0;
+        } else {
+            return super.compareTo(t);
         }
     }
 
