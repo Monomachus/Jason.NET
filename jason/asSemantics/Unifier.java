@@ -207,9 +207,9 @@ public class Unifier implements Cloneable {
                 return unifiesNoUndo(t1gv, t2vl);
             }
 
-            // both are var (not unnamedvar) with no value, like X=Y
+            // both are var with no value, like X=Y
             // we must ensure that these vars will form a cluster
-            if (! t1gv.isUnnamedVar() && ! t2gv.isUnnamedVar()) {
+            //if (! t1gv.isUnnamedVar() && ! t2gv.isUnnamedVar()) {
                 VarTerm t1c = (VarTerm) t1gv.clone();
                 VarTerm t2c = (VarTerm) t2gv.clone();
                 VarsCluster cluster = new VarsCluster(t1c, t2c, this);
@@ -219,7 +219,7 @@ public class Unifier implements Cloneable {
                         function.put(vtc, cluster);
                     }
                 }
-            }
+            //}
             return true;
         }
 

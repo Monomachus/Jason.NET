@@ -48,7 +48,9 @@ public class Structure extends DefaultTerm {
 
 	private static final long serialVersionUID = 1L;
     private static Logger logger = Logger.getLogger(Structure.class.getName());
-    protected static final Term[] emptyTermArray = new Term[0]; // just to have a type for toArray in the getTermsArray method
+
+    protected static final List<Term> emptyTermList  = new ArrayList<Term>(0);
+    protected static final Term[]     emptyTermArray = new Term[0]; // just to have a type for toArray in the getTermsArray method
     
 
 	private final String functor; // immutable field

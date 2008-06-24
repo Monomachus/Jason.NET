@@ -436,6 +436,7 @@ public class ListTermImpl extends Structure implements ListTerm {
 
 	@SuppressWarnings("unchecked")
 	public boolean addAll(Collection c) {
+		if (c == null) return false;
 		ListTerm lt = this; // where to add
 		Iterator i = c.iterator();
 		while (i.hasNext()) {

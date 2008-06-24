@@ -53,6 +53,8 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
 
     private Term value  = null;
 
+    private String unnamedId = null; // set when transformed in unnamed var
+    
     public VarTerm(String s) {
         super(s);
         if (s != null && Character.isLowerCase(s.charAt(0))) {
@@ -79,6 +81,7 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
             // do not call constructor with term parameter!
             VarTerm t = new VarTerm(super.getFunctor());
             t.setSrc(this);
+            t.unnamedId = this.unnamedId;
             if (hasAnnot())
                 t.setAnnots((ListTerm) getAnnots().clone());
             return t;
@@ -91,7 +94,20 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
     }
 
     public boolean isUnnamedVar() {
-        return false;
+        return unnamedId != null;
+    }
+    
+    /** change the functor of the var to _ */
+    public void setUnnamed() {
+    	unnamedId = UnnamedVar.createNewName();
+    }
+    public void setUnnamed(String id) {
+    	unnamedId = id;
+    }
+    
+    /** undo the setUnanamed() */
+    public void setNamed() {
+    	unnamedId = null;
     }
 
     @Override
@@ -192,7 +208,10 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
     @Override
     public String getFunctor() {
         if (value == null) {
-            return super.getFunctor();
+        	if (unnamedId != null)
+        		return unnamedId;
+        	else
+        		return super.getFunctor();
         } else if (value.isStructure()) {
             return ((Structure)getValue()).getFunctor();
         } else {

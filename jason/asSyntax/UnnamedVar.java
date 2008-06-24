@@ -35,11 +35,15 @@ public class UnnamedVar extends VarTerm {
 	private static int varCont = 1;
 
     public UnnamedVar() {
-        super("_" + (varCont++));
+        super(createNewName());
     }
 
     public UnnamedVar(String name) {
         super( name.length() == 1 ? "_" + (varCont++) : name);
+    }
+    
+    public static String createNewName() {
+    	return "_" + (varCont++);
     }
 
     public Object clone() {

@@ -115,6 +115,11 @@ public final class Atom extends Literal {
 	}
 
 	@Override
+	public List<Term> getTerms() {
+		return emptyTermList;
+	}
+	
+	@Override
 	public Term[] getTermsArray() {
 	    return emptyTermArray;
 	}
