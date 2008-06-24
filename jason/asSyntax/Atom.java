@@ -155,6 +155,7 @@ public final class Atom extends Literal {
     
     @Override public void makeTermsAnnon() { }
     @Override public void makeVarsAnnon() { }
+    @Override public void makeVarsAnnon(Unifier un) { }
 
     @Override
     protected int calcHashCode() {

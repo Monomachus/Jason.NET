@@ -360,7 +360,7 @@ public class Agent {
     
     public void addInitialGoalsInTS() {
 	    for (Literal g: initialGoals) {
-	    	g.makeVarsAnnon();
+	    	g.makeVarsAnnon(null);
 	    	if (! g.hasSource())
 	    	    g.addAnnot(BeliefBase.TSelf);
 	    	getTS().getC().addAchvGoal(g,Intention.EmptyInt);

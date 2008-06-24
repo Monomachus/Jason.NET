@@ -484,15 +484,5 @@ public class VarTermTest extends TestCase {
         
         x.apply(u);
         assertEquals(x.toString(), "10");
-    }
-    
-    public void testTransformUnnamed() {
-    	VarTerm x = new VarTerm("X");
-    	assertFalse(x.isUnnamedVar());
-    	x.setUnnamed();
-    	assertTrue(x.isUnnamedVar());
-    	assertFalse("X".equals(x.toString()));
-    	x.setNamed();
-    	assertTrue("X".equals(x.toString()));
-    }
+    }    
 }

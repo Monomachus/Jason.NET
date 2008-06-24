@@ -53,8 +53,6 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
 
     private Term value  = null;
 
-    private String unnamedId = null; // set when transformed in unnamed var
-    
     public VarTerm(String s) {
         super(s);
         if (s != null && Character.isLowerCase(s.charAt(0))) {
@@ -81,7 +79,6 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
             // do not call constructor with term parameter!
             VarTerm t = new VarTerm(super.getFunctor());
             t.setSrc(this);
-            t.unnamedId = this.unnamedId;
             if (hasAnnot())
                 t.setAnnots((ListTerm) getAnnots().clone());
             return t;
@@ -94,22 +91,9 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
     }
 
     public boolean isUnnamedVar() {
-        return unnamedId != null;
+        return false;
     }
     
-    /** change the functor of the var to _ */
-    public void setUnnamed() {
-    	unnamedId = UnnamedVar.createNewName();
-    }
-    public void setUnnamed(String id) {
-    	unnamedId = id;
-    }
-    
-    /** undo the setUnanamed() */
-    public void setNamed() {
-    	unnamedId = null;
-    }
-
     @Override
     public boolean isGround() {
         return value != null && value.isGround();
@@ -161,6 +145,19 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
         return false;            	
     }    
 
+    protected UnnamedVar preferredUnnamedVar(Unifier un) {
+        if (un != null) {
+            // check if I have a var cluster with another unnamed var there
+            // and then prefer that unnamed var instead of a new one
+    		Term vl = un.get(this);
+    		if (vl != null && vl instanceof VarsCluster)
+    		    for (VarTerm v: (VarsCluster)vl)
+    		        if (v.isUnnamedVar())
+    		            return (UnnamedVar)v;
+        }
+        return new UnnamedVar();
+    }
+    
     /**
      * returns the value of this var. 
      */
@@ -208,10 +205,7 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
     @Override
     public String getFunctor() {
         if (value == null) {
-        	if (unnamedId != null)
-        		return unnamedId;
-        	else
-        		return super.getFunctor();
+        	return super.getFunctor();
         } else if (value.isStructure()) {
             return ((Structure)getValue()).getFunctor();
         } else {

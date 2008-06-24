@@ -30,6 +30,7 @@ import jason.asSyntax.VarTerm;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.logging.Logger;
 
 import org.w3c.dom.Document;
@@ -79,7 +80,7 @@ public class VarsCluster extends DefaultTerm implements Iterable<VarTerm> {
 		if (vl == null) {
 			// v1 has no value
 			if (vars == null) {
-				vars = new HashSet<VarTerm>();
+				vars = new TreeSet<VarTerm>();
 			}
 			vars.add(vt);
 		} else if (vl instanceof VarsCluster) {

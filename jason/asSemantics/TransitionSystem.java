@@ -467,7 +467,7 @@ public class TransitionSystem {
             }
             // free variables in an event cannot conflict with those in the plan
             body = (Literal)body.clone();
-            body.makeVarsAnnon();
+            body.makeVarsAnnon(null);
             conf.C.addAchvGoal(body, conf.C.SI);
             confP.step = State.StartRC;
             break;
@@ -658,7 +658,7 @@ public class TransitionSystem {
                 // they are anonymous)
                 Literal tel = topIM.getPlan().getTrigger().getLiteral();
                 tel.apply(topIM.unif);
-                tel.makeVarsAnnon();
+                tel.makeVarsAnnon(topIM.unif);
                 im.unif.unifies(tel, g);
             }
         }

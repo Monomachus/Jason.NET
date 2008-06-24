@@ -310,15 +310,17 @@ public class Structure extends DefaultTerm {
 
     /** Replaces all variables of the term for unnamed variables (_). */
     public void makeVarsAnnon() {
-    	makeVarsAnnon(new HashMap<VarTerm,UnnamedVar>());
+    	makeVarsAnnon(null, new HashMap<VarTerm,UnnamedVar>());
     }
     
-    /**
-     * Replaces all variables of the term for unnamed variables (_).
-     * 
-     * @param changes is the map of replacements
-     */
-    protected void makeVarsAnnon(Map<VarTerm,UnnamedVar> changes) {
+    /** Replaces all variables of the term for unnamed variables (_).
+        if un != null, unnamed vars unified to the var are preferred */
+    public void makeVarsAnnon(Unifier un) {
+    	makeVarsAnnon(un, new HashMap<VarTerm,UnnamedVar>());
+    }
+
+    /** change all vars by unnamed vars, if un != null, unnamed vars unified to the var are preferred */
+    protected void makeVarsAnnon(Unifier un, Map<VarTerm,UnnamedVar> changes) {
         final int size = getArity();
         for (int i=0; i<size; i++) {
             Term ti = getTerm(i);
@@ -326,14 +328,15 @@ public class Structure extends DefaultTerm {
             	// replace ti to an unnamed var
             	UnnamedVar uv = changes.get(ti);
             	if (uv == null) {
-            		uv = new UnnamedVar();
+            		VarTerm vt = (VarTerm)ti;
+            		uv = vt.preferredUnnamedVar(un);
             		changes.put((VarTerm)ti, uv);
             	}
             	setTerm(i,uv);
             } else if (ti.isStructure()) {
                 Structure tis = (Structure)ti;
                 if (tis.hasTerm()) {
-                    tis.makeVarsAnnon(changes);
+                    tis.makeVarsAnnon(un, changes);
                 }
             }
         }

@@ -12,6 +12,7 @@ import java.util.Map;
 public interface Term extends Cloneable, Comparable<Term>, Serializable, ToDOM {
 
     public boolean isVar();
+    public boolean isUnnamedVar();
     public boolean isLiteral();
     public boolean isRule();
     public boolean isList();

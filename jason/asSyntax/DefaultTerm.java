@@ -53,6 +53,7 @@ public abstract class DefaultTerm extends SourceInfo implements Term, Serializab
     }
             
     public boolean isVar()            { return false; }
+    public boolean isUnnamedVar()     { return false; }
     public boolean isLiteral()        { return false; }
     public boolean isRule()           { return false; }
     public boolean isList()           { return false; }
