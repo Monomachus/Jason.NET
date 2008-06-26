@@ -51,12 +51,12 @@ public class nth extends DefaultInternalAction {
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
     	try {
 	        if (!args[0].isNumeric()) {
-	            throw new JasonException("nth: the first argument should be numeric!");
+	            throw new JasonException("nth: the first argument should be numeric and not '"+args[0]+"'.");
 	        }
 	        int index = (int)((NumberTerm)args[0]).solve();
 	
 	        if (!args[1].isList()) {
-	            throw new JasonException("nth: the second argument should be a list!");
+	            throw new JasonException("nth: the second argument should be a list and not '"+args[1]+"'.");
 	        }
 	        ListTerm list = (ListTerm)args[1];
 	

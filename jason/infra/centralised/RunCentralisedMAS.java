@@ -52,6 +52,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.logging.ConsoleHandler;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
@@ -212,9 +213,21 @@ public class RunCentralisedMAS {
 	                LogManager.getLogManager().readConfiguration(RunCentralisedMAS.class.getResource("/templates/" + logPropFile).openStream());
 	            } catch (Exception e) {
 	                System.err.println("Error setting up logger:" + e);
+	                e.printStackTrace();
 	            }
 	        }
     	}
+    }
+    
+    public static void setupDefaultConsoleLogger() {
+        Handler[] hs = Logger.getLogger("").getHandlers(); 
+        for (int i = 0; i < hs.length; i++) { 
+            Logger.getLogger("").removeHandler(hs[i]); 
+        }
+        Handler h = new ConsoleHandler();
+        h.setFormatter(new MASConsoleLogFormatter()); 
+        Logger.getLogger("").addHandler(h);
+        Logger.getLogger("").setLevel(Level.INFO);        
     }
 
     protected void createButtons() {

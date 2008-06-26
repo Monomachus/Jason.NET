@@ -42,7 +42,7 @@ public class UnnamedVar extends VarTerm {
 
     public UnnamedVar(String name) {
         super( name.length() == 1 ? "_" + (varCont++) : name);
-        myId = varCont;
+        myId = varCont++;
     }
 
     public UnnamedVar(int id) {

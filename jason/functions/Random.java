@@ -12,7 +12,7 @@ import jason.asSyntax.Term;
   
    <p>Examples:<ul>
    <li> <code>math.random</code>: returns the random number between 0 and 1.</li>
-   <li> <code>math.random(10)</code>: returns the random number between 0 and 10.</li>
+   <li> <code>math.random(10)</code>: returns the random number between 0 and 9.9999.</li>
    </ul>
    
    @author Jomi

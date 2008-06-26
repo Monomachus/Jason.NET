@@ -146,15 +146,22 @@ public class Agent {
     	            }
                 }
             }
-                
-            // kqml Plans at the end of the ag PS
-            setASLSrc("kqmlPlans.asl");
-            parseAS(JasonException.class.getResource("/asl/kqmlPlans.asl"));
-            setASLSrc(asSrc);
+
             if (parsingOk) {
                 addInitialBelsInBB();
                 addInitialGoalsInTS();
             }
+
+            // kqml Plans at the end of the ag PS
+            if (JasonException.class.getResource("/asl/kqmlPlans.asl") != null) { 
+                setASLSrc("kqmlPlans.asl");
+                parseAS(JasonException.class.getResource("/asl/kqmlPlans.asl"));
+                setASLSrc(asSrc);
+            } else {
+                logger.warning("The kqmlPlans.asl was not found!");
+            }
+            
+
             return ts;
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error creating the agent class!", e);
