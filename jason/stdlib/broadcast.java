@@ -77,7 +77,7 @@ public class broadcast extends DefaultInternalAction {
 		} catch (ArrayIndexOutOfBoundsException e) {
 			throw new JasonException("The internal action 'broadcast' has not received two arguments.");
 		}
-		Message m = new Message(ilf.toString(), null, null, pcnt);
+		Message m = new Message(ilf.toString(), ts.getUserAgArch().getAgName(), null, pcnt);
 
 		try {
 			ts.getUserAgArch().broadcast(m);

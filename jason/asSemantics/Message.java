@@ -119,9 +119,12 @@ public class Message {
 		this.inReplyTo = inReplyTo;
 	}
 	
-	public Object clone() {
+	public Message copy() {
 		return new Message(this);
 	}
+    public Object clone() {
+        return new Message(this);
+    }
 	
 	public String toString() {
 		String irt = (inReplyTo == null ? "" : "->"+inReplyTo);

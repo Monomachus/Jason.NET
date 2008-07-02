@@ -148,7 +148,7 @@ public class send extends DefaultInternalAction {
         } catch (ArrayIndexOutOfBoundsException e) {
             throw new JasonException("The internal action 'send' to '"+to+"' has not received three arguments.");
         } 
-        Message m = new Message(ilf.toString(), null, null, pcnt);
+        Message m = new Message(ilf.toString(), ts.getUserAgArch().getAgName(), null, pcnt);
 
         // async ask has a fourth argument and should suspend the intention
         lastSendWasSynAsk = m.isAsk() && args.length > 3;
