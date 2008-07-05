@@ -27,6 +27,12 @@
 			wm.getDockable(jason.jeditplugin.JasonIDPlugin.NAME).newProject();
 		</CODE>
 	</ACTION>
+	<ACTION NAME="jason.clean-project">
+		<CODE>
+			wm.addDockableWindow(jason.jeditplugin.JasonIDPlugin.NAME);
+			wm.getDockable(jason.jeditplugin.JasonIDPlugin.NAME).runAntTask("clean");
+		</CODE>
+	</ACTION>
 	<ACTION NAME="jason.new-ag">
 		<CODE>
 			wm.addDockableWindow(jason.jeditplugin.JasonIDPlugin.NAME);
@@ -66,13 +72,13 @@
 	<ACTION NAME="jason.create-jar">
 		<CODE>
 			wm.addDockableWindow(jason.jeditplugin.JasonIDPlugin.NAME);
-			wm.getDockable(jason.jeditplugin.JasonIDPlugin.NAME).createJar();
+			wm.getDockable(jason.jeditplugin.JasonIDPlugin.NAME).runAntTask("jar");
 		</CODE>
 	</ACTION>
 	<ACTION NAME="jason.create-jnlp">
 		<CODE>
 			wm.addDockableWindow(jason.jeditplugin.JasonIDPlugin.NAME);
-			wm.getDockable(jason.jeditplugin.JasonIDPlugin.NAME).createJnlp();
+			wm.getDockable(jason.jeditplugin.JasonIDPlugin.NAME).runAntTask("jnlp");
 		</CODE>
 	</ACTION>
 </ACTIONS>

@@ -233,6 +233,8 @@ public class CentralisedAgArch implements Runnable, AgArchInfraTier {
     // this is used by the .send internal action in stdlib
     public void sendMsg(Message m) throws ReceiverNotFoundException {
         // actually send the message
+        if (m.getSender() == null)  m.setSender(getAgName());
+        
         CentralisedAgArch rec = masRunner.getAg(m.getReceiver());
         
         if (rec == null) {

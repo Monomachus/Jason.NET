@@ -627,37 +627,21 @@ public class JasonID extends JPanel implements EBComponent, RunProjectListener {
             ex.printStackTrace();
         }
     }
-
-    public void createJar() {
-        final Buffer b = getProjectBuffer();
-        if (b == null) {
-            textArea.setText("There is no Jason project opened!");
-            return;
-        }
-        MAS2JProject project = parseProject(b);
-        if (project == null) // || !parseProjectAS(project)) {
-        	return;
-        CentralisedMASLauncherAnt script = new CentralisedMASLauncherAnt("jar");
-        script.setProject(project);
-        if (script.writeScripts(false)) {
-            new Thread(script, "Ant-Task").start();
-        }
-    }
-
-    public void createJnlp() {
-        final Buffer b = getProjectBuffer();
-        if (b == null) {
-            textArea.setText("There is no Jason project opened!");
-            return;
-        }
-        MAS2JProject project = parseProject(b);
-        if (project == null) // || !parseProjectAS(project)) {
-        	return;
-        CentralisedMASLauncherAnt script = new CentralisedMASLauncherAnt("jnlp");
-        script.setProject(project);
-        if (script.writeScripts(false)) {
-            new Thread(script, "Ant-Task").start();
-        }
-    }
     
+    public void runAntTask(String task) {
+        final Buffer b = getProjectBuffer();
+        if (b == null) {
+            textArea.setText("There is no Jason project opened!");
+            return;
+        }
+        MAS2JProject project = parseProject(b);
+        if (project == null) // || !parseProjectAS(project)) {
+            return;
+        CentralisedMASLauncherAnt script = new CentralisedMASLauncherAnt(task);
+        script.setProject(project);
+        if (script.writeScripts(false)) {
+            new Thread(script, "Ant-Task").start();
+        }
+        
+    }    
 }

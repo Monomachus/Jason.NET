@@ -3,6 +3,7 @@ package jason.asSemantics;
 import jason.asSyntax.InternalActionLiteral;
 import jason.asSyntax.PlanBody;
 import jason.asSyntax.PlanBodyImpl;
+import jason.asSyntax.Term;
 import jason.asSyntax.PlanBody.BodyType;
 
 import java.util.concurrent.TimeUnit;
@@ -29,6 +30,10 @@ public abstract class SuspendInternalAction implements InternalAction {
 
     public boolean suspendIntention() {
         return true;
+    }
+    
+    public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
+        return false;
     }
     
     /**

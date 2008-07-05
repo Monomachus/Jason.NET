@@ -198,7 +198,7 @@ public class MAS2JProject {
 			r.add(getDirectory());
 		}
 		for (String p: sourcepaths) {
-			if (isDefaultDirectory()) {
+			if (getDirectory().startsWith(".") || getDirectory().startsWith("/") || getDirectory().charAt(1) == ':') {
 				r.add(p);
 			} else {
 				r.add(getDirectory()+File.separator+p);
