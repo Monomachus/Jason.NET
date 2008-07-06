@@ -63,12 +63,12 @@ The unification is changed by the evaluation of the logical formula, i.e., X mig
 </p>
 
 */
-public class conditional extends DefaultInternalAction {
+public class if_then_else extends DefaultInternalAction {
 
 	private static InternalAction singleton = null;
 	public static InternalAction create() {
 		if (singleton == null) 
-			singleton = new conditional();
+			singleton = new if_then_else();
 		return singleton;
 	}
 	

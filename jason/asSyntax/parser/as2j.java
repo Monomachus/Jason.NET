@@ -548,7 +548,7 @@
       }
       F = pred();
                                                 if (F.getFunctor().equals("if")) {
-                                                               Pred c = new Pred(".conditional");
+                                                               Pred c = new Pred(".if_then_else");
                                                                c.setTerms(F.getTerms());
                                                                F = c;
                                                             } else if (F.getFunctor().equals("while")) {
