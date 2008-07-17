@@ -62,7 +62,9 @@ public class DefaultBeliefBase implements BeliefBase {
     protected Set<Literal> percepts = new HashSet<Literal>();
 
     public void init(Agent ag, String[] args) {
-    	logger = Logger.getLogger(ag.getTS().getUserAgArch().getAgName() + "-"+DefaultBeliefBase.class.getSimpleName());
+        if (ag != null) {
+            logger = Logger.getLogger(ag.getTS().getUserAgArch().getAgName() + "-"+DefaultBeliefBase.class.getSimpleName());
+        }
     }
 
     public void stop() {

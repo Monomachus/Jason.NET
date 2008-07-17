@@ -42,7 +42,12 @@ import org.w3c.dom.Element;
 
 /**
  * Represents a variable Term: like X (starts with upper case). It may have a
- * value, after {@link Unifier}.apply.
+ * value, after {@link VarTerm}.apply.
+ *
+ * An object of this class can be used in place of a 
+ * Literal, Number, List, String, .... It behaves like a 
+ * Literal, Number, .... just in case its value is a Literal, 
+ * Number, ...
  * 
  * @author jomi
  */
@@ -110,15 +115,17 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
         }
 
         vl = (Term)vl.clone(); // should clone here, since there is no cloning in unify
-        // TODO: decide whether to use var annots in apply
+        // decide whether to use var annots in apply
         //   X = p[a]
         //   !X[b]
         // what's the event: 
         //   +!p[a]
         // or
         //   +!p[a,b]
-        //if (vl.isPred() && this.hasAnnot())  // if this var has annots, add them in the value's annots (Experimental)
-        //    ((Pred)vl).addAnnots(this.getAnnots());
+        // Answer: use annots of var, useful for meta-programming like
+        //         P[step(N)]
+        if (vl.isPred() && this.hasAnnot())  // if this var has annots, add them in the value's annots (Experimental)
+            ((Pred)vl).addAnnots(this.getAnnots());
         
         value = vl;        
         resetHashCodeCache();
@@ -147,8 +154,9 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
 
     protected UnnamedVar preferredUnnamedVar(Unifier un) {
         if (un != null) {
-            // check if I have a var cluster with another unnamed var there
-            // and then prefer that unnamed var instead of a new one
+            // check if I am in a var cluster with another unnamed var,
+            // i.e. I am unified with an unnamed var,
+            // then prefer that unnamed var instead of a new one
     		Term vl = un.get(this);
     		if (vl != null && vl instanceof VarsCluster)
     		    for (VarTerm v: (VarsCluster)vl)

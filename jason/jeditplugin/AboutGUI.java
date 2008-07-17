@@ -18,12 +18,12 @@ public class AboutGUI {
 	        Properties p = new Properties();
 	        p.load(JasonID.class.getResource("/dist.properties").openStream());
 	        version = "Jason " + p.get("version") + "." + p.get("release");
-	        build = " build " + p.get("build") + " on " + p.get("build.date") + "\n\n";
+	        build = " build on " + p.get("build.date") + "\n\n";
 	    } catch (Exception ex) { }
 	
 	    JOptionPane.showMessageDialog(parent,
 	    version +  build+
-	    "Copyright (C) 2003-2005  Rafael H. Bordini, Jomi F. Hubner, et al.\n\n"+
+	    "Copyright (C) 2003-2008  Rafael H. Bordini, Jomi F. Hubner, et al.\n\n"+
 	    "This library is free software; you can redistribute it and/or\n"+
 	    "modify it under the terms of the GNU Lesser General Public\n"+
 	    "License as published by the Free Software Foundation; either\n"+
@@ -40,7 +40,7 @@ public class AboutGUI {
 		"Musees Nationaux, France). Photograph by Herve Lewandowski.\n\n"+
 	    "To contact the authors:\n"+
 	    "http://www.dur.ac.uk/r.bordini\n"+
-	    "http://www.inf.furb.br/~jomi",
+	    "http://www.emse.fr/~hubner",
 	    "JasonID - About",
 	    JOptionPane.INFORMATION_MESSAGE,
 	    new ImageIcon(JasonID.class.getResource("/images/Jason-GMoreau-Small.jpg")));

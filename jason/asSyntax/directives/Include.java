@@ -56,7 +56,8 @@ public class Include implements Directive {
 	    			// or in the source paths
 	        		List<String> newpath = new ArrayList<String>();
 	        		newpath.add(new File(outerPrefix).getAbsoluteFile().getParent());
-	        		newpath.addAll(aslSourcePath);
+	        		if (aslSourcePath != null)
+	        		    newpath.addAll(aslSourcePath);
 	        		file = checkPathAndFixWithSourcePath(file, newpath, null);
 	        		in = new FileInputStream(file);
 	    		}

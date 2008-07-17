@@ -261,7 +261,7 @@ public class VarTermTest extends TestCase {
         assertTrue(u.unifies(v1, p1));
         assertEquals(u.get("X").toString(), "p(t1,t2)");
         v1.apply(u);
-        assertEquals("p(t1,t2)",v1.toString());
+        assertEquals("p(t1,t2)[a,b,c]",v1.toString());
     }
 
     public void testVarWithAnnots2() {
@@ -280,7 +280,7 @@ public class VarTermTest extends TestCase {
     	assertTrue(u.unifies(v1, v2));
     	assertTrue(u.unifies(new Literal("vvv"), v1));
     	v1.apply(u);
-    	assertEquals("vvv", v1.toString());
+    	assertEquals("vvv[a]", v1.toString());
     }
 
     public void testVarWithAnnots3() {
@@ -315,7 +315,7 @@ public class VarTermTest extends TestCase {
         assertEquals("a", u.get("A").toString());
         assertEquals("p(1)", u.get(v).toString());
         v.apply(u);
-        assertEquals("p(1)", v.toString());
+        assertEquals("p(1)[a]", v.toString());
     }
 
     /*
@@ -348,7 +348,7 @@ public class VarTermTest extends TestCase {
         assertTrue(i.hasNext());
         u = i.next(); // u = {P[d]=b2}
         v1.apply(u);
-        assertEquals("b2",v1.toString());
+        assertEquals("b2[d]",v1.toString());
     }
     
     @SuppressWarnings("unchecked")

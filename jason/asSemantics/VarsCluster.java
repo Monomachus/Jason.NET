@@ -77,18 +77,16 @@ public class VarsCluster extends DefaultTerm implements Iterable<VarTerm> {
 
 	private void add(VarTerm vt) {
 		Term vl = u.get(vt);
-		if (vl == null) {
-			// v1 has no value
-			if (vars == null) {
+		if (vl == null) { // vt is not in a VarsCluster
+			if (vars == null)
 				vars = new TreeSet<VarTerm>();
-			}
 			vars.add(vt);
 		} else if (vl instanceof VarsCluster) {
-			if (vars == null) {
+		    // since vt is in a VarsCluster, join the two sets here
+			if (vars == null)
 				vars = ((VarsCluster) vl).vars;
-			} else {
+			else
 				vars.addAll(((VarsCluster) vl).vars);
-			}
 		} else {
 			logger.warning("joining var that has value!");
 		}
