@@ -96,12 +96,13 @@ Provides all default internal actions of Jason.
 
 <h2>Meta programming</h2>
 <ul>
-  <li>{@link jason.stdlib.atom}: check whether an argument is an atom.</li>
+  <li>{@link jason.stdlib.atom}: check whether an argument is an atom (p).</li>
+  <li>{@link jason.stdlib.structure}: check whether an argument is a  structure (p(t1,t2), [a,b]).</li>
+  <li>{@link jason.stdlib.literal}: check whether an argument is a literal (p(t1,t2), ~p(t1,t2), p(t1,t2)[a1,a2]).</li>
+  <li>{@link jason.stdlib.list}: check whether an argument is a list ([a,b]).</li>
   <li>{@link jason.stdlib.ground}: check whether an argument is ground.</li>
-  <li>{@link jason.stdlib.literal}: check whether an argument is a literal.</li>
-  <li>{@link jason.stdlib.list}: check whether an argument is a list.</li>
-  <li>{@link jason.stdlib.number}: check whether an argument is a number.</li>
-  <li>{@link jason.stdlib.string}: check whether an argument is a string.</li>
+  <li>{@link jason.stdlib.number}: check whether an argument is a number (1, 2.3).</li>
+  <li>{@link jason.stdlib.string}: check whether an argument is a string ("s").</li>
   <li>{@link jason.stdlib.ground}: check whether an argument is ground.</li>
   <li>{@link jason.stdlib.add_annot}: add an annotation in a literal.</li>
   <li>{@link jason.stdlib.add_nested_source}: add a source in a literal.</li>

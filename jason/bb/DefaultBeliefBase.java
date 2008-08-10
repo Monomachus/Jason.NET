@@ -163,7 +163,9 @@ public class DefaultBeliefBase implements BeliefBase {
     }
 
     private boolean removeFromEntry(Literal l) {
-        if (!l.hasSource()) {
+        if (l.hasSource()) {
+            return false;
+        } else {
             PredicateIndicator key = l.getPredicateIndicator();
             BelEntry entry = belsMap.get(key);
             entry.remove(l);
@@ -172,8 +174,6 @@ public class DefaultBeliefBase implements BeliefBase {
             }
             size--;
             return true;
-        } else {
-            return false;
         }
     }
 

@@ -35,7 +35,7 @@ import java.util.logging.Logger;
 /**
  * Represents an atom (a structure with no arguments, e.g. "tell", "a"), it is an
  * immutable object.  It extends Literal, so can be used in place of a
- * Literal, but does not allow operations on terms/atoms and can not be negated.
+ * Literal, but does not allow operations on terms/annots and can not be negated.
  */
 public final class Atom extends Literal {
 
