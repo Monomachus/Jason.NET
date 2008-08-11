@@ -601,9 +601,9 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
         if (value != null && value.isNumeric())
             return ((NumberTerm) value).solve();
         else if (hasValue())
-            logger.log(Level.SEVERE, "Error getting numerical value of VarTerm " + super.getFunctor() + ", the variable value ("+value+") is not a number.", new Exception());
+            logger.log(Level.SEVERE, getErrorMsg()+" Error getting numerical value of VarTerm " + super.getFunctor() + ", the variable value ("+value+") is not a number.", new Exception());
         else
-            logger.log(Level.SEVERE, "Error getting numerical value of VarTerm " + super.getFunctor() + ", the variable hasn't a value.", new Exception());
+            logger.log(Level.SEVERE, getErrorMsg()+" Error getting numerical value of VarTerm " + super.getFunctor() + ", the variable hasn't a value.", new Exception());
         return 0;
     }
 
