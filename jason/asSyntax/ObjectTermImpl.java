@@ -6,7 +6,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 public class ObjectTermImpl extends DefaultTerm implements ObjectTerm {
-
+    private static final long serialVersionUID = 1L;
+    
     private final Object o;
     private       Method mclone;
     private       boolean hasTestedClone = false;

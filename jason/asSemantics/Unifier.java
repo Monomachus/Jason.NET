@@ -70,16 +70,22 @@ public class Unifier implements Cloneable {
      * other's value
      */
     public Term get(VarTerm vtp) {
-        return function.get(vtp);
+        Term vl = function.get(vtp);
+        if (vl != null && vl.isVar()) { // optimised deref
+            return get((VarTerm)vl);
+        }
+        return vl;
     }
 
+    /*
     public Term get(Term t) {
         if (t.isVar()) {
-            return function.get((VarTerm) t);
+            return function.get( deref((VarTerm) t));
         } else {
             return null;
         }
     }
+    */
 
     public boolean unifies(Trigger te1, Trigger te2) {
         return te1.sameType(te2) && unifies(te1.getLiteral(), te2.getLiteral());
@@ -143,19 +149,21 @@ public class Unifier implements Cloneable {
         // X = p(1), An = a, R=[b]
         if (ok && np1 != null) { // they are predicates
 	        if (np1.isVar() && np1.hasAnnot()) {
-	        	Term np1vl = function.get((VarTerm) np1);
-	        	if (np1vl.isPred()) {
-	        	    Pred pvl = (Pred)np1vl.clone(); 
+	            np1 = deref( (VarTerm)np1);
+	        	Term np1vl = function.get( (VarTerm) np1);
+	        	if (np1vl != null && np1vl.isPred()) {
+	        	    Pred pvl = (Pred)np1vl.clone();
 	        		pvl.clearAnnots();
-	        		function.put((VarTerm) np1, pvl);
+	        		bind((VarTerm) np1, pvl);
 	        	}
 	        }
 	        if (np2.isVar() && np2.hasAnnot()) {
+	            np2 = deref( (VarTerm)np2);
 	        	Term np2vl = function.get((VarTerm) np2);
-	        	if (np2vl.isPred()) {
+	        	if (np2vl != null && np2vl.isPred()) {
                     Pred pvl = (Pred)np2vl.clone(); 
                     pvl.clearAnnots();
-                    function.put((VarTerm) np2, pvl);
+                    bind((VarTerm) np2, pvl);
 	        	}
 	        }
         }
@@ -179,74 +187,31 @@ public class Unifier implements Cloneable {
         final boolean t1gisvar = t1g.isVar();
         final boolean t2gisvar = t2g.isVar();
         
-        // both are vars
-        if (t1gisvar && t2gisvar) {
-            VarTerm t1gv = (VarTerm) t1g;
-            VarTerm t2gv = (VarTerm) t2g;
-            
+        // one of the args is a var
+        if (t1gisvar || t2gisvar) { 
+
+            // deref vars
+            final VarTerm t1gv = t1gisvar ? deref((VarTerm)t1g) : null;
+            final VarTerm t2gv = t2gisvar ? deref((VarTerm)t2g) : null;
+
             // get their values
-            Term t1vl = function.get(t1gv);
-            Term t2vl = function.get(t2gv);
-
-            // if the variable value is a var cluster, it means it has no value
-            if (t1vl instanceof VarsCluster)
-                t1vl = null;
-            if (t2vl instanceof VarsCluster)
-                t2vl = null;
-
-            // both has value, their values should unify
-            if (t1vl != null && t2vl != null)
-                return unifiesNoUndo(t1vl, t2vl);
+            final Term t1vl = t1gisvar ? function.get(t1gv) : t1g;
+            final Term t2vl = t2gisvar ? function.get(t2gv) : t2g;
             
-            // only t1 has value, t1's value should unify with var t2
-            if (t1vl != null)
-                return unifiesNoUndo(t2gv, t1vl);
-            
-            // only t2 has value, t2's value should unify with var t1
-            if (t2vl != null)
-                return unifiesNoUndo(t1gv, t2vl);
-
-            // both are var with no value, like X=Y
-            // we must ensure that these vars will form a cluster
-            //if (! t1gv.isUnnamedVar() && ! t2gv.isUnnamedVar()) {
-            VarTerm t1c = (VarTerm) t1gv.clone();
-            VarTerm t2c = (VarTerm) t2gv.clone();
-            VarsCluster cluster = new VarsCluster(t1c, t2c, this);
-            if (cluster.hasValue()) {
-                // all vars of the cluster should have the same value
-                for (VarTerm vtc : cluster)
-                    function.put(vtc, cluster);
+            if (t1vl != null && t2vl != null) {
+                // unifies the two values of the vars
+                return unifiesNoUndo(t1vl, t2vl); 
+            } else if (t1vl != null) {
+                bind(t2gv, t1vl);
+            } else if (t2vl != null) {
+                bind(t1gv, t2vl);
+            } else { //if (t1gv != null && t2gv != null) {
+                // unify two vars
+                bind(t1gv, t2gv);
             }
-            //}
             return true;
-        }
-
-        // t1 is var that doesn't occur in t2
-        if (t1gisvar) {
-            VarTerm t1gv = (VarTerm) t1g;
-            // if t1g is not free, must unify values
-            Term t1vl = function.get(t1gv);
-            if (t1vl != null && !(t1vl instanceof VarsCluster))
-                return unifiesNoUndo(t1vl,t2g);
-            else if (!t2g.hasVar(t1gv))
-                return setVarValue(t1gv, t2g);
-            else
-                return false;
-        }
-
-        // t2 is var that doesn't occur in t1
-        if (t2gisvar) {
-            VarTerm t2gv = (VarTerm) t2g;
-            // if t1g is not free, must unify values
-            Term t2vl = function.get(t2gv);
-            if (t2vl != null && !(t2vl instanceof VarsCluster))
-                return unifiesNoUndo(t2vl,t1g);
-            else if (!t1g.hasVar(t2gv))
-                return setVarValue(t2gv, t1g);
-            else
-                return false;
-        }
-
+        }        
+        
         // both terms are not vars
         
         // if any of the terms is not a structure (is a number or a
@@ -300,21 +265,40 @@ public class Unifier implements Cloneable {
         
         return true;
     }
-
-    protected boolean setVarValue(VarTerm vt, Term value) {
-        // if the var has a cluster, set value for all cluster
-        Term currentVl = function.get(vt);
-        if (currentVl != null && currentVl instanceof VarsCluster) {
-            VarsCluster cluster = (VarsCluster) currentVl;
-            for (VarTerm cvt : cluster)
-                function.put(cvt, value); //(Term) value.clone()); // the clone is done in apply
-        } else {
-            // no value in cluster
-            function.put((VarTerm) vt.clone(), value); //(Term) value.clone());  // the clone is done in apply
+    
+    public VarTerm deref(VarTerm v) {
+        Term vl = function.get(v);
+        // original def (before optimise)
+        //   if (vl != null && vl.isVar())
+        //      return deref(vl);
+        //   return v;
+        
+        VarTerm first = v;
+        while (vl != null && vl.isVar()) {
+            v  = (VarTerm)vl;
+            vl = function.get(v);
         }
-        return true;
+        if (first != v) {
+            function.put(first, v); // optimise map
+        }            
+        return v;
     }
-
+    
+    
+    
+    public void bind(VarTerm vt1, VarTerm vt2) {
+        final int comp = vt1.compareTo(vt2); 
+        if (comp < 0) {
+            function.put((VarTerm)vt1.clone(), vt2);
+        } else if (comp > 0){
+            function.put((VarTerm)vt2.clone(), vt1);
+        } // if they are the same (comp == 0), do not bind
+    }
+    
+    private void bind(VarTerm vt, Term vl) {
+        function.put((VarTerm) vt.clone(), vl);
+    }
+        
     public void clear() {
         function.clear();
     }

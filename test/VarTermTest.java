@@ -74,7 +74,6 @@ public class VarTermTest extends TestCase {
         u.unifies(x9,x8);
 
         u.unifies(x7,x4);
-        
         u.unifies(x3,new Structure("a"));
         assertEquals(u.get(x1).toString(),"a");
         assertEquals(u.get(x2).toString(),"a");
@@ -493,11 +492,14 @@ public class VarTermTest extends TestCase {
     public void testUnnamedvarsorder() {
         // the order is important for the "return" of plans/rules (where makeVarAnnon is used)
         // the most recently created unnamed vars should come first
-        List<UnnamedVar> l = new ArrayList<UnnamedVar>();
+        List<VarTerm> l = new ArrayList<VarTerm>();
         l.add(new UnnamedVar(5));
+        l.add(new VarTerm("F"));
         l.add(new UnnamedVar(6));
         l.add(new UnnamedVar(11));
+        l.add(new VarTerm("B"));
         Collections.sort(l);
-        assertEquals("[_5, _6, _11]", l.toString());
+        assertEquals("[B, F, _11, _6, _5]", l.toString()); // this order is VERY important for unification!
     }
+    
 }

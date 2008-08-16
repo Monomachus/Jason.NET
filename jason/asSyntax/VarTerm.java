@@ -25,7 +25,6 @@ package jason.asSyntax;
 
 import jason.asSemantics.Agent;
 import jason.asSemantics.Unifier;
-import jason.asSemantics.VarsCluster;
 import jason.asSyntax.parser.as2j;
 
 import java.io.StringReader;
@@ -141,7 +140,7 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
         if (value == null) {
             Term vl = u.get(this);
             //System.out.println("applying "+this+"="+vl+" un="+u);
-            if (vl != null && !(vl instanceof VarsCluster)) {
+            if (vl != null) { // && !(vl instanceof VarsCluster)) {
                 setValue(vl);
                 value.apply(u); // in case t has var args
                 return true;
@@ -151,20 +150,6 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
         }
         return false;            	
     }    
-
-    protected UnnamedVar preferredUnnamedVar(Unifier un) {
-        if (un != null) {
-            // check if I am in a var cluster with another unnamed var,
-            // i.e. I am unified with an unnamed var,
-            // then prefer that unnamed var instead of a new one
-    		Term vl = un.get(this);
-    		if (vl != null && vl instanceof VarsCluster)
-    		    for (VarTerm v: (VarsCluster)vl)
-    		        if (v.isUnnamedVar())
-    		            return (UnnamedVar)v;
-        }
-        return new UnnamedVar();
-    }
     
     /**
      * returns the value of this var. 
@@ -200,6 +185,8 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
     public int compareTo(Term t) {
         if (value != null)
             return value.compareTo(t);
+        else if (t.isUnnamedVar())
+            return -1;
         else
             return super.compareTo(t);
     }

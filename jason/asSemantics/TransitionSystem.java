@@ -403,7 +403,7 @@ public class TransitionSystem {
             return;
         }
         Unifier     u = im.unif;
-        PlanBody h = im.getCurrentStep();
+        PlanBody    h = im.getCurrentStep();
         h.apply(u);
         
         Literal body  = null;
@@ -466,8 +466,8 @@ public class TransitionSystem {
                 body.addAnnot(BeliefBase.TSelf);
             }
             // free variables in an event cannot conflict with those in the plan
-            body = (Literal)body.clone();
-            body.makeVarsAnnon(null);
+            body = body.copy();
+            body.makeVarsAnnon(u);
             conf.C.addAchvGoal(body, conf.C.SI);
             confP.step = State.StartRC;
             break;
@@ -479,8 +479,8 @@ public class TransitionSystem {
                 // programmer set some annotation
                 body.addAnnot(BeliefBase.TSelf);
             }
-            body = (Literal)body.clone();
-            body.makeVarsAnnon();
+            body = body.copy();
+            body.makeVarsAnnon(u);
             conf.C.addAchvGoal(body, Intention.EmptyInt);
             updateIntention();
             break;
@@ -495,7 +495,7 @@ public class TransitionSystem {
             	if (f instanceof Literal) { // generate event when using literal in the test (no events for log. expr. like ?(a & b))
             		body = (Literal)f.clone();
             		if (body.isLiteral()) { // in case body is a var with content that is not a literal (note the VarTerm pass in the instanceof Literal)
-    	                body.makeVarsAnnon();
+    	                body.makeVarsAnnon(u);
     	                Trigger te = new Trigger(TEOperator.add, TEType.test, body);
     	                if (ag.getPL().hasCandidatePlan(te)) {
     	                    Event evt = new Event(te, conf.C.SI);
@@ -553,7 +553,7 @@ public class TransitionSystem {
                 newfocus = conf.C.SI;
 
             // rename free vars
-            body.makeVarsAnnon();
+            body.makeVarsAnnon(u);
             
             // call BRF
             try {

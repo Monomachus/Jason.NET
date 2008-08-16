@@ -17,6 +17,8 @@ import org.w3c.dom.Element;
  */
 public class PlanBodyImpl extends Structure implements PlanBody, Iterable<PlanBody> {
 
+    private static final long serialVersionUID = 1L;
+
     public static final String BODY_PLAN_FUNCTOR = ";";
 
     private Term        term     = null; 

@@ -185,9 +185,9 @@ public class Literal extends Pred implements LogicalFormula {
                         // it is used to define what will be the unifier used
                         // inside the rule.
                         if (cloneAnnon == null) {
-                            cloneAnnon = (Literal)Literal.this.clone();
+                            cloneAnnon = Literal.this.copy();
                             cloneAnnon.apply(un);
-                            cloneAnnon.makeVarsAnnon(null);
+                            cloneAnnon.makeVarsAnnon(un);
                         }
                         Unifier ruleUn = new Unifier();
                         if (ruleUn.unifiesNoUndo(cloneAnnon, rule)) { // the rule head unifies with the literal
@@ -198,7 +198,7 @@ public class Literal extends Pred implements LogicalFormula {
                             }
                         }
                     } else {
-                        Unifier u = (Unifier) un.clone();
+                        Unifier u = un.copy();
                         if (u.unifiesNoUndo(Literal.this, b)) {
                             current = u;
                             return;

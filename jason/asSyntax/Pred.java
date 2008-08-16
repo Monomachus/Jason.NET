@@ -417,27 +417,30 @@ public class Pred extends Structure {
      * @param changes is the map of replacements
      */
     @Override
-    protected void makeVarsAnnon(Unifier un, Map<VarTerm,UnnamedVar> changes) {
+    public void makeVarsAnnon(Unifier un) {
         if (annots != null) {
         	Iterator<ListTerm> i = annots.listTermIterator();
         	while (i.hasNext()) {
         		ListTerm lt = i.next();
         		Term ta = lt.getTerm();
-                if (ta.isVar()) {
-                	// replace ta to an unnamed var
-                	UnnamedVar uv = changes.get(ta);
-                	if (uv == null) {
-                		VarTerm vt = (VarTerm)ta;
-                		uv = vt.preferredUnnamedVar(un);
-                		changes.put((VarTerm)ta, uv);
-                	}
-                	lt.setTerm(uv);
+
+                if (ta.isVar() && !ta.isUnnamedVar()) {
+                    // replace ta to an unnamed var
+                    VarTerm vt = un == null ? (VarTerm)ta : un.deref((VarTerm)ta);
+                    UnnamedVar uv;
+                    if (vt.isUnnamedVar()) {
+                        uv = (UnnamedVar)vt;
+                    } else {
+                        uv = new UnnamedVar();
+                        un.bind(vt, uv);
+                    }
+                    lt.setTerm(uv);
                 } else if (ta.isStructure()) {
-                	((Structure)ta).makeVarsAnnon(un,changes);
+                	((Structure)ta).makeVarsAnnon(un);
                 }
             }
         }
-        super.makeVarsAnnon(un, changes);
+        super.makeVarsAnnon(un);
     }
     
     @Override

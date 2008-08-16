@@ -12,6 +12,7 @@ import jason.asSyntax.Pred;
 import jason.asSyntax.Structure;
 import jason.asSyntax.Term;
 import jason.asSyntax.Trigger;
+import jason.asSyntax.UnnamedVar;
 import jason.asSyntax.VarTerm;
 import jason.asSyntax.Trigger.TEOperator;
 import jason.asSyntax.Trigger.TEType;
@@ -578,9 +579,9 @@ public class TermTest extends TestCase {
     	u.clear();
         assertTrue(u.unifies(l1, l2));
         l2.apply(u);
-        assertEquals(l2.toString(), "calc(32,33,33)");
+        assertEquals("calc(32,33,33)", l2.toString());
         l1.apply(u);
-        assertEquals(l1.toString(), "calc(32,33,33)");
+        assertEquals("calc(32,33,33)", l1.toString());
     }
 
     public void testMakeVarAnnon3() {
@@ -591,7 +592,35 @@ public class TermTest extends TestCase {
     	assertEquals(3, v.size());
     	assertEquals("vl("+l1.getTerm(1)+")",l1.getAnnots("vl").get(0).toString());
     }
+    
+    public void testMakeVarAnnon4() {
+        Literal l = Literal.parseLiteral("p(X)");
+        Unifier u = new Unifier();
+        u.unifies(new UnnamedVar(4), new VarTerm("X"));
+        u.unifies(new VarTerm("X"), new UnnamedVar(2));
+        u.unifies(new UnnamedVar(2), new VarTerm("Y"));
+        u.unifies(new UnnamedVar(10), new VarTerm("Y"));
+        u.unifies(new VarTerm("X"), new VarTerm("Z"));
+        /*
+        Iterator<VarTerm> i = u.binds(new VarTerm("X"));
+        while (i.hasNext()) {
+            System.out.println(i.next());
+        }
+        */
+        l.makeVarsAnnon(u);
+        //System.out.println(u+ " "+l);
+        assertEquals("p(_2)", l.toString());
+    }
 
+    public void testMakeVarAnnon5() {
+        Literal l = Literal.parseLiteral("p(X,Y)[s(Y)]");
+        Unifier u = new Unifier();
+        u.unifies(new VarTerm("X"), new VarTerm("Y"));
+        l.makeVarsAnnon(u);
+        assertEquals(l.getTerm(0), l.getTerm(1));
+        assertEquals("[s("+l.getTerm(0)+")]", l.getAnnots().toString());
+    }
+    
     public void testAddAnnots() {
     	Literal p1 = Literal.parseLiteral("p1");
     	Literal p2 = Literal.parseLiteral("p2[a1,a2]");
