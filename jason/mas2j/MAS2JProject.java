@@ -89,10 +89,6 @@ public class MAS2JProject {
 		}
 	}
 	
-	public boolean isDefaultDirectory() {
-		return projectDir.equals(".");
-	}
-	
 	public String getDirectory() {
 		return projectDir;
 	}
@@ -198,10 +194,11 @@ public class MAS2JProject {
 			r.add(getDirectory());
 		}
 		for (String p: sourcepaths) {
-			if (getDirectory().startsWith(".") || getDirectory().startsWith("/") || getDirectory().charAt(1) == ':') {
+			//if (getDirectory().startsWith(".") || getDirectory().startsWith("/") || getDirectory().charAt(1) == ':') {
+		    if (p.startsWith(".") || p.startsWith("/") || p.charAt(1) == ':') {		    
 				r.add(p);
 			} else {
-				r.add(getDirectory()+File.separator+p);
+				r.add(getDirectory()+"/"+p);
 			}
 		}
 		return r;

@@ -77,14 +77,11 @@ public final class NumberTermImpl extends DefaultTerm implements NumberTerm {
     public boolean equals(Object o) {
         if (o == this) return true;
 
-        if (o != null && o instanceof Term && ((Term)o).isNumeric()) {
+        if (o != null && o instanceof Term && ((Term)o).isNumeric() && !((Term)o).isArithExpr()) {
             NumberTerm st = (NumberTerm)o;
-			if (st.isVar() || st.isArithExpr()) 
-                return false;
-            else
-                try {
-                    return solve() == st.solve();
-                } catch (Exception e) { }
+            try {
+                return solve() == st.solve();
+            } catch (Exception e) { }
 		} 
 		return false;
 	}

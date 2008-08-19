@@ -320,8 +320,8 @@ public class Structure extends DefaultTerm {
             Term ti = getTerm(i);
             if (ti.isVar() && !ti.isUnnamedVar()) {
             	// replace ti to an unnamed var
-                VarTerm vt = un == null ? (VarTerm)ti : un.deref((VarTerm)ti);
-                UnnamedVar uv = null;
+                VarTerm vt = un.deref((VarTerm)ti);
+                UnnamedVar uv;
                 if (vt.isUnnamedVar()) {
                     uv = (UnnamedVar)vt;
                 } else {

@@ -382,7 +382,7 @@ public class JadeAgArch extends JadeAg implements AgArchInfraTier {
         
         try {
             Term acTerm = action.getActionTerm();
-            logger.info("doing: " + acTerm);
+            logger.fine("doing: " + acTerm);
 
             rwid++;
             String rw  = "id"+rwid;

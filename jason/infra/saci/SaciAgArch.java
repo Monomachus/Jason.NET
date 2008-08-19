@@ -422,7 +422,7 @@ public class SaciAgArch extends saci.Agent implements AgArchInfraTier {
         TransitionSystem ts = userAgArch.getTS();
         try {
             Term acTerm = action.getActionTerm();
-            logger.info("doing: " + acTerm);
+            logger.fine("doing: " + acTerm);
 
             String rw = mboxPercept.getRW();
             saci.Message m = new saci.Message("(ask :receiver environment :ontology AS-Action :content execute)");

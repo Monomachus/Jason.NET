@@ -426,7 +426,7 @@ public class Pred extends Structure {
 
                 if (ta.isVar() && !ta.isUnnamedVar()) {
                     // replace ta to an unnamed var
-                    VarTerm vt = un == null ? (VarTerm)ta : un.deref((VarTerm)ta);
+                    VarTerm vt = un.deref((VarTerm)ta);
                     UnnamedVar uv;
                     if (vt.isUnnamedVar()) {
                         uv = (UnnamedVar)vt;

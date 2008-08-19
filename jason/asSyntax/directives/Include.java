@@ -90,13 +90,13 @@ public class Include implements Directive {
         		return f;
         	} else if (srcpath != null) {
         		for (String path: srcpath) {
-    				File newname = new File(path + "/" + f.toString());
-    				if (newname.exists()) {
-    					try {
+                    try {
+                        File newname = new File(path + "/" + f.toString());
+                        if (newname.exists()) {
 							return newname.getCanonicalFile().toString();
-						} catch (IOException e) {
-							e.printStackTrace();
-						}
+                        }
+					} catch (IOException e) {
+						e.printStackTrace();
     				}
     			}
         	}
