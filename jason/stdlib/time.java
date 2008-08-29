@@ -36,6 +36,7 @@ import java.util.GregorianCalendar;
   </ul>
 
   @see jason.stdlib.date
+  @see jason.functions.time
   
  */
 public class time extends DefaultInternalAction {
