@@ -9,39 +9,39 @@ import jason.asSyntax.Pred;
  * <p>There are two kinds of directives: single directive and begin/end directive. 
  * The single directive does not have inner plans, as, for instance, the 
  * include:
- * <blockquote><code>
+ * <br/><code>
  *     ...<br>
  *     { include("a.asl") } <br>
  *     ...<br>
- * </code></blockquote>
+ * </code><br/>
  * 
  * <p>begin/end directives have inner plans, as used in goal patterns:
- * <blockquote><code>
+ * <br/><code>
  *     ...<br>
  *     { begin ebdg(g) } <br>
  *     +!g : bel <- action1. <br>
  *     +!g       <- action2. <br>
  *     { end } <br>
  *     ...<br>
- * </code></blockquote>
+ * </code><br/>
  * This pattern will change these two plans to:
- * <blockquote><code>
+ * <br/><code>
  *     +!g : g. <br>
  *     +!g : not (p__1(g)) & bel <- +p__1(g); action1; ?g. <br>
  *     +!g : not (p__2(g))       <- +p__2(g); action2; ?g. <br>
  *     -!g <- !g. <br>
  *      +g <- -p__1(g); -p__2(g); .dropGoal(g,true). <br>
- * </code></blockquote>
+ * </code><br/>
  * 
  * Goal patterns are proposed in the paper: <br> 
- * <blockquote> 
+ * <br/> 
  * Jomi Fred Hubner, Rafael H. Bordini, and Michael Wooldridge. <br>
  * Programming declarative goals using plan patterns. <br> In Matteo
  * Baldoni and Ulle Endriss, editors, <i>Proceedings of the Fourth
  * International Workshop on Declarative Agent Languages and
  * Technologies</i> (DALT 2006), held with AAMAS 2006, 8th May, Hakodate,
  * Japan, pages 65-81. Springer, 2006. <br> 
- * </blockquote>
+ * <br/>
  * 
  * @author jomi
  */

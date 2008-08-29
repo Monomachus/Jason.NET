@@ -272,7 +272,7 @@ public class Literal extends Pred implements LogicalFormula {
 		return predicateIndicatorCache;
 	}
 	
-	/** returns this literal as a list [<functor>, <list of terms>, <list of annots>] */
+	/** returns this literal as a list with three elements: [functor, list of terms, list of annots] */
 	public ListTerm getAsListOfTerms() {
 		ListTerm l = new ListTermImpl();
 		l.add(new Literal(type, getFunctor()));
@@ -287,7 +287,7 @@ public class Literal extends Pred implements LogicalFormula {
 		return l;
 	}
 
-	/** creates a literal from a list [<functor>, <list of terms>, <list of annots>] */
+	/** creates a literal from a list with three elements: [functor, list of terms, list of annots] */
 	public static Literal newFromListOfTerms(ListTerm lt) throws JasonException {
 		try {
 			Iterator<Term> i = lt.iterator();

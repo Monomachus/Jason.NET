@@ -414,7 +414,7 @@ public class Pred extends Structure {
     /**
      * Replaces all variables of the term for unnamed variables (_).
      * 
-     * @param changes is the map of replacements
+     * @param un is the unifier that containt the map of replacements
      */
     @Override
     public void makeVarsAnnon(Unifier un) {

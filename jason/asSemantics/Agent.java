@@ -534,7 +534,7 @@ public class Agent {
     }
 
     /**
-     * Returns true if BB contains the literal <i>bel</bel> (using unification to test).
+     * Returns true if BB contains the literal <i>bel</i> (using unification to test).
      * The unifier <i>un</i> is updated by the method.
      */
     public boolean believes(LogicalFormula bel, Unifier un) {

@@ -29,49 +29,53 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Implementation of BB that stores some beliefs in a relational data base.
- * 
- * <p>The parameters for this customisation are:
- * <ul>
- * <li>args[0] is the Database Engine JDBC drive
- * <li>args[1] is the JDBC URL connection string <br/> 
- *     The url can use the agent name as parameter as in "jdbc:mysql://localhost/%s".
- *     In this case, %s will be replaced by the agent's name. 
- * <li>args[2] is the username 
- * <li>args[3] is the password
- * <li>args[4] is an AS list with all beliefs that are mapped to DB.
- *     Each element of the list is in the form
- *     <blockquote>
- *     <code>predicate(arity [, table_name [, columns]])</code>
- *     </blockquote>
- *     and columns is in the form
- *     <blockquote>
- *     <code>columns( col_name(col_type), col_name(col_type), ....)</code>
- *     </blockquote>
- * </ul>
- * 
- * <p>Example in .mas2j project:<br>
- * <blockquote>
- * <pre>
+  Implementation of BB that stores some beliefs in a relational data base.
+  
+  <p>The parameters for this customisation are:
+  <ul>
+  <li>args[0] is the Database Engine JDBC drive
+  <li>args[1] is the JDBC URL connection string <br/> 
+      The url can use the agent name as parameter as in "jdbc:mysql://localhost/%s".
+      In this case, %s will be replaced by the agent's name. 
+  <li>args[2] is the username 
+  <li>args[3] is the password
+  <li>args[4] is an AS list with all beliefs that are mapped to DB.
+      Each element of the list is in the form
+      <br/><br/>
+      <code>predicate(arity [, table_name [, columns]])</code>
+      <br/><br/>
+      and columns is in the form
+      <br/><br/>
+      <code>columns( col_name(col_type), col_name(col_type), ....)</code>
+      <br/><br/>
+  </ul>
+  
+  <p>Example in .mas2j project, the agent c uses a JDBC belief base:<br>
+  <br/>
+  <pre>
  agents: 
    c beliefBaseClass jason.bb.JDBCPersistentBB(
       "org.hsqldb.jdbcDriver", // driver for HSQLDB
       "jdbc:hsqldb:bookstore", // URL connection
       "sa", // user
       "", // password
-      "[a(1,tablea,columns(runs(integer))),book(5),book_author(2),author(2,author,columns(id(integer),name(varchar(30)))),publisher(2)]");
-            // predicate a/1 is mapped to a table called "tablea" with an integer column called runs;
-            //     the name and type of the columns is used only if the table does not exits and
-            //     have to be created;
-            //     if no column name/type is provided, an arbitrary name is used with type varchar(256)
-            // predicate book (with arity 5) is mapped to a table called "book" 
-            //     if no table name is provided the predicate name is used for the table name
-            // the columns for author are "id" (an integer) and "name" (char);
-            // and so on...
+      "[a(1,tablea,columns(runs(integer))),
+        book(5),
+        book_author(2),
+        author(2,author,columns(id(integer),name(varchar(30)))),
+        publisher(2)]");
    </pre>
- * </blockquote>
- * 
- *  @author Jomi
+
+   <p>The predicate <code>a/1</code> is mapped to a table called "tablea" with an integer column called runs;
+   predicate <code>book</code> (with arity 5) is mapped to a table called "book"; and so on.
+
+
+   <p>The name and type of the columns are used only if the table does not exits and have to be created. 
+      If no column name/type is provided, an arbitrary name is used with type varchar(256).
+      If no table name is provided, the predicate name is used for the table name.
+   <br/>
+  
+   @author Jomi
  */
 public class JDBCPersistentBB extends DefaultBeliefBase {
     private static Logger logger     = Logger.getLogger(JDBCPersistentBB.class.getName());

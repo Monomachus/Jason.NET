@@ -39,6 +39,7 @@ public abstract class SuspendInternalAction implements InternalAction {
     /**
      * Suspend the current intention, put it in the PendingIntention (PI) structure and assigns it to a key.
      *  
+     * @param ts        the "engine" of the agent
      * @param basekey   the base key to form final key used to get the intention back from PI (e.g. "moise", "cartago", ...)
      * @param timeout   the max time the intention will be in PI, the value 0 means until "resume"
      * @return the final key used to store the intention in PI
