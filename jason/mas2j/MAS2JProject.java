@@ -209,7 +209,7 @@ public class MAS2JProject {
 	}
 
     public void addDirectiveClass(String id, ClassParameters classname) {
-        directiveClasses.put(id, classname.className);
+        directiveClasses.put(id, classname.getClassName());
     }
     
     public Map<String,String> getDirectiveClasses() {
@@ -238,18 +238,18 @@ public class MAS2JProject {
         s.append("MAS " + getSocName() + " {\n");
 		s.append("   infrastructure: "+getInfrastructure()+"\n\n");
 		
-		if (! getEnvClass().className.equals(jason.environment.Environment.class.getName())) {
+		if (! getEnvClass().getClassName().equals(jason.environment.Environment.class.getName())) {
 			s.append("   environment: "+getEnvClass());
-			if (envClass.host != null) {
-				s.append(" at "+envClass.host);
+			if (envClass.getHost() != null) {
+				s.append(" at "+envClass.getHost());
 			}
 			s.append("\n\n");
 		}
 		
 		if (getControlClass() != null) {
 			s.append("   executionControl: "+getControlClass());
-			if (getControlClass().host != null) {
-				s.append(" at "+getControlClass().host);
+			if (getControlClass().getHost() != null) {
+				s.append(" at "+getControlClass().getHost());
 			}
 			s.append("\n\n");
 		}
@@ -299,7 +299,7 @@ public class MAS2JProject {
 	public InfrastructureFactory getInfrastructureFactory() throws JasonException {
 		if (infraFac == null) {
 			try {
-				String facClass = Config.get().getInfrastructureFactoryClass(infrastructure.className);
+				String facClass = Config.get().getInfrastructureFactoryClass(infrastructure.getClassName());
 				infraFac = (InfrastructureFactory)Class.forName(facClass).newInstance();
 			} catch (Exception e) { 
 				throw new JasonException("The project's infrastructure ('"+infrastructure+"') is unknown!");

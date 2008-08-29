@@ -81,13 +81,13 @@ public class AgentParameters {
 			}
 			s.append("] ");
 		}
-		if (archClass != null && archClass.className.length() > 0) {
+		if (archClass != null && archClass.getClassName().length() > 0) {
 			s.append("agentArchClass "+archClass+" ");
 		}
-		if (agClass != null && agClass.className.length() > 0) {
+		if (agClass != null && agClass.getClassName().length() > 0) {
 			s.append("agentClass "+agClass+" ");
 		}
-        if (bbClass != null && bbClass.className.length() > 0) {
+        if (bbClass != null && bbClass.getClassName().length() > 0) {
             s.append("beliefBaseClass "+bbClass+" ");
         }
 		if (qty > 1) {

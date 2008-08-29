@@ -15,9 +15,9 @@ import jason.asSyntax.*;
  * @author jomi
  */
 public class ClassParameters {
-    public String className;
-    public List<String> parameters = new ArrayList<String>();
-    public String host;
+    private String className;
+    private List<String> parameters = new ArrayList<String>();
+    private String host;
     
     public ClassParameters() {}
     public ClassParameters(String className) {
@@ -32,10 +32,26 @@ public class ClassParameters {
         }
     }
     
+    public void setClassName(String cn) {
+        className = cn;
+    }
+    public String getClassName() {
+        return className;
+    }
+    
+
+    public void addParameter(String s) {
+        parameters.add(s);
+    }
+    public String getParameter(int index) {
+        return parameters.get(index);
+    }
+    public boolean hasParameter(String s) {
+        return parameters.contains(s);
+    }
     public boolean hasParameters() {
         return !parameters.isEmpty();
     }
-    
     public String[] getParametersArray() {        
         String[] p = new String[parameters.size()];
         int i=0;
@@ -44,7 +60,6 @@ public class ClassParameters {
         }
         return p;
     }
-    
     /** returns parameters with space as separator */
     public String getParametersStr(String sep) {
         StringBuilder out = new StringBuilder();
@@ -57,6 +72,13 @@ public class ClassParameters {
         }
         return out.toString();
         
+    }
+
+    public void setHost(String h) {
+        host = h;
+    }
+    public String getHost() {
+        return host;
     }
     
     public String toString() {

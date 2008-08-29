@@ -227,7 +227,7 @@ public class mas2j implements mas2jConstants {
       jj_consume_token(-1);
       throw new ParseException();
     }
-                                          cp.className = c.image;
+                                          cp.setClassName(c.image);
     label_3:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -251,7 +251,7 @@ public class mas2j implements mas2jConstants {
         jj_consume_token(-1);
         throw new ParseException();
       }
-                                          cp.className += "." + c.image;
+                                          cp.setClassName(cp.getClassName() + "." + c.image);
     }
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case 43:
@@ -279,7 +279,7 @@ public class mas2j implements mas2jConstants {
           jj_consume_token(-1);
           throw new ParseException();
         }
-                                                                    cp.parameters.add(c.image);
+                                                                    cp.addParameter(c.image);
         label_4:
         while (true) {
           switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -309,7 +309,7 @@ public class mas2j implements mas2jConstants {
             jj_consume_token(-1);
             throw new ParseException();
           }
-                                                                    cp.parameters.add(c.image);
+                                                                    cp.addParameter(c.image);
         }
         break;
       default:
@@ -443,7 +443,7 @@ public class mas2j implements mas2jConstants {
     }
                               project.setEnvClass(envClass);
                               if (host != null) {
-                                          envClass.host = host.image;
+                                          envClass.setHost(host.image);
                                   }
   }
 
@@ -471,7 +471,7 @@ public class mas2j implements mas2jConstants {
     }
                               project.setControlClass(controlClass);
                               if (host != null) {
-                                   controlClass.host = host.image;
+                                   controlClass.setHost(host.image);
                               }
   }
 

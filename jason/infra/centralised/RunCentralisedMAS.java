@@ -332,7 +332,7 @@ public class RunCentralisedMAS {
         logger.fine("Creating environment " + project.getEnvClass());
         env = new CentralisedEnvironment(project.getEnvClass(), this);
 
-        boolean isPool = project.getInfrastructure().parameters.contains("pool");
+        boolean isPool = project.getInfrastructure().hasParameter("pool");
         if (isPool) logger.info("Creating agents....");
         int nbAg = 0;
         Agent pag = null;
@@ -367,10 +367,10 @@ public class RunCentralisedMAS {
                     agArch.setEnvInfraTier(env);
                     if (isPool && cAg > 0) {
                         // creation by cloning previous agent
-                        agArch.initAg(ap.archClass.className, pag, this);
+                        agArch.initAg(ap.archClass.getClassName(), pag, this);
                     } else {
                         // normal creation
-                        agArch.initAg(ap.archClass.className, ap.agClass.className, ap.bbClass, ap.asSource.toString(), ap.getAsSetts(debug, project.getControlClass() != null), this);
+                        agArch.initAg(ap.archClass.getClassName(), ap.agClass.getClassName(), ap.bbClass, ap.asSource.toString(), ap.getAsSetts(debug, project.getControlClass() != null), this);
                     }
                     addAg(agArch);
                     
@@ -411,7 +411,7 @@ public class RunCentralisedMAS {
     
     protected void startAgs() {
         // run the agents
-        if (project.getInfrastructure().parameters.contains("pool")) {
+        if (project.getInfrastructure().hasParameter("pool")) {
             createThreadPool();
         } else {
             createAgsThreads();
@@ -446,8 +446,8 @@ public class RunCentralisedMAS {
                 // get the max number of threads in the pool
                 int maxthreads = 10;
                 try {
-                    if (project.getInfrastructure().parameters.size() > 1) {
-                        maxthreads = Integer.parseInt(project.getInfrastructure().parameters.get(1));
+                    if (project.getInfrastructure().hasParameters()) {
+                        maxthreads = Integer.parseInt(project.getInfrastructure().getParameter(1));
                         logger.info("Creating a thread pool with "+maxthreads+" thread(s).");
                     }
                 } catch (Exception e) {

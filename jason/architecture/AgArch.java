@@ -71,7 +71,7 @@ public class AgArch {
         // set the agent
         try {
             Agent ag = (Agent) Class.forName(agClass).newInstance();
-            BeliefBase bb = (BeliefBase) Class.forName(bbPars.className).newInstance();
+            BeliefBase bb = (BeliefBase) Class.forName(bbPars.getClassName()).newInstance();
             ts = ag.initAg(this, bb, asSrc, stts);
             bb.init(ag, bbPars.getParametersArray());
         } catch (Exception e) {

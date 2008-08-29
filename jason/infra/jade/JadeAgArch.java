@@ -87,8 +87,8 @@ public class JadeAgArch extends JadeAg implements AgArchInfraTier {
             if (args[0] instanceof AgentParameters) {
                 AgentParameters ap = (AgentParameters)args[0];
                 asSource      = ap.asSource.getAbsolutePath();
-                archClassName = ap.archClass.className;
-                agClassName   = ap.agClass.className;
+                archClassName = ap.archClass.getClassName();
+                agClassName   = ap.agClass.getClassName();
                 bbPars        = ap.bbClass;
                 stts          = ap.getAsSetts((Boolean)args[1], (Boolean)args[2]); // TODO: get this parameters
 

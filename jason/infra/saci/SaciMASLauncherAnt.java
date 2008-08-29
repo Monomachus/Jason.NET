@@ -136,11 +136,11 @@ public class SaciMASLauncherAnt extends CentralisedMASLauncherAnt implements MAS
             tmpEnvClass = project.getEnvClass();
         }
         String pars = tmpEnvClass.getParametersStr(" ").replaceAll("\"","'");
-        out.println("\t\targs=\"" + tmpEnvClass.className + " " + pars + "\" ");
+        out.println("\t\targs=\"" + tmpEnvClass.getClassName() + " " + pars + "\" ");
         // do not use class.getName, it does not work with jason.exe
         out.println("\t\tclass=\"jason.infra.saci.SaciEnvironment\" ");
-        if (tmpEnvClass.host != null) {
-            out.println("\t\thost=" + tmpEnvClass.host);
+        if (tmpEnvClass.getHost() != null) {
+            out.println("\t\thost=" + tmpEnvClass.getHost());
         }
         out.println("\t/>");
 
@@ -162,8 +162,8 @@ public class SaciMASLauncherAnt extends CentralisedMASLauncherAnt implements MAS
             out.println("\t\tsociety.name=\"" + project.getSocName() + "-env\" ");
 
             out.println("\t\targs=\"" + fControlClass + " " + fControlClass.getParametersStr(" ") + "\"");
-            if (fControlClass.host != null) {
-                out.println("\t\thost=" + fControlClass.host);
+            if (fControlClass.getHost() != null) {
+                out.println("\t\thost=" + fControlClass.getHost());
             }
             out.println("\t\tclass=\"jason.infra.saci.SaciExecutionControl\" ");
             out.println("\t/>");
@@ -201,7 +201,7 @@ public class SaciMASLauncherAnt extends CentralisedMASLauncherAnt implements MAS
         	fname = project.getDirectory() + File.separator + fname;
         }
         File tmpAsSrc = new File(fname);
-        s.append("\n\t\targs=\"" + tmpAgArchClass.className + " " + tmpAgClass.className +
+        s.append("\n\t\targs=\"" + tmpAgArchClass.getClassName() + " " + tmpAgClass.getClassName() +
                 " '" + sBBClass + "' " +
                 " '" + tmpAsSrc.getAbsolutePath() + "'" + getSaciOptsStr(agp, debug, forceSync) + "\"");
         if (agp.qty > 1) {

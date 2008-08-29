@@ -115,11 +115,11 @@ public class StartNewAgentGUI extends BaseDialogGUI {
                 try {
                 	String agClass = null;
                 	if (ap.agClass != null) {
-                		agClass = ap.agClass.className;
+                		agClass = ap.agClass.getClassName();
                 	}
                 	String archClass = null;
                 	if (ap.archClass != null) {
-                		archClass = ap.archClass.className;
+                		archClass = ap.archClass.getClassName();
                 	}
                     for (int i = 0; i < ap.qty; i++) {
                         String name = ap.name;

@@ -60,7 +60,7 @@ public class JadeExecutionControl extends JadeAg implements ExecutionControlInfr
             if (args != null && args.length > 0) {
                 if (args[0] instanceof ClassParameters) { // it is an mas2j parameter
                     ClassParameters ecp = (ClassParameters)args[0];
-                    userControl = (ExecutionControl) Class.forName(ecp.className).newInstance();
+                    userControl = (ExecutionControl) Class.forName(ecp.getClassName()).newInstance();
                     userControl.setExecutionControlInfraTier(this);
                     userControl.init(ecp.getParametersArray());
                 } else {

@@ -255,16 +255,16 @@ File fileName() :           { String path = "";
 
 ClassParameters classDef() :  { Token c; String p = ""; ClassParameters cp = new ClassParameters(); }
 {
-   (c = <ID> | c = <ASID>)              { cp.className = c.image; }
+   (c = <ID> | c = <ASID>)              { cp.setClassName(c.image); }
    (
-     "." (c = <ID> | c = <ASID>)        { cp.className += "." + c.image; }
+     "." (c = <ID> | c = <ASID>)        { cp.setClassName(cp.getClassName() + "." + c.image); }
    )*
    [
      "("
 	   [
-	     (c=<ID> | c=<ASID> | c=<NUMBER> | c=<STRING>)        { cp.parameters.add(c.image); }
+	     (c=<ID> | c=<ASID> | c=<NUMBER> | c=<STRING>)        { cp.addParameter(c.image); }
    	     ( 
-   	       "," (c=<ID> | c=<ASID> | c=<NUMBER> | c=<STRING>)  { cp.parameters.add(c.image); }
+   	       "," (c=<ID> | c=<ASID> | c=<NUMBER> | c=<STRING>)  { cp.addParameter(c.image); }
    	     )*
    	   ]
      ")"
@@ -308,7 +308,7 @@ void environment() :        { Token host = null; ClassParameters envClass = null
                             { 
                               project.setEnvClass(envClass);
                               if (host != null) {
-		                          envClass.host = host.image;
+		                          envClass.setHost(host.image);
 	                          }
                             }
 }
@@ -324,7 +324,7 @@ void control() :            { Token host =  null; }
   ]
                             { project.setControlClass(controlClass);
                               if (host != null) {
-                                   controlClass.host = host.image;
+                                   controlClass.setHost(host.image);
                               }
                             }
 }
