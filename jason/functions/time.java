@@ -8,7 +8,7 @@ import jason.asSyntax.Term;
   <p>Function: <b><code>system.time</code></b>: encapsulates java System.currentTimeMillis(),
   returns the current time in milliseconds.
   
-  @see jason.stdlib.time
+  @see jason.stdlib.time internal action time
 
   @author Jomi 
 */

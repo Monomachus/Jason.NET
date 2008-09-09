@@ -25,6 +25,7 @@ package jason.bb;
 
 import jason.asSemantics.Agent;
 import jason.asSemantics.Unifier;
+import jason.asSyntax.Atom;
 import jason.asSyntax.Literal;
 import jason.asSyntax.Pred;
 import jason.asSyntax.PredicateIndicator;
@@ -42,8 +43,8 @@ import org.w3c.dom.Element;
  */
 public interface BeliefBase extends Iterable<Literal>, Cloneable {
 
-    public static final Term TPercept = Pred.createSource("percept");
-    public static final Term TSelf    = Pred.createSource("self");
+    public static final Term TPercept = Pred.createSource(new Atom("percept"));
+    public static final Term TSelf    = Pred.createSource(new Atom("self"));
     
     /** 
      * Called before the MAS execution with the agent that uses this

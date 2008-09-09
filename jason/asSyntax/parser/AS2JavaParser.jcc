@@ -460,12 +460,14 @@ Pred pred() :         { Token K; Pred p; List l; ListTerm lt; PlanBody b; }
 
 
 /* List of terms */
-List terms() : { List listTerms = new ArrayList(); Term v; PlanBody o; }
+List terms() :    { ArrayList listTerms = new ArrayList(); Term v; PlanBody o; }
 {
   v=term()             { listTerms.add(v); } 
   ( "," v=term()       { listTerms.add(v); }
   )* 
-                       { return listTerms; }
+                       { listTerms.trimToSize(); 
+                         return listTerms; 
+                       }
 }
 
 

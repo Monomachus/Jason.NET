@@ -272,10 +272,11 @@ public class DefaultBeliefBase implements BeliefBase {
         
         @SuppressWarnings("unchecked")
         public void add(Literal l, boolean addInEnd) {
-            try {
+            //try {
                 // minimise the allocation space of terms
-                if (!l.isAtom()) ((ArrayList) l.getTerms()).trimToSize();
-            } catch (Exception e) {}
+            // Moved to the parser.
+            //    if (!l.isAtom()) ((ArrayList) l.getTerms()).trimToSize();
+            //} catch (Exception e) {}
             
             map.put(new LiteralWrapper(l), l);
             if (addInEnd) {

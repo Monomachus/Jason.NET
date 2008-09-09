@@ -512,7 +512,7 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
     }
 
     @Override
-    public void addSource(Structure t) {
+    public void addSource(Term t) {
         if (value != null && getValue().isPred())
             ((Pred) getValue()).addSource(t);
         else
@@ -521,7 +521,7 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
     }
 
     @Override
-    public boolean delSource(Structure s) {
+    public boolean delSource(Term s) {
         if (value != null && getValue().isPred())
             return ((Pred) getValue()).delSource(s);
         else
@@ -553,7 +553,7 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
     }
 
     @Override
-    public boolean hasSource(Structure s) {
+    public boolean hasSource(Term s) {
         if (value != null && getValue().isPred())
             return ((Pred) getValue()).hasSource(s);
         else

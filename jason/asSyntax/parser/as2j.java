@@ -647,7 +647,7 @@
 
 /* List of terms */
   final public List terms() throws ParseException {
-                 List listTerms = new ArrayList(); Term v; PlanBody o;
+                    ArrayList listTerms = new ArrayList(); Term v; PlanBody o;
     v = term();
                          listTerms.add(v);
     label_10:
@@ -664,6 +664,7 @@
       v = term();
                          listTerms.add(v);
     }
+                         listTerms.trimToSize();
                          {if (true) return listTerms;}
     throw new Error("Missing return statement in function");
   }
@@ -1233,13 +1234,13 @@
     return false;
   }
 
-  final private boolean jj_3R_13() {
-    if (jj_scan_token(39)) return true;
+  final private boolean jj_3R_17() {
+    if (jj_scan_token(42)) return true;
     return false;
   }
 
-  final private boolean jj_3R_17() {
-    if (jj_scan_token(42)) return true;
+  final private boolean jj_3R_13() {
+    if (jj_scan_token(39)) return true;
     return false;
   }
 

@@ -230,6 +230,27 @@ public class Pred extends Structure {
         return removed;
     }
 
+    /**
+     * returns all annots with the specified functor e.g.: from annots
+     * [t(a), t(b), source(tom)]
+     * and functor "t",
+     * it returns [t(a),t(b)]
+     */
+    public ListTerm getAnnots(String functor) {
+        ListTerm ls = new ListTermImpl();
+        if (annots != null) {
+            ListTerm tail = ls;
+            for (Term ta : annots) {
+                if (ta.isStructure()) {
+                    if (((Structure)ta).getFunctor().equals(functor)) {
+                        tail = tail.append(ta);
+                    }
+                }
+            }
+        }
+        return ls;
+    }
+
     /** returns true if all this predicate annots are in p's annots */
     public boolean hasSubsetAnnot(Pred p) {
         if (annots == null) return true;
@@ -307,25 +328,20 @@ public class Pred extends Structure {
     /**
      * Adds a source annotation like "source(<i>agName</i>)".
      */
-    public void addSource(Structure agName) {
+    public void addSource(Term agName) {
         if (agName != null)
             addAnnot(createSource(agName));
     }
 
     /** deletes "source(<i>agName</i>)" */
-    public boolean delSource(Structure agName) {
+    public boolean delSource(Term agName) {
         if (annots != null)
             return annots.remove(createSource(agName));
         else
         	return false;
     }
 
-    public static Term createSource(String source) {
-    	Structure s = new Structure("source",1);
-    	s.addTerm(new Atom(source));
-    	return s;
-    }
-    public static Term createSource(Structure source) {
+    public static Term createSource(Term source) {
     	Structure s = new Structure("source",1);
     	s.addTerm(source);
     	return s;
@@ -346,27 +362,6 @@ public class Pred extends Structure {
                         tail = tail.append(tas.getTerm(0));
                     }
                 }
-            }
-        }
-        return ls;
-    }
-
-    /**
-     * returns all annots with the specified functor e.g.: from annots
-     * [t(a), t(b), source(tom)]
-     * and functor "t",
-     * it returns [t(a),t(b)]
-     */
-    public ListTerm getAnnots(String functor) {
-        ListTerm ls = new ListTermImpl();
-        if (annots != null) {
-        	ListTerm tail = ls;
-            for (Term ta : annots) {
-            	if (ta.isStructure()) {
-            		if (((Structure)ta).getFunctor().equals(functor)) {
-            			tail = tail.append(ta);
-            		}
-            	}
             }
         }
         return ls;
@@ -401,11 +396,9 @@ public class Pred extends Structure {
     }
 
     /** returns true if this pred has a "source(<i>agName</i>)" */
-    public boolean hasSource(Structure agName) {
+    public boolean hasSource(Term agName) {
         if (annots != null) {
-            Structure ts = new Structure("source");
-            ts.addTerm(agName);
-            return annots.contains(ts);
+            return annots.contains(createSource(agName));
         }
         return false;
     }
@@ -414,7 +407,7 @@ public class Pred extends Structure {
     /**
      * Replaces all variables of the term for unnamed variables (_).
      * 
-     * @param un is the unifier that containt the map of replacements
+     * @param un is the unifier that contains the map of replacements
      */
     @Override
     public void makeVarsAnnon(Unifier un) {
