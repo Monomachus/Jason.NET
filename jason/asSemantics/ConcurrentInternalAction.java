@@ -20,7 +20,7 @@ import java.util.concurrent.TimeUnit;
 
   @author jomi
 */
-public abstract class SuspendInternalAction implements InternalAction {
+public abstract class ConcurrentInternalAction implements InternalAction {
 
     private static int actcount  = 0;
     
@@ -42,9 +42,9 @@ public abstract class SuspendInternalAction implements InternalAction {
      * @param ts        the "engine" of the agent
      * @param basekey   the base key to form final key used to get the intention back from PI (e.g. "moise", "cartago", ...)
      * @param timeout   the max time the intention will be in PI, the value 0 means until "resume"
-     * @return the final key used to store the intention in PI
+     * @return the final key used to store the intention in PI, this key is used the resume the intention
      */
-    public String suspend(final TransitionSystem ts, String basekey, int timeout) {
+    public String suspendInt(final TransitionSystem ts, String basekey, int timeout) {
         final String key = basekey + "/" + (actcount++); 
         final Circumstance C = ts.getC();
         Intention i = C.getSelectedIntention();
@@ -65,16 +65,21 @@ public abstract class SuspendInternalAction implements InternalAction {
         return key;
     }
     
+    public void startInternalAction(TransitionSystem ts, Runnable code) {
+        ts.getAg().getScheduler().execute(code);
+        //new Thread(code).start();
+    }
+    
     /** called back when some intention should be resumed/failed by timeout */
     abstract public void timeout(TransitionSystem ts, String intentionKey);
     
     /** resume the intention identified by intentionKey */
-    public void resume(TransitionSystem ts, String intentionKey) {
+    public void resumeInt(TransitionSystem ts, String intentionKey) {
         resume(ts, intentionKey, false);
     }
 
     /** fails the intention identified by intentionKey */
-    public void fail(TransitionSystem ts, String intentionKey) {
+    public void failInt(TransitionSystem ts, String intentionKey) {
         resume(ts, intentionKey, true);
     }
 

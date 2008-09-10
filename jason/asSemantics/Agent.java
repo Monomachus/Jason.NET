@@ -206,7 +206,7 @@ public class Agent {
     
     public ScheduledExecutorService getScheduler() {
         if (scheduler == null)
-            scheduler = Executors.newScheduledThreadPool(1);
+            scheduler = Executors.newScheduledThreadPool(2);
         return scheduler;
     }
     

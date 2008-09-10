@@ -191,6 +191,7 @@ public class wait extends DefaultInternalAction {
                     } else {
                     	c.addIntention(si);
                     }
+                    ts.getUserAgArch().getArchInfraTier().wake();
                 }
             } catch (Exception e) {
                 ts.getLogger().log(Level.SEVERE, "Error at .wait thread", e);

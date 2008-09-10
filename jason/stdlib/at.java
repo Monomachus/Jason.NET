@@ -25,7 +25,6 @@
 package jason.stdlib;
 
 import jason.JasonException;
-import jason.asSemantics.Circumstance;
 import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.Event;
 import jason.asSemantics.Intention;
@@ -121,7 +120,7 @@ public class at extends DefaultInternalAction {
 			
 			Trigger te = Trigger.parseTrigger(sevent.getString());
 
-            ts.getAg().getScheduler().schedule(new CheckDeadline(te, ts.getC()), deadline, TimeUnit.MILLISECONDS);
+            ts.getAg().getScheduler().schedule(new CheckDeadline(te, ts), deadline, TimeUnit.MILLISECONDS);
 			return true;
         } catch (ArrayIndexOutOfBoundsException e) {
             throw new JasonException("The internal action 'at' has not received two arguments.");
@@ -137,17 +136,16 @@ public class at extends DefaultInternalAction {
     }
     
 	class CheckDeadline implements Runnable {
-        		
 		private int     id = 0;
         private Event   event;
-        private Circumstance c;
+        private TransitionSystem ts;
         private boolean cancelled = false;
         
-        public CheckDeadline(Trigger te, Circumstance c) {
+        public CheckDeadline(Trigger te, TransitionSystem ts) {
         	idCount++;
         	this.id = idCount;
             this.event = new Event(te, Intention.EmptyInt);
-            this.c = c;
+            this.ts = ts;
             ats.put(id, this);
         }
         
@@ -157,8 +155,10 @@ public class at extends DefaultInternalAction {
 
         public void run() {
             try {
-                if (!cancelled)
-                    c.addEvent(event);
+                if (!cancelled) {
+                    ts.getC().addEvent(event);
+                    ts.getUserAgArch().getArchInfraTier().wake();
+                }
             } finally {
             	ats.remove(id);
             }

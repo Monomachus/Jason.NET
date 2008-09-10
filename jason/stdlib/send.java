@@ -204,7 +204,7 @@ public class send extends DefaultInternalAction {
                                 intention.peek().getUnif().unifies(send.getTerm(3), new Atom("timeout"));
                                 // add the intention back in C.I
                                 ts.getC().addIntention(intention);
-                                System.out.println("OK");
+                                ts.getUserAgArch().getArchInfraTier().wake();                                
                             }
                         }
                     }, (long)((NumberTerm)tto).solve(), TimeUnit.MILLISECONDS);
