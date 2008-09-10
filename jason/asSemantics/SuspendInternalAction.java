@@ -10,11 +10,11 @@ import java.util.concurrent.TimeUnit;
 
 /** 
 
-  This class can be used in place of DefaultInternalAction to create IA that
-  suspend/resume the intention.
+  This class can be used in place of DefaultInternalAction to create an IA that
+  suspend the intention while it is being executed.
 
-  Example: a plan should to ask something to an user and wait until he/she answer some.
-  If DefaultInternalAction is used for that, all the agent thread is suspended until
+  Example: a plan may ask something to an user and wait the answer.
+  If DefaultInternalAction is used for that, all the agent thread is blocked until
   the answer. With SuspendInternalAction, only the intention using the IA is
   suspended. See demos/gui/gui1.  
 

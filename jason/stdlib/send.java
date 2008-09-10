@@ -25,17 +25,19 @@
 package jason.stdlib;
 
 import jason.JasonException;
-import jason.asSemantics.Circumstance;
 import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.Intention;
 import jason.asSemantics.Message;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
+import jason.asSyntax.Atom;
 import jason.asSyntax.ListTerm;
 import jason.asSyntax.NumberTerm;
 import jason.asSyntax.StringTerm;
 import jason.asSyntax.Structure;
 import jason.asSyntax.Term;
+
+import java.util.concurrent.TimeUnit;
 
 /**
   <p>Internal action: <b><code>.send</code></b>.
@@ -121,18 +123,15 @@ public class send extends DefaultInternalAction {
     private boolean lastSendWasSynAsk = false; 
     
     @Override
-    public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
-        Term to   = null;
-        Term ilf  = null;
-        Term pcnt = null;
-        // check parameters
+    public Object execute(final TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         try {
-            to   = args[0];
-            ilf  = args[1];
-            pcnt = args[2];
+            // check parameters
+            Term to   = args[0];
+            Term ilf  = args[1];
+            Term pcnt = args[2];
 	        
             if (!to.isAtom() && !to.isList() && !to.isString()) {
-                throw new JasonException("The TO parameter ('"+to+"') of the internal action 'send' is not an atom or list of atoms!");
+                throw new JasonException("The TO parameter ('"+to+"') of the internal action 'send' is not an atom, a string nor a list of receivers!");
             }
 
             if (! ilf.isAtom()) {
@@ -145,28 +144,26 @@ public class send extends DefaultInternalAction {
             //    ((Pred)pcnt).delSources();
             //} catch (Exception e) {}
             
-        } catch (ArrayIndexOutOfBoundsException e) {
-            throw new JasonException("The internal action 'send' to '"+to+"' has not received three arguments.");
-        } 
-        Message m = new Message(ilf.toString(), ts.getUserAgArch().getAgName(), null, pcnt);
-
-        // async ask has a fourth argument and should suspend the intention
-        lastSendWasSynAsk = m.isAsk() && args.length > 3;
-        if (lastSendWasSynAsk) {
-        	ts.getC().getPendingIntentions().put(m.getMsgId(), ts.getC().getSelectedIntention());
-        }
-
-        // (un)tell or unknown performative with 4 args is a reply to
-        if ( (m.isTell() || m.isUnTell() || !m.isKnownPerformative()) && args.length > 3) {
-            Term mid = args[3];
-            if (! mid.isAtom()) {
-                throw new JasonException("The Message ID ('"+mid+"') parameter of the internal action 'send' is not an atom!");
-            }
-            m.setInReplyTo(mid.toString());
-        }
         
-        // send the message
-        try {
+            // create a message to be sent
+            final Message m = new Message(ilf.toString(), ts.getUserAgArch().getAgName(), null, pcnt);
+    
+            // async ask has a fourth argument and should suspend the intention
+            lastSendWasSynAsk = m.isAsk() && args.length > 3;
+            if (lastSendWasSynAsk) {
+            	ts.getC().getPendingIntentions().put(m.getMsgId(), ts.getC().getSelectedIntention());
+            }
+    
+            // (un)tell or unknown performative with 4 args is a reply to
+            if ( (m.isTell() || m.isUnTell() || !m.isKnownPerformative()) && args.length > 3) {
+                Term mid = args[3];
+                if (! mid.isAtom()) {
+                    throw new JasonException("The Message ID ('"+mid+"') parameter of the internal action 'send' is not an atom!");
+                }
+                m.setInReplyTo(mid.toString());
+            }
+        
+            // send the message
             if (to.isList()) {
                 if (m.isAsk() && args.length > 3) {
                     throw new JasonException("Cannot send 'ask' to a list of receivers!");                                                   
@@ -197,54 +194,37 @@ public class send extends DefaultInternalAction {
                 // get the timeout deadline
                 Term tto = (Term)args[4];
                 if (tto.isNumeric()) {
-                    new CheckTimeout((long)((NumberTerm)tto).solve(), m.getMsgId(), ts.getC()).start(); 
+                    ts.getAg().getScheduler().schedule( new Runnable() {
+                        public void run() {
+                            // if the intention is still in PI, brings it back to C.I
+                            Intention intention = ts.getC().getPendingIntentions().remove(m.getMsgId());
+                            if (intention != null) {
+                                // unify "timeout" with the fourth parameter of .send
+                                Structure send = (Structure)intention.peek().removeCurrentStep();
+                                intention.peek().getUnif().unifies(send.getTerm(3), new Atom("timeout"));
+                                // add the intention back in C.I
+                                ts.getC().addIntention(intention);
+                                System.out.println("OK");
+                            }
+                        }
+                    }, (long)((NumberTerm)tto).solve(), TimeUnit.MILLISECONDS);
                 } else {
                     throw new JasonException("The 5th parameter of send must be a number (timeout) and not '"+tto+"'!");
                 }
             }
             
             return true;
+        } catch (ArrayIndexOutOfBoundsException e) {
+            throw new JasonException("The internal action 'send' to '"+args[0]+"' has not received three arguments.");
+        } catch (JasonException e) {
+            throw e;
         } catch (Exception e) {
-            throw new JasonException("Error sending message " + m + "\nError: "+e, e);
+            throw new JasonException("Error sending message " + args + "\nError: "+e, e);
         }
     }
 
     @Override
     public boolean suspendIntention() {
         return lastSendWasSynAsk;
-    }
-    
-    
-    private static Structure timeoutTerm = new Structure("timeout");
-    
-    class CheckTimeout extends Thread {
-        
-        private long timeout = 0;
-        private String idInPending;
-        private Circumstance c;
-        
-        public CheckTimeout(long to, String rw, Circumstance c) {
-            this.timeout = to;
-            this.idInPending = rw;
-            this.c = c;
-        }
-        
-        public void run() {
-            try {
-                sleep(timeout);
-
-                // if the intention is still in PI, brings it back to C.I
-                Intention intention = c.getPendingIntentions().remove(idInPending);
-                if (intention != null) {
-                    // unify "timeout" with the fourth parameter of .send
-                    Structure send = (Structure)intention.peek().removeCurrentStep();
-                    intention.peek().getUnif().unifies(send.getTerm(3), timeoutTerm);
-                    // add the intention back in C.I
-                    c.addIntention(intention);
-                }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-    }
+    }    
 }
