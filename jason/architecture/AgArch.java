@@ -25,6 +25,7 @@ package jason.architecture;
 import jason.JasonException;
 import jason.asSemantics.ActionExec;
 import jason.asSemantics.Agent;
+import jason.asSemantics.Circumstance;
 import jason.asSemantics.Message;
 import jason.asSemantics.TransitionSystem;
 import jason.asSyntax.Literal;
@@ -71,9 +72,14 @@ public class AgArch {
         // set the agent
         try {
             Agent ag = (Agent) Class.forName(agClass).newInstance();
+            
+            new TransitionSystem(ag, new Circumstance(), stts, this);
+
             BeliefBase bb = (BeliefBase) Class.forName(bbPars.getClassName()).newInstance();
-            ts = ag.initAg(this, bb, asSrc, stts);
+            ag.setBB(bb); // the agent's BB have to be already set for the BB initialisation
             bb.init(ag, bbPars.getParametersArray());
+            
+            ag.initAg(asSrc); // load the source code of the agent
         } catch (Exception e) {
             throw new JasonException("as2j: error creating the agent class! - ", e);
         }

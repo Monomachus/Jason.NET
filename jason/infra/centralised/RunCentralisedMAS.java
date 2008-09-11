@@ -370,7 +370,7 @@ public class RunCentralisedMAS {
                         agArch.initAg(ap.archClass.getClassName(), pag, this);
                     } else {
                         // normal creation
-                        agArch.initAg(ap.archClass.getClassName(), ap.agClass.getClassName(), ap.bbClass, ap.asSource.toString(), ap.getAsSetts(debug, project.getControlClass() != null), this);
+                        agArch.initAg(ap.archClass.getClassName(), ap.agClass.getClassName(), ap.getBBClass(), ap.asSource.toString(), ap.getAsSetts(debug, project.getControlClass() != null), this);
                     }
                     addAg(agArch);
                     

@@ -96,7 +96,7 @@ public class CentralisedAgArch implements Runnable, AgArchInfraTier {
             setLogger();
         } catch (Exception e) {
             running = false;
-            throw new JasonException("as2j: error creating the agent class! - ", e);
+            throw new JasonException("as2j: error creating the agent class! - "+e.getMessage(), e);
         }
     }
 

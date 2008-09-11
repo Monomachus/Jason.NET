@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -77,7 +78,7 @@ import java.util.logging.Logger;
   
    @author Jomi
  */
-public class JDBCPersistentBB extends DefaultBeliefBase {
+public class JDBCPersistentBB extends ChainBBAdapter {
     private static Logger logger     = Logger.getLogger(JDBCPersistentBB.class.getName());
 
     static final String   COL_PREFIX = "term";
@@ -94,6 +95,11 @@ public class JDBCPersistentBB extends DefaultBeliefBase {
     public JDBCPersistentBB() {
         extraCols = 2;
     }
+    public JDBCPersistentBB(BeliefBase next) {
+        super(next);
+        extraCols = 2;
+    }
+    
     
     // map of bels in DB
     protected Map<PredicateIndicator, ResultSetMetaData> belsDB = new HashMap<PredicateIndicator, ResultSetMetaData>();
@@ -150,6 +156,7 @@ public class JDBCPersistentBB extends DefaultBeliefBase {
         } catch (SQLException e) {
             logger.log(Level.SEVERE, "DB connection failure. url= " + url + ", user=" + args[2] + ", password=" + args[3], e);
         }
+        nextBB.init(ag, args);
     }
 
     @Override
@@ -164,6 +171,7 @@ public class JDBCPersistentBB extends DefaultBeliefBase {
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error in shutdown SGBD ", e);
         }
+        nextBB.stop();
     }
 
     /** returns true if the literal is stored in a DB */
@@ -186,7 +194,7 @@ public class JDBCPersistentBB extends DefaultBeliefBase {
     @Override
     public Literal contains(Literal l) {
         if (!isDB(l))
-            return super.contains(l);
+            return nextBB.contains(l);
 
         Statement stmt = null;
         try {
@@ -213,7 +221,7 @@ public class JDBCPersistentBB extends DefaultBeliefBase {
     @Override
     public boolean add(Literal l) {
         if (!isDB(l))
-            return super.add(l);
+            return nextBB.add(l);
 
         Literal bl = contains(l);
         Statement stmt = null;
@@ -230,7 +238,7 @@ public class JDBCPersistentBB extends DefaultBeliefBase {
                         
                         // check if it needs to be added in the percepts list
                         if (l.hasAnnot(TPercept)) {
-                            percepts.add(bl);
+                            getDBBPercepts().add(bl);
                         }
 
                         // store bl annots
@@ -245,7 +253,7 @@ public class JDBCPersistentBB extends DefaultBeliefBase {
                 stmt.executeUpdate(getInsert(l));
                 // add it in the percepts list
                 if (l.hasAnnot(TPercept)) {
-                    percepts.add(l);
+                    getDBBPercepts().add(l);
                 }
                 return true;
             }
@@ -261,11 +269,10 @@ public class JDBCPersistentBB extends DefaultBeliefBase {
         return false;
     }
 
-    
     @Override
     public boolean remove(Literal l) {
         if (!isDB(l))
-            return super.add(l);
+            return nextBB.remove(l);
 
         Literal bl = contains(l);
         if (bl != null) {
@@ -273,7 +280,7 @@ public class JDBCPersistentBB extends DefaultBeliefBase {
             try {
                 if (l.hasSubsetAnnot(bl)) {
                     if (l.hasAnnot(TPercept)) {
-                        percepts.remove(bl);
+                        getDBBPercepts().remove(bl);
                     }
                     boolean result = bl.delAnnot(l) || !bl.hasAnnot();
                     stmt = conn.createStatement();
@@ -299,11 +306,19 @@ public class JDBCPersistentBB extends DefaultBeliefBase {
         return false;
     }
 
+    private Set<Literal> getDBBPercepts() {
+        BeliefBase last = getLastBB();
+        if (last instanceof DefaultBeliefBase) 
+            return ((DefaultBeliefBase)last).getPerceptsSet();
+        else
+            return null;    
+    }
+    
     
     @Override
     public boolean abolish(PredicateIndicator pi) {
         if (belsDB.get(pi) == null)
-            return super.abolish(pi);
+            return nextBB.abolish(pi);
 
         Statement stmt = null;
         try {
@@ -326,7 +341,7 @@ public class JDBCPersistentBB extends DefaultBeliefBase {
     public Iterator<Literal> getCandidateBeliefs(Literal l, Unifier u) {
         final PredicateIndicator pi = l.getPredicateIndicator();
         if (belsDB.get(pi) == null)
-            return super.getCandidateBeliefs(l, u);
+            return nextBB.getCandidateBeliefs(l, u);
         
         if (l.isVar()) {
             // all bels are relevant
@@ -401,14 +416,14 @@ public class JDBCPersistentBB extends DefaultBeliefBase {
                 logger.log(Level.WARNING, "SQL Error closing connection", e);
             }
         }
-        return count + super.size();
+        return count + nextBB.size();
     }
     
     @Override
     public Iterator<Literal> iterator() {
         List<Literal> all = new ArrayList<Literal>(size());
         
-        Iterator<Literal> is = super.iterator();
+        Iterator<Literal> is = nextBB.iterator();
         while (is.hasNext()) {
             all.add(is.next());
         }

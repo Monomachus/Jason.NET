@@ -42,7 +42,6 @@ import jason.bb.BeliefBase;
 import jason.bb.DefaultBeliefBase;
 import jason.functions.Count;
 import jason.functions.RuleToFunction;
-import jason.runtime.Settings;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -103,31 +102,11 @@ public class Agent {
         checkCustomSelectOption();
     }
 
-    private void checkCustomSelectOption() {
-        hasCustomSelOp = false;
-        for (Method m: this.getClass().getMethods()) {
-            if (!m.getDeclaringClass().equals(Agent.class) && m.getName().equals("selectOption")) {
-                hasCustomSelOp = true;
-            }
-        }
-    }
-    
-    public boolean hasCustomSelectOption() {
-        return hasCustomSelOp;
-    }
-    
-    /** Creates the TS of this agent, parses its AS source, and sets its Settings */
-    public TransitionSystem initAg(AgArch arch, BeliefBase bb, String asSrc, Settings stts) throws JasonException {
+    /** parse and load the agent code, asSrc may be null */
+    public TransitionSystem initAg(String asSrc) throws JasonException {
         // set the agent
         try {
-            setLogger(arch);
-            logger.setLevel(stts.logLevel());
-
-            if (bb != null)
-                this.bb = bb;
-            
             initDefaultFunctions();
-            setTS(new TransitionSystem(this, new Circumstance(), stts, arch));
 
             boolean parsingOk = true;
             if (asSrc != null) {
@@ -160,7 +139,6 @@ public class Agent {
             } else {
                 logger.warning("The kqmlPlans.asl was not found!");
             }
-            
 
             return ts;
         } catch (Exception e) {
@@ -444,12 +422,17 @@ public class Agent {
     /** TS Initialisation (called by the AgArch) */
     public void setTS(TransitionSystem ts) {
         this.ts = ts;
+        setLogger(ts.getUserAgArch());
+        logger.setLevel(ts.getSettings().logLevel());        
     }
 
     public TransitionSystem getTS() {
         return ts;
     }
 
+    public void setBB(BeliefBase bb) {
+        this.bb = bb;
+    }
     public BeliefBase getBB() {
         return bb;
     }
@@ -686,6 +669,19 @@ public class Agent {
         }
     }
 
+    private void checkCustomSelectOption() {
+        hasCustomSelOp = false;
+        for (Method m: this.getClass().getMethods()) {
+            if (!m.getDeclaringClass().equals(Agent.class) && m.getName().equals("selectOption")) {
+                hasCustomSelOp = true;
+            }
+        }
+    }
+    
+    public boolean hasCustomSelectOption() {
+        return hasCustomSelOp;
+    }
+    
     static DocumentBuilder builder = null;
 
     /** Gets the agent "mind" (Beliefs, plans and circumstance) as XML */

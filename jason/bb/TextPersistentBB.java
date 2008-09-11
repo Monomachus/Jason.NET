@@ -1,6 +1,5 @@
 package jason.bb;
 
-import jason.RevisionFailedException;
 import jason.asSemantics.Agent;
 import jason.asSyntax.Literal;
 
@@ -16,21 +15,28 @@ import java.util.logging.Logger;
  * beliefs in the file; when the agent stops, save the BB in the file.
  * The file name is the agent's name + ".bb".
  */
-public class TextPersistentBB extends DefaultBeliefBase {
+public class TextPersistentBB extends ChainBBAdapter {
     private static Logger logger = Logger.getLogger(TextPersistentBB.class.getName());
 
-    File file = null;
+    private File file = null;
+    
+    public TextPersistentBB() { }
+    public TextPersistentBB(BeliefBase next) {
+        super(next);
+    }
 
     public void init(Agent ag, String[] args) {
-        try {
-            file = new File(ag.getTS().getUserAgArch().getAgName() + ".bb");
-            logger.fine("reading from file " + file);
-            if (file.exists()) {
-                ag.parseAS(file.getAbsoluteFile());
+        if (ag != null) {
+            try {
+                file = new File(ag.getTS().getUserAgArch().getAgName() + ".bb");
+                logger.fine("reading from file " + file);
+                if (file.exists()) {
+                    ag.parseAS(file.getAbsoluteFile());
                     ag.addInitialBelsInBB();
+                }
+            } catch (Exception e) {
+                logger.log(Level.SEVERE,"Error initialising TextPersistentBB.",e);
             }
-        } catch (RevisionFailedException e) {
-            logger.log(Level.SEVERE,"Error in init.",e);
         }
     }
 
@@ -48,5 +54,6 @@ public class TextPersistentBB extends DefaultBeliefBase {
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error writing BB in file " + file, e);
         }
+        nextBB.stop();
     }
 }

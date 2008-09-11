@@ -238,7 +238,7 @@ public class MAS2JProject {
         s.append("MAS " + getSocName() + " {\n");
 		s.append("   infrastructure: "+getInfrastructure()+"\n\n");
 		
-		if (! getEnvClass().getClassName().equals(jason.environment.Environment.class.getName())) {
+		if (getEnvClass() != null && ! getEnvClass().getClassName().equals(jason.environment.Environment.class.getName())) {
 			s.append("   environment: "+getEnvClass());
 			if (envClass.getHost() != null) {
 				s.append(" at "+envClass.getHost());

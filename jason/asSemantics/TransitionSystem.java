@@ -96,6 +96,12 @@ public class TransitionSystem {
         setLogger(agArch);
         if (setts != null)
             logger.setLevel(setts.logLevel());
+        
+        if (a != null)
+            a.setTS(this);
+        
+        if (ar != null)
+            ar.setTS(this);
     }
 
     public void setLogger(AgArch arch) {

@@ -1,5 +1,7 @@
 package test;
 
+import jason.asSyntax.Literal;
+import jason.bb.ChainBB;
 import jason.mas2j.MAS2JProject;
 import jason.mas2j.parser.mas2j;
 
@@ -31,7 +33,7 @@ public class MAS2JParserTest extends TestCase {
         boolean ok = true;
         try {
             MAS2JProject project = parser.mas();
-            System.out.println(project);
+            //System.out.println(project);
             parser = new mas2j(new StringReader(project.toString()));
             parser.mas();
         } catch (Exception e) {
@@ -43,7 +45,7 @@ public class MAS2JParserTest extends TestCase {
     }
 
 	@SuppressWarnings("unchecked")
-	public void testParser() {
+	public void testParser1() {
 		try {
 			MAS2JProject project = parser.mas();
 	    	project.setDirectory("/tmp");
@@ -62,4 +64,22 @@ public class MAS2JParserTest extends TestCase {
 		}
 	}
 
+    public void testClassParForChainBB() throws Exception {
+        StringBuffer source = new StringBuffer("MAS auctionCent { ");
+        source.append("agents: bob beliefBaseClass jason.bb.ChainBB(jason.bb.TextPersistentBB, ");
+        source.append("jason.bb.IndexedBB(\"student(key,_)\", \"depot(_,_,_)\"));");
+        source.append(" }");
+        parser = new mas2j(new StringReader(source.toString()));
+
+        MAS2JProject project = parser.mas();
+        
+        assertEquals(2,  project.getAg("bob").getBBClass().getParametersArray().length);
+        
+        ChainBB bb = new ChainBB();
+        bb.init(null, project.getAg("bob").getBBClass().getParametersArray());
+        
+        bb.add(Literal.parseLiteral("b(1)"));
+    }
+	
+	
 }

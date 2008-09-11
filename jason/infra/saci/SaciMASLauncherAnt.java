@@ -190,7 +190,7 @@ public class SaciMASLauncherAnt extends CentralisedMASLauncherAnt implements MAS
             tmpAgArchClass = new ClassParameters(AgArch.class.getName());
         }
         
-        ClassParameters tmpBBClass = agp.bbClass;
+        ClassParameters tmpBBClass = agp.getBBClass();
         if (tmpBBClass == null) {
             tmpBBClass = new ClassParameters(DefaultBeliefBase.class.getName());
         }

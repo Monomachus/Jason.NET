@@ -59,7 +59,7 @@ public class DefaultBeliefBase implements BeliefBase {
     private int size = 0;
 
     /** set of beliefs with percept annot, used to improve performance of buf */
-    protected Set<Literal> percepts = new HashSet<Literal>();
+    private Set<Literal> percepts = new HashSet<Literal>();
 
     public void init(Agent ag, String[] args) {
         if (ag != null) {
@@ -103,6 +103,10 @@ public class DefaultBeliefBase implements BeliefBase {
         //return ((Set<Literal>)percepts.clone()).iterator();        
     }
 
+    Set<Literal> getPerceptsSet() {
+        return percepts;
+    }
+    
     public boolean add(Literal l) {
         return add(l, false);
     }

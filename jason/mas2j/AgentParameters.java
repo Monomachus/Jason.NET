@@ -54,6 +54,10 @@ public class AgentParameters {
     	}
     }
     
+    public ClassParameters getBBClass() {
+        return bbClass;
+    }
+    
     public void setAgClass(String c) {
         if (c != null) agClass = new ClassParameters(c);
     }

@@ -253,7 +253,7 @@ File fileName() :           { String path = "";
 }
 
 
-ClassParameters classDef() :  { Token c; String p = ""; ClassParameters cp = new ClassParameters(); }
+ClassParameters classDef() :  { Token c; String s; ClassParameters cp = new ClassParameters(); }
 {
    (c = <ID> | c = <ASID>)              { cp.setClassName(c.image); }
    (
@@ -262,9 +262,9 @@ ClassParameters classDef() :  { Token c; String p = ""; ClassParameters cp = new
    [
      "("
 	   [
-	     (c=<ID> | c=<ASID> | c=<NUMBER> | c=<STRING>)        { cp.addParameter(c.image); }
+	     (s=parameter())                { cp.addParameter(s); }
    	     ( 
-   	       "," (c=<ID> | c=<ASID> | c=<NUMBER> | c=<STRING>)  { cp.addParameter(c.image); }
+   	       "," (s=parameter())          { cp.addParameter(s); }
    	     )*
    	   ]
      ")"
@@ -272,14 +272,32 @@ ClassParameters classDef() :  { Token c; String p = ""; ClassParameters cp = new
                            { return cp; }
 }
 
+String parameter() :       { Token c; String s; ClassParameters cp; }
+{
+      ( cp=classDef()      { return cp.toString(); }
+      | c=<NUMBER>         { return c.image; }
+      | c=<STRING>         { return c.image; }
+      | s=listParameters() { return s; }
+      ) 
+}
 
 
-Map ASoptions() :          { Map opts = new HashMap(); }
+String listParameters() :  { String s; List l = new ArrayList(); }
+{
+     "["
+	     (s=parameter())       { l.add(s); }
+   	     ( 
+   	       "," s=parameter()   { l.add(s); }
+   	     )*
+     "]"
+                               { return l.toString(); }
+}
+
+
+Map ASoptions() :              { Map opts = new HashMap(); }
 {
   [ "[" opts = procOption(opts) ( "," opts = procOption(opts) )* "]" ]
-  {
-    return opts; 
-  }
+                               { return opts;  }
 }
 
 Map procOption(Map opts): { Token opt; Token oval; }

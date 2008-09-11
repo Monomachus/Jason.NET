@@ -214,7 +214,7 @@ public class mas2j implements mas2jConstants {
   }
 
   final public ClassParameters classDef() throws ParseException {
-                                Token c; String p = ""; ClassParameters cp = new ClassParameters();
+                                Token c; String s; ClassParameters cp = new ClassParameters();
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case ID:
       c = jj_consume_token(ID);
@@ -261,25 +261,9 @@ public class mas2j implements mas2jConstants {
       case STRING:
       case ASID:
       case ID:
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-        case ID:
-          c = jj_consume_token(ID);
-          break;
-        case ASID:
-          c = jj_consume_token(ASID);
-          break;
-        case NUMBER:
-          c = jj_consume_token(NUMBER);
-          break;
-        case STRING:
-          c = jj_consume_token(STRING);
-          break;
-        default:
-          jj_la1[10] = jj_gen;
-          jj_consume_token(-1);
-          throw new ParseException();
-        }
-                                                                    cp.addParameter(c.image);
+      case 46:
+        s = parameter();
+                                              cp.addParameter(s);
         label_4:
         while (true) {
           switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -287,52 +271,87 @@ public class mas2j implements mas2jConstants {
             ;
             break;
           default:
-            jj_la1[11] = jj_gen;
+            jj_la1[10] = jj_gen;
             break label_4;
           }
           jj_consume_token(44);
-          switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-          case ID:
-            c = jj_consume_token(ID);
-            break;
-          case ASID:
-            c = jj_consume_token(ASID);
-            break;
-          case NUMBER:
-            c = jj_consume_token(NUMBER);
-            break;
-          case STRING:
-            c = jj_consume_token(STRING);
-            break;
-          default:
-            jj_la1[12] = jj_gen;
-            jj_consume_token(-1);
-            throw new ParseException();
-          }
-                                                                    cp.addParameter(c.image);
+          s = parameter();
+                                              cp.addParameter(s);
         }
         break;
       default:
-        jj_la1[13] = jj_gen;
+        jj_la1[11] = jj_gen;
         ;
       }
       jj_consume_token(45);
       break;
     default:
-      jj_la1[14] = jj_gen;
+      jj_la1[12] = jj_gen;
       ;
     }
                              {if (true) return cp;}
     throw new Error("Missing return statement in function");
   }
 
+  final public String parameter() throws ParseException {
+                             Token c; String s; ClassParameters cp;
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case ASID:
+    case ID:
+      cp = classDef();
+                             {if (true) return cp.toString();}
+      break;
+    case NUMBER:
+      c = jj_consume_token(NUMBER);
+                             {if (true) return c.image;}
+      break;
+    case STRING:
+      c = jj_consume_token(STRING);
+                             {if (true) return c.image;}
+      break;
+    case 46:
+      s = listParameters();
+                             {if (true) return s;}
+      break;
+    default:
+      jj_la1[13] = jj_gen;
+      jj_consume_token(-1);
+      throw new ParseException();
+    }
+    throw new Error("Missing return statement in function");
+  }
+
+  final public String listParameters() throws ParseException {
+                             String s; List l = new ArrayList();
+    jj_consume_token(46);
+    s = parameter();
+                                     l.add(s);
+    label_5:
+    while (true) {
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case 44:
+        ;
+        break;
+      default:
+        jj_la1[14] = jj_gen;
+        break label_5;
+      }
+      jj_consume_token(44);
+      s = parameter();
+                                     l.add(s);
+    }
+    jj_consume_token(47);
+                                 {if (true) return l.toString();}
+    throw new Error("Missing return statement in function");
+  }
+
   final public Map ASoptions() throws ParseException {
-                             Map opts = new HashMap();
+                                 Map opts = new HashMap();
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case 46:
       jj_consume_token(46);
       opts = procOption(opts);
-      label_5:
+      label_6:
       while (true) {
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case 44:
@@ -340,7 +359,7 @@ public class mas2j implements mas2jConstants {
           break;
         default:
           jj_la1[15] = jj_gen;
-          break label_5;
+          break label_6;
         }
         jj_consume_token(44);
         opts = procOption(opts);
@@ -351,7 +370,7 @@ public class mas2j implements mas2jConstants {
       jj_la1[16] = jj_gen;
       ;
     }
-    {if (true) return opts;}
+                                 {if (true) return opts;}
     throw new Error("Missing return statement in function");
   }
 
@@ -481,7 +500,7 @@ public class mas2j implements mas2jConstants {
     case CLASSPATH:
       jj_consume_token(CLASSPATH);
       jj_consume_token(39);
-      label_6:
+      label_7:
       while (true) {
         cp = jj_consume_token(STRING);
         jj_consume_token(41);
@@ -492,7 +511,7 @@ public class mas2j implements mas2jConstants {
           break;
         default:
           jj_la1[23] = jj_gen;
-          break label_6;
+          break label_7;
         }
       }
       break;
@@ -508,7 +527,7 @@ public class mas2j implements mas2jConstants {
     case SOURCEPATH:
       jj_consume_token(SOURCEPATH);
       jj_consume_token(39);
-      label_7:
+      label_8:
       while (true) {
         cp = jj_consume_token(STRING);
         jj_consume_token(41);
@@ -519,7 +538,7 @@ public class mas2j implements mas2jConstants {
           break;
         default:
           jj_la1[25] = jj_gen;
-          break label_7;
+          break label_8;
         }
       }
       break;
@@ -535,7 +554,7 @@ public class mas2j implements mas2jConstants {
     case DIRECTIVE:
       jj_consume_token(DIRECTIVE);
       jj_consume_token(39);
-      label_8:
+      label_9:
       while (true) {
         directiveId = jj_consume_token(ASID);
         jj_consume_token(48);
@@ -548,7 +567,7 @@ public class mas2j implements mas2jConstants {
           break;
         default:
           jj_la1[27] = jj_gen;
-          break label_8;
+          break label_9;
         }
       }
       break;
@@ -571,10 +590,10 @@ public class mas2j implements mas2jConstants {
       jj_la1_1();
    }
    private static void jj_la1_0() {
-      jj_la1_0 = new int[] {0x1000,0x20000000,0xa0000000,0x7000800,0x7000800,0x80000000,0x0,0x60000000,0x0,0x60000000,0x78000000,0x0,0x78000000,0x78000000,0x0,0x0,0x0,0x78000000,0x205a8000,0x800,0x200,0x800,0x400,0x10000000,0x2000,0x10000000,0x4000,0x20000000,0x200000,};
+      jj_la1_0 = new int[] {0x1000,0x20000000,0xa0000000,0x7000800,0x7000800,0x80000000,0x0,0x60000000,0x0,0x60000000,0x0,0x78000000,0x0,0x78000000,0x0,0x0,0x0,0x78000000,0x205a8000,0x800,0x200,0x800,0x400,0x10000000,0x2000,0x10000000,0x4000,0x20000000,0x200000,};
    }
    private static void jj_la1_1() {
-      jj_la1_1 = new int[] {0x0,0x0,0x0,0x100,0x100,0x0,0x400,0x0,0x400,0x0,0x0,0x1000,0x0,0x0,0x800,0x1000,0x4000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,};
+      jj_la1_1 = new int[] {0x0,0x0,0x0,0x100,0x100,0x0,0x400,0x0,0x400,0x0,0x1000,0x4000,0x800,0x4000,0x1000,0x1000,0x4000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,};
    }
 
   public mas2j(java.io.InputStream stream) {

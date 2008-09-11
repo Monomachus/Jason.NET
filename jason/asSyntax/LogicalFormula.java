@@ -2,7 +2,6 @@ package jason.asSyntax;
 
 import jason.asSemantics.Agent;
 import jason.asSemantics.Unifier;
-import jason.util.ToDOM;
 
 import java.util.Iterator;
 
@@ -12,7 +11,7 @@ import java.util.Iterator;
  * 
  * @author Jomi
  */
-public interface LogicalFormula extends Term, Cloneable, ToDOM {
+public interface LogicalFormula extends Term, Cloneable {
     /**
      * Checks whether the formula is a
      * logical consequence of the belief base.
