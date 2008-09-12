@@ -42,6 +42,7 @@ import jason.bb.BeliefBase;
 import jason.bb.DefaultBeliefBase;
 import jason.functions.Count;
 import jason.functions.RuleToFunction;
+import jason.runtime.Settings;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -103,7 +104,7 @@ public class Agent {
     }
 
     /** parse and load the agent code, asSrc may be null */
-    public TransitionSystem initAg(String asSrc) throws JasonException {
+    public void initAg(String asSrc) throws JasonException {
         // set the agent
         try {
             initDefaultFunctions();
@@ -139,14 +140,38 @@ public class Agent {
             } else {
                 logger.warning("The kqmlPlans.asl was not found!");
             }
-
-            return ts;
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error creating the agent class!", e);
             throw new JasonException("Error creating the agent class! - " + e);
         }
     }
     
+    /** @deprecated Prefer the initAg method with only the source code of the agent as parameter.
+     *  
+     *  A call of this method like
+     *     <pre>
+     *     TransitionSystem ts = ag.initAg(arch, bb, asSrc, stts)
+     *     </pre> 
+     *  can be replaced by
+     *     <pre>
+     *     new TransitionSystem(ag, new Circumstance(), stts, arch);
+     *     ag.setBB(bb); // only if you use a custom BB
+     *     ag.initAg(asSrc);
+     *     TransitionSystem ts = ag.getTS();
+     *     </pre> 
+     */
+    public TransitionSystem initAg(AgArch arch, BeliefBase bb, String asSrc, Settings stts) throws JasonException {
+        try {
+            if (bb != null) setBB(bb);
+            new TransitionSystem(this, new Circumstance(), stts, arch);
+            initAg(asSrc);
+            return ts;
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Error creating the agent class!", e);
+            throw new JasonException("Error creating the agent class! - " + e);
+        }
+    }
+
     public void stopAg() {
         bb.stop();
         
