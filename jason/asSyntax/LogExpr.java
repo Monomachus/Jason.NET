@@ -67,7 +67,17 @@ public class LogExpr extends BinaryStructure implements LogicalFormula {
 		super(oper.toString(),(Term)f);
 		op = oper;
 	}
-	
+
+    /** gets the LHS of this Expression */
+    public LogicalFormula getLHS() {
+        return (LogicalFormula)getTerm(0);
+    }
+    
+    /** gets the RHS of this Expression */
+    public LogicalFormula getRHS() {
+        return (LogicalFormula)getTerm(1);
+    }
+
     public Iterator<Unifier> logicalConsequence(final Agent ag, final Unifier un) {
         try {
 	        switch (op) {
