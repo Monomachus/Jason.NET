@@ -216,16 +216,6 @@ public class LogExpr extends BinaryStructure implements LogicalFormula {
 		return op;
 	}
 	
-	/** gets the LHS of this Expression */
-	public LogicalFormula getLHS() {
-		return (LogicalFormula)getTerm(0);
-	}
-	
-	/** gets the RHS of this Expression */
-	public LogicalFormula getRHS() {
-		return (LogicalFormula)getTerm(1);
-	}
-
     /** get as XML */
     public Element getAsDOM(Document document) {
         Element u = super.getAsDOM(document);

@@ -87,7 +87,7 @@ public class PlanLibrary implements Iterable<Plan> {
     			if (i < 0) {
     		        // add label, if necessary
     		        if (p.getLabel() == null) {
-    		        	setAutoLabel(p);
+    		        	p.setLabel(getUniqueLabel());
     		        }
     				p.getLabel().addSource(tSource);
     				add(p);
@@ -104,8 +104,19 @@ public class PlanLibrary implements Iterable<Plan> {
 	}
 
 
-	
     public void add(Plan p) throws JasonException {
+        add(p,false);
+    }
+    
+    /**
+     * Adds a plan into the plan library, either before or after all other
+     * plans depending on the boolean parameter.
+     * 
+     * @param p The plan to be added to the plan library
+     * @param before Whether or not to place the new plan before others
+     * @throws JasonException
+     */
+    public void add(Plan p, boolean before) throws JasonException {
         // test p.label
         if (p.getLabel() != null && planLabels.keySet().contains(p.getLabel().getFunctor())) {
             // test if the new plan is equal, in this case, just add a source
@@ -119,7 +130,8 @@ public class PlanLibrary implements Iterable<Plan> {
         }
         
         // add label, if necessary
-        if (p.getLabel() == null) setAutoLabel(p);
+        if (p.getLabel() == null) 
+            p.setLabel(getUniqueLabel());
 
         // add self source
         if (!p.getLabel().hasSource()) p.getLabel().addAnnot(BeliefBase.TSelf);
@@ -128,11 +140,17 @@ public class PlanLibrary implements Iterable<Plan> {
 
         Trigger pte = p.getTrigger();
         if (pte.getLiteral().isVar()) {
-            varPlans.add(p);
+            if (before) 
+                varPlans.add(0,p); 
+            else 
+                varPlans.add(p);
             // add plan p in all entries
             for (List<Plan> lp: relPlans.values())
             	if (!lp.isEmpty() && lp.get(0).getTrigger().sameType(pte)) // only add if same type
-            		lp.add(p);
+            	    if (before)
+            	        lp.add(0,p);
+            	    else
+            	        lp.add(p);
         } else {
             List<Plan> codesList = relPlans.get(pte.getPredicateIndicator());
             if (codesList == null) {
@@ -140,13 +158,19 @@ public class PlanLibrary implements Iterable<Plan> {
                 // copy plans from var plans
                 for (Plan vp: varPlans)
                 	if (vp.getTrigger().sameType(pte))
-                		codesList.add(vp);
+                	    codesList.add(vp);
                 relPlans.put(pte.getPredicateIndicator(), codesList);
             }
-            codesList.add(p);
+            if (before)
+                codesList.add(0,p);
+            else
+                codesList.add(p);
         }
 
-        plans.add(p);
+        if (before)
+            plans.add(0,p);
+        else
+            plans.add(p);
     }
     
 	public void addAll(PlanLibrary pl) throws JasonException {
@@ -162,12 +186,12 @@ public class PlanLibrary implements Iterable<Plan> {
 	}
 
 	/** add a label to the plan */
-	private void setAutoLabel(Plan p) {
+	private Pred getUniqueLabel() {
         String l;
         do {
             l = "l__" + (lastPlanLabel++);
         } while (planLabels.keySet().contains(l));
-        p.setLabel(new Pred(l));
+        return new Pred(l);
 	}
     
 	/** return a plan for a label */

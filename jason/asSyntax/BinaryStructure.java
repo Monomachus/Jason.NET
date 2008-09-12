@@ -51,6 +51,16 @@ public abstract class BinaryStructure extends Structure {
 		return getArity() == 1;
 	}
 	
+    /** gets the LHS of this Expression */
+    public LogicalFormula getLHS() {
+        return (LogicalFormula)getTerm(0);
+    }
+    
+    /** gets the RHS of this Expression */
+    public LogicalFormula getRHS() {
+        return (LogicalFormula)getTerm(1);
+    }
+
     @Override
     public String toString() {
 		if (isUnary()) {

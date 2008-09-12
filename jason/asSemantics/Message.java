@@ -24,8 +24,12 @@
 
 package jason.asSemantics;
 
+import jason.asSyntax.DefaultTerm;
 
-public class Message {
+import java.io.Serializable;
+
+
+public class Message implements Serializable {
     
     private String ilForce  = null;
     private String sender   = null;
@@ -126,6 +130,39 @@ public class Message {
         return new Message(this);
     }
 	
+    /**
+     * Creates a new message object based on a string that 
+     * follows the format of the toString of Message class.
+     * 
+     * @author Rogier
+     * @param msg the string message
+     * @return the parsed Message
+     */
+    public static Message parseMsg(String msg) {
+        int one, two;
+        Message newmsg = new Message();
+        if (msg.startsWith("<")) {
+            one = msg.indexOf(",");
+            int arrowIndex = msg.indexOf("->");
+            if (one < arrowIndex) { // If there is an arrow before the first comma
+                newmsg.msgId = msg.substring(1, arrowIndex);
+                newmsg.inReplyTo = msg.substring(arrowIndex + 2, one);
+            } else { // If not (either there is no arrow, or there is one behind the first comma)
+                newmsg.msgId = msg.substring(1, one);
+            }
+            two = msg.indexOf(",", one + 1);
+            newmsg.sender = msg.substring(one + 1, two);
+            one = msg.indexOf(",", two + 1);
+            newmsg.ilForce = msg.substring(two + 1, one);
+            two = msg.indexOf(",", one + 1);
+            newmsg.receiver = msg.substring(one + 1, two);
+            one = msg.indexOf(">", two + 1);
+            String content = msg.substring(two + 1, one);
+            newmsg.propCont = DefaultTerm.parse(content);
+        }
+        return newmsg;
+    }
+    
 	public String toString() {
 		String irt = (inReplyTo == null ? "" : "->"+inReplyTo);
         return "<"+msgId+irt+","+sender+","+ilForce+","+receiver+","+propCont+">";
