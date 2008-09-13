@@ -32,7 +32,7 @@ public class DG implements Directive {
             
             // add ?g in the end of all inner plans
             for (Plan p: innerContent.getPL()) {
-                PlanBody b = new PlanBodyImpl(BodyType.test, (Literal)goal.clone());
+                PlanBody b = new PlanBodyImpl(BodyType.test, goal.copy());
                 p.getBody().add(b);
                 newAg.getPL().add(p);
             }

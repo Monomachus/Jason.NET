@@ -255,7 +255,7 @@ public class DefaultBeliefBase implements BeliefBase {
     public Object clone() {
     	DefaultBeliefBase bb = new DefaultBeliefBase();
     	for (Literal b: this) {
-    		bb.add(1,(Literal)b.clone());
+    		bb.add(1, b.copy());
     	}
     	return bb;
     }
@@ -308,7 +308,7 @@ public class DefaultBeliefBase implements BeliefBase {
         protected Object clone() {
         	BelEntry be = new BelEntry();
         	for (Literal l: list) {
-        		be.add((Literal)l.clone(), false);
+        		be.add(l.copy(), false);
         	}
         	return be;
         }

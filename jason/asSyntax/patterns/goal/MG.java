@@ -35,7 +35,7 @@ public class MG implements Directive {
             Agent newAg = sd.process(subDir, outerContent, innerContent); 
             if (newAg != null) {
                 // add bel g
-                Literal ig = (Literal)goal.clone();
+                Literal ig = goal.copy();
                 ig.addAnnot(BeliefBase.TPercept);
             	newAg.addInitialBel(goal);
 

@@ -505,7 +505,7 @@ public class Agent {
                 
                 Trigger te = new Trigger(TEOperator.del, TEType.belief, l);
                 if (ts.getC().hasListener() || pl.hasCandidatePlan(te)) {
-                    l = (Literal)l.clone();
+                    l = l.copy();
                     l.clearAnnots();
                     l.addAnnot(BeliefBase.TPercept);
                     te.setLiteral(l);
@@ -529,7 +529,7 @@ public class Agent {
         // checking all percepts for new beliefs
         for (Literal lp : percepts) {
             try {
-                lp = (Literal) lp.clone();
+                lp = lp.copy();
                 lp.addAnnot(BeliefBase.TPercept);
                 if (getBB().add(lp)) {
                     Trigger te = new Trigger(TEOperator.add, TEType.belief, lp);

@@ -124,11 +124,14 @@ public class Trigger implements Cloneable {
 	}
 
 	public Object clone() {
-        Trigger c = new Trigger(operator, type, (Literal)literal.clone());
-        c.piCache = this.piCache;
-        return c; 
+        return copy(); 
 	}
 
+    public Trigger copy() {
+        Trigger c = new Trigger(operator, type, literal.copy());
+        c.piCache = this.piCache;
+        return c; 
+    }	
     
 	/** return [+|-][!|?] super.getPredicateIndicator */
 	public PredicateIndicator getPredicateIndicator() {

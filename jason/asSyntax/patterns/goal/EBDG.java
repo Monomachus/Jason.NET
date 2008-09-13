@@ -56,7 +56,7 @@ public class EBDG implements Directive {
                 PlanBody b1 = new PlanBodyImpl(BodyType.addBel, pi);
                 p.getBody().add(0, b1);
                 // add ?g
-                PlanBody b2 = new PlanBodyImpl(BodyType.test, (Literal)goal.clone());
+                PlanBody b2 = new PlanBodyImpl(BodyType.test, goal.copy());
                 p.getBody().add(b2);
                 newAg.getPL().add(p);
             }

@@ -82,6 +82,10 @@ public class Rule extends Literal {
         return r; 
     }
 
+    public Literal headCopy() {
+        return (Literal)super.clone();        
+    }
+    /** @deprecated use headCopy */
     public Literal headClone() {
         return (Literal)super.clone();
     }

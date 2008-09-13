@@ -2,6 +2,7 @@
 
 package <PCK>;
 
+import jason.*;
 import jason.asSemantics.*;
 import jason.asSyntax.*;
 import java.util.logging.*;
@@ -12,12 +13,8 @@ public class <IA_NAME> extends DefaultInternalAction {
 
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
-        try {
-            logger.info("not implemented!");
-            return true;
-        } catch (Exception e) {
-            logger.warning("Error in internal action '<PCK>.<IA_NAME>'! "+e);
-        }
-        return false;
+        logger.info("executing internal action '<PCK>.<IA_NAME>'");
+        throw new JasonException("not implemented!");
+        //return true;
     }
 }

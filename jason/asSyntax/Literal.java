@@ -163,7 +163,7 @@ public class Literal extends Pred implements LogicalFormula {
                 while (ruleIt != null && ruleIt.hasNext()) {
                     // unifies the rule head with the result of rule evaluation
                     Unifier ruleUn = ruleIt.next(); // evaluation result
-                    Literal rhead  = rule.headClone();
+                    Literal rhead  = rule.headCopy();
                     rhead.apply(ruleUn);
                     rhead.makeVarsAnnon(ruleUn);
                     

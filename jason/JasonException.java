@@ -24,17 +24,26 @@
 
 package jason;
 
+import jason.asSyntax.Atom;
+import jason.asSyntax.ListTerm;
+import jason.asSyntax.ListTermImpl;
+import jason.asSyntax.StringTermImpl;
+import jason.asSyntax.Structure;
+import jason.asSyntax.Term;
+
 
 public class JasonException extends java.lang.Exception {
     
 	private static final long serialVersionUID = 1L;
+
+	private static final Term defaultError = new Atom("internal_action");
+	private Term error = defaultError;
 
 	/**
      * Creates a new instance of <code>JasonException</code> without detail message.
      */
     public JasonException() {
     }
-    
     
     /**
      * Constructs an instance of <code>JasonException</code> with the specified detail message.
@@ -44,9 +53,44 @@ public class JasonException extends java.lang.Exception {
         super(msg);
     }
 
+    /**
+     * Constructs an instance of <code>JasonException</code> with the specified detail message
+     * and error description term.
+     * 
+     * @param msg the detail message.
+     * @param error the term that details (in AgentSpeak) the error
+     */
+    public JasonException(String msg, Term error) {
+        super(msg);
+        this.error = error;
+    }
+
     public JasonException(String msg, Exception cause) {
         super(msg);
         initCause(cause);
     }
     
+    public JasonException(String msg, Term error, Exception cause) {
+        super(msg);
+        initCause(cause);
+        this.error = error;
+    }
+
+    public ListTerm getErrorTerms() {
+        return createBasicErrorAnnots(error, getMessage());
+    }
+    
+    public static ListTerm createBasicErrorAnnots(String id, String msg) {
+        return createBasicErrorAnnots(new Atom(id), msg);
+    }
+    public static ListTerm createBasicErrorAnnots(Term id, String msg) {
+        ListTerm failAnnots = new ListTermImpl();
+        Structure e = new Structure("error", 1);
+        e.addTerm(id);
+        failAnnots.add(e);
+        Structure m = new Structure("error_msg", 1);
+        m.addTerm(new StringTermImpl(msg));
+        failAnnots.add(m);
+        return failAnnots;
+    }
 }

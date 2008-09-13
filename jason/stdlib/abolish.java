@@ -27,6 +27,7 @@ import jason.JasonException;
 import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
+import jason.asSyntax.Atom;
 import jason.asSyntax.Literal;
 import jason.asSyntax.Term;
 
@@ -55,9 +56,7 @@ public class abolish extends DefaultInternalAction {
             ts.getAg().abolish((Literal)args[0], un);
             return true;
         } catch (ArrayIndexOutOfBoundsException e) {
-            throw new JasonException("The internal action 'abolish' has not received the required argument.");
-        } catch (Exception e) {
-            throw new JasonException("Error in internal action 'abolish': " + e, e);
+            throw new JasonException("The internal action 'abolish' has not received the required argument.", new Atom("wrong_arguments"));
         }
     }
 }

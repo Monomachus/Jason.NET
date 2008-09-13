@@ -27,14 +27,16 @@ import jason.JasonException;
 import jason.RevisionFailedException;
 import jason.architecture.AgArch;
 import jason.asSyntax.Atom;
-import jason.asSyntax.PlanBody;
 import jason.asSyntax.DefaultTerm;
 import jason.asSyntax.InternalActionLiteral;
 import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Literal;
 import jason.asSyntax.LogicalFormula;
+import jason.asSyntax.NumberTermImpl;
 import jason.asSyntax.Plan;
+import jason.asSyntax.PlanBody;
 import jason.asSyntax.PlanLibrary;
+import jason.asSyntax.StringTermImpl;
 import jason.asSyntax.Structure;
 import jason.asSyntax.Term;
 import jason.asSyntax.Trigger;
@@ -177,7 +179,7 @@ public class TransitionSystem {
                     getC().addIntention(intention);
                 } else {
                     conf.C.SI = intention;
-                    generateGoalDeletion();
+                    generateGoalDeletion(JasonException.createBasicErrorAnnots("ask_failed", ""));
                 }
 
                 // the message is not an ask answer
@@ -255,8 +257,9 @@ public class TransitionSystem {
         confP.step = State.ProcAct; // default next step
         if (conf.C.SE.trigger.isGoal()) {
             // can't carry on, no relevant/applicable plan.
-            logger.warning("Found a goal for which there is no "+m+" plan:" + conf.C.SE);
-            generateGoalDeletionFromEvent();
+            String msg = "Found a goal for which there is no "+m+" plan:" + conf.C.SE;
+            if (!generateGoalDeletionFromEvent(JasonException.createBasicErrorAnnots("no_"+m, msg))) 
+                logger.warning(msg);                
         } else {
             if (conf.C.SE.isInternal()) {
                 // e.g. belief addition as internal event, just go ahead
@@ -286,7 +289,7 @@ public class TransitionSystem {
             if (logger.isLoggable(Level.FINE)) logger.fine("Selected option "+confP.C.SO+" for event "+confP.C.SE);
         } else {
             logger.fine("** selectOption returned null!");
-            generateGoalDeletionFromEvent(); 
+            generateGoalDeletionFromEvent(JasonException.createBasicErrorAnnots("no_option", "selectOption returned null"));
             // can't carry on, no applicable plan.
             confP.step = State.ProcAct;
         }
@@ -301,7 +304,7 @@ public class TransitionSystem {
      */
     private void applyFindOp() throws JasonException {
         confP.step = State.AddIM; // default next step
-
+        
         // get all relevant plans for the selected event
         //Trigger te = (Trigger) conf.C.SE.trigger.clone();
         List<Plan> candidateRPs = conf.ag.pl.getCandidatePlans(conf.C.SE.trigger);
@@ -322,10 +325,11 @@ public class TransitionSystem {
                     } 
                 }
             }
-        }
-        
-        // problem: no plan
-        applyRelApplPlRule2("relevant/applicable");
+            applyRelApplPlRule2("applicable");   
+        } else {
+            // problem: no plan
+            applyRelApplPlRule2("relevant");   
+        }        
     }
     
     private void applyAddIM() throws JasonException {
@@ -361,7 +365,7 @@ public class TransitionSystem {
     	                updateIntention();
     	            	applyClrInt(confP.C.SI);
     	            } else {
-    	                generateGoalDeletion();
+    	                generateGoalDeletion(JasonException.createBasicErrorAnnots("action_failed", ""));
     	            }
                 } else {
                     applyProcAct(); // get next action
@@ -426,6 +430,7 @@ public class TransitionSystem {
 
         case internalAction:
             boolean ok = false;
+            List<Term> errorAnnots = null;
             try {
                 InternalAction ia = ((InternalActionLiteral)bTerm).getIA(ag);
                 Object oresult = ia.execute(this, u, body.getTermsArray());
@@ -439,17 +444,23 @@ public class TransitionSystem {
                             ok = true;
                         }
                     }
+                    if (!ok) { // IA returned false
+                        errorAnnots = JasonException.createBasicErrorAnnots("ia_failed", ""); 
+                    }
                 }
 
                 if (ok && !ia.suspendIntention())
                     updateIntention();
-                
+            } catch (JasonException e) {
+                errorAnnots = e.getErrorTerms();
+                if (!generateGoalDeletion(errorAnnots))
+                    logger.log(Level.SEVERE, body.getErrorMsg()+": "+ e.getMessage());
+                ok = true; // just to not generate the event again
             } catch (Exception e) {
                 logger.log(Level.SEVERE, body.getErrorMsg()+": "+ e.getMessage(), e);
-                ok = false;
             }
             if (!ok)
-                generateGoalDeletion();
+                generateGoalDeletion(errorAnnots);
 
             break;
 
@@ -459,8 +470,9 @@ public class TransitionSystem {
                 im.unif = iu.next();
                 updateIntention();
             } else {
-                if (logger.isLoggable(Level.FINE)) logger.fine("Constraint "+h+" was not satisfied ("+h.getErrorMsg()+").");
-                generateGoalDeletion();
+                String msg = "Constraint "+h+" was not satisfied ("+h.getErrorMsg()+").";
+                generateGoalDeletion(JasonException.createBasicErrorAnnots(new Atom("constraint_failed"), msg));
+                logger.fine(msg);
             }
             break;
 
@@ -627,6 +639,7 @@ public class TransitionSystem {
 
         // remove the finished IM from the top of the intention
         IntendedMeans topIM = i.pop();
+        Literal topLiteral = topIM.getTrigger().getLiteral();
         if (logger.isLoggable(Level.FINE)) logger.fine("Returning from IM "+topIM.getPlan().getLabel()+", te="+topIM.getPlan().getTrigger());
         
         // if finished a failure handling IM ...
@@ -641,12 +654,11 @@ public class TransitionSystem {
             // should became
             //   +!s: !z
         	im = i.peek();
-        	if (im.isFinished() || !im.unif.unifies(topIM.getTrigger().getLiteral(), im.getCurrentStep().getBodyTerm()))
+        	if (im.isFinished() || !im.unif.unifies(im.getCurrentStep().getBodyTerm(), topLiteral))
         		im = i.pop(); // +!c above
-        	
             while (i.size() > 0 &&
-            	   !im.unif.unifies(topIM.getTrigger().getLiteral(), im.getTrigger().getLiteral()) &&
-            	   !im.unif.unifies(topIM.getTrigger().getLiteral(), im.getCurrentStep().getBodyTerm())) {
+            	   !im.unif.unifies(im.getTrigger().getLiteral(), topLiteral) &&
+            	   !im.unif.unifies(im.getCurrentStep().getBodyTerm(), topLiteral)) {
                 im = i.pop();
             }
         }
@@ -654,16 +666,24 @@ public class TransitionSystem {
             im = i.peek(); // +!s or +?s
             if (!im.isFinished()) {
                 // removes !b or ?s
+                /* I am trying against  comments below and use topIM.getTrigger!
+                 * since I don't remember why the trigger cann't be used
+                 * probably the reason is the old buggy makeVarAnnos
+                 
                 Term g = im.removeCurrentStep();
                 // make the TE of finished plan ground and unify that
                 // with goal/test in the body (to "return" values).
-                // (it must the plan TE and not the IM.trigger because the
+                // (it must be the plan TE and not the IM.trigger because the
                 // vars have name only in the plan TE, in the IM.trigger
-                // they are anonymous)
+                // they are anonymous)                
                 Literal tel = topIM.getPlan().getTrigger().getLiteral();
-                tel.apply(topIM.unif);
-                tel.makeVarsAnnon(topIM.unif);
-                im.unif.unifies(tel, g);
+                // but import annots from IM.trigger
+                tel.addAnnots(topIM.getTrigger().getLiteral().getAnnots());
+                tel.topLiteral.makeVarsAnnon(topIM.unif); 
+                */
+                // unifies the final event with the body that called it
+                topLiteral.apply(topIM.unif);
+                im.unif.unifies(im.removeCurrentStep(), topLiteral);
             }
         }
 
@@ -764,11 +784,17 @@ public class TransitionSystem {
 
     /** generate a failure event for the current intention */
     private void generateGoalDeletion() throws JasonException {
+        generateGoalDeletion(null);
+    }
+    private boolean generateGoalDeletion(List<Term> failAnnots) throws JasonException {
+        boolean failEeventGenerated = false;
         IntendedMeans im = conf.C.SI.peek();
         if (im.isGoalAdd()) {
             Event failEvent = findEventForFailure(conf.C.SI, im.getTrigger());
             if (failEvent != null) {
+                setDefaultFailureAnnots(failEvent, im.getCurrentStep().getBodyTerm(), failAnnots);
                 confP.C.addEvent(failEvent);
+                failEeventGenerated = true;
                 if (logger.isLoggable(Level.FINE)) logger.fine("Generating goal deletion " + failEvent.getTrigger() + " from goal: " + im.getTrigger());
             } else {
                 logger.warning("No fail event was generated for " + im.getTrigger());
@@ -784,23 +810,26 @@ public class TransitionSystem {
         } else {
             logger.warning("Could not finish intention: " + conf.C.SI);
         }
+        return failEeventGenerated;
     }
 
     // similar to the one above, but for an Event rather than intention
-    private void generateGoalDeletionFromEvent() throws JasonException {
+    private boolean generateGoalDeletionFromEvent(List<Term> failAnnots) throws JasonException {
         Event ev = conf.C.SE;
         if (ev == null) {
             logger.warning("** It is not possible to generate a goal deletion event because SE is null! " + conf.C);
-            return;
+            return false;
         }
         
         Trigger tevent = ev.trigger;
-
+        boolean failEeventGenerated = false;
         if (tevent.isAddition() && tevent.isGoal()) {
             Event failEvent = findEventForFailure(ev.intention, tevent);
             if (failEvent != null) {
-                logger.warning("Generating goal deletion " + failEvent.getTrigger() + " from event: " + ev.getTrigger());
+                setDefaultFailureAnnots(failEvent, tevent.getLiteral(), failAnnots);
                 confP.C.addEvent(failEvent);
+                failEeventGenerated = true;
+                //logger.warning("Generating goal deletion " + failEvent.getTrigger() + " from event: " + ev.getTrigger());
             } else {
                 logger.warning("No fail event was generated for " + ev.getTrigger());
             }
@@ -814,6 +843,7 @@ public class TransitionSystem {
             logger.warning("Requeing external event: " + ev);
         } else
             logger.warning("Discarding external event: " + ev);
+        return failEeventGenerated;
     }
 
     public Event findEventForFailure(Intention i, Trigger tevent) {
@@ -828,11 +858,48 @@ public class TransitionSystem {
     	}
         // if some failure handling plan is found
         if (tevent.isGoal() && getAg().getPL().hasCandidatePlan(failTrigger)) {
-            return new Event(failTrigger, i);
+            return new Event(failTrigger.copy(), i);
         }
         return null;
     }
     
+    private static void setDefaultFailureAnnots(Event failEvent, Term body, List<Term> failAnnots) {
+        // add default failure annots
+        if (failAnnots == null)
+            failAnnots = JasonException.createBasicErrorAnnots("unknown", "");
+        
+        // add failure annots in the event related to the code source
+        Literal bodyterm = null;
+        Term codesrc     = null;
+        Term codeline    = null;
+        if (body != null && body instanceof Literal) {
+            bodyterm = (Literal)body;
+            codesrc  = new StringTermImpl(bodyterm.getSrc());
+            codeline = new NumberTermImpl(bodyterm.getSrcLine());
+        } else {
+            bodyterm = new Atom("no_code");
+            codesrc  = new Atom("no_code");
+            codeline = new Atom("no_code");
+            
+        }
+
+        // code
+        Structure code = new Structure("code");
+        code.addTerm(bodyterm);
+        failAnnots.add(code);
+        
+        // ASL source
+        Structure src = new Structure("code_src");
+        src.addTerm(codesrc);
+        failAnnots.add(src);                    
+
+        // line in the source
+        Structure line = new Structure("code_line");
+        line.addTerm(codeline);
+        failAnnots.add(line);                    
+        failEvent.getTrigger().getLiteral().addAnnots(failAnnots);
+    }
+        
     public boolean canSleep() {
         return !conf.C.hasEvent() && !conf.C.hasIntention() && 
                conf.C.MB.isEmpty() && !conf.C.hasFeedbackAction() && 
