@@ -126,7 +126,7 @@ public class IntendedMeans implements Serializable {
 
     public Object clone() {
     	IntendedMeans c = new IntendedMeans();
-    	c.unif = this.unif.copy();
+    	c.unif = this.unif.clone();
     	c.plan = (Plan)this.plan.clone();
     	c.trigger = (Trigger)this.trigger.clone(); 
     	return c;

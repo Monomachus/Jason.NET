@@ -176,11 +176,11 @@ public class Unifier implements Cloneable {
     protected boolean unifyTerms(Term t1g, Term t2g) {
         // if args are expressions, apply them and use their values
         if (t1g.isArithExpr()) {
-            t1g = (Term) t1g.clone();
+            t1g = t1g.clone();
             t1g.apply(this);
         }
         if (t2g.isArithExpr()) {
-            t2g = (Term) t2g.clone();
+            t2g = t2g.clone();
             t2g.apply(this);
         }
 
@@ -314,16 +314,11 @@ public class Unifier implements Cloneable {
     /** add all unifications from u */
     public void compose(Unifier u) {
         for (VarTerm k: u.function.keySet())
-            function.put( (VarTerm)k.clone(), (Term)u.function.get(k).clone());
+            function.put( (VarTerm)k.clone(), u.function.get(k).clone());
     }
-    
-    public Object clone() {
-        return copy();
-    }
-    
-    /** same as clone but with typed return */
+
     @SuppressWarnings("unchecked")
-    public Unifier copy() {
+    public Unifier clone() {
         try {
             Unifier newUn = new Unifier();
             newUn.function = (HashMap)function.clone();

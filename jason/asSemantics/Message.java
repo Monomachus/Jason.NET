@@ -123,10 +123,7 @@ public class Message implements Serializable {
 		this.inReplyTo = inReplyTo;
 	}
 	
-	public Message copy() {
-		return new Message(this);
-	}
-    public Object clone() {
+    public Message clone() {
         return new Message(this);
     }
 	

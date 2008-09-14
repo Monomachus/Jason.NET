@@ -79,8 +79,8 @@ public class RelExpr extends BinaryStructure implements LogicalFormula {
 	}
     
     public Iterator<Unifier> logicalConsequence(final Agent ag, Unifier un) {
-        Term xp = (Term)getTerm(0).clone();
-        Term yp = (Term)getTerm(1).clone();
+        Term xp = getTerm(0).clone();
+        Term yp = getTerm(1).clone();
         xp.apply(un);
         yp.apply(un);
 
@@ -142,8 +142,8 @@ public class RelExpr extends BinaryStructure implements LogicalFormula {
     }
 	
 	/** make a hard copy of the terms */
-	public Object clone() {
-		return  new RelExpr((Term)getTerm(0).clone(), op, (Term)getTerm(1).clone());
+	public LogicalFormula clone() {
+		return  new RelExpr(getTerm(0).clone(), op, getTerm(1).clone());
 	}
 	
 	/** gets the Operation of this Expression */

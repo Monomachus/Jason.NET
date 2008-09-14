@@ -87,15 +87,13 @@ public class findall extends DefaultInternalAction {
             Iterator<Unifier> iu = logExpr.logicalConsequence(ts.getAg(), un);
             while (iu.hasNext()) {
                 Unifier nu = iu.next();
-                Term vl = (Term) var.clone();
+                Term vl = var.clone();
                 vl.apply(nu);
                 tail = tail.append(vl);
             }
             return un.unifies(args[2], all);
         } catch (ArrayIndexOutOfBoundsException e) {
             throw new JasonException("The internal action 'findall' has not received three arguments.");
-        } catch (Exception e) {
-            throw new JasonException("Error in internal action 'findall': " + e, e);
         }
     }
 }

@@ -156,7 +156,7 @@ public class PlanBodyImpl extends Structure implements PlanBody, Iterable<PlanBo
 
     public boolean add(PlanBody bl) {
         if (term == null) {
-            bl = (PlanBody)bl.clone();
+            bl = bl.clonePB();
             swap(bl);
             this.next = bl.getBodyNext();
         } else if (next == null)
@@ -222,15 +222,19 @@ public class PlanBodyImpl extends Structure implements PlanBody, Iterable<PlanBo
         bl.setBodyTerm(l);
     }
 
-    public Object clone() {
+    public PlanBody clone() {
         if (term == null) // empty
             return new PlanBodyImpl();
 
-        PlanBodyImpl c = new PlanBodyImpl(formType, (Term)term.clone());
+        PlanBodyImpl c = new PlanBodyImpl(formType, term.clone());
         c.isTerm = isTerm;
         if (next != null)
-            c.setBodyNext((PlanBody)getBodyNext().clone());
+            c.setBodyNext(getBodyNext().clonePB());
         return c;
+    }
+    
+    public PlanBody clonePB() {
+        return clone();
     }
     
     public String toString() {

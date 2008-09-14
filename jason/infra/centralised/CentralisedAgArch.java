@@ -243,7 +243,7 @@ public class CentralisedAgArch implements Runnable, AgArchInfraTier {
             else
                 return;
         }
-        rec.receiveMsg(m.copy()); // send a cloned message
+        rec.receiveMsg(m.clone()); // send a cloned message
 	
         // notify listeners
         if (msgListeners != null) 

@@ -46,7 +46,7 @@ public final class Atom extends Literal {
         super(functor, 0);
     }
     
-    public Object clone() {
+    public Atom clone() {
 		return this; // since this object is immutable
     }
 

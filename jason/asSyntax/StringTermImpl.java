@@ -61,7 +61,7 @@ public final class StringTermImpl extends DefaultTerm implements StringTerm {
 		return value;
 	}
 	
-	public Object clone() {
+	public StringTerm clone() {
 		return this;
 	}
 	

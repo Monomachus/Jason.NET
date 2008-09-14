@@ -113,7 +113,7 @@ public class loop extends DefaultInternalAction {
             	un.compose(iu.next());
             	
             	PlanBody whattoadd = (PlanBody)args[1]; //.clone(); 
-	            whattoadd.add(new PlanBodyImpl(BodyType.internalAction, (Term)whileia.getBodyTerm().clone())); //(PlanBody)whileia.clone()); // add the while after 
+	            whattoadd.add(new PlanBodyImpl(BodyType.internalAction, whileia.getBodyTerm().clone())); //(PlanBody)whileia.clone()); // add the while after 
 	        	whattoadd.setAsBodyTerm(false);
         		whileia.add(1,whattoadd);
 	        	//System.out.println("new body="+whileia.getBodyNext());
@@ -121,10 +121,6 @@ public class loop extends DefaultInternalAction {
             return true;
         } catch (ArrayIndexOutOfBoundsException e) {
             throw new JasonException("'while' has not received the required arguments.");
-        } catch (JasonException e) {
-        	throw e;
-        } catch (Exception e) {
-            throw new JasonException("Error in 'while': " + e, e);
         }
     }
 }

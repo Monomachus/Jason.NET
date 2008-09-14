@@ -89,7 +89,7 @@ public class add_nested_source extends DefaultInternalAction {
 		}
 	}
 
-	public Term addAnnotToList(Unifier unif, Term l, Structure source) {
+	public Term addAnnotToList(Unifier unif, Term l, Term source) {
 		if (l.isList()) {
 			ListTerm result = new ListTermImpl();
 			for (Term lTerm: (ListTerm)l) {

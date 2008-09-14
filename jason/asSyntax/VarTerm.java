@@ -76,7 +76,7 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
         }
     }
 
-    public Object clone() {
+    public Term clone() {
         if (value != null) {
             return value.clone();
         } else {
@@ -84,11 +84,19 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
             VarTerm t = new VarTerm(super.getFunctor());
             t.setSrc(this);
             if (hasAnnot())
-                t.setAnnots((ListTerm) getAnnots().clone());
+                t.setAnnots(getAnnots().cloneLT());
             return t;
         }
     }
-
+    
+    public PlanBody clonePB() {
+        return (PlanBody)clone();
+    }
+    
+    public ListTerm cloneLT() {
+        return (ListTerm)clone();
+    }
+    
     @Override
     public boolean isVar() {
         return value == null;
@@ -113,7 +121,7 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
             return false;
         }
 
-        vl = (Term)vl.clone(); // should clone here, since there is no cloning in unify
+        vl = vl.clone(); // should clone here, since there is no cloning in unify
         // decide whether to use var annots in apply
         //   X = p[a]
         //   !X[b]
@@ -232,7 +240,7 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
             return ((LogicalFormula)value).logicalConsequence(ag, un);
         else {
             // try to apply
-            Term t = (Term) this.clone();
+            Term t = this.clone();
             if (t instanceof VarTerm) { // the clone is still a var
                 VarTerm c = (VarTerm)t;
                 c.apply(un);

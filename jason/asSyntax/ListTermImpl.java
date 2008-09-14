@@ -80,18 +80,17 @@ public class ListTermImpl extends Structure implements ListTerm {
     }
 	
 	/** make a hard copy of the terms */
-	public Object clone() {
+	public ListTerm clone() {
 		ListTermImpl t = new ListTermImpl();
-		if (term != null) t.term = (Term)this.term.clone();
-		if (next != null) t.next = (Term)this.next.clone();
+		if (term != null) t.term = this.term.clone();
+		if (next != null) t.next = this.next.clone();
 		return t;
 	}
 	
-	public ListTermImpl copy() {
-	    return (ListTermImpl)clone();
+	public ListTerm cloneLT() {
+	    return clone();
 	}
 	
-
     @Override
     public boolean equals(Object t) {
         if (t == null) return false;
@@ -285,7 +284,7 @@ public class ListTermImpl extends Structure implements ListTerm {
 		if (isEmpty()) {
 		    setValuesFrom(lt);
 		} else if (((ListTerm)next).isEmpty() ) {
-			next = (Term)lt;
+			next = lt;
 		} else {
 			((ListTerm)next).concat(lt);
 		}
@@ -303,11 +302,11 @@ public class ListTermImpl extends Structure implements ListTerm {
         if (isEmpty()) {
             return r;
         } else if (isTail()) {
-            r = new ListTermImpl((Term)term.clone(), r);
+            r = new ListTermImpl(term.clone(), r);
             r.setTail((VarTerm)next.clone());
             return r;
         } else {
-            return ((ListTermImpl)next).reverse_internal( new ListTermImpl((Term)term.clone(), r) );
+            return ((ListTermImpl)next).reverse_internal( new ListTermImpl(term.clone(), r) );
         }
     }
 
@@ -431,26 +430,26 @@ public class ListTermImpl extends Structure implements ListTerm {
         }
 	}
 	public boolean add(Term o) {
-		return append((Term)o) != null;
+		return append(o) != null;
 	}
 
 	@SuppressWarnings("unchecked")
 	public boolean addAll(Collection c) {
 		if (c == null) return false;
 		ListTerm lt = this; // where to add
-		Iterator i = c.iterator();
+		Iterator<Term> i = c.iterator();
 		while (i.hasNext()) {
-			lt = lt.append((Term)i.next());
+			lt = lt.append(i.next());
 		}
 		return true;
 	}
 	
 	@SuppressWarnings("unchecked")
 	public boolean addAll(int index, Collection c) {
-		Iterator i = c.iterator();
+		Iterator<Term> i = c.iterator();
 		int p = index;
 		while (i.hasNext()) {
-			add(p, (Term)i.next()); 
+			add(p, i.next()); 
 			p++;
 		}
 		return true;
@@ -472,9 +471,9 @@ public class ListTermImpl extends Structure implements ListTerm {
 	@SuppressWarnings("unchecked")
 	public boolean containsAll(Collection c) {
 		boolean r = true;
-		Iterator i = c.iterator();
+		Iterator<Term> i = c.iterator();
 		while (i.hasNext() && r) {
-			r = r && contains((Term)i.next()); 
+			r = r && contains(i.next()); 
 		}
 		return r;
 	}

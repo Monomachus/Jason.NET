@@ -94,13 +94,11 @@ public class delete extends DefaultInternalAction {
             
             // first element as term
             if (args[1].isList()) {
-                return un.unifies(args[2], deleteFromList(args[0],(ListTerm)args[1], un.copy()));
+                return un.unifies(args[2], deleteFromList(args[0],(ListTerm)args[1], un.clone()));
             }
             throw new JasonException("Incorrect use of the internal action '.delete' (see documentation).");
         } catch (ArrayIndexOutOfBoundsException e) {
             throw new JasonException("The internal action '.delete' has not received three arguments.");
-        } catch (Exception e) {
-            throw new JasonException("Error in internal action '.delete': " + e, e);
         }
 	}
 	
@@ -111,9 +109,9 @@ public class delete extends DefaultInternalAction {
 	    for (Term t: l) {
 	        boolean u = un.unifies(element, t); 
 	        if (u)
-	            un = bak.copy();
+	            un = bak.clone();
 	        else
-	            last = last.append((Term)t.clone());
+	            last = last.append(t.clone());
 	    }
 	    return r;
 	}
@@ -124,7 +122,7 @@ public class delete extends DefaultInternalAction {
         int i = 0;
         for (Term t: l) {
             if ((i++) != index)
-                last = last.append((Term)t.clone());
+                last = last.append(t.clone());
         }
         return r;
     }

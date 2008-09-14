@@ -64,7 +64,7 @@ public final class NumberTermImpl extends DefaultTerm implements NumberTerm {
 		return value;
 	}
 
-	public Object clone() {
+	public NumberTerm clone() {
 		return this;
 	}
 	

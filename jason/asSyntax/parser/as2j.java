@@ -289,7 +289,7 @@
                                if (config.getBoolean(Config.WARN_SING_VAR) && !parsedFiles.contains(asSource)) {
                                   List<VarTerm> singletonVars = h.getSingletonVars();
                                   if (singletonVars.size() > 0) {
-                                     logger.warning(getSourceRef(h)+" warning: the rule with head '"+((Rule)h).headCopy()+"' has the following singleton variables: "+singletonVars);
+                                     logger.warning(getSourceRef(h)+" warning: the rule with head '"+((Rule)h).headClone()+"' has the following singleton variables: "+singletonVars);
                                   }
                                }
       break;

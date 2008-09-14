@@ -163,11 +163,11 @@ public class Literal extends Pred implements LogicalFormula {
                 while (ruleIt != null && ruleIt.hasNext()) {
                     // unifies the rule head with the result of rule evaluation
                     Unifier ruleUn = ruleIt.next(); // evaluation result
-                    Literal rhead  = rule.headCopy();
+                    Literal rhead  = rule.headClone();
                     rhead.apply(ruleUn);
                     rhead.makeVarsAnnon(ruleUn);
                     
-                    Unifier unC = un.copy();
+                    Unifier unC = un.clone();
                     if (unC.unifiesNoUndo(Literal.this, rhead)) {
                         current = unC;
                         return;
@@ -198,7 +198,7 @@ public class Literal extends Pred implements LogicalFormula {
                             }
                         }
                     } else {
-                        Unifier u = un.copy();
+                        Unifier u = un.clone();
                         if (u.unifiesNoUndo(Literal.this, b)) {
                             current = u;
                             return;
@@ -245,15 +245,12 @@ public class Literal extends Pred implements LogicalFormula {
         return 0;
     }        
 
-	public Object clone() {
-        Literal c = new Literal(this);
-        c.predicateIndicatorCache = this.predicateIndicatorCache;
-        c.hashCodeCache = this.hashCodeCache;
-        return c;
+	public Term clone() {
+	    return new Literal(this);
 	}
 	
 	public Literal copy() {
-	    return (Literal)clone();
+	    return (Literal)clone(); // should call the clone, that is overridden in subclasses
 	}
 
     
@@ -280,7 +277,7 @@ public class Literal extends Pred implements LogicalFormula {
 		lt.addAll(getTerms());
 		l.add(lt);
 		if (hasAnnot()) {
-		    l.add((ListTerm)getAnnots().clone());
+		    l.add(getAnnots().cloneLT());
 		} else {
 		    l.add(new ListTermImpl());
 		}
@@ -302,10 +299,10 @@ public class Literal extends Pred implements LogicalFormula {
 			Literal l = new Literal(pos,((Structure)tfunctor).getFunctor());
 
 			if (i.hasNext()) {
-				l.setTerms((ListTerm)((ListTerm)i.next()).clone());
+				l.setTerms(((ListTerm)i.next()).cloneLT());
 			}
 			if (i.hasNext()) {
-				l.setAnnots((ListTerm)((ListTerm)i.next()).clone());
+				l.setAnnots(((ListTerm)i.next()).cloneLT());
 			}
 			return l;
 		} catch (Exception e) {

@@ -83,7 +83,7 @@ public class member extends DefaultInternalAction {
             	
             	void find() {
                     while (i.hasNext()) {
-                        c = un.copy();
+                        c = un.clone();
                     	if (c.unifiesNoUndo(member, i.next()))
                     		return; // member found in the list, c is the current response
                     }

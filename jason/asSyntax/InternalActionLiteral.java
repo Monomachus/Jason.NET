@@ -56,6 +56,8 @@ public class InternalActionLiteral extends Literal {
 	public InternalActionLiteral(InternalActionLiteral l) {
 		super((Literal) l);
 		this.ia = l.ia;
+		predicateIndicatorCache = l.predicateIndicatorCache;
+        hashCodeCache           = l.hashCodeCache;
 	}
 
 	// used by the parser
@@ -111,7 +113,7 @@ public class InternalActionLiteral extends Literal {
             	// clone terms array
                 Term[] clone = getTermsArray();
                 for (int i=0; i<clone.length; i++) {
-                    clone[i] = (Term)clone[i].clone();
+                    clone[i] = clone[i].clone();
                     clone[i].apply(un);
                 }
     
@@ -141,11 +143,8 @@ public class InternalActionLiteral extends Literal {
         return "Error in internal action '"+this+"' ("+ getSrc() + line + ")";    	
     }
     
-	public Object clone() {
-        InternalActionLiteral c = new InternalActionLiteral(this);
-        c.predicateIndicatorCache = this.predicateIndicatorCache;
-        c.hashCodeCache           = this.hashCodeCache;
-        return c;
+	public InternalActionLiteral clone() {
+        return new InternalActionLiteral(this);
 	}
 
     

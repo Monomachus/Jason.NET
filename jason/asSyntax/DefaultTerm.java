@@ -70,7 +70,7 @@ public abstract class DefaultTerm extends SourceInfo implements Term, Serializab
     
     public void countVars(Map<VarTerm, Integer> c) {}
     
-    abstract public    Object clone();
+    abstract public    Term   clone();
     abstract protected int    calcHashCode();
     
     public int hashCode() {

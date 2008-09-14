@@ -123,11 +123,7 @@ public class Trigger implements Cloneable {
 		return (operator == TEOperator.add);
 	}
 
-	public Object clone() {
-        return copy(); 
-	}
-
-    public Trigger copy() {
+    public Trigger clone() {
         Trigger c = new Trigger(operator, type, literal.copy());
         c.piCache = this.piCache;
         return c; 

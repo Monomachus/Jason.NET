@@ -177,7 +177,7 @@ public class Intention implements Serializable, Comparable<Intention> {
         return String.valueOf(id).hashCode();
     }
     
-    public Object clone() {
+    public Intention clone() {
     	Intention i = new Intention();
     	i.id = id;
         i.isAtomic = isAtomic;

@@ -192,7 +192,7 @@ public class send extends DefaultInternalAction {
             
             if (lastSendWasSynAsk && args.length == 5) {
                 // get the timeout deadline
-                Term tto = (Term)args[4];
+                Term tto = args[4];
                 if (tto.isNumeric()) {
                     ts.getAg().getScheduler().schedule( new Runnable() {
                         public void run() {

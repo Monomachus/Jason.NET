@@ -34,7 +34,7 @@ public class ObjectTermImpl extends DefaultTerm implements ObjectTerm {
     }
     
     @Override
-    public Object clone() {
+    public ObjectTerm clone() {
         try {
         	if (!hasTestedClone) {
         		hasTestedClone = true;

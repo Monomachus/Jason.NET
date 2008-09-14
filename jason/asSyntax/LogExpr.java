@@ -212,7 +212,7 @@ public class LogExpr extends BinaryStructure implements LogicalFormula {
     }
 	
 	/** make a hard copy of the terms */
-	public Object clone() {
+	public LogicalFormula clone() {
 		// do not call constructor with term parameter!
 		if (isUnary())
 			return new LogExpr(op, (LogicalFormula)getTerm(0).clone());

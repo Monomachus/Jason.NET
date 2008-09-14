@@ -50,14 +50,14 @@ public class UnnamedVar extends VarTerm {
         myId = id;
     }
 
-    public Object clone() {
+    public Term clone() {
         if (hasValue()) {
             return getValue().clone();
         } else {
             UnnamedVar newv = new UnnamedVar(getFunctor());
             newv.myId = this.myId;
             if (hasAnnot())
-                newv.addAnnots((ListTerm)this.getAnnots().clone());
+                newv.addAnnots(this.getAnnots().cloneLT());
         	return newv;
         }
     }

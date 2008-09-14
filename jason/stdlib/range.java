@@ -72,7 +72,7 @@ public class range extends DefaultInternalAction {
     
                 	public Unifier next() {
                 	    vl++;
-                	    Unifier c = un.copy();
+                	    Unifier c = un.clone();
                         c.unifiesNoUndo(var,new NumberTermImpl(vl));
                         return c;
                 	}

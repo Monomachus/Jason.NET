@@ -81,13 +81,13 @@ public class drop_intention extends DefaultInternalAction {
     }
     
     public void dropInt(Circumstance C, Literal l, Unifier un) {
-        Unifier bak = un.copy();
+        Unifier bak = un.clone();
         
         Trigger g = new Trigger(TEOperator.add, TEType.achieve, l);
         for (Intention i: C.getIntentions()) {
             if (i.hasTrigger(g, un)) {
                 C.removeIntention(i);
-                un = bak.copy();
+                un = bak.clone();
             }
         }
         
@@ -96,7 +96,7 @@ public class drop_intention extends DefaultInternalAction {
             Intention i = e.getIntention();
             if (i != null && i.hasTrigger(g, un)) {
                 C.removeEvent(e);
-                un = bak.copy();
+                un = bak.clone();
             }
         }
         
@@ -105,7 +105,7 @@ public class drop_intention extends DefaultInternalAction {
             Intention i = a.getIntention();
             if (i.hasTrigger(g, un)) {
                 C.dropPendingAction(i);
-                un = bak.copy();
+                un = bak.clone();
             }
         }
 
@@ -113,7 +113,7 @@ public class drop_intention extends DefaultInternalAction {
         for (Intention i: C.getPendingIntentions().values()) {
             if (i.hasTrigger(g, un)) {
                 C.dropPendingIntention(i);
-                un = bak.copy();
+                un = bak.clone();
             }
         }
     }

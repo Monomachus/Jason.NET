@@ -75,17 +75,13 @@ public class Rule extends Literal {
         return body;
     }
     
-    public Object clone() {
-        Rule r = new Rule((Literal)super.clone(), (LogicalFormula)body.clone());
+    public Rule clone() {
+        Rule r = new Rule(super.copy(), (LogicalFormula)body.clone());
         r.predicateIndicatorCache = null;
         r.resetHashCodeCache();
         return r; 
     }
 
-    public Literal headCopy() {
-        return (Literal)super.clone();        
-    }
-    /** @deprecated use headCopy */
     public Literal headClone() {
         return (Literal)super.clone();
     }

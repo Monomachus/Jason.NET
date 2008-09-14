@@ -168,7 +168,7 @@ public class ArithFunctionTerm extends Structure implements NumberTerm {
     }
 
     @Override
-    public Object clone() {
+    public NumberTerm clone() {
         if (isEvaluated())
             return value;
         else

@@ -58,7 +58,7 @@ public class Pred extends Structure {
         super(p);
 
         if (p.annots != null) {
-            annots = (ListTerm) p.getAnnots().clone();
+            annots = p.getAnnots().cloneLT();
         } else {
             annots = null;
         }
@@ -204,7 +204,7 @@ public class Pred extends Structure {
 	            Term t = i.next();
 	            // p will only contain the annots actually added (for Event)
 	            if (!annots.contains(t)) {
-	            	tail = tail.append((Term) t.clone());
+	            	tail = tail.append(t.clone());
 	                imported = true;
 	            } else {
 	                // Remove what is not new from p
@@ -284,7 +284,7 @@ public class Pred extends Structure {
         if (p.getAnnots() == null) return false;
 
         // since p's annots will be changed, clone them
-        ListTerm pannots = (ListTerm)p.getAnnots().clone();
+        ListTerm pannots = p.getAnnots().cloneLT();
 
         VarTerm pTail = null;
         if (pannots.getTail() instanceof VarTerm) pTail = (VarTerm)pannots.getTail();
@@ -479,7 +479,7 @@ public class Pred extends Structure {
         return 0;
     }
 
-    public Object clone() {
+    public Term clone() {
         return new Pred(this);
     }
 

@@ -33,4 +33,7 @@ public interface PlanBody extends Term {
     public boolean add(PlanBody bl);
     public boolean add(int index, PlanBody bl);
     public Term removeBody(int index);  
+    
+    /** clone the plan body */
+    public PlanBody clonePB(); 
 }

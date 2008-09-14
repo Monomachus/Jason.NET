@@ -175,7 +175,7 @@ public class ArithExpr extends ArithFunctionTerm implements NumberTerm {
 	}
     
     /** make a hard copy of the terms */
-    public Object clone() {
+    public NumberTerm clone() {
         if (isEvaluated()) {
             return getValue();
         } else {

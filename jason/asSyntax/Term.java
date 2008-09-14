@@ -29,7 +29,7 @@ public interface Term extends Cloneable, Comparable<Term>, Serializable, ToDOM {
     public boolean hasVar(VarTerm t);
     public void countVars(Map<VarTerm, Integer> c);
 
-    public Object clone();
+    public Term clone();
 
     public boolean equals(Object o);
     

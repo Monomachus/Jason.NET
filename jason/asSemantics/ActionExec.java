@@ -78,8 +78,8 @@ public class ActionExec implements Serializable {
         return "<"+action+","+intention+","+result+">";
     }
 
-    protected Object clone() {
-    	ActionExec ae = new ActionExec((Pred)action.clone(),(Intention)intention.clone());
+    protected ActionExec clone() {
+    	ActionExec ae = new ActionExec((Pred)action.clone(), intention.clone());
     	ae.result = this.result;
     	return ae;
     }

@@ -858,7 +858,7 @@ public class TransitionSystem {
     	}
         // if some failure handling plan is found
         if (tevent.isGoal() && getAg().getPL().hasCandidatePlan(failTrigger)) {
-            return new Event(failTrigger.copy(), i);
+            return new Event(failTrigger.clone(), i);
         }
         return null;
     }

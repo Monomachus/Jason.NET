@@ -502,4 +502,11 @@ public class VarTermTest extends TestCase {
         assertEquals("[B, F, _11, _6, _5]", l.toString()); // this order is VERY important for unification!
     }
     
+    public void testCopy() {
+        VarTerm x = new VarTerm("X");
+        Unifier u = new Unifier();
+        u.unifies(x, Literal.parseLiteral("goto(3,2)[source(bob)]"));
+        x.apply(u);
+        assertEquals("goto(3,2)[source(bob)]", x.copy().toString());        
+    }
 }

@@ -101,10 +101,6 @@ public class sort extends DefaultInternalAction {
             return un.unifies(l1, args[1]);
         } catch (ArrayIndexOutOfBoundsException e) {
             throw new JasonException("The internal action 'sort' has not received two arguments.");
-        } catch (JasonException e) {
-        	throw e;
-        } catch (Exception e) {
-            throw new JasonException("Error in internal action 'sort': " + e, e);
         }    
     }
 }

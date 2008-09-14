@@ -106,7 +106,7 @@ public class foreach extends DefaultInternalAction {
 	        	// get all solutions for the loop
 	            // Note: you should get all solutions here, otherwise I concurrent modification will occur for the iterator 
 	            LogicalFormula logExpr = (LogicalFormula)args[0];
-	            iu = logExpr.logicalConsequence(ts.getAg(), un.copy());
+	            iu = logExpr.logicalConsequence(ts.getAg(), un.clone());
 	            List<Unifier> allsol = new ArrayList<Unifier>();
 	            while (iu.hasNext())
 	                allsol.add(iu.next());
@@ -121,7 +121,7 @@ public class foreach extends DefaultInternalAction {
             	un.clear();
             	un.compose(iu.next());
             	PlanBody whattoadd = (PlanBody)args[1].clone(); 
-	            whattoadd.add(new PlanBodyImpl(BodyType.internalAction, (Term)foria.getBodyTerm().clone())); 
+	            whattoadd.add(new PlanBodyImpl(BodyType.internalAction, foria.getBodyTerm().clone())); 
 	        	whattoadd.setAsBodyTerm(false);
 	        	foria.add(1,whattoadd);
 	        	//System.out.println("new body="+foria.getBodyNext());

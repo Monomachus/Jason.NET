@@ -75,6 +75,8 @@ public class Structure extends DefaultTerm {
     public Structure(Structure t) {
         functor = t.getFunctor();
         terms   = t.getDeepCopyOfTerms();
+        predicateIndicatorCache = t.predicateIndicatorCache;
+        hashCodeCache           = t.hashCodeCache;
         setSrc(t);
     }
 
@@ -210,13 +212,9 @@ public class Structure extends DefaultTerm {
     }
     
 
-
     /** make a deep copy of the terms */
-    public Object clone() {
-        Structure c = new Structure(this);
-        c.predicateIndicatorCache = this.predicateIndicatorCache;
-        c.hashCodeCache           = this.hashCodeCache;
-        return c;
+    public Term clone() {
+        return new Structure(this);
     }
 
     public void addTerm(Term t) {
@@ -375,7 +373,7 @@ public class Structure extends DefaultTerm {
         final int tss = getArity();
         List<Term> l = new ArrayList<Term>(tss);
         for (int i = 0; i < tss; i++)
-            l.add((Term)getTerm(i).clone());
+            l.add(getTerm(i).clone());
         return l;
     }
     

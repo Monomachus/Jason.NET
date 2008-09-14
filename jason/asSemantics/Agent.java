@@ -682,7 +682,7 @@ public class Agent {
                 Literal inBB = il.next();
                 if (!inBB.isRule()) {
                     // need to clone unifier since it is changed in previous iteration
-                    if (un.copy().unifiesNoUndo(bel, inBB)) {
+                    if (un.clone().unifiesNoUndo(bel, inBB)) {
                         toDel.add(inBB);
                     }
                 }
