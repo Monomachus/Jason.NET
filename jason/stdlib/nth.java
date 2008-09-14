@@ -47,31 +47,31 @@ public class nth extends DefaultInternalAction {
 		return singleton;
 	}
 
+	@Override public int getMinArgs() { return 3; }
+    @Override public int getMaxArgs() { return 3; }
+
+    @Override protected void checkArguments(Term[] args) throws JasonException {
+        super.checkArguments(args); // check number of arguments
+        if (!args[0].isNumeric()) {
+            throw JasonException.createWrongArgument(this,"first argument should be numeric and not '"+args[0]+"'.");
+        }
+        if (!args[1].isList()) {
+            throw JasonException.createWrongArgument(this,"second argument should be a list and not '"+args[1]+"'.");
+        }
+    }
+
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
-    	try {
-	        if (!args[0].isNumeric()) {
-	            throw new JasonException("nth: the first argument should be numeric and not '"+args[0]+"'.");
-	        }
-	        int index = (int)((NumberTerm)args[0]).solve();
-	
-	        if (!args[1].isList()) {
-	            throw new JasonException("nth: the second argument should be a list and not '"+args[1]+"'.");
-	        }
-	        ListTerm list = (ListTerm)args[1];
-	
-	        if (index < 0 || index >= list.size()) {
-	            throw new JasonException("nth: index "+index+" is out of bounds ("+list.size()+")");
-	        }
-	        Term element = list.get(index);
-	
-	        return un.unifies(args[2], element);
-	    } catch (ArrayIndexOutOfBoundsException e) {
-	        throw new JasonException("The internal action 'nth' has not received three arguments.");
-	    } catch (JasonException e) {
-	    	throw e;
-	    } catch (Exception e) {
-	        throw new JasonException("Error in internal action 'nth': " + e, e);
-	    }
+        checkArguments(args);
+
+        int index = (int)((NumberTerm)args[0]).solve();
+        ListTerm list = (ListTerm)args[1];
+
+        if (index < 0 || index >= list.size()) {
+            throw new JasonException("nth: index "+index+" is out of bounds ("+list.size()+")");
+        }
+        Term element = list.get(index);
+
+        return un.unifies(args[2], element);
     }
 }

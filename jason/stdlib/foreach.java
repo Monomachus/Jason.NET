@@ -87,52 +87,55 @@ public class foreach extends DefaultInternalAction {
 		return singleton;
 	}
 	
+    @Override public int getMinArgs() { return 2; }
+    @Override public int getMaxArgs() { return 2; }
+	
+    @Override protected void checkArguments(Term[] args) throws JasonException {
+        super.checkArguments(args); // check number of arguments
+        if ( !(args[0] instanceof LogicalFormula))
+            throw JasonException.createWrongArgument(this,"first argument must be a logical formula.");
+        if ( !args[1].isPlanBody())
+            throw JasonException.createWrongArgument(this,"second argument must be a plan body term.");
+    }
+    
+    
     @SuppressWarnings("unchecked")
 	@Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
-        try {
-        	IntendedMeans im    = ts.getC().getSelectedIntention().peek();
-        	PlanBody      foria = im.getCurrentStep();
+    	IntendedMeans im    = ts.getC().getSelectedIntention().peek();
+    	PlanBody      foria = im.getCurrentStep();
 
-        	Iterator<Unifier> iu;
+    	Iterator<Unifier> iu;
+    	
+        if (args.length == 2) {
+            // first execution of while
+        	checkArguments(args);
         	
-            if (args.length != 3) {
-	            // first execution of while
-            	if ( !(args[0] instanceof LogicalFormula))
-            		throw new JasonException("The first argument of for must be a logical formula.");
-	            if ( !args[1].isPlanBody())
-	        		throw new JasonException("The second argument of for must be a plan body term.");
-            	
-	        	// get all solutions for the loop
-	            // Note: you should get all solutions here, otherwise I concurrent modification will occur for the iterator 
-	            LogicalFormula logExpr = (LogicalFormula)args[0];
-	            iu = logExpr.logicalConsequence(ts.getAg(), un.clone());
-	            List<Unifier> allsol = new ArrayList<Unifier>();
-	            while (iu.hasNext())
-	                allsol.add(iu.next());
-	            iu = allsol.iterator();
-	        	((Structure)foria.getBodyTerm()).addTerm(new ObjectTermImpl(iu));
-            } else {
-            	// restore the solutions
-            	iu = (Iterator<Unifier>)((ObjectTerm)args[2]).getObject();
-            }
-            
-            if (iu.hasNext()) {
-            	un.clear();
-            	un.compose(iu.next());
-            	PlanBody whattoadd = (PlanBody)args[1].clone(); 
-	            whattoadd.add(new PlanBodyImpl(BodyType.internalAction, foria.getBodyTerm().clone())); 
-	        	whattoadd.setAsBodyTerm(false);
-	        	foria.add(1,whattoadd);
-	        	//System.out.println("new body="+foria.getBodyNext());
-            }
-            return true;
-        } catch (ArrayIndexOutOfBoundsException e) {
-            throw new JasonException("'for' has not received the required arguments.");
-        } catch (JasonException e) {
-        	throw e;
-        } catch (Exception e) {
-            throw new JasonException("Error in 'for': " + e, e);
+        	// get all solutions for the loop
+            // Note: you should get all solutions here, otherwise I concurrent modification will occur for the iterator 
+            LogicalFormula logExpr = (LogicalFormula)args[0];
+            iu = logExpr.logicalConsequence(ts.getAg(), un.clone());
+            List<Unifier> allsol = new ArrayList<Unifier>();
+            while (iu.hasNext())
+                allsol.add(iu.next());
+            iu = allsol.iterator();
+        	((Structure)foria.getBodyTerm()).addTerm(new ObjectTermImpl(iu));
+        } else if (args.length == 3) {
+        	// restore the solutions
+        	iu = (Iterator<Unifier>)((ObjectTerm)args[2]).getObject();
+        } else {
+            throw JasonException.createWrongArgumentNb(this);
         }
+        
+        if (iu.hasNext()) {
+        	un.clear();
+        	un.compose(iu.next());
+        	PlanBody whattoadd = (PlanBody)args[1].clone(); 
+            whattoadd.add(new PlanBodyImpl(BodyType.internalAction, foria.getBodyTerm().clone())); 
+        	whattoadd.setAsBodyTerm(false);
+        	foria.add(1,whattoadd);
+        	//System.out.println("new body="+foria.getBodyNext());
+        }
+        return true;
     }
 }

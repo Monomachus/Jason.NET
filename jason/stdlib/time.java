@@ -1,6 +1,5 @@
 package jason.stdlib;
 
-import jason.JasonException;
 import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.InternalAction;
 import jason.asSemantics.TransitionSystem;
@@ -47,18 +46,17 @@ public class time extends DefaultInternalAction {
 			singleton = new time();
 		return singleton;
 	}
+	
+    @Override public int getMinArgs() { return 3; }
+    @Override public int getMaxArgs() { return 3; }
 
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
-        try {
-            Calendar now = new GregorianCalendar();
-            return un.unifies(args[0], new NumberTermImpl(now.get(Calendar.HOUR))) &&
-                   un.unifies(args[1], new NumberTermImpl(now.get(Calendar.MINUTE))) &&
-                   un.unifies(args[2], new NumberTermImpl(now.get(Calendar.SECOND)));
-        } catch (ArrayIndexOutOfBoundsException e) {
-            throw new JasonException("The internal action 'time' has not received three arguments.");
-        } catch (Exception e) {
-            throw new JasonException("Error in internal action 'time': " + e, e);
-        }
+        checkArguments(args);
+
+        Calendar now = new GregorianCalendar();
+        return un.unifies(args[0], new NumberTermImpl(now.get(Calendar.HOUR))) &&
+               un.unifies(args[1], new NumberTermImpl(now.get(Calendar.MINUTE))) &&
+               un.unifies(args[2], new NumberTermImpl(now.get(Calendar.SECOND)));
     }
 }

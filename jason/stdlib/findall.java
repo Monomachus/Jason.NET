@@ -52,7 +52,7 @@ import java.util.Iterator;
   is has the same syntax as the plan context.
   <br/>
 
-  <li>+/- result (list): the resulting populated list.<br/>
+  <li>+/- result (list): the result list populated with found solutions for the query.<br/>
   
   </ul>
   
@@ -76,24 +76,31 @@ import java.util.Iterator;
 */
 public class findall extends DefaultInternalAction {
 
+    @Override public int getMinArgs() { return 3; }
+    @Override public int getMaxArgs() { return 3; }
+
+    @Override protected void checkArguments(Term[] args) throws JasonException {
+        super.checkArguments(args); // check number of arguments
+        if (! (args[1] instanceof LogicalFormula))
+            throw JasonException.createWrongArgument(this,"second argument must be a formula");
+    }
+
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
-        try {
-            Term var = args[0];
-            LogicalFormula logExpr = (LogicalFormula)args[1];
+        checkArguments(args);
 
-            ListTerm all = new ListTermImpl();
-            ListTerm tail = all;
-            Iterator<Unifier> iu = logExpr.logicalConsequence(ts.getAg(), un);
-            while (iu.hasNext()) {
-                Unifier nu = iu.next();
-                Term vl = var.clone();
-                vl.apply(nu);
-                tail = tail.append(vl);
-            }
-            return un.unifies(args[2], all);
-        } catch (ArrayIndexOutOfBoundsException e) {
-            throw new JasonException("The internal action 'findall' has not received three arguments.");
+        Term var = args[0];
+        LogicalFormula logExpr = (LogicalFormula)args[1];
+
+        ListTerm all = new ListTermImpl();
+        ListTerm tail = all;
+        Iterator<Unifier> iu = logExpr.logicalConsequence(ts.getAg(), un);
+        while (iu.hasNext()) {
+            Unifier nu = iu.next();
+            Term vl = var.clone();
+            vl.apply(nu);
+            tail = tail.append(vl);
         }
+        return un.unifies(args[2], all);
     }
 }

@@ -63,9 +63,13 @@ import jason.asSyntax.Term;
 
  */
 public class drop_all_events extends DefaultInternalAction {
+
+    @Override public int getMinArgs() { return 0; }
+    @Override public int getMaxArgs() { return 0; }
     
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
+        checkArguments(args);
         ts.getC().clearEvents();
         return true;
     }

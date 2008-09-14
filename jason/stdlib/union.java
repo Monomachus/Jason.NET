@@ -23,8 +23,6 @@
 
 package jason.stdlib;
 
-import jason.JasonException;
-import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.InternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
@@ -61,7 +59,7 @@ import jason.asSyntax.Term;
   @see jason.stdlib.difference
   @see jason.stdlib.intersection
 */
-public class union extends DefaultInternalAction {
+public class union extends difference { // to inherit checkArguments
 	
 	private static InternalAction singleton = null;
 	public static InternalAction create() {
@@ -72,15 +70,7 @@ public class union extends DefaultInternalAction {
 
 	@Override
 	public Object execute(TransitionSystem ts, Unifier un, Term[] args)	throws Exception {
-		
-	    if (!args[0].isList())
-            throw new JasonException("First argument of union '"+args[0]+"'is not a list.");
-        if (!args[1].isList())
-            throw new JasonException("Second argument of union '"+args[1]+"'is not a list.");
-        
-        if (!args[2].isVar() && !args[2].isList())
-			throw new JasonException("Last argument of union '"+args[2]+"'is not a list nor a variable.");
-
+	    checkArguments(args);
 		return un.unifies(args[2], ((ListTerm)args[0]).union( (ListTerm)args[1]) );
 	}
 }

@@ -24,6 +24,8 @@
 
 package jason;
 
+import jason.asSemantics.DefaultInternalAction;
+import jason.asSemantics.InternalAction;
 import jason.asSyntax.Atom;
 import jason.asSyntax.ListTerm;
 import jason.asSyntax.ListTermImpl;
@@ -35,6 +37,8 @@ import jason.asSyntax.Term;
 public class JasonException extends java.lang.Exception {
     
 	private static final long serialVersionUID = 1L;
+	
+	public static final Term WRONG_ARGS = new Atom("wrong_arguments");
 
 	private static final Term defaultError = new Atom("internal_action");
 	private Term error = defaultError;
@@ -78,6 +82,24 @@ public class JasonException extends java.lang.Exception {
 
     public ListTerm getErrorTerms() {
         return createBasicErrorAnnots(error, getMessage());
+    }
+    
+    @SuppressWarnings("unchecked")
+    public static JasonException createWrongArgumentNb(DefaultInternalAction ia) {
+        String msg;
+        if (ia.getMinArgs() == ia.getMaxArgs())
+            if (ia.getMinArgs() == 1)
+                msg = " One argument is expected.";
+            else
+                msg = " "+ia.getMinArgs()+" arguments are expected."; 
+        else
+            msg = " From "+ia.getMinArgs()+" to "+ia.getMaxArgs()+" arguments are expected."; 
+        return new JasonException("The internal action '"+ia.getClass().getSimpleName()+"' has not received the required number of argument(s)."+msg , WRONG_ARGS);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static JasonException createWrongArgument(InternalAction ia, String reason) {
+        return new JasonException("Wrong argument for internal action '"+ia.getClass().getSimpleName()+"': "+reason, WRONG_ARGS);
     }
     
     public static ListTerm createBasicErrorAnnots(String id, String msg) {

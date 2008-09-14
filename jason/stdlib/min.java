@@ -68,29 +68,33 @@ public class min extends DefaultInternalAction {
 		return singleton;
 	}
 
+    @Override public int getMinArgs() { return 2; }
+    @Override public int getMaxArgs() { return 2; }
+
+    @Override protected void checkArguments(Term[] args) throws JasonException {
+        super.checkArguments(args); // check number of arguments
+        if (!args[0].isList())
+            throw JasonException.createWrongArgument(this,"first argument must be a list");
+    }
+
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
-        try {
-        	if (!args[0].isList()) {
-            	throw new JasonException("The first argument of .min should be a list.");
-            }
-        	ListTerm list = (ListTerm)args[0];
-        	if (list.isEmpty()) {
-            	return false;        		
-        	}
+        checkArguments(args);
 
-        	Iterator<Term> i = list.iterator();
-        	Term min = i.next();
-        	while (i.hasNext()) {
-        		Term t = i.next();
-        		if (compare(min,t)) {
-        			min = t;
-        		}
-        	}
-            return un.unifies(args[1], min.clone());
-        } catch (ArrayIndexOutOfBoundsException e) {
-            throw new JasonException("The internal action 'max/min' has not received two arguments.");
-        }    
+    	ListTerm list = (ListTerm)args[0];
+    	if (list.isEmpty()) {
+        	return false;        		
+    	}
+
+    	Iterator<Term> i = list.iterator();
+    	Term min = i.next();
+    	while (i.hasNext()) {
+    		Term t = i.next();
+    		if (compare(min,t)) {
+    			min = t;
+    		}
+    	}
+        return un.unifies(args[1], min.clone());
     }
     
     protected boolean compare(Term a, Term t) {

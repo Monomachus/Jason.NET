@@ -52,8 +52,12 @@ public class fail extends DefaultInternalAction {
 		return singleton;
 	}
 
+    @Override public int getMinArgs() { return 0; }
+    @Override public int getMaxArgs() { return 0; }
+
 	@Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
+        checkArguments(args);
         return false;
     }
 }

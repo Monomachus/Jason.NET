@@ -57,6 +57,17 @@ import jason.asSyntax.Term;
 */
 public class broadcast extends DefaultInternalAction {
 
+    @Override public int getMinArgs() { return 2; }
+    @Override public int getMaxArgs() { return 2; }
+
+    @Override
+    protected void checkArguments(Term[] args) throws JasonException {
+        super.checkArguments(args);
+        if (!args[0].isAtom()) {
+            throw JasonException.createWrongArgument(this,"illocutionary force argument must be an atom");
+        }
+    }
+
     @Override
     public boolean canBeUsedInContext() {
         return false;
@@ -64,27 +75,14 @@ public class broadcast extends DefaultInternalAction {
 
     @Override
 	public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
-		Term ilf = null;
-		Term pcnt = null;
+        checkArguments(args);
 
-		try {
-			ilf = args[0];
-			if (!ilf.isAtom()) {
-				throw new JasonException("The illocutionary force parameter of the internal action 'broadcast' is not an atom!");
-			}
+        Term ilf = args[0];
+        Term pcnt = args[1];
 
-			pcnt = args[1];
-		} catch (ArrayIndexOutOfBoundsException e) {
-			throw new JasonException("The internal action 'broadcast' has not received two arguments.");
-		}
 		Message m = new Message(ilf.toString(), ts.getUserAgArch().getAgName(), null, pcnt);
-
-		try {
-			ts.getUserAgArch().broadcast(m);
-			return true;
-		} catch (Exception e) {
-			throw new JasonException("Error broadcasting message " + pcnt, e);
-		}
+		ts.getUserAgArch().broadcast(m);
+		return true;
 	}
 
 }

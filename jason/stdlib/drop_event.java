@@ -23,7 +23,6 @@
 
 package jason.stdlib;
 
-import jason.JasonException;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.Literal;
@@ -65,13 +64,8 @@ public class drop_event extends drop_desire {
     
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
-        try {
-            dropEvt(ts.getC(), (Literal)args[0], un);
-            return true;
-        } catch (ArrayIndexOutOfBoundsException e) {
-            throw new JasonException("The internal action 'drop_event' has not received the required argument.");
-        } catch (Exception e) {
-            throw new JasonException("Error in internal action 'drop_event': " + e, e);
-        }
+        checkArguments(args);
+        dropEvt(ts.getC(), (Literal)args[0], un);
+        return true;
     }
 }

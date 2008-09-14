@@ -23,7 +23,6 @@
 
 package jason.stdlib;
 
-import jason.JasonException;
 import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.InternalAction;
 import jason.asSemantics.TransitionSystem;
@@ -36,7 +35,7 @@ import jason.asSyntax.Term;
   <p>Internal action: <b><code>.plan_label(<i>P</i>,<i>L</i>)</code></b>.
   
   <p>Description: unifies <i>P</i> with a string representing the plan
-  labelled with the term <i>L</i> within the agent's plan library.
+  labeled with the term <i>L</i> within the agent's plan library.
   
   <p>Parameters:<ul>
   
@@ -67,23 +66,22 @@ public class plan_label extends DefaultInternalAction {
 		return singleton;
 	}
 
+	@Override public int getMinArgs() { return 2; }
+    @Override public int getMaxArgs() { return 2; }
+
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
-        try {
-            Term label = args[1];
-            Plan p = ts.getAg().getPL().get(label.toString());
-            if (p != null) {
-            	p = (Plan)p.clone();
-                p.getLabel().delSources();
-                String ps = p.toASString().replaceAll("\"", "\\\\\"");
-                return un.unifies(new StringTermImpl(ps), args[0]);
-            } else {
-            	return false;
-            }
-        } catch (ArrayIndexOutOfBoundsException e) {
-            throw new JasonException("The internal action 'plan_label' has not received two arguments.");
-        } catch (Exception e) {
-            throw new JasonException("Error in internal action 'plan_label': " + e, e);
+        checkArguments(args);
+
+        Term label = args[1];
+        Plan p = ts.getAg().getPL().get(label.toString());
+        if (p != null) {
+        	p = (Plan)p.clone();
+            p.getLabel().delSources();
+            String ps = p.toASString().replaceAll("\"", "\\\\\"");
+            return un.unifies(new StringTermImpl(ps), args[0]);
+        } else {
+        	return false;
         }
     }
 }

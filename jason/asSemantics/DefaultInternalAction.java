@@ -1,5 +1,6 @@
 package jason.asSemantics;
 
+import jason.JasonException;
 import jason.asSyntax.Term;
 
 import java.io.Serializable;
@@ -16,12 +17,15 @@ public class DefaultInternalAction implements InternalAction, Serializable {
     
     private static final long serialVersionUID = 1L;
 
-    public boolean suspendIntention() {
-        return false;
-    }
+    public boolean suspendIntention()   { return false;  }
+    public boolean canBeUsedInContext() { return true;  }
+
+    public int getMinArgs() { return 0; }
+    public int getMaxArgs() { return Integer.MAX_VALUE; }
     
-    public boolean canBeUsedInContext() {
-        return true;
+    protected void checkArguments(Term[] args) throws JasonException {
+        if (args.length < getMinArgs() || args.length > getMaxArgs())
+            throw JasonException.createWrongArgumentNb(this);            
     }
 
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {

@@ -72,59 +72,60 @@ import java.util.concurrent.TimeUnit;
 public class at extends DefaultInternalAction {
 
     public static final String atAtom = ".at"; 
+
+    @Override public int getMinArgs() { return 2; }
+    @Override public int getMaxArgs() { return 2; }
      
     @Override
     public Object execute(final TransitionSystem ts, Unifier un, Term[] args) throws Exception {
-        try {
-	        StringTerm time   = (StringTerm)args[0];
-			String     stime  = time.getString();
-            StringTerm sevent = (StringTerm)args[1];
+        checkArguments(args);
+        
+        StringTerm time   = (StringTerm)args[0];
+		String     stime  = time.getString();
+        StringTerm sevent = (StringTerm)args[1];
 
-			// parse time
-			long deadline = -1;
+		// parse time
+		long deadline = -1;
 
-			// if it starts with now
-			if (stime.startsWith("now")) {
-				// it is something like "now +3 minutes"
-				stime = stime.substring(3).trim();
-				// get the amount of time
-				if (stime.startsWith("+")) {
-					stime = stime.substring(1).trim();
-					int pos = stime.indexOf(" ");
-					if (pos > 0) {
-						deadline = Integer.parseInt(stime.substring(0,pos));
-						// get the time unit
-						stime = stime.substring(pos).trim();
-						if (stime.equals("s") || stime.startsWith("second")) {
-							deadline *= 1000;
-						}
-						if (stime.equals("m") || stime.startsWith("minute")) {
-							deadline *= 1000 * 60;
-						}
-						if (stime.equals("h") || stime.startsWith("hour")) {
-							deadline *= 1000 * 60 * 60;
-						}
-						if (stime.equals("d") || stime.startsWith("day")) {
-							deadline *= 1000 * 60 * 60 * 24;
-						}
+		// if it starts with now
+		if (stime.startsWith("now")) {
+			// it is something like "now +3 minutes"
+			stime = stime.substring(3).trim();
+			// get the amount of time
+			if (stime.startsWith("+")) {
+				stime = stime.substring(1).trim();
+				int pos = stime.indexOf(" ");
+				if (pos > 0) {
+					deadline = Integer.parseInt(stime.substring(0,pos));
+					// get the time unit
+					stime = stime.substring(pos).trim();
+					if (stime.equals("s") || stime.startsWith("second")) {
+						deadline *= 1000;
+					}
+					if (stime.equals("m") || stime.startsWith("minute")) {
+						deadline *= 1000 * 60;
+					}
+					if (stime.equals("h") || stime.startsWith("hour")) {
+						deadline *= 1000 * 60 * 60;
+					}
+					if (stime.equals("d") || stime.startsWith("day")) {
+						deadline *= 1000 * 60 * 60 * 24;
 					}
 				}
-						
-			} else {
-                throw new JasonException("The time parameter ('"+stime+"') of the internal action 'at' is not implemented!");            	
-            }
-
-			if (deadline == -1) {
-                throw new JasonException("The time parameter ('"+time+"') of the internal action 'at' did not parse correctly!");            	
 			}
-			
-			Trigger te = Trigger.parseTrigger(sevent.getString());
+					
+		} else {
+            throw new JasonException("The time parameter ('"+stime+"') of the internal action 'at' is not implemented!");            	
+        }
 
-            ts.getAg().getScheduler().schedule(new CheckDeadline(te, ts), deadline, TimeUnit.MILLISECONDS);
-			return true;
-        } catch (ArrayIndexOutOfBoundsException e) {
-            throw new JasonException("The internal action 'at' has not received two arguments.");
-        } 
+		if (deadline == -1) {
+            throw new JasonException("The time parameter ('"+time+"') of the internal action 'at' did not parse correctly!");            	
+		}
+		
+		Trigger te = Trigger.parseTrigger(sevent.getString());
+
+        ts.getAg().getScheduler().schedule(new CheckDeadline(te, ts), deadline, TimeUnit.MILLISECONDS);
+		return true;
     }
 	
 	private static int idCount = 0;

@@ -47,16 +47,15 @@ import jason.runtime.RuntimeServicesInfraTier;
  */
 public class stopMAS extends DefaultInternalAction {
 
+    @Override public int getMinArgs() { return 0; }
+    @Override public int getMaxArgs() { return 0; }
+
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
+        checkArguments(args);
 
-        try {
-            RuntimeServicesInfraTier rs = ts.getUserAgArch().getArchInfraTier().getRuntimeServices();
-            rs.stopMAS();
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return false;
+        RuntimeServicesInfraTier rs = ts.getUserAgArch().getArchInfraTier().getRuntimeServices();
+        rs.stopMAS();
+        return true;
     }
 }

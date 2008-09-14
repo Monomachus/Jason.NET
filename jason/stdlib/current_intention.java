@@ -23,7 +23,6 @@
 
 package jason.stdlib;
 
-import jason.JasonException;
 import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.Event;
 import jason.asSemantics.Intention;
@@ -93,27 +92,25 @@ import jason.asSyntax.Term;
 */
 public class current_intention extends DefaultInternalAction {
 
+    @Override public int getMinArgs() { return 1; }
+    @Override public int getMaxArgs() { return 1; }
+
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
-        try {
-            // try to get the intention from the "body"
-            Intention i = ts.getC().getSelectedIntention();
+        checkArguments(args);
+        
+        // try to get the intention from the "body"
+        Intention i = ts.getC().getSelectedIntention();
 
-            if (i == null) {
-                // try to get the intention from the event
-                Event evt = ts.getC().getSelectedEvent();
-                if (evt != null)
-                    i = evt.getIntention();
-            }
-            if (i != null)
-                return un.unifies(i.getAsTerm(), args[0]);
-            else
-                return false;
-            
-        } catch (ArrayIndexOutOfBoundsException e) {
-            throw new JasonException("The internal action 'current_intention' has not received the required argument.");
-        } catch (Exception e) {
-            throw new JasonException("Error in internal action 'current_intention': " + e, e);
-        }    
+        if (i == null) {
+            // try to get the intention from the event
+            Event evt = ts.getC().getSelectedEvent();
+            if (evt != null)
+                i = evt.getIntention();
+        }
+        if (i != null)
+            return un.unifies(i.getAsTerm(), args[0]);
+        else
+            return false;            
     }
 }

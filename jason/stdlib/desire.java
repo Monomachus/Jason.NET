@@ -24,7 +24,6 @@
 
 package jason.stdlib;
 
-import jason.JasonException;
 import jason.asSemantics.Circumstance;
 import jason.asSemantics.Event;
 import jason.asSemantics.Intention;
@@ -67,13 +66,8 @@ public class desire extends intend {
 
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
-        try {
-            return desires(ts.getC(),(Literal)args[0],un);
-        } catch (ArrayIndexOutOfBoundsException e) {
-            throw new JasonException("The internal action 'desire' has not received the required argument.");
-        } catch (Exception e) {
-            throw new JasonException("Error in internal action 'desire': " + e, e);
-        }
+        checkArguments(args);
+        return desires(ts.getC(),(Literal)args[0],un);
     }
     
     public boolean desires(Circumstance C, Literal l, Unifier un) {

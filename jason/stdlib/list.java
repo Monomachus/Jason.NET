@@ -1,6 +1,5 @@
 package jason.stdlib;
 
-import jason.JasonException;
 import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.InternalAction;
 import jason.asSemantics.TransitionSystem;
@@ -44,17 +43,12 @@ public class list extends DefaultInternalAction {
 		return singleton;
 	}
 
+	@Override public int getMinArgs() { return 1; }
+    @Override public int getMaxArgs() { return 1; }
+
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
-        try {
-            if (args.length > 1) throw new JasonException("The internal action 'list' has received more than one argument.");
-            return args[0].isList();
-        } catch (ArrayIndexOutOfBoundsException e) {
-            throw new JasonException("The internal action 'list' has not received the required argument.");
-        } catch (JasonException j) {
-            throw j;
-        } catch (Exception e) {
-            throw new JasonException("Error in internal action 'list': " + e, e);
-        }
+        checkArguments(args);
+        return args[0].isList();
     }
 }

@@ -122,105 +122,102 @@ public class send extends DefaultInternalAction {
 
     private boolean lastSendWasSynAsk = false; 
     
+    @Override public int getMinArgs() { return 3; }
+    @Override public int getMaxArgs() { return 5; }
+
+    @Override protected void checkArguments(Term[] args) throws JasonException {
+        super.checkArguments(args); // check number of arguments
+        if (!args[0].isAtom() && !args[0].isList() && !args[0].isString())
+            throw JasonException.createWrongArgument(this,"TO parameter ('"+args[0]+"') must be an atom, a string or a list of receivers!");
+
+        if (! args[1].isAtom())
+            throw JasonException.createWrongArgument(this,"illocutionary force parameter ('"+args[1]+"') must be an atom!");
+    }
+
     @Override
     public Object execute(final TransitionSystem ts, Unifier un, Term[] args) throws Exception {
-        try {
-            // check parameters
-            Term to   = args[0];
-            Term ilf  = args[1];
-            Term pcnt = args[2];
-	        
-            if (!to.isAtom() && !to.isList() && !to.isString()) {
-                throw new JasonException("The TO parameter ('"+to+"') of the internal action 'send' is not an atom, a string nor a list of receivers!");
-            }
+        checkArguments(args);
+        
+        Term to   = args[0];
+        Term ilf  = args[1];
+        Term pcnt = args[2];
+        
+        // remove source annots in the content (in case it is a pred)
+        // -- CHANGE: use nested annots 
+        //try {
+        //    ((Pred)pcnt).delSources();
+        //} catch (Exception e) {}
+        
+    
+        // create a message to be sent
+        final Message m = new Message(ilf.toString(), ts.getUserAgArch().getAgName(), null, pcnt);
 
-            if (! ilf.isAtom()) {
-                throw new JasonException("The illocutionary force parameter ('"+ilf+"') of the internal action 'send' is not an atom!");
+        // async ask has a fourth argument and should suspend the intention
+        lastSendWasSynAsk = m.isAsk() && args.length > 3;
+        if (lastSendWasSynAsk) {
+        	ts.getC().getPendingIntentions().put(m.getMsgId(), ts.getC().getSelectedIntention());
+        }
+
+        // (un)tell or unknown performative with 4 args is a reply to
+        if ( (m.isTell() || m.isUnTell() || !m.isKnownPerformative()) && args.length > 3) {
+            Term mid = args[3];
+            if (! mid.isAtom()) {
+                throw new JasonException("The Message ID ('"+mid+"') parameter of the internal action 'send' is not an atom!");
             }
-	        
-            // remove source annots in the content (in case it is a pred)
-            // -- CHANGE: use nested annots 
-            //try {
-            //    ((Pred)pcnt).delSources();
-            //} catch (Exception e) {}
-            
-        
-            // create a message to be sent
-            final Message m = new Message(ilf.toString(), ts.getUserAgArch().getAgName(), null, pcnt);
+            m.setInReplyTo(mid.toString());
+        }
     
-            // async ask has a fourth argument and should suspend the intention
-            lastSendWasSynAsk = m.isAsk() && args.length > 3;
-            if (lastSendWasSynAsk) {
-            	ts.getC().getPendingIntentions().put(m.getMsgId(), ts.getC().getSelectedIntention());
-            }
-    
-            // (un)tell or unknown performative with 4 args is a reply to
-            if ( (m.isTell() || m.isUnTell() || !m.isKnownPerformative()) && args.length > 3) {
-                Term mid = args[3];
-                if (! mid.isAtom()) {
-                    throw new JasonException("The Message ID ('"+mid+"') parameter of the internal action 'send' is not an atom!");
-                }
-                m.setInReplyTo(mid.toString());
-            }
-        
-            // send the message
-            if (to.isList()) {
-                if (m.isAsk() && args.length > 3) {
-                    throw new JasonException("Cannot send 'ask' to a list of receivers!");                                                   
-                } else {
-                    for (Term t: (ListTerm)to) {
-                        if (t.isAtom() || t.isString()) {
-                            String rec = t.toString();
-                            if (t.isString()) {
-                                rec = ((StringTerm)t).getString();
-                            }
-                            m.setReceiver(rec);
-                            ts.getUserAgArch().sendMsg(m);
-                        } else {
-                            throw new JasonException("The TO parameter ('"+t+"') of the internal action 'send' is not an atom!");
+        // send the message
+        if (to.isList()) {
+            if (m.isAsk() && args.length > 3) {
+                throw new JasonException("Cannot send 'ask' to a list of receivers!");                                                   
+            } else {
+                for (Term t: (ListTerm)to) {
+                    if (t.isAtom() || t.isString()) {
+                        String rec = t.toString();
+                        if (t.isString()) {
+                            rec = ((StringTerm)t).getString();
                         }
+                        m.setReceiver(rec);
+                        ts.getUserAgArch().sendMsg(m);
+                    } else {
+                        throw new JasonException("The TO parameter ('"+t+"') of the internal action 'send' is not an atom!");
                     }
                 }
-            } else {
-                String rec = to.toString();
-                if (to.isString()) {
-                    rec = ((StringTerm)to).getString();
-                }
-                m.setReceiver(rec);
-                ts.getUserAgArch().sendMsg(m);
             }
-            
-            if (lastSendWasSynAsk && args.length == 5) {
-                // get the timeout deadline
-                Term tto = args[4];
-                if (tto.isNumeric()) {
-                    ts.getAg().getScheduler().schedule( new Runnable() {
-                        public void run() {
-                            // if the intention is still in PI, brings it back to C.I
-                            Intention intention = ts.getC().getPendingIntentions().remove(m.getMsgId());
-                            if (intention != null) {
-                                // unify "timeout" with the fourth parameter of .send
-                                Structure send = (Structure)intention.peek().removeCurrentStep();
-                                intention.peek().getUnif().unifies(send.getTerm(3), new Atom("timeout"));
-                                // add the intention back in C.I
-                                ts.getC().addIntention(intention);
-                                ts.getUserAgArch().getArchInfraTier().wake();                                
-                            }
-                        }
-                    }, (long)((NumberTerm)tto).solve(), TimeUnit.MILLISECONDS);
-                } else {
-                    throw new JasonException("The 5th parameter of send must be a number (timeout) and not '"+tto+"'!");
-                }
+        } else {
+            String rec = to.toString();
+            if (to.isString()) {
+                rec = ((StringTerm)to).getString();
             }
-            
-            return true;
-        } catch (ArrayIndexOutOfBoundsException e) {
-            throw new JasonException("The internal action 'send' to '"+args[0]+"' has not received three arguments.");
-        } catch (JasonException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new JasonException("Error sending message " + args + "\nError: "+e, e);
+            m.setReceiver(rec);
+            ts.getUserAgArch().sendMsg(m);
         }
+        
+        if (lastSendWasSynAsk && args.length == 5) {
+            // get the timeout deadline
+            Term tto = args[4];
+            if (tto.isNumeric()) {
+                ts.getAg().getScheduler().schedule( new Runnable() {
+                    public void run() {
+                        // if the intention is still in PI, brings it back to C.I
+                        Intention intention = ts.getC().getPendingIntentions().remove(m.getMsgId());
+                        if (intention != null) {
+                            // unify "timeout" with the fourth parameter of .send
+                            Structure send = (Structure)intention.peek().removeCurrentStep();
+                            intention.peek().getUnif().unifies(send.getTerm(3), new Atom("timeout"));
+                            // add the intention back in C.I
+                            ts.getC().addIntention(intention);
+                            ts.getUserAgArch().getArchInfraTier().wake();                                
+                        }
+                    }
+                }, (long)((NumberTerm)tto).solve(), TimeUnit.MILLISECONDS);
+            } else {
+                throw new JasonException("The 5th parameter of send must be a number (timeout) and not '"+tto+"'!");
+            }
+        }
+        
+        return true;
     }
 
     @Override

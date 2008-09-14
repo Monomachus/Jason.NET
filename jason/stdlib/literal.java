@@ -1,6 +1,5 @@
 package jason.stdlib;
 
-import jason.JasonException;
 import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.InternalAction;
 import jason.asSemantics.TransitionSystem;
@@ -44,14 +43,12 @@ public class literal extends DefaultInternalAction {
 		return singleton;
 	}
 
+    @Override public int getMinArgs() { return 1; }
+    @Override public int getMaxArgs() { return 1; }
+
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
-        try {
-            return args[0].isLiteral();
-        } catch (ArrayIndexOutOfBoundsException e) {
-            throw new JasonException("The internal action 'literal' has not received the required argument.");
-        } catch (Exception e) {
-            throw new JasonException("Error in internal action 'literal': " + e, e);
-        }
+        checkArguments(args);
+        return args[0].isLiteral();
     }
 }

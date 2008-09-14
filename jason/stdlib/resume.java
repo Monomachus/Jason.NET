@@ -63,41 +63,44 @@ import java.util.Iterator;
    
  */
 public class resume extends DefaultInternalAction {
-    
+
+    @Override public int getMinArgs() { return 1; }
+    @Override public int getMaxArgs() { return 1; }
+
+    @Override protected void checkArguments(Term[] args) throws JasonException {
+        super.checkArguments(args); // check number of arguments
+        if (!args[0].isLiteral())
+            throw JasonException.createWrongArgument(this,"first argument must be a literal");
+    }
+
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
-        try {
-            Trigger      g = new Trigger(TEOperator.add, TEType.achieve, (Literal)args[0]);
-            Circumstance C = ts.getC();
-            
-            Iterator<String> ik = C.getPendingIntentions().keySet().iterator();
-            while (ik.hasNext()) {
-            	String k = ik.next();
-            	if (k.startsWith(suspend.SUSPENDED_INT)) {
-            		Intention i = C.getPendingIntentions().get(k);
-	            	if (i.hasTrigger(g, un)) {
-	                	i.setSuspended(false);
-	            		ik.remove();
-	            		
-	            		// remove the IA .suspend in case of self-suspend
-	            		if (k.equals(suspend.SELF_SUSPENDED_INT)) {
-	            		    i.peek().removeCurrentStep();
-	            		}
-                        
-                        // add it back in I if not in PA
-                        if (! C.getPendingActions().containsKey(i.getId())) {
-                            C.addIntention(i);
-                        }
-	            	}
-            	}
-            }
-            return true;
+        checkArguments(args);
 
-        } catch (ArrayIndexOutOfBoundsException e) {
-            throw new JasonException("The internal action 'resume' has not received one argument.");
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new JasonException("Error in internal action 'resume': " + e, e);
+        Trigger      g = new Trigger(TEOperator.add, TEType.achieve, (Literal)args[0]);
+        Circumstance C = ts.getC();
+        
+        Iterator<String> ik = C.getPendingIntentions().keySet().iterator();
+        while (ik.hasNext()) {
+        	String k = ik.next();
+        	if (k.startsWith(suspend.SUSPENDED_INT)) {
+        		Intention i = C.getPendingIntentions().get(k);
+            	if (i.hasTrigger(g, un)) {
+                	i.setSuspended(false);
+            		ik.remove();
+            		
+            		// remove the IA .suspend in case of self-suspend
+            		if (k.equals(suspend.SELF_SUSPENDED_INT)) {
+            		    i.peek().removeCurrentStep();
+            		}
+                    
+                    // add it back in I if not in PA
+                    if (! C.getPendingActions().containsKey(i.getId())) {
+                        C.addIntention(i);
+                    }
+            	}
+        	}
         }
+        return true;
     }        
 }

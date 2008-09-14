@@ -73,82 +73,86 @@ public class suspend extends DefaultInternalAction {
     public static final String SUSPENDED_INT      = "suspended-";
     public static final String SELF_SUSPENDED_INT = SUSPENDED_INT+"self";
 
+    @Override public int getMinArgs() { return 0; }
+    @Override public int getMaxArgs() { return 1; }
+
+    @Override protected void checkArguments(Term[] args) throws JasonException {
+        super.checkArguments(args); // check number of arguments
+        if (args.length == 1 && !args[0].isLiteral())
+            throw JasonException.createWrongArgument(this,"first argument must be a literal");
+    }
+
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
-        try {
-            suspendIntention = false;
-            
-            Circumstance C = ts.getC();
+        checkArguments(args);
 
-            if (args.length == 0) {
-                // suspend the current intention
-                Intention i = C.getSelectedIntention();
-                suspendIntention = true;
-                i.setSuspended(true);
-                C.getPendingIntentions().put(SELF_SUSPENDED_INT, i);
-                return true;
-            }
-            
-            // use the argument to select the intention to suspend.
-            
-            Trigger      g = new Trigger(TEOperator.add, TEType.achieve, (Literal)args[0]);
-        	String       k = SUSPENDED_INT+g.getLiteral();
-        	
-            // ** Must test in PA/PI first since some actions (as .suspend) put intention in PI
-            
-            // suspending from Pending Actions
-            for (ActionExec a: C.getPendingActions().values()) {
-            	Intention i = a.getIntention();
-                if (i.hasTrigger(g, un)) {
-                    i.setSuspended(true);
-                    C.getPendingIntentions().put(k, i);
-                }
-            }
-            
-            // suspending from Pending Intentions
-            for (Intention i: C.getPendingIntentions().values()) {
-                if (i.hasTrigger(g, un)) { 
-            		i.setSuspended(true);
-                }
-            }
+        suspendIntention = false;
+        
+        Circumstance C = ts.getC();
 
-            for (Intention i: C.getIntentions()) {
-                if (i.hasTrigger(g, un)) {
-                    i.setSuspended(true);
-                    C.removeIntention(i);
-                    C.getPendingIntentions().put(k, i);
-                }
-            }
-            
-            // suspending the current intention?
+        if (args.length == 0) {
+            // suspend the current intention
             Intention i = C.getSelectedIntention();
-            if (i.hasTrigger(g, un)) {
-        		suspendIntention = true;
-                i.setSuspended(true);
-        		C.getPendingIntentions().put(SELF_SUSPENDED_INT, i);
-            }
-                
-            // suspending G in Events
-            for (Event e: C.getEvents()) {
-                i = e.getIntention();
-                if ( i != null && 
-                        (i.hasTrigger(g, un)) ||       // the goal is in the i's stack of IM
-                         un.unifies(e.getTrigger(), g) // the goal is the trigger of the event
-                        ) {
-                    i.setSuspended(true);
-                    C.removeEvent(e);                    
-                    C.getPendingIntentions().put(k, i);
-                } else if (i == Intention.EmptyInt && un.unifies(e.getTrigger(), g)) { // the case of !!
-            		ts.getLogger().warning("** NOT IMPLEMENTED ** (suspend of !!)");
-                }
-            }
+            suspendIntention = true;
+            i.setSuspended(true);
+            C.getPendingIntentions().put(SELF_SUSPENDED_INT, i);
             return true;
-            
-        } catch (ArrayIndexOutOfBoundsException e) {
-            throw new JasonException("The internal action 'suspend' has not received one argument.", e);
-        } catch (Exception e) {
-            throw new JasonException("Error in internal action 'suspend': " + e, e);
         }
+        
+        // use the argument to select the intention to suspend.
+        
+        Trigger      g = new Trigger(TEOperator.add, TEType.achieve, (Literal)args[0]);
+    	String       k = SUSPENDED_INT+g.getLiteral();
+    	
+        // ** Must test in PA/PI first since some actions (as .suspend) put intention in PI
+        
+        // suspending from Pending Actions
+        for (ActionExec a: C.getPendingActions().values()) {
+        	Intention i = a.getIntention();
+            if (i.hasTrigger(g, un)) {
+                i.setSuspended(true);
+                C.getPendingIntentions().put(k, i);
+            }
+        }
+        
+        // suspending from Pending Intentions
+        for (Intention i: C.getPendingIntentions().values()) {
+            if (i.hasTrigger(g, un)) { 
+        		i.setSuspended(true);
+            }
+        }
+
+        for (Intention i: C.getIntentions()) {
+            if (i.hasTrigger(g, un)) {
+                i.setSuspended(true);
+                C.removeIntention(i);
+                C.getPendingIntentions().put(k, i);
+            }
+        }
+        
+        // suspending the current intention?
+        Intention i = C.getSelectedIntention();
+        if (i.hasTrigger(g, un)) {
+    		suspendIntention = true;
+            i.setSuspended(true);
+    		C.getPendingIntentions().put(SELF_SUSPENDED_INT, i);
+        }
+            
+        // suspending G in Events
+        for (Event e: C.getEvents()) {
+            i = e.getIntention();
+            if ( i != null && 
+                    (i.hasTrigger(g, un)) ||       // the goal is in the i's stack of IM
+                     un.unifies(e.getTrigger(), g) // the goal is the trigger of the event
+                    ) {
+                i.setSuspended(true);
+                C.removeEvent(e);                    
+                C.getPendingIntentions().put(k, i);
+            } else if (i == Intention.EmptyInt && un.unifies(e.getTrigger(), g)) { // the case of !!
+        		ts.getLogger().warning("** NOT IMPLEMENTED ** (suspend of !!)");
+            }
+        }
+        return true;
     }
 
     @Override

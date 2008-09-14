@@ -23,7 +23,6 @@
 
 package jason.stdlib;
 
-import jason.JasonException;
 import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
@@ -60,16 +59,12 @@ import jason.asSyntax.Term;
 */
 public class kill_agent extends DefaultInternalAction {
 
+    @Override public int getMinArgs() { return 1; }
+    @Override public int getMaxArgs() { return 1; }
+
     @Override
 	public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
-		
-		try {
-            Term name = args[0];
-            return ts.getUserAgArch().getArchInfraTier().getRuntimeServices().killAgent(name.toString());
-		} catch (IndexOutOfBoundsException e) {
-			throw new JasonException("The internal action 'kill_agent' received a wrong number of arguments.");
-		} catch (Exception e) {
-            throw new JasonException("Error in internal action 'kill_agent': " + e, e);
-		}
+        checkArguments(args);
+        return ts.getUserAgArch().getArchInfraTier().getRuntimeServices().killAgent(args[0].toString());
 	}
 }

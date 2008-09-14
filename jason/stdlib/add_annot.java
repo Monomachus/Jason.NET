@@ -77,18 +77,17 @@ public class add_annot extends DefaultInternalAction {
 			singleton = new add_annot();
 		return singleton;
 	}
+	
+    @Override public int getMinArgs() { return 3; }
+    @Override public int getMaxArgs() { return 3; }	
 
-    @Override
-	public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
-		try {
-			Term result = addAnnotToList(un, args[0], args[1]);
-			return un.unifies(result,args[2]);
-		} catch (ArrayIndexOutOfBoundsException e) {
-			throw new JasonException("The internal action 'add_annot' requires three arguments.");
-		}
+    @Override public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
+        checkArguments(args);
+		Term result = addAnnotToList(un, args[0], args[1]);
+		return un.unifies(result,args[2]);
 	}
 
-	public Term addAnnotToList(Unifier unif, Term l, Term annot) {
+	public Term addAnnotToList(Unifier unif, Term l, Term annot) throws JasonException {
 		if (l.isList()) {
 			ListTerm result = new ListTermImpl();
 			for (Term lTerm: (ListTerm)l) {
@@ -98,21 +97,15 @@ public class add_annot extends DefaultInternalAction {
 				}
 			}
 			return result;
-		} else {
-			try {
-				// if it can be parsed as a literal and is not an atom, OK to add annot
-				Literal result;
-				if (l.isAtom())
-					result = new Literal(((Structure)l).getFunctor());
-				else
-					result = Literal.parseLiteral(l.toString());
-				result.addAnnot(annot);
-				return result;
-			} catch (Exception e) {
-				// no problem, the content is not a pred (it is a number,
-				// string, ....) received in a message, for instance
-			}
+		} else if (l.isLiteral()) {
+			Literal result;
+			if (l.isAtom())
+				result = new Literal(((Structure)l).getFunctor());
+			else
+				result = Literal.parseLiteral(l.toString());
+			result.addAnnot(annot);
+			return result;
 		}
-		return null;
+		return l;
 	}	
 }

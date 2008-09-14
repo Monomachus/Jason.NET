@@ -88,7 +88,7 @@ public class concat extends DefaultInternalAction {
             ListTerm result = (ListTerm)args[0].clone();
             for (int i=1; i<args.length-1; i++) {
     			if (!args[i].isList())
-    				throw new JasonException("arg["+i+"] is not a list in concat.");
+    	            throw JasonException.createWrongArgument(this,"arg["+i+"] is not a list");
                 result.concat((ListTerm)args[i].clone());
             }
 			return un.unifies(result, args[args.length-1]);
@@ -97,7 +97,7 @@ public class concat extends DefaultInternalAction {
 	    } else {
             // string concat
             if (!args[args.length-1].isVar() && !args[args.length-1].isString()) {
-                throw new JasonException("Last argument of concat '"+args[args.length-1]+"' is not a string nor a variable.");
+                throw JasonException.createWrongArgument(this,"Last argument '"+args[args.length-1]+"' is not a string nor a variable.");
             }
             String vl = args[0].toString();
             if (args[0].isString()) {

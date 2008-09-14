@@ -72,40 +72,40 @@ public class if_then_else extends DefaultInternalAction {
 		return singleton;
 	}
 	
+    @Override public int getMinArgs() { return 2; }
+    @Override public int getMaxArgs() { return 3; }
+    
+    @Override protected void checkArguments(Term[] args) throws JasonException {
+        super.checkArguments(args); // check number of arguments
+        if ( !(args[0] instanceof LogicalFormula))
+            throw JasonException.createWrongArgument(this,"first argument (test) must be a logical formula.");
+        if ( !args[1].isPlanBody())
+            throw JasonException.createWrongArgument(this,"second argument (then) must be a plan body term.");
+        if ( args.length == 3 && !args[2].isPlanBody())
+            throw JasonException.createWrongArgument(this,"third argument (else) must be a plan body term.");
+    }
+    
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
-        try {
-        	if ( !(args[0] instanceof LogicalFormula))
-        		throw new JasonException("The first argument of if must be a logical formula.");
+        checkArguments(args);
         	
-            LogicalFormula logExpr = (LogicalFormula)args[0];
-            PlanBody whattoadd = null;
+        LogicalFormula logExpr = (LogicalFormula)args[0];
+        PlanBody whattoadd = null;
             
-            Iterator<Unifier> iu = logExpr.logicalConsequence(ts.getAg(), un);
-            if (iu.hasNext()) {	// .if THEN
-	            if ( !args[1].isPlanBody())
-	        		throw new JasonException("The second argument of if must be a plan body term.");
-                whattoadd = (PlanBody)args[1];
-            	un.compose(iu.next());
-            } else if (args.length == 3) { // .if ELSE
-	            if ( !args[2].isPlanBody())
-	        		throw new JasonException("The third argument of if must be a plan body term.");
-                whattoadd = (PlanBody)args[2];
-            }
-
-            if (whattoadd != null) {
-	        	IntendedMeans im = ts.getC().getSelectedIntention().peek();
-	        	PlanBody ifia = im.getCurrentStep();
-	        	whattoadd.setAsBodyTerm(false);
-	        	ifia.add(1,whattoadd);
-            }
-            return true;
-        } catch (ArrayIndexOutOfBoundsException e) {
-            throw new JasonException("The 'if' has not received the required arguments.");
-        } catch (JasonException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new JasonException("Error in 'if': " + e, e);
+        Iterator<Unifier> iu = logExpr.logicalConsequence(ts.getAg(), un);
+        if (iu.hasNext()) {	// .if THEN
+            whattoadd = (PlanBody)args[1];
+        	un.compose(iu.next());
+        } else if (args.length == 3) { // .if ELSE
+            whattoadd = (PlanBody)args[2];
         }
+
+        if (whattoadd != null) {
+        	IntendedMeans im = ts.getC().getSelectedIntention().peek();
+        	PlanBody ifia = im.getCurrentStep();
+        	whattoadd.setAsBodyTerm(false);
+        	ifia.add(1,whattoadd);
+        }
+        return true;
     }
 }

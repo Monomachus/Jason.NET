@@ -89,18 +89,21 @@ public class sort extends DefaultInternalAction {
 			singleton = new sort();
 		return singleton;
 	}
+	
+    @Override public int getMinArgs() { return 2; }
+    @Override public int getMaxArgs() { return 2; }
+
+    @Override protected void checkArguments(Term[] args) throws JasonException {
+        super.checkArguments(args); // check number of arguments
+        if (!args[0].isList())
+            throw JasonException.createWrongArgument(this,"first argument must be a list");
+    }
     
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
-        try {
-            ListTerm l1 = (ListTerm) args[0].clone();
-            if (l1.isVar()) {
-            	throw new JasonException("The first argument of .sort should not be a free variable.");
-            }
-            Collections.sort(l1);
-            return un.unifies(l1, args[1]);
-        } catch (ArrayIndexOutOfBoundsException e) {
-            throw new JasonException("The internal action 'sort' has not received two arguments.");
-        }    
+        checkArguments(args);
+        ListTerm l1 = (ListTerm) args[0].clone();
+        Collections.sort(l1);
+        return un.unifies(l1, args[1]);
     }
 }

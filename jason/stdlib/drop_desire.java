@@ -23,7 +23,6 @@
 
 package jason.stdlib;
 
-import jason.JasonException;
 import jason.asSemantics.Circumstance;
 import jason.asSemantics.Event;
 import jason.asSemantics.Intention;
@@ -73,15 +72,11 @@ public class drop_desire extends drop_intention {
     
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
-        try {
-            dropEvt(ts.getC(), (Literal)args[0], un);
-            dropInt(ts.getC(), (Literal)args[0], un);
-            return true;
-        } catch (ArrayIndexOutOfBoundsException e) {
-            throw new JasonException("The internal action 'drop_desire' has not received the required argument.");
-        } catch (Exception e) {
-            throw new JasonException("Error in internal action 'drop_desire': " + e, e);
-        }
+        checkArguments(args);
+
+        dropEvt(ts.getC(), (Literal)args[0], un);
+        dropInt(ts.getC(), (Literal)args[0], un);
+        return true;
     }
     
     public void dropEvt(Circumstance C, Literal l, Unifier un) {

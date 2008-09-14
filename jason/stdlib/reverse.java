@@ -72,21 +72,25 @@ public class reverse extends DefaultInternalAction {
 			singleton = new reverse();
 		return singleton;
 	}
+	
+    @Override public int getMinArgs() { return 2; }
+    @Override public int getMaxArgs() { return 2; }
 
 	@Override
 	public Object execute(TransitionSystem ts, Unifier un, Term[] args)	throws Exception {
-		
+	    checkArguments(args);
+	    
 	    if (args[0].isList()) {
             // list reverse
 			if (!args[1].isVar() && !args[1].isList())
-				throw new JasonException("The last argument of reverse '"+args[1]+"'is not a list nor a variable.");
+				throw JasonException.createWrongArgument(this,"last argument '"+args[1]+"' must be a list or a variable.");
 			
 			return un.unifies(((ListTerm)args[0]).reverse(), args[1]);
         
 	    } else {
             // string reverse
             if (!args[1].isVar() && !args[1].isString())
-                throw new JasonException("The last argument of reverse '"+args[1]+"' is not a string nor a variable.");
+                throw JasonException.createWrongArgument(this,"last argument '"+args[1]+"' must be a string or a variable.");
             String vl = args[0].toString();
             if (args[0].isString())
                 vl = ((StringTerm)args[0]).getString();

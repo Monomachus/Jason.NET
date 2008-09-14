@@ -24,7 +24,6 @@
 
 package jason.stdlib;
 
-import jason.JasonException;
 import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
@@ -77,28 +76,28 @@ import jason.asSyntax.Term;
  */
 public class remove_plan extends DefaultInternalAction {
 
+    @Override public int getMinArgs() { return 1; }
+    @Override public int getMaxArgs() { return 2; }
+
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
-        try {
-            Term label = args[0];
+        checkArguments(args);
+        Term label = args[0];
 
-            Structure source = new Atom("self");
-        	if (args.length > 1) {
-				source = (Structure)args[1];
-        	}
-        	
-        	if (label.isList()) { // arg[0] is a list
-        		boolean r = true;
-        		ListTerm lt = (ListTerm)args[0];
-                for (Term t: lt) {
-        			r = r && ts.getAg().getPL().remove((Structure)t, source);
-        		}
-        		return r;
-        	} else { // args[0] is a plan label
-        		return ts.getAg().getPL().remove((Structure)label, source);
-        	}
-        } catch (ArrayIndexOutOfBoundsException e) {
-            throw new JasonException("The internal action 'remove_plan' has not received the required argument (a plan label or list of labels).");
-        }
+        Structure source = new Atom("self");
+    	if (args.length > 1) {
+			source = (Structure)args[1];
+    	}
+    	
+    	if (label.isList()) { // arg[0] is a list
+    		boolean r = true;
+    		ListTerm lt = (ListTerm)args[0];
+            for (Term t: lt) {
+    			r = r && ts.getAg().getPL().remove((Structure)t, source);
+    		}
+    		return r;
+    	} else { // args[0] is a plan label
+    		return ts.getAg().getPL().remove((Structure)label, source);
+    	}
     }
 }

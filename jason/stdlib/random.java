@@ -38,20 +38,22 @@ public class random extends DefaultInternalAction {
 			singleton = new random();
 		return singleton;
 	}
-    
+	
     private Random random = new Random();    
 	
+    @Override public int getMinArgs() { return 1; }
+    @Override public int getMaxArgs() { return 1; }
+    
+    @Override protected void checkArguments(Term[] args) throws JasonException {
+        super.checkArguments(args); // check number of arguments
+        if (!args[0].isVar()) {
+            throw JasonException.createWrongArgument(this,"first argument must be a variable.");                
+        }
+    }
+
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
-        try {
-            if (!args[0].isVar()) {
-                throw new JasonException("The first argument of the internal action 'random' is not a variable.");                
-            }
-            return un.unifies(args[0], new NumberTermImpl(random.nextDouble()));
-        } catch (ArrayIndexOutOfBoundsException e) {
-            throw new JasonException("The internal action 'random' has not received the required argument.");
-        } catch (Exception e) {
-            throw new JasonException("Error in internal action 'random': " + e, e);
-        }    
+        checkArguments(args);
+        return un.unifies(args[0], new NumberTermImpl(random.nextDouble()));
     }
 }

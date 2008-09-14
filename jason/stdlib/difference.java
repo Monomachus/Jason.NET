@@ -71,17 +71,22 @@ public class difference extends DefaultInternalAction {
 		return singleton;
 	}
 
+	@Override public int getMinArgs() { return 3; }
+    @Override public int getMaxArgs() { return 3; }
+
+    @Override protected void checkArguments(Term[] args) throws JasonException {
+        super.checkArguments(args); // check number of arguments
+        if (!args[0].isList())
+            throw JasonException.createWrongArgument(this,"first argument '"+args[0]+"'is not a list.");
+        if (!args[1].isList())
+            throw JasonException.createWrongArgument(this,"second argument '"+args[1]+"'is not a list.");
+        if (!args[2].isVar() && !args[2].isList())
+            throw JasonException.createWrongArgument(this,"last argument '"+args[2]+"'is not a list nor a variable.");
+    }
+
 	@Override
 	public Object execute(TransitionSystem ts, Unifier un, Term[] args)	throws Exception {
-		
-	    if (!args[0].isList())
-            throw new JasonException("First argument of difference '"+args[0]+"'is not a list.");
-        if (!args[1].isList())
-            throw new JasonException("Second argument of difference '"+args[1]+"'is not a list.");
-        
-        if (!args[2].isVar() && !args[2].isList())
-			throw new JasonException("Last argument of difference '"+args[2]+"'is not a list nor a variable.");
-
+        checkArguments(args);
 		return un.unifies(args[2], ((ListTerm)args[0]).difference( (ListTerm)args[1]) );
 	}
 }

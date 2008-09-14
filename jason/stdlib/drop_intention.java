@@ -68,16 +68,20 @@ import jason.asSyntax.Trigger.TEType;
  */
 public class drop_intention extends DefaultInternalAction {
     
+    @Override public int getMinArgs() { return 1; }
+    @Override public int getMaxArgs() { return 1; }
+    
+    @Override protected void checkArguments(Term[] args) throws JasonException {
+        super.checkArguments(args); // check number of arguments
+        if (!args[0].isLiteral())
+            throw JasonException.createWrongArgument(this,"first argument must be a literal");
+    }
+
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
-        try {
-            dropInt(ts.getC(),(Literal)args[0],un);
-            return true;
-        } catch (ArrayIndexOutOfBoundsException e) {
-            throw new JasonException("The internal action 'drop_intention' has not received the required argument.");
-        } catch (Exception e) {
-            throw new JasonException("Error in internal action 'drop_intention': " + e, e);
-        }
+        checkArguments(args);
+        dropInt(ts.getC(),(Literal)args[0],un);
+        return true;
     }
     
     public void dropInt(Circumstance C, Literal l, Unifier un) {

@@ -69,15 +69,19 @@ import jason.asSyntax.Trigger.TEType;
  */
 public class intend extends DefaultInternalAction {
     
+    @Override public int getMinArgs() { return 1; }
+    @Override public int getMaxArgs() { return 1; }
+
+    @Override protected void checkArguments(Term[] args) throws JasonException {
+        super.checkArguments(args); // check number of arguments
+        if (!args[0].isLiteral())
+            throw JasonException.createWrongArgument(this,"first argument must be a literal");
+    }
+
     @Override
 	public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
-        try {
-    	    return intends(ts.getC(),(Literal)args[0],un);
-        } catch (ArrayIndexOutOfBoundsException e) {
-            throw new JasonException("The internal action 'intend' has not received the required argument.");
-        } catch (Exception e) {
-            throw new JasonException("Error in internal action 'intend': " + e, e);
-        }
+        checkArguments(args);
+        return intends(ts.getC(),(Literal)args[0],un);
     }
     
     public boolean intends(Circumstance C, Literal l, Unifier un) {

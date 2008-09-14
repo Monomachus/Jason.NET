@@ -70,18 +70,22 @@ import jason.asSyntax.Trigger.TEType;
 
  */
 public class succeed_goal extends DefaultInternalAction {
+
+    @Override public int getMinArgs() { return 1; }
+    @Override public int getMaxArgs() { return 1; }
+
+    @Override protected void checkArguments(Term[] args) throws JasonException {
+        super.checkArguments(args); // check number of arguments
+        if (!args[0].isLiteral())
+            throw JasonException.createWrongArgument(this,"first argument must be a literal");
+    }
     
+
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
-        try {
-            drop(ts, (Literal)args[0], un);
-            return true;
-        } catch (ArrayIndexOutOfBoundsException e) {
-            throw new JasonException("The internal action 'succeed_goal' has not received one argument.");
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new JasonException("Error in internal action 'succeed_goal': " + e, e);
-        }
+        checkArguments(args);
+        drop(ts, (Literal)args[0], un);
+        return true;
     }
     
     public void drop(TransitionSystem ts, Literal l, Unifier un) throws Exception {

@@ -23,7 +23,6 @@
 
 package jason.stdlib;
 
-import jason.JasonException;
 import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.InternalAction;
 import jason.asSemantics.TransitionSystem;
@@ -66,12 +65,12 @@ public class my_name extends DefaultInternalAction {
 		return singleton;
 	}
 
+	@Override public int getMinArgs() { return 1; }
+    @Override public int getMaxArgs() { return 1; }
+
     @Override
 	public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
-		try {
-            return un.unifies(args[0], new Atom(ts.getUserAgArch().getAgName()));
-		} catch (ArrayIndexOutOfBoundsException e) {
-			throw new JasonException("The internal action 'my_name' has not received the required argument.");
-		}
+        checkArguments(args);
+        return un.unifies(args[0], new Atom(ts.getUserAgArch().getAgName()));
 	}
 }

@@ -69,36 +69,35 @@ import java.util.List;
  */
 public class relevant_plans extends DefaultInternalAction {
 
+    @Override public int getMinArgs() { return 2; }
+    @Override public int getMaxArgs() { return 2; }
+
     @Override
 	public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
-		try {
-			StringTerm sTe = (StringTerm) args[0];
-			Trigger te = Trigger.parseTrigger(sTe.getString());
-			if (te == null) {
-				throw new JasonException("The first argument of the 'relevant_plans' internal action is not a triggering event.");
-			}
-			ListTerm lt = new ListTermImpl();
-            List<Option> rp = ts.relevantPlans(te);
-            if (rp != null) {
-                for (Option opt: rp) {
-                    // remove sources (this IA is used for communication)
-                    Plan np = (Plan)opt.getPlan().clone();
-                    if (np.getLabel() != null) {
-                        np.getLabel().delSources();
-                    }
-                    StringTerm stplan = new StringTermImpl(np.toASString().replaceAll("\\\"", "\\\\\""));
-                    lt.add(stplan);
-                }
-			}
-
-			// second arg is a var
-			Term listVar = args[1];
-
-			return un.unifies(lt, listVar);
-		} catch (ArrayIndexOutOfBoundsException e) {
-			throw new JasonException("The internal action 'relevant_plans' has not received two arguments (TE and VAR).");
-		} catch (Exception e) {
-			throw new JasonException("Error in internal action 'relevant_plans': " + e, e);
+        checkArguments(args);
+        
+		StringTerm sTe = (StringTerm) args[0];
+		Trigger te = Trigger.parseTrigger(sTe.getString());
+		if (te == null) {
+			throw new JasonException("The first argument of the 'relevant_plans' internal action is not a triggering event.");
 		}
+		ListTerm lt = new ListTermImpl();
+        List<Option> rp = ts.relevantPlans(te);
+        if (rp != null) {
+            for (Option opt: rp) {
+                // remove sources (this IA is used for communication)
+                Plan np = (Plan)opt.getPlan().clone();
+                if (np.getLabel() != null) {
+                    np.getLabel().delSources();
+                }
+                StringTerm stplan = new StringTermImpl(np.toASString().replaceAll("\\\"", "\\\\\""));
+                lt.add(stplan);
+            }
+		}
+
+		// second arg is a var
+		Term listVar = args[1];
+
+		return un.unifies(lt, listVar);
 	}
 }

@@ -44,48 +44,49 @@ public class range extends DefaultInternalAction {
 			singleton = new range();
 		return singleton;
 	}
+
+    @Override public int getMinArgs() { return 3; }
+    @Override public int getMaxArgs() { return 3; }
+
+    @Override protected void checkArguments(Term[] args) throws JasonException {
+        super.checkArguments(args); // check number of arguments
+        if (!args[1].isNumeric())
+            throw JasonException.createWrongArgument(this,"second parameter ('" + args[1] + "') must be a number!");
+        if (!args[2].isNumeric())
+            throw JasonException.createWrongArgument(this,"third parameter ('" + args[2] + "') must be a number!");
+    }
     
+
     @Override
     public Object execute(TransitionSystem ts, final Unifier un, Term[] args) throws Exception {
-        try {
-            if (!args[1].isNumeric())
-                throw new JasonException("The second parameter ('" + args[1] + "') to the internal action 'range' is not a number!");
-            if (!args[2].isNumeric())
-                throw new JasonException("The third parameter ('" + args[1] + "') to the internal action 'range' is not a number!");
+        checkArguments(args);
 
-            final int start = (int)((NumberTerm)args[1]).solve();
-            final int end   = (int)((NumberTerm)args[2]).solve();
-            if (!args[0].isVar()) {
-                // first arg is not a var
-                int vl = (int)((NumberTerm)args[0]).solve();
-                return vl >= start && vl <= end;
-            } else {
-                // first arg is a var, backtrack
-                final Term var = args[0];
-    
-                return new Iterator<Unifier>() {
-                	int vl = start-1;
-                	
-                	public boolean hasNext() {
-                	    return vl < end;
-            		}
-    
-                	public Unifier next() {
-                	    vl++;
-                	    Unifier c = un.clone();
-                        c.unifiesNoUndo(var,new NumberTermImpl(vl));
-                        return c;
-                	}
-                	
-                	public void remove() {}
-                };
-            }
-        } catch (ArrayIndexOutOfBoundsException e) {
-            throw new JasonException("The internal action 'range' has not received two arguments.");
-        } catch (JasonException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new JasonException("Error in internal action 'range': " + e, e);
+        final int start = (int)((NumberTerm)args[1]).solve();
+        final int end   = (int)((NumberTerm)args[2]).solve();
+        if (!args[0].isVar()) {
+            // first arg is not a var
+            int vl = (int)((NumberTerm)args[0]).solve();
+            return vl >= start && vl <= end;
+        } else {
+            // first arg is a var, backtrack
+            final Term var = args[0];
+
+            return new Iterator<Unifier>() {
+            	int vl = start-1;
+            	
+            	public boolean hasNext() {
+            	    return vl < end;
+        		}
+
+            	public Unifier next() {
+            	    vl++;
+            	    Unifier c = un.clone();
+                    c.unifiesNoUndo(var,new NumberTermImpl(vl));
+                    return c;
+            	}
+            	
+            	public void remove() {}
+            };
         }
     }
 }

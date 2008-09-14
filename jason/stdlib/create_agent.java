@@ -82,46 +82,51 @@ import java.io.File;
 */
 public class create_agent extends DefaultInternalAction {
 
+    @Override public int getMinArgs() { return 2; }
+    @Override public int getMaxArgs() { return 3; }
+
+    @Override protected void checkArguments(Term[] args) throws JasonException {
+        super.checkArguments(args); // check number of arguments
+        if (!args[1].isString())
+            throw JasonException.createWrongArgument(this,"second argument must be a string");
+        if (args.length == 3 && !args[2].isString())
+            throw JasonException.createWrongArgument(this,"third argument must be a list");  
+    }
+
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
+        checkArguments(args);
+        
+        Term       name   = args[0];
+        StringTerm source = (StringTerm)args[1];
 
-        try {
-            Term       name   = args[0];
-            StringTerm source = (StringTerm)args[1];
+        File fSource = new File(source.getString());
+        if (!fSource.exists()) {
+            throw new JasonException("The source file " + source + " was not found!");
+        }
 
-            File fSource = new File(source.getString());
-            if (!fSource.exists()) {
-                throw new JasonException("The source file " + source + " was not found!");
-            }
-
-            String agClass = null;
-            String agArchClass = null;
-            ClassParameters bbPars = null;
-            if (args.length > 2) { // optional parameter
-                // get the parameters
-                for (Term t: (ListTerm)args[2]) {
-                    if (t.isStructure()) {
-                        Structure s = (Structure)t;
-                        if (s.getFunctor().equals("beliefBaseClass")) {
-                            bbPars = new ClassParameters(testString(s.getTerm(0)));
-                        } else if (s.getFunctor().equals("agentClass")) {
-                            agClass = testString(s.getTerm(0)).toString();
-                        } else if (s.getFunctor().equals("agentArchClass")) {
-                            agArchClass = testString(s.getTerm(0)).toString();
-                        }
+        String agClass = null;
+        String agArchClass = null;
+        ClassParameters bbPars = null;
+        if (args.length > 2) { // optional parameter
+            // get the parameters
+            for (Term t: (ListTerm)args[2]) {
+                if (t.isStructure()) {
+                    Structure s = (Structure)t;
+                    if (s.getFunctor().equals("beliefBaseClass")) {
+                        bbPars = new ClassParameters(testString(s.getTerm(0)));
+                    } else if (s.getFunctor().equals("agentClass")) {
+                        agClass = testString(s.getTerm(0)).toString();
+                    } else if (s.getFunctor().equals("agentArchClass")) {
+                        agArchClass = testString(s.getTerm(0)).toString();
                     }
                 }
-
             }
 
-            RuntimeServicesInfraTier rs = ts.getUserAgArch().getArchInfraTier().getRuntimeServices();
-            return rs.createAgent(name.toString(), fSource.getAbsolutePath(), agClass, agArchClass, bbPars, ts.getSettings());
-
-        } catch (IndexOutOfBoundsException e) {
-            throw new JasonException("The internal action 'create_agent' received a wrong number of arguments.");
-        } catch (Exception e) {
-            throw new JasonException("Error in internal action 'create_agent': " + e, e);
         }
+
+        RuntimeServicesInfraTier rs = ts.getUserAgArch().getArchInfraTier().getRuntimeServices();
+        return rs.createAgent(name.toString(), fSource.getAbsolutePath(), agClass, agArchClass, bbPars, ts.getSettings());
     }
     
     private Structure testString(Term t) {

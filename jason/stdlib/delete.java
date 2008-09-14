@@ -79,27 +79,28 @@ public class delete extends DefaultInternalAction {
 		return singleton;
 	}
 
+	@Override public int getMinArgs() { return 3; }
+    @Override public int getMaxArgs() { return 3; }
+
 	@Override
 	public Object execute(TransitionSystem ts, Unifier un, Term[] args)	throws Exception {
-        try {
-            if (args[0].isNumeric() && args[1].isString()) {
-                return un.unifies(args[2], deleteFromString((int)((NumberTerm)args[0]).solve(),(StringTerm)args[1]));
-            } 
-            if (args[0].isNumeric() && args[1].isList()) {
-                return un.unifies(args[2], deleteFromList((int)((NumberTerm)args[0]).solve(),(ListTerm)args[1]));
-            }
-            if (args[0].isString() && args[1].isString()) {
-                return un.unifies(args[2], deleteFromString((StringTerm)args[0],(StringTerm)args[1]));
-            }
-            
-            // first element as term
-            if (args[1].isList()) {
-                return un.unifies(args[2], deleteFromList(args[0],(ListTerm)args[1], un.clone()));
-            }
-            throw new JasonException("Incorrect use of the internal action '.delete' (see documentation).");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            throw new JasonException("The internal action '.delete' has not received three arguments.");
+        checkArguments(args);
+
+        if (args[0].isNumeric() && args[1].isString()) {
+            return un.unifies(args[2], deleteFromString((int)((NumberTerm)args[0]).solve(),(StringTerm)args[1]));
+        } 
+        if (args[0].isNumeric() && args[1].isList()) {
+            return un.unifies(args[2], deleteFromList((int)((NumberTerm)args[0]).solve(),(ListTerm)args[1]));
         }
+        if (args[0].isString() && args[1].isString()) {
+            return un.unifies(args[2], deleteFromString((StringTerm)args[0],(StringTerm)args[1]));
+        }
+        
+        // first element as term
+        if (args[1].isList()) {
+            return un.unifies(args[2], deleteFromList(args[0],(ListTerm)args[1], un.clone()));
+        }
+        throw new JasonException("Incorrect use of the internal action '.delete' (see documentation).");
 	}
 	
 	ListTerm deleteFromList(Term element, ListTerm l, Unifier un) {

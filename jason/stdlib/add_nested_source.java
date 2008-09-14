@@ -24,7 +24,6 @@
 
 package jason.stdlib;
 
-import jason.JasonException;
 import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.InternalAction;
 import jason.asSemantics.TransitionSystem;
@@ -62,7 +61,7 @@ import jason.asSyntax.Term;
   <li> <code>.add_nested_source(a[source(bob)],jomi,B)</code>: <code>B</code>
   unifies with <code>a[source(jomi)[source(bob)]]</code>.</li>
 
-  <li> <code>.add_annot([a1,a2], jomi, B)</code>: <code>B</code>
+  <li> <code>.add_nested_source([a1,a2], jomi, B)</code>: <code>B</code>
   unifies with <code>[a1[source(jomi)], a2[source(jomi)]]</code>.</li>
 
   </ul>
@@ -78,15 +77,14 @@ public class add_nested_source extends DefaultInternalAction {
 			singleton = new add_nested_source();
 		return singleton;
 	}
+	
+    @Override public int getMinArgs() { return 3; }
+    @Override public int getMaxArgs() { return 3; }
 
-	@Override
-	public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
-		try {
-			Term result = addAnnotToList(un, args[0], (Structure)args[1].clone());
-			return un.unifies(result,args[2]);
-		} catch (ArrayIndexOutOfBoundsException e) {
-			throw new JasonException("The internal action 'add_nested_source' requires three arguments.");
-		}
+	@Override public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
+        checkArguments(args);
+		Term result = addAnnotToList(un, args[0], args[1].clone());
+		return un.unifies(result,args[2]);
 	}
 
 	public Term addAnnotToList(Unifier unif, Term l, Term source) {
@@ -99,28 +97,23 @@ public class add_nested_source extends DefaultInternalAction {
 				}
 			}
 			return result;
+		} else if (l.isLiteral()) {
+			Literal result;
+			if (l.isAtom())
+				result = new Literal(((Structure)l).getFunctor());
+			else
+				result = (Literal)l.clone();
+			
+			// create the source annots
+			Pred ts = new Pred("source",1);
+            ts.addTerm(source);
+            ts.addAnnots(result.getAnnots("source"));
+            
+            result.delSources();
+			result.addAnnot(ts);
+			return result;
 		} else {
-			try {
-				// if it can be parsed as a literal and is not an atom, OK to add annot
-				Literal result;
-				if (l.isAtom())
-					result = new Literal(((Structure)l).getFunctor());
-				else
-					result = Literal.parseLiteral(l.toString());
-				
-				// create the source annots
-				Pred ts = new Pred("source",1);
-	            ts.addTerm(source);
-	            ts.addAnnots(result.getAnnots("source"));
-	            
-	            result.delSources();
-				result.addAnnot(ts);
-				return result;
-			} catch (Exception e) {
-				// no problem, the content is not a pred (it is a number,
-				// string, ....) received in a message, for instance
-			}
+		    return l;
 		}
-		return null;
 	}	
 }

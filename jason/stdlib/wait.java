@@ -88,45 +88,39 @@ public class wait extends DefaultInternalAction {
     public static final String waitAtom = ".wait"; 
     //static Logger logger = Logger.getLogger(wait.class.getName());
 
-    @Override
-    public boolean canBeUsedInContext() {
-        return false;
-    }
+    @Override  public boolean canBeUsedInContext() {  return false;  }
+    @Override public boolean suspendIntention() { return true;  } 
+    
+    @Override public int getMinArgs() { return 1; }
+    @Override public int getMaxArgs() { return 2; }
 
     @Override
     public Object execute(final TransitionSystem ts, Unifier un, Term[] args) throws Exception {
+        checkArguments(args);
+        
         long timeout = -1;
         Trigger te = null;
         Term elapsedTime = null;
-        try {
-            if (args[0].isNumeric()) {
-                // time in milliseconds
-                NumberTerm time = (NumberTerm)args[0];
-                timeout = (long) time.solve();
-            } else if (args[0].isString()) {
-                // wait for event
-                StringTerm st = (StringTerm) args[0];
-                st.apply(un);
-                te = Trigger.parseTrigger(st.getString());
+        
+        if (args[0].isNumeric()) {
+            // time in milliseconds
+            NumberTerm time = (NumberTerm)args[0];
+            timeout = (long) time.solve();
+        } else if (args[0].isString()) {
+            // wait for event
+            StringTerm st = (StringTerm) args[0];
+            st.apply(un);
+            te = Trigger.parseTrigger(st.getString());
 
-                if (args.length >= 2)
-                    timeout = (long) ((NumberTerm) args[1]).solve();
-                if (args.length == 3)
-                	elapsedTime = args[2];
-            }
-            new WaitEvent(te, un, ts, timeout, elapsedTime);
-            return true;
-        } catch (Exception e) {
-            ts.getLogger().log(Level.SEVERE, "Error at .wait.", e);
+            if (args.length >= 2)
+                timeout = (long) ((NumberTerm) args[1]).solve();
+            if (args.length == 3)
+            	elapsedTime = args[2];
         }
-        return false;
+        new WaitEvent(te, un, ts, timeout, elapsedTime);
+        return true;
     }    
 
-    @Override
-    public boolean suspendIntention() {
-        return true;
-    } 
-    
     class WaitEvent implements CircumstanceListener { 
         private Trigger          te;
         private String           sTE; // a string version of TE

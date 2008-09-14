@@ -23,7 +23,6 @@
 
 package jason.stdlib;
 
-import jason.JasonException;
 import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
@@ -75,28 +74,27 @@ import jason.asSyntax.Term;
  */
 public class add_plan extends DefaultInternalAction {
 
+    @Override public int getMinArgs() { return 1; }
+    @Override public int getMaxArgs() { return 2; }
+
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
-        try {
-            Term plans = DefaultTerm.parse(args[0].toString());
+        checkArguments(args);
 
-            Structure source = new Atom("self");
-            if (args.length > 1) {
-                source = (Structure) args[1];
-            }
+        Term plans = DefaultTerm.parse(args[0].toString());
 
-            if (plans.isList()) { // arg[0] is a list of strings
-                for (Term t: (ListTerm) plans) {
-                    ts.getAg().getPL().add((StringTerm) t, source);
-                }
-            } else { // args[0] is a plan
-                ts.getAg().getPL().add((StringTerm) plans, source);
-            }
-            return true;
-        } catch (ArrayIndexOutOfBoundsException e) {
-            throw new JasonException("The internal action 'add_plan' has not received two arguments (a plan as a string and the source).");
-        } catch (Exception e) {
-            throw new JasonException("Error in internal action 'add_plan': " + e, e);
+        Structure source = new Atom("self");
+        if (args.length > 1) {
+            source = (Structure) args[1];
         }
+
+        if (plans.isList()) { // arg[0] is a list of strings
+            for (Term t: (ListTerm) plans) {
+                ts.getAg().getPL().add((StringTerm) t, source);
+            }
+        } else { // args[0] is a plan
+            ts.getAg().getPL().add((StringTerm) plans, source);
+        }
+        return true;
     }
 }

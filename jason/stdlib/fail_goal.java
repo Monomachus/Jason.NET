@@ -75,15 +75,9 @@ public class fail_goal extends succeed_goal {
     
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
-        try {
-            drop(ts, (Literal)args[0], un);
-            return true;
-        } catch (ArrayIndexOutOfBoundsException e) {
-            throw new JasonException("The internal action 'fail_goal' has not received one argument.");
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new JasonException("Error in internal action 'fail_goal': " + e, e);
-        }
+        checkArguments(args);
+        drop(ts, (Literal)args[0], un);
+        return true;
     }
     
     /* returns: >0 the intention was changed

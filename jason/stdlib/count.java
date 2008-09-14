@@ -70,21 +70,26 @@ import java.util.Iterator;
 */
 public class count extends DefaultInternalAction {
 
+    @Override public int getMinArgs() { return 2; }
+    @Override public int getMaxArgs() { return 2; }
+
+    @Override protected void checkArguments(Term[] args) throws JasonException {
+        super.checkArguments(args); // check number of arguments
+        if (!(args[0] instanceof LogicalFormula))
+            throw JasonException.createWrongArgument(this,"first argument must be a formula");
+    }
+
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
-        try {
-            LogicalFormula logExpr = (LogicalFormula)args[0];
-            int n = 0;
-            Iterator<Unifier> iu = logExpr.logicalConsequence(ts.getAg(), un);
-            while (iu.hasNext()) {
-                iu.next();
-                n++;
-            }
-            return un.unifies(args[1], new NumberTermImpl(n));
-        } catch (ArrayIndexOutOfBoundsException e) {
-            throw new JasonException("The internal action 'count' has not received two arguments.");
-        } catch (Exception e) {
-            throw new JasonException("Error in internal action 'count': " + e, e);
+        checkArguments(args);
+
+        LogicalFormula logExpr = (LogicalFormula)args[0];
+        int n = 0;
+        Iterator<Unifier> iu = logExpr.logicalConsequence(ts.getAg(), un);
+        while (iu.hasNext()) {
+            iu.next();
+            n++;
         }
+        return un.unifies(args[1], new NumberTermImpl(n));
     }
 }

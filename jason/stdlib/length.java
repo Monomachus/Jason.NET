@@ -75,9 +75,13 @@ public class length extends DefaultInternalAction {
 			singleton = new length();
 		return singleton;
 	}
+	
+    @Override public int getMinArgs() { return 2; }
+    @Override public int getMaxArgs() { return 2; }
 
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
+        checkArguments(args);
         Term l1 = args[0];
         Term l2 = args[1];
 

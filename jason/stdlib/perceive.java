@@ -44,8 +44,12 @@ import jason.asSyntax.Term;
   </ul>
 */
 public class perceive extends DefaultInternalAction {
+    @Override public int getMinArgs() { return 0; }
+    @Override public int getMaxArgs() { return 0; }
+
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
+        checkArguments(args);
         ts.getAg().buf(ts.getUserAgArch().perceive());
         return true;
     }

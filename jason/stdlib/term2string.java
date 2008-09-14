@@ -42,32 +42,29 @@ public class term2string extends DefaultInternalAction {
 		return singleton;
 	}
 
+	@Override public int getMinArgs() { return 2; }
+    @Override public int getMaxArgs() { return 2; }
+
     @Override
     public Object execute(TransitionSystem ts, final Unifier un, final Term[] args) throws Exception {
-        try {
-            // case 1, no vars
-            if (!args[0].isVar() && args[1].isString()) {
-                return args[0].toString().equals( ((StringTerm)args[1]).getString() );
-            }
-            
-            // case 2, second is var
-            if (!args[0].isVar() && args[1].isVar()) {
-                return un.unifies(new StringTermImpl(args[0].toString()), args[1]);
-            }
-            
-            // case 3, first is var
-            if (args[0].isVar() && args[1].isString()) {
-                return un.unifies(args[0], DefaultTerm.parse( ((StringTerm)args[1]).getString() ));
-            }
-            
-            throw new JasonException("invalid case of term2string");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            throw new JasonException("The internal action 'term2string' has not received two arguments.");
-        } catch (JasonException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new JasonException("Error in internal action 'term2string': " + e, e);
+        checkArguments(args);
+        
+        // case 1, no vars
+        if (!args[0].isVar() && args[1].isString()) {
+            return args[0].toString().equals( ((StringTerm)args[1]).getString() );
         }
+        
+        // case 2, second is var
+        if (!args[0].isVar() && args[1].isVar()) {
+            return un.unifies(new StringTermImpl(args[0].toString()), args[1]);
+        }
+        
+        // case 3, first is var
+        if (args[0].isVar() && args[1].isString()) {
+            return un.unifies(args[0], DefaultTerm.parse( ((StringTerm)args[1]).getString() ));
+        }
+        
+        throw new JasonException("invalid case of term2string");
     }
 }
 
