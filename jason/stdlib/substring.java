@@ -52,7 +52,7 @@ public class substring extends DefaultInternalAction {
 		return singleton;
 	}
 
-    @Override public int getMinArgs() { return 3; }
+    @Override public int getMinArgs() { return 2; }
     @Override public int getMaxArgs() { return 3; }
 
     @Override

@@ -118,6 +118,9 @@ public class Environment {
 		return environmentInfraTier;
 	}
 
+    public Logger getLoger() {
+        return logger;
+    }
     
     public void informAgsEnvironmentChanged(Collection<String> agents) {
         if (environmentInfraTier != null) {
@@ -310,7 +313,7 @@ public class Environment {
             public void run() {
                 try {
                     boolean success = executeAction(agName, action);
-                    environmentInfraTier.actionExecuted(agName, action, success, infraData);
+                    environmentInfraTier.actionExecuted(agName, action, success, infraData); // send the result of the execution to the agent
                 } catch (Exception ie) {
                     if (!(ie instanceof InterruptedException)) {
                         logger.log(Level.WARNING, "act error!",ie);

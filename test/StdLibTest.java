@@ -215,10 +215,6 @@ public class StdLibTest extends TestCase {
 
     }
 
-    public static void main(String[] a) {
-        new StdLibTest().testSubString();
-    }
-
     public void testConcat() {
         ListTerm l1 = ListTermImpl.parseList("[a,b,c]");
         ListTerm l2 = ListTermImpl.parseList("[d,e,f]");
@@ -248,7 +244,7 @@ public class StdLibTest extends TestCase {
     }
 
     @SuppressWarnings("unchecked")
-	public void testSubString() {
+	public void testSubString() throws Exception {
         StringTerm s1 = new StringTermImpl("a");
         StringTerm s2 = new StringTermImpl("bbacca");
 
@@ -258,22 +254,19 @@ public class StdLibTest extends TestCase {
         VarTerm X = new VarTerm("X");
 
         Unifier u = new Unifier();
-        try {
-            assertTrue((Boolean)new jason.stdlib.substring().execute(null, u, new Term[] { s1, s2 }));
-            Iterator<Unifier> i = (Iterator)new jason.stdlib.substring().execute(null, u, new Term[] { s1, s2 , X});
-            assertEquals(i.next().get("X").toString(), "2");
-            assertEquals(i.next().get("X").toString(), "5");
-            assertFalse(i.hasNext());
 
-            assertTrue((Boolean)new jason.stdlib.substring().execute(null, u, new Term[] { t1, t2}));
-            i = (Iterator)new jason.stdlib.substring().execute(null, new Unifier(), new Term[] { t1, t2, X});
-            assertTrue(i.hasNext());
-            assertEquals(i.next().get("X").toString(), "9");
-            assertFalse(i.hasNext());
+        assertTrue((Boolean)new jason.stdlib.substring().execute(null, u, new Term[] { s1, s2 }));
+        Iterator<Unifier> i = (Iterator)new jason.stdlib.substring().execute(null, u, new Term[] { s1, s2 , X});
+        assertEquals(i.next().get("X").toString(), "2");
+        assertEquals(i.next().get("X").toString(), "5");
+        assertFalse(i.hasNext());
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        assertTrue((Boolean)new jason.stdlib.substring().execute(null, u, new Term[] { t1, t2}));
+        i = (Iterator)new jason.stdlib.substring().execute(null, new Unifier(), new Term[] { t1, t2, X});
+        assertTrue(i.hasNext());
+        assertEquals(i.next().get("X").toString(), "9");
+        assertFalse(i.hasNext());
+
     }
     
     public void testDropGoal1() throws ParseException {

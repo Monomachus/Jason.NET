@@ -339,7 +339,7 @@ public class ListTermImpl extends Structure implements ListTerm {
         ListTerm result = new ListTermImpl();
         ListTerm tail = result;
         for (Term t: set)
-            tail = tail.append((Term)t.clone());
+            tail = tail.append(t.clone());
         return result;
 
     }
@@ -524,7 +524,7 @@ public class ListTermImpl extends Structure implements ListTerm {
             public Term next() {
                 last = pos;
                 pos++;
-                return get(last);
+                return get(last); // TODO: get complexity is O(n)! and sort uses this iterator.... it will be nice to have a get implementation with constant time.
             }
             public int nextIndex() {
                 return pos+1;
