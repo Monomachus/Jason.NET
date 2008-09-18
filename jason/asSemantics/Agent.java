@@ -390,7 +390,7 @@ public class Agent {
 	    		this.addInitialGoal(g);
 	    	}
 	    	for (Plan p: a.getPL()) {
-	    		this.getPL().add(p);
+	    		this.getPL().add(p, false);
 	    	}
     	}
     }

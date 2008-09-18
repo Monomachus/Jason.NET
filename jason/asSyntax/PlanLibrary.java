@@ -62,15 +62,33 @@ public class PlanLibrary implements Iterable<Plan> {
 
 	private Logger logger = Logger.getLogger(PlanLibrary.class.getName());	
 	
+    /** 
+     *  Add a new plan written as a String. The source
+     *  normally is "self" or the agent that sent this plan.
+     *  If the already has a plan equals to "stPlan", only a
+     *  new source is added.
+     *  
+     *  The plan is added in the end of the PlanLibrary.
+     *  
+     *  returns the plan added, null if it does not work.
+     */
+    public Plan add(StringTerm stPlan, Structure tSource) {
+       return add(stPlan, tSource, false); 
+    }
+    
 	/** 
-	 *  Add a new plan based on a String. The source
+	 *  Add a new plan written as a String. The source
 	 *  normally is "self" or the agent that sent this plan.
 	 *  If the already has a plan equals to "stPlan", only a
 	 *  new source is added.
+	 *  
+	 *  If <i>before</i> is true, the plan will be added in the
+	 *  begin of the PlanLibrary; otherwise, it is added in
+	 *  the end.
      *  
      *   returns the plan added, null if it does not work.
 	 */
-	public Plan add(StringTerm stPlan, Structure tSource) {
+	public Plan add(StringTerm stPlan, Structure tSource, boolean before) {
 		String sPlan = stPlan.getString();
 		try {
 			// remove quotes \" -> "
@@ -90,9 +108,9 @@ public class PlanLibrary implements Iterable<Plan> {
     		        	p.setLabel(getUniqueLabel());
     		        }
     				p.getLabel().addSource(tSource);
-    				add(p);
+    				add(p, before);
     			} else {
-    				p = (Plan) plans.get(i);
+    				p = plans.get(i);
     				p.getLabel().addSource(tSource);
     			}
     			return p;
@@ -175,13 +193,13 @@ public class PlanLibrary implements Iterable<Plan> {
     
 	public void addAll(PlanLibrary pl) throws JasonException {
 		for (Plan p: pl) { 
-			add(p);
+			add(p, false);
 		}
 	}
 
 	public void addAll(List<Plan> plans) throws JasonException {
 		for (Plan p: plans) { 
-			add(p);
+			add(p, false);
 		}
 	}
 
@@ -197,6 +215,10 @@ public class PlanLibrary implements Iterable<Plan> {
 	/** return a plan for a label */
     public Plan get(String label) {
         return planLabels.get(label);
+    }
+    
+    public int size() {
+        return plans.size();
     }
     
     public List<Plan> getPlans() {
