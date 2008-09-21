@@ -43,8 +43,14 @@ import org.w3c.dom.Element;
  */
 public interface BeliefBase extends Iterable<Literal>, Cloneable {
 
-    public static final Term TPercept = Pred.createSource(new Atom("percept"));
-    public static final Term TSelf    = Pred.createSource(new Atom("self"));
+    public static final Term ASelf    = new Atom("self");
+    public static final Term APercept = new Atom("percept");
+
+    /** represents the structure 'source(percept)' */
+    public static final Term TPercept = Pred.createSource(APercept);
+
+    /** represents the structure 'source(self)' */
+    public static final Term TSelf    = Pred.createSource(ASelf);
     
     /** 
      * Called before the MAS execution with the agent that uses this
