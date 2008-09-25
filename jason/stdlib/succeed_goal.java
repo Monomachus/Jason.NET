@@ -150,7 +150,7 @@ public class succeed_goal extends DefaultInternalAction {
      *           3 = simply removed without event
      */
     int dropIntention(Intention i, Trigger g, TransitionSystem ts, Unifier un) throws JasonException {
-        if (i != null && i.dropGoal(g, un)) {
+        if (i != null && i.dropGoal(g, un) && !i.isFinished()) {  // could be finished after i.dropGoal() !!
         	// continue the intention
         	i.peek().removeCurrentStep();
         	ts.applyClrInt(i);
