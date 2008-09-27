@@ -38,13 +38,25 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- This class represents an abstract literal (an Atom, Structure, Pred, and even LiteralImpl), is is mainly
- the interface of a literal. The concrete implementation (that supports all operation) is LiteralImpl class.
+ This class represents an abstract literal (an Atom, Structure, Predicate, ...), is is mainly
+ the interface of a literal. 
  
- Maybe, in future releases this class will be transformed to a interface, for now it is an abstract class to
- allow Literal.parseLiteral that is used a lot by users.
+ To create a Literal, one of the following classes may be used:
+ Atom -- the most simple literal, is composed by a functor (no term, no annots);
+ Structure -- has functor and terms;
+ Pred -- has functor, terms, and annotations;
+ LiteralImpl -- Pred + negation. This latter class supports all the operations of 
+ the Literal interface.
+ 
+ There are useful static methods in this class to create Literals.
  
  @author jomi
+ 
+ @see Atom
+ @see Structure
+ @see Pred
+ @see LiteralImpl
+ 
  */
 public abstract class Literal extends DefaultTerm implements LogicalFormula {
 
@@ -57,6 +69,16 @@ public abstract class Literal extends DefaultTerm implements LogicalFormula {
     public static final Literal LFalse = new FalseLiteral();
 
     protected PredicateIndicator predicateIndicatorCache = null; // to not compute it all the time (is is called many many times)
+    
+    /** create a literal with only a functor, but where terms and annotations may be added */
+    public static Literal create(String functor) {
+        return new LiteralImpl(functor);
+    }
+
+    /** create a literal copying data from other literal */
+    public static Literal create(Literal l) {
+        return new LiteralImpl(l);
+    }    
     
 	public static Literal parseLiteral(String sLiteral) {
 		try {
@@ -284,7 +306,7 @@ public abstract class Literal extends DefaultTerm implements LogicalFormula {
     @SuppressWarnings("serial")
     static final class TrueLiteral extends LiteralImpl {
     	public TrueLiteral() {
-    		super("true",0);
+    		super("true", 0);
 		}
 
     	@Override
@@ -301,7 +323,7 @@ public abstract class Literal extends DefaultTerm implements LogicalFormula {
     @SuppressWarnings("serial")
 	static final class FalseLiteral extends LiteralImpl {
     	public FalseLiteral() {
-    		super("false",0);
+    		super("false", 0);
 		}
 
     	@Override

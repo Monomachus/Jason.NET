@@ -252,7 +252,7 @@ public class Plan extends SourceInfo implements Cloneable, Serializable {
         Element u = (Element) document.createElement("plan");
         if (label != null) {
             Element l = (Element) document.createElement("label");
-            l.appendChild(new LiteralImpl(Literal.LPos, label).getAsDOM(document));
+            l.appendChild(new LiteralImpl(label).getAsDOM(document));
             u.appendChild(l);
         }
         u.appendChild(tevent.getAsDOM(document));

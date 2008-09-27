@@ -65,7 +65,7 @@ public class InternalActionLiteral extends LiteralImpl {
 
     // used by the parser
     public InternalActionLiteral(Pred p, Agent ag) throws Exception {
-        super(true,p);
+        super(p);
         if (ag != null)
             ia = ag.getIA(getFunctor());
     }
