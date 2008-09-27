@@ -335,7 +335,7 @@ public class TermTest extends TestCase {
     	assertTrue(u.unifies(t1, t3));
         assertEquals(u.get("H").toString(),"a");
         assertEquals(u.get("R").toString(),"[b,c,d]");
-    }    
+    }  
     
     public void testApplyAnnots() {
         Term t1 = DefaultTerm.parse("p[a,X,c,d]");

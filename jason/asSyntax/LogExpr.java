@@ -44,10 +44,6 @@ import org.w3c.dom.Element;
 
    @navassoc - op - LogicalOp
    
-   //@view
-   //@match class jason.asSyntax.Term
-   //@opt !hide
-    
  */
 public class LogExpr extends BinaryStructure implements LogicalFormula {
 

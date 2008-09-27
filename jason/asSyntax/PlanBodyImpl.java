@@ -15,7 +15,7 @@ import org.w3c.dom.Element;
  *  
  *  
  *  @navassoc - next - PlanBody
- *  @navassoc - type - BodyType
+ *  @navassoc - type - PlanBody.BodyType
  *  
  *  @author Jomi  
  */

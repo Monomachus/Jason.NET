@@ -23,10 +23,8 @@
 
 package jason.asSemantics;
 
-import jason.asSyntax.Atom;
 import jason.asSyntax.Literal;
 import jason.asSyntax.Pred;
-import jason.asSyntax.Structure;
 import jason.asSyntax.Term;
 import jason.asSyntax.Trigger;
 import jason.asSyntax.VarTerm;
@@ -215,50 +213,27 @@ public class Unifier implements Cloneable {
         
         // both terms are not vars
         
-        // if the first is an Atom and the second pred, they must have the same functor
-        // and no terms in the pred
-        if (t1g.isAtom() && t2g.isPred()) {
-            Atom t1a = (Atom)t1g;
-            Pred t2p = (Pred)t2g;
-            return t2p.getArity() == 0 && t1a.getFunctor().equals(t2p.getFunctor());
-        }
-        
-        // if any of the terms is not a structure (is a number or a
+        // if any of the terms is not a literal (is a number or a
         // string), they must be equal
-        if (!t1g.isStructure() || !t2g.isStructure())
+        if (!t1g.isLiteral() || !t2g.isLiteral())
         	return t1g.equals(t2g);
 
-        // both terms are structures
+        // both terms are literal
 
-        Structure t1s = (Structure)t1g;
-        Structure t2s = (Structure)t2g;
+        Literal t1s = (Literal)t1g;
+        Literal t2s = (Literal)t2g;
 
         // different arities
         final int ts = t1s.getArity();
         if (ts != t2s.getArity())
             return false;
         
-        final boolean t1islit = t1g.isLiteral();
-        final boolean t2islit = t2g.isLiteral();
-        final boolean t1isneg = t1islit && ((Literal)t1g).negated();
-        final boolean t2isneg = t2islit && ((Literal)t2g).negated();
-
         // if both are literal, they must have the same negated
-        if (t1islit && t2islit && t1isneg != t2isneg)
+        if (t1s.negated() != t2s.negated())
         	return false;
         	
-        // if one term is literal and the other not, the literal should not be negated
-        if (t1islit && !t2islit && t1isneg)
-        	return false;
-        if (t2islit && !t1islit && t2isneg)
-        	return false;
-        
-        // if the first term is a predicate and the second not, the first should not have annots 
-        if (t1g.isPred() && !t2g.isPred() && ((Pred)t1g).hasAnnot())
-        	return false;
-        
         // different functor
-        if (!t1s.getFunctor().equals(t2s.getFunctor())) // t1a.getFunctor() != null && 
+        if (!t1s.getFunctor().equals(t2s.getFunctor()))  
             return false;
         
         // unify inner terms
@@ -267,10 +242,9 @@ public class Unifier implements Cloneable {
             if (!unifiesNoUndo(t1s.getTerm(i), t2s.getTerm(i)))
                 return false;
 
-        // if both are predicates, the first's annots must be subset of the second's annots
-        if (t1g.isPred() && t2g.isPred())
-            if ( ! ((Pred)t1g).hasSubsetAnnot((Pred)t2g, this))
-                return false;
+        // the first's annots must be subset of the second's annots
+        if ( ! t1s.hasSubsetAnnot(t2s, this))
+            return false;
         
         return true;
     }

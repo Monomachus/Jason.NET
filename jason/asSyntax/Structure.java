@@ -44,7 +44,7 @@ import org.w3c.dom.Element;
  * e.g.: val(10,x(3)). 
  * <i>n</i> can be 0, so this class also represents atoms.
  *
- * @composed - - 0..* Term
+ * @composed - terms 0..* Term
  * 
  */
 public class Structure extends Atom {

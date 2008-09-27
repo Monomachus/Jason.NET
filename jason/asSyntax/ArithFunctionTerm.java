@@ -14,6 +14,8 @@ import org.w3c.dom.Element;
  * Represents an arithmetic function, like math.max(arg1,arg2) -- a functor (math.max) and two arguments.
  * A Structure is thus used to store the data.
  * 
+ * @composed - "arguments (from Structure.terms)" 0..* Term
+ * 
  * @author Jomi
  *
  */
