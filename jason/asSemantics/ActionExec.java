@@ -62,10 +62,10 @@ public class ActionExec implements Serializable {
     }
    
     public Structure getActionTerm() {
-        if (action.isAtom())
-            return new Structure(action.getFunctor());
-        else
+        if (action instanceof Structure)
             return (Structure)action;
+        else
+            return new Structure(action);
     }
     
     public Intention getIntention() {
