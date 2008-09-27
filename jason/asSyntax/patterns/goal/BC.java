@@ -1,7 +1,6 @@
 package jason.asSyntax.patterns.goal;
 
 import jason.asSemantics.Agent;
-import jason.asSyntax.Literal;
 import jason.asSyntax.Plan;
 import jason.asSyntax.Pred;
 import jason.asSyntax.Term;
@@ -23,16 +22,16 @@ public class BC implements Directive {
     public Agent process(Pred directive, Agent outerContent, Agent innerContent) {
         try {
             Term goal = directive.getTerm(0);
-            Literal subDir;
+            Pred subDir;
             if (directive.getArity() > 1) {
-                subDir = Literal.parseLiteral(directive.getTerm(1).toString());
+                subDir = Pred.parsePred(directive.getTerm(1).toString());
             } else {
-                subDir = Literal.parseLiteral("bdg("+goal+")");
+                subDir = Pred.parsePred("bdg("+goal+")");
             }
             Directive sd = DirectiveProcessor.getDirective(subDir.getFunctor());
 
             // apply sub directive
-            Agent newAg = sd.process(subDir, outerContent, innerContent); 
+            Agent newAg = sd.process((Pred)subDir, outerContent, innerContent); 
             if (newAg != null) {
 
                 // add +!g : true <- !!g.

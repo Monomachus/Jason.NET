@@ -55,7 +55,7 @@
         return null;
     }
 
-    private ArithFunction getArithFunction(Structure l) {
+    private ArithFunction getArithFunction(Literal l) {
         ArithFunction af = null;
         if (curAg != null)
            // try to find the function in agent register
@@ -510,12 +510,12 @@
       ;
     }
     B = log_expr();
-                         if (B instanceof Literal) {
+                         if (formType == BodyType.action && B instanceof RelExpr) {
+                            {if (true) return new PlanBodyImpl(BodyType.constraint, (RelExpr)B);} // constraint
+                         } else if (B instanceof Literal) {
                             if ( ((Literal)B).isInternalAction() )
                                formType = BodyType.internalAction;
                             {if (true) return new PlanBodyImpl(formType, (Literal)B);}
-                         } else if (formType == BodyType.action && B instanceof RelExpr) {
-                            {if (true) return new PlanBodyImpl(BodyType.constraint, (RelExpr)B);} // constraint 
                          } else {
                                 if (formType == BodyType.test) {
                                    if (B instanceof LogicalFormula)
@@ -569,7 +569,7 @@
                                          logger.warning(getSourceRef(F)+" warning: The internal action class for '"+F+"' was not found!");
                                    }
                                 }
-                                {if (true) return new Literal(type,F);}
+                                {if (true) return new LiteralImpl(type,F);}
       break;
     case TK_TRUE:
       k = jj_consume_token(TK_TRUE);

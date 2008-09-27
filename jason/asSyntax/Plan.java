@@ -38,17 +38,25 @@ import java.util.logging.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-/** Represents an AgentSpack plan */
+/** Represents an AgentSpack plan 
+
+ @navassoc - label - Pred
+ @navassoc - event - Trigger
+ @navassoc - context - LogicalFormula
+ @navassoc - body - PlanBody
+
+
+ */
 public class Plan extends SourceInfo implements Cloneable, Serializable {
     
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
     private static final Term TAtomic         = DefaultTerm.parse("atomic");
     private static final Term TBreakPoint     = DefaultTerm.parse("breakpoint");
     private static final Term TAllUnifs       = DefaultTerm.parse("all_unifs");
     
     private static Logger     logger          = Logger.getLogger(Plan.class.getName());
     
-	private Pred              label  = null;
+    private Pred              label  = null;
     private Trigger           tevent = null;
     private LogicalFormula    context;
     private PlanBody          body;
@@ -244,7 +252,7 @@ public class Plan extends SourceInfo implements Cloneable, Serializable {
         Element u = (Element) document.createElement("plan");
         if (label != null) {
             Element l = (Element) document.createElement("label");
-            l.appendChild(new Literal(Literal.LPos, label).getAsDOM(document));
+            l.appendChild(new LiteralImpl(Literal.LPos, label).getAsDOM(document));
             u.appendChild(l);
         }
         u.appendChild(tevent.getAsDOM(document));

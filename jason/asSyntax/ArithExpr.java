@@ -34,14 +34,16 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
- * Represents and solve arithmetic expressions like "10 + 30".
+  Represents and solve arithmetic expressions like "10 + 30".
+ 
+  @navassoc - op - ArithmeticOp
  */
 public class ArithExpr extends ArithFunctionTerm implements NumberTerm {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
     private static Logger logger = Logger.getLogger(ArithExpr.class.getName());
-	
-	public enum ArithmeticOp {
+    
+    public enum ArithmeticOp {
         none {
             double eval(double x, double y) {
                 return 0;
@@ -121,23 +123,23 @@ public class ArithExpr extends ArithFunctionTerm implements NumberTerm {
     private ArithmeticOp  op = ArithmeticOp.none;
 
     public ArithExpr(NumberTerm t1, ArithmeticOp oper, NumberTerm t2) {
-    	super(oper.toString(),2);
-    	addTerms(t1, t2);
+        super(oper.toString(),2);
+        addTerms(t1, t2);
         op = oper;
-		if (t1 instanceof SourceInfo) setSrc((SourceInfo)t1);
-		else if (t2 instanceof SourceInfo) setSrc((SourceInfo)t2);        
+        if (t1 instanceof SourceInfo) setSrc((SourceInfo)t1);
+        else if (t2 instanceof SourceInfo) setSrc((SourceInfo)t2);        
     }
 
     public ArithExpr(ArithmeticOp oper, NumberTerm t1) {
-    	super(oper.toString(),1);
-    	addTerm(t1);
+        super(oper.toString(),1);
+        addTerm(t1);
         op = oper;
-		setSrc(t1);
+        setSrc(t1);
     }
     
     private ArithExpr(ArithExpr ae) { // for clone
-    	super(ae);
-    	op = ae.op;
+        super(ae);
+        op = ae.op;
     }
 
     /** returns some Term that can be evaluated as Number */
@@ -170,9 +172,9 @@ public class ArithExpr extends ArithFunctionTerm implements NumberTerm {
     }
 
     @Override
-	public boolean checkArity(int a) {
+    public boolean checkArity(int a) {
         return a == 1 || a == 2;
-	}
+    }
     
     /** make a hard copy of the terms */
     public NumberTerm clone() {

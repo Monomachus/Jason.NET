@@ -28,11 +28,12 @@ import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.InternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
+import jason.asSyntax.Atom;
 import jason.asSyntax.ListTerm;
 import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Literal;
+import jason.asSyntax.LiteralImpl;
 import jason.asSyntax.Pred;
-import jason.asSyntax.Structure;
 import jason.asSyntax.Term;
 
 /**
@@ -100,7 +101,7 @@ public class add_nested_source extends DefaultInternalAction {
 		} else if (l.isLiteral()) {
 			Literal result;
 			if (l.isAtom())
-				result = new Literal(((Structure)l).getFunctor());
+				result = new LiteralImpl(((Atom)l).getFunctor());
 			else
 				result = (Literal)l.clone();
 			

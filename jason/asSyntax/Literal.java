@@ -31,18 +31,22 @@ import jason.asSyntax.parser.ParseException;
 import jason.asSyntax.parser.as2j;
 
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
-
 /**
- * A Literal is a Pred with strong negation (~).
+ This class represents an abstract literal (an Atom, Structure, Pred, and even LiteralImpl), is is mainly
+ the interface of a literal. The concrete implementation (that supports all operation) is LiteralImpl class.
+ 
+ Maybe, in future releases this class will be transformed to a interface, for now it is an abstract class to
+ allow Literal.parseLiteral that is used a lot by users.
+ 
+ @author jomi
  */
-public class Literal extends Pred implements LogicalFormula {
+public abstract class Literal extends DefaultTerm implements LogicalFormula {
 
 	private static final long serialVersionUID = 1L;
     private static Logger logger = Logger.getLogger(Literal.class.getName());
@@ -52,36 +56,8 @@ public class Literal extends Pred implements LogicalFormula {
     public static final Literal LTrue  = new TrueLiteral();
     public static final Literal LFalse = new FalseLiteral();
 
-	private boolean type = LPos;
-
-	/** creates a positive literal */
-	public Literal(String functor) {
-		super(functor);
-	}
-
-	/** to be used by atom */
-    protected Literal(String functor, int termsSize) {
-        super(functor, termsSize);
-    }
-
-	/** if pos == true, the literal is positive, otherwise it is negative */
-	public Literal(boolean pos, String functor) {
-		super(functor);
-		type = pos;
-	}
-
-	/** if pos == true, the literal is positive, otherwise it is negative */
-	public Literal(boolean pos, Pred p) {
-		super(p);
-		type = pos;
-	}
-
-	public Literal(Literal l) {
-	    super((Pred) l);
-	    type = l.type;
-	}
-
-
+    protected PredicateIndicator predicateIndicatorCache = null; // to not compute it all the time (is is called many many times)
+    
 	public static Literal parseLiteral(String sLiteral) {
 		try {
 			as2j parser = new as2j(new StringReader(sLiteral));
@@ -96,30 +72,82 @@ public class Literal extends Pred implements LogicalFormula {
         return new as2j(new StringReader(sLiteral)).literal();
     }
 
+    public Literal copy() {
+        return (Literal)clone(); // should call the clone, that is overridden in subclasses
+    }
+
+    public abstract String getFunctor();
+    
     @Override
 	public boolean isLiteral() {
 		return true;
 	}
-
-	@Override
-	public boolean isAtom() {
-		return super.isAtom() && !negated();
-	}
-	
-	/** to be overridden by subclasses (as internal action) */
-	public boolean canBeAddedInBB() {
-		return true;
-	}
-	
-	public boolean negated() {
-		return type == LNeg;
-	}
     
-    public void setNegated(boolean b) {
-        type = b;
-        resetHashCodeCache();
+    /** returns functor symbol "/" arity */
+    public PredicateIndicator getPredicateIndicator() {
+        if (predicateIndicatorCache == null) {
+            predicateIndicatorCache = new PredicateIndicator(getFunctor(),getArity());
+        }
+        return predicateIndicatorCache;
     }
 
+    /* default implementation of some methods */
+
+    public int getArity()         { return 0;  }
+    public boolean hasTerm()      { return false; } // should use getArity to work for list/atom
+    public List<Term> getTerms()  { return Structure.emptyTermList;   }
+    public Term[] getTermsArray() { return getTerms().toArray(Structure.emptyTermArray);  }
+    public List<VarTerm> getSingletonVars() { return new ArrayList<VarTerm>(); }
+
+
+    public void makeTermsAnnon()  {}
+    public void makeVarsAnnon()   {}
+    public void makeVarsAnnon(Unifier un) {}
+
+    public ListTerm getAnnots()     { return null; }
+    public boolean hasAnnot(Term t) { return false; }
+    public boolean hasAnnot()       { return false; }
+    public boolean hasSubsetAnnot(Literal p)            { return true; }
+    public boolean hasSubsetAnnot(Literal p, Unifier u) { return true; }
+    public void clearAnnots()       { }
+    public ListTerm getAnnots(String functor) { return new ListTermImpl(); }
+    public ListTerm getSources()    { return new ListTermImpl(); }
+    public boolean hasSource()      { return false; }
+    public boolean hasSource(Term agName) { return false; }
+
+    public boolean canBeAddedInBB() { return false; }
+    public boolean negated()        { return false; }
+
+    public boolean equalsAsStructure(Object p) { return false;  }
+    
+	/* Not implemented methods */
+	
+    // structure
+    public void addTerm(Term t) {  logger.log(Level.SEVERE, "addTerm is not implemented in the class "+this.getClass().getSimpleName(), new Exception());  }
+    public void delTerm(int index) { logger.log(Level.SEVERE, "delTerm is not implemented in the class "+this.getClass().getSimpleName(), new Exception());  }
+    public void addTerms(Term ... ts ) { logger.log(Level.SEVERE, "addTerms is not implemented in the class "+this.getClass().getSimpleName(), new Exception());  }
+    public void addTerms(List<Term> l) { logger.log(Level.SEVERE, "addTerms is not implemented in the class "+this.getClass().getSimpleName(), new Exception());  }
+    public Term getTerm(int i)    { logger.log(Level.SEVERE, "getTerm(i) is not implemented in the class "+this.getClass().getSimpleName(), new Exception()); return null; }
+    public void setTerms(List<Term> l) { logger.log(Level.SEVERE, "setTerms is not implemented in the class "+this.getClass().getSimpleName(), new Exception());  }
+    public void setTerm(int i, Term t) { logger.log(Level.SEVERE, "setTerm is not implemented in the class "+this.getClass().getSimpleName(), new Exception());  }
+    
+    // pred
+    public void setAnnots(ListTerm l) { logger.log(Level.SEVERE, "setAnnots is not implemented in the class "+this.getClass().getSimpleName(), new Exception());  }
+    public boolean addAnnot(Term t) { logger.log(Level.SEVERE, "addAnnot is not implemented in the class "+this.getClass().getSimpleName(), new Exception()); return false; }
+    public void addAnnots(List<Term> l) { logger.log(Level.SEVERE, "addAnnots is not implemented in the class "+this.getClass().getSimpleName(), new Exception());  }
+    public void addAnnot(int index, Term t) { logger.log(Level.SEVERE, "addAnnot is not implemented in the class "+this.getClass().getSimpleName(), new Exception());  }
+    public void delAnnot(Term t) { logger.log(Level.SEVERE, "delAnnot is not implemented in the class "+this.getClass().getSimpleName(), new Exception());  }
+    public boolean delAnnots(List<Term> l) { logger.log(Level.SEVERE, "delAnnots is not implemented in the class "+this.getClass().getSimpleName(), new Exception()); return false; }
+    public boolean importAnnots(Literal p) { logger.log(Level.SEVERE, "importAnnots is not implemented in the class "+this.getClass().getSimpleName(), new Exception());  return false; }
+
+    public void addSource(Term agName) { logger.log(Level.SEVERE, "addSource is not implemented in the class "+this.getClass().getSimpleName(), new Exception());  }
+    public boolean delSource(Term agName) { logger.log(Level.SEVERE, "delSource is not implemented in the class "+this.getClass().getSimpleName(), new Exception());  return false; }
+    public void delSources() { logger.log(Level.SEVERE, "delSources is not implemented in the class "+this.getClass().getSimpleName(), new Exception());  }
+
+    // literal    
+    public void setNegated(boolean b) {  logger.log(Level.SEVERE, "setNegated is not implemented in the class "+this.getClass().getSimpleName(), new Exception());  }
+    
+    
     /** 
      * logicalConsequence checks whether one particular predicate
      * is a logical consequence of the belief base.
@@ -211,68 +239,11 @@ public class Literal extends Pred implements LogicalFormula {
         };
     }   
 
-    @Override
-    public boolean equals(Object o) {
-        if (o == null) return false;
-        if (o == this) return true;
-
-        if (o instanceof Literal) {
-			final Literal l = (Literal) o;
-			return type == l.type && hashCode() == l.hashCode() && super.equals(l);
-		} else if (o instanceof Structure) {
-			return !negated() && super.equals(o);
-		}
-        return false;
-	}
-
-    @Override    
-    public String getErrorMsg() {
-        return "Error in '"+this+"' ("+ super.getErrorMsg() + ")";       
-    }
     
-    @Override
-    public int compareTo(Term t) {
-        if (t.isLiteral()) {
-            Literal tl = (Literal)t;
-            if (!negated() && tl.negated()) {
-                return -1;
-            } if (negated() && !tl.negated()) {
-                return 1;
-            }
-        }
-        int c = super.compareTo(t);
-        if (c != 0) return c;
-        return 0;
-    }        
-
-	public Term clone() {
-	    return new Literal(this);
-	}
-	
-	public Literal copy() {
-	    return (Literal)clone(); // should call the clone, that is overridden in subclasses
-	}
-
-    
-    @Override
-    protected int calcHashCode() {
-        int result = super.calcHashCode();
-        if (negated()) result += 3271;
-        return result;
-    }
-
-	/** returns [~] super.getPredicateIndicator */
-	@Override 
-    public PredicateIndicator getPredicateIndicator() {
-		if (predicateIndicatorCache == null)
-		    predicateIndicatorCache = new PredicateIndicator(((type == LPos) ? "" : "~")+getFunctor(),getArity());
-		return predicateIndicatorCache;
-	}
-	
 	/** returns this literal as a list with three elements: [functor, list of terms, list of annots] */
 	public ListTerm getAsListOfTerms() {
 		ListTerm l = new ListTermImpl();
-		l.add(new Literal(type, getFunctor()));
+		l.add(new LiteralImpl(!negated(), getFunctor()));
 		ListTerm lt = new ListTermImpl();
 		lt.addAll(getTerms());
 		l.add(lt);
@@ -296,7 +267,7 @@ public class Literal extends Pred implements LogicalFormula {
 				pos = Literal.LNeg;
 			}
 
-			Literal l = new Literal(pos,((Structure)tfunctor).getFunctor());
+			Literal l = new LiteralImpl(pos,((Atom)tfunctor).getFunctor());
 
 			if (i.hasNext()) {
 				l.setTerms(((ListTerm)i.next()).cloneLT());
@@ -310,27 +281,8 @@ public class Literal extends Pred implements LogicalFormula {
 		}
 	}
 	
-	public String toString() {
-		if (type == LPos)
-			return super.toString();
-		else
-			return "~" + super.toString();
-	}
-
-    /** get as XML */
-    @Override
-    public Element getAsDOM(Document document) {
-        Element u = (Element) document.createElement("literal");
-        if (negated()) {
-            u.setAttribute("negated", negated()+"");
-        }
-        u.appendChild(super.getAsDOM(document));
-        return u;
-    }
-
-    
     @SuppressWarnings("serial")
-    static final class TrueLiteral extends Literal {
+    static final class TrueLiteral extends LiteralImpl {
     	public TrueLiteral() {
     		super("true",0);
 		}
@@ -347,7 +299,7 @@ public class Literal extends Pred implements LogicalFormula {
     }
     
     @SuppressWarnings("serial")
-	static final class FalseLiteral extends Literal {
+	static final class FalseLiteral extends LiteralImpl {
     	public FalseLiteral() {
     		super("false",0);
 		}
@@ -362,5 +314,4 @@ public class Literal extends Pred implements LogicalFormula {
         	return LogExpr.EMPTY_UNIF_LIST.iterator();            
         }
     }
-    
 }

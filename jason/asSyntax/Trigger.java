@@ -24,14 +24,6 @@
 
 package jason.asSyntax;
 
-/** 
- * Represents an AgentSpeak trigger (like +!g, +p, ...).
- * 
- * It is composed by:
- *    an operator (+ or -);
- *    a type (<empty>, !, or ?);
- *    a literal
- */
 import jason.asSemantics.Unifier;
 import jason.asSyntax.parser.ParseException;
 import jason.asSyntax.parser.as2j;
@@ -43,6 +35,19 @@ import java.util.logging.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+/** 
+ * Represents an AgentSpeak trigger (like +!g, +p, ...).
+ * 
+ * It is composed by:
+ *    an operator (+ or -);
+ *    a type (<empty>, !, or ?);
+ *    a literal
+ *    
+ * @opt attributes    
+ * @navassoc - literal   - Literal
+ * @navassoc - operator - TEOperator
+ * @navassoc - type     - TEType
+ */
 public class Trigger implements Cloneable {
 
     private static Logger logger = Logger.getLogger(Trigger.class.getName());

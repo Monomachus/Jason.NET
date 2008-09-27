@@ -31,14 +31,16 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
- * A rule is a Literal (head) with an optional body, as in "a :- b &amp; c".
+     A rule is a Literal (head) with an optional body, as in "a :- b &amp; c".
+    
+     @navassoc - body - LogicalFormula
  */
-public class Rule extends Literal {
+public class Rule extends LiteralImpl {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
     private static Logger logger = Logger.getLogger(Rule.class.getName());
 
-	private LogicalFormula body   = null;
+    private LogicalFormula body   = null;
 
     public Rule(Literal head, LogicalFormula body) {
         super(head);

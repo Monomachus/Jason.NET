@@ -43,41 +43,32 @@ import org.w3c.dom.Element;
  * Represents a structure: a functor with <i>n</i> arguments, 
  * e.g.: val(10,x(3)). 
  * <i>n</i> can be 0, so this class also represents atoms.
+ *
+ * @composed - - 0..* Term
+ * 
  */
-public class Structure extends DefaultTerm {
+public class Structure extends Atom {
 
 	private static final long serialVersionUID = 1L;
     private static Logger logger = Logger.getLogger(Structure.class.getName());
 
     protected static final List<Term> emptyTermList  = new ArrayList<Term>(0);
-    protected static final Term[]     emptyTermArray = new Term[0]; // just to have a type for toArray in the getTermsArray method
-    
+    protected static final Term[]     emptyTermArray = new Term[0]; // just to have a type for toArray in the getTermsArray method  
 
-	private final String functor; // immutable field
     private List<Term> terms;
 
-    protected PredicateIndicator predicateIndicatorCache = null; // to not compute it all the time (is is called many many times)
-    
     public Structure(String functor) {
-        //if (functor != null && Character.isUpperCase(functor.charAt(0))) {
-        //    logger.warning("Are you sure you want to create a structure that begins with uppercase ("+functor+")? Should it be a VarTerm instead?");
-        //}
-        //if (functor != null && functor.charAt(0) == '~') {
-        //    logger.warning("A functor should not start with ~ ("+functor+")!");
-        //}
         //this.functor = (functor == null ? null : functor.intern()); // it does not improve performance in test i did!
-        if (functor == null)
-            logger.log(Level.WARNING, "A structure functor should not be null!", new Exception());
-        this.functor = functor;
+        super(functor);
         this.terms = new ArrayList<Term>(5);
     }
     
-    public Structure(Structure t) {
-        functor = t.getFunctor();
-        terms   = t.getDeepCopyOfTerms();
-        predicateIndicatorCache = t.predicateIndicatorCache;
-        hashCodeCache           = t.hashCodeCache;
-        setSrc(t);
+    public Structure(Literal l) {
+        super(l);
+        final int tss = l.getArity();
+        terms = new ArrayList<Term>(tss);
+        for (int i = 0; i < tss; i++)
+            terms.add(l.getTerm(i).clone());
     }
 
     /** 
@@ -86,10 +77,7 @@ public class Structure extends DefaultTerm {
      * It is used by list term and atom to not create the array list for terms. 
      */
     public Structure(String functor, int termsSize) {
-        //this.functor = (functor == null ? null : functor.intern()); 
-        if (functor == null)
-            logger.log(Level.WARNING, "A structure functor should not be null!", new Exception());
-        this.functor = functor;
+        super(functor);
         if (termsSize > 0)
         	terms = new ArrayList<Term>(termsSize);
     }
@@ -97,30 +85,27 @@ public class Structure extends DefaultTerm {
     public static Structure parse(String sTerm) {
         as2j parser = new as2j(new StringReader(sTerm));
         try {
-            return (Structure)parser.term();
+            Term t = parser.term();
+            if (t.isAtom()) 
+                return new Structure((Atom)t);
+            else
+                return (Structure)t;
         } catch (Exception e) {
             logger.log(Level.SEVERE,"Error parsing structure " + sTerm,e);
             return null;
         }
     }
     public static Structure tryParsingStructure(String sTerm) throws ParseException {
-        return (Structure) new as2j(new StringReader(sTerm)).term();
+        Term t = new as2j(new StringReader(sTerm)).term();
+        if (t.isAtom()) 
+            return new Structure((Atom)t);
+        else
+            return (Structure)t;
     }
     
-    public String getFunctor() {
-        return functor;
-    }
-
-    /** returns functor symbol "/" arity */
-    public PredicateIndicator getPredicateIndicator() {
-        if (predicateIndicatorCache == null) {
-            predicateIndicatorCache = new PredicateIndicator(getFunctor(),getArity());
-        }
-        return predicateIndicatorCache;
-    }
-
+    @Override
     protected int calcHashCode() {
-        int result = functor.hashCode();
+        int result = super.calcHashCode();
         final int ts = getArity();
         for (int i=0; i<ts; i++)
         	result = 7 * result + getTerm(i).hashCode();
@@ -150,54 +135,36 @@ public class Structure extends DefaultTerm {
                     return false;
 
             return true;
-        } 
+        }
+        if (t instanceof Atom) {
+            return super.equals(t);
+        }
         return false;
     }
-
-
-    public int compareTo(Term t) {
-        if (! t.isStructure()) return super.compareTo(t);
-
-		// this is a list and the other not
-		if (isList() && !t.isList()) return 1;
-
-		// this is not a list and the other is
-		if (!isList() && t.isList()) return -1;
-
-		// both are lists, check the size
-		if (isList() && t.isList()) {
-			ListTerm l1 = (ListTerm)this;
-			ListTerm l2 = (ListTerm)t;
-			final int l1s = l1.size();
-			final int l2s = l2.size();
-			if (l1s > l2s) return 1;
-			if (l2s > l1s) return -1;
-		}
-
-		// both are list with same size,
-		// or none are list
-        Structure tAsStruct = (Structure)t;
-
-        final int ma = getArity();
-        final int oa = tAsStruct.getArity();
-        if (ma < oa) return -1;
-        if (ma > oa) return 1;
-
-        int c;
-        if (getFunctor() != null && tAsStruct.getFunctor() != null) {
-            c = getFunctor().compareTo(tAsStruct.getFunctor());
-            if (c != 0) return c;
-        }
-
-        for (int i=0; i<ma && i<oa; i++) {
-            c = getTerm(i).compareTo(tAsStruct.getTerm(i));
-            if (c != 0) return c;
-        }
-
-        return 0;
-    }
-
     
+    public int compareTo(Term t) {
+        int c = super.compareTo(t);
+        if (c != 0)
+            return c;
+
+        if (t.isStructure()) { 
+            Structure tAsStruct = (Structure)t;
+
+            final int ma = getArity();
+            final int oa = tAsStruct.getArity();
+            if (ma < oa) return -1;
+            if (ma > oa) return 1;
+
+            for (int i=0; i<ma && i<oa; i++) {
+                c = getTerm(i).compareTo(tAsStruct.getTerm(i));
+                if (c != 0) 
+                    return c;
+            }
+        }
+        return 0;
+    }  
+    
+    @Override
     public boolean apply(Unifier u) {
     	boolean r = false;
         // do not use iterator! (see ListTermImpl class)
@@ -217,6 +184,7 @@ public class Structure extends DefaultTerm {
         return new Structure(this);
     }
 
+    @Override
     public void addTerm(Term t) {
     	if (t == null) return;
         terms.add(t);
@@ -224,12 +192,14 @@ public class Structure extends DefaultTerm {
         resetHashCodeCache();
     }
     
+    @Override
     public void delTerm(int index) {
     	terms.remove(index);
         predicateIndicatorCache = null;
         resetHashCodeCache();
     }
     
+    @Override
     public void addTerms(Term ... ts ) {
     	for (Term t: ts) {
             terms.add(t);
@@ -238,6 +208,7 @@ public class Structure extends DefaultTerm {
         resetHashCodeCache();
     }
 
+    @Override
     public void addTerms(List<Term> l) {
         for (Term t: l) {
             terms.add(t);
@@ -246,12 +217,14 @@ public class Structure extends DefaultTerm {
         resetHashCodeCache();
     }
  
+    @Override
     public void setTerms(List<Term> l) {
         terms = l;
         predicateIndicatorCache = null;
         resetHashCodeCache();
     }
     
+    @Override
     public void setTerm(int i, Term t) {
         terms.set(i,t);
         resetHashCodeCache();
@@ -262,6 +235,7 @@ public class Structure extends DefaultTerm {
     	return terms.get(i);
     }
 
+    @Override
     public int getArity() {
         if (terms == null)
             return 0;
@@ -274,18 +248,16 @@ public class Structure extends DefaultTerm {
         return getArity();
     }
 
+    @Override
     public List<Term> getTerms() {
         return terms;
     }
     
+    @Override
     public boolean hasTerm() {
     	return getArity() > 0; // should use getArity to work for list/atom
     }
     
-    public Term[] getTermsArray() {
-        return terms.toArray(emptyTermArray);
-    }
-
     @Override
     public boolean isStructure() {
         return true;
@@ -296,6 +268,7 @@ public class Structure extends DefaultTerm {
 		return !hasTerm();
 	}
 
+    @Override
     public boolean isGround() {
         final int size = getArity();
         for (int i=0; i<size; i++) {
@@ -307,11 +280,13 @@ public class Structure extends DefaultTerm {
     }
 
     /** Replaces all variables by unnamed variables (_). */
+    @Override
     public void makeVarsAnnon() {
     	makeVarsAnnon(new Unifier());
     }
     
     /** change all vars by unnamed vars, the unifier un is used to consistently replace vars. */
+    @Override
     public void makeVarsAnnon(Unifier un) { 
         final int size = getArity();
         for (int i=0; i<size; i++) {
@@ -337,6 +312,7 @@ public class Structure extends DefaultTerm {
         resetHashCodeCache();
     }
 
+    @Override
     public void makeTermsAnnon() {
         final int size = getArity();
         for (int i=0; i<size; i++)
@@ -344,6 +320,7 @@ public class Structure extends DefaultTerm {
         resetHashCodeCache();
     }
 
+    @Override
     public boolean hasVar(VarTerm t) {
         final int size = getArity();
         for (int i=0; i<size; i++)
@@ -369,18 +346,11 @@ public class Structure extends DefaultTerm {
             getTerm(i).countVars(c);
     }
 
-    protected List<Term> getDeepCopyOfTerms() {
-        final int tss = getArity();
-        List<Term> l = new ArrayList<Term>(tss);
-        for (int i = 0; i < tss; i++)
-            l.add(getTerm(i).clone());
-        return l;
-    }
     
     public String toString() {
         StringBuilder s = new StringBuilder();
-        if (functor != null) 
-            s.append(functor);
+        if (getFunctor() != null) 
+            s.append(getFunctor());
         if (getArity() > 0) {
             s.append('(');
             Iterator<Term> i = terms.iterator();
@@ -397,7 +367,6 @@ public class Structure extends DefaultTerm {
     public Element getAsDOM(Document document) {
         Element u = (Element) document.createElement("structure");
         u.setAttribute("functor",getFunctor());
-        //u.appendChild(document.createTextNode(toString()));
         if (hasTerm()) {
             Element ea = document.createElement("arguments");
             for (Term t: getTerms()) {

@@ -23,65 +23,41 @@
 
 package jason.asSyntax;
 
-import jason.JasonException;
-import jason.asSemantics.Unifier;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
 /**
- * Represents an atom (a structure with no arguments, e.g. "tell", "a"), it is an
- * immutable object.  It extends Literal, so can be used in place of a
- * Literal, but does not allow operations on terms/annots and can not be negated.
+ * Represents an atom (a positive literal with no arguments and no annotations, e.g. "tell", "a").
  */
-public final class Atom extends Literal {
+public class Atom extends Literal {
 
     private static final long serialVersionUID = 1L;
     private static Logger logger = Logger.getLogger(Atom.class.getName());
 
+    private final String functor; // immutable field
+    
     public Atom(String functor) {
-        super(functor, 0);
+        if (functor == null)
+            logger.log(Level.WARNING, "A structure functor should not be null!", new Exception());
+        this.functor = functor;
     }
     
-    public Atom clone() {
-		return this; // since this object is immutable
+    public Atom(Literal l) {
+        this.functor            = l.getFunctor();
+        predicateIndicatorCache = l.predicateIndicatorCache;
+        hashCodeCache           = l.hashCodeCache;
+        setSrc(l);        
+    }
+    
+    public String getFunctor() {
+        return functor;
     }
 
-    @Override
-    public boolean apply(Unifier u) {
-    	return false;
-    }
-    
-	//
-	// override structure methods
-	//
-    
-	@Override
-    public void addTerm(Term t) {
-		logger.log(Level.SEVERE, "atom error!",new JasonException("atom has no terms!"));
-    }
-    
-	@Override
-    public void addTerms(List<Term> l) {
-		logger.log(Level.SEVERE, "atom error!",new JasonException("atom has no terms!"));
-    }
-    
-	@Override
-    public void setTerms(List<Term> l) {
-		logger.log(Level.SEVERE, "atom error!",new JasonException("atom has no terms!"));
-    }
-    
-	@Override
-    public void setTerm(int i, Term t) {
-		logger.log(Level.SEVERE, "atom error!",new JasonException("atom has no terms!"));
-    }
-     
-	@Override
-    public int getArity() {
-		return 0;
+    public Term clone() {
+		return this; // since this object is immutable
     }
     
 	@Override
@@ -89,76 +65,60 @@ public final class Atom extends Literal {
 		return true;
 	}
 
-	@Override
-    public boolean isGround() {
-        return true;
-    }
-	
-	@Override
-	public boolean hasTerm() {
-	    return false;
-	}
-	
-	@Override
-	public boolean hasVar(VarTerm t) {
-	    return false;
-	}
-	
-	@Override
-	public void countVars(Map<VarTerm, Integer> c) {}
-	
-	@Override
-	protected List<Term> getDeepCopyOfTerms() {
-		// this method exists to make the Structure(Structure) constructor to work with 
-		// an Atom as parameter
-		return new ArrayList<Term>(2);
-	}
-
-	@Override
-	public List<Term> getTerms() {
-		return emptyTermList;
-	}
-	
-	@Override
-	public Term[] getTermsArray() {
-	    return emptyTermArray;
-	}
-	
-	@Override
-	public void setNegated(boolean b) {
-    	logger.log(Level.SEVERE, "You should not negate the atom "+this+"\n",new Exception());
-		super.setNegated(b);
-	}
-	
     @Override
     public boolean equals(Object o) {
         if (o == null) return false;
         if (o == this) return true;
-        if (o instanceof Structure) {
-        	Structure s = (Structure)o;
-        	return s.isAtom() && getFunctor().equals(s.getFunctor());
+        if (o instanceof Atom) {
+            Atom a = (Atom)o;
+            //System.out.println(getFunctor() +" ==== " + a.getFunctor() + " is "+ (a.isAtom())); // && getFunctor().equals(a.getFunctor())));
+            return a.isAtom() && getFunctor().equals(a.getFunctor());
         }
         return false;
     }
     
-    @Override
-    public boolean addAnnot(Term t) {
-    	logger.log(Level.SEVERE, "You should not add annot '"+t+"' in atom "+this+"\n",new Exception());
-    	return super.addAnnot(t);
-    }
-    
-    @Override
-    public void addAnnots(List<Term> l) {
-        logger.log(Level.SEVERE, "You should not add annots '"+l+"' in atom "+this+"\n",new Exception());
-        super.addAnnots(l);
-    }
-    
-    @Override public void makeTermsAnnon() { }
-    @Override public void makeVarsAnnon() { }
-    @Override public void makeVarsAnnon(Unifier un) { }
+    public int compareTo(Term t) {
+        if (t.isNumeric()) return 1;
+        
+        // this is a list and the other not
+        if (isList() && !t.isList()) return 1;
 
+        // this is not a list and the other is
+        if (!isList() && t.isList()) return -1;
+
+        // both are lists, check the size
+        if (isList() && t.isList()) {
+            ListTerm l1 = (ListTerm)this;
+            ListTerm l2 = (ListTerm)t;
+            final int l1s = l1.size();
+            final int l2s = l2.size();
+            if (l1s > l2s) return 1;
+            if (l2s > l1s) return -1;
+            return 0; // need to check elements (in Structure class)
+        }
+        
+        if (t instanceof Atom) { 
+            Atom tAsAtom = (Atom)t;
+            return getFunctor().compareTo(tAsAtom.getFunctor());
+        } 
+
+        return super.compareTo(t);
+    }
+    
     @Override
     protected int calcHashCode() {
         return getFunctor().hashCode();
+    }
+    
+    @Override
+    public String toString() {
+        return functor;
+    }
+
+    /** get as XML */
+    public Element getAsDOM(Document document) {
+        Element u = (Element) document.createElement("structure");
+        u.setAttribute("functor",getFunctor());
+        return u;
     }
 }

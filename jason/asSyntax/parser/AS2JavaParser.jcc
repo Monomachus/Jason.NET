@@ -85,7 +85,7 @@ PARSER_BEGIN(as2j)
         return null;
     }
 
-    private ArithFunction getArithFunction(Structure l) {
+    private ArithFunction getArithFunction(Literal l) {
         ArithFunction af = null;
         if (curAg != null)
            // try to find the function in agent register
@@ -376,12 +376,12 @@ Object body_formula() :
    ]
    
    B = log_expr()
-                       { if (B instanceof Literal) {
+                       { if (formType == BodyType.action && B instanceof RelExpr) {
+                            return new PlanBodyImpl(BodyType.constraint, (RelExpr)B); // constraint
+                         } else if (B instanceof Literal) {
                             if ( ((Literal)B).isInternalAction() )
                                formType = BodyType.internalAction;
-                            return new PlanBodyImpl(formType, (Literal)B); 
-                         } else if (formType == BodyType.action && B instanceof RelExpr) {
-                            return new PlanBodyImpl(BodyType.constraint, (RelExpr)B); // constraint 
+                            return new PlanBodyImpl(formType, (Literal)B);  
                          } else {
 	                        if (formType == BodyType.test) {
 	                           if (B instanceof LogicalFormula)
@@ -424,7 +424,7 @@ Literal literal() :           { Pred F; Token k; boolean type = Literal.LPos; }
                                       	 logger.warning(getSourceRef(F)+" warning: The internal action class for '"+F+"' was not found!");
                                    }
                                 }
-                                return new Literal(type,F);
+                                return new LiteralImpl(type,F);
                               }
     )
   | k=<TK_TRUE>               { return Literal.LTrue; } 

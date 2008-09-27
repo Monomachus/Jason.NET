@@ -6,6 +6,7 @@ import jason.asSyntax.DefaultTerm;
 import jason.asSyntax.ListTerm;
 import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Literal;
+import jason.asSyntax.LiteralImpl;
 import jason.asSyntax.NumberTermImpl;
 import jason.asSyntax.Plan;
 import jason.asSyntax.Pred;
@@ -68,9 +69,9 @@ public class TermTest extends TestCase {
 		t3.addTerm(new VarTerm("X"));
 		assertFalse(t1.equals(t3));
 		
-		Literal l3 = new Literal(true, new Pred("pos"));
+		Literal l3 = new LiteralImpl(true, new Pred("pos"));
 		l3.addAnnot(BeliefBase.TPercept);
-		Literal l4 = new Literal(true, new Pred("pos"));
+		Literal l4 = new LiteralImpl(true, new Pred("pos"));
 		l4.addAnnot(BeliefBase.TPercept);
 		assertEquals(l3, l4);
 		
@@ -280,7 +281,7 @@ public class TermTest extends TestCase {
         
         // Literal and predicate
         Pred p = Pred.parsePred("s(1)[b]");
-        assertFalse(p.isLiteral());
+        assertTrue(p.isLiteral());
         assertTrue(u.unifies(lp, p));
         assertFalse(u.unifies((Term)ln, (Term)p));
         assertTrue(u.unifies(Literal.parseLiteral("s(1)"), p));
@@ -298,6 +299,8 @@ public class TermTest extends TestCase {
         Atom a = new Atom("s");
         assertFalse(u.unifies(lp, a));
         assertFalse(u.unifies(ln, a));
+        assertTrue(u.unifies(a, Literal.parseLiteral("s")));
+        assertTrue(Literal.parseLiteral("s").equals(a));
         assertTrue(u.unifies(Literal.parseLiteral("s"), a));
         assertFalse(u.unifies(Literal.parseLiteral("~s"), a));
      
@@ -309,6 +312,7 @@ public class TermTest extends TestCase {
         assertFalse(u.unifies(a, p));
         assertFalse(u.unifies(p, a));
         assertTrue(u.unifies(Pred.parsePred("s"), a));
+        assertFalse(u.unifies(Pred.parsePred("s[b]"), a));
         assertTrue(u.unifies(a,Pred.parsePred("s[b]")));
     }
 
@@ -359,7 +363,7 @@ public class TermTest extends TestCase {
 	public void testTriggetAnnot() throws ParseException {
 		Literal content = Literal.parseLiteral("~alliance");
 		content.addSource(new Structure("ag1"));
-		Literal received = new Literal(Literal.LPos, new Pred("received"));
+		Literal received = new LiteralImpl(Literal.LPos, new Pred("received"));
 		received.addTerm(new Structure("ag1"));
 		received.addTerm(new Structure("tell"));
 		received.addTerm(content);
@@ -367,7 +371,7 @@ public class TermTest extends TestCase {
 		
 		Trigger t1 = new Trigger(TEOperator.add, TEType.belief, received);
 
-		Literal received2 = new Literal(Literal.LPos, new Pred("received"));
+		Literal received2 = new LiteralImpl(Literal.LPos, new Pred("received"));
 		received2.addTerm(new VarTerm("S"));
 		received2.addTerm(new Structure("tell"));
 		received2.addTerm(new VarTerm("C"));
@@ -397,7 +401,7 @@ public class TermTest extends TestCase {
 	public void testLiteralUnify() {
 		Literal content = Literal.parseLiteral("~alliance");
 		content.addSource(new Structure("ag1"));
-		Literal l1 = new Literal(Literal.LPos, new Pred("received"));
+		Literal l1 = new LiteralImpl(Literal.LPos, new Pred("received"));
 		l1.addTerm(new Structure("ag1"));
 		l1.addTerm(new Structure("tell"));
 		l1.addTerm(content);
@@ -496,9 +500,9 @@ public class TermTest extends TestCase {
         p1 = Pred.parsePred("a(3)[3]");
         p2 = Pred.parsePred("a(3)[10]");
         Pred p3 = Pred.parsePred("a(3)[10]");
-        assertEquals(p1.compareTo(p2), -1);
-        assertEquals(p2.compareTo(p1), 1);
-        assertEquals(p2.compareTo(p3), 0);
+        assertEquals(1, p2.compareTo(p1));
+        assertEquals(-1, p1.compareTo(p2));
+        assertEquals(0, p2.compareTo(p3));
 
         Literal l1 = Literal.parseLiteral("~a(3)");
         Literal l2 = Literal.parseLiteral("a(3)");
@@ -507,8 +511,8 @@ public class TermTest extends TestCase {
         assertTrue(l1.compareTo(l3) == 1);
         assertTrue(l2.compareTo(l3) == -1);
 
-        assertTrue(l2.compareTo(new Atom("g")) > 0);
-        assertTrue(new Atom("g").compareTo(l2) < 0);
+        assertTrue(l2.compareTo(new Atom("g")) < 0);
+        assertTrue(new Atom("g").compareTo(l2) > 0);
         assertTrue(new Atom("g").compareTo(new Atom("g")) == 0);
 
         
@@ -526,7 +530,7 @@ public class TermTest extends TestCase {
         
         l = ListTermImpl.parseList("[b,[1,1,1],c,10,g,casa,f(10),5,[3,10],f(4),[3,4]]");
         Collections.sort(l);
-        assertEquals("[5,10,b,c,casa,g,f(4),f(10),[3,4],[3,10],[1,1,1]]",l.toString());
+        assertEquals("[5,10,b,c,casa,f(4),f(10),g,[3,4],[3,10],[1,1,1]]",l.toString());
     }
     
     public void testUnify4() {
@@ -757,14 +761,19 @@ public class TermTest extends TestCase {
 	
 	public void testAtomParsing() {
 	    Literal l = Literal.parseLiteral("b");
-	    assertFalse(l instanceof Atom);
+	    assertTrue(l instanceof Literal);
+	    assertTrue(l.isAtom());
+
+	    // if is atom, can be cast to Atom
+	    @SuppressWarnings("unused")
+        Atom x = (Atom)l;
 	    
 	    l = Literal.parseLiteral("b(10,a,c(10,x))[ant1,source(c)]");
 	    assertTrue(l.getTerm(1) instanceof Atom);
-        assertFalse(l.getTerm(2) instanceof Atom);
+        assertFalse(l.getTerm(2).isAtom());
         assertTrue(l.getAnnots().get(0) instanceof Atom);
         
         l =  Literal.parseLiteral("b(a.r)"); // internal actions should not be atoms
-        assertFalse(l.getTerm(0) instanceof Atom);
+        assertFalse(l.getTerm(0).isAtom());
 	}
 }

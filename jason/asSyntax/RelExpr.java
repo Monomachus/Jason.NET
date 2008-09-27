@@ -52,6 +52,8 @@ import org.w3c.dom.Element;
  *      X is [~p, [t1, t2], [a1,a2]]
  * </ul>
  * 
+ * @navassoc - op - RelationalOp
+ * 
  * @author Jomi
  */
 public class RelExpr extends BinaryStructure implements LogicalFormula {

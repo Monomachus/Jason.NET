@@ -24,6 +24,7 @@
 
 package jason.asSemantics;
 
+import jason.asSyntax.Literal;
 import jason.asSyntax.Pred;
 import jason.asSyntax.Structure;
 
@@ -37,11 +38,11 @@ public class ActionExec implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-    private Structure action;
+    private Literal   action;
 	private Intention intention;
     private boolean   result;
     
-    public ActionExec(Pred ac, Intention i) {
+    public ActionExec(Literal ac, Intention i) {
         action = ac;
         intention = i;
         result = false;
@@ -61,7 +62,10 @@ public class ActionExec implements Serializable {
     }
    
     public Structure getActionTerm() {
-        return action;
+        if (action.isAtom())
+            return new Structure(action.getFunctor());
+        else
+            return (Structure)action;
     }
     
     public Intention getIntention() {

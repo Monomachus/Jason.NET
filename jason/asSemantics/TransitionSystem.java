@@ -31,6 +31,7 @@ import jason.asSyntax.DefaultTerm;
 import jason.asSyntax.InternalActionLiteral;
 import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Literal;
+import jason.asSyntax.LiteralImpl;
 import jason.asSyntax.LogicalFormula;
 import jason.asSyntax.NumberTermImpl;
 import jason.asSyntax.Plan;
@@ -186,7 +187,7 @@ public class TransitionSystem {
             } else if (conf.ag.socAcc(m)) {
 
                 // generate an event
-                Literal received = new Literal("kqml_received");
+                Literal received = new LiteralImpl("kqml_received");
                 received.addTerms(
                 		new Atom(m.getSender()),
                 		new Atom(m.getIlForce()),
@@ -863,10 +864,11 @@ public class TransitionSystem {
         return null;
     }
     
+    private static final Term aNOCODE = new Atom("no_code");
     private static void setDefaultFailureAnnots(Event failEvent, Term body, List<Term> failAnnots) {
         // add default failure annots
         if (failAnnots == null)
-            failAnnots = JasonException.createBasicErrorAnnots("unknown", "");
+            failAnnots = JasonException.createBasicErrorAnnots( JasonException.UNKNOW_ERROR, "");
         
         // add failure annots in the event related to the code source
         Literal bodyterm = null;
@@ -878,9 +880,8 @@ public class TransitionSystem {
             codeline = new NumberTermImpl(bodyterm.getSrcLine());
         } else {
             bodyterm = new Atom("no_code");
-            codesrc  = new Atom("no_code");
-            codeline = new Atom("no_code");
-            
+            codesrc  = aNOCODE;
+            codeline = aNOCODE;            
         }
 
         // code

@@ -2,10 +2,10 @@ package test;
 
 import jason.JasonException;
 import jason.asSemantics.Unifier;
+import jason.asSyntax.LiteralImpl;
+import jason.asSyntax.Plan;
 import jason.asSyntax.PlanBody;
 import jason.asSyntax.PlanBodyImpl;
-import jason.asSyntax.Literal;
-import jason.asSyntax.Plan;
 import jason.asSyntax.PlanLibrary;
 import jason.asSyntax.Trigger;
 import jason.asSyntax.VarTerm;
@@ -87,7 +87,7 @@ public class PlanTest extends TestCase {
     }
     
     public void testEqualsBodyLiteral() {
-        PlanBody bl = new PlanBodyImpl(BodyType.achieve, new Literal("g1"));
+        PlanBody bl = new PlanBodyImpl(BodyType.achieve, new LiteralImpl("g1"));
         VarTerm v = new VarTerm("X");
         Unifier u = new Unifier();
         // X = !g1

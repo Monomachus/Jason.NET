@@ -37,7 +37,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
- * A Pred is a Structure with annotations, e.g.: a(1)[an1,an2].
+ * A Pred extends a Structure with annotations, e.g.: a(1)[an1,an2].
  */
 public class Pred extends Structure {
 
@@ -46,25 +46,20 @@ public class Pred extends Structure {
 
 	private ListTerm      annots;
 
-    public Pred(String ps) {
-        super(ps);
+    public Pred(String functor) {
+        super(functor);
     }
 
-    public Pred(Structure t) {
-        super(t);
-    }
+    public Pred(Literal l) {
+        super(l);
 
-    public Pred(Pred p) {
-        super(p);
-
-        if (p.annots != null) {
-            annots = p.getAnnots().cloneLT();
+        if (l.hasAnnot()) {
+            annots = l.getAnnots().cloneLT();
         } else {
             annots = null;
         }
     }
 
-    /** to be used by atom */
     public Pred(String functor, int termsSize) {
         super(functor, termsSize);
     }
@@ -108,11 +103,13 @@ public class Pred extends Structure {
         return r;
     }
     
+    @Override       
     public void setAnnots(ListTerm l) {
         annots = l;
         if (annots != null && annots.isEmpty()) annots = null;
     }
 
+    @Override       
     public boolean addAnnot(Term t) {
         if (annots == null) annots = new ListTermImpl();
         if (!annots.contains(t)) {
@@ -122,6 +119,7 @@ public class Pred extends Structure {
         return false;
     }
 
+    @Override       
     public void addAnnots(List<Term> l) {
         if (l == null || l.isEmpty()) return;
         ListTerm tail;
@@ -137,29 +135,35 @@ public class Pred extends Structure {
         }
     }
 
+    @Override       
     public void addAnnot(int index, Term t) {
         if (annots == null) annots = new ListTermImpl();
         if (!annots.contains(t)) annots.add(index, t);
     }
 
+    @Override       
     public void delAnnot(Term t) {
         if (annots != null) annots.remove(t);
     }
 
+    @Override       
     public void clearAnnots() {
 		annots = null;
     }
 
+    @Override       
     public ListTerm getAnnots() {
         return annots;
     }
 
+    @Override       
     public boolean hasAnnot(Term t) {
         if (annots == null) return false;
         return annots.contains(t);
     }
 
     /** returns true if the pred has at least one annot */
+    @Override       
     public boolean hasAnnot() {
         return annots != null && !annots.isEmpty();
     }
@@ -193,7 +197,8 @@ public class Pred extends Structure {
      * 
      * @return true if some annot was imported.
      */
-    public boolean importAnnots(Pred p) {
+    @Override       
+    public boolean importAnnots(Literal p) {
     	boolean imported = false;
         if (p.hasAnnot()) {
             if (annots == null) annots = new ListTermImpl();
@@ -216,13 +221,14 @@ public class Pred extends Structure {
     }
 
     /**
-     * removes all annots in this pred that are in <i>p</i>.
+     * removes all annots in this pred that are in the list <i>l</i>.
      * @return true if some annot was removed.
      */
-    public boolean delAnnot(Pred p) {
+    @Override
+    public boolean delAnnots(List<Term> l) {
     	boolean removed = false;
-        if (p.hasAnnot() && this.hasAnnot()) {
-        	for (Term t: p.getAnnots()) { 
+        if (l != null && this.hasAnnot()) {
+        	for (Term t: l) { 
         		boolean r = annots.remove(t);
 	            removed = removed || r;
 	        }
@@ -236,6 +242,7 @@ public class Pred extends Structure {
      * and functor "t",
      * it returns [t(a),t(b)]
      */
+    @Override
     public ListTerm getAnnots(String functor) {
         ListTerm ls = new ListTermImpl();
         if (annots != null) {
@@ -252,9 +259,10 @@ public class Pred extends Structure {
     }
 
     /** returns true if all this predicate annots are in p's annots */
-    public boolean hasSubsetAnnot(Pred p) {
+    @Override
+    public boolean hasSubsetAnnot(Literal p) {
         if (annots == null) return true;
-        if (annots != null && p.getAnnots() == null) return false;
+        if (hasAnnot() && !p.hasAnnot()) return false;
         for (Term myAnnot : annots) {
             if (!p.hasAnnot(myAnnot)) {
                 return false;
@@ -277,11 +285,12 @@ public class Pred extends Structure {
      *   this[b|T] = p[x,y,b]
      * unifies and T is [x,y] (this will be a subset if T is [x,y].
      */
-    public boolean hasSubsetAnnot(Pred p, Unifier u) {
+    @Override
+    public boolean hasSubsetAnnot(Literal p, Unifier u) {
     	//return getSubsetAnnots(p,u,null);
     	
         if (annots == null) return true;
-        if (p.getAnnots() == null) return false;
+        if (!p.hasAnnot()) return false;
 
         // since p's annots will be changed, clone them
         ListTerm pannots = p.getAnnots().cloneLT();
@@ -328,12 +337,14 @@ public class Pred extends Structure {
     /**
      * Adds a source annotation like "source(<i>agName</i>)".
      */
+    @Override
     public void addSource(Term agName) {
         if (agName != null)
             addAnnot(createSource(agName));
     }
 
     /** deletes "source(<i>agName</i>)" */
+    @Override
     public boolean delSource(Term agName) {
         if (annots != null)
             return annots.remove(createSource(agName));
@@ -351,6 +362,7 @@ public class Pred extends Structure {
      * returns the sources of this Pred as a new list. e.g.: from annots
      * [source(a), source(b)], it returns [a,b]
      */
+    @Override
     public ListTerm getSources() {
         ListTerm ls = new ListTermImpl();
         if (annots != null) {
@@ -368,6 +380,7 @@ public class Pred extends Structure {
     }
 
     /** deletes all sources annotations */
+    @Override
     public void delSources() {
         if (annots != null) {
             Iterator<Term> i = annots.iterator();
@@ -382,6 +395,7 @@ public class Pred extends Structure {
         }
     }
 
+    @Override
     public boolean hasSource() {
         if (annots != null) {
             for (Term ta : annots) {
@@ -396,6 +410,7 @@ public class Pred extends Structure {
     }
 
     /** returns true if this pred has a "source(<i>agName</i>)" */
+    @Override
     public boolean hasSource(Term agName) {
         if (annots != null) {
             return annots.contains(createSource(agName));
@@ -443,7 +458,7 @@ public class Pred extends Structure {
         if (o instanceof Pred) {
             final Pred p = (Pred) o;
             return super.equals(o) && this.hasSubsetAnnot(p) && p.hasSubsetAnnot(this);
-        } else if (o instanceof Structure) {
+        } else if (o instanceof Atom) {
             return !hasAnnot() && super.equals(o);
         }
         return false;

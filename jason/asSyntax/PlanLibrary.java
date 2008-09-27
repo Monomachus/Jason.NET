@@ -41,7 +41,10 @@ import java.util.logging.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-/** Represents a set of plans used by an agent */  
+/** Represents a set of plans used by an agent 
+
+    @has - plans 0..* Plan
+*/  
 public class PlanLibrary implements Iterable<Plan> {
 
 	/** a MAP from TE to a list of relevant plans */
@@ -72,7 +75,7 @@ public class PlanLibrary implements Iterable<Plan> {
      *  
      *  returns the plan added, null if it does not work.
      */
-    public Plan add(StringTerm stPlan, Structure tSource) {
+    public Plan add(StringTerm stPlan, Term tSource) {
        return add(stPlan, tSource, false); 
     }
     
@@ -88,7 +91,7 @@ public class PlanLibrary implements Iterable<Plan> {
      *  
      *   returns the plan added, null if it does not work.
 	 */
-	public Plan add(StringTerm stPlan, Structure tSource, boolean before) {
+	public Plan add(StringTerm stPlan, Term tSource, boolean before) {
 		String sPlan = stPlan.getString();
 		try {
 			// remove quotes \" -> "
@@ -241,7 +244,7 @@ public class PlanLibrary implements Iterable<Plan> {
 	 * Remove a plan represented by the label <i>pLabel</i>.
 	 * In case the plan has many sources, only the plan's source is removed. 
 	 */
-	public boolean remove(Structure pLabel, Structure source) {
+	public boolean remove(Atom pLabel, Term source) {
 		// find the plan
 		Plan p = get(pLabel.getFunctor());
 		if (p != null) {
@@ -306,7 +309,7 @@ public class PlanLibrary implements Iterable<Plan> {
     	return l;
     }
 
-    public static final Trigger TE_IDLE = new Trigger(TEOperator.add, TEType.achieve, new Literal("idle"));
+    public static final Trigger TE_IDLE = new Trigger(TEOperator.add, TEType.achieve, new Atom("idle"));
 
     public List<Plan> getIdlePlans() {
         return relPlans.get(TE_IDLE.getPredicateIndicator());

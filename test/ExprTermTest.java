@@ -171,7 +171,7 @@ public class ExprTermTest extends TestCase {
         u.unifies(new VarTerm("X"), new NumberTermImpl(-5));
         l.apply(u);
         Collections.sort(l);
-        assertEquals(l.toString(), "[-6,-1,3,5,5,10,55,a(3)]");    	
+        assertEquals("[-6,-1,3,5,5,10,55,a(3)]",l.toString());    	
     }
     
     public void testLength() {

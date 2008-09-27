@@ -157,7 +157,7 @@ public class DefaultBeliefBase implements BeliefBase {
                 if (l.hasAnnot(TPercept)) {
                     percepts.remove(bl);
                 }
-                boolean result = bl.delAnnot(l); // note that l annots can be empty, in this case, nothing is deleted!
+                boolean result = bl.delAnnots(l.getAnnots()); // note that l annots can be empty, in this case, nothing is deleted!
                 return removeFromEntry(bl) || result;
             }
         } else {

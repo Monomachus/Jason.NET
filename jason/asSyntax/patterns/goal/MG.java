@@ -23,11 +23,11 @@ public class MG implements Directive {
     public Agent process(Pred directive, Agent outerContent, Agent innerContent) {
         try {
             Literal goal = Literal.parseLiteral(directive.getTerm(0).toString());
-            Literal subDir;
+            Pred subDir;
             if (directive.getArity() > 1) {
-                subDir = Literal.parseLiteral(directive.getTerm(1).toString());
+                subDir = Pred.parsePred(directive.getTerm(1).toString());
             } else {
-                subDir = Literal.parseLiteral("bc("+goal+")");
+                subDir = Pred.parsePred("bc("+goal+")");
             }
             Directive sd = DirectiveProcessor.getDirective(subDir.getFunctor());
 

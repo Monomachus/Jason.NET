@@ -40,7 +40,14 @@ import org.w3c.dom.Element;
 
 
 /** 
- *  Represents a logical formula with some logical operator ("&amp;",  "|", "not").
+   Represents a logical formula with some logical operator ("&amp;",  "|", "not").
+
+   @navassoc - op - LogicalOp
+   
+   //@view
+   //@match class jason.asSyntax.Term
+   //@opt !hide
+    
  */
 public class LogExpr extends BinaryStructure implements LogicalFormula {
 

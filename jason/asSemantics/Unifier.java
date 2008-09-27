@@ -23,6 +23,7 @@
 
 package jason.asSemantics;
 
+import jason.asSyntax.Atom;
 import jason.asSyntax.Literal;
 import jason.asSyntax.Pred;
 import jason.asSyntax.Structure;
@@ -214,6 +215,14 @@ public class Unifier implements Cloneable {
         
         // both terms are not vars
         
+        // if the first is an Atom and the second pred, they must have the same functor
+        // and no terms in the pred
+        if (t1g.isAtom() && t2g.isPred()) {
+            Atom t1a = (Atom)t1g;
+            Pred t2p = (Pred)t2g;
+            return t2p.getArity() == 0 && t1a.getFunctor().equals(t2p.getFunctor());
+        }
+        
         // if any of the terms is not a structure (is a number or a
         // string), they must be equal
         if (!t1g.isStructure() || !t2g.isStructure())
@@ -249,7 +258,7 @@ public class Unifier implements Cloneable {
         	return false;
         
         // different functor
-        if (t1s.getFunctor() != null && !t1s.getFunctor().equals(t2s.getFunctor()))
+        if (!t1s.getFunctor().equals(t2s.getFunctor())) // t1a.getFunctor() != null && 
             return false;
         
         // unify inner terms

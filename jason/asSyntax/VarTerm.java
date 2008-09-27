@@ -50,7 +50,7 @@ import org.w3c.dom.Element;
  * 
  * @author jomi
  */
-public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm, ObjectTerm, PlanBody {
+public class VarTerm extends LiteralImpl implements NumberTerm, ListTerm, StringTerm, ObjectTerm, PlanBody {
 
     private static final long serialVersionUID = 1L;
     private static Logger logger = Logger.getLogger(VarTerm.class.getName());
@@ -209,8 +209,8 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
     public String getFunctor() {
         if (value == null) {
         	return super.getFunctor();
-        } else if (value.isStructure()) {
-            return ((Structure)getValue()).getFunctor();
+        } else if (value instanceof Atom) {
+            return ((Atom)getValue()).getFunctor();
         } else {
             return null;
         }
@@ -429,7 +429,7 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
     }
 
     @Override
-    public boolean importAnnots(Pred p) {
+    public boolean importAnnots(Literal p) {
         if (value != null && getValue().isPred())
             return ((Pred) getValue()).importAnnots(p);
         else
@@ -461,11 +461,11 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
     }
 
     @Override
-    public boolean delAnnot(Pred p) {
-        if (value != null && getValue().isPred())
-            return ((Pred) getValue()).delAnnot(p);
+    public boolean delAnnots(List<Term> l) {
+        if (value != null && getValue().isLiteral())
+            return ((Literal) getValue()).delAnnots(l);
         else
-            return super.delAnnot(p);
+            return super.delAnnots(l);
     }
 
     @Override
@@ -478,33 +478,33 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
 
     @Override
     public boolean hasAnnot(Term t) {
-        if (value != null && getValue().isPred())
-            return ((Pred) getValue()).hasAnnot(t);
+        if (value != null && getValue().isLiteral())
+            return ((Literal) getValue()).hasAnnot(t);
         else
             return super.hasAnnot(t);
     }
 
     @Override
     public boolean hasAnnot() {
-        if (value != null && getValue().isPred())
-            return ((Pred) getValue()).hasAnnot();
+        if (value != null && getValue().isLiteral())
+            return ((Literal) getValue()).hasAnnot();
         else
             return super.hasAnnot();
     }
 
     @Override
-    public boolean hasSubsetAnnot(Pred p) {
-        if (value != null && value.isPred()) {
-            return ((Pred)value).hasSubsetAnnot(p);
+    public boolean hasSubsetAnnot(Literal p) {
+        if (value != null && value.isLiteral()) {
+            return ((Literal)value).hasSubsetAnnot(p);
         } else {
             return super.hasSubsetAnnot(p);
         }
     }
 
     @Override
-    public boolean hasSubsetAnnot(Pred p, Unifier u) {
-        if (value != null && value.isPred()) {
-            return ((Pred)value).hasSubsetAnnot(p, u);
+    public boolean hasSubsetAnnot(Literal p, Unifier u) {
+        if (value != null && value.isLiteral()) {
+            return ((Literal)value).hasSubsetAnnot(p, u);
         } else {
             return super.hasSubsetAnnot(p, u);
         }
@@ -513,8 +513,8 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
     
     @Override
     public ListTerm getAnnots() {
-        if (value != null && getValue().isPred())
-            return ((Pred) getValue()).getAnnots();
+        if (value != null && getValue().isLiteral())
+            return ((Literal) getValue()).getAnnots();
         else
             return super.getAnnots();
     }
@@ -546,24 +546,24 @@ public class VarTerm extends Literal implements NumberTerm, ListTerm, StringTerm
 
     @Override
     public ListTerm getSources() {
-        if (value != null && getValue().isPred())
-            return ((Pred) getValue()).getSources();
+        if (value != null && getValue().isLiteral())
+            return ((Literal) getValue()).getSources();
         else
             return super.getSources();
     }
 
     @Override
     public boolean hasSource() {
-        if (value != null && getValue().isPred())
-            return ((Pred) getValue()).hasSource();
+        if (value != null && getValue().isLiteral())
+            return ((Literal) getValue()).hasSource();
         else
             return super.hasSource();
     }
 
     @Override
     public boolean hasSource(Term s) {
-        if (value != null && getValue().isPred())
-            return ((Pred) getValue()).hasSource(s);
+        if (value != null && getValue().isLiteral())
+            return ((Literal) getValue()).hasSource(s);
         else
             return super.hasSource(s);
     }

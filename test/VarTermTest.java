@@ -10,6 +10,7 @@ import jason.asSyntax.DefaultTerm;
 import jason.asSyntax.ListTerm;
 import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Literal;
+import jason.asSyntax.LiteralImpl;
 import jason.asSyntax.NumberTerm;
 import jason.asSyntax.NumberTermImpl;
 import jason.asSyntax.Pred;
@@ -277,7 +278,7 @@ public class VarTermTest extends TestCase {
     	assertFalse(u.unifies(v2, v1));
 
     	assertTrue(u.unifies(v1, v2));
-    	assertTrue(u.unifies(new Literal("vvv"), v1));
+    	assertTrue(u.unifies(new LiteralImpl("vvv"), v1));
     	v1.apply(u);
     	assertEquals("vvv[a]", v1.toString());
     }
@@ -406,6 +407,18 @@ public class VarTermTest extends TestCase {
         assertEquals(u.get("X3").toString(),"1");
     }
     
+    /*
+     // TODO: allow ~X (?)
+    public void testUnify2() {
+        Term a1 = DefaultTerm.parse("~X");
+        Term a2 = DefaultTerm.parse("~s");
+        Unifier u = new Unifier();
+        assertTrue(u.unifies(a1,a2));
+        System.out.println(u);
+        assertEquals("s",u.get("X").toString());
+    }
+    */
+
     public void testInnerVarUnif() {
         Unifier u = new Unifier();
         Literal l = Literal.parseLiteral("op(X)");
@@ -508,5 +521,17 @@ public class VarTermTest extends TestCase {
         u.unifies(x, Literal.parseLiteral("goto(3,2)[source(bob)]"));
         x.apply(u);
         assertEquals("goto(3,2)[source(bob)]", x.copy().toString());        
+    }
+    
+    public void testCompare() {
+        VarTerm x = new VarTerm("X");
+        VarTerm y = new VarTerm("Y");
+        Unifier u = new Unifier();
+        u.unifies(x, new NumberTermImpl(10));
+        u.unifies(y, new NumberTermImpl(20));
+        x.apply(u);
+        y.apply(u);
+        assertTrue(x.compareTo(y) < 0);
+        assertTrue(y.compareTo(x) > 0);
     }
 }

@@ -26,12 +26,11 @@ package jason.stdlib;
 import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
-import jason.asSyntax.Atom;
 import jason.asSyntax.DefaultTerm;
 import jason.asSyntax.ListTerm;
 import jason.asSyntax.StringTerm;
-import jason.asSyntax.Structure;
 import jason.asSyntax.Term;
+import jason.bb.BeliefBase;
 
 
 /**
@@ -81,6 +80,7 @@ import jason.asSyntax.Term;
   @see jason.stdlib.relevant_plans
   @see jason.stdlib.remove_plan
 
+  @author Jomi
  */
 public class add_plan extends DefaultInternalAction {
 
@@ -93,9 +93,9 @@ public class add_plan extends DefaultInternalAction {
 
         Term plans = DefaultTerm.parse(args[0].toString());
 
-        Structure source = new Atom("self");
+        Term source = BeliefBase.ASelf;
         if (args.length > 1)
-            source = (Structure) args[1];
+            source = args[1];
 
         boolean before = false;
         if (args.length > 2)

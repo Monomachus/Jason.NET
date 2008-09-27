@@ -6,6 +6,7 @@ import jason.asSyntax.DefaultTerm;
 import jason.asSyntax.ListTerm;
 import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Literal;
+import jason.asSyntax.LiteralImpl;
 import jason.asSyntax.NumberTermImpl;
 import jason.asSyntax.PredicateIndicator;
 import jason.asSyntax.StringTerm;
@@ -282,7 +283,7 @@ public class JDBCPersistentBB extends ChainBBAdapter {
                     if (l.hasAnnot(TPercept)) {
                         getDBBPercepts().remove(bl);
                     }
-                    boolean result = bl.delAnnot(l) || !bl.hasAnnot();
+                    boolean result = bl.delAnnots(l.getAnnots()) || !bl.hasAnnot();
                     stmt = conn.createStatement();
                     if (bl.hasAnnot() && isCreatedByJason(l.getPredicateIndicator())) {
                         // store new bl annots
@@ -457,7 +458,7 @@ public class JDBCPersistentBB extends ChainBBAdapter {
     protected Literal resultSetToLiteral(ResultSet rs, PredicateIndicator pi) throws SQLException {
         ResultSetMetaData meta = belsDB.get(pi);
         boolean isJasonTable = isCreatedByJason(pi);
-        Literal ldb = new Literal(pi.getFunctor());
+        Literal ldb = new LiteralImpl(pi.getFunctor());
         int end = meta.getColumnCount();
         if (isJasonTable)
             end = end - extraCols;

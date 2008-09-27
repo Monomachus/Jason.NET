@@ -75,10 +75,10 @@ public class desire extends intend {
 
         // we need to check the selected event in this cycle (already removed from E)
         if (C.getSelectedEvent() != null) {
-            Trigger t = C.getSelectedEvent().getTrigger();
+            Trigger   t = C.getSelectedEvent().getTrigger();
             Intention i = C.getSelectedEvent().getIntention(); 
             if (i != Intention.EmptyInt && i.size() > 0) {
-                t = (Trigger) t.clone();
+                t = t.clone();
                 t.apply(i.peek().getUnif());
             }
             if (un.unifies(teFromL, t)) {
@@ -87,10 +87,10 @@ public class desire extends intend {
         }
 
         for (Event ei : C.getEvents()) {
-            Trigger t = ei.getTrigger();
+            Trigger   t = ei.getTrigger();
             Intention i = ei.getIntention(); 
             if (i != Intention.EmptyInt && i.size() > 0) {
-                t = (Trigger) t.clone();
+                t = t.clone();
                 t.apply(i.peek().getUnif());
             }
             if (un.unifies(teFromL, t)) {

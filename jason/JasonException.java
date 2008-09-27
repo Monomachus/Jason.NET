@@ -38,7 +38,8 @@ public class JasonException extends java.lang.Exception {
     
 	private static final long serialVersionUID = 1L;
 	
-	public static final Term WRONG_ARGS = new Atom("wrong_arguments");
+	public static final Term WRONG_ARGS   = new Atom("wrong_arguments");
+    public static final Term UNKNOW_ERROR = new Atom("unknown");
 
 	private static final Term defaultError = new Atom("internal_action");
 	private Term error = defaultError;

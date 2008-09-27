@@ -39,38 +39,41 @@ import org.w3c.dom.Element;
 
 
 /**
- * A particular type of literal used to represent internal actions (has a "." in the functor).
- */
-public class InternalActionLiteral extends Literal {
+ A particular type of literal used to represent internal actions (has a "." in the functor).
 
-	private static final long serialVersionUID = 1L;
+ @navassoc - ia - InternalAction
+
+ */
+public class InternalActionLiteral extends LiteralImpl {
+
+    private static final long serialVersionUID = 1L;
     private static Logger logger = Logger.getLogger(InternalActionLiteral.class.getName());
     
     private InternalAction ia = null; // reference to the object that implements the internal action
     
-	public InternalActionLiteral(String functor) {
-		super(functor);
-	}
+    public InternalActionLiteral(String functor) {
+        super(functor);
+    }
 
-	// used by clone
-	public InternalActionLiteral(InternalActionLiteral l) {
-		super((Literal) l);
-		this.ia = l.ia;
-		predicateIndicatorCache = l.predicateIndicatorCache;
+    // used by clone
+    public InternalActionLiteral(InternalActionLiteral l) {
+        super((LiteralImpl) l);
+        this.ia = l.ia;
+        predicateIndicatorCache = l.predicateIndicatorCache;
         hashCodeCache           = l.hashCodeCache;
-	}
+    }
 
-	// used by the parser
-	public InternalActionLiteral(Pred p, Agent ag) throws Exception {
+    // used by the parser
+    public InternalActionLiteral(Pred p, Agent ag) throws Exception {
         super(true,p);
         if (ag != null)
             ia = ag.getIA(getFunctor());
     }
-	
+    
     @Override
-	public boolean isInternalAction() {
-		return true;
-	}
+    public boolean isInternalAction() {
+        return true;
+    }
 
     @Override
     public boolean isAtom() {
@@ -79,15 +82,15 @@ public class InternalActionLiteral extends Literal {
     
     @Override
     public boolean canBeAddedInBB() {
-		return false;
-	}
+        return false;
+    }
 
     @Override
     public boolean apply(Unifier u) {
-    	if (this.ia != null && (this.ia instanceof loop || this.ia instanceof foreach))
-    		return false;
-		else 
-			return super.apply(u);
+        if (this.ia != null && (this.ia instanceof loop || this.ia instanceof foreach))
+            return false;
+        else 
+            return super.apply(u);
     }
     
     @Override
@@ -110,14 +113,14 @@ public class InternalActionLiteral extends Literal {
     public Iterator<Unifier> logicalConsequence(Agent ag, Unifier un) {
         if (ag.getTS().getUserAgArch().isRunning()) {
             try {
-            	// clone terms array
+                // clone terms array
                 Term[] clone = getTermsArray();
                 for (int i=0; i<clone.length; i++) {
                     clone[i] = clone[i].clone();
                     clone[i].apply(un);
                 }
     
-            	// calls IA's execute method
+                // calls IA's execute method
                 Object oresult = getIA(ag).execute(ag.getTS(), un, clone);
                 if (oresult instanceof Boolean && (Boolean)oresult) {
                     return LogExpr.createUnifIterator(un);
@@ -125,7 +128,7 @@ public class InternalActionLiteral extends Literal {
                     return ((Iterator<Unifier>)oresult);
                 }
             } catch (Exception e) {
-                logger.log(Level.SEVERE, getErrorMsg() + ": " +	e.getMessage(), e);
+                logger.log(Level.SEVERE, getErrorMsg() + ": " + e.getMessage(), e);
             }
         }
         return LogExpr.EMPTY_UNIF_LIST.iterator();  // empty iterator for unifier
@@ -139,13 +142,13 @@ public class InternalActionLiteral extends Literal {
     
     @Override
     public String getErrorMsg() {
-    	String line = (getSrcLine() >= 0 ? ":"+getSrcLine() : "");
-        return "Error in internal action '"+this+"' ("+ getSrc() + line + ")";    	
+        String line = (getSrcLine() >= 0 ? ":"+getSrcLine() : "");
+        return "Error in internal action '"+this+"' ("+ getSrc() + line + ")";      
     }
     
-	public InternalActionLiteral clone() {
+    public InternalActionLiteral clone() {
         return new InternalActionLiteral(this);
-	}
+    }
 
     
     /** get as XML */

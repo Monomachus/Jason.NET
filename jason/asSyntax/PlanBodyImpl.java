@@ -13,7 +13,11 @@ import org.w3c.dom.Element;
  *  A plan body like <code>a1; ?t; !g</code> is represented by the following structure
  *  <code>(a1, (?t, (!g)))</code>.
  *  
- * @author Jomi  
+ *  
+ *  @navassoc - next - PlanBody
+ *  @navassoc - type - BodyType
+ *  
+ *  @author Jomi  
  */
 public class PlanBodyImpl extends Structure implements PlanBody, Iterable<PlanBody> {
 

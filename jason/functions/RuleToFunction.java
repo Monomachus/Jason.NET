@@ -6,6 +6,7 @@ import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.InternalActionLiteral;
 import jason.asSyntax.Literal;
+import jason.asSyntax.LiteralImpl;
 import jason.asSyntax.NumberTerm;
 import jason.asSyntax.Term;
 import jason.asSyntax.VarTerm;
@@ -55,7 +56,7 @@ public class RuleToFunction extends DefaultArithFunction  {
 	    if (literal.indexOf(".") > 0) // is internal action
 	        r = new InternalActionLiteral(literal);
 	    else
-	        r = new Literal(literal);
+	        r = new LiteralImpl(literal);
 	    
 	    r.addTerms(args);
 	    VarTerm answer = new VarTerm("__RuleToFunctionResult");

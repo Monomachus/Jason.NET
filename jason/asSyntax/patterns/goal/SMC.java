@@ -1,7 +1,6 @@
 package jason.asSyntax.patterns.goal;
 
 import jason.asSemantics.Agent;
-import jason.asSyntax.Literal;
 import jason.asSyntax.Plan;
 import jason.asSyntax.Pred;
 import jason.asSyntax.Term;
@@ -24,7 +23,7 @@ public class SMC implements Directive {
         try {
             Term goal = directive.getTerm(0);
             Term fail = directive.getTerm(1);
-            Literal subDir = Literal.parseLiteral("bc("+goal+")");
+            Pred subDir = Pred.parsePred("bc("+goal+")");
             //logger.fine("parameters="+goal+","+fail+","+subDir);
             Directive sd = DirectiveProcessor.getDirective(subDir.getFunctor());
 

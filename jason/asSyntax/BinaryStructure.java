@@ -28,7 +28,11 @@ import org.w3c.dom.Element;
 
 
 /** 
- *  Represents a binary/unary logical/relational operator.
+   Represents a binary/unary logical/relational operator.
+ 
+   @navassoc - left  - Term
+   @navassoc - right - Term
+    
  */
 public abstract class BinaryStructure extends Structure {
 

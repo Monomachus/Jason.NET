@@ -48,6 +48,9 @@ import org.w3c.dom.Element;
  * The last ListTem is an empty ListTerm (term==null).
  * In lists terms with a tail ([a|X]), next is the Tail (next==X, term==a).
  *
+ * @navassoc - element - Term
+ * @navassoc - next - ListTerm
+ *
  * @author Jomi
  */
 public class ListTermImpl extends Structure implements ListTerm {

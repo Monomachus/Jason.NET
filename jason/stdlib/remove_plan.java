@@ -29,8 +29,8 @@ import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.Atom;
 import jason.asSyntax.ListTerm;
-import jason.asSyntax.Structure;
 import jason.asSyntax.Term;
+import jason.bb.BeliefBase;
 
 /**
   <p>Internal action: <b><code>.remove_plan</code></b>.
@@ -84,20 +84,20 @@ public class remove_plan extends DefaultInternalAction {
         checkArguments(args);
         Term label = args[0];
 
-        Structure source = new Atom("self");
+        Term source = BeliefBase.ASelf;
     	if (args.length > 1) {
-			source = (Structure)args[1];
+			source = (Atom)args[1];
     	}
     	
     	if (label.isList()) { // arg[0] is a list
     		boolean r = true;
     		ListTerm lt = (ListTerm)args[0];
             for (Term t: lt) {
-    			r = r && ts.getAg().getPL().remove((Structure)t, source);
+    			r = r && ts.getAg().getPL().remove((Atom)t, source);
     		}
     		return r;
     	} else { // args[0] is a plan label
-    		return ts.getAg().getPL().remove((Structure)label, source);
+    		return ts.getAg().getPL().remove((Atom)label, source);
     	}
     }
 }

@@ -1,16 +1,17 @@
 package jason.asSyntax.patterns.goal;
 
 import jason.asSemantics.Agent;
-import jason.asSyntax.PlanBody;
-import jason.asSyntax.PlanBodyImpl;
 import jason.asSyntax.Literal;
+import jason.asSyntax.LiteralImpl;
 import jason.asSyntax.LogExpr;
 import jason.asSyntax.LogicalFormula;
 import jason.asSyntax.NumberTermImpl;
 import jason.asSyntax.Plan;
+import jason.asSyntax.PlanBody;
+import jason.asSyntax.PlanBodyImpl;
 import jason.asSyntax.Pred;
-import jason.asSyntax.PlanBody.BodyType;
 import jason.asSyntax.LogExpr.LogicalOp;
+import jason.asSyntax.PlanBody.BodyType;
 import jason.asSyntax.directives.Directive;
 
 import java.util.logging.Level;
@@ -39,7 +40,7 @@ public class EBDG implements Directive {
             for (Plan p: innerContent.getPL()) {
                 i++;
                 // create p__f(i,g)
-                Literal pi = new Literal("p__f");
+                Literal pi = new LiteralImpl("p__f");
 				pi.addTerm(new NumberTermImpl(i));
                 pi.addTerm(goal);
                 
