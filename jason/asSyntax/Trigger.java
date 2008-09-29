@@ -25,7 +25,6 @@
 package jason.asSyntax;
 
 import jason.asSemantics.Unifier;
-import jason.asSyntax.parser.ParseException;
 import jason.asSyntax.parser.as2j;
 
 import java.io.StringReader;
@@ -83,10 +82,6 @@ public class Trigger implements Cloneable {
             logger.log(Level.SEVERE,"Error parsing trigger" + sTe,e);
             return null;
         }
-    }
-
-    public static Trigger tryParsingTrigger(String sTe) throws ParseException {
-        return new as2j(new StringReader(sTe)).trigger();
     }
 
     public void setTrigOp(TEOperator op) {

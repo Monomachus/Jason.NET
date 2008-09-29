@@ -27,7 +27,6 @@ import jason.JasonException;
 import jason.architecture.AgArch;
 import jason.asSemantics.Agent;
 import jason.asSemantics.Unifier;
-import jason.asSyntax.parser.ParseException;
 import jason.asSyntax.parser.as2j;
 
 import java.io.StringReader;
@@ -48,28 +47,12 @@ import java.util.logging.Logger;
  LiteralImpl -- Pred + negation. This latter class supports all the operations of 
  the Literal interface.
  
- There are useful static methods in this class to create Literals.
+ <p>There are useful static methods in class {@link ASSyntax} to create Literals.
  
-      Examples:
-      <pre> 
-           // create the literal 'p'
-           Literal l1 = Literal.create("p"); 
-           
-           // create the literal 'p(a,3)'
-           Literal l2 = Literal.create("p", new Atom(a), new NumberTermImpl(3)); 
-           
-           // create the literal 'p(a,3)[s,"s"]'
-           Literal l3 = Literal.create("p", new Atom("a"), new NumberTermImpl(3))
-                               .addAnnots(new Atom("s"), new StringTermImpl("s"));
-           
-           // create the literal '~p(a,3)[s,"s"]'
-           Literal l4 = Literal.create("p", new Atom("a"), new NumberTermImpl(3))
-                               .addAnnots(new Atom("s"), new StringTermImpl("s"))
-                               .setNegated(Literal.LNeg);
-     </pre> 
  
  @author jomi
  
+ @see ASSyntax
  @see Atom
  @see Structure
  @see Pred
@@ -88,23 +71,7 @@ public abstract class Literal extends DefaultTerm implements LogicalFormula {
 
     protected PredicateIndicator predicateIndicatorCache = null; // to not compute it all the time (is is called many many times)
     
-    /** creates a literal copying data from other literal */
-    public static Literal create(Literal l) {
-        return new LiteralImpl(l);
-    }    
-
-    /** 
-     * Creates a new literal, the first argument is the functor (a string)
-     * and the n remainder arguments are terms. see documentation of this
-     * class for example of use.
-     */
-    public static Literal create(String functor, Term... terms) {
-        Literal l = new LiteralImpl(functor);
-        l.addTerms(terms);
-        return l;
-    }
-
-    /** creates a new literal by parsing a string */
+    /** creates a new literal by parsing a string -- ASSyntax.parseLiteral is preferred. */
     public static Literal parseLiteral(String sLiteral) {
         try {
             as2j parser = new as2j(new StringReader(sLiteral));
@@ -115,10 +82,6 @@ public abstract class Literal extends DefaultTerm implements LogicalFormula {
         }
     }
     
-    public static Literal tryParsingLiteral(String sLiteral) throws ParseException {
-        return new as2j(new StringReader(sLiteral)).literal();
-    }
-
     public Literal copy() {
         return (Literal)clone(); // should call the clone, that is overridden in subclasses
     }

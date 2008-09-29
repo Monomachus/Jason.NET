@@ -24,7 +24,6 @@
 package jason.asSyntax;
 
 import jason.asSemantics.Unifier;
-import jason.asSyntax.parser.ParseException;
 import jason.asSyntax.parser.as2j;
 
 import java.io.StringReader;
@@ -86,21 +85,14 @@ public class Structure extends Atom {
         as2j parser = new as2j(new StringReader(sTerm));
         try {
             Term t = parser.term();
-            if (t.isAtom()) 
-                return new Structure((Atom)t);
-            else
+            if (t instanceof Structure) 
                 return (Structure)t;
+            else
+                return new Structure((Atom)t);
         } catch (Exception e) {
             logger.log(Level.SEVERE,"Error parsing structure " + sTerm,e);
             return null;
         }
-    }
-    public static Structure tryParsingStructure(String sTerm) throws ParseException {
-        Term t = new as2j(new StringReader(sTerm)).term();
-        if (t.isAtom()) 
-            return new Structure((Atom)t);
-        else
-            return (Structure)t;
     }
     
     @Override

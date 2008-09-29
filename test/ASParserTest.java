@@ -1,9 +1,15 @@
 package test;
 
+import static jason.asSyntax.ASSyntax.createAtom;
+import static jason.asSyntax.ASSyntax.createLiteral;
+import static jason.asSyntax.ASSyntax.createNumber;
+import static jason.asSyntax.ASSyntax.createString;
 import jason.architecture.AgArch;
 import jason.asSemantics.Agent;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
+import jason.asSyntax.ASSyntax;
+import jason.asSyntax.ListTerm;
 import jason.asSyntax.Literal;
 import jason.asSyntax.LogExpr;
 import jason.asSyntax.LogicalFormula;
@@ -11,6 +17,7 @@ import jason.asSyntax.NumberTerm;
 import jason.asSyntax.Plan;
 import jason.asSyntax.PlanBody;
 import jason.asSyntax.RelExpr;
+import jason.asSyntax.parser.ParseException;
 import jason.asSyntax.parser.as2j;
 import jason.infra.centralised.CentralisedAgArch;
 import jason.mas2j.MAS2JProject;
@@ -213,5 +220,36 @@ public class ASParserTest extends TestCase {
                 }
             }
         }
+    }
+    
+    public void testFactory() throws ParseException {
+        // create the literal 'p'
+        Literal l = createLiteral("p"); 
+        assertEquals("p", l.toString());
+        
+        // create the literal 'p(a,3)'
+        l = createLiteral("p", createAtom("a"), createNumber(3)); 
+        assertEquals("p(a,3)", l.toString());
+             
+        // create the literal 'p(a,3)[s,"s"]'
+        l = createLiteral("p", createAtom("a"), createNumber(3))
+                             .addAnnots(createAtom("s"), createString("s"));
+        assertEquals("p(a,3)[s,\"s\"]", l.toString());
+             
+        // create the literal '~p(a,3)[s,"s"]'
+        l = createLiteral(Literal.LNeg, "p", createAtom("a"), createNumber(3))
+                             .addAnnots(createAtom("s"), createString("s"));
+        assertEquals("~p(a,3)[s,\"s\"]", l.toString());
+        l = ASSyntax.parseLiteral(l.toString());
+        assertEquals("~p(a,3)[s,\"s\"]", l.toString());
+        
+        ListTerm   ll = ASSyntax.createList(); // empty list
+        assertEquals("[]", ll.toString());
+        
+        ll = ASSyntax.createList(createAtom("a"), createLiteral("b", createNumber(5))); 
+        assertEquals("[a,b(5)]", ll.toString());
+        
+        ll = ASSyntax.parseList(ll.toString());
+        assertEquals("[a,b(5)]", ll.toString());
     }
 }

@@ -75,7 +75,7 @@ public class ListTermImpl extends Structure implements ListTerm {
     public static ListTerm parseList(String sList) {
         as2j parser = new as2j(new StringReader(sList));
         try {
-            return (ListTerm)parser.list();
+            return parser.list();
         } catch (Exception e) {
             logger.log(Level.SEVERE,"Error parsing list "+sList,e);
             return null;
