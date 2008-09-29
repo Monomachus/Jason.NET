@@ -200,21 +200,23 @@ public class Structure extends Atom {
     }
     
     @Override
-    public void addTerms(Term ... ts ) {
+    public Literal addTerms(Term ... ts ) {
         for (Term t: ts) {
             terms.add(t);
         }
         predicateIndicatorCache = null;
         resetHashCodeCache();
+        return this;
     }
 
     @Override
-    public void addTerms(List<Term> l) {
+    public Literal addTerms(List<Term> l) {
         for (Term t: l) {
             terms.add(t);
         }
         predicateIndicatorCache = null;
         resetHashCodeCache();
+        return this;
     }
  
     @Override
@@ -230,7 +232,6 @@ public class Structure extends Atom {
         resetHashCodeCache();
     }
      
-    /** returns the i-th term (first term is 0) */
     public Term getTerm(int i) {
         return terms.get(i);
     }
@@ -279,13 +280,11 @@ public class Structure extends Atom {
         return true;
     }
 
-    /** Replaces all variables by unnamed variables (_). */
     @Override
     public void makeVarsAnnon() {
         makeVarsAnnon(new Unifier());
     }
     
-    /** change all vars by unnamed vars, the unifier un is used to consistently replace vars. */
     @Override
     public void makeVarsAnnon(Unifier un) { 
         final int size = getArity();

@@ -38,7 +38,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- This class represents an abstract literal (an Atom, Structure, Predicate, ...), is is mainly
+ This class represents an abstract literal (an Atom, Structure, Predicate, etc), is is mainly
  the interface of a literal. 
  
  To create a Literal, one of the following classes may be used:
@@ -49,6 +49,24 @@ import java.util.logging.Logger;
  the Literal interface.
  
  There are useful static methods in this class to create Literals.
+ 
+      Examples:
+      <pre> 
+           // create the literal 'p'
+           Literal l1 = Literal.create("p"); 
+           
+           // create the literal 'p(a,3)'
+           Literal l2 = Literal.create("p", new Atom(a), new NumberTermImpl(3)); 
+           
+           // create the literal 'p(a,3)[s,"s"]'
+           Literal l3 = Literal.create("p", new Atom("a"), new NumberTermImpl(3))
+                               .addAnnots(new Atom("s"), new StringTermImpl("s"));
+           
+           // create the literal '~p(a,3)[s,"s"]'
+           Literal l4 = Literal.create("p", new Atom("a"), new NumberTermImpl(3))
+                               .addAnnots(new Atom("s"), new StringTermImpl("s"))
+                               .setNegated(Literal.LNeg);
+     </pre> 
  
  @author jomi
  
@@ -70,16 +88,23 @@ public abstract class Literal extends DefaultTerm implements LogicalFormula {
 
     protected PredicateIndicator predicateIndicatorCache = null; // to not compute it all the time (is is called many many times)
     
-    /** create a literal with only a functor, but where terms and annotations may be added */
-    public static Literal create(String functor) {
-        return new LiteralImpl(functor);
-    }
-
-    /** create a literal copying data from other literal */
+    /** creates a literal copying data from other literal */
     public static Literal create(Literal l) {
         return new LiteralImpl(l);
     }    
-    
+
+    /** 
+     * Creates a new literal, the first argument is the functor (a string)
+     * and the n remainder arguments are terms. see documentation of this
+     * class for example of use.
+     */
+    public static Literal create(String functor, Term... terms) {
+        Literal l = new LiteralImpl(functor);
+        l.addTerms(terms);
+        return l;
+    }
+
+    /** creates a new literal by parsing a string */
     public static Literal parseLiteral(String sLiteral) {
         try {
             as2j parser = new as2j(new StringReader(sLiteral));
@@ -98,6 +123,7 @@ public abstract class Literal extends DefaultTerm implements LogicalFormula {
         return (Literal)clone(); // should call the clone, that is overridden in subclasses
     }
 
+    /** returns the functor of this literal */
     public abstract String getFunctor();
     
     @Override
@@ -115,29 +141,80 @@ public abstract class Literal extends DefaultTerm implements LogicalFormula {
 
     /* default implementation of some methods */
 
+    /** returns the number of terms of this literal */
     public int getArity()         { return 0;  }
-    public boolean hasTerm()      { return false; } // should use getArity to work for list/atom
+    /** returns trus if this literal has some term */
+    public boolean hasTerm()      { return false; } 
+    /** returns all terms of this literal */
     public List<Term> getTerms()  { return Structure.emptyTermList;   }
+    /** returns all terms of this literal as an array */
     public Term[] getTermsArray() { return getTerms().toArray(Structure.emptyTermArray);  }
+    /** returns all singleton vars (that appears once) in this literal */
     public List<VarTerm> getSingletonVars() { return new ArrayList<VarTerm>(); }
 
-
+    /** Replaces all terms by unnamed variables (_). */
     public void makeTermsAnnon()  {}
+    /** Replaces all variables by unnamed variables (_). */
     public void makeVarsAnnon()   {}
+
+    /**
+     * Replaces all variables of the term for unnamed variables (_).
+     * 
+     * @param un is the unifier that contains the map of replacements
+     */
     public void makeVarsAnnon(Unifier un) {}
 
+    /** returns all annotations of the literal */
     public ListTerm getAnnots()     { return null; }
+    /** returns true if there is some annotation <i>t</i> in the literal */
     public boolean hasAnnot(Term t) { return false; }
+
+    /** returns true if the pred has at least one annot */
     public boolean hasAnnot()       { return false; }
+    
+    /** returns true if all this predicate annots are in p's annots */
     public boolean hasSubsetAnnot(Literal p)            { return true; }
+    
+    /**
+     * Returns true if all this predicate's annots are in p's annots using the
+     * unifier u. 
+     *
+     * if p annots has a Tail, p annots's Tail will receive this predicate's annots,
+     * e.g.: 
+     *   this[a,b,c] = p[x,y,b|T]
+     * unifies and T is [a,c] (this will be a subset if p has a and c in its annots).
+     *
+     * if this annots has a tail, the Tail will receive all necessary term
+     * to be a subset, e.g.:
+     *   this[b|T] = p[x,y,b]
+     * unifies and T is [x,y] (this will be a subset if T is [x,y].
+     */
     public boolean hasSubsetAnnot(Literal p, Unifier u) { return true; }
-    public void clearAnnots()       { }
+
+    /** removes all annotations */
+    public void    clearAnnots()    { }
+    
+    /**
+     * returns all annots with the specified functor e.g.: from annots
+     * [t(a), t(b), source(tom)]
+     * and functor "t",
+     * it returns [t(a),t(b)]
+     */
     public ListTerm getAnnots(String functor) { return new ListTermImpl(); }
+    /**
+     * returns the sources of this literal as a new list. e.g.: from annots
+     * [source(a), source(b)], it returns [a,b]
+     */
     public ListTerm getSources()    { return new ListTermImpl(); }
+    /** returns true if this literal has some source annotation */
     public boolean hasSource()      { return false; }
+    /** returns true if this literal has a "source(<i>agName</i>)" */
     public boolean hasSource(Term agName) { return false; }
 
+    /** returns this if this literal can be added in the belief base (Atoms, for instance, can not be) */
     public boolean canBeAddedInBB() { return false; }
+    
+    /** returns whether this literal is negated or not, use Literal.LNeg and Literal.LPos to compare the returned value */
     public boolean negated()        { return false; }
 
     public boolean equalsAsStructure(Object p) { return false;  }
@@ -147,8 +224,11 @@ public abstract class Literal extends DefaultTerm implements LogicalFormula {
     // structure
     public void addTerm(Term t) {  logger.log(Level.SEVERE, "addTerm is not implemented in the class "+this.getClass().getSimpleName(), new Exception());  }
     public void delTerm(int index) { logger.log(Level.SEVERE, "delTerm is not implemented in the class "+this.getClass().getSimpleName(), new Exception());  }
-    public void addTerms(Term ... ts ) { logger.log(Level.SEVERE, "addTerms is not implemented in the class "+this.getClass().getSimpleName(), new Exception());  }
-    public void addTerms(List<Term> l) { logger.log(Level.SEVERE, "addTerms is not implemented in the class "+this.getClass().getSimpleName(), new Exception());  }
+    /** adds some terms and return this */
+    public Literal addTerms(Term ... ts ) { logger.log(Level.SEVERE, "addTerms is not implemented in the class "+this.getClass().getSimpleName(), new Exception()); return null; }
+    /** adds some terms and return this */
+    public Literal addTerms(List<Term> l) { logger.log(Level.SEVERE, "addTerms is not implemented in the class "+this.getClass().getSimpleName(), new Exception()); return null; }
+    /** returns the i-th term (first term is 0) */
     public Term getTerm(int i)    { logger.log(Level.SEVERE, "getTerm(i) is not implemented in the class "+this.getClass().getSimpleName(), new Exception()); return null; }
     public void setTerms(List<Term> l) { logger.log(Level.SEVERE, "setTerms is not implemented in the class "+this.getClass().getSimpleName(), new Exception());  }
     public void setTerm(int i, Term t) { logger.log(Level.SEVERE, "setTerm is not implemented in the class "+this.getClass().getSimpleName(), new Exception());  }
@@ -156,18 +236,44 @@ public abstract class Literal extends DefaultTerm implements LogicalFormula {
     // pred
     public void setAnnots(ListTerm l) { logger.log(Level.SEVERE, "setAnnots is not implemented in the class "+this.getClass().getSimpleName(), new Exception());  }
     public boolean addAnnot(Term t) { logger.log(Level.SEVERE, "addAnnot is not implemented in the class "+this.getClass().getSimpleName(), new Exception()); return false; }
-    public void addAnnots(List<Term> l) { logger.log(Level.SEVERE, "addAnnots is not implemented in the class "+this.getClass().getSimpleName(), new Exception());  }
-    public void addAnnot(int index, Term t) { logger.log(Level.SEVERE, "addAnnot is not implemented in the class "+this.getClass().getSimpleName(), new Exception());  }
+    
+    /** adds some annots and return this */
+    public Literal addAnnots(Term ... terms) { logger.log(Level.SEVERE, "addAnnots is not implemented in the class "+this.getClass().getSimpleName(), new Exception()); return null; }
+
+    /** adds some annots and return this */
+    public Literal addAnnots(List<Term> l) { logger.log(Level.SEVERE, "addAnnots is not implemented in the class "+this.getClass().getSimpleName(), new Exception()); return null; }
+    //public void addAnnot(int index, Term t) { logger.log(Level.SEVERE, "addAnnot is not implemented in the class "+this.getClass().getSimpleName(), new Exception());  }
     public void delAnnot(Term t) { logger.log(Level.SEVERE, "delAnnot is not implemented in the class "+this.getClass().getSimpleName(), new Exception());  }
+
+    /**
+     * removes all annots in this pred that are in the list <i>l</i>.
+     * @return true if some annot was removed.
+     */
     public boolean delAnnots(List<Term> l) { logger.log(Level.SEVERE, "delAnnots is not implemented in the class "+this.getClass().getSimpleName(), new Exception()); return false; }
+
+    /**
+     * "import" annots from another predicate <i>p</i>. p will be changed
+     * to contain only the annots actually imported (for Event), 
+     * for example:
+     *     p    = b[a,b] 
+     *     this = b[b,c] 
+     *     after import, p = b[a] 
+     * It is used to generate event <+b[a]>.
+     * 
+     * @return true if some annot was imported.
+     */
     public boolean importAnnots(Literal p) { logger.log(Level.SEVERE, "importAnnots is not implemented in the class "+this.getClass().getSimpleName(), new Exception());  return false; }
 
+    /** adds the annotation source(<i>agName</i>) */
     public void addSource(Term agName) { logger.log(Level.SEVERE, "addSource is not implemented in the class "+this.getClass().getSimpleName(), new Exception());  }
+    /** deletes one source(<i>agName</i>) annotation, return true if deleted */
     public boolean delSource(Term agName) { logger.log(Level.SEVERE, "delSource is not implemented in the class "+this.getClass().getSimpleName(), new Exception());  return false; }
+    /** deletes all source annotations */
     public void delSources() { logger.log(Level.SEVERE, "delSources is not implemented in the class "+this.getClass().getSimpleName(), new Exception());  }
 
     // literal    
-    public void setNegated(boolean b) {  logger.log(Level.SEVERE, "setNegated is not implemented in the class "+this.getClass().getSimpleName(), new Exception());  }
+    /** changes the negation of the literal and return this */
+    public Literal setNegated(boolean b) {  logger.log(Level.SEVERE, "setNegated is not implemented in the class "+this.getClass().getSimpleName(), new Exception()); return null; }
     
     
     /** 

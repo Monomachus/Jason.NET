@@ -79,9 +79,10 @@ public class LiteralImpl extends Pred implements LogicalFormula {
         return type == LNeg;
     }
     
-    public void setNegated(boolean b) {
+    public Literal setNegated(boolean b) {
         type = b;
         resetHashCodeCache();
+        return this;
     }
 
     @Override

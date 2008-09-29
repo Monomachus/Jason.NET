@@ -304,10 +304,11 @@ public class VarTerm extends LiteralImpl implements NumberTerm, ListTerm, String
     }
 
     @Override
-    public void addTerms(List<Term> l) {
+    public Literal addTerms(List<Term> l) {
         if (value != null && value.isStructure()) {
-            ((Structure)getValue()).addTerms(l);
+            return ((Structure)getValue()).addTerms(l);
         }
+        return this;
     }
 
     @Override
@@ -420,6 +421,7 @@ public class VarTerm extends LiteralImpl implements NumberTerm, ListTerm, String
             super.setAnnots(l);
     }
 
+    /*
     @Override
     public void addAnnot(int index, Term t) {
         if (value != null && getValue().isPred())
@@ -427,6 +429,7 @@ public class VarTerm extends LiteralImpl implements NumberTerm, ListTerm, String
         else
             super.addAnnot(index, t);
     }
+    */
 
     @Override
     public boolean importAnnots(Literal p) {
@@ -445,11 +448,11 @@ public class VarTerm extends LiteralImpl implements NumberTerm, ListTerm, String
     }
 
     @Override
-    public void addAnnots(List<Term> l) {
+    public Literal addAnnots(List<Term> l) {
         if (value != null && getValue().isPred())
-            ((Pred) getValue()).addAnnots(l);
+            return ((Pred) getValue()).addAnnots(l);
         else
-            super.addAnnots(l);
+            return super.addAnnots(l);
     }
 
     @Override

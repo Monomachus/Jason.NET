@@ -120,8 +120,8 @@ public class Pred extends Structure {
     }
 
     @Override       
-    public void addAnnots(List<Term> l) {
-        if (l == null || l.isEmpty()) return;
+    public Literal addAnnots(List<Term> l) {
+        if (l == null || l.isEmpty()) return this;
         ListTerm tail;
         if (annots == null) {
             annots = new ListTermImpl();
@@ -133,13 +133,32 @@ public class Pred extends Structure {
             if (!annots.contains(t)) 
                 tail = tail.append(t);
         }
+        return this;
     }
 
+    @Override       
+    public Literal addAnnots(Term ... l) {
+        ListTerm tail;
+        if (annots == null) {
+            annots = new ListTermImpl();
+            tail = annots;
+        } else {
+            tail= annots.getLast();
+        }
+        for (Term t : l) {
+            if (!annots.contains(t)) 
+                tail = tail.append(t);
+        }
+        return this;
+    }
+
+    /*
     @Override       
     public void addAnnot(int index, Term t) {
         if (annots == null) annots = new ListTermImpl();
         if (!annots.contains(t)) annots.add(index, t);
     }
+    */
 
     @Override       
     public void delAnnot(Term t) {
@@ -162,7 +181,6 @@ public class Pred extends Structure {
         return annots.contains(t);
     }
 
-    /** returns true if the pred has at least one annot */
     @Override       
     public boolean hasAnnot() {
         return annots != null && !annots.isEmpty();
@@ -186,17 +204,6 @@ public class Pred extends Structure {
                 t.countVars(c);
     }
 
-    /**
-     * "import" annots from another predicate <i>p</i>. p will be changed
-     * to contain only the annots actually imported (for Event), 
-     * for example:
-     *     p    = b[a,b] 
-     *     this = b[b,c] 
-     *     after import, p = b[a] 
-     * It is used to generate event <+b[a]>.
-     * 
-     * @return true if some annot was imported.
-     */
     @Override       
     public boolean importAnnots(Literal p) {
         boolean imported = false;
@@ -220,10 +227,6 @@ public class Pred extends Structure {
         return imported;
     }
 
-    /**
-     * removes all annots in this pred that are in the list <i>l</i>.
-     * @return true if some annot was removed.
-     */
     @Override
     public boolean delAnnots(List<Term> l) {
         boolean removed = false;
@@ -236,12 +239,6 @@ public class Pred extends Structure {
         return removed;
     }
 
-    /**
-     * returns all annots with the specified functor e.g.: from annots
-     * [t(a), t(b), source(tom)]
-     * and functor "t",
-     * it returns [t(a),t(b)]
-     */
     @Override
     public ListTerm getAnnots(String functor) {
         ListTerm ls = new ListTermImpl();
@@ -258,7 +255,6 @@ public class Pred extends Structure {
         return ls;
     }
 
-    /** returns true if all this predicate annots are in p's annots */
     @Override
     public boolean hasSubsetAnnot(Literal p) {
         if (annots == null) return true;
@@ -271,20 +267,6 @@ public class Pred extends Structure {
         return true;
     }
 
-    /**
-     * Returns true if all this predicate's annots are in p's annots using the
-     * unifier u. 
-     *
-     * if p annots has a Tail, p annots's Tail will receive this predicate's annots,
-     * e.g.: 
-     *   this[a,b,c] = p[x,y,b|T]
-     * unifies and T is [a,c] (this will be a subset if p has a and c in its annots).
-     *
-     * if this annots has a tail, the Tail will receive all necessary term
-     * to be a subset, e.g.:
-     *   this[b|T] = p[x,y,b]
-     * unifies and T is [x,y] (this will be a subset if T is [x,y].
-     */
     @Override
     public boolean hasSubsetAnnot(Literal p, Unifier u) {
         //return getSubsetAnnots(p,u,null);
@@ -334,16 +316,12 @@ public class Pred extends Structure {
 
     
     
-    /**
-     * Adds a source annotation like "source(<i>agName</i>)".
-     */
     @Override
     public void addSource(Term agName) {
         if (agName != null)
             addAnnot(createSource(agName));
     }
 
-    /** deletes "source(<i>agName</i>)" */
     @Override
     public boolean delSource(Term agName) {
         if (annots != null)
@@ -358,10 +336,6 @@ public class Pred extends Structure {
     	return s;
     }
     
-    /**
-     * returns the sources of this Pred as a new list. e.g.: from annots
-     * [source(a), source(b)], it returns [a,b]
-     */
     @Override
     public ListTerm getSources() {
         ListTerm ls = new ListTermImpl();
@@ -379,7 +353,6 @@ public class Pred extends Structure {
         return ls;
     }
 
-    /** deletes all sources annotations */
     @Override
     public void delSources() {
         if (annots != null) {
@@ -409,7 +382,6 @@ public class Pred extends Structure {
         return false;
     }
 
-    /** returns true if this pred has a "source(<i>agName</i>)" */
     @Override
     public boolean hasSource(Term agName) {
         if (annots != null) {
@@ -419,11 +391,6 @@ public class Pred extends Structure {
     }
 
     
-    /**
-     * Replaces all variables of the term for unnamed variables (_).
-     * 
-     * @param un is the unifier that contains the map of replacements
-     */
     @Override
     public void makeVarsAnnon(Unifier un) {
         if (annots != null) {
