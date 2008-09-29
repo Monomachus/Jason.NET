@@ -70,31 +70,31 @@ import jason.asSyntax.Term;
 */
 public class concat extends DefaultInternalAction {
 
-	private static InternalAction singleton = null;
-	public static InternalAction create() {
-		if (singleton == null) 
-			singleton = new concat();
-		return singleton;
-	}
+    private static InternalAction singleton = null;
+    public static InternalAction create() {
+        if (singleton == null) 
+            singleton = new concat();
+        return singleton;
+    }
 
-	@Override
-	public Object execute(TransitionSystem ts, Unifier un, Term[] args)	throws Exception {
-		
-	    if (args[0].isList()) {
+    @Override
+    public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
+        
+        if (args[0].isList()) {
             // list concat
-			if (!args[args.length-1].isVar() && !args[args.length-1].isList()) {
-				throw new JasonException("Last argument of concat '"+args[args.length-1]+"'is not a list nor a variable.");
-			}
+            if (!args[args.length-1].isVar() && !args[args.length-1].isList()) {
+                throw new JasonException("Last argument of concat '"+args[args.length-1]+"'is not a list nor a variable.");
+            }
             ListTerm result = (ListTerm)args[0].clone();
             for (int i=1; i<args.length-1; i++) {
-    			if (!args[i].isList())
-    	            throw JasonException.createWrongArgument(this,"arg["+i+"] is not a list");
+                if (!args[i].isList())
+                    throw JasonException.createWrongArgument(this,"arg["+i+"] is not a list");
                 result.concat((ListTerm)args[i].clone());
             }
-			return un.unifies(result, args[args.length-1]);
+            return un.unifies(result, args[args.length-1]);
 
         
-	    } else {
+        } else {
             // string concat
             if (!args[args.length-1].isVar() && !args[args.length-1].isString()) {
                 throw JasonException.createWrongArgument(this,"Last argument '"+args[args.length-1]+"' is not a string nor a variable.");
@@ -112,6 +112,6 @@ public class concat extends DefaultInternalAction {
                 sr.append(vl);
             }
             return un.unifies(new StringTermImpl(sr.toString()), args[args.length-1]);
-		}
-	}
+        }
+    }
 }

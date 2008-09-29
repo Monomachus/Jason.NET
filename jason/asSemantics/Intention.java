@@ -47,8 +47,8 @@ import org.w3c.dom.Element;
  */
 public class Intention implements Serializable, Comparable<Intention> {
 
-	private static final long serialVersionUID = 1L;
-	public  static final Intention EmptyInt = null;
+    private static final long serialVersionUID = 1L;
+    public  static final Intention EmptyInt = null;
     private static       int idCount = 0;
 
     private int     id;
@@ -116,21 +116,21 @@ public class Intention implements Serializable, Comparable<Intention> {
     }
     
     public void setSuspended(boolean b) {
-    	isSuspended = b;
+        isSuspended = b;
     }
     
     public boolean isSuspended() {
-    	return isSuspended;
+        return isSuspended;
     }
     
     public Stack<IntendedMeans> getIMs() {
-    	return intendedMeans;
+        return intendedMeans;
     }
     
     /** returns the IntendedMeans with TE = g, returns null if there isn't one */
     public IntendedMeans getIM(Trigger g, Unifier u) {
         for (IntendedMeans im : intendedMeans)
-        	//System.out.println(g + " = "+ im.getTrigger()+" = "+u.unifies(g, im.getTrigger()));
+            //System.out.println(g + " = "+ im.getTrigger()+" = "+u.unifies(g, im.getTrigger()));
             if (u.unifies(g, im.getTrigger()))
                 return im;
         return null;
@@ -178,14 +178,14 @@ public class Intention implements Serializable, Comparable<Intention> {
     }
     
     public Intention clone() {
-    	Intention i = new Intention();
-    	i.id = id;
+        Intention i = new Intention();
+        i.id = id;
         i.isAtomic = isAtomic;
         i.intendedMeans = new Stack<IntendedMeans>();
         for (IntendedMeans im: intendedMeans) {
-        	i.intendedMeans.add((IntendedMeans)im.clone());
+            i.intendedMeans.add((IntendedMeans)im.clone());
         }
-    	return i;
+        return i;
     }
         
     public String toString() {

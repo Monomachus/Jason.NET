@@ -61,8 +61,8 @@ public class VarTerm extends LiteralImpl implements NumberTerm, ListTerm, String
         super(s);
         if (s != null && Character.isLowerCase(s.charAt(0))) {
             logger.warning("Are you sure you want to create a VarTerm that begins with lowercase (" + s + ")? Should it be a Term instead?");
-        	Exception e = new Exception("stack");
-        	e.printStackTrace();
+            Exception e = new Exception("stack");
+            e.printStackTrace();
         }
     }
 
@@ -154,9 +154,9 @@ public class VarTerm extends LiteralImpl implements NumberTerm, ListTerm, String
                 return true;
             }
         } else {
-        	return getValue().apply(u);
+            return getValue().apply(u);
         }
-        return false;            	
+        return false;               
     }    
     
     /**
@@ -208,7 +208,7 @@ public class VarTerm extends LiteralImpl implements NumberTerm, ListTerm, String
     @Override
     public String getFunctor() {
         if (value == null) {
-        	return super.getFunctor();
+            return super.getFunctor();
         } else if (value instanceof Atom) {
             return ((Atom)getValue()).getFunctor();
         } else {
@@ -389,7 +389,7 @@ public class VarTerm extends LiteralImpl implements NumberTerm, ListTerm, String
             c.put(this, n+1);
             super.countVars(c);
         } else {
-        	value.countVars(c);
+            value.countVars(c);
         }
     }
 
@@ -637,7 +637,7 @@ public class VarTerm extends LiteralImpl implements NumberTerm, ListTerm, String
     }
 
     @SuppressWarnings("unchecked")
-	public boolean containsAll(Collection c) {
+    public boolean containsAll(Collection c) {
         return value != null && getValue().isList() && ((ListTerm) getValue()).containsAll(c);
     }
 
@@ -698,7 +698,7 @@ public class VarTerm extends LiteralImpl implements NumberTerm, ListTerm, String
     }
 
     @SuppressWarnings("unchecked")
-	public boolean removeAll(Collection c) {
+    public boolean removeAll(Collection c) {
         if (value != null && getValue().isList())
             return ((ListTerm) getValue()).removeAll(c);
         else
@@ -706,7 +706,7 @@ public class VarTerm extends LiteralImpl implements NumberTerm, ListTerm, String
     }
 
     @SuppressWarnings("unchecked")
-	public boolean retainAll(Collection c) {
+    public boolean retainAll(Collection c) {
         if (value != null && getValue().isList())
             return ((ListTerm) getValue()).retainAll(c);
         else
@@ -957,7 +957,7 @@ public class VarTerm extends LiteralImpl implements NumberTerm, ListTerm, String
         if (value != null && getValue() instanceof PlanBody)
             return ((PlanBody) getValue()).isBodyTerm();
         else
-        	return false;
+            return false;
     }
     
     public void setAsBodyTerm(boolean b) {

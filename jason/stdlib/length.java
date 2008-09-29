@@ -69,13 +69,13 @@ import jason.asSyntax.Term;
  */
 public class length extends DefaultInternalAction {
 
-	private static InternalAction singleton = null;
-	public static InternalAction create() {
-		if (singleton == null) 
-			singleton = new length();
-		return singleton;
-	}
-	
+    private static InternalAction singleton = null;
+    public static InternalAction create() {
+        if (singleton == null) 
+            singleton = new length();
+        return singleton;
+    }
+    
     @Override public int getMinArgs() { return 2; }
     @Override public int getMaxArgs() { return 2; }
 

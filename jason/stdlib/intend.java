@@ -79,7 +79,7 @@ public class intend extends DefaultInternalAction {
     }
 
     @Override
-	public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
+    public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         checkArguments(args);
         return intends(ts.getC(),(Literal)args[0],un);
     }

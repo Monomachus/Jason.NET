@@ -39,14 +39,14 @@ import java.util.GregorianCalendar;
   
  */
 public class time extends DefaultInternalAction {
-	
-	private static InternalAction singleton = null;
-	public static InternalAction create() {
-		if (singleton == null) 
-			singleton = new time();
-		return singleton;
-	}
-	
+    
+    private static InternalAction singleton = null;
+    public static InternalAction create() {
+        if (singleton == null) 
+            singleton = new time();
+        return singleton;
+    }
+    
     @Override public int getMinArgs() { return 3; }
     @Override public int getMaxArgs() { return 3; }
 

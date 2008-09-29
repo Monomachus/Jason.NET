@@ -36,25 +36,25 @@ import org.w3c.dom.Element;
  */
 public abstract class BinaryStructure extends Structure {
 
-	/** Constructor for binary operator */
-	public BinaryStructure(Term t1, String id, Term t2) {
-		super(id,2);
-		addTerms( t1, t2 );
-		if (t1 instanceof SourceInfo) setSrc((SourceInfo)t1);
-		else if (t2 instanceof SourceInfo) setSrc((SourceInfo)t2);
-	}
+    /** Constructor for binary operator */
+    public BinaryStructure(Term t1, String id, Term t2) {
+        super(id,2);
+        addTerms( t1, t2 );
+        if (t1 instanceof SourceInfo) setSrc((SourceInfo)t1);
+        else if (t2 instanceof SourceInfo) setSrc((SourceInfo)t2);
+    }
 
-	/** Constructor for unary operator */
-	public BinaryStructure(String id, Term arg) {
-		super(id,1);
-		addTerm( arg );
-		setSrc(arg);
-	}
-	
-	public boolean isUnary() {
-		return getArity() == 1;
-	}
-	
+    /** Constructor for unary operator */
+    public BinaryStructure(String id, Term arg) {
+        super(id,1);
+        addTerm( arg );
+        setSrc(arg);
+    }
+    
+    public boolean isUnary() {
+        return getArity() == 1;
+    }
+    
     /** gets the LHS of this operation */
     public Term getLHS() {
         return getTerm(0);
@@ -67,12 +67,12 @@ public abstract class BinaryStructure extends Structure {
 
     @Override
     public String toString() {
-		if (isUnary()) {
-			return getFunctor()+"("+getTerm(0)+")";
-		} else {
-			return "("+getTerm(0)+getFunctor()+getTerm(1)+")";
-		}
-	}
+        if (isUnary()) {
+            return getFunctor()+"("+getTerm(0)+")";
+        } else {
+            return "("+getTerm(0)+getFunctor()+getTerm(1)+")";
+        }
+    }
 
     /** get as XML */
     public Element getAsDOM(Document document) {

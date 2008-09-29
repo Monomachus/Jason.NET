@@ -37,7 +37,7 @@ import java.util.logging.Logger;
  */
 public abstract class DefaultTerm extends SourceInfo implements Term, Serializable {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
     private static Logger logger = Logger.getLogger(Term.class.getName());
 
     protected Integer hashCodeCache = null;
@@ -63,7 +63,7 @@ public abstract class DefaultTerm extends SourceInfo implements Term, Serializab
     public boolean isNumeric()        { return false; }
     public boolean isPred()           { return false; }
     public boolean isStructure()      { return false; }
-	public boolean isAtom()           { return false; }
+    public boolean isAtom()           { return false; }
     public boolean isPlanBody()       { return false; }
     public boolean isGround()         { return true; }
     public boolean hasVar(VarTerm t)  { return false; }
@@ -88,6 +88,6 @@ public abstract class DefaultTerm extends SourceInfo implements Term, Serializab
     }
 
     public boolean apply(Unifier u) {
-    	return false;
+        return false;
     }
 }

@@ -46,7 +46,7 @@ public class Message implements Serializable {
     }
 
     public Message(String ilf, String s, String r, Object c) {
-    	this(ilf, s, r, c, "mid"+(idCount++));
+        this(ilf, s, r, c, "mid"+(idCount++));
     }
     
     public Message(String ilf, String s, String r, Object c, String id) {
@@ -67,66 +67,66 @@ public class Message implements Serializable {
         inReplyTo= m.inReplyTo;
     }
     
-	public String getIlForce() {
-		return ilForce;
-	}
-	
-	public boolean isAsk() {
-		return ilForce.startsWith("ask");
-	}
-	public boolean isTell() {
-		return ilForce.equals("tell");
-	}
-	public boolean isUnTell() {
-		return ilForce.equals("untell");
-	}
+    public String getIlForce() {
+        return ilForce;
+    }
+    
+    public boolean isAsk() {
+        return ilForce.startsWith("ask");
+    }
+    public boolean isTell() {
+        return ilForce.equals("tell");
+    }
+    public boolean isUnTell() {
+        return ilForce.equals("untell");
+    }
 
-	public boolean isKnownPerformative() {
-	    for (String s: knownPerformatives) {
-	        if (ilForce.equals(s)) 
-	            return true;
-	    }
-	    return false;
-	}
-	
-	public void setPropCont(Object o) {
-		propCont = o;
-	}
-	public Object getPropCont() {
-		return propCont;
-	}
-	
-	public String getReceiver() {
-		return receiver;
-	}
-	public void setSender(String agName) {
-		sender = agName;
-	}
-	public String getSender() {
-		return sender;
-	}
-	public void setReceiver(String agName) {
-		receiver = agName;
-	}
-	
-	public String getMsgId() {
-		return msgId;
-	}
-	public void setMsgId(String id) {
-		msgId = id;
-	}
-	
-	public String getInReplyTo() {
-		return inReplyTo;
-	}
-	public void setInReplyTo(String inReplyTo) {
-		this.inReplyTo = inReplyTo;
-	}
-	
+    public boolean isKnownPerformative() {
+        for (String s: knownPerformatives) {
+            if (ilForce.equals(s)) 
+                return true;
+        }
+        return false;
+    }
+    
+    public void setPropCont(Object o) {
+        propCont = o;
+    }
+    public Object getPropCont() {
+        return propCont;
+    }
+    
+    public String getReceiver() {
+        return receiver;
+    }
+    public void setSender(String agName) {
+        sender = agName;
+    }
+    public String getSender() {
+        return sender;
+    }
+    public void setReceiver(String agName) {
+        receiver = agName;
+    }
+    
+    public String getMsgId() {
+        return msgId;
+    }
+    public void setMsgId(String id) {
+        msgId = id;
+    }
+    
+    public String getInReplyTo() {
+        return inReplyTo;
+    }
+    public void setInReplyTo(String inReplyTo) {
+        this.inReplyTo = inReplyTo;
+    }
+    
     public Message clone() {
         return new Message(this);
     }
-	
+    
     /**
      * Creates a new message object based on a string that 
      * follows the format of the toString of Message class.
@@ -160,8 +160,8 @@ public class Message implements Serializable {
         return newmsg;
     }
     
-	public String toString() {
-		String irt = (inReplyTo == null ? "" : "->"+inReplyTo);
+    public String toString() {
+        String irt = (inReplyTo == null ? "" : "->"+inReplyTo);
         return "<"+msgId+irt+","+sender+","+ilForce+","+receiver+","+propCont+">";
     }
 }

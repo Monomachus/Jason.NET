@@ -49,7 +49,7 @@ public interface ExecutionControlInfraTier {
      * Gets the agent state (beliefs, intentions, plans, ...)
      * as an XML document
      */
-	public Document getAgState(String agName);
+    public Document getAgState(String agName);
 
     /** Gets an object with infrastructure runtime services */
     public RuntimeServicesInfraTier getRuntimeServices();

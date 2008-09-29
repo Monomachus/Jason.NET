@@ -68,7 +68,7 @@ import jason.asSyntax.Trigger.TEType;
   
  */
 public class suspend extends DefaultInternalAction {
-	
+    
     boolean suspendIntention = false;
     public static final String SUSPENDED_INT      = "suspended-";
     public static final String SELF_SUSPENDED_INT = SUSPENDED_INT+"self";
@@ -102,13 +102,13 @@ public class suspend extends DefaultInternalAction {
         // use the argument to select the intention to suspend.
         
         Trigger      g = new Trigger(TEOperator.add, TEType.achieve, (Literal)args[0]);
-    	String       k = SUSPENDED_INT+g.getLiteral();
-    	
+        String       k = SUSPENDED_INT+g.getLiteral();
+        
         // ** Must test in PA/PI first since some actions (as .suspend) put intention in PI
         
         // suspending from Pending Actions
         for (ActionExec a: C.getPendingActions().values()) {
-        	Intention i = a.getIntention();
+            Intention i = a.getIntention();
             if (i.hasTrigger(g, un)) {
                 i.setSuspended(true);
                 C.getPendingIntentions().put(k, i);
@@ -118,7 +118,7 @@ public class suspend extends DefaultInternalAction {
         // suspending from Pending Intentions
         for (Intention i: C.getPendingIntentions().values()) {
             if (i.hasTrigger(g, un)) { 
-        		i.setSuspended(true);
+                i.setSuspended(true);
             }
         }
 
@@ -133,9 +133,9 @@ public class suspend extends DefaultInternalAction {
         // suspending the current intention?
         Intention i = C.getSelectedIntention();
         if (i.hasTrigger(g, un)) {
-    		suspendIntention = true;
+            suspendIntention = true;
             i.setSuspended(true);
-    		C.getPendingIntentions().put(SELF_SUSPENDED_INT, i);
+            C.getPendingIntentions().put(SELF_SUSPENDED_INT, i);
         }
             
         // suspending G in Events
@@ -149,7 +149,7 @@ public class suspend extends DefaultInternalAction {
                 C.removeEvent(e);                    
                 C.getPendingIntentions().put(k, i);
             } else if (i == Intention.EmptyInt && un.unifies(e.getTrigger(), g)) { // the case of !!
-        		ts.getLogger().warning("** NOT IMPLEMENTED ** (suspend of !!)");
+                ts.getLogger().warning("** NOT IMPLEMENTED ** (suspend of !!)");
             }
         }
         return true;
@@ -157,6 +157,6 @@ public class suspend extends DefaultInternalAction {
 
     @Override
     public boolean suspendIntention() {
-    	return suspendIntention;
+        return suspendIntention;
     }
 }

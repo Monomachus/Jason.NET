@@ -19,7 +19,7 @@ public interface MASLauncherInfraTier extends Runnable {
     /**
      * Sets the description of the project to be run.
      */
-	public void setProject(MAS2JProject project);
+    public void setProject(MAS2JProject project);
 
     /** 
      * Sets the object that wants to be informed about the changes in
@@ -27,16 +27,16 @@ public interface MASLauncherInfraTier extends Runnable {
      * wants to change available buttons as the project is being
      * executed.
      */
-	public void setListener(RunProjectListener listener);
+    public void setListener(RunProjectListener listener);
 
     /**
      * Writes the script(s), normally Ant scripts, used to launch the
      * MAS.
      */
-	public boolean writeScripts(boolean debug);
+    public boolean writeScripts(boolean debug);
 
     /**
      * Stops the MAS execution.
      */
-	public void stopMAS();
+    public void stopMAS();
 }

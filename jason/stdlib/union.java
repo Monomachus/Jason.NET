@@ -60,17 +60,17 @@ import jason.asSyntax.Term;
   @see jason.stdlib.intersection
 */
 public class union extends difference { // to inherit checkArguments
-	
-	private static InternalAction singleton = null;
-	public static InternalAction create() {
-		if (singleton == null) 
-			singleton = new union();
-		return singleton;
-	}
+    
+    private static InternalAction singleton = null;
+    public static InternalAction create() {
+        if (singleton == null) 
+            singleton = new union();
+        return singleton;
+    }
 
-	@Override
-	public Object execute(TransitionSystem ts, Unifier un, Term[] args)	throws Exception {
-	    checkArguments(args);
-		return un.unifies(args[2], ((ListTerm)args[0]).union( (ListTerm)args[1]) );
-	}
+    @Override
+    public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
+        checkArguments(args);
+        return un.unifies(args[2], ((ListTerm)args[0]).union( (ListTerm)args[1]) );
+    }
 }

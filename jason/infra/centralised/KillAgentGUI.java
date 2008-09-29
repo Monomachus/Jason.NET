@@ -15,9 +15,9 @@ import javax.swing.border.TitledBorder;
 
 public class KillAgentGUI extends BaseDialogGUI {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private JList lAgs;
+    private JList lAgs;
     private RuntimeServicesInfraTier services;
 
     public KillAgentGUI(Frame f, String title) {

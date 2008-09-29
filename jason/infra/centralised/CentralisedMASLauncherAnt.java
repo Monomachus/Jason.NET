@@ -32,13 +32,13 @@ public class CentralisedMASLauncherAnt implements MASLauncherInfraTier {
     private String task;
     
     public CentralisedMASLauncherAnt() {
-    	task = "run";
-	}
+        task = "run";
+    }
 
     /** create the launcher for a specific ant task */
     public CentralisedMASLauncherAnt(String task) {
-    	this.task = task;
-	}
+        this.task = task;
+    }
     
     public void setProject(MAS2JProject project) {
         this.project = project;
@@ -69,7 +69,7 @@ public class CentralisedMASLauncherAnt implements MASLauncherInfraTier {
 
             Thread.sleep(300);
             stop = false;
-			// read the program output and print it out
+            // read the program output and print it out
             while (!stop) {
                 while (in.ready()) {
                     System.out.println(in.readLine());
@@ -181,30 +181,30 @@ public class CentralisedMASLauncherAnt implements MASLauncherInfraTier {
             lib = "        <fileset dir=\"${basedir}/lib\" >  <include name=\"*.jar\" /> </fileset>\n";
         }
 
-		// add classpath defined in the project .mas2j
-		for (String cp: project.getClassPaths()) {
-		    int apos = cp.indexOf("*"); 
-		    if (apos < 0) {
-		        lib += "        <pathelement location=\""+cp+"\"/>\n";
-		    } else {
-		        cp = cp.replaceAll("\\\\", "/");
-		        String dir   = "${basedir}";
+        // add classpath defined in the project .mas2j
+        for (String cp: project.getClassPaths()) {
+            int apos = cp.indexOf("*"); 
+            if (apos < 0) {
+                lib += "        <pathelement location=\""+cp+"\"/>\n";
+            } else {
+                cp = cp.replaceAll("\\\\", "/");
+                String dir   = "${basedir}";
                 String files = cp;
-		        int spos = cp.lastIndexOf("/");
-		        if (spos >= 0 && spos < apos) {
-		            dir   = cp.substring(0,spos);
-		            files = cp.substring(spos+1);
-		        } else {
-		            spos = cp.lastIndexOf("/**"); 
-	                if (spos >= 0 && spos < apos) {
-	                    dir   = cp.substring(0,spos);
-	                    files = cp.substring(spos+1);
-	                }
+                int spos = cp.lastIndexOf("/");
+                if (spos >= 0 && spos < apos) {
+                    dir   = cp.substring(0,spos);
+                    files = cp.substring(spos+1);
+                } else {
+                    spos = cp.lastIndexOf("/**"); 
+                    if (spos >= 0 && spos < apos) {
+                        dir   = cp.substring(0,spos);
+                        files = cp.substring(spos+1);
+                    }
                 }
 
-	            lib += "        <fileset dir=\""+dir+"\" >  <include name=\""+files+"\" /> </fileset>\n";		        
-		    }
-		}
+                lib += "        <fileset dir=\""+dir+"\" >  <include name=\""+files+"\" /> </fileset>\n";               
+            }
+        }
 
         script = replace(script, "<PATH-LIB>", lib);
 
@@ -231,7 +231,7 @@ public class CentralisedMASLauncherAnt implements MASLauncherInfraTier {
     }
 
     protected boolean hasCBuild() {
-    	return new File(project.getDirectory() + File.separator + bindir + "c-build.xml").exists();
+        return new File(project.getDirectory() + File.separator + bindir + "c-build.xml").exists();
     }
 
 }

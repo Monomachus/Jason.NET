@@ -84,26 +84,26 @@ public class FunctionRegister implements Directive {
     }
     
     @SuppressWarnings("unchecked")
-	public Agent process(Pred directive, Agent outerContent, Agent innerContent) {
+    public Agent process(Pred directive, Agent outerContent, Agent innerContent) {
         if (outerContent == null)
             return null;
-    	try {
-    	    String id = ((StringTerm)directive.getTerm(0)).getString();
-    	    if (directive.getArity() == 1) {
-    	        // it is implemented in java
+        try {
+            String id = ((StringTerm)directive.getTerm(0)).getString();
+            if (directive.getArity() == 1) {
+                // it is implemented in java
                 outerContent.addFunction((Class<ArithFunction>)Class.forName(id));
-    	    } else if (directive.getArity() == 3) {
-    	        // is is implemented in AS
-    	        int arity = (int)((NumberTerm)directive.getTerm(1)).solve();
+            } else if (directive.getArity() == 3) {
+                // is is implemented in AS
+                int arity = (int)((NumberTerm)directive.getTerm(1)).solve();
                 String predicate = ((StringTerm)directive.getTerm(2)).getString();
-    	        outerContent.addFunction(id, arity, predicate);
-    	    } else {
-    	        // error
+                outerContent.addFunction(id, arity, predicate);
+            } else {
+                // error
                 logger.log(Level.SEVERE, "Wrong number of arguments for register_function "+directive);
-    	    }
-		} catch (Exception e) {
-			logger.log(Level.SEVERE, "Error processing directive register_function.",e);
-		}
-    	return null;
+            }
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Error processing directive register_function.",e);
+        }
+        return null;
     }
 }

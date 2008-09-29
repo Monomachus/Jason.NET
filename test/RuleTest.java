@@ -19,9 +19,9 @@ import junit.framework.TestCase;
 /** JUnit test case for syntax package */
 public class RuleTest extends TestCase {
 
-	protected void setUp() throws Exception {
-		super.setUp();
-	}
+    protected void setUp() throws Exception {
+        super.setUp();
+    }
  
     public void testLogCons() {
         Agent ag = new Agent();
@@ -144,7 +144,7 @@ public class RuleTest extends TestCase {
     
     
     @SuppressWarnings("unchecked")
-	private int iteratorSize(Iterator i) {
+    private int iteratorSize(Iterator i) {
         int c = 0;
         while (i.hasNext()) {
             i.next();

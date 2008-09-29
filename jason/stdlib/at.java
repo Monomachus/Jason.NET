@@ -81,70 +81,70 @@ public class at extends DefaultInternalAction {
         checkArguments(args);
         
         StringTerm time   = (StringTerm)args[0];
-		String     stime  = time.getString();
+        String     stime  = time.getString();
         StringTerm sevent = (StringTerm)args[1];
 
-		// parse time
-		long deadline = -1;
+        // parse time
+        long deadline = -1;
 
-		// if it starts with now
-		if (stime.startsWith("now")) {
-			// it is something like "now +3 minutes"
-			stime = stime.substring(3).trim();
-			// get the amount of time
-			if (stime.startsWith("+")) {
-				stime = stime.substring(1).trim();
-				int pos = stime.indexOf(" ");
-				if (pos > 0) {
-					deadline = Integer.parseInt(stime.substring(0,pos));
-					// get the time unit
-					stime = stime.substring(pos).trim();
-					if (stime.equals("s") || stime.startsWith("second")) {
-						deadline *= 1000;
-					}
-					if (stime.equals("m") || stime.startsWith("minute")) {
-						deadline *= 1000 * 60;
-					}
-					if (stime.equals("h") || stime.startsWith("hour")) {
-						deadline *= 1000 * 60 * 60;
-					}
-					if (stime.equals("d") || stime.startsWith("day")) {
-						deadline *= 1000 * 60 * 60 * 24;
-					}
-				}
-			}
-					
-		} else {
-            throw new JasonException("The time parameter ('"+stime+"') of the internal action 'at' is not implemented!");            	
+        // if it starts with now
+        if (stime.startsWith("now")) {
+            // it is something like "now +3 minutes"
+            stime = stime.substring(3).trim();
+            // get the amount of time
+            if (stime.startsWith("+")) {
+                stime = stime.substring(1).trim();
+                int pos = stime.indexOf(" ");
+                if (pos > 0) {
+                    deadline = Integer.parseInt(stime.substring(0,pos));
+                    // get the time unit
+                    stime = stime.substring(pos).trim();
+                    if (stime.equals("s") || stime.startsWith("second")) {
+                        deadline *= 1000;
+                    }
+                    if (stime.equals("m") || stime.startsWith("minute")) {
+                        deadline *= 1000 * 60;
+                    }
+                    if (stime.equals("h") || stime.startsWith("hour")) {
+                        deadline *= 1000 * 60 * 60;
+                    }
+                    if (stime.equals("d") || stime.startsWith("day")) {
+                        deadline *= 1000 * 60 * 60 * 24;
+                    }
+                }
+            }
+                    
+        } else {
+            throw new JasonException("The time parameter ('"+stime+"') of the internal action 'at' is not implemented!");               
         }
 
-		if (deadline == -1) {
-            throw new JasonException("The time parameter ('"+time+"') of the internal action 'at' did not parse correctly!");            	
-		}
-		
-		Trigger te = Trigger.parseTrigger(sevent.getString());
+        if (deadline == -1) {
+            throw new JasonException("The time parameter ('"+time+"') of the internal action 'at' did not parse correctly!");               
+        }
+        
+        Trigger te = Trigger.parseTrigger(sevent.getString());
 
         ts.getAg().getScheduler().schedule(new CheckDeadline(te, ts), deadline, TimeUnit.MILLISECONDS);
-		return true;
+        return true;
     }
-	
-	private static int idCount = 0;
-	private Map<Integer,CheckDeadline> ats = new ConcurrentHashMap<Integer,CheckDeadline>();
+    
+    private static int idCount = 0;
+    private Map<Integer,CheckDeadline> ats = new ConcurrentHashMap<Integer,CheckDeadline>();
     
     public void cancelAts() {
-    	for (CheckDeadline t: ats.values())
+        for (CheckDeadline t: ats.values())
             t.cancel();
     }
     
-	class CheckDeadline implements Runnable {
-		private int     id = 0;
+    class CheckDeadline implements Runnable {
+        private int     id = 0;
         private Event   event;
         private TransitionSystem ts;
         private boolean cancelled = false;
         
         public CheckDeadline(Trigger te, TransitionSystem ts) {
-        	idCount++;
-        	this.id = idCount;
+            idCount++;
+            this.id = idCount;
             this.event = new Event(te, Intention.EmptyInt);
             this.ts = ts;
             ats.put(id, this);
@@ -161,7 +161,7 @@ public class at extends DefaultInternalAction {
                     ts.getUserAgArch().getArchInfraTier().wake();
                 }
             } finally {
-            	ats.remove(id);
+                ats.remove(id);
             }
         }
     }

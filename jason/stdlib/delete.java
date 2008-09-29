@@ -72,18 +72,18 @@ import jason.asSyntax.Term;
 */
 public class delete extends DefaultInternalAction {
 
-	private static InternalAction singleton = null;
-	public static InternalAction create() {
-		if (singleton == null) 
-			singleton = new delete();
-		return singleton;
-	}
+    private static InternalAction singleton = null;
+    public static InternalAction create() {
+        if (singleton == null) 
+            singleton = new delete();
+        return singleton;
+    }
 
-	@Override public int getMinArgs() { return 3; }
+    @Override public int getMinArgs() { return 3; }
     @Override public int getMaxArgs() { return 3; }
 
-	@Override
-	public Object execute(TransitionSystem ts, Unifier un, Term[] args)	throws Exception {
+    @Override
+    public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         checkArguments(args);
 
         if (args[0].isNumeric() && args[1].isString()) {
@@ -101,23 +101,23 @@ public class delete extends DefaultInternalAction {
             return un.unifies(args[2], deleteFromList(args[0],(ListTerm)args[1], un.clone()));
         }
         throw new JasonException("Incorrect use of the internal action '.delete' (see documentation).");
-	}
-	
-	ListTerm deleteFromList(Term element, ListTerm l, Unifier un) {
-	    Unifier bak = un;
-	    ListTerm r = new ListTermImpl();
-	    ListTerm last = r;
-	    for (Term t: l) {
-	        boolean u = un.unifies(element, t); 
-	        if (u)
-	            un = bak.clone();
-	        else
-	            last = last.append(t.clone());
-	    }
-	    return r;
-	}
+    }
+    
+    ListTerm deleteFromList(Term element, ListTerm l, Unifier un) {
+        Unifier bak = un;
+        ListTerm r = new ListTermImpl();
+        ListTerm last = r;
+        for (Term t: l) {
+            boolean u = un.unifies(element, t); 
+            if (u)
+                un = bak.clone();
+            else
+                last = last.append(t.clone());
+        }
+        return r;
+    }
 
-	ListTerm deleteFromList(int index, ListTerm l) {
+    ListTerm deleteFromList(int index, ListTerm l) {
         ListTerm r = new ListTermImpl();
         ListTerm last = r;
         int i = 0;
@@ -127,18 +127,18 @@ public class delete extends DefaultInternalAction {
         }
         return r;
     }
-	
-	StringTerm deleteFromString(int index, StringTerm st) {
-	    try {
-    	    String s = st.getString();
-    	    s = s.substring(0,index) + s.substring(index+1);
-    	    return new StringTermImpl(s);
-	    } catch (StringIndexOutOfBoundsException e) {
-	        return st;
-	    }
-	}
+    
+    StringTerm deleteFromString(int index, StringTerm st) {
+        try {
+            String s = st.getString();
+            s = s.substring(0,index) + s.substring(index+1);
+            return new StringTermImpl(s);
+        } catch (StringIndexOutOfBoundsException e) {
+            return st;
+        }
+    }
 
-	StringTerm deleteFromString(StringTerm st1, StringTerm st2) {
+    StringTerm deleteFromString(StringTerm st1, StringTerm st2) {
         try {
             String s1 = st1.getString();
             String s2 = st2.getString();

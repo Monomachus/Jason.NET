@@ -53,16 +53,16 @@ numbers &lt; atoms &lt; structures &lt; lists
 
 */
 public class max extends min {
-	
-	private static InternalAction singleton = null;
-	public static InternalAction create() {
-		if (singleton == null) 
-			singleton = new max();
-		return singleton;
-	}
+    
+    private static InternalAction singleton = null;
+    public static InternalAction create() {
+        if (singleton == null) 
+            singleton = new max();
+        return singleton;
+    }
 
-	@Override
+    @Override
     protected boolean compare(Term a, Term t) {
-    	return a.compareTo(t) < 0;
+        return a.compareTo(t) < 0;
     }
 }

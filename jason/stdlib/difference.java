@@ -64,14 +64,14 @@ import jason.asSyntax.Term;
 */
 public class difference extends DefaultInternalAction {
 
-	private static InternalAction singleton = null;
-	public static InternalAction create() {
-		if (singleton == null) 
-			singleton = new difference();
-		return singleton;
-	}
+    private static InternalAction singleton = null;
+    public static InternalAction create() {
+        if (singleton == null) 
+            singleton = new difference();
+        return singleton;
+    }
 
-	@Override public int getMinArgs() { return 3; }
+    @Override public int getMinArgs() { return 3; }
     @Override public int getMaxArgs() { return 3; }
 
     @Override protected void checkArguments(Term[] args) throws JasonException {
@@ -84,9 +84,9 @@ public class difference extends DefaultInternalAction {
             throw JasonException.createWrongArgument(this,"last argument '"+args[2]+"'is not a list nor a variable.");
     }
 
-	@Override
-	public Object execute(TransitionSystem ts, Unifier un, Term[] args)	throws Exception {
+    @Override
+    public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         checkArguments(args);
-		return un.unifies(args[2], ((ListTerm)args[0]).difference( (ListTerm)args[1]) );
-	}
+        return un.unifies(args[2], ((ListTerm)args[0]).difference( (ListTerm)args[1]) );
+    }
 }

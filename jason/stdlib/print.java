@@ -58,15 +58,15 @@ import jason.asSemantics.InternalAction;
 */
 public class print extends println implements InternalAction {
 
-	private static InternalAction singleton = null;
-	public static InternalAction create() {
-		if (singleton == null) 
-			singleton = new print();
-		return singleton;
-	}
-	
+    private static InternalAction singleton = null;
+    public static InternalAction create() {
+        if (singleton == null) 
+            singleton = new print();
+        return singleton;
+    }
+    
     @Override
-	protected String getNewLine() {
-		return "";
-	}
+    protected String getNewLine() {
+        return "";
+    }
 }

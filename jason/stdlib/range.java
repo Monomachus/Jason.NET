@@ -37,13 +37,13 @@ import java.util.Iterator;
   @see jason.stdlib.foreach for
 */
 public class range extends DefaultInternalAction {
-	
-	private static InternalAction singleton = null;
-	public static InternalAction create() {
-		if (singleton == null) 
-			singleton = new range();
-		return singleton;
-	}
+    
+    private static InternalAction singleton = null;
+    public static InternalAction create() {
+        if (singleton == null) 
+            singleton = new range();
+        return singleton;
+    }
 
     @Override public int getMinArgs() { return 3; }
     @Override public int getMaxArgs() { return 3; }
@@ -72,20 +72,20 @@ public class range extends DefaultInternalAction {
             final Term var = args[0];
 
             return new Iterator<Unifier>() {
-            	int vl = start-1;
-            	
-            	public boolean hasNext() {
-            	    return vl < end;
-        		}
+                int vl = start-1;
+                
+                public boolean hasNext() {
+                    return vl < end;
+                }
 
-            	public Unifier next() {
-            	    vl++;
-            	    Unifier c = un.clone();
+                public Unifier next() {
+                    vl++;
+                    Unifier c = un.clone();
                     c.unifiesNoUndo(var,new NumberTermImpl(vl));
                     return c;
-            	}
-            	
-            	public void remove() {}
+                }
+                
+                public void remove() {}
             };
         }
     }

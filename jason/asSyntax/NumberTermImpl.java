@@ -32,46 +32,46 @@ import org.w3c.dom.Element;
 /** Immutable class that implements a term that represents a number */
 public final class NumberTermImpl extends DefaultTerm implements NumberTerm {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
     private static Logger logger = Logger.getLogger(NumberTermImpl.class.getName());
 
-	private final double value;
-	
-	public NumberTermImpl() {
-		super();
-		value = 0;
-	}
-	
-	public NumberTermImpl(String sn) {
-		double t = 0;
-		try {
-			t = Double.parseDouble(sn);
-		} catch (Exception e) {
-			logger.log(Level.SEVERE,"Error setting number term value from "+sn,e);
-		}
-		value = t;
-	}
-	
-	public NumberTermImpl(double vl) {
-		value = vl;
-	}
-	
-	public NumberTermImpl(NumberTermImpl t) {
-		value = t.solve();
-	}
+    private final double value;
+    
+    public NumberTermImpl() {
+        super();
+        value = 0;
+    }
+    
+    public NumberTermImpl(String sn) {
+        double t = 0;
+        try {
+            t = Double.parseDouble(sn);
+        } catch (Exception e) {
+            logger.log(Level.SEVERE,"Error setting number term value from "+sn,e);
+        }
+        value = t;
+    }
+    
+    public NumberTermImpl(double vl) {
+        value = vl;
+    }
+    
+    public NumberTermImpl(NumberTermImpl t) {
+        value = t.solve();
+    }
 
-	public double solve() {
-		return value;
-	}
+    public double solve() {
+        return value;
+    }
 
-	public NumberTerm clone() {
-		return this;
-	}
-	
-	@Override
-	public boolean isNumeric() {
-		return true;
-	}
+    public NumberTerm clone() {
+        return this;
+    }
+    
+    @Override
+    public boolean isNumeric() {
+        return true;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -82,9 +82,9 @@ public final class NumberTermImpl extends DefaultTerm implements NumberTerm {
             try {
                 return solve() == st.solve();
             } catch (Exception e) { }
-		} 
-		return false;
-	}
+        } 
+        return false;
+    }
 
     @Override
     protected int calcHashCode() {
@@ -103,14 +103,14 @@ public final class NumberTermImpl extends DefaultTerm implements NumberTerm {
         return super.compareTo(o);    
     }
 
-	public String toString() {
-		long r = Math.round(value);
-		if (value == (double)r) {
-			return String.valueOf(r);
-		} else {
-			return String.valueOf(value);
-		}
-	}
+    public String toString() {
+        long r = Math.round(value);
+        if (value == (double)r) {
+            return String.valueOf(r);
+        } else {
+            return String.valueOf(value);
+        }
+    }
     
     /** get as XML */
     public Element getAsDOM(Document document) {

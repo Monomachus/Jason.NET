@@ -83,17 +83,17 @@ public class JadeExecutionControl extends JadeAg implements ExecutionControlInfr
         
         try {
             addBehaviour(new OneShotBehaviour() {
-            	@Override
-            	public void action() {
-            		userControl.updateNumberOfAgents();
-            		informAllAgsToPerformCycle(0);
-            		/*
-            		executor.execute(new Runnable() {
-            			public void run() {
-            			}
-            		});
-            		*/
-            	}
+                @Override
+                public void action() {
+                    userControl.updateNumberOfAgents();
+                    informAllAgsToPerformCycle(0);
+                    /*
+                    executor.execute(new Runnable() {
+                        public void run() {
+                        }
+                    });
+                    */
+                }
             });
 
             addBehaviour(new CyclicBehaviour() {
@@ -104,13 +104,13 @@ public class JadeExecutionControl extends JadeAg implements ExecutionControlInfr
                         block(1000);
                     } else {
                         try {
-                        	// check if the message is an agent state
+                            // check if the message is an agent state
                             @SuppressWarnings("unused")
                             Document o = (Document)m.getContentObject();
                             logger.warning("Received agState too late! in-reply-to:"+m.getInReplyTo());
                         } catch (Exception _) {
                             try {
-                            	// check if the message is an end of cycle from some agent 
+                                // check if the message is an end of cycle from some agent 
                                 final String content = m.getContent();
                                 final int p = content.indexOf(",");
                                 if (p > 0) {
@@ -119,11 +119,11 @@ public class JadeExecutionControl extends JadeAg implements ExecutionControlInfr
                                     final int cycle = Integer.parseInt(content.substring(p+1));
                                     executor.execute(new Runnable() {
                                         public void run() {
-                                        	try {
-                                        		userControl.receiveFinishedCycle(sender, breakpoint, cycle);
-                                        	} catch (Exception e) {
-                                                logger.log(Level.SEVERE, "Error processing end of cycle.", e);                                        		
-                                        	}
+                                            try {
+                                                userControl.receiveFinishedCycle(sender, breakpoint, cycle);
+                                            } catch (Exception e) {
+                                                logger.log(Level.SEVERE, "Error processing end of cycle.", e);                                              
+                                            }
                                         }
                                     });
                                 }
@@ -166,7 +166,7 @@ public class JadeExecutionControl extends JadeAg implements ExecutionControlInfr
         addBehaviour(new OneShotBehaviour() {
             public void action() {
                 try {
-                	logger.fine("Sending performCycle "+cycle+" to all agents.");
+                    logger.fine("Sending performCycle "+cycle+" to all agents.");
                     ACLMessage m = new ACLMessage(ACLMessage.INFORM);
                     m.setOntology(controllerOntology);
                     addAllAgsAsReceivers(m);

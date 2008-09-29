@@ -46,12 +46,12 @@ import java.util.StringTokenizer;
  */
 public class Config extends Properties {
 
-	private static final long  serialVersionUID = 1L;
+    private static final long  serialVersionUID = 1L;
 
-	/** path to jason.jar */
-	public static final String JASON_JAR     = "jasonJar";
-	
-	/** path to saci.jar */
+    /** path to jason.jar */
+    public static final String JASON_JAR     = "jasonJar";
+    
+    /** path to saci.jar */
     public static final String SACI_JAR      = "saciJar";
     
     /** path to ant home (jar directory) */
@@ -131,11 +131,11 @@ public class Config extends Properties {
     /** returns the jason home (based on jason.jar) */
     public String getJasonHome() {
         try {
-        	return new File(getJasonJar()).getParentFile().getParent();
+            return new File(getJasonJar()).getParentFile().getParent();
         } catch (Exception e) {
-        	e.printStackTrace();
+            e.printStackTrace();
         }
-    	return "";
+        return "";
     }
 
     /** Returns the full path to the saci.jar file */
@@ -293,31 +293,31 @@ public class Config extends Properties {
     }
 
     public String[] getAvailableInfrastructures() {
-    	try {
-    		List<String> infras = new ArrayList<String>();
-    		infras.add("Centralised"); // set Centralised as the first
-    		for (Object k: keySet()) {
-    			String sk = k.toString();
-    			int p = sk.indexOf(".");
-    			if (p > 0 && sk.startsWith("infrastructure") && p == sk.lastIndexOf(".")) { // only one "."
-    				String newinfra = sk.substring(p+1);
-    				if (!infras.contains(newinfra)) {
-    					infras.add(newinfra);
-    				}
-    			}
-    		}
-    		if (infras.size() > 0) {
-	    		// copy infras to a array
-	    		String[] r = new String[infras.size()];
-	    		for (int i=0; i<r.length; i++) {
-	    			r[i] = infras.get(i);
-	    		}
-	    		return r;
-    		}
-    	} catch (Exception e) {
-            System.err.println("Error getting user infrastructures.");    		
-    	}
-		return new String[] {"Centralised","Jade","Saci"};
+        try {
+            List<String> infras = new ArrayList<String>();
+            infras.add("Centralised"); // set Centralised as the first
+            for (Object k: keySet()) {
+                String sk = k.toString();
+                int p = sk.indexOf(".");
+                if (p > 0 && sk.startsWith("infrastructure") && p == sk.lastIndexOf(".")) { // only one "."
+                    String newinfra = sk.substring(p+1);
+                    if (!infras.contains(newinfra)) {
+                        infras.add(newinfra);
+                    }
+                }
+            }
+            if (infras.size() > 0) {
+                // copy infras to a array
+                String[] r = new String[infras.size()];
+                for (int i=0; i<r.length; i++) {
+                    r[i] = infras.get(i);
+                }
+                return r;
+            }
+        } catch (Exception e) {
+            System.err.println("Error getting user infrastructures.");          
+        }
+        return new String[] {"Centralised","Jade","Saci"};
     }
     
     public String getInfrastructureFactoryClass(String infraId) {

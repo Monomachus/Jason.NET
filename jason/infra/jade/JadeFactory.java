@@ -6,11 +6,11 @@ import jason.runtime.RuntimeServicesInfraTier;
 
 public class JadeFactory implements InfrastructureFactory {
 
-	public MASLauncherInfraTier createMASLauncher() {
-		return new JadeMASLauncherAnt();
-	}
+    public MASLauncherInfraTier createMASLauncher() {
+        return new JadeMASLauncherAnt();
+    }
 
-	public RuntimeServicesInfraTier createRuntimeServices() {
-		return new JadeRuntimeServices(null, null);
-	}
+    public RuntimeServicesInfraTier createRuntimeServices() {
+        return new JadeRuntimeServices(null, null);
+    }
 }

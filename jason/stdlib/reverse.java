@@ -65,29 +65,29 @@ import jason.asSyntax.Term;
 
 */
 public class reverse extends DefaultInternalAction {
-	
-	private static InternalAction singleton = null;
-	public static InternalAction create() {
-		if (singleton == null) 
-			singleton = new reverse();
-		return singleton;
-	}
-	
+    
+    private static InternalAction singleton = null;
+    public static InternalAction create() {
+        if (singleton == null) 
+            singleton = new reverse();
+        return singleton;
+    }
+    
     @Override public int getMinArgs() { return 2; }
     @Override public int getMaxArgs() { return 2; }
 
-	@Override
-	public Object execute(TransitionSystem ts, Unifier un, Term[] args)	throws Exception {
-	    checkArguments(args);
-	    
-	    if (args[0].isList()) {
-            // list reverse
-			if (!args[1].isVar() && !args[1].isList())
-				throw JasonException.createWrongArgument(this,"last argument '"+args[1]+"' must be a list or a variable.");
-			
-			return un.unifies(((ListTerm)args[0]).reverse(), args[1]);
+    @Override
+    public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
+        checkArguments(args);
         
-	    } else {
+        if (args[0].isList()) {
+            // list reverse
+            if (!args[1].isVar() && !args[1].isList())
+                throw JasonException.createWrongArgument(this,"last argument '"+args[1]+"' must be a list or a variable.");
+            
+            return un.unifies(((ListTerm)args[0]).reverse(), args[1]);
+        
+        } else {
             // string reverse
             if (!args[1].isVar() && !args[1].isString())
                 throw JasonException.createWrongArgument(this,"last argument '"+args[1]+"' must be a string or a variable.");
@@ -96,6 +96,6 @@ public class reverse extends DefaultInternalAction {
                 vl = ((StringTerm)args[0]).getString();
 
             return un.unifies(new StringTermImpl(new StringBuilder(vl).reverse().toString()), args[1]);
-		}
-	}
+        }
+    }
 }

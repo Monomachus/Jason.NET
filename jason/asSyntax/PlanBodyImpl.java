@@ -69,10 +69,10 @@ public class PlanBodyImpl extends Structure implements PlanBody, Iterable<PlanBo
     }
     
     public boolean isBodyTerm() {
-    	return isTerm;
+        return isTerm;
     }
     public void setAsBodyTerm(boolean b) {
-    	isTerm = b;
+        isTerm = b;
     }
     
     @Override
@@ -171,23 +171,23 @@ public class PlanBodyImpl extends Structure implements PlanBody, Iterable<PlanBo
     }
 
     public PlanBody getLastBody() {
-    	if (next == null)
-    		return this;
-    	else
-    		return next.getLastBody();
+        if (next == null)
+            return this;
+        else
+            return next.getLastBody();
     }
     
     public boolean add(int index, PlanBody bl) {
         if (index == 0) {
-        	PlanBody newpb = new PlanBodyImpl(this.formType, this.term);
-        	newpb.setBodyNext(next);
+            PlanBody newpb = new PlanBodyImpl(this.formType, this.term);
+            newpb.setBodyNext(next);
             swap(bl);
             this.next = bl.getBodyNext();
             this.getLastBody().setBodyNext(newpb);
         } else if (next != null) { 
             next.add(index - 1, bl);
         } else {
-        	next = bl;
+            next = bl;
         }
         return true;
     }
@@ -245,18 +245,18 @@ public class PlanBodyImpl extends Structure implements PlanBody, Iterable<PlanBo
         if (term == null) {
             return "";
         } else {
-        	String b, e;
-        	if (isTerm) {
-        		b = "{ "; 
-        		e = " }";
-        	} else {
-        		b = ""; 
-        		e = "";
-        	}
-        	if (next == null)
-        		return b+formType.toString() + term+e;
-        	else
-        		return b+formType.toString() + term + "; " + next+e;
+            String b, e;
+            if (isTerm) {
+                b = "{ "; 
+                e = " }";
+            } else {
+                b = ""; 
+                e = "";
+            }
+            if (next == null)
+                return b+formType.toString() + term+e;
+            else
+                return b+formType.toString() + term + "; " + next+e;
         }
     }
 

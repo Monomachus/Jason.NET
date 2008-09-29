@@ -41,10 +41,10 @@ import org.w3c.dom.Element;
  */
 public class Pred extends Structure {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
     private static Logger logger = Logger.getLogger(Pred.class.getName());
 
-	private ListTerm      annots;
+    private ListTerm      annots;
 
     public Pred(String functor) {
         super(functor);
@@ -79,10 +79,10 @@ public class Pred extends Structure {
         return true;
     }
 
-	@Override
-	public boolean isAtom() {
-		return super.isAtom() && !hasAnnot();
-	}
+    @Override
+    public boolean isAtom() {
+        return super.isAtom() && !hasAnnot();
+    }
     
     @Override
     public boolean isGround() {
@@ -93,9 +93,9 @@ public class Pred extends Structure {
         }
     }
 
-    @Override    	
+    @Override       
     public boolean apply(Unifier u) {
-    	boolean r = super.apply(u);
+        boolean r = super.apply(u);
         if (annots != null) {
             boolean ra = annots.apply(u);
             r = r || ra;
@@ -131,7 +131,7 @@ public class Pred extends Structure {
         }
         for (Term t : l) {
             if (!annots.contains(t)) 
-            	tail = tail.append(t);
+                tail = tail.append(t);
         }
     }
 
@@ -148,7 +148,7 @@ public class Pred extends Structure {
 
     @Override       
     public void clearAnnots() {
-		annots = null;
+        annots = null;
     }
 
     @Override       
@@ -199,23 +199,23 @@ public class Pred extends Structure {
      */
     @Override       
     public boolean importAnnots(Literal p) {
-    	boolean imported = false;
+        boolean imported = false;
         if (p.hasAnnot()) {
             if (annots == null) annots = new ListTermImpl();
             ListTerm tail = annots.getLast();
             
-	        Iterator<Term> i = p.getAnnots().iterator();
-	        while (i.hasNext()) {
-	            Term t = i.next();
-	            // p will only contain the annots actually added (for Event)
-	            if (!annots.contains(t)) {
-	            	tail = tail.append(t.clone());
-	                imported = true;
-	            } else {
-	                // Remove what is not new from p
-	                i.remove();
-	            }
-	        }
+            Iterator<Term> i = p.getAnnots().iterator();
+            while (i.hasNext()) {
+                Term t = i.next();
+                // p will only contain the annots actually added (for Event)
+                if (!annots.contains(t)) {
+                    tail = tail.append(t.clone());
+                    imported = true;
+                } else {
+                    // Remove what is not new from p
+                    i.remove();
+                }
+            }
         }
         return imported;
     }
@@ -226,12 +226,12 @@ public class Pred extends Structure {
      */
     @Override
     public boolean delAnnots(List<Term> l) {
-    	boolean removed = false;
+        boolean removed = false;
         if (l != null && this.hasAnnot()) {
-        	for (Term t: l) { 
-        		boolean r = annots.remove(t);
-	            removed = removed || r;
-	        }
+            for (Term t: l) { 
+                boolean r = annots.remove(t);
+                removed = removed || r;
+            }
         }
         return removed;
     }
@@ -287,8 +287,8 @@ public class Pred extends Structure {
      */
     @Override
     public boolean hasSubsetAnnot(Literal p, Unifier u) {
-    	//return getSubsetAnnots(p,u,null);
-    	
+        //return getSubsetAnnots(p,u,null);
+        
         if (annots == null) return true;
         if (!p.hasAnnot()) return false;
 

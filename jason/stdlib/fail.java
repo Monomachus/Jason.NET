@@ -45,17 +45,17 @@ import jason.asSyntax.Term;
  */
 public class fail extends DefaultInternalAction {
 
-	private static InternalAction singleton = null;
-	public static InternalAction create() {
-		if (singleton == null) 
-			singleton = new fail();
-		return singleton;
-	}
+    private static InternalAction singleton = null;
+    public static InternalAction create() {
+        if (singleton == null) 
+            singleton = new fail();
+        return singleton;
+    }
 
     @Override public int getMinArgs() { return 0; }
     @Override public int getMaxArgs() { return 0; }
 
-	@Override
+    @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         checkArguments(args);
         return false;

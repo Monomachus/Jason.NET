@@ -19,18 +19,18 @@ public class asl2html extends asl2xml {
         this.style = style;
     }
     
-	public static void main(String[] args) throws Exception {
-		if (args.length != 1) {
-			System.err.println("The asl code file must be informed");
-			System.exit(1);
-		}
-		new asl2html().run(args[0]);
-	}
+    public static void main(String[] args) throws Exception {
+        if (args.length != 1) {
+            System.err.println("The asl code file must be informed");
+            System.exit(1);
+        }
+        new asl2html().run(args[0]);
+    }
 
     public Transformer getTransformer()  throws Exception {
         if (transCache == null) {
             transCache = getFactory().newTransformer(
-            		new StreamSource(asl2html.class.getResource(style).openStream()));
+                    new StreamSource(asl2html.class.getResource(style).openStream()));
         }
         return transCache;
     }

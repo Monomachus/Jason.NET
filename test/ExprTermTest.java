@@ -171,7 +171,7 @@ public class ExprTermTest extends TestCase {
         u.unifies(new VarTerm("X"), new NumberTermImpl(-5));
         l.apply(u);
         Collections.sort(l);
-        assertEquals("[-6,-1,3,5,5,10,55,a(3)]",l.toString());    	
+        assertEquals("[-6,-1,3,5,5,10,55,a(3)]",l.toString());      
     }
     
     public void testLength() {
@@ -182,7 +182,7 @@ public class ExprTermTest extends TestCase {
 
         nb = ArithExpr.parseExpr(".length([a,3,b(100),400,1])");
         nb.apply(u);
-        assertEquals(nb, new NumberTermImpl(5));    	
+        assertEquals(nb, new NumberTermImpl(5));        
     }
     
     public void testCount() throws Exception {

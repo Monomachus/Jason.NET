@@ -13,8 +13,8 @@ import java.util.Iterator;
 /**
 <p>Internal action: <b><code>.min</code></b>.
 
-	<p>Description: gets the minimum value of a list of terms, using
-	the "natural" order of terms. Between 
+    <p>Description: gets the minimum value of a list of terms, using
+    the "natural" order of terms. Between 
 different types of terms, the following order is
 used:<br>
 
@@ -60,13 +60,13 @@ numbers &lt; atoms &lt; structures &lt; lists
 
 */
 public class min extends DefaultInternalAction {
-	
-	private static InternalAction singleton = null;
-	public static InternalAction create() {
-		if (singleton == null) 
-			singleton = new min();
-		return singleton;
-	}
+    
+    private static InternalAction singleton = null;
+    public static InternalAction create() {
+        if (singleton == null) 
+            singleton = new min();
+        return singleton;
+    }
 
     @Override public int getMinArgs() { return 2; }
     @Override public int getMaxArgs() { return 2; }
@@ -81,23 +81,23 @@ public class min extends DefaultInternalAction {
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         checkArguments(args);
 
-    	ListTerm list = (ListTerm)args[0];
-    	if (list.isEmpty()) {
-        	return false;        		
-    	}
+        ListTerm list = (ListTerm)args[0];
+        if (list.isEmpty()) {
+            return false;               
+        }
 
-    	Iterator<Term> i = list.iterator();
-    	Term min = i.next();
-    	while (i.hasNext()) {
-    		Term t = i.next();
-    		if (compare(min,t)) {
-    			min = t;
-    		}
-    	}
+        Iterator<Term> i = list.iterator();
+        Term min = i.next();
+        while (i.hasNext()) {
+            Term t = i.next();
+            if (compare(min,t)) {
+                min = t;
+            }
+        }
         return un.unifies(args[1], min.clone());
     }
     
     protected boolean compare(Term a, Term t) {
-    	return a.compareTo(t) > 0;
+        return a.compareTo(t) > 0;
     }
 }

@@ -32,7 +32,7 @@ public class SMC implements Directive {
             if (newAg != null) {
 
                 // add +f : true <- .fail_goal(g).
-            	newAg.getPL().add(Plan.parse("+"+fail+" <- .fail_goal("+goal+")."));
+                newAg.getPL().add(Plan.parse("+"+fail+" <- .fail_goal("+goal+")."));
                 
                 return newAg;
             }

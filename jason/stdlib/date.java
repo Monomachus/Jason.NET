@@ -38,17 +38,17 @@ import java.util.GregorianCalendar;
  */
 public class date extends DefaultInternalAction {
 
-	private static InternalAction singleton = null;
-	public static InternalAction create() {
-		if (singleton == null) 
-			singleton = new date();
-		return singleton;
-	}
+    private static InternalAction singleton = null;
+    public static InternalAction create() {
+        if (singleton == null) 
+            singleton = new date();
+        return singleton;
+    }
 
     @Override public int getMinArgs() { return 3; }
     @Override public int getMaxArgs() { return 3; }
 
-	/** date(YY,MM,DD) */
+    /** date(YY,MM,DD) */
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         checkArguments(args);

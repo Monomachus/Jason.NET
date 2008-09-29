@@ -20,7 +20,7 @@ public class RC implements Directive {
     static Logger logger = Logger.getLogger(RC.class.getName());
     
     public Agent process(Pred directive, Agent outerContent, Agent innerContent) {
-    	try {
+        try {
             Term goal = directive.getTerm(0);
             Term motivation = directive.getTerm(1);
             Pred subDir = Pred.parsePred("bc("+goal+")");
@@ -32,7 +32,7 @@ public class RC implements Directive {
             if (newAg != null) {
 
                 // add -m : true <- .succeed_goal(g).
-            	newAg.getPL().add(Plan.parse("-"+motivation+" <- .succeed_goal("+goal+")."));
+                newAg.getPL().add(Plan.parse("-"+motivation+" <- .succeed_goal("+goal+")."));
                 
                 return newAg;
             }

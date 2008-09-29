@@ -244,7 +244,7 @@ public class StdLibTest extends TestCase {
     }
 
     @SuppressWarnings("unchecked")
-	public void testSubString() throws Exception {
+    public void testSubString() throws Exception {
         StringTerm s1 = new StringTermImpl("a");
         StringTerm s2 = new StringTermImpl("bbacca");
 
@@ -375,7 +375,7 @@ public class StdLibTest extends TestCase {
     }
 
     @SuppressWarnings("unchecked")
-	private int iteratorSize(Iterator i) {
+    private int iteratorSize(Iterator i) {
         int c = 0;
         while (i.hasNext()) {
             i.next();

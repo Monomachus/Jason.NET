@@ -31,16 +31,16 @@ import java.util.Random;
 
 */
 public class random extends DefaultInternalAction {
-	
-	private static InternalAction singleton = null;
-	public static InternalAction create() {
-		if (singleton == null) 
-			singleton = new random();
-		return singleton;
-	}
-	
+    
+    private static InternalAction singleton = null;
+    public static InternalAction create() {
+        if (singleton == null) 
+            singleton = new random();
+        return singleton;
+    }
+    
     private Random random = new Random();    
-	
+    
     @Override public int getMinArgs() { return 1; }
     @Override public int getMaxArgs() { return 1; }
     

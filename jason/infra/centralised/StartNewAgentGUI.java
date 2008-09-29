@@ -24,9 +24,9 @@ import javax.swing.filechooser.FileFilter;
 
 public class StartNewAgentGUI extends BaseDialogGUI {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	protected JTextField agName;
+    protected JTextField agName;
     protected JTextField agSource;
     protected JTextField archClass;
     protected JTextField agClass;
@@ -113,14 +113,14 @@ public class StartNewAgentGUI extends BaseDialogGUI {
                 boolean fs = RunCentralisedMAS.getRunner().getControllerInfraTier() != null;
                 RuntimeServicesInfraTier services = RunCentralisedMAS.getRunner().getEnvironmentInfraTier().getRuntimeServices();
                 try {
-                	String agClass = null;
-                	if (ap.agClass != null) {
-                		agClass = ap.agClass.getClassName();
-                	}
-                	String archClass = null;
-                	if (ap.archClass != null) {
-                		archClass = ap.archClass.getClassName();
-                	}
+                    String agClass = null;
+                    if (ap.agClass != null) {
+                        agClass = ap.agClass.getClassName();
+                    }
+                    String archClass = null;
+                    if (ap.archClass != null) {
+                        archClass = ap.archClass.getClassName();
+                    }
                     for (int i = 0; i < ap.qty; i++) {
                         String name = ap.name;
                         if (ap.qty > 1) {

@@ -82,24 +82,24 @@ public class resume extends DefaultInternalAction {
         
         Iterator<String> ik = C.getPendingIntentions().keySet().iterator();
         while (ik.hasNext()) {
-        	String k = ik.next();
-        	if (k.startsWith(suspend.SUSPENDED_INT)) {
-        		Intention i = C.getPendingIntentions().get(k);
-            	if (i.hasTrigger(g, un)) {
-                	i.setSuspended(false);
-            		ik.remove();
-            		
-            		// remove the IA .suspend in case of self-suspend
-            		if (k.equals(suspend.SELF_SUSPENDED_INT)) {
-            		    i.peek().removeCurrentStep();
-            		}
+            String k = ik.next();
+            if (k.startsWith(suspend.SUSPENDED_INT)) {
+                Intention i = C.getPendingIntentions().get(k);
+                if (i.hasTrigger(g, un)) {
+                    i.setSuspended(false);
+                    ik.remove();
+                    
+                    // remove the IA .suspend in case of self-suspend
+                    if (k.equals(suspend.SELF_SUSPENDED_INT)) {
+                        i.peek().removeCurrentStep();
+                    }
                     
                     // add it back in I if not in PA
                     if (! C.getPendingActions().containsKey(i.getId())) {
                         C.addIntention(i);
                     }
-            	}
-        	}
+                }
+            }
         }
         return true;
     }        

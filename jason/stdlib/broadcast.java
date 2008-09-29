@@ -74,15 +74,15 @@ public class broadcast extends DefaultInternalAction {
     }
 
     @Override
-	public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
+    public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         checkArguments(args);
 
         Term ilf = args[0];
         Term pcnt = args[1];
 
-		Message m = new Message(ilf.toString(), ts.getUserAgArch().getAgName(), null, pcnt);
-		ts.getUserAgArch().broadcast(m);
-		return true;
-	}
+        Message m = new Message(ilf.toString(), ts.getUserAgArch().getAgName(), null, pcnt);
+        ts.getUserAgArch().broadcast(m);
+        return true;
+    }
 
 }

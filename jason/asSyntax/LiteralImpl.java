@@ -32,52 +32,52 @@ import org.w3c.dom.Element;
  */
 public class LiteralImpl extends Pred implements LogicalFormula {
 
-	private static final long serialVersionUID = 1L;
-	//private static Logger logger = Logger.getLogger(LiteralImpl.class.getName());
+    private static final long serialVersionUID = 1L;
+    //private static Logger logger = Logger.getLogger(LiteralImpl.class.getName());
     
-	private boolean type = LPos;
+    private boolean type = LPos;
 
-	/** creates a positive literal */
-	public LiteralImpl(String functor) {
-		super(functor);
-	}
+    /** creates a positive literal */
+    public LiteralImpl(String functor) {
+        super(functor);
+    }
 
-	/** if pos == true, the literal is positive, otherwise it is negative */
-	public LiteralImpl(boolean pos, String functor) {
-		super(functor);
-		type = pos;
-	}
+    /** if pos == true, the literal is positive, otherwise it is negative */
+    public LiteralImpl(boolean pos, String functor) {
+        super(functor);
+        type = pos;
+    }
 
     public LiteralImpl(Literal l) {
         super(l);
         type = !l.negated();
     }
     
-	/** if pos == true, the literal is positive, otherwise it is negative */
-	public LiteralImpl(boolean pos, Literal l) {
-		super(l);
-		type = pos;
-	}
+    /** if pos == true, the literal is positive, otherwise it is negative */
+    public LiteralImpl(boolean pos, Literal l) {
+        super(l);
+        type = pos;
+    }
 
-	protected LiteralImpl(String functor, int terms) {
-	    super(functor, terms);
-	}
+    protected LiteralImpl(String functor, int terms) {
+        super(functor, terms);
+    }
 
-	@Override
-	public boolean isAtom() {
-		return super.isAtom() && !negated();
-	}
-	
-	/** to be overridden by subclasses (as internal action) */
     @Override
-	public boolean canBeAddedInBB() {
-		return true;
-	}
-	
+    public boolean isAtom() {
+        return super.isAtom() && !negated();
+    }
+    
+    /** to be overridden by subclasses (as internal action) */
     @Override
-	public boolean negated() {
-		return type == LNeg;
-	}
+    public boolean canBeAddedInBB() {
+        return true;
+    }
+    
+    @Override
+    public boolean negated() {
+        return type == LNeg;
+    }
     
     public void setNegated(boolean b) {
         type = b;
@@ -90,13 +90,13 @@ public class LiteralImpl extends Pred implements LogicalFormula {
         if (o == this) return true;
 
         if (o instanceof LiteralImpl) {
-			final LiteralImpl l = (LiteralImpl) o;
-			return type == l.type && hashCode() == l.hashCode() && super.equals(l);
-		} else if (o instanceof Atom) {
-			return !negated() && super.equals(o);
-		}
+            final LiteralImpl l = (LiteralImpl) o;
+            return type == l.type && hashCode() == l.hashCode() && super.equals(l);
+        } else if (o instanceof Atom) {
+            return !negated() && super.equals(o);
+        }
         return false;
-	}
+    }
 
     @Override    
     public String getErrorMsg() {
@@ -116,10 +116,10 @@ public class LiteralImpl extends Pred implements LogicalFormula {
         return super.compareTo(t);
     }        
 
-	public Term clone() {
-	    return new LiteralImpl(this);
-	}
-	
+    public Term clone() {
+        return new LiteralImpl(this);
+    }
+    
     @Override
     protected int calcHashCode() {
         int result = super.calcHashCode();
@@ -127,20 +127,20 @@ public class LiteralImpl extends Pred implements LogicalFormula {
         return result;
     }
 
-	/** returns [~] super.getPredicateIndicator */
-	@Override 
+    /** returns [~] super.getPredicateIndicator */
+    @Override 
     public PredicateIndicator getPredicateIndicator() {
-		if (predicateIndicatorCache == null)
-		    predicateIndicatorCache = new PredicateIndicator(((type == LPos) ? "" : "~")+getFunctor(),getArity());
-		return predicateIndicatorCache;
-	}
-	
-	public String toString() {
-		if (type == LPos)
-			return super.toString();
-		else
-			return "~" + super.toString();
-	}
+        if (predicateIndicatorCache == null)
+            predicateIndicatorCache = new PredicateIndicator(((type == LPos) ? "" : "~")+getFunctor(),getArity());
+        return predicateIndicatorCache;
+    }
+    
+    public String toString() {
+        if (type == LPos)
+            return super.toString();
+        else
+            return "~" + super.toString();
+    }
 
     /** get as XML */
     @Override

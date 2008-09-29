@@ -39,15 +39,15 @@ import jason.asSyntax.*;
 */
 
 public class nth extends DefaultInternalAction {
-	
-	private static InternalAction singleton = null;
-	public static InternalAction create() {
-		if (singleton == null) 
-			singleton = new nth();
-		return singleton;
-	}
+    
+    private static InternalAction singleton = null;
+    public static InternalAction create() {
+        if (singleton == null) 
+            singleton = new nth();
+        return singleton;
+    }
 
-	@Override public int getMinArgs() { return 3; }
+    @Override public int getMinArgs() { return 3; }
     @Override public int getMaxArgs() { return 3; }
 
     @Override protected void checkArguments(Term[] args) throws JasonException {

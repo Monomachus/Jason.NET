@@ -41,24 +41,24 @@ import org.w3c.dom.Element;
 
 public class IntendedMeans implements Serializable {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	protected Unifier unif = null;
-	protected Plan    plan;
-	private   Trigger trigger; // the trigger which created this IM
+    protected Unifier unif = null;
+    protected Plan    plan;
+    private   Trigger trigger; // the trigger which created this IM
     
     public IntendedMeans(Option opt, Trigger te) {
-    	plan = opt.getPlan().cloneOnlyBody();
-    	unif = opt.getUnifier(); //(Unifier)opt.getUnifier().clone();
+        plan = opt.getPlan().cloneOnlyBody();
+        unif = opt.getUnifier(); //(Unifier)opt.getUnifier().clone();
         
-    	// REMOVED: experimental
-    	/*
-    	Literal planLiteral = plan.getTrigger().getLiteral();
-    	if (planLiteral.hasAnnot()) {
-    		planLiteral.getAnnots().apply(unif);
-    		// TODO: why?
-    	}
-    	*/
+        // REMOVED: experimental
+        /*
+        Literal planLiteral = plan.getTrigger().getLiteral();
+        if (planLiteral.hasAnnot()) {
+            planLiteral.getAnnots().apply(unif);
+            // TODO: why?
+        }
+        */
         if (te == null) {
             trigger = plan.getTrigger();
         } else {
@@ -74,7 +74,7 @@ public class IntendedMeans implements Serializable {
     }
     
     private IntendedMeans() {
-    	// used for clone
+        // used for clone
     }
 
     /** removes the current action of the IM and returns the term of the body */
@@ -93,7 +93,7 @@ public class IntendedMeans implements Serializable {
 
     
     public Plan getPlan() {
-    	return plan;
+        return plan;
     }
     
     public void setUnif(Unifier unif) {
@@ -101,20 +101,20 @@ public class IntendedMeans implements Serializable {
     }
     
     public Unifier getUnif() {
-    	return unif;
+        return unif;
     }
 
     /** gets the trigger event that caused the creation of this IM */
     public Trigger getTrigger() {
-    	return trigger;
+        return trigger;
     }
     public void setTrigger(Trigger tr) {
-    	trigger = tr;
+        trigger = tr;
     }
 
-	public boolean isAtomic() {
-		return plan != null && plan.isAtomic();
-	}
+    public boolean isAtomic() {
+        return plan != null && plan.isAtomic();
+    }
     
     public boolean isFinished() {
         return plan.getBody().isEmptyBody();
@@ -125,11 +125,11 @@ public class IntendedMeans implements Serializable {
     }
 
     public Object clone() {
-    	IntendedMeans c = new IntendedMeans();
-    	c.unif = this.unif.clone();
-    	c.plan = (Plan)this.plan.clone();
-    	c.trigger = (Trigger)this.trigger.clone(); 
-    	return c;
+        IntendedMeans c = new IntendedMeans();
+        c.unif = this.unif.clone();
+        c.plan = (Plan)this.plan.clone();
+        c.trigger = (Trigger)this.trigger.clone(); 
+        return c;
     }
     
     public String toString() {
@@ -152,16 +152,16 @@ public class IntendedMeans implements Serializable {
     }
     
     /** get as XML */
-	public Element getAsDOM(Document document) {
-		Element eim = (Element) document.createElement("intended-means");
-		eim.setAttribute("trigger", trigger.toString());
-		if (plan != null) {
-			eim.appendChild(plan.getAsDOM(document));
-		}
-		if (unif != null && unif.size() > 0) {
-			eim.appendChild(unif.getAsDOM(document));
-		}
-		return eim;
-	}
+    public Element getAsDOM(Document document) {
+        Element eim = (Element) document.createElement("intended-means");
+        eim.setAttribute("trigger", trigger.toString());
+        if (plan != null) {
+            eim.appendChild(plan.getAsDOM(document));
+        }
+        if (unif != null && unif.size() > 0) {
+            eim.appendChild(unif.getAsDOM(document));
+        }
+        return eim;
+    }
 
 }

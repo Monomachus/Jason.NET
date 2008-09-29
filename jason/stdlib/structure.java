@@ -36,13 +36,13 @@ import jason.asSyntax.Term;
 
 */
 public class structure extends DefaultInternalAction {
-	
-	private static InternalAction singleton = null;
-	public static InternalAction create() {
-		if (singleton == null) 
-			singleton = new structure();
-		return singleton;
-	}
+    
+    private static InternalAction singleton = null;
+    public static InternalAction create() {
+        if (singleton == null) 
+            singleton = new structure();
+        return singleton;
+    }
 
     @Override public int getMinArgs() { return 1; }
     @Override public int getMaxArgs() { return 1; }

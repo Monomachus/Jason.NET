@@ -13,10 +13,10 @@ import junit.framework.TestCase;
 /** JUnit test case for syntax package */
 public class MAS2JParserTest extends TestCase {
 
-	mas2j parser;
-	 
-	protected void setUp() throws Exception {
-		super.setUp();
+    mas2j parser;
+     
+    protected void setUp() throws Exception {
+        super.setUp();
         StringBuffer source = new StringBuffer("MAS auctionCent { ");
         source.append("infrastructure: Centralised ");
         source.append("environment: myEnv at \"x.edu\" ");
@@ -26,8 +26,8 @@ public class MAS2JParserTest extends TestCase {
         source.append("classpath: \"x.jar\"; \"../../\";");
         source.append("aslSourcePath: \"kk\"; \".\";");
         source.append("}");
-    	parser = new mas2j(new StringReader(source.toString()));
-	}
+        parser = new mas2j(new StringReader(source.toString()));
+    }
 
     public void testToString() {
         boolean ok = true;
@@ -44,25 +44,25 @@ public class MAS2JParserTest extends TestCase {
         assertTrue(ok);
     }
 
-	@SuppressWarnings("unchecked")
-	public void testParser1() {
-		try {
-			MAS2JProject project = parser.mas();
-	    	project.setDirectory("/tmp");
-			
-			//project.writeXMLScript(System.out);
-			//project.writeScripts(true);
-			Map ag1Opt = project.getAg("ag1").options;
-			assertEquals(ag1Opt.size(),3);
+    @SuppressWarnings("unchecked")
+    public void testParser1() {
+        try {
+            MAS2JProject project = parser.mas();
+            project.setDirectory("/tmp");
+            
+            //project.writeXMLScript(System.out);
+            //project.writeScripts(true);
+            Map ag1Opt = project.getAg("ag1").options;
+            assertEquals(ag1Opt.size(),3);
             
             assertEquals(project.getDirectiveClasses().size(),2);
             assertEquals(project.getDirectiveClasses().get("md2").toString(), "mypkg.LogDirective");
             
-		} catch (Exception e) {
-			System.err.println("Error:"+e);
-			e.printStackTrace();
-		}
-	}
+        } catch (Exception e) {
+            System.err.println("Error:"+e);
+            e.printStackTrace();
+        }
+    }
 
     public void testClassParForChainBB() throws Exception {
         StringBuffer source = new StringBuffer("MAS auctionCent { ");
@@ -80,6 +80,6 @@ public class MAS2JParserTest extends TestCase {
         
         bb.add(Literal.parseLiteral("b(1)"));
     }
-	
-	
+    
+    
 }

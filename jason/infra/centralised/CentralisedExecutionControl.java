@@ -83,7 +83,7 @@ public class CentralisedExecutionControl implements ExecutionControlInfraTier {
     public void informAllAgsToPerformCycle(int cycle) {
         synchronized (masRunner.getAgs()) {
             for (CentralisedAgArch ag: masRunner.getAgs().values()) {
-            	ag.getUserAgArch().setCycleNumber(cycle);
+                ag.getUserAgArch().setCycleNumber(cycle);
                 ag.receiveSyncSignal();
             }
         }

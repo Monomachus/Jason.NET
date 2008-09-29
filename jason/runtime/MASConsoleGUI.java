@@ -151,7 +151,7 @@ public class MASConsoleGUI {
     }
 
     public void append(String agName, String s) {
-    	try {
+        try {
             if (!frame.isVisible()) {
                 frame.setVisible(true);
             }
@@ -188,8 +188,8 @@ public class MASConsoleGUI {
                 output.append(s);
             }
         } catch (Exception e) {
-        	close();
-        	System.out.println(e); 
+            close();
+            System.out.println(e); 
         }
     }
 

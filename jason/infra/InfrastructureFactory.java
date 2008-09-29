@@ -17,7 +17,7 @@ public interface InfrastructureFactory {
      * instance of MASLauncherInfraTier, this instance is used to
      * start a new MAS execution. It is normally used by JasonIDE.
      */
-	public MASLauncherInfraTier createMASLauncher();
+    public MASLauncherInfraTier createMASLauncher();
 
     /**
      * Every infrastructure factory should be able to create an
@@ -26,5 +26,5 @@ public interface InfrastructureFactory {
      * destruction, etc. These services are normally used by user
      * classes as AgArch and Environments.
      */
-	public RuntimeServicesInfraTier createRuntimeServices();
+    public RuntimeServicesInfraTier createRuntimeServices();
 }

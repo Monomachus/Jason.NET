@@ -26,15 +26,15 @@ import java.util.logging.Logger;
  */
 public abstract class JadeAg extends Agent {
 
-	// KQML performatives not available in FIPA-ACL
-	public static final int UNTELL    = 1001;
-	public static final int ASKALL    = 1002;
-	public static final int UNACHIEVE = 1003;
-	public static final int TELLHOW   = 1004;
-	public static final int UNTELLHOW = 1005;
-	public static final int ASKHOW    = 1006;
-	
-	private static final long serialVersionUID = 1L;
+    // KQML performatives not available in FIPA-ACL
+    public static final int UNTELL    = 1001;
+    public static final int ASKALL    = 1002;
+    public static final int UNACHIEVE = 1003;
+    public static final int TELLHOW   = 1004;
+    public static final int UNTELLHOW = 1005;
+    public static final int ASKHOW    = 1006;
+    
+    private static final long serialVersionUID = 1L;
 
     protected Logger logger = Logger.getLogger(JadeAg.class.getName());
 
@@ -65,7 +65,7 @@ public abstract class JadeAg extends Agent {
         send(acl);
     }
 
-	public void broadcast(final Message m) {
+    public void broadcast(final Message m) {
         addBehaviour(new OneShotBehaviour() {
             private static final long serialVersionUID = 1L;
             public void action() {
@@ -78,7 +78,7 @@ public abstract class JadeAg extends Agent {
                 }
             }
         });
-	}
+    }
     
     protected ACLMessage ask(final ACLMessage m) {
         try {
@@ -113,59 +113,59 @@ public abstract class JadeAg extends Agent {
         }
     }
 
-	protected ACLMessage jasonToACL(Message m) throws IOException {
-		ACLMessage acl = new ACLMessage(kqmlToACL(m.getIlForce()));
-		// send content as string if it is a Term/String (it is better for interoperability)
-		if (m.getPropCont() instanceof Term || m.getPropCont() instanceof String) {
-			acl.setContent(m.getPropCont().toString());			
-		} else {
-		    acl.setContentObject((Serializable)m.getPropCont());
-		}
-		acl.setReplyWith(m.getMsgId());
-		acl.setLanguage("AgentSpeak");
+    protected ACLMessage jasonToACL(Message m) throws IOException {
+        ACLMessage acl = new ACLMessage(kqmlToACL(m.getIlForce()));
+        // send content as string if it is a Term/String (it is better for interoperability)
+        if (m.getPropCont() instanceof Term || m.getPropCont() instanceof String) {
+            acl.setContent(m.getPropCont().toString());         
+        } else {
+            acl.setContentObject((Serializable)m.getPropCont());
+        }
+        acl.setReplyWith(m.getMsgId());
+        acl.setLanguage("AgentSpeak");
         if (m.getInReplyTo() != null) {
-        	acl.setInReplyTo(m.getInReplyTo());
+            acl.setInReplyTo(m.getInReplyTo());
         }
         return acl;
-	}
-	
-	public static int kqmlToACL(String p) {
-		if (p.equals("tell")) {
-			return ACLMessage.INFORM;
-		} else if (p.equals("askOne")) {
-			return ACLMessage.QUERY_REF;
-		} else if (p.equals("achieve")) {
-			return ACLMessage.REQUEST;
-		} else if (p.equals("untell")) {
-			return UNTELL;
-		} else if (p.equals("unachieve")) {
-			return UNACHIEVE;
-		} else if (p.equals("askAll")) {
-			return ASKALL;
-		} else if (p.equals("askHow")) {
-			return ASKHOW;
-		} else if (p.equals("tellHow")) {
-			return TELLHOW;
-		} else if (p.equals("untellHow")) {
-			return UNTELLHOW;
-		}
-		
-		return ACLMessage.getInteger(p);			
-	}
-	
-	public static String aclToKqml(int p) {
-		switch(p) {
-		case ACLMessage.INFORM:	return "tell"; 
-		case ACLMessage.QUERY_REF: return "askOne";
-		case ACLMessage.REQUEST: return "achieve";
-		case UNTELL: return "untell";
-		case UNACHIEVE: return "unachieve";
-		case ASKALL: return "askAll";
-		case ASKHOW: return "askHow";
-		case TELLHOW: return "tellHow";
-		case UNTELLHOW: return "untellHow";
-		}
-		return ACLMessage.getPerformative(p).toLowerCase().replaceAll("-", "_");	
-	}
-	
+    }
+    
+    public static int kqmlToACL(String p) {
+        if (p.equals("tell")) {
+            return ACLMessage.INFORM;
+        } else if (p.equals("askOne")) {
+            return ACLMessage.QUERY_REF;
+        } else if (p.equals("achieve")) {
+            return ACLMessage.REQUEST;
+        } else if (p.equals("untell")) {
+            return UNTELL;
+        } else if (p.equals("unachieve")) {
+            return UNACHIEVE;
+        } else if (p.equals("askAll")) {
+            return ASKALL;
+        } else if (p.equals("askHow")) {
+            return ASKHOW;
+        } else if (p.equals("tellHow")) {
+            return TELLHOW;
+        } else if (p.equals("untellHow")) {
+            return UNTELLHOW;
+        }
+        
+        return ACLMessage.getInteger(p);            
+    }
+    
+    public static String aclToKqml(int p) {
+        switch(p) {
+        case ACLMessage.INFORM: return "tell"; 
+        case ACLMessage.QUERY_REF: return "askOne";
+        case ACLMessage.REQUEST: return "achieve";
+        case UNTELL: return "untell";
+        case UNACHIEVE: return "unachieve";
+        case ASKALL: return "askAll";
+        case ASKHOW: return "askHow";
+        case TELLHOW: return "tellHow";
+        case UNTELLHOW: return "untellHow";
+        }
+        return ACLMessage.getPerformative(p).toLowerCase().replaceAll("-", "_");    
+    }
+    
 }

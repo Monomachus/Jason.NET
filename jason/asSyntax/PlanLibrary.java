@@ -47,24 +47,24 @@ import org.w3c.dom.Element;
 */  
 public class PlanLibrary implements Iterable<Plan> {
 
-	/** a MAP from TE to a list of relevant plans */
+    /** a MAP from TE to a list of relevant plans */
     private Map<PredicateIndicator,List<Plan>> relPlans = new HashMap<PredicateIndicator,List<Plan>>();
 
-	/**
-	 * All plans as defined in the AS code (maintains the order of the plans)
-	 */
-	private List<Plan> plans = new ArrayList<Plan>();
-	
-	/** list of plans that have var as TE */
-	private List<Plan> varPlans = new ArrayList<Plan>();
-	
-	/** A map from labels to plans */
-	private Map<String,Plan> planLabels = new HashMap<String,Plan>();
-	
-	private static int lastPlanLabel = 0;
+    /**
+     * All plans as defined in the AS code (maintains the order of the plans)
+     */
+    private List<Plan> plans = new ArrayList<Plan>();
+    
+    /** list of plans that have var as TE */
+    private List<Plan> varPlans = new ArrayList<Plan>();
+    
+    /** A map from labels to plans */
+    private Map<String,Plan> planLabels = new HashMap<String,Plan>();
+    
+    private static int lastPlanLabel = 0;
 
-	private Logger logger = Logger.getLogger(PlanLibrary.class.getName());	
-	
+    private Logger logger = Logger.getLogger(PlanLibrary.class.getName());  
+    
     /** 
      *  Add a new plan written as a String. The source
      *  normally is "self" or the agent that sent this plan.
@@ -79,50 +79,50 @@ public class PlanLibrary implements Iterable<Plan> {
        return add(stPlan, tSource, false); 
     }
     
-	/** 
-	 *  Add a new plan written as a String. The source
-	 *  normally is "self" or the agent that sent this plan.
-	 *  If the already has a plan equals to "stPlan", only a
-	 *  new source is added.
-	 *  
-	 *  If <i>before</i> is true, the plan will be added in the
-	 *  begin of the PlanLibrary; otherwise, it is added in
-	 *  the end.
+    /** 
+     *  Add a new plan written as a String. The source
+     *  normally is "self" or the agent that sent this plan.
+     *  If the already has a plan equals to "stPlan", only a
+     *  new source is added.
+     *  
+     *  If <i>before</i> is true, the plan will be added in the
+     *  begin of the PlanLibrary; otherwise, it is added in
+     *  the end.
      *  
      *   returns the plan added, null if it does not work.
-	 */
-	public Plan add(StringTerm stPlan, Term tSource, boolean before) {
-		String sPlan = stPlan.getString();
-		try {
-			// remove quotes \" -> "
+     */
+    public Plan add(StringTerm stPlan, Term tSource, boolean before) {
+        String sPlan = stPlan.getString();
+        try {
+            // remove quotes \" -> "
             StringBuilder sTemp = new StringBuilder();
-			for (int c=0; c <sPlan.length(); c++) {
-				if (sPlan.charAt(c) != '\\') {
-					sTemp.append(sPlan.charAt(c));
-				}
-			}
-			sPlan  = sTemp.toString();
-			Plan p = Plan.parse(sPlan);
-			if (p != null) {
-    			int i = plans.indexOf(p);
-    			if (i < 0) {
-    		        // add label, if necessary
-    		        if (p.getLabel() == null) {
-    		        	p.setLabel(getUniqueLabel());
-    		        }
-    				p.getLabel().addSource(tSource);
-    				add(p, before);
-    			} else {
-    				p = plans.get(i);
-    				p.getLabel().addSource(tSource);
-    			}
-    			return p;
+            for (int c=0; c <sPlan.length(); c++) {
+                if (sPlan.charAt(c) != '\\') {
+                    sTemp.append(sPlan.charAt(c));
+                }
             }
-		} catch (Exception e) {
-			logger.log(Level.SEVERE,"Error adding plan "+stPlan,e);
-		}
+            sPlan  = sTemp.toString();
+            Plan p = Plan.parse(sPlan);
+            if (p != null) {
+                int i = plans.indexOf(p);
+                if (i < 0) {
+                    // add label, if necessary
+                    if (p.getLabel() == null) {
+                        p.setLabel(getUniqueLabel());
+                    }
+                    p.getLabel().addSource(tSource);
+                    add(p, before);
+                } else {
+                    p = plans.get(i);
+                    p.getLabel().addSource(tSource);
+                }
+                return p;
+            }
+        } catch (Exception e) {
+            logger.log(Level.SEVERE,"Error adding plan "+stPlan,e);
+        }
         return null;
-	}
+    }
 
 
     public void add(Plan p) throws JasonException {
@@ -167,19 +167,19 @@ public class PlanLibrary implements Iterable<Plan> {
                 varPlans.add(p);
             // add plan p in all entries
             for (List<Plan> lp: relPlans.values())
-            	if (!lp.isEmpty() && lp.get(0).getTrigger().sameType(pte)) // only add if same type
-            	    if (before)
-            	        lp.add(0,p);
-            	    else
-            	        lp.add(p);
+                if (!lp.isEmpty() && lp.get(0).getTrigger().sameType(pte)) // only add if same type
+                    if (before)
+                        lp.add(0,p);
+                    else
+                        lp.add(p);
         } else {
             List<Plan> codesList = relPlans.get(pte.getPredicateIndicator());
             if (codesList == null) {
                 codesList = new ArrayList<Plan>();
                 // copy plans from var plans
                 for (Plan vp: varPlans)
-                	if (vp.getTrigger().sameType(pte))
-                	    codesList.add(vp);
+                    if (vp.getTrigger().sameType(pte))
+                        codesList.add(vp);
                 relPlans.put(pte.getPredicateIndicator(), codesList);
             }
             if (before)
@@ -194,28 +194,28 @@ public class PlanLibrary implements Iterable<Plan> {
             plans.add(p);
     }
     
-	public void addAll(PlanLibrary pl) throws JasonException {
-		for (Plan p: pl) { 
-			add(p, false);
-		}
-	}
+    public void addAll(PlanLibrary pl) throws JasonException {
+        for (Plan p: pl) { 
+            add(p, false);
+        }
+    }
 
-	public void addAll(List<Plan> plans) throws JasonException {
-		for (Plan p: plans) { 
-			add(p, false);
-		}
-	}
+    public void addAll(List<Plan> plans) throws JasonException {
+        for (Plan p: plans) { 
+            add(p, false);
+        }
+    }
 
-	/** add a label to the plan */
-	private Pred getUniqueLabel() {
+    /** add a label to the plan */
+    private Pred getUniqueLabel() {
         String l;
         do {
             l = "l__" + (lastPlanLabel++);
         } while (planLabels.keySet().contains(l));
         return new Pred(l);
-	}
+    }
     
-	/** return a plan for a label */
+    /** return a plan for a label */
     public Plan get(String label) {
         return planLabels.get(label);
     }
@@ -229,7 +229,7 @@ public class PlanLibrary implements Iterable<Plan> {
     }
     
     public Iterator<Plan> iterator() {
-    	return plans.iterator();
+        return plans.iterator();
     }
 
     /** remove all plans */
@@ -241,8 +241,8 @@ public class PlanLibrary implements Iterable<Plan> {
     }
     
     /** 
-	 * Remove a plan represented by the label <i>pLabel</i>.
-	 * In case the plan has many sources, only the plan's source is removed. 
+     * Remove a plan represented by the label <i>pLabel</i>.
+     * In case the plan has many sources, only the plan's source is removed. 
 	 */
 	public boolean remove(Atom pLabel, Term source) {
 		// find the plan
@@ -299,14 +299,14 @@ public class PlanLibrary implements Iterable<Plan> {
     }
     
     public List<Plan> getCandidatePlans(Trigger te) {
-    	List<Plan> l = relPlans.get(te.getPredicateIndicator());
-    	if ((l == null || l.isEmpty()) && !varPlans.isEmpty()) {  // no rel plan, try varPlan
-    		l = new ArrayList<Plan>();
-    		for (Plan p: varPlans)
-    			if (p.getTrigger().sameType(te))
-    				l.add(p);
-    	}
-    	return l;
+        List<Plan> l = relPlans.get(te.getPredicateIndicator());
+        if ((l == null || l.isEmpty()) && !varPlans.isEmpty()) {  // no rel plan, try varPlan
+            l = new ArrayList<Plan>();
+            for (Plan p: varPlans)
+                if (p.getTrigger().sameType(te))
+                    l.add(p);
+        }
+        return l;
     }
 
     public static final Trigger TE_IDLE = new Trigger(TEOperator.add, TEType.achieve, new Atom("idle"));
@@ -316,31 +316,31 @@ public class PlanLibrary implements Iterable<Plan> {
     }
 
     public Object clone() {
-    	PlanLibrary pl = new PlanLibrary();
-    	try {
-			pl.addAll(this);
-		} catch (JasonException e) {
-			e.printStackTrace();
-		}
-    	return pl;
+        PlanLibrary pl = new PlanLibrary();
+        try {
+            pl.addAll(this);
+        } catch (JasonException e) {
+            e.printStackTrace();
+        }
+        return pl;
     }
 
     public String toString() {
         return plans.toString();
     }
     
-	/** get as XML */
-	public Element getAsDOM(Document document) {
-		Element eplans = (Element) document.createElement("plans");
-		String lastFunctor = null;
-		for (Plan p: plans) {
-			String currentFunctor = p.getTrigger().getLiteral().getFunctor();
-			if (lastFunctor != null && !currentFunctor.equals(lastFunctor)) {
-				eplans.appendChild((Element) document.createElement("new-set-of-plans"));
-			}
-			lastFunctor = currentFunctor;
-			eplans.appendChild(p.getAsDOM(document));
-		}
-		return eplans;
-	}
+    /** get as XML */
+    public Element getAsDOM(Document document) {
+        Element eplans = (Element) document.createElement("plans");
+        String lastFunctor = null;
+        for (Plan p: plans) {
+            String currentFunctor = p.getTrigger().getLiteral().getFunctor();
+            if (lastFunctor != null && !currentFunctor.equals(lastFunctor)) {
+                eplans.appendChild((Element) document.createElement("new-set-of-plans"));
+            }
+            lastFunctor = currentFunctor;
+            eplans.appendChild(p.getAsDOM(document));
+        }
+        return eplans;
+    }
 }

@@ -33,7 +33,7 @@ import java.util.logging.Logger;
 
 /** MAS Runtime Settings for an Agent (from mas2j file, agent declaration) */
 public class Settings {
-	
+    
     public static final byte      ODiscard        = 1;
     public static final byte      ORequeue        = 2;
     public static final byte      ORetrieve       = 3;
@@ -42,9 +42,9 @@ public class Settings {
     public static final int       ODefaultNRC     = 1;
     public static final int       ODefaultVerbose = 1;
     public static final boolean   ODefaultSync    = false;
-	
+    
     private static Logger logger = Logger.getLogger(Settings.class.getName());          
-    	
+        
     private byte    events    = ODiscard;
     private boolean intBels   = OSameFocus;
     private int     nrcbp     = ODefaultNRC;
@@ -77,58 +77,58 @@ public class Settings {
         userParameters = options;
         
         for (String key: options.keySet()) {
-        	
-        	if (key.equals("events")) {
-		        String events = (String)options.get("events");
-	            if (events.equals("discard")) {
-	                setEvents(ODiscard);
-	            } else if (events.equals("requeue")) {
-	                setEvents(ORequeue);
-	            } else if (events.equals("retrieve")) {
-	                setEvents(ORetrieve);
-	            }
+            
+            if (key.equals("events")) {
+                String events = (String)options.get("events");
+                if (events.equals("discard")) {
+                    setEvents(ODiscard);
+                } else if (events.equals("requeue")) {
+                    setEvents(ORequeue);
+                } else if (events.equals("retrieve")) {
+                    setEvents(ORetrieve);
+                }
 
-        	} else if (key.equals("intBels")) {
-		        String intBels = (String)options.get("intBels");
-	            if (intBels.equals("sameFocus")) {
-	                setIntBels(OSameFocus);
-	            } else if (intBels.equals("newFocus")) {
-	            	setIntBels(ONewFocus);
-	            }
+            } else if (key.equals("intBels")) {
+                String intBels = (String)options.get("intBels");
+                if (intBels.equals("sameFocus")) {
+                    setIntBels(OSameFocus);
+                } else if (intBels.equals("newFocus")) {
+                    setIntBels(ONewFocus);
+                }
 
-        	} else if (key.equals("nrcbp")) {
-		        String nrc = (String)options.get("nrcbp");
-	            setNRCBP(nrc);
-	
-        	} else if (key.equals("verbose")) {
-        		String verbose = (String)options.get("verbose");
-	            setVerbose(verbose);
-	
-        	} else if (key.equals("synchronised")) {
-        		String sSync = (String)options.get("synchronised");
-	        	if (sSync.equals("true")) {
-	        		setSync(true);
-	        	} else {
-	        		setSync(false);
-	        	}
-        	} else {
-        		//userParameters.put(key, options.get(key));
-	        }
+            } else if (key.equals("nrcbp")) {
+                String nrc = (String)options.get("nrcbp");
+                setNRCBP(nrc);
+    
+            } else if (key.equals("verbose")) {
+                String verbose = (String)options.get("verbose");
+                setVerbose(verbose);
+    
+            } else if (key.equals("synchronised")) {
+                String sSync = (String)options.get("synchronised");
+                if (sSync.equals("true")) {
+                    setSync(true);
+                } else {
+                    setSync(false);
+                }
+            } else {
+                //userParameters.put(key, options.get(key));
+            }
         }
     }
 
     /** add user defined option */
     public void addOption(String key, Object value) {
-    	userParameters.put(key, value);
+        userParameters.put(key, value);
     }
 
-	public void setEvents(byte opt) {
-		events = opt;
-	}
+    public void setEvents(byte opt) {
+        events = opt;
+    }
 
-	public void setIntBels(boolean opt) {
-		intBels = opt;
-	}
+    public void setIntBels(boolean opt) {
+        intBels = opt;
+    }
 
     public void setNRCBP(String opt) {
         try {
@@ -138,9 +138,9 @@ public class Settings {
         }
     }
 
-	public void setNRCBP(int opt) {
-		nrcbp = opt;
-	}
+    public void setNRCBP(int opt) {
+        nrcbp = opt;
+    }
 
     public void setVerbose(String opt) {
         try {
@@ -150,9 +150,9 @@ public class Settings {
         }
     }
 
-	public void setVerbose(int opt) {
-		verbose = opt;
-	}
+    public void setVerbose(int opt) {
+        verbose = opt;
+    }
     
     public boolean discard() {
         return events == ODiscard;
@@ -174,7 +174,7 @@ public class Settings {
     }
 
     public int nrcbp() {
-    	return nrcbp;
+        return nrcbp;
     }
     
     public int verbose() {
@@ -182,24 +182,24 @@ public class Settings {
     }
     
     public java.util.logging.Level logLevel() {
-	   	 switch(verbose) {
-	   	 case 0 : return java.util.logging.Level.WARNING;
-	   	 case 1 : return java.util.logging.Level.INFO;
-	   	 case 2 : return java.util.logging.Level.FINE;
-	   	 }
-	   	 return java.util.logging.Level.INFO;
+         switch(verbose) {
+         case 0 : return java.util.logging.Level.WARNING;
+         case 1 : return java.util.logging.Level.INFO;
+         case 2 : return java.util.logging.Level.FINE;
+         }
+         return java.util.logging.Level.INFO;
    }
     
     /** returns true if the execution is synchronised */
     public boolean isSync() {
-    	return sync;
+        return sync;
     }
     
     public void setSync(boolean pSync) {
-    	sync = pSync;
+        sync = pSync;
     }
     
     public String getUserParameter(String key) {
-    	return (String)userParameters.get(key);
+        return (String)userParameters.get(key);
     }
 }

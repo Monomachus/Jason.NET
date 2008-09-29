@@ -130,10 +130,10 @@ public class create_agent extends DefaultInternalAction {
     }
     
     private Structure testString(Term t) {
-    	if (t.isStructure())
-    		return (Structure)t;
-    	if (t.isString())
-    		return Structure.parse(((StringTerm)t).getString());
-    	return null;
+        if (t.isStructure())
+            return (Structure)t;
+        if (t.isString())
+            return Structure.parse(((StringTerm)t).getString());
+        return null;
     }
 }

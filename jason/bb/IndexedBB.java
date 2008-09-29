@@ -40,54 +40,54 @@ public class IndexedBB extends ChainBBAdapter {
     
     @Override
     public void init(Agent ag, String[] args) {
-    	for (int i=0; i<args.length; i++) {
-    	    Structure bel = Structure.parse(args[i]);
-    	    indexedBels.put(bel.getFunctor(), bel);
-    	}
+        for (int i=0; i<args.length; i++) {
+            Structure bel = Structure.parse(args[i]);
+            indexedBels.put(bel.getFunctor(), bel);
+        }
     }
 
     // TODO: access indexes 
     
-	@Override
-	public boolean add(Literal bel) {
-	    Structure kb = indexedBels.get(bel.getFunctor());
-		if (kb != null && kb.getArity() == bel.getArity()) { // is a constrained bel?
-			
-			// find the bel in BB and eventually remove it
-			u.clear();
-			Literal linbb = null;
-			boolean remove = false;
+    @Override
+    public boolean add(Literal bel) {
+        Structure kb = indexedBels.get(bel.getFunctor());
+        if (kb != null && kb.getArity() == bel.getArity()) { // is a constrained bel?
+            
+            // find the bel in BB and eventually remove it
+            u.clear();
+            Literal linbb = null;
+            boolean remove = false;
 
-			Iterator<Literal> relevant = getCandidateBeliefs(bel, null);
-			if (relevant != null) {
-			    final int kbArity = kb.getArity();
-				while (relevant.hasNext() && !remove) {
-					linbb = relevant.next();
-					
-					if (!linbb.isRule()) {
-    					// check equality of all terms that are "key"
-    					// if some key is different, no problem
-    					// otherwise, remove the current bel
-    					boolean equals = true;
-    					for (int i = 0; i<kbArity; i++) {
-    						Term kbt = kb.getTerm(i);
-    						if (!kbt.isVar()) { // is key?
-    							if (!u.unifies(bel.getTerm(i), linbb.getTerm(i))) {
-    								equals = false;
-    								break;
-    							}
-    						}
-    					}
-    					if (equals) {
-    						remove = true;
-    					}
-					}
-				}
-			}
-			if (remove) {
-				remove(linbb);
-			}
-		}
-		return nextBB.add(bel);
-	}
+            Iterator<Literal> relevant = getCandidateBeliefs(bel, null);
+            if (relevant != null) {
+                final int kbArity = kb.getArity();
+                while (relevant.hasNext() && !remove) {
+                    linbb = relevant.next();
+                    
+                    if (!linbb.isRule()) {
+                        // check equality of all terms that are "key"
+                        // if some key is different, no problem
+                        // otherwise, remove the current bel
+                        boolean equals = true;
+                        for (int i = 0; i<kbArity; i++) {
+                            Term kbt = kb.getTerm(i);
+                            if (!kbt.isVar()) { // is key?
+                                if (!u.unifies(bel.getTerm(i), linbb.getTerm(i))) {
+                                    equals = false;
+                                    break;
+                                }
+                            }
+                        }
+                        if (equals) {
+                            remove = true;
+                        }
+                    }
+                }
+            }
+            if (remove) {
+                remove(linbb);
+            }
+        }
+        return nextBB.add(bel);
+    }
 }

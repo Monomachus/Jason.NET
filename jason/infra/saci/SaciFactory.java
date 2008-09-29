@@ -6,11 +6,11 @@ import jason.runtime.RuntimeServicesInfraTier;
 
 public class SaciFactory implements InfrastructureFactory {
 
-	public MASLauncherInfraTier createMASLauncher() {
-		return new SaciMASLauncherAnt();
-	}
+    public MASLauncherInfraTier createMASLauncher() {
+        return new SaciMASLauncherAnt();
+    }
 
-	public RuntimeServicesInfraTier createRuntimeServices() {
-		return new SaciRuntimeServices(null);
-	}
+    public RuntimeServicesInfraTier createRuntimeServices() {
+        return new SaciRuntimeServices(null);
+    }
 }

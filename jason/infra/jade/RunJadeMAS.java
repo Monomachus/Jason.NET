@@ -110,19 +110,19 @@ public class RunJadeMAS extends RunCentralisedMAS {
     }
 
     protected boolean startContainer() {
-    	try {
-	        // source based on jade.Boot
-	        ProfileImpl profile = new BootProfileImpl(prepareArgs(Config.get().getJadeArrayArgs()));
-	        if (profile.getBooleanProperty(Profile.MAIN, true)) 
-	            cc = Runtime.instance().createMainContainer(profile);
-	        else
-	            cc = Runtime.instance().createAgentContainer(profile);
-	        //Runtime.instance().setCloseVM(true); // Exit the JVM when there are no more containers around
-	        return cc != null;
-    	} catch (Throwable e) {
-    		logger.warning("Error starting JADE:"+e);
-    		return false;
-    	}
+        try {
+            // source based on jade.Boot
+            ProfileImpl profile = new BootProfileImpl(prepareArgs(Config.get().getJadeArrayArgs()));
+            if (profile.getBooleanProperty(Profile.MAIN, true)) 
+                cc = Runtime.instance().createMainContainer(profile);
+            else
+                cc = Runtime.instance().createAgentContainer(profile);
+            //Runtime.instance().setCloseVM(true); // Exit the JVM when there are no more containers around
+            return cc != null;
+        } catch (Throwable e) {
+            logger.warning("Error starting JADE:"+e);
+            return false;
+        }
     }
     
     @Override
@@ -190,7 +190,7 @@ public class RunJadeMAS extends RunCentralisedMAS {
 
     @Override
     protected void startAgs() {
-    	if (envc == null) return;
+        if (envc == null) return;
         try {
             envc.start();
             

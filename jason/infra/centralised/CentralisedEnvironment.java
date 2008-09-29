@@ -43,46 +43,46 @@ import java.util.logging.Logger;
 public class CentralisedEnvironment implements EnvironmentInfraTier {
 
     /** the user customisation class for the environment */
-	private Environment userEnv;
-	private RunCentralisedMAS masRunner = RunCentralisedMAS.getRunner();
-	private boolean running = true;
+    private Environment userEnv;
+    private RunCentralisedMAS masRunner = RunCentralisedMAS.getRunner();
+    private boolean running = true;
     
     private static Logger logger = Logger.getLogger(CentralisedEnvironment.class.getName());
-	
+    
     public CentralisedEnvironment(ClassParameters userEnvArgs, RunCentralisedMAS masRunner) throws JasonException {
         this.masRunner = masRunner;
         if (userEnvArgs != null) {
             try {
-    			userEnv = (Environment) getClass().getClassLoader().loadClass(userEnvArgs.getClassName()).newInstance();
-    			userEnv.setEnvironmentInfraTier(this);
-    			userEnv.init(userEnvArgs.getParametersArray());
+                userEnv = (Environment) getClass().getClassLoader().loadClass(userEnvArgs.getClassName()).newInstance();
+                userEnv.setEnvironmentInfraTier(this);
+                userEnv.init(userEnvArgs.getParametersArray());
             } catch (Exception e) {
                 logger.log(Level.SEVERE,"Error in Centralised MAS environment creation",e);
                 throw new JasonException("The user environment class instantiation '"+userEnvArgs+"' has failed!"+e.getMessage());
             }
         }
     }
-	
+    
     public boolean isRunning() {
         return running;
     }
     
-	/** called before the end of MAS execution, it just calls the user environment class stop method. */
-	public void stop() {
+    /** called before the end of MAS execution, it just calls the user environment class stop method. */
+    public void stop() {
         running = false;
-		userEnv.stop();
-	}
+        userEnv.stop();
+    }
 
-	public void setUserEnvironment(Environment env) {
-	    userEnv = env;
-	}
+    public void setUserEnvironment(Environment env) {
+        userEnv = env;
+    }
     public Environment getUserEnvironment() {
         return userEnv;
     }
 
     /** called by the agent infra arch to perform an action in the environment */
     public void act(final String agName, final ActionExec action) {
-    	if (running) {
+        if (running) {
             userEnv.scheduleAction(agName, action.getActionTerm(), action);
         }
     }
@@ -109,7 +109,7 @@ public class CentralisedEnvironment implements EnvironmentInfraTier {
             informAgsEnvironmentChanged();
         } else {
             for (String agName: agentsToNotify) {
-            	CentralisedAgArch ag = masRunner.getAg(agName);
+                CentralisedAgArch ag = masRunner.getAg(agName);
                 if (ag != null) {
                     ag.wake();
                 } else {

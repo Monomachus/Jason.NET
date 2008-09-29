@@ -33,9 +33,9 @@ import org.w3c.dom.Element;
 
 public class Event implements Serializable {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	Trigger   trigger   = null;
+    Trigger   trigger   = null;
     Intention intention = Intention.EmptyInt;
     
     public Event(Trigger t, Intention i) {
@@ -43,13 +43,13 @@ public class Event implements Serializable {
         intention = i;
     }
 
-	public Trigger getTrigger() {
-		return trigger;
-	}
+    public Trigger getTrigger() {
+        return trigger;
+    }
 
-	public Intention getIntention() {
-		return intention;
-	}
+    public Intention getIntention() {
+        return intention;
+    }
     
     public boolean sameTE(Object t) {
         return trigger.equals(t);
@@ -79,7 +79,7 @@ public class Event implements Serializable {
     public Object clone() {
         Trigger   tc = (trigger   == null ? null : (Trigger)trigger.clone());
         Intention ic = (intention == null ? null : (Intention)intention.clone());
-    	return new Event(tc, ic);
+        return new Event(tc, ic);
     }
     
     public String toString() {
@@ -90,13 +90,13 @@ public class Event implements Serializable {
     }
 
     /** get as XML */
-	public Element getAsDOM(Document document) {
-		Element eevt = (Element) document.createElement("event");
+    public Element getAsDOM(Document document) {
+        Element eevt = (Element) document.createElement("event");
         eevt.appendChild(trigger.getAsDOM(document));
-		if (intention != Intention.EmptyInt) {
-			eevt.setAttribute("intention", intention.getId()+"");
-		}
-		return eevt;
-	}
+        if (intention != Intention.EmptyInt) {
+            eevt.setAttribute("intention", intention.getId()+"");
+        }
+        return eevt;
+    }
 
 }

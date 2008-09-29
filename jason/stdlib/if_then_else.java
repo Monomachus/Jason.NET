@@ -65,13 +65,13 @@ The unification is changed by the evaluation of the logical formula, i.e., X mig
 */
 public class if_then_else extends DefaultInternalAction {
 
-	private static InternalAction singleton = null;
-	public static InternalAction create() {
-		if (singleton == null) 
-			singleton = new if_then_else();
-		return singleton;
-	}
-	
+    private static InternalAction singleton = null;
+    public static InternalAction create() {
+        if (singleton == null) 
+            singleton = new if_then_else();
+        return singleton;
+    }
+    
     @Override public int getMinArgs() { return 2; }
     @Override public int getMaxArgs() { return 3; }
     
@@ -88,23 +88,23 @@ public class if_then_else extends DefaultInternalAction {
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         checkArguments(args);
-        	
+            
         LogicalFormula logExpr = (LogicalFormula)args[0];
         PlanBody whattoadd = null;
             
         Iterator<Unifier> iu = logExpr.logicalConsequence(ts.getAg(), un);
-        if (iu.hasNext()) {	// .if THEN
+        if (iu.hasNext()) { // .if THEN
             whattoadd = (PlanBody)args[1];
-        	un.compose(iu.next());
+            un.compose(iu.next());
         } else if (args.length == 3) { // .if ELSE
             whattoadd = (PlanBody)args[2];
         }
 
         if (whattoadd != null) {
-        	IntendedMeans im = ts.getC().getSelectedIntention().peek();
-        	PlanBody ifia = im.getCurrentStep();
-        	whattoadd.setAsBodyTerm(false);
-        	ifia.add(1,whattoadd);
+            IntendedMeans im = ts.getC().getSelectedIntention().peek();
+            PlanBody ifia = im.getCurrentStep();
+            whattoadd.setAsBodyTerm(false);
+            ifia.add(1,whattoadd);
         }
         return true;
     }

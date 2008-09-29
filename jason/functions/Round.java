@@ -19,23 +19,23 @@ import jason.asSyntax.Term;
 */
 public class Round extends DefaultArithFunction  {
 
-	public String getName() {
+    public String getName() {
         return "math.round";
     }
     
-	@Override
-	public double evaluate(TransitionSystem ts, Term[] args) throws Exception {
-		if (args[0].isNumeric()) {
-			double n = ((NumberTerm)args[0]).solve();
-			return Math.round(n);
-		} else {
-			throw new JasonException("The argument '"+args[0]+"' is not numeric!");
-		}
-	}
+    @Override
+    public double evaluate(TransitionSystem ts, Term[] args) throws Exception {
+        if (args[0].isNumeric()) {
+            double n = ((NumberTerm)args[0]).solve();
+            return Math.round(n);
+        } else {
+            throw new JasonException("The argument '"+args[0]+"' is not numeric!");
+        }
+    }
 
-	@Override
-	public boolean checkArity(int a) {
-		return a == 1;
-	}
-	
+    @Override
+    public boolean checkArity(int a) {
+        return a == 1;
+    }
+    
 }

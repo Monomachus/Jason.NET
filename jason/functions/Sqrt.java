@@ -18,24 +18,24 @@ import jason.asSyntax.Term;
 */
 public class Sqrt extends DefaultArithFunction  {
 
-	public String getName() {
+    public String getName() {
         return "math.sqrt";
     }
     
 
-	@Override
-	public double evaluate(TransitionSystem ts, Term[] args) throws Exception {
-		if (args[0].isNumeric()) {
-			double n = ((NumberTerm)args[0]).solve();
-			return Math.sqrt(n);
-		} else {
-			throw new JasonException("The argument '"+args[0]+"' is not numeric!");
-		}
-	}
+    @Override
+    public double evaluate(TransitionSystem ts, Term[] args) throws Exception {
+        if (args[0].isNumeric()) {
+            double n = ((NumberTerm)args[0]).solve();
+            return Math.sqrt(n);
+        } else {
+            throw new JasonException("The argument '"+args[0]+"' is not numeric!");
+        }
+    }
 
-	@Override
-	public boolean checkArity(int a) {
-		return a == 1;
-	}
-	
+    @Override
+    public boolean checkArity(int a) {
+        return a == 1;
+    }
+    
 }

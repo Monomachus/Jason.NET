@@ -31,15 +31,15 @@ import jason.asSyntax.Term;
 
 */
 public class string extends DefaultInternalAction {
-	
-	private static InternalAction singleton = null;
-	public static InternalAction create() {
-		if (singleton == null) 
-			singleton = new string();
-		return singleton;
-	}
+    
+    private static InternalAction singleton = null;
+    public static InternalAction create() {
+        if (singleton == null) 
+            singleton = new string();
+        return singleton;
+    }
 
-	@Override public int getMinArgs() { return 1; }
+    @Override public int getMinArgs() { return 1; }
     @Override public int getMaxArgs() { return 1; }
 
     @Override

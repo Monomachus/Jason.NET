@@ -59,22 +59,22 @@ import java.util.logging.Logger;
  */
 public class CentralisedAgArch implements Runnable, AgArchInfraTier {
 
-	protected CentralisedEnvironment    infraEnv     = null;
+    protected CentralisedEnvironment    infraEnv     = null;
     private CentralisedExecutionControl infraControl = null;
-    private RunCentralisedMAS		    masRunner    = RunCentralisedMAS.getRunner();
+    private RunCentralisedMAS           masRunner    = RunCentralisedMAS.getRunner();
 
     /** The user implementation of the architecture */
     protected AgArch        userAgArch;
 
     private String          agName  = "";
     private boolean         running = true;
-    private Queue<Message>  mbox    = new ConcurrentLinkedQueue<Message>();	
+    private Queue<Message>  mbox    = new ConcurrentLinkedQueue<Message>(); 
     protected Logger        logger  = Logger.getLogger(CentralisedAgArch.class.getName());
     
     private static List<MsgListener> msgListeners = null;
     public static void addMsgListener(MsgListener l) {
         if (msgListeners == null) {
-        	msgListeners = new ArrayList<MsgListener>();
+            msgListeners = new ArrayList<MsgListener>();
         }
         msgListeners.add(l);
     }
@@ -89,7 +89,7 @@ public class CentralisedAgArch implements Runnable, AgArchInfraTier {
      */
     public void initAg(String agArchClass, String agClass, ClassParameters bbPars, String asSrc, Settings stts, RunCentralisedMAS masRunner) throws JasonException {
         try {
-        	this.masRunner = masRunner; 
+            this.masRunner = masRunner; 
             userAgArch = (AgArch) Class.forName(agArchClass).newInstance();
             userAgArch.setArchInfraTier(this);
             userAgArch.initAg(agClass, bbPars, asSrc, stts);
@@ -118,7 +118,7 @@ public class CentralisedAgArch implements Runnable, AgArchInfraTier {
     
     public void setLogger() {
         logger = Logger.getLogger(CentralisedAgArch.class.getName() + "." + getAgName());
-        logger.setLevel(userAgArch.getTS().getSettings().logLevel());    	
+        logger.setLevel(userAgArch.getTS().getSettings().logLevel());       
     }
     
     public Logger getLogger() {
@@ -134,7 +134,7 @@ public class CentralisedAgArch implements Runnable, AgArchInfraTier {
     }
 
     public void setUserAgArch(AgArch arch) {
-    	userAgArch = arch;
+        userAgArch = arch;
     }
     
     public AgArch getUserAgArch() {
@@ -169,7 +169,7 @@ public class CentralisedAgArch implements Runnable, AgArchInfraTier {
         running = false;
         if (myThread != null) myThread.interrupt();
         synchronized (syncStopRun) {
-        	masRunner.delAg(agName);
+            masRunner.delAg(agName);
         }
         userAgArch.stopAg();
     }
@@ -244,20 +244,20 @@ public class CentralisedAgArch implements Runnable, AgArchInfraTier {
                 return;
         }
         rec.receiveMsg(m.clone()); // send a cloned message
-	
+    
         // notify listeners
         if (msgListeners != null) 
-        	for (MsgListener l: msgListeners) 
-        		l.msgSent(m);
+            for (MsgListener l: msgListeners) 
+                l.msgSent(m);
     }
     
     public void receiveMsg(Message m) {
         mbox.offer(m);
-        wake();    	
+        wake();     
     }
 
     public void broadcast(jason.asSemantics.Message m) throws Exception {
-    	for (String agName: masRunner.getAgs().keySet()) {
+        for (String agName: masRunner.getAgs().keySet()) {
             if (!agName.equals(this.getAgName())) {
                 m.setReceiver(agName);
                 sendMsg(m);

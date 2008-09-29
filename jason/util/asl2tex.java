@@ -25,13 +25,13 @@ public class asl2tex extends asl2xml {
         this.style = style;
     }
     
-	public static void main(String[] args) throws Exception {
-		if (args.length != 1) {
-			System.err.println("The asl code file must be informed");
-			System.exit(1);
-		}
-		new asl2tex().run(args[0]);
-	}
+    public static void main(String[] args) throws Exception {
+        if (args.length != 1) {
+            System.err.println("The asl code file must be informed");
+            System.exit(1);
+        }
+        new asl2tex().run(args[0]);
+    }
     
     public String transform(Document agState)  throws Exception {
         StringWriter so = new StringWriter();

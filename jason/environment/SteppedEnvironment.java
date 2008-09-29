@@ -28,21 +28,21 @@ import java.util.logging.Logger;
  */
 public class SteppedEnvironment extends Environment {
 
-	private Logger logger = Logger.getLogger(SteppedEnvironment.class.getName());
+    private Logger logger = Logger.getLogger(SteppedEnvironment.class.getName());
 
     /** Policy used when a second action is requested and the agent still has another action pending execution */
-	public enum OverActionsPolicy {
-    	/** Queue the second action request for future execution */
-    	queue, 
-    	
-    	/** Fail the second action */
-    	failSecond,
-    	
-    	/** Ignore the second action, it is considered as successfully executed */
-    	ignoreSecond
-	};
-    	
-	private int step = 0;   // step counter
+    public enum OverActionsPolicy {
+        /** Queue the second action request for future execution */
+        queue, 
+        
+        /** Fail the second action */
+        failSecond,
+        
+        /** Ignore the second action, it is considered as successfully executed */
+        ignoreSecond
+    };
+        
+    private int step = 0;   // step counter
     private int nbAgs = -1; // number of agents acting on the environment
     private Map<String,ActRequest> requests; // actions to be executed
     private Queue<ActRequest> overRequests; // second action tentative in the step  
@@ -54,27 +54,27 @@ public class SteppedEnvironment extends Environment {
     private OverActionsPolicy overActPol = OverActionsPolicy.ignoreSecond;
     
     public SteppedEnvironment() {
-    	super(2);
-	}
+        super(2);
+    }
     
     @Override
     public void init(String[] args) {
-    	super.init(args);
-    	   	
-    	if (args.length > 0) {
-    		try {
-    			stepTimeout = Integer.parseInt(args[0]);
-    		} catch (Exception e) {
-    			logger.warning("The argument "+args[0]+" is not a valid number for step timeout");
-    		}
-    	}
-    	
-    	// reset everything
-    	requests = new HashMap<String,ActRequest>();
-    	overRequests = new LinkedList<ActRequest>();
-		step = 0;
+        super.init(args);
+            
+        if (args.length > 0) {
+            try {
+                stepTimeout = Integer.parseInt(args[0]);
+            } catch (Exception e) {
+                logger.warning("The argument "+args[0]+" is not a valid number for step timeout");
+            }
+        }
+        
+        // reset everything
+        requests = new HashMap<String,ActRequest>();
+        overRequests = new LinkedList<ActRequest>();
+        step = 0;
         if (timeoutThread != null) timeoutThread.allAgFinished();
-		stepStarted(step);
+        stepStarted(step);
     }
 
     public void setSleep(int s) {
@@ -84,33 +84,33 @@ public class SteppedEnvironment extends Environment {
     
     @Override
     public void stop() {
-    	super.stop();
-    	if (timeoutThread != null) timeoutThread.interrupt();
+        super.stop();
+        if (timeoutThread != null) timeoutThread.interrupt();
     }
     
     
     /** 
-     * 	Updates the number of agents using the environment, this default
+     *  Updates the number of agents using the environment, this default
      *  implementation, considers all agents in the MAS as actors in the
      *  environment.
      */
     protected void updateNumberOfAgents() {
-    	setNbAgs(getEnvironmentInfraTier().getRuntimeServices().getAgentsName().size());
+        setNbAgs(getEnvironmentInfraTier().getRuntimeServices().getAgentsName().size());
     }
 
     /** Returns the number of agents in the MAS (used to test the end of a cycle) */
     public int getNbAgs() {
-    	return nbAgs;
+        return nbAgs;
     }
     
     /** Set the number of agents */
     public void setNbAgs(int n) {
-    	nbAgs = n;
+        nbAgs = n;
     }
 
     /** returns the current step counter */
     public int getStep() {
-    	return step;
+        return step;
     }
     
     /** 
@@ -119,46 +119,46 @@ public class SteppedEnvironment extends Environment {
      * If set as failSecond, the second action fails.
      */
     public void setOverActionsPolicy(OverActionsPolicy p) {
-    	overActPol = p;
+        overActPol = p;
     }
     
     @Override
     public void scheduleAction(String agName, Structure action, Object infraData) {
         if (!isRunning()) return;
-		ActRequest newRequest = new ActRequest(agName, action, requiredStepsForAction(agName, action), infraData);
+        ActRequest newRequest = new ActRequest(agName, action, requiredStepsForAction(agName, action), infraData);
 
-		boolean startNew = false;
-		
-		synchronized (requests) { // lock access to requests
-	    	if (nbAgs < 0 || timeoutThread == null) {
-	    		// initialise dynamic information
-	    		// (must be in sync part, so that more agents do not start the timeout thread)
-	    		updateNumberOfAgents();
-	        	if (stepTimeout > 0 && timeoutThread == null) {
-	        		timeoutThread = new TimeOutThread(stepTimeout);
-	        		timeoutThread.start();
-	        	}
-	    	}
+        boolean startNew = false;
+        
+        synchronized (requests) { // lock access to requests
+            if (nbAgs < 0 || timeoutThread == null) {
+                // initialise dynamic information
+                // (must be in sync part, so that more agents do not start the timeout thread)
+                updateNumberOfAgents();
+                if (stepTimeout > 0 && timeoutThread == null) {
+                    timeoutThread = new TimeOutThread(stepTimeout);
+                    timeoutThread.start();
+                }
+            }
 
-	    	// if the agent already has an action scheduled, fail the first
-    		ActRequest inSchedule = requests.get(agName);
-    		if (inSchedule != null) {
-    			if (overActPol == OverActionsPolicy.queue) {
-    				overRequests.offer(newRequest);
-    			} else if (overActPol == OverActionsPolicy.failSecond) {
-					getEnvironmentInfraTier().actionExecuted(agName, action, false, infraData);
-    			} else if (overActPol == OverActionsPolicy.ignoreSecond) {
-    				getEnvironmentInfraTier().actionExecuted(agName, action, true, infraData);
-    			}	
-    		} else {
-				// store the action request 		
-				requests.put(agName, newRequest);
-		
-		    	// test if all agents have sent their actions
-				if (testEndCycle(requests.keySet())) {
-					startNew = true;
-		    	}
-    		}
+            // if the agent already has an action scheduled, fail the first
+            ActRequest inSchedule = requests.get(agName);
+            if (inSchedule != null) {
+                if (overActPol == OverActionsPolicy.queue) {
+                    overRequests.offer(newRequest);
+                } else if (overActPol == OverActionsPolicy.failSecond) {
+                    getEnvironmentInfraTier().actionExecuted(agName, action, false, infraData);
+                } else if (overActPol == OverActionsPolicy.ignoreSecond) {
+                    getEnvironmentInfraTier().actionExecuted(agName, action, true, infraData);
+                }   
+            } else {
+                // store the action request         
+                requests.put(agName, newRequest);
+        
+                // test if all agents have sent their actions
+                if (testEndCycle(requests.keySet())) {
+                    startNew = true;
+                }
+            }
 
             if (startNew) {
                 if (sleep > 0) {
@@ -167,17 +167,17 @@ public class SteppedEnvironment extends Environment {
                     } catch (InterruptedException e) {}
                 }
             }
-    	}
-		
-		if (startNew) {
-			// starts the execution of the next step by another thread, so to not look the agent thread
-			executor.execute(new Runnable() {
-				public void run() {
-					if (timeoutThread != null) timeoutThread.allAgFinished();
-					startNewStep();
-				}
-			});			
-		}
+        }
+        
+        if (startNew) {
+            // starts the execution of the next step by another thread, so to not look the agent thread
+            executor.execute(new Runnable() {
+                public void run() {
+                    if (timeoutThread != null) timeoutThread.allAgFinished();
+                    startNewStep();
+                }
+            });         
+        }
     }
 
     public Structure getActionInSchedule(String agName) {
@@ -188,77 +188,77 @@ public class SteppedEnvironment extends Environment {
         return null;
     }
     
-	/** 
-	 * Returns true when a new cycle can start, it normally 
-	 * holds when all agents are in the finishedAgs set.
-	 *  
-	 * @param finishedAgs the set of agents' name that already finished the current cycle
-	 */ 
-	protected boolean testEndCycle(Set<String> finishedAgs) {
-		return finishedAgs.size() >= getNbAgs();
-	}
+    /** 
+     * Returns true when a new cycle can start, it normally 
+     * holds when all agents are in the finishedAgs set.
+     *  
+     * @param finishedAgs the set of agents' name that already finished the current cycle
+     */ 
+    protected boolean testEndCycle(Set<String> finishedAgs) {
+        return finishedAgs.size() >= getNbAgs();
+    }
     
-	/** This method is called after the execution of the action and before to send 'continue' to the agents */ 
+    /** This method is called after the execution of the action and before to send 'continue' to the agents */ 
     protected void updateAgsPercept() {
-    }	
-	
+    }   
+    
     private void startNewStep() {
         if (!isRunning()) return;
-    	synchronized (requests) {
+        synchronized (requests) {
 
-			//logger.info("#"+requests.size());
-    		//logger.info("#"+overRequests.size());
-			
+            //logger.info("#"+requests.size());
+            //logger.info("#"+overRequests.size());
+            
             try {
 
-	    		// execute all scheduled actions
-				for (ActRequest a: requests.values()) {
-					a.remainSteps--;
-					if (a.remainSteps == 0) {
-						// calls the user implementation of the action
-						a.success = executeAction(a.agName, a.action);
-					}
-				}
-				
-				updateAgsPercept();
-				
-				// notify the agents about the result of the execution
-				Iterator<ActRequest> i = requests.values().iterator();
-				while (i.hasNext()) {
-					ActRequest a = i.next();
-					if (a.remainSteps == 0) {
-						getEnvironmentInfraTier().actionExecuted(a.agName, a.action, a.success, a.infraData);
-						i.remove();
-					}
-				}
-            	
-				// clear all requests
-				//requests.clear();
-				
-				// add actions waiting in over requests into the requests
-				Iterator<ActRequest> io = overRequests.iterator();
-				while (io.hasNext()) {
-					ActRequest a = io.next();
-					if (requests.get(a.agName) == null) {
-						requests.put(a.agName, a);
-						io.remove();
-					}
-				}
-				
-				// the over requests could complete the requests
-		    	// so test end of step again
-				if (testEndCycle(requests.keySet())) {
-					startNewStep();
-		    	}
+                // execute all scheduled actions
+                for (ActRequest a: requests.values()) {
+                    a.remainSteps--;
+                    if (a.remainSteps == 0) {
+                        // calls the user implementation of the action
+                        a.success = executeAction(a.agName, a.action);
+                    }
+                }
+                
+                updateAgsPercept();
+                
+                // notify the agents about the result of the execution
+                Iterator<ActRequest> i = requests.values().iterator();
+                while (i.hasNext()) {
+                    ActRequest a = i.next();
+                    if (a.remainSteps == 0) {
+                        getEnvironmentInfraTier().actionExecuted(a.agName, a.action, a.success, a.infraData);
+                        i.remove();
+                    }
+                }
+                
+                // clear all requests
+                //requests.clear();
+                
+                // add actions waiting in over requests into the requests
+                Iterator<ActRequest> io = overRequests.iterator();
+                while (io.hasNext()) {
+                    ActRequest a = io.next();
+                    if (requests.get(a.agName) == null) {
+                        requests.put(a.agName, a);
+                        io.remove();
+                    }
+                }
+                
+                // the over requests could complete the requests
+                // so test end of step again
+                if (testEndCycle(requests.keySet())) {
+                    startNewStep();
+                }
             } catch (Exception ie) {
                 if (isRunning() && !(ie instanceof InterruptedException)) {
                     logger.log(Level.WARNING, "act error!",ie);
                 }
             }
-			
-    	}
-    	step++;
-    	stepStarted(step);    	
+            
+        }
+        step++;
+        stepStarted(step);      
     }
     
     /** to be overridden by the user class */
@@ -266,79 +266,79 @@ public class SteppedEnvironment extends Environment {
     }
 
     /** to be overridden by the user class */
-    protected void stepFinished(int step, long time, boolean timeout) {    	
+    protected void stepFinished(int step, long time, boolean timeout) {     
     }
     
     protected int requiredStepsForAction(String agName, Structure action) {
-    	return 1;
+        return 1;
     }
     
     /** stops perception while executing the step's actions */
     @Override
     public List<Literal> getPercepts(String agName) {
-    	synchronized (requests) {
-    		return super.getPercepts(agName);
-    	}
+        synchronized (requests) {
+            return super.getPercepts(agName);
+        }
     }
     
     class ActRequest {
-    	String agName;
-    	Structure action;
-    	Object infraData;
-    	boolean success; 
-    	int remainSteps; // the number os steps this action have to wait to be executed
-    	public ActRequest(String ag, Structure act, int rs, Object data) {
-    		agName = ag;
-    		action = act;
-    		infraData = data;
-    		remainSteps = rs;
-		}
-    	public boolean equals(Object obj) {
-    		return agName.equals(obj);
-    	}
-    	public int hashCode() {
-    		return agName.hashCode();
-    	}
-    	public String toString() {
-    		return "["+agName+","+action+"]";
-    	}
+        String agName;
+        Structure action;
+        Object infraData;
+        boolean success; 
+        int remainSteps; // the number os steps this action have to wait to be executed
+        public ActRequest(String ag, Structure act, int rs, Object data) {
+            agName = ag;
+            action = act;
+            infraData = data;
+            remainSteps = rs;
+        }
+        public boolean equals(Object obj) {
+            return agName.equals(obj);
+        }
+        public int hashCode() {
+            return agName.hashCode();
+        }
+        public String toString() {
+            return "["+agName+","+action+"]";
+        }
     }
     
     class TimeOutThread extends Thread {
-		Lock lock = new ReentrantLock();
-		Condition agActCond = lock.newCondition();
-    	long timeout = 0;
+        Lock lock = new ReentrantLock();
+        Condition agActCond = lock.newCondition();
+        long timeout = 0;
 
-    	public TimeOutThread(long to) {
-    		super("EnvironmentTimeOutThread");
-    		timeout = to;
-		}
-    	
-    	public void allAgFinished() {
-    		lock.lock();
-    		agActCond.signal();
-    		lock.unlock();
-    	}
-    	
-		public void run() {
-			try {
-				while (true) {
-		    		lock.lock();
-		    		long lastStepStart = System.currentTimeMillis();
-		    		boolean byTimeOut = !agActCond.await(timeout, TimeUnit.MILLISECONDS);
-					long now  = System.currentTimeMillis();
-		    		long time = (now-lastStepStart);
-		    		stepFinished(step, time, byTimeOut);
-		    		lock.unlock();
-					
-		    		if (byTimeOut) {
-						startNewStep();
-					}
-				}
-			} catch (InterruptedException e) {				
-			} catch (Exception e) {
-				logger.log(Level.SEVERE, "Error in timeout thread!",e);
-			}
-		}
+        public TimeOutThread(long to) {
+            super("EnvironmentTimeOutThread");
+            timeout = to;
+        }
+        
+        public void allAgFinished() {
+            lock.lock();
+            agActCond.signal();
+            lock.unlock();
+        }
+        
+        public void run() {
+            try {
+                while (true) {
+                    lock.lock();
+                    long lastStepStart = System.currentTimeMillis();
+                    boolean byTimeOut = !agActCond.await(timeout, TimeUnit.MILLISECONDS);
+                    long now  = System.currentTimeMillis();
+                    long time = (now-lastStepStart);
+                    stepFinished(step, time, byTimeOut);
+                    lock.unlock();
+                    
+                    if (byTimeOut) {
+                        startNewStep();
+                    }
+                }
+            } catch (InterruptedException e) {              
+            } catch (Exception e) {
+                logger.log(Level.SEVERE, "Error in timeout thread!",e);
+            }
+        }
     }    
 }

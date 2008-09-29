@@ -14,9 +14,9 @@ import org.gjt.sp.jedit.View;
 
 public class NewEnvironmentGUI extends NewAgentGUI {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private JTextField envClass;
+    private JTextField envClass;
 
     public NewEnvironmentGUI(String title, Buffer b, View view) {
         super(title, b, view, ".");

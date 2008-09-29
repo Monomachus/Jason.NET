@@ -80,16 +80,16 @@ i.e., the unification after the for is the same as before.
 
 public class foreach extends DefaultInternalAction {
 
-	private static InternalAction singleton = null;
-	public static InternalAction create() {
-		if (singleton == null) 
-			singleton = new foreach();
-		return singleton;
-	}
-	
+    private static InternalAction singleton = null;
+    public static InternalAction create() {
+        if (singleton == null) 
+            singleton = new foreach();
+        return singleton;
+    }
+    
     @Override public int getMinArgs() { return 2; }
     @Override public int getMaxArgs() { return 2; }
-	
+    
     @Override protected void checkArguments(Term[] args) throws JasonException {
         super.checkArguments(args); // check number of arguments
         if ( !(args[0] instanceof LogicalFormula))
@@ -100,18 +100,18 @@ public class foreach extends DefaultInternalAction {
     
     
     @SuppressWarnings("unchecked")
-	@Override
+    @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
-    	IntendedMeans im    = ts.getC().getSelectedIntention().peek();
-    	PlanBody      foria = im.getCurrentStep();
+        IntendedMeans im    = ts.getC().getSelectedIntention().peek();
+        PlanBody      foria = im.getCurrentStep();
 
-    	Iterator<Unifier> iu;
-    	
+        Iterator<Unifier> iu;
+        
         if (args.length == 2) {
             // first execution of while
-        	checkArguments(args);
-        	
-        	// get all solutions for the loop
+            checkArguments(args);
+            
+            // get all solutions for the loop
             // Note: you should get all solutions here, otherwise I concurrent modification will occur for the iterator 
             LogicalFormula logExpr = (LogicalFormula)args[0];
             iu = logExpr.logicalConsequence(ts.getAg(), un.clone());
@@ -119,22 +119,22 @@ public class foreach extends DefaultInternalAction {
             while (iu.hasNext())
                 allsol.add(iu.next());
             iu = allsol.iterator();
-        	((Structure)foria.getBodyTerm()).addTerm(new ObjectTermImpl(iu));
+            ((Structure)foria.getBodyTerm()).addTerm(new ObjectTermImpl(iu));
         } else if (args.length == 3) {
-        	// restore the solutions
-        	iu = (Iterator<Unifier>)((ObjectTerm)args[2]).getObject();
+            // restore the solutions
+            iu = (Iterator<Unifier>)((ObjectTerm)args[2]).getObject();
         } else {
             throw JasonException.createWrongArgumentNb(this);
         }
         
         if (iu.hasNext()) {
-        	un.clear();
-        	un.compose(iu.next());
-        	PlanBody whattoadd = (PlanBody)args[1].clone(); 
+            un.clear();
+            un.compose(iu.next());
+            PlanBody whattoadd = (PlanBody)args[1].clone(); 
             whattoadd.add(new PlanBodyImpl(BodyType.internalAction, foria.getBodyTerm().clone())); 
-        	whattoadd.setAsBodyTerm(false);
-        	foria.add(1,whattoadd);
-        	//System.out.println("new body="+foria.getBodyNext());
+            whattoadd.setAsBodyTerm(false);
+            foria.add(1,whattoadd);
+            //System.out.println("new body="+foria.getBodyNext());
         }
         return true;
     }

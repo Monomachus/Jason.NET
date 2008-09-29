@@ -31,158 +31,158 @@ import junit.framework.TestCase;
 /** JUnit test case for syntax package */
 public class BeliefBaseTest extends TestCase {
 
-	protected void setUp() throws Exception {
-		super.setUp();
-	}
+    protected void setUp() throws Exception {
+        super.setUp();
+    }
 
-	public void testAdd() {
-		Literal l1, l2, l3, l4, l5;
-		BeliefBase bb = new DefaultBeliefBase();
-		
-		l1 = new LiteralImpl(true, new Pred("pos"));
-		assertTrue(bb.add(l1));
-		
-		assertFalse(bb.add(new LiteralImpl(true, new Pred("pos"))));
+    public void testAdd() {
+        Literal l1, l2, l3, l4, l5;
+        BeliefBase bb = new DefaultBeliefBase();
+        
+        l1 = new LiteralImpl(true, new Pred("pos"));
+        assertTrue(bb.add(l1));
+        
+        assertFalse(bb.add(new LiteralImpl(true, new Pred("pos"))));
         assertEquals(bb.size(),1);
 
-		l2 = new LiteralImpl("pos");
-		l2.addAnnot(new Atom("a"));
+        l2 = new LiteralImpl("pos");
+        l2.addAnnot(new Atom("a"));
         //System.out.println(l1.hashCode()+"/"+l2.hashCode());
         //System.out.println(bb+"-"+ bb.contains(l2));
         assertTrue(bb.contains(l2) != null);
         
-		assertTrue(bb.add(l2));
-		// the add should maintain the annots
-		assertEquals(1,l2.getAnnots().size());
-		
-		assertFalse(bb.add(l2));
-		// the add should remove the annots
-		assertEquals(0,l2.getAnnots().size());
+        assertTrue(bb.add(l2));
+        // the add should maintain the annots
+        assertEquals(1,l2.getAnnots().size());
+        
+        assertFalse(bb.add(l2));
+        // the add should remove the annots
+        assertEquals(0,l2.getAnnots().size());
 
-		//System.out.println(bb+" "+ bb.contains(l2)+" l2="+l2);
+        //System.out.println(bb+" "+ bb.contains(l2)+" l2="+l2);
         assertEquals(bb.contains(l2).toString(),"pos[a]");
-		assertEquals(bb.size(),1);
+        assertEquals(bb.size(),1);
 
-		l3 = new LiteralImpl(true, new Pred("pos"));
-		l3.addAnnot(new Structure("b"));
-		l3.addAnnot(BeliefBase.TPercept);
-		assertTrue(bb.add(l3));
-		assertFalse(bb.add(l3));
-		assertEquals(bb.size(),1);
+        l3 = new LiteralImpl(true, new Pred("pos"));
+        l3.addAnnot(new Structure("b"));
+        l3.addAnnot(BeliefBase.TPercept);
+        assertTrue(bb.add(l3));
+        assertFalse(bb.add(l3));
+        assertEquals(bb.size(),1);
 
-		l3 = new LiteralImpl(true, new Pred("pos"));
-		l3.addSource(new Structure("ag1"));
-		assertTrue(bb.add(l3));
+        l3 = new LiteralImpl(true, new Pred("pos"));
+        l3.addSource(new Structure("ag1"));
+        assertTrue(bb.add(l3));
 
-		// same as above, must not insert
-		l3 = new LiteralImpl(true, new Pred("pos"));
-		l3.addSource(new Atom("ag1"));
-		assertFalse(bb.add(l3));
-		
-		l4 = new LiteralImpl(true, new Pred("pos"));
-		l4.addTerm(new Atom("1"));
-		l4.addTerm(new Atom("2"));
-		l4.addAnnot(BeliefBase.TPercept);
-		assertTrue(bb.add(l4));
+        // same as above, must not insert
+        l3 = new LiteralImpl(true, new Pred("pos"));
+        l3.addSource(new Atom("ag1"));
+        assertFalse(bb.add(l3));
+        
+        l4 = new LiteralImpl(true, new Pred("pos"));
+        l4.addTerm(new Atom("1"));
+        l4.addTerm(new Atom("2"));
+        l4.addAnnot(BeliefBase.TPercept);
+        assertTrue(bb.add(l4));
 
-		l4 = new LiteralImpl(true, new Pred("pos"));
-		l4.addTerm(new Atom("1"));
-		l4.addTerm(new Atom("2"));
-		l4.addAnnot(BeliefBase.TPercept);
-		assertFalse(bb.add(l4));
-		assertEquals(bb.size(),2);
+        l4 = new LiteralImpl(true, new Pred("pos"));
+        l4.addTerm(new Atom("1"));
+        l4.addTerm(new Atom("2"));
+        l4.addAnnot(BeliefBase.TPercept);
+        assertFalse(bb.add(l4));
+        assertEquals(bb.size(),2);
 
-		l4 = new LiteralImpl(true, new Pred("pos"));
-		l4.addTerm(new Structure("5"));
-		l4.addTerm(new Structure("6"));
-		l4.addAnnot(BeliefBase.TPercept);
-		assertTrue(bb.add(l4));
+        l4 = new LiteralImpl(true, new Pred("pos"));
+        l4.addTerm(new Structure("5"));
+        l4.addTerm(new Structure("6"));
+        l4.addAnnot(BeliefBase.TPercept);
+        assertTrue(bb.add(l4));
 
-		l5 = new LiteralImpl(true, new Pred("garb"));
-		l5.addTerm(new Structure("r1"));
-		assertTrue(bb.add(l5));
-		
-		//System.out.println("BB="+bb);
-		//System.out.println("Percepts="+bb.getPercepts());
-		assertEquals(iteratorSize(bb.getPercepts()), 3);
-		
-		//Literal lRel1 = new Literal(true, new Pred("pos"));
-		//System.out.println("Rel "+lRel1.getFunctorArity()+"="+bb.getRelevant(lRel1));
+        l5 = new LiteralImpl(true, new Pred("garb"));
+        l5.addTerm(new Structure("r1"));
+        assertTrue(bb.add(l5));
+        
+        //System.out.println("BB="+bb);
+        //System.out.println("Percepts="+bb.getPercepts());
+        assertEquals(iteratorSize(bb.getPercepts()), 3);
+        
+        //Literal lRel1 = new Literal(true, new Pred("pos"));
+        //System.out.println("Rel "+lRel1.getFunctorArity()+"="+bb.getRelevant(lRel1));
 
-		Literal lRel2 = new LiteralImpl(true, new Pred("pos"));
-		lRel2.addTerm(new VarTerm("X"));
-		lRel2.addTerm(new VarTerm("Y"));
-		//System.out.println("Rel "+lRel2.getFunctorArity()+"="+bb.getRelevant(lRel2));
-		assertEquals(bb.size(), 4);
-		assertEquals(iteratorSize(bb.iterator()), 4);
-		
-		// remove
-		l5 = new LiteralImpl(true, new Pred("garb"));
-		l5.addTerm(new Structure("r1"));
-		assertTrue(bb.remove(l5));
-		assertEquals(bb.getCandidateBeliefs(l5, null), null);
-		assertEquals(bb.size(), 3);
+        Literal lRel2 = new LiteralImpl(true, new Pred("pos"));
+        lRel2.addTerm(new VarTerm("X"));
+        lRel2.addTerm(new VarTerm("Y"));
+        //System.out.println("Rel "+lRel2.getFunctorArity()+"="+bb.getRelevant(lRel2));
+        assertEquals(bb.size(), 4);
+        assertEquals(iteratorSize(bb.iterator()), 4);
+        
+        // remove
+        l5 = new LiteralImpl(true, new Pred("garb"));
+        l5.addTerm(new Structure("r1"));
+        assertTrue(bb.remove(l5));
+        assertEquals(bb.getCandidateBeliefs(l5, null), null);
+        assertEquals(bb.size(), 3);
 
-		l4 = new LiteralImpl(true, new Pred("pos"));
-		l4.addTerm(new Structure("5"));
-		l4.addTerm(new Structure("6"));
-		l4.addAnnot(BeliefBase.TPercept);
-		assertTrue(bb.remove(l4));
-		assertEquals(iteratorSize(bb.getCandidateBeliefs(l4, null)), 1);
-		assertEquals(bb.size(), 2);
-		assertEquals(iteratorSize(bb.iterator()), 2);
+        l4 = new LiteralImpl(true, new Pred("pos"));
+        l4.addTerm(new Structure("5"));
+        l4.addTerm(new Structure("6"));
+        l4.addAnnot(BeliefBase.TPercept);
+        assertTrue(bb.remove(l4));
+        assertEquals(iteratorSize(bb.getCandidateBeliefs(l4, null)), 1);
+        assertEquals(bb.size(), 2);
+        assertEquals(iteratorSize(bb.iterator()), 2);
 
-		//System.out.println("remove grab(r1), pos(5,6)");
-		//System.out.println("BB="+bb);
-		//System.out.println("Percepts="+bb.getPercepts());
-		assertEquals(iteratorSize(bb.getPercepts()), 2);
-	
-		l4 = new LiteralImpl(true, new Pred("pos"));
-		l4.addTerm(new Structure("1"));
-		l4.addTerm(new Structure("2"));
-		l4.addAnnot(BeliefBase.TPercept);
-		assertTrue(bb.remove(l4));
-		assertEquals(bb.getCandidateBeliefs(l4, null), null);
-		assertEquals(bb.size(), 1);
+        //System.out.println("remove grab(r1), pos(5,6)");
+        //System.out.println("BB="+bb);
+        //System.out.println("Percepts="+bb.getPercepts());
+        assertEquals(iteratorSize(bb.getPercepts()), 2);
+    
+        l4 = new LiteralImpl(true, new Pred("pos"));
+        l4.addTerm(new Structure("1"));
+        l4.addTerm(new Structure("2"));
+        l4.addAnnot(BeliefBase.TPercept);
+        assertTrue(bb.remove(l4));
+        assertEquals(bb.getCandidateBeliefs(l4, null), null);
+        assertEquals(bb.size(), 1);
         assertEquals(iteratorSize(bb.getPercepts()), 1);
 
-		//System.out.println("remove pos(1,2)");
-		//System.out.println("BB="+bb);
-		
-		l2 = new LiteralImpl(true, new Pred("pos"));
-		l2.addAnnot(new Structure("a"));
-		assertTrue(bb.contains(l2) != null);
-		assertFalse(bb.contains(l2).hasSubsetAnnot(l2));
-		assertTrue(bb.remove(l2));
+        //System.out.println("remove pos(1,2)");
+        //System.out.println("BB="+bb);
+        
+        l2 = new LiteralImpl(true, new Pred("pos"));
+        l2.addAnnot(new Structure("a"));
+        assertTrue(bb.contains(l2) != null);
+        assertFalse(bb.contains(l2).hasSubsetAnnot(l2));
+        assertTrue(bb.remove(l2));
 
-		l2.addAnnot(new Structure("b"));
-		l2.addAnnot(BeliefBase.TPercept);
-		l2.delAnnot(new Structure("a"));
+        l2.addAnnot(new Structure("b"));
+        l2.addAnnot(BeliefBase.TPercept);
+        l2.delAnnot(new Structure("a"));
         assertTrue(l2.hasAnnot(BeliefBase.TPercept));
         assertEquals(2,l2.getAnnots().size());
         Literal l2inBB = ((DefaultBeliefBase)bb).contains(l2);
         assertTrue(l2inBB != null);
         //System.out.println("l2 in BB="+l2inBB+", l2 is "+l2);
-		assertTrue(bb.remove(l2));
-		//System.out.println("removed l2 "+l2);
-		//System.out.println("BB="+bb);
-		//System.out.print("Percepts=");
+        assertTrue(bb.remove(l2));
+        //System.out.println("removed l2 "+l2);
+        //System.out.println("BB="+bb);
+        //System.out.print("Percepts=");
         //Iterator i = bb.getPercepts();
         //while (i.hasNext()) {
         //    System.out.print(i.next()+",");
         //}
-		assertEquals(iteratorSize(bb.getPercepts()), 0);
-		assertEquals(bb.size(), 1);
-		
-		l3 = Literal.parseLiteral("pos[source(ag1)]");
-		assertFalse(l2.isAtom());
-		assertTrue(bb.remove(l3));
-		
-		//System.out.println("removed "+l3);
-		//System.out.println("BB="+bb);
-		assertEquals(bb.size(), 0);
-		assertEquals(iteratorSize(bb.iterator()), 0);
-	}
+        assertEquals(iteratorSize(bb.getPercepts()), 0);
+        assertEquals(bb.size(), 1);
+        
+        l3 = Literal.parseLiteral("pos[source(ag1)]");
+        assertFalse(l2.isAtom());
+        assertTrue(bb.remove(l3));
+        
+        //System.out.println("removed "+l3);
+        //System.out.println("BB="+bb);
+        assertEquals(bb.size(), 0);
+        assertEquals(iteratorSize(bb.iterator()), 0);
+    }
 
     public void testAdd2() {
         BeliefBase bb = new DefaultBeliefBase();
@@ -231,41 +231,41 @@ public class BeliefBaseTest extends TestCase {
     }
     
     
-	public void testRemWithList() {
-		Unifier u = new Unifier();
-		BeliefBase bb = new DefaultBeliefBase();
-		Literal s = Literal.parseLiteral("seen(L)");
-		assertTrue(u.unifies(new VarTerm("L"), (Term)ListTermImpl.parseList("[a,b]")));
-		//System.out.println("u="+u);
-		s.apply(u);
-		bb.add(s);
+    public void testRemWithList() {
+        Unifier u = new Unifier();
+        BeliefBase bb = new DefaultBeliefBase();
+        Literal s = Literal.parseLiteral("seen(L)");
+        assertTrue(u.unifies(new VarTerm("L"), (Term)ListTermImpl.parseList("[a,b]")));
+        //System.out.println("u="+u);
+        s.apply(u);
+        bb.add(s);
 
-		VarTerm b1 = new VarTerm("B1");
-		u.unifies(b1, Literal.parseLiteral("seen([a,b])"));
-		b1.apply(u);
-		//System.out.println("b1="+b1);
-		//System.out.println("test 1");
-		assertTrue(b1.equalsAsStructure(Literal.parseLiteral("seen([a,b])")));
-		assertTrue(b1.equalsAsStructure(s));
-		assertTrue(bb.remove(b1));
-	}
-	
-	public void testRemWithUnnamedVar() {
-		Agent ag = new Agent();
+        VarTerm b1 = new VarTerm("B1");
+        u.unifies(b1, Literal.parseLiteral("seen([a,b])"));
+        b1.apply(u);
+        //System.out.println("b1="+b1);
+        //System.out.println("test 1");
+        assertTrue(b1.equalsAsStructure(Literal.parseLiteral("seen([a,b])")));
+        assertTrue(b1.equalsAsStructure(s));
+        assertTrue(bb.remove(b1));
+    }
+    
+    public void testRemWithUnnamedVar() {
+        Agent ag = new Agent();
         AgArch arch = new AgArch();
         arch.setArchInfraTier(new CentralisedAgArch());
         ag.setTS(new TransitionSystem(ag, null, null, arch));
 
         ag.getBB().add(Literal.parseLiteral("pos(2,3)"));
-		Unifier u = new Unifier();
+        Unifier u = new Unifier();
 
-		Literal l = Literal.parseLiteral("pos(_,_)");
-		assertTrue(ag.believes(l, u));
-		l.apply(u);
-		assertEquals(l, Literal.parseLiteral("pos(2,3)"));
-		
-		assertTrue(ag.getBB().remove(l));
-	}
+        Literal l = Literal.parseLiteral("pos(_,_)");
+        assertTrue(ag.believes(l, u));
+        l.apply(u);
+        assertEquals(l, Literal.parseLiteral("pos(2,3)"));
+        
+        assertTrue(ag.getBB().remove(l));
+    }
     
     @SuppressWarnings("unused")
     public void testLogCons() {
@@ -496,7 +496,7 @@ public class BeliefBaseTest extends TestCase {
         assertEquals(iteratorSize(bb.iterator()),size+2);
 
         //for (Literal l2: bb) {
-        //	System.out.println(l2);
+        //  System.out.println(l2);
         //}
         
         // test remove
@@ -522,7 +522,7 @@ public class BeliefBaseTest extends TestCase {
     
     
     @SuppressWarnings("unchecked")
-	public void testBelBRF() throws RevisionFailedException {
+    public void testBelBRF() throws RevisionFailedException {
         Agent ag = new Agent();
         AgArch arch = new AgArch();
         arch.setArchInfraTier(new CentralisedAgArch());
@@ -608,7 +608,7 @@ public class BeliefBaseTest extends TestCase {
     }
     
     @SuppressWarnings("unchecked")
-	private int iteratorSize(Iterator i) {
+    private int iteratorSize(Iterator i) {
         int c = 0;
         while (i.hasNext()) {
             i.next();

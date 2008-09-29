@@ -63,100 +63,100 @@ public class Trigger implements Cloneable {
         test    { public String toString() { return "?"; } }
     };
     
-	private TEOperator operator = TEOperator.add;
+    private TEOperator operator = TEOperator.add;
     private TEType     type     = TEType.belief;
-	private Literal    literal;
+    private Literal    literal;
 
-	private PredicateIndicator piCache = null;
-	
-	public Trigger(TEOperator op, TEType t, Literal l) {
-		literal = l;
+    private PredicateIndicator piCache = null;
+    
+    public Trigger(TEOperator op, TEType t, Literal l) {
+        literal = l;
         type    = t;
-		setTrigOp(op);
-	}
+        setTrigOp(op);
+    }
 
-	public static Trigger parseTrigger(String sTe) {
-		as2j parser = new as2j(new StringReader(sTe));
-		try {
-		    return parser.trigger(); 
-		} catch (Exception e) {
-			logger.log(Level.SEVERE,"Error parsing trigger" + sTe,e);
-			return null;
-		}
-	}
+    public static Trigger parseTrigger(String sTe) {
+        as2j parser = new as2j(new StringReader(sTe));
+        try {
+            return parser.trigger(); 
+        } catch (Exception e) {
+            logger.log(Level.SEVERE,"Error parsing trigger" + sTe,e);
+            return null;
+        }
+    }
 
     public static Trigger tryParsingTrigger(String sTe) throws ParseException {
         return new as2j(new StringReader(sTe)).trigger();
     }
 
-	public void setTrigOp(TEOperator op) {
-		operator = op;
+    public void setTrigOp(TEOperator op) {
+        operator = op;
         piCache  = null;
-	}
+    }
 
-	public boolean sameType(Trigger e) {
-		return operator == e.operator && type == e.type;
-	}
+    public boolean sameType(Trigger e) {
+        return operator == e.operator && type == e.type;
+    }
 
     @Override
-	public boolean equals(Object o) {
+    public boolean equals(Object o) {
         if (o != null && o instanceof Trigger) {
             Trigger t = (Trigger) o;
             return (operator == t.operator && type == t.type && literal.equals(t.getLiteral()));
         }
         return false;
-	}
+    }
 
     @Override
     public int hashCode() {
         return getPredicateIndicator().hashCode();
     }
 
-	public boolean isAchvGoal() {
-		return type == TEType.achieve;
-	}
+    public boolean isAchvGoal() {
+        return type == TEType.achieve;
+    }
 
-	public boolean isGoal() {
-		return type == TEType.achieve || type == TEType.test;
-	}
+    public boolean isGoal() {
+        return type == TEType.achieve || type == TEType.test;
+    }
 
-	public TEType getType() {
-		return type;
-	}
+    public TEType getType() {
+        return type;
+    }
 
-	public boolean isAddition() {
-		return (operator == TEOperator.add);
-	}
+    public boolean isAddition() {
+        return (operator == TEOperator.add);
+    }
 
     public Trigger clone() {
         Trigger c = new Trigger(operator, type, literal.copy());
         c.piCache = this.piCache;
         return c; 
-    }	
+    }   
     
-	/** return [+|-][!|?] super.getPredicateIndicator */
-	public PredicateIndicator getPredicateIndicator() {
+    /** return [+|-][!|?] super.getPredicateIndicator */
+    public PredicateIndicator getPredicateIndicator() {
         if (piCache == null) {
             piCache = new PredicateIndicator(operator.toString() + type + literal.getFunctor(), literal.getArity());
         }
         return piCache;
     }
-	
-	public boolean apply(Unifier u) {
-		return literal.apply(u);
-	}
+    
+    public boolean apply(Unifier u) {
+        return literal.apply(u);
+    }
 
-	public Literal getLiteral() {
-		return literal;
-	}
+    public Literal getLiteral() {
+        return literal;
+    }
 
         public void setLiteral(Literal literal) {
-		this.literal = literal;
-	}
-	
-	public String toString() {
-		return operator.toString() + type + literal;
-	}
+        this.literal = literal;
+    }
+    
+    public String toString() {
+        return operator.toString() + type + literal;
+    }
     
     
     /** get as XML */

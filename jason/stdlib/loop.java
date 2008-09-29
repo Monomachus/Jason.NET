@@ -72,13 +72,13 @@ i.e., the unification after the while is the same as before.
 */
 public class loop extends DefaultInternalAction {
 
-	private static InternalAction singleton = null;
-	public static InternalAction create() {
-		if (singleton == null) 
-			singleton = new loop();
-		return singleton;
-	}
-	
+    private static InternalAction singleton = null;
+    public static InternalAction create() {
+        if (singleton == null) 
+            singleton = new loop();
+        return singleton;
+    }
+    
     @Override public int getMinArgs() { return 2; }
     @Override public int getMaxArgs() { return 2; }
     
@@ -92,21 +92,21 @@ public class loop extends DefaultInternalAction {
     
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
-        	
-    	IntendedMeans im = ts.getC().getSelectedIntention().peek();
-    	PlanBody whileia = im.getCurrentStep();
+            
+        IntendedMeans im = ts.getC().getSelectedIntention().peek();
+        PlanBody whileia = im.getCurrentStep();
 
         // if the IA has a backup unifier, use that (it is an object term)
         if (args.length == 2) {
             // first execution of while
             checkArguments(args);
-        	// add backup unifier in the IA
-        	((Structure)whileia.getBodyTerm()).addTerm(new ObjectTermImpl(un.clone()));
+            // add backup unifier in the IA
+            ((Structure)whileia.getBodyTerm()).addTerm(new ObjectTermImpl(un.clone()));
         } else if (args.length == 3) {
-        	// restore the unifier of previous iterations
-        	Unifier ubak = (Unifier)((ObjectTerm)args[2]).getObject();
-        	un.clear();
-        	un.compose(ubak);
+            // restore the unifier of previous iterations
+            Unifier ubak = (Unifier)((ObjectTerm)args[2]).getObject();
+            un.clear();
+            un.compose(ubak);
         } else {
             throw JasonException.createWrongArgumentNb(this);
         }
@@ -114,15 +114,15 @@ public class loop extends DefaultInternalAction {
         LogicalFormula logExpr = (LogicalFormula)args[0]; //.clone();
         //logExpr.apply(un); // need to apply since the internal action literal for while does not apply
         Iterator<Unifier> iu = logExpr.logicalConsequence(ts.getAg(), un); 
-        if (iu.hasNext()) {	
+        if (iu.hasNext()) { 
             
-        	un.compose(iu.next());
-        	
-        	PlanBody whattoadd = (PlanBody)args[1]; //.clone(); 
+            un.compose(iu.next());
+            
+            PlanBody whattoadd = (PlanBody)args[1]; //.clone(); 
             whattoadd.add(new PlanBodyImpl(BodyType.internalAction, whileia.getBodyTerm().clone())); //(PlanBody)whileia.clone()); // add the while after 
-        	whattoadd.setAsBodyTerm(false);
-    		whileia.add(1,whattoadd);
-        	//System.out.println("new body="+whileia.getBodyNext());
+            whattoadd.setAsBodyTerm(false);
+            whileia.add(1,whattoadd);
+            //System.out.println("new body="+whileia.getBodyNext());
         }
         return true;
     }

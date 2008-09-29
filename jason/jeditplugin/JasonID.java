@@ -82,9 +82,9 @@ import errorlist.ErrorSource;
 
 public class JasonID extends JPanel implements EBComponent, RunProjectListener {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	View                 view;
+    View                 view;
     OutputStreamAdapter  myOut;
     JTextArea            textArea;
     AnimatedIcon         animation;
@@ -338,8 +338,8 @@ public class JasonID extends JPanel implements EBComponent, RunProjectListener {
     }
 
     private void saveAll() {
-    	
-    	Buffer[] bufs = org.gjt.sp.jedit.jEdit.getBuffers();
+        
+        Buffer[] bufs = org.gjt.sp.jedit.jEdit.getBuffers();
         for (int i = 0; i < bufs.length; i++) {
             if (bufs[i].isDirty()) {
                 bufs[i].save(view, null);
@@ -388,10 +388,10 @@ public class JasonID extends JPanel implements EBComponent, RunProjectListener {
             while (iASfile.hasNext()) {
                 asFile = iASfile.next();
                 try {
-	                textArea.append("Parsing AgentSpeak file '" + asFile.getName() + "'...");
-	                jason.asSyntax.parser.as2j parser = new jason.asSyntax.parser.as2j(new FileReader(asFile));
-	                parser.agent(null);
-	                textArea.append(" parsed successfully!\n");
+                    textArea.append("Parsing AgentSpeak file '" + asFile.getName() + "'...");
+                    jason.asSyntax.parser.as2j parser = new jason.asSyntax.parser.as2j(new FileReader(asFile));
+                    parser.agent(null);
+                    textArea.append(" parsed successfully!\n");
                 } catch (FileNotFoundException ex) {
                     textArea.append(" error: file '"+asFile+"' not found!");
                     return false;

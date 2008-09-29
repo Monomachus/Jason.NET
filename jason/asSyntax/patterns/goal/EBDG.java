@@ -41,7 +41,7 @@ public class EBDG implements Directive {
                 i++;
                 // create p__f(i,g)
                 Literal pi = new LiteralImpl("p__f");
-				pi.addTerm(new NumberTermImpl(i));
+                pi.addTerm(new NumberTermImpl(i));
                 pi.addTerm(goal);
                 
                 // change context to "not p__f(i,g) & c"

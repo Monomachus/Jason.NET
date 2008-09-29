@@ -72,49 +72,49 @@ import jason.asSyntax.Term;
  */
 public class add_nested_source extends DefaultInternalAction {
 
-	private static InternalAction singleton = null;
-	public static InternalAction create() {
-		if (singleton == null) 
-			singleton = new add_nested_source();
-		return singleton;
-	}
-	
+    private static InternalAction singleton = null;
+    public static InternalAction create() {
+        if (singleton == null) 
+            singleton = new add_nested_source();
+        return singleton;
+    }
+    
     @Override public int getMinArgs() { return 3; }
     @Override public int getMaxArgs() { return 3; }
 
-	@Override public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
+    @Override public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         checkArguments(args);
-		Term result = addAnnotToList(un, args[0], args[1].clone());
-		return un.unifies(result,args[2]);
-	}
+        Term result = addAnnotToList(un, args[0], args[1].clone());
+        return un.unifies(result,args[2]);
+    }
 
-	public Term addAnnotToList(Unifier unif, Term l, Term source) {
-		if (l.isList()) {
-			ListTerm result = new ListTermImpl();
-			for (Term lTerm: (ListTerm)l) {
-				Term t = addAnnotToList( unif, lTerm, source);
-				if (t != null) {
-					result.add(t);
-				}
-			}
-			return result;
-		} else if (l.isLiteral()) {
-			Literal result;
-			if (l.isAtom())
-				result = new LiteralImpl(((Atom)l).getFunctor());
-			else
-				result = (Literal)l.clone();
-			
-			// create the source annots
-			Pred ts = new Pred("source",1);
+    public Term addAnnotToList(Unifier unif, Term l, Term source) {
+        if (l.isList()) {
+            ListTerm result = new ListTermImpl();
+            for (Term lTerm: (ListTerm)l) {
+                Term t = addAnnotToList( unif, lTerm, source);
+                if (t != null) {
+                    result.add(t);
+                }
+            }
+            return result;
+        } else if (l.isLiteral()) {
+            Literal result;
+            if (l.isAtom())
+                result = new LiteralImpl(((Atom)l).getFunctor());
+            else
+                result = (Literal)l.clone();
+            
+            // create the source annots
+            Pred ts = new Pred("source",1);
             ts.addTerm(source);
             ts.addAnnots(result.getAnnots("source"));
             
             result.delSources();
-			result.addAnnot(ts);
-			return result;
-		} else {
-		    return l;
-		}
-	}	
+            result.addAnnot(ts);
+            return result;
+        } else {
+            return l;
+        }
+    }   
 }

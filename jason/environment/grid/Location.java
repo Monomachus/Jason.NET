@@ -8,7 +8,7 @@ public final class Location {
         this.y = y;
     }
     
-	/** calculates the Manhattan distance between two points */
+    /** calculates the Manhattan distance between two points */
     public int distance(Location l) {
         return Math.abs(x - l.x) + Math.abs(y - l.y);
     }
@@ -24,7 +24,7 @@ public final class Location {
     }
 
     public boolean isInArea(Location tr, Location bl) {
-    	return x >= tr.x && x <= bl.x && y >= tr.y && y <= bl.y;
+        return x >= tr.x && x <= bl.x && y >= tr.y && y <= bl.y;
     }
     public boolean isNeigbour(Location l) {
         return 
@@ -34,30 +34,30 @@ public final class Location {
     }
     
     @Override
-	public int hashCode() {
-		final int PRIME = 31;
-		int result = 1;
-		result = PRIME * result + x;
-		result = PRIME * result + y;
-		return result;
-	}
+    public int hashCode() {
+        final int PRIME = 31;
+        int result = 1;
+        result = PRIME * result + x;
+        result = PRIME * result + y;
+        return result;
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (obj == null) return false;
-		if (this == obj) return true;
-		if (getClass() != obj.getClass()) return false;
-		final Location other = (Location) obj;
-		if (x != other.x) return false;
-		if (y != other.y) return false;
-		return true;
-	}
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) return false;
+        if (this == obj) return true;
+        if (getClass() != obj.getClass()) return false;
+        final Location other = (Location) obj;
+        if (x != other.x) return false;
+        if (y != other.y) return false;
+        return true;
+    }
     
     public Object clone() {
         return new Location(x,y);
     }
     
     public String toString() {
-    	return (x + "," + y);
+        return (x + "," + y);
     }
 }

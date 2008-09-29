@@ -36,15 +36,15 @@ import jason.asSyntax.Term;
 
 public class JasonException extends java.lang.Exception {
     
-	private static final long serialVersionUID = 1L;
-	
-	public static final Term WRONG_ARGS   = new Atom("wrong_arguments");
+    private static final long serialVersionUID = 1L;
+    
+    public static final Term WRONG_ARGS   = new Atom("wrong_arguments");
     public static final Term UNKNOW_ERROR = new Atom("unknown");
 
-	private static final Term defaultError = new Atom("internal_action");
-	private Term error = defaultError;
+    private static final Term defaultError = new Atom("internal_action");
+    private Term error = defaultError;
 
-	/**
+    /**
      * Creates a new instance of <code>JasonException</code> without detail message.
      */
     public JasonException() {

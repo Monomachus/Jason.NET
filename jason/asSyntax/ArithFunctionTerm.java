@@ -24,7 +24,7 @@ public class ArithFunctionTerm extends Structure implements NumberTerm {
     private static final long serialVersionUID = 1L;
 
     private static Logger logger = Logger.getLogger(ArithFunctionTerm.class.getName());
-	
+    
     private NumberTerm value = null; // value, when evaluated
 
     private ArithFunction function = null;
@@ -35,36 +35,36 @@ public class ArithFunctionTerm extends Structure implements NumberTerm {
         super(functor, termsSize);        
     }
     
-	public ArithFunctionTerm(ArithFunction function) {
-		super(function.getName(), 2);
-        this.function = function;	
-	}
+    public ArithFunctionTerm(ArithFunction function) {
+        super(function.getName(), 2);
+        this.function = function;   
+    }
 
-	public ArithFunctionTerm(ArithFunctionTerm af) {
-		super(af);
-		value    = af.value;
-		function = af.function;
-		agent    = af.agent;
-	}
-	
-	public NumberTerm getValue() {
-		return value;
-	}
-	
-	@Override
-	public boolean isNumeric() {
-		return true;
-	}
-	
-	@Override
-	public boolean isAtom() {
-	    return false;
-	}
-	
-	@Override
-	public boolean isStructure() {
-		return false;
-	}
+    public ArithFunctionTerm(ArithFunctionTerm af) {
+        super(af);
+        value    = af.value;
+        function = af.function;
+        agent    = af.agent;
+    }
+    
+    public NumberTerm getValue() {
+        return value;
+    }
+    
+    @Override
+    public boolean isNumeric() {
+        return true;
+    }
+    
+    @Override
+    public boolean isAtom() {
+        return false;
+    }
+    
+    @Override
+    public boolean isStructure() {
+        return false;
+    }
 
     @Override
     public boolean isArithExpr() {
@@ -90,22 +90,22 @@ public class ArithFunctionTerm extends Structure implements NumberTerm {
      * so future calls of solve do not need to compute the value again
      */
     @Override
-	public boolean apply(Unifier u) {
-    	if (isEvaluated()) return false;
-    	
-    	super.apply(u);
-    	if ((function != null && function.allowUngroundTerms()) || isGround()) {
+    public boolean apply(Unifier u) {
+        if (isEvaluated()) return false;
+        
+        super.apply(u);
+        if ((function != null && function.allowUngroundTerms()) || isGround()) {
             try {
                 value = new NumberTermImpl(solve());
                 return true;
             } catch (Exception e) {
                 logger.log(Level.SEVERE, getErrorMsg()+ " -- "+ e);
             }
-    	//} else {
-    	//	logger.warning(getErrorMsg()+ " -- this function has unground arguments and can not be evaluated! Unifier is "+u);
-    	}
-    	
-		return false;
+        //} else {
+        //  logger.warning(getErrorMsg()+ " -- this function has unground arguments and can not be evaluated! Unifier is "+u);
+        }
+        
+        return false;
     }
 
     public void setAgent(Agent ag) {
@@ -113,10 +113,10 @@ public class ArithFunctionTerm extends Structure implements NumberTerm {
     }
     
     /** computes the value for this arithmetic function (as defined in the NumberTerm interface) */
-	public double solve() {
-		if (isEvaluated())
-			return value.solve();
-		else if (function != null)
+    public double solve() {
+        if (isEvaluated())
+            return value.solve();
+        else if (function != null)
             try {
                 return function.evaluate((agent == null ? null : agent.getTS()),getTermsArray());
             } catch (Exception e) {
@@ -124,13 +124,13 @@ public class ArithFunctionTerm extends Structure implements NumberTerm {
             }
         else 
             logger.log(Level.SEVERE, getErrorMsg()+ " -- the function can not be evalutated, it has no function assigned to it!", new Exception());
-		return 0;
-	}
+        return 0;
+    }
 
     public boolean checkArity(int a) {
         return function != null && function.checkArity(a);
     }
-	
+    
     @Override
     public boolean equals(Object t) {
         if (t == null) return false;
@@ -151,9 +151,9 @@ public class ArithFunctionTerm extends Structure implements NumberTerm {
     @Override
     protected int calcHashCode() {
         if (isEvaluated())
-        	return value.hashCode();
+            return value.hashCode();
         else
-        	return super.calcHashCode();
+            return super.calcHashCode();
     }
 
     @Override
@@ -161,7 +161,7 @@ public class ArithFunctionTerm extends Structure implements NumberTerm {
         if (isEvaluated())
             return value.toString();
         else
-        	return super.toString();
+            return super.toString();
     }
 
     @Override    
@@ -177,7 +177,7 @@ public class ArithFunctionTerm extends Structure implements NumberTerm {
             return new ArithFunctionTerm(this);
     } 
     
-	public Element getAsDOM(Document document) {
+    public Element getAsDOM(Document document) {
         if (isEvaluated()) {
             return value.getAsDOM(document);
         } else {
@@ -188,5 +188,5 @@ public class ArithFunctionTerm extends Structure implements NumberTerm {
             u.appendChild(r);
             return u;
         }
-	}
+    }
 }

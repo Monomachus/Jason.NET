@@ -265,44 +265,44 @@ public class VarTermTest extends TestCase {
     }
 
     public void testVarWithAnnots2() {
-    	// test vars annots
+        // test vars annots
 
-    	// X[a] = Y[a,b] - ok
-    	VarTerm v1 = VarTerm.parseVar("X[a]");
-    	VarTerm v2 = VarTerm.parseVar("Y[a,b]");
-    	Unifier u = new Unifier();
-    	assertTrue(u.unifies(v1, v2));
+        // X[a] = Y[a,b] - ok
+        VarTerm v1 = VarTerm.parseVar("X[a]");
+        VarTerm v2 = VarTerm.parseVar("Y[a,b]");
+        Unifier u = new Unifier();
+        assertTrue(u.unifies(v1, v2));
 
-    	// X[a,b] = Y[a] - not ok
-    	u = new Unifier();
-    	assertFalse(u.unifies(v2, v1));
+        // X[a,b] = Y[a] - not ok
+        u = new Unifier();
+        assertFalse(u.unifies(v2, v1));
 
-    	assertTrue(u.unifies(v1, v2));
-    	assertTrue(u.unifies(new LiteralImpl("vvv"), v1));
-    	v1.apply(u);
-    	assertEquals("vvv[a]", v1.toString());
+        assertTrue(u.unifies(v1, v2));
+        assertTrue(u.unifies(new LiteralImpl("vvv"), v1));
+        v1.apply(u);
+        assertEquals("vvv[a]", v1.toString());
     }
 
     public void testVarWithAnnots3() {
-    	// X[a,b,c,d] = Y[a,c|R] - ok and R=[b,d]
-    	VarTerm v1 = VarTerm.parseVar("X[a,b,c,d]");
-    	VarTerm v2 = VarTerm.parseVar("Y[a,c|R]");
-    	Unifier u = new Unifier();
-    	assertTrue(u.unifies(v1, v2));
+        // X[a,b,c,d] = Y[a,c|R] - ok and R=[b,d]
+        VarTerm v1 = VarTerm.parseVar("X[a,b,c,d]");
+        VarTerm v2 = VarTerm.parseVar("Y[a,c|R]");
+        Unifier u = new Unifier();
+        assertTrue(u.unifies(v1, v2));
         assertEquals("[b,d]",u.get("R").toString());
     }
     
     public void testVarWithAnnots4() {
-    	// X[source(A)] = open[source(a)] - ok and A -> a
-    	VarTerm v1 = VarTerm.parseVar("X[source(A)]");
-    	Unifier u = new Unifier();
-    	assertTrue(u.unifies(v1, Literal.parseLiteral("open[source(a)]")));
-    	assertEquals(u.get("A").toString(),"a");
-    	assertEquals(u.get("X").toString(),"open");
+        // X[source(A)] = open[source(a)] - ok and A -> a
+        VarTerm v1 = VarTerm.parseVar("X[source(A)]");
+        Unifier u = new Unifier();
+        assertTrue(u.unifies(v1, Literal.parseLiteral("open[source(a)]")));
+        assertEquals(u.get("A").toString(),"a");
+        assertEquals(u.get("X").toString(),"open");
 
-    	VarTerm v2 = VarTerm.parseVar("X[source(self)]");
-    	u = new Unifier();
-    	assertFalse(u.unifies(v2, Literal.parseLiteral("open[source(a)]")));
+        VarTerm v2 = VarTerm.parseVar("X[source(self)]");
+        u = new Unifier();
+        assertFalse(u.unifies(v2, Literal.parseLiteral("open[source(a)]")));
     }
 
     public void testVarWithAnnots5() {
@@ -320,14 +320,14 @@ public class VarTermTest extends TestCase {
 
     /*
     public void testVarWithAnnots5() {
-    	// P -> open[source(a)]
-    	// P[source(self)]
-    	// apply on P is open[source(a),source(self)]?
-    	Unifier u = new Unifier();
-    	u.unifies(new VarTerm("P"), Literal.parseLiteral("open[source(a)]"));
-    	VarTerm v1 = VarTerm.parseVar("P[source(self)]");
-    	v1.apply(u);
-    	assertEquals(v1.getAnnots().size(), 2);
+        // P -> open[source(a)]
+        // P[source(self)]
+        // apply on P is open[source(a),source(self)]?
+        Unifier u = new Unifier();
+        u.unifies(new VarTerm("P"), Literal.parseLiteral("open[source(a)]"));
+        VarTerm v1 = VarTerm.parseVar("P[source(self)]");
+        v1.apply(u);
+        assertEquals(v1.getAnnots().size(), 2);
     }
     */
     
@@ -379,23 +379,23 @@ public class VarTermTest extends TestCase {
     }
     
     public void testSimple2() {
-    	VarTerm v = new VarTerm("X");
-    	assertFalse(v.isAtom());
-    	assertTrue(v.isVar());
-    	Term t;
+        VarTerm v = new VarTerm("X");
+        assertFalse(v.isAtom());
+        assertTrue(v.isVar());
+        Term t;
 
-    	as2jTokenManager tokens = new as2jTokenManager(new SimpleCharStream(new StringReader("Event")));
-    	Token tk = tokens.getNextToken();
-    	assertEquals(tk.kind, jason.asSyntax.parser.as2jConstants.VAR);
-    	
-    	t = VarTerm.parseVar("Ea");
-    	assertFalse(t.isAtom());
-    	assertTrue(t.isVar());
-    	
-    	t = DefaultTerm.parse("Event");
-    	assertFalse(t.isAtom());
-    	assertTrue(t.isVar());
-    	
+        as2jTokenManager tokens = new as2jTokenManager(new SimpleCharStream(new StringReader("Event")));
+        Token tk = tokens.getNextToken();
+        assertEquals(tk.kind, jason.asSyntax.parser.as2jConstants.VAR);
+        
+        t = VarTerm.parseVar("Ea");
+        assertFalse(t.isAtom());
+        assertTrue(t.isVar());
+        
+        t = DefaultTerm.parse("Event");
+        assertFalse(t.isAtom());
+        assertTrue(t.isVar());
+        
     }
     
     public void testUnify1() {
@@ -462,10 +462,10 @@ public class VarTermTest extends TestCase {
     }
     
     public void testUnamedVarAnnots() {
-    	Term t = DefaultTerm.parse("_[scheme(Id)]");
-    	Map<VarTerm,Integer> c = new HashMap<VarTerm, Integer>();
-    	t.countVars(c);
-    	assertEquals(1,c.get(new VarTerm("Id")).intValue());
+        Term t = DefaultTerm.parse("_[scheme(Id)]");
+        Map<VarTerm,Integer> c = new HashMap<VarTerm, Integer>();
+        t.countVars(c);
+        assertEquals(1,c.get(new VarTerm("Id")).intValue());
     }
     
     public void testUnifClone() {

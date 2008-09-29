@@ -22,32 +22,32 @@ import jason.asSyntax.Term;
 */
 public class Min extends DefaultArithFunction  {
 
-	public String getName() {
-	    return "math.min";
-	}
-	
-	@Override
-	public double evaluate(TransitionSystem ts, Term[] args) throws Exception {
-		if (args[0].isNumeric() && args[1].isNumeric()) {
-			double n0 = ((NumberTerm)args[0]).solve();
-			double n1 = ((NumberTerm)args[1]).solve();
-			return Math.min(n0,n1);
-		} else if (args[0].isList()) {
-			double min = Double.MAX_VALUE;
-			for (Term t: (ListTerm)args[0]) {
-				if (t.isNumeric()) {
-					double n = ((NumberTerm)t).solve();
-					if (n < min)
-						min = n;
-				}
-			}
-			return min;
-		}
-		throw new JasonException(getName()+" is not implemented for type '"+args[0]+"'.");
-	}
+    public String getName() {
+        return "math.min";
+    }
+    
+    @Override
+    public double evaluate(TransitionSystem ts, Term[] args) throws Exception {
+        if (args[0].isNumeric() && args[1].isNumeric()) {
+            double n0 = ((NumberTerm)args[0]).solve();
+            double n1 = ((NumberTerm)args[1]).solve();
+            return Math.min(n0,n1);
+        } else if (args[0].isList()) {
+            double min = Double.MAX_VALUE;
+            for (Term t: (ListTerm)args[0]) {
+                if (t.isNumeric()) {
+                    double n = ((NumberTerm)t).solve();
+                    if (n < min)
+                        min = n;
+                }
+            }
+            return min;
+        }
+        throw new JasonException(getName()+" is not implemented for type '"+args[0]+"'.");
+    }
 
-	@Override
-	public boolean checkArity(int a) {
-		return a == 1 || a == 2;
-	}
+    @Override
+    public boolean checkArity(int a) {
+        return a == 1 || a == 2;
+    }
 }

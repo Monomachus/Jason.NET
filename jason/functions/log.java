@@ -14,23 +14,23 @@ import jason.asSyntax.Term;
 */
 public class log extends DefaultArithFunction  {
 
-	public String getName() {
-	    return "math.log";
-	}
-	
-	@Override
-	public double evaluate(TransitionSystem ts, Term[] args) throws Exception {
-		if (args[0].isNumeric()) {
-			double n = ((NumberTerm)args[0]).solve();
-			return Math.log(n);
-		} else {
-			throw new JasonException("The argument '"+args[0]+"' is not numeric!");
-		}
-	}
+    public String getName() {
+        return "math.log";
+    }
+    
+    @Override
+    public double evaluate(TransitionSystem ts, Term[] args) throws Exception {
+        if (args[0].isNumeric()) {
+            double n = ((NumberTerm)args[0]).solve();
+            return Math.log(n);
+        } else {
+            throw new JasonException("The argument '"+args[0]+"' is not numeric!");
+        }
+    }
 
-	@Override
-	public boolean checkArity(int a) {
-		return a == 1;
-	}
-	
+    @Override
+    public boolean checkArity(int a) {
+        return a == 1;
+    }
+    
 }

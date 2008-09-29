@@ -61,10 +61,10 @@ import saci.MessageHandler;
  */
 public class SaciAgArch extends saci.Agent implements AgArchInfraTier {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	// to get the percepts via SACI we need an extra mailbox (the
-	// normal mbox is used for inter-agent communication
+    // to get the percepts via SACI we need an extra mailbox (the
+    // normal mbox is used for inter-agent communication
     private MBoxSAg  mboxPercept = null;
 
     /** the user implementation of the architecture */
@@ -356,9 +356,9 @@ public class SaciAgArch extends saci.Agent implements AgArchInfraTier {
     private saci.Message jasonToKQML(jason.asSemantics.Message m) {
         saci.Message msaci = new saci.Message("(" + m.getIlForce() + ")");
         if (m.getPropCont() instanceof Term) { // send content as string if it is a Term (it is better for interoperability)
-        	msaci.put("content", m.getPropCont().toString());        	
+            msaci.put("content", m.getPropCont().toString());           
         } else {
-        	msaci.put("content", m.getPropCont());
+            msaci.put("content", m.getPropCont());
         }
         msaci.put("reply-with", m.getMsgId());
         msaci.put("language", "AgentSpeak");
@@ -394,7 +394,7 @@ public class SaciAgArch extends saci.Agent implements AgArchInfraTier {
 
                 Object propCont = m.get("content");
                 if (propCont != null) {
-                	/*
+                    /*
                     String sPropCont = propCont.toString();
                     if (sPropCont.startsWith("\"")) { // deal with a term enclosed by "
                         sPropCont = sPropCont.substring(1, sPropCont.length() - 1);

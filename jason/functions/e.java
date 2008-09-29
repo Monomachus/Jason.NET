@@ -15,18 +15,18 @@ import jason.asSyntax.Term;
 */
 public class e extends DefaultArithFunction  {
 
-	public String getName() {
-	    return "math.e";
-	}
-	
-	@Override
-	public double evaluate(TransitionSystem ts, Term[] args) throws Exception {
-	    return Math.E;
-	}
+    public String getName() {
+        return "math.e";
+    }
+    
+    @Override
+    public double evaluate(TransitionSystem ts, Term[] args) throws Exception {
+        return Math.E;
+    }
 
-	@Override
-	public boolean checkArity(int a) {
-		return a == 0;
-	}
-	
+    @Override
+    public boolean checkArity(int a) {
+        return a == 0;
+    }
+    
 }

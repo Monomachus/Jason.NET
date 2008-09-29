@@ -35,13 +35,13 @@ variables. Numbers, Strings, and Atoms are always ground.
 */
 public class ground extends DefaultInternalAction {
 
-	private static InternalAction singleton = null;
-	public static InternalAction create() {
-		if (singleton == null) 
-			singleton = new ground();
-		return singleton;
-	}
-	
+    private static InternalAction singleton = null;
+    public static InternalAction create() {
+        if (singleton == null) 
+            singleton = new ground();
+        return singleton;
+    }
+    
     @Override public int getMinArgs() { return 1; }
     @Override public int getMaxArgs() { return 1; }
 

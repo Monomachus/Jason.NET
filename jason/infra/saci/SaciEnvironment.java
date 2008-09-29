@@ -67,7 +67,7 @@ public class SaciEnvironment extends saci.Agent implements EnvironmentInfraTier 
         }
     }
 
-	public void informAgsEnvironmentChanged(Collection agentsToNotify) {
+    public void informAgsEnvironmentChanged(Collection agentsToNotify) {
         try {
             if (agentsToNotify == null) {
                 informAgsEnvironmentChanged();

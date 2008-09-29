@@ -47,14 +47,14 @@ import java.util.Iterator;
 
 */
 public class member extends DefaultInternalAction {
-	
-	private static InternalAction singleton = null;
-	public static InternalAction create() {
-		if (singleton == null) 
-			singleton = new member();
-		return singleton;
-	}
-	
+    
+    private static InternalAction singleton = null;
+    public static InternalAction create() {
+        if (singleton == null) 
+            singleton = new member();
+        return singleton;
+    }
+    
     @Override public int getMinArgs() { return 2; }
     @Override public int getMaxArgs() { return 2; }
 
@@ -64,7 +64,7 @@ public class member extends DefaultInternalAction {
             throw JasonException.createWrongArgument(this,"second argument must be a list");
     }
     
-	
+    
     
     @Override
     public Object execute(TransitionSystem ts, final Unifier un, Term[] args) throws Exception {
@@ -74,31 +74,31 @@ public class member extends DefaultInternalAction {
         final Iterator<Term> i = ((ListTerm)args[1]).iterator();
 
         return new Iterator<Unifier>() {
-        	Unifier c = null; // the current response (which is an unifier)
-        	
-        	public boolean hasNext() {
-        		if (c == null) // the first call of hasNext should find the first response 
-        			find();
-        		return c != null; 
-    		}
+            Unifier c = null; // the current response (which is an unifier)
+            
+            public boolean hasNext() {
+                if (c == null) // the first call of hasNext should find the first response 
+                    find();
+                return c != null; 
+            }
 
-        	public Unifier next() {
-        		if (c == null) find();
-        		Unifier b = c;
-        		find(); // find next response
-        		return b;
-        	}
-        	
-        	void find() {
+            public Unifier next() {
+                if (c == null) find();
+                Unifier b = c;
+                find(); // find next response
+                return b;
+            }
+            
+            void find() {
                 while (i.hasNext()) {
                     c = un.clone();
-                	if (c.unifiesNoUndo(member, i.next()))
-                		return; // member found in the list, c is the current response
+                    if (c.unifiesNoUndo(member, i.next()))
+                        return; // member found in the list, c is the current response
                 }
                 c = null; // no member is found, 
-        	}
+            }
 
-        	public void remove() {}
+            public void remove() {}
         };
         
         /* -- old version of the implementation

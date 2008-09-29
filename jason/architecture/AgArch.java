@@ -104,7 +104,7 @@ public class AgArch {
         return ts;
     }
     public void setTS(TransitionSystem ts) {
-    	this.ts = ts;
+        this.ts = ts;
     }
 
     /** Gets the agent's perception as a list of Literals.
@@ -135,7 +135,7 @@ public class AgArch {
 
     /** Puts the agent in sleep. */
     public void sleep() {
-    	archTier.sleep();
+        archTier.sleep();
     }
     
     /** Gets the agent's name */

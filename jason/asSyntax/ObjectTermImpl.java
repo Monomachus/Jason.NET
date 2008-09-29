@@ -36,13 +36,13 @@ public class ObjectTermImpl extends DefaultTerm implements ObjectTerm {
     @Override
     public ObjectTerm clone() {
         try {
-        	if (!hasTestedClone) {
-        		hasTestedClone = true;
-        		mclone = o.getClass().getMethod("clone", (Class[])null);
-        	}
-        	if (mclone != null) {
-        		return new ObjectTermImpl(mclone.invoke(o, (Object[])null));
-        	}
+            if (!hasTestedClone) {
+                hasTestedClone = true;
+                mclone = o.getClass().getMethod("clone", (Class[])null);
+            }
+            if (mclone != null) {
+                return new ObjectTermImpl(mclone.invoke(o, (Object[])null));
+            }
         } catch (Exception e) {
             //System.err.println("The object inside ObjectTerm should be clonable!");
             //e.printStackTrace();

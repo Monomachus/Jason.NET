@@ -58,27 +58,27 @@ import org.w3c.dom.Element;
  */
 public class RelExpr extends BinaryStructure implements LogicalFormula {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
     private static Logger logger = Logger.getLogger(RelExpr.class.getName());
 
-	public enum RelationalOp { 
-		none   { public String toString() { return ""; } }, 
-		gt     { public String toString() { return " > "; } }, 
-		gte    { public String toString() { return " >= "; } },
-		lt     { public String toString() { return " < "; } }, 
-		lte    { public String toString() { return " <= "; } },
-		eq     { public String toString() { return " == "; } },
-		dif    { public String toString() { return " \\== "; } },
-		unify          { public String toString() { return " = "; } },
-		literalBuilder { public String toString() { return " =.. "; } };
-	}
+    public enum RelationalOp { 
+        none   { public String toString() { return ""; } }, 
+        gt     { public String toString() { return " > "; } }, 
+        gte    { public String toString() { return " >= "; } },
+        lt     { public String toString() { return " < "; } }, 
+        lte    { public String toString() { return " <= "; } },
+        eq     { public String toString() { return " == "; } },
+        dif    { public String toString() { return " \\== "; } },
+        unify          { public String toString() { return " = "; } },
+        literalBuilder { public String toString() { return " =.. "; } };
+    }
 
-	private RelationalOp op = RelationalOp.none;
+    private RelationalOp op = RelationalOp.none;
 
-	public RelExpr(Term t1, RelationalOp oper, Term t2) {
-		super(t1,oper.toString(),t2);
-		op = oper;
-	}
+    public RelExpr(Term t1, RelationalOp oper, Term t2) {
+        super(t1,oper.toString(),t2);
+        op = oper;
+    }
     
     public Iterator<Unifier> logicalConsequence(final Agent ag, Unifier un) {
         Term xp = getTerm(0).clone();
@@ -104,23 +104,23 @@ public class RelExpr extends BinaryStructure implements LogicalFormula {
 
                 // both are not vars, using normal unification
                 if (!p.isVar() && !l.isVar()) {
-                	if (un.unifies(p.getAsListOfTerms(), l)) {
-                		return LogExpr.createUnifIterator(un);
-                	}
+                    if (un.unifies(p.getAsListOfTerms(), l)) {
+                        return LogExpr.createUnifIterator(un);
+                    }
                 } else {
                 
-	                // first is var, second is list, var is assigned to l transformed in literal
-	                if (p.isVar() && l.isList() && un.unifies(p, Literal.newFromListOfTerms(l))) {
-	                    return LogExpr.createUnifIterator(un);
-	                }
-	                
-	                // first is literal, second is var, var is assigned to l transformed in list
-	                if (p.isLiteral() && l.isVar() && un.unifies(p.getAsListOfTerms(), l)) {
-	                    return LogExpr.createUnifIterator(un);
-	                }
+                    // first is var, second is list, var is assigned to l transformed in literal
+                    if (p.isVar() && l.isList() && un.unifies(p, Literal.newFromListOfTerms(l))) {
+                        return LogExpr.createUnifIterator(un);
+                    }
+                    
+                    // first is literal, second is var, var is assigned to l transformed in list
+                    if (p.isLiteral() && l.isVar() && un.unifies(p.getAsListOfTerms(), l)) {
+                        return LogExpr.createUnifIterator(un);
+                    }
 
-	                // both are vars, error
-	                logger.log(Level.SEVERE, "Both arguments of "+getTerm(0)+" =.. "+getTerm(1)+" are variables!");
+                    // both are vars, error
+                    logger.log(Level.SEVERE, "Both arguments of "+getTerm(0)+" =.. "+getTerm(1)+" are variables!");
                 }
 
             } catch (Exception e) {
@@ -142,16 +142,16 @@ public class RelExpr extends BinaryStructure implements LogicalFormula {
         }
         return null;
     }
-	
-	/** make a hard copy of the terms */
-	public LogicalFormula clone() {
-		return  new RelExpr(getTerm(0).clone(), op, getTerm(1).clone());
-	}
-	
-	/** gets the Operation of this Expression */
-	public RelationalOp getOp() {
-		return op;
-	}
+    
+    /** make a hard copy of the terms */
+    public LogicalFormula clone() {
+        return  new RelExpr(getTerm(0).clone(), op, getTerm(1).clone());
+    }
+    
+    /** gets the Operation of this Expression */
+    public RelationalOp getOp() {
+        return op;
+    }
     /** get as XML */
     public Element getAsDOM(Document document) {
         Element u = super.getAsDOM(document);

@@ -115,7 +115,7 @@ public class wait extends DefaultInternalAction {
             if (args.length >= 2)
                 timeout = (long) ((NumberTerm) args[1]).solve();
             if (args.length == 3)
-            	elapsedTime = args[2];
+                elapsedTime = args[2];
         }
         new WaitEvent(te, un, ts, timeout, elapsedTime);
         return true;
@@ -171,19 +171,19 @@ public class wait extends DefaultInternalAction {
                 if (c.getPendingIntentions().remove(sTE) == si && !c.getIntentions().contains(si) && !dropped) {
                     if (stopByTimeout && te != null && elapsedTimeTerm == null) {
                         // fail the .wait
-                    	PlanBody body = si.peek().getPlan().getBody();
-                    	body.add(1, new PlanBodyImpl(BodyType.internalAction, new InternalActionLiteral(".fail")));
+                        PlanBody body = si.peek().getPlan().getBody();
+                        body.add(1, new PlanBodyImpl(BodyType.internalAction, new InternalActionLiteral(".fail")));
                     } 
                     si.peek().removeCurrentStep();
                     if (elapsedTimeTerm != null) {
                         long elapsedTime = System.currentTimeMillis() - startTime;
-                    	un.unifies(elapsedTimeTerm, new NumberTermImpl(elapsedTime));
+                        un.unifies(elapsedTimeTerm, new NumberTermImpl(elapsedTime));
                     }
                     if (si.isSuspended()) { // if the intention was suspended by .suspend
-                    	String k = suspend.SUSPENDED_INT+si.getId();
-                    	c.getPendingIntentions().put(k, si);
+                        String k = suspend.SUSPENDED_INT+si.getId();
+                        c.getPendingIntentions().put(k, si);
                     } else {
-                    	c.addIntention(si);
+                        c.addIntention(si);
                     }
                     ts.getUserAgArch().getArchInfraTier().wake();
                 }

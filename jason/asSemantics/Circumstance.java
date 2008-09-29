@@ -45,7 +45,7 @@ import org.w3c.dom.Element;
 
 public class Circumstance implements Serializable {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     private Queue<Event>               E;
     private Queue<Intention>           I;
@@ -66,7 +66,7 @@ public class Circumstance implements Serializable {
     private List<CircumstanceListener> listeners = new CopyOnWriteArrayList<CircumstanceListener>();
 
     public Circumstance() {
-    	create();
+        create();
         reset();
     }
 
@@ -78,7 +78,7 @@ public class Circumstance implements Serializable {
         MB = new LinkedList<Message>();
         PA = new ConcurrentHashMap<Integer, ActionExec>();
         PI = new ConcurrentHashMap<String, Intention>();
-        FA = new ArrayList<ActionExec>();    	
+        FA = new ArrayList<ActionExec>();       
     }
     
     /** set null for A, RP, AP, SE, SO, and SI */
@@ -237,7 +237,7 @@ public class Circumstance implements Serializable {
     }
     
     public void clearPendingIntentions() {
-    	PI.clear();
+        PI.clear();
     }
     
     public boolean dropPendingIntention(Intention i) {
@@ -269,7 +269,7 @@ public class Circumstance implements Serializable {
     }
 
     public boolean hasFeedbackAction() {
-    	return !FA.isEmpty();
+        return !FA.isEmpty();
     }
     
     public List<ActionExec> getFeedbackActions() {
@@ -277,11 +277,11 @@ public class Circumstance implements Serializable {
     }
     
     public void addFeedbackAction(ActionExec act) {
-    	if (act.getIntention() != null) {
-	    	synchronized (FA) {
-				FA.add(act);
-			}
-    	}
+        if (act.getIntention() != null) {
+            synchronized (FA) {
+                FA.add(act);
+            }
+        }
     }
 
     public Map<Integer, ActionExec> getPendingActions() {
@@ -289,7 +289,7 @@ public class Circumstance implements Serializable {
     }
     
     public void clearPendingActions() {
-    	PA.clear();
+        PA.clear();
     }
 
     public boolean hasPendingAction() {
@@ -330,26 +330,26 @@ public class Circumstance implements Serializable {
 
     /** clone E, I, MB, PA, PI, FA, and AI */
     public Object clone() {
-    	Circumstance c = new Circumstance();
-    	for (Event e: this.E) {
-    		c.E.add((Event)e.clone());
-    	}
-    	for (Intention i: this.I) {
-    		c.I.add((Intention)i.clone());
-    	}
-    	for (Message m: this.MB) {
-    		c.MB.add((Message)m.clone());
-    	}
-    	for (int k: this.PA.keySet()) {
-    		c.PA.put(k, (ActionExec)PA.get(k).clone());
-    	}
-    	for (String k: this.PI.keySet()) {
-    		c.PI.put(k, (Intention)PI.get(k).clone());
-    	}
-    	for (ActionExec ae: FA) {
-    		c.FA.add((ActionExec)ae.clone());
-    	}
-    	return c;
+        Circumstance c = new Circumstance();
+        for (Event e: this.E) {
+            c.E.add((Event)e.clone());
+        }
+        for (Intention i: this.I) {
+            c.I.add((Intention)i.clone());
+        }
+        for (Message m: this.MB) {
+            c.MB.add((Message)m.clone());
+        }
+        for (int k: this.PA.keySet()) {
+            c.PA.put(k, (ActionExec)PA.get(k).clone());
+        }
+        for (String k: this.PI.keySet()) {
+            c.PI.put(k, (Intention)PI.get(k).clone());
+        }
+        for (ActionExec ae: FA) {
+            c.FA.add((ActionExec)ae.clone());
+        }
+        return c;
     }
 
 
@@ -534,20 +534,20 @@ public class Circumstance implements Serializable {
     }
 
     public String toString() {
-    	StringBuilder s = new StringBuilder("Circumstance:\n");
-    	s.append("  E ="+E +"\n");
-    	s.append("  I ="+I +"\n");
-    	s.append("  A ="+A +"\n");
-    	s.append("  MB="+MB+"\n");
-    	s.append("  RP="+RP+"\n");
-    	s.append("  AP="+AP+"\n");
-    	s.append("  SE="+SE+"\n");
-    	s.append("  SO="+SO+"\n");
-    	s.append("  SI="+SI+"\n");
-    	s.append("  AI="+AI+"\n");
-    	s.append("  PA="+PA+"\n");
-    	s.append("  PI="+PI+"\n");
-    	s.append("  FA="+FA+".");
+        StringBuilder s = new StringBuilder("Circumstance:\n");
+        s.append("  E ="+E +"\n");
+        s.append("  I ="+I +"\n");
+        s.append("  A ="+A +"\n");
+        s.append("  MB="+MB+"\n");
+        s.append("  RP="+RP+"\n");
+        s.append("  AP="+AP+"\n");
+        s.append("  SE="+SE+"\n");
+        s.append("  SO="+SO+"\n");
+        s.append("  SI="+SI+"\n");
+        s.append("  AI="+AI+"\n");
+        s.append("  PA="+PA+"\n");
+        s.append("  PI="+PI+"\n");
+        s.append("  FA="+FA+".");
         return s.toString();
     }
 

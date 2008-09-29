@@ -47,29 +47,29 @@ import org.w3c.dom.Element;
  */
 public class LogExpr extends BinaryStructure implements LogicalFormula {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
     private static Logger logger = Logger.getLogger(LogExpr.class.getName());
 
     public static final List<Unifier> EMPTY_UNIF_LIST = Collections.emptyList();
 
-	public enum LogicalOp { 
-		none   { public String toString() { return ""; } }, 
-		not    { public String toString() { return "not "; } }, 
-		and    { public String toString() { return " & "; } },
-		or     { public String toString() { return " | "; } };
-	}
+    public enum LogicalOp { 
+        none   { public String toString() { return ""; } }, 
+        not    { public String toString() { return "not "; } }, 
+        and    { public String toString() { return " & "; } },
+        or     { public String toString() { return " | "; } };
+    }
 
-	private  LogicalOp op = LogicalOp.none;
-	
-	public LogExpr(LogicalFormula f1, LogicalOp oper, LogicalFormula f2) {
-		super(f1, oper.toString(), f2);
-		op = oper;
-	}
+    private  LogicalOp op = LogicalOp.none;
+    
+    public LogExpr(LogicalFormula f1, LogicalOp oper, LogicalFormula f2) {
+        super(f1, oper.toString(), f2);
+        op = oper;
+    }
 
-	public LogExpr(LogicalOp oper, LogicalFormula f) {
-		super(oper.toString(),(Term)f);
-		op = oper;
-	}
+    public LogExpr(LogicalOp oper, LogicalFormula f) {
+        super(oper.toString(),(Term)f);
+        op = oper;
+    }
 
     /** gets the LHS of this Expression */
     public LogicalFormula getLHS() {
@@ -83,106 +83,106 @@ public class LogExpr extends BinaryStructure implements LogicalFormula {
 
     public Iterator<Unifier> logicalConsequence(final Agent ag, final Unifier un) {
         try {
-	        switch (op) {
-	        
-	        case not:
-	            if (!getLHS().logicalConsequence(ag,un).hasNext()) {
-	                return createUnifIterator(un);
-	            }
-	            break;
-	        
-	        case and:
-	            return new Iterator<Unifier>() {
-	                Iterator<Unifier> ileft   = getLHS().logicalConsequence(ag,un);;
+            switch (op) {
+            
+            case not:
+                if (!getLHS().logicalConsequence(ag,un).hasNext()) {
+                    return createUnifIterator(un);
+                }
+                break;
+            
+            case and:
+                return new Iterator<Unifier>() {
+                    Iterator<Unifier> ileft   = getLHS().logicalConsequence(ag,un);;
                     Iterator<Unifier> iright  = null;
-	                Unifier           current = null;
-	                boolean           needsUpdate = true;
-	                
-	                public boolean hasNext() {
-	                    if (needsUpdate) 
-	                        get();
-	                    return current != null;
-	                }
-	                public Unifier next() {
-	                    if (needsUpdate)
-	                        get();
-	                    Unifier a = current;
-	                    if (current != null)
-	                        needsUpdate = true;
-	                    return a;
-	                }
-	                private void get() {
-	                    needsUpdate = false;
-	                    current     = null;
-	                    while ((iright == null || !iright.hasNext()) && ileft.hasNext())
-	                        iright = getRHS().logicalConsequence(ag, ileft.next());
-	                    if (iright != null && iright.hasNext())
-	                        current = iright.next();
-	                }
-	                public void remove() {}
-	            };
-	            
-	        case or:
-	            return new Iterator<Unifier>() {
-	                Iterator<Unifier> ileft  = getLHS().logicalConsequence(ag,un);
-	                Iterator<Unifier> iright = null;
-	                Unifier current          = null;
-	                boolean needsUpdate      = true;
-	                
-	                public boolean hasNext() {
-	                    if (needsUpdate) 
-	                        get();
-	                    return current != null;
-	                }
-	                public Unifier next() {
-	                    if (needsUpdate) 
-	                        get();
-	                    Unifier a = current;
-	                    if (current != null)
-	                        needsUpdate = true;
-	                    return a;
-	                }
-	                private void get() {
+                    Unifier           current = null;
+                    boolean           needsUpdate = true;
+                    
+                    public boolean hasNext() {
+                        if (needsUpdate) 
+                            get();
+                        return current != null;
+                    }
+                    public Unifier next() {
+                        if (needsUpdate)
+                            get();
+                        Unifier a = current;
+                        if (current != null)
+                            needsUpdate = true;
+                        return a;
+                    }
+                    private void get() {
                         needsUpdate = false;
-	                    current     = null;
-	                    if (ileft != null && ileft.hasNext())
-	                        current = ileft.next();
-	                    else {
-	                        if (iright == null)
-	                            iright = getRHS().logicalConsequence(ag,un);
-	                        if (iright != null && iright.hasNext())
-	                            current = iright.next();
-	                    }
-	                }
-	                public void remove() {}
-	            };
-	        }
-	    } catch (Exception e) {
-    		String slhs = "is null ";
-			Iterator<Unifier> i = getLHS().logicalConsequence(ag,un);
-			if (i != null) {
-				slhs = "";
-				while (i.hasNext()) {
-					slhs += i.next().toString()+", ";
-				}
-			} else {
-				slhs = "iterator is null";
-			}
-    		String srhs = "is null ";
-    		if (!isUnary()) {
-    			i = getRHS().logicalConsequence(ag,un);
-    			if (i != null) {
-    				srhs = "";
-    				while (i.hasNext()) {
-    					srhs += i.next().toString()+", ";
-    				}
-    			} else {
-    				srhs = "iterator is null";
-    			}
-    		} 
-    		
-    		logger.log(Level.SEVERE, "Error evaluating expression "+this+". \nlhs elements="+slhs+". \nrhs elements="+srhs,e);
-    	}
+                        current     = null;
+                        while ((iright == null || !iright.hasNext()) && ileft.hasNext())
+                            iright = getRHS().logicalConsequence(ag, ileft.next());
+                        if (iright != null && iright.hasNext())
+                            current = iright.next();
+                    }
+                    public void remove() {}
+                };
+                
+            case or:
+                return new Iterator<Unifier>() {
+                    Iterator<Unifier> ileft  = getLHS().logicalConsequence(ag,un);
+                    Iterator<Unifier> iright = null;
+                    Unifier current          = null;
+                    boolean needsUpdate      = true;
+                    
+                    public boolean hasNext() {
+                        if (needsUpdate) 
+                            get();
+                        return current != null;
+                    }
+                    public Unifier next() {
+                        if (needsUpdate) 
+                            get();
+                        Unifier a = current;
+                        if (current != null)
+                            needsUpdate = true;
+                        return a;
+                    }
+                    private void get() {
+                        needsUpdate = false;
+                        current     = null;
+                        if (ileft != null && ileft.hasNext())
+                            current = ileft.next();
+                        else {
+                            if (iright == null)
+                                iright = getRHS().logicalConsequence(ag,un);
+                            if (iright != null && iright.hasNext())
+                                current = iright.next();
+                        }
+                    }
+                    public void remove() {}
+                };
+            }
+        } catch (Exception e) {
+            String slhs = "is null ";
+            Iterator<Unifier> i = getLHS().logicalConsequence(ag,un);
+            if (i != null) {
+                slhs = "";
+                while (i.hasNext()) {
+                    slhs += i.next().toString()+", ";
+                }
+            } else {
+                slhs = "iterator is null";
+            }
+            String srhs = "is null ";
+            if (!isUnary()) {
+                i = getRHS().logicalConsequence(ag,un);
+                if (i != null) {
+                    srhs = "";
+                    while (i.hasNext()) {
+                        srhs += i.next().toString()+", ";
+                    }
+                } else {
+                    srhs = "iterator is null";
+                }
+            } 
+            
+            logger.log(Level.SEVERE, "Error evaluating expression "+this+". \nlhs elements="+slhs+". \nrhs elements="+srhs,e);
+        }
         return EMPTY_UNIF_LIST.iterator();  // empty iterator for unifier
     }   
 
@@ -213,22 +213,22 @@ public class LogExpr extends BinaryStructure implements LogicalFormula {
     public static LogicalFormula tryParsingLogExpr(String sExpr) throws ParseException {
         return (LogicalFormula)new as2j(new StringReader(sExpr)).log_expr();
     }
-	
-	/** make a hard copy of the terms */
-	public LogicalFormula clone() {
-		// do not call constructor with term parameter!
-		if (isUnary())
-			return new LogExpr(op, (LogicalFormula)getTerm(0).clone());
-		else
-			return new LogExpr((LogicalFormula)getTerm(0).clone(), op, (LogicalFormula)getTerm(1).clone());
-	}
-	
+    
+    /** make a hard copy of the terms */
+    public LogicalFormula clone() {
+        // do not call constructor with term parameter!
+        if (isUnary())
+            return new LogExpr(op, (LogicalFormula)getTerm(0).clone());
+        else
+            return new LogExpr((LogicalFormula)getTerm(0).clone(), op, (LogicalFormula)getTerm(1).clone());
+    }
+    
 
-	/** gets the Operation of this Expression */
-	public LogicalOp getOp() {
-		return op;
-	}
-	
+    /** gets the Operation of this Expression */
+    public LogicalOp getOp() {
+        return op;
+    }
+    
     /** get as XML */
     public Element getAsDOM(Document document) {
         Element u = super.getAsDOM(document);

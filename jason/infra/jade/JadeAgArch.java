@@ -44,7 +44,7 @@ public class JadeAgArch extends JadeAg implements AgArchInfraTier {
     /** name of the "jason agent" service in DF */
     public  static String dfName = "j_agent";
     
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
    
     /** the user customisation of the architecture */
     protected AgArch userAgArch;
@@ -60,9 +60,9 @@ public class JadeAgArch extends JadeAg implements AgArchInfraTier {
     Behaviour tsBehaviour;
     
     // 
-	// Jade Methods
-	// ------------
-	//
+    // Jade Methods
+    // ------------
+    //
 
     @SuppressWarnings("serial")
     @Override
@@ -195,19 +195,19 @@ public class JadeAgArch extends JadeAg implements AgArchInfraTier {
         }
     }
     
-	@Override
-	protected void takeDown() {
+    @Override
+    protected void takeDown() {
         logger.info("Finished!");
-	}
-	
-	
-	// Jason Methods
-	// -------------
-	//	
+    }
+    
+    
+    // Jason Methods
+    // -------------
+    //  
 
-	public void stopAg() {
-		doDelete();
-	}
+    public void stopAg() {
+        doDelete();
+    }
     
     public void sleep() {
         enterInSleepMode = true;
@@ -218,15 +218,15 @@ public class JadeAgArch extends JadeAg implements AgArchInfraTier {
         tsBehaviour.restart();
     }
 
-	public String getAgName() {
-		return getLocalName();
-	}
+    public String getAgName() {
+        return getLocalName();
+    }
 
-	public boolean canSleep() {
-		return getCurQueueSize() == 0 && isRunning();
-	}
+    public boolean canSleep() {
+        return getCurQueueSize() == 0 && isRunning();
+    }
 
-	public void checkMail() {
+    public void checkMail() {
         ACLMessage m = null;
         do {
             try {
@@ -246,9 +246,9 @@ public class JadeAgArch extends JadeAg implements AgArchInfraTier {
                     String irt       = m.getInReplyTo();
                 
                     Object propCont = null;
-    				try {
-    					propCont = m.getContentObject();
-    				} catch (UnreadableException e) {
+                    try {
+                        propCont = m.getContentObject();
+                    } catch (UnreadableException e) {
                         if (m.getLanguage() == null || !m.getLanguage().equals("AgentSpeak")) {
                             // not AS messages are treated as string 
                             propCont = new StringTermImpl(m.getContent());
@@ -259,7 +259,7 @@ public class JadeAgArch extends JadeAg implements AgArchInfraTier {
                         } else {
                             propCont = m.getContent();
                         }
-    				}
+                    }
                     if (propCont != null) {
                         jason.asSemantics.Message im = new jason.asSemantics.Message(ilForce, sender, getLocalName(), propCont, replyWith);
                         if (irt != null) {
@@ -272,7 +272,7 @@ public class JadeAgArch extends JadeAg implements AgArchInfraTier {
                 logger.log(Level.SEVERE, "Error receiving message.", e);
             }
         } while (m != null);
-	}
+    }
 
     boolean isActionFeedback(ACLMessage m) {
         // check if there are feedbacks on requested action executions
@@ -333,7 +333,7 @@ public class JadeAgArch extends JadeAg implements AgArchInfraTier {
         return m.getOntology() != null && m.getOntology().equals(JadeEnvironment.perceptionOntology);
     }
 
-	@SuppressWarnings("unchecked")
+    @SuppressWarnings("unchecked")
     public List<Literal> perceive() {
         if (!isRunning()) return null;
         if (getEnvironmentAg() == null) return null;
@@ -353,7 +353,7 @@ public class JadeAgArch extends JadeAg implements AgArchInfraTier {
         }
         
         return percepts;
-	}
+    }
 
     private AID getEnvironmentAg() {
         // get the name of the environment
@@ -376,7 +376,7 @@ public class JadeAgArch extends JadeAg implements AgArchInfraTier {
         return environmentAID;
     }
 
-	public void act(ActionExec action, List<ActionExec> feedback) {
+    public void act(ActionExec action, List<ActionExec> feedback) {
         if (!isRunning()) return;
         if (getEnvironmentAg() == null) return;
         
@@ -396,11 +396,11 @@ public class JadeAgArch extends JadeAg implements AgArchInfraTier {
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error sending action " + action, e);
         }
-	}
+    }
 
-	public RuntimeServicesInfraTier getRuntimeServices() {
-	    return new JadeRuntimeServices(getContainerController(), this);
-	}
+    public RuntimeServicesInfraTier getRuntimeServices() {
+        return new JadeRuntimeServices(getContainerController(), this);
+    }
 
     /** 
      *  Informs the infrastructure tier controller that the agent 
@@ -409,7 +409,7 @@ public class JadeAgArch extends JadeAg implements AgArchInfraTier {
      *  <p><i>breakpoint</i> is true in case the agent selected one plan 
      *  with the "breakpoint" annotation.  
      */ 
-	public void informCycleFinished(boolean breakpoint, int cycle) {
+    public void informCycleFinished(boolean breakpoint, int cycle) {
         try {
             ACLMessage m = new ACLMessage(ACLMessage.INFORM);
             m.addReceiver(controllerAID);
@@ -419,5 +419,5 @@ public class JadeAgArch extends JadeAg implements AgArchInfraTier {
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error sending cycle finished.", e);
         }
-	}
+    }
 }

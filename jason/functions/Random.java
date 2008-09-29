@@ -27,18 +27,18 @@ public class Random extends DefaultArithFunction  {
         return "math.random";
     }
     
-	@Override
-	public double evaluate(TransitionSystem ts, Term[] args) throws Exception {
-		if (args.length == 1 && args[0].isNumeric()) {
-			return Math.random() * ((NumberTerm)args[0]).solve();
-		} else {
-			return Math.random();
-		}
-	}
+    @Override
+    public double evaluate(TransitionSystem ts, Term[] args) throws Exception {
+        if (args.length == 1 && args[0].isNumeric()) {
+            return Math.random() * ((NumberTerm)args[0]).solve();
+        } else {
+            return Math.random();
+        }
+    }
 
-	@Override
-	public boolean checkArity(int a) {
-		return a == 0 || a == 1;
-	}
-	
+    @Override
+    public boolean checkArity(int a) {
+        return a == 0 || a == 1;
+    }
+    
 }

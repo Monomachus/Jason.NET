@@ -33,26 +33,26 @@ public class PlanTest extends TestCase {
     }
     
     public void testRelevant() throws JasonException, ParseException {
-    	PlanLibrary pl = new PlanLibrary();
-    	pl.add(Plan.parse("+p(0) <- .print(a)."));
-    	pl.add(Plan.parse("+p(X) : X > 0 <- .print(a)."));
-    	
-    	pl.add(Plan.parse("+!p(0) <- .print(a)."));
-    	pl.add(Plan.parse("+!p(X) : X > 0 <- .print(a)."));
+        PlanLibrary pl = new PlanLibrary();
+        pl.add(Plan.parse("+p(0) <- .print(a)."));
+        pl.add(Plan.parse("+p(X) : X > 0 <- .print(a)."));
+        
+        pl.add(Plan.parse("+!p(0) <- .print(a)."));
+        pl.add(Plan.parse("+!p(X) : X > 0 <- .print(a)."));
 
-    	pl.add(Plan.parse("+!X <- .print(a)."));
-    	
-    	List<Plan> pls = pl.getCandidatePlans(Trigger.parseTrigger("+p(3)"));
-    	assertEquals(2, pls.size());
+        pl.add(Plan.parse("+!X <- .print(a)."));
+        
+        List<Plan> pls = pl.getCandidatePlans(Trigger.parseTrigger("+p(3)"));
+        assertEquals(2, pls.size());
 
-    	pls = pl.getCandidatePlans(Trigger.parseTrigger("+!p(3)"));
-    	assertEquals(3, pls.size());	
+        pls = pl.getCandidatePlans(Trigger.parseTrigger("+!p(3)"));
+        assertEquals(3, pls.size());    
 
-    	pls = pl.getCandidatePlans(Trigger.parseTrigger("+!bla"));
-    	assertEquals(1, pls.size());	
+        pls = pl.getCandidatePlans(Trigger.parseTrigger("+!bla"));
+        assertEquals(1, pls.size());    
 
-    	pls = pl.getCandidatePlans(Trigger.parseTrigger("+bla"));
-    	assertEquals(0, pls.size());	
+        pls = pl.getCandidatePlans(Trigger.parseTrigger("+bla"));
+        assertEquals(0, pls.size());    
     }
     
     public void testParser1() {

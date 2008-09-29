@@ -6,8 +6,8 @@ package jason.asSyntax;
 public class SourceInfo {
 
     private String      source  = null; 
-	private int         beginSrcLine = -1; // the line this literal appears in the source
-	private int         endSrcLine   = -1;
+    private int         beginSrcLine = -1; // the line this literal appears in the source
+    private int         endSrcLine   = -1;
 
     public SourceInfo() {        
     }
@@ -34,10 +34,10 @@ public class SourceInfo {
     }
 
     public void setSrcLine(int i) {
-		beginSrcLine = i;
-	}
+        beginSrcLine = i;
+    }
     public int getSrcLine() {
-    	return beginSrcLine;
+        return beginSrcLine;
     }
 
     public void setSrcLines(int b, int e) {

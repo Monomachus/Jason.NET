@@ -48,18 +48,18 @@ import java.util.logging.Logger;
  */
 public class MAS2JProject {
 
-	public static final String EXT       = "mas2j";
-	public static final String AS_EXT    = "asl";
-	
-	private static Logger logger = Logger.getLogger(MAS2JProject.class.getName());
-		
-	private String soc;
-	private ClassParameters envClass = null; 
+    public static final String EXT       = "mas2j";
+    public static final String AS_EXT    = "asl";
+    
+    private static Logger logger = Logger.getLogger(MAS2JProject.class.getName());
+        
+    private String soc;
+    private ClassParameters envClass = null; 
     private ClassParameters controlClass = null;
     private ClassParameters infrastructure = new ClassParameters("Centralised");
     private String projectDir = ".";
     private File   projectFile = null;
-	private List<AgentParameters> agents = new ArrayList<AgentParameters>();
+    private List<AgentParameters> agents = new ArrayList<AgentParameters>();
     private List<String> classpaths = new ArrayList<String>();
     private List<String> sourcepaths = new ArrayList<String>();
     private Map<String,String> directiveClasses = new HashMap<String,String>();
@@ -80,98 +80,98 @@ public class MAS2JProject {
         }
     }
     
-	public void setDirectory(String d) {
-		if (d != null) {
-			projectDir = d;
-			if (projectDir.endsWith(File.separator) || projectDir.endsWith("/")) {
-				projectDir = projectDir.substring(0,projectDir.length()-1);
-			}
-		}
-	}
-	
-	public String getDirectory() {
-		return projectDir;
-	}
-	
-	public void setProjectFile(File f) {
-		projectFile = f;
-	}
-	
-	public File getProjectFile() {
-		return projectFile;
-	}
-	
-	public void setInfrastructure(ClassParameters infra) {
-		infrastructure = infra;
-	}
-	public ClassParameters getInfrastructure() {
-		return infrastructure;
-	}
-
-	public void setEnvClass(ClassParameters e) {
-		envClass = e;
-	}
-	public ClassParameters getEnvClass() {
-		return envClass;
-	}
-	
-	public void setSocName(String s) {
-		soc = s;
-	}
-
-	public String getSocName() {
-		return soc;
-	}
-
-	public void setControlClass(ClassParameters sControl) {
-		controlClass = sControl;
-	}
-	public ClassParameters getControlClass() {
-		return controlClass;
-	}
-
-	public void initAgMap() {
-		agents = new ArrayList<AgentParameters>();
-	}
-	public void addAgent(AgentParameters a) {
-		agents.add(a);
-	}
-	public AgentParameters getAg(String name) {
-		for (AgentParameters a: agents) {
-			if (a.name.equals(name)) {
-				return a;
-			}
-		}
-		return null;
-	}
-	
-	public List<AgentParameters> getAgents() {
-		return agents;
-	}
-	
-	public Set<File> getAllASFiles() {
-		Set<File> files = new HashSet<File>();
-		for (AgentParameters agp: agents) {
-			if (agp.asSource != null) {
-				files.add(agp.asSource);
-			}
-		}
-		return files;
-	}
-	
-	/** change the source of the agents using the source path information,
-	 *  also considers code from a jar file (if urlPrefix is not null) */
-    public void fixAgentsSrc(String urlPrefix) {
-		List<String> srcpath = getSourcePaths();
-		for (AgentParameters agp: agents) {
-			if (agp.asSource != null) {
-				agp.fixSrc(srcpath, urlPrefix);
-			}
-		}    	
+    public void setDirectory(String d) {
+        if (d != null) {
+            projectDir = d;
+            if (projectDir.endsWith(File.separator) || projectDir.endsWith("/")) {
+                projectDir = projectDir.substring(0,projectDir.length()-1);
+            }
+        }
+    }
+    
+    public String getDirectory() {
+        return projectDir;
+    }
+    
+    public void setProjectFile(File f) {
+        projectFile = f;
+    }
+    
+    public File getProjectFile() {
+        return projectFile;
+    }
+    
+    public void setInfrastructure(ClassParameters infra) {
+        infrastructure = infra;
+    }
+    public ClassParameters getInfrastructure() {
+        return infrastructure;
     }
 
-	public void addClassPath(String cp) {
-		if (cp.startsWith("\"")) {
+    public void setEnvClass(ClassParameters e) {
+        envClass = e;
+    }
+    public ClassParameters getEnvClass() {
+        return envClass;
+    }
+    
+    public void setSocName(String s) {
+        soc = s;
+    }
+
+    public String getSocName() {
+        return soc;
+    }
+
+    public void setControlClass(ClassParameters sControl) {
+        controlClass = sControl;
+    }
+    public ClassParameters getControlClass() {
+        return controlClass;
+    }
+
+    public void initAgMap() {
+        agents = new ArrayList<AgentParameters>();
+    }
+    public void addAgent(AgentParameters a) {
+        agents.add(a);
+    }
+    public AgentParameters getAg(String name) {
+        for (AgentParameters a: agents) {
+            if (a.name.equals(name)) {
+                return a;
+            }
+        }
+        return null;
+    }
+    
+    public List<AgentParameters> getAgents() {
+        return agents;
+    }
+    
+    public Set<File> getAllASFiles() {
+        Set<File> files = new HashSet<File>();
+        for (AgentParameters agp: agents) {
+            if (agp.asSource != null) {
+                files.add(agp.asSource);
+            }
+        }
+        return files;
+    }
+    
+    /** change the source of the agents using the source path information,
+     *  also considers code from a jar file (if urlPrefix is not null) */
+    public void fixAgentsSrc(String urlPrefix) {
+        List<String> srcpath = getSourcePaths();
+        for (AgentParameters agp: agents) {
+            if (agp.asSource != null) {
+                agp.fixSrc(srcpath, urlPrefix);
+            }
+        }       
+    }
+
+    public void addClassPath(String cp) {
+        if (cp.startsWith("\"")) {
 			cp = cp.substring(1,cp.length()-1);
 		}
 		classpaths.add(cp);
@@ -183,30 +183,30 @@ public class MAS2JProject {
 	
 	public void addSourcePath(String cp) {
 		if (cp.startsWith("\"")) {
-			cp = cp.substring(1,cp.length()-1);
-		}
-		sourcepaths.add(cp);
-	}
+            cp = cp.substring(1,cp.length()-1);
+        }
+        sourcepaths.add(cp);
+    }
 
-	public List<String> getSourcePaths() {
-		List<String> r = new ArrayList<String>();
-		if (sourcepaths.isEmpty()) {
-			r.add(getDirectory());
-		}
-		for (String p: sourcepaths) {
-			//if (getDirectory().startsWith(".") || getDirectory().startsWith("/") || getDirectory().charAt(1) == ':') {
-		    if (p.startsWith(".") || p.startsWith("/") || p.charAt(1) == ':') {		    
-				r.add(p);
-			} else {
-				r.add(getDirectory()+"/"+p);
-			}
-		}
-		return r;
-	}
-	
-	public void removeSourcePath(int index) {
-		sourcepaths.remove(index);
-	}
+    public List<String> getSourcePaths() {
+        List<String> r = new ArrayList<String>();
+        if (sourcepaths.isEmpty()) {
+            r.add(getDirectory());
+        }
+        for (String p: sourcepaths) {
+            //if (getDirectory().startsWith(".") || getDirectory().startsWith("/") || getDirectory().charAt(1) == ':') {
+            if (p.startsWith(".") || p.startsWith("/") || p.charAt(1) == ':') {         
+                r.add(p);
+            } else {
+                r.add(getDirectory()+"/"+p);
+            }
+        }
+        return r;
+    }
+    
+    public void removeSourcePath(int index) {
+        sourcepaths.remove(index);
+    }
 
     public void addDirectiveClass(String id, ClassParameters classname) {
         directiveClasses.put(id, classname.getClassName());
@@ -227,8 +227,8 @@ public class MAS2JProject {
             }
         }
     }
-	
-	public String toString() {
+    
+    public String toString() {
         StringBuilder s = new StringBuilder();
         
         s.append("/*\n");
@@ -236,31 +236,31 @@ public class MAS2JProject {
         s.append("    -- created on "+new SimpleDateFormat("MMMM dd, yyyy").format(new Date())+"\n");
         s.append("*/\n\n");
         s.append("MAS " + getSocName() + " {\n");
-		s.append("   infrastructure: "+getInfrastructure()+"\n\n");
-		
-		if (getEnvClass() != null && ! getEnvClass().getClassName().equals(jason.environment.Environment.class.getName())) {
-			s.append("   environment: "+getEnvClass());
-			if (envClass.getHost() != null) {
-				s.append(" at "+envClass.getHost());
-			}
-			s.append("\n\n");
-		}
-		
-		if (getControlClass() != null) {
-			s.append("   executionControl: "+getControlClass());
-			if (getControlClass().getHost() != null) {
-				s.append(" at "+getControlClass().getHost());
-			}
-			s.append("\n\n");
-		}
-		
-		// agents
-		s.append("   agents:\n");
-		Iterator<AgentParameters> i = agents.iterator();
-		while (i.hasNext()) {
-			s.append("       "+i.next());
-			s.append("\n");
-		}
+        s.append("   infrastructure: "+getInfrastructure()+"\n\n");
+        
+        if (getEnvClass() != null && ! getEnvClass().getClassName().equals(jason.environment.Environment.class.getName())) {
+            s.append("   environment: "+getEnvClass());
+            if (envClass.getHost() != null) {
+                s.append(" at "+envClass.getHost());
+            }
+            s.append("\n\n");
+        }
+        
+        if (getControlClass() != null) {
+            s.append("   executionControl: "+getControlClass());
+            if (getControlClass().getHost() != null) {
+                s.append(" at "+getControlClass().getHost());
+            }
+            s.append("\n\n");
+        }
+        
+        // agents
+        s.append("   agents:\n");
+        Iterator<AgentParameters> i = agents.iterator();
+        while (i.hasNext()) {
+            s.append("       "+i.next());
+            s.append("\n");
+        }
         s.append("\n");
 
         // directives
@@ -272,39 +272,39 @@ public class MAS2JProject {
             s.append("\n");
         }
         
-		// classpath
-		if (classpaths.size() > 0) {
-			s.append("   classpath: ");
-			for (String cp: classpaths) {
-				s.append("\""+cp+"\"; ");
-			}
+        // classpath
+        if (classpaths.size() > 0) {
+            s.append("   classpath: ");
+            for (String cp: classpaths) {
+                s.append("\""+cp+"\"; ");
+            }
             s.append("\n");
-		}
+        }
         
-		// sourcepath
-		if (sourcepaths.size() > 0) {
-			s.append("   aslSourcePath: ");
-			for (String cp: sourcepaths) {
-				s.append("\""+cp+"\"; ");
-			}
+        // sourcepath
+        if (sourcepaths.size() > 0) {
+            s.append("   aslSourcePath: ");
+            for (String cp: sourcepaths) {
+                s.append("\""+cp+"\"; ");
+            }
             s.append("\n");
-		}
+        }
 
-		s.append("}");
+        s.append("}");
 
-		return s.toString();
-	}
+        return s.toString();
+    }
 
-	private InfrastructureFactory infraFac = null; // backup 
-	public InfrastructureFactory getInfrastructureFactory() throws JasonException {
-		if (infraFac == null) {
-			try {
-				String facClass = Config.get().getInfrastructureFactoryClass(infrastructure.getClassName());
-				infraFac = (InfrastructureFactory)Class.forName(facClass).newInstance();
-			} catch (Exception e) { 
-				throw new JasonException("The project's infrastructure ('"+infrastructure+"') is unknown!");
-			}
-		}
-		return infraFac;
+    private InfrastructureFactory infraFac = null; // backup 
+    public InfrastructureFactory getInfrastructureFactory() throws JasonException {
+        if (infraFac == null) {
+            try {
+                String facClass = Config.get().getInfrastructureFactoryClass(infrastructure.getClassName());
+                infraFac = (InfrastructureFactory)Class.forName(facClass).newInstance();
+            } catch (Exception e) { 
+                throw new JasonException("The project's infrastructure ('"+infrastructure+"') is unknown!");
+            }
+        }
+        return infraFac;
     }
 }

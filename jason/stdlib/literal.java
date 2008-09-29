@@ -35,13 +35,13 @@ import jason.asSyntax.Term;
   @see jason.stdlib.ground
 */
 public class literal extends DefaultInternalAction {
-	
-	private static InternalAction singleton = null;
-	public static InternalAction create() {
-		if (singleton == null) 
-			singleton = new literal();
-		return singleton;
-	}
+    
+    private static InternalAction singleton = null;
+    public static InternalAction create() {
+        if (singleton == null) 
+            singleton = new literal();
+        return singleton;
+    }
 
     @Override public int getMinArgs() { return 1; }
     @Override public int getMaxArgs() { return 1; }

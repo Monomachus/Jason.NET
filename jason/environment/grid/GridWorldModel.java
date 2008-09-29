@@ -97,11 +97,11 @@ public class GridWorldModel {
 
     // gets how many objects of some kind are in the grid
     public int countObjects(int obj) {
-    	int c = 0;
+        int c = 0;
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
                 if (hasObject(obj,i,j)) {
-                	c++;
+                    c++;
                 }
             }
         }
@@ -190,11 +190,11 @@ public class GridWorldModel {
 
     /** returns true if the location l has not the object obj */
     public boolean isFree(int obj, Location l) {
-        return inGrid(l.x, l.y) && (data[l.x][l.y] & obj) == 0;    	
+        return inGrid(l.x, l.y) && (data[l.x][l.y] & obj) == 0;     
     }
     /** returns true if the location x,y has not the object obj */
     public boolean isFree(int obj, int x, int y) {
-        return inGrid(x, y) && (data[x][y] & obj) == 0;    	
+        return inGrid(x, y) && (data[x][y] & obj) == 0;     
     }
     
     public boolean isFreeOfObstacle(Location l) {
@@ -206,27 +206,27 @@ public class GridWorldModel {
 
     /** returns a random free location using isFree to test the availability of some possible location (it means free of agents and obstacles) */ 
     protected Location getFreePos() {
-    	for (int i=0; i<(getWidth()*getHeight()*5); i++) {
-    		int x = random.nextInt(getWidth());
-    		int y = random.nextInt(getHeight());
-    		Location l = new Location(x,y);
-    		if (isFree(l)) {
-    			return l;
-    		}
-    	}
-    	return null; // not found
+        for (int i=0; i<(getWidth()*getHeight()*5); i++) {
+            int x = random.nextInt(getWidth());
+            int y = random.nextInt(getHeight());
+            Location l = new Location(x,y);
+            if (isFree(l)) {
+                return l;
+            }
+        }
+        return null; // not found
     }
 
     /** returns a random free location using isFree(object) to test the availability of some possible location */ 
     protected Location getFreePos(int obj) {
-    	for (int i=0; i<(getWidth()*getHeight()*5); i++) {
-    		int x = random.nextInt(getWidth());
-    		int y = random.nextInt(getHeight());
-    		Location l = new Location(x,y);
-    		if (isFree(obj,l)) {
-    			return l;
-    		}
-    	}
-    	return null; // not found
+        for (int i=0; i<(getWidth()*getHeight()*5); i++) {
+            int x = random.nextInt(getWidth());
+            int y = random.nextInt(getHeight());
+            Location l = new Location(x,y);
+            if (isFree(obj,l)) {
+                return l;
+            }
+        }
+        return null; // not found
     }
 }

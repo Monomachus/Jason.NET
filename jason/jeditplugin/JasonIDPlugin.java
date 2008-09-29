@@ -41,12 +41,12 @@ public class JasonIDPlugin extends EBPlugin {
 
     static {
         try {
-        	// set some properties
-        	org.gjt.sp.jedit.jEdit.setProperty("sidekick.parser.asl.label", "AgentSpeak");
-        	org.gjt.sp.jedit.jEdit.setProperty("mode.asl.sidekick.parser", "asl");
-        	org.gjt.sp.jedit.jEdit.setProperty("sidekick.parser.mas2j_parser.label", "JasonProject");
-        	org.gjt.sp.jedit.jEdit.setProperty("mode.mas2j.sidekick.parser", "mas2j");
-        	
+            // set some properties
+            org.gjt.sp.jedit.jEdit.setProperty("sidekick.parser.asl.label", "AgentSpeak");
+            org.gjt.sp.jedit.jEdit.setProperty("mode.asl.sidekick.parser", "asl");
+            org.gjt.sp.jedit.jEdit.setProperty("sidekick.parser.mas2j_parser.label", "JasonProject");
+            org.gjt.sp.jedit.jEdit.setProperty("mode.mas2j.sidekick.parser", "mas2j");
+            
             Class.forName(JasonIDOptionPanel.class.getName()); // just to run static init
         } catch (Exception e) {
         }
@@ -91,7 +91,7 @@ public class JasonIDPlugin extends EBPlugin {
                     }
                 }
                 //if (bu.getBuffer().getPath().endsWith(MAS2JProject.AS_EXT)) {
-                	//bu.getBuffer().setProperty("sidekick.parser", AgentSpeakSideKickParser.ID);
+                    //bu.getBuffer().setProperty("sidekick.parser", AgentSpeakSideKickParser.ID);
                 //}
             }
         }
@@ -101,16 +101,16 @@ public class JasonIDPlugin extends EBPlugin {
     //static JasonProjectSideKickParser jpskp = new JasonProjectSideKickParser();
 
     public void start() {
-    	/*
+        /*
         SideKickPlugin.registerParser(asskp);
         SideKickPlugin.registerParser(jpskp);
         Log.log(Log.DEBUG, this, "Registered " + asskp);
         Log.log(Log.DEBUG, this, "Registered " + jpskp);
-		*/
+        */
         handleMessage(null);
     }
 
-	/*
+    /*
     public void stop() {
         SideKickPlugin.unregisterParser(asskp);
         SideKickPlugin.unregisterParser(jpskp);

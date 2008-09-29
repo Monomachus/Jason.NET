@@ -97,18 +97,18 @@ public class RunCentralisedMAS {
     }
     
     public void init(String[] args) {
-    	String projectFileName = null;
+        String projectFileName = null;
         if (args.length < 1) {
-        	if (RunCentralisedMAS.class.getResource("/"+defaultProjectFileName) != null) {
-        		projectFileName = defaultProjectFileName;
-        		readFromJAR = true;
-        		Config.get(false); // to void to call fix/store the configuration in this case everything is read from a jar/jnlp file
-        	} else {
-        		System.err.println("You should inform the MAS project file.");
-        		System.exit(1);
-        	}
+            if (RunCentralisedMAS.class.getResource("/"+defaultProjectFileName) != null) {
+                projectFileName = defaultProjectFileName;
+                readFromJAR = true;
+                Config.get(false); // to void to call fix/store the configuration in this case everything is read from a jar/jnlp file
+            } else {
+                System.err.println("You should inform the MAS project file.");
+                System.exit(1);
+            }
         } else {
-        	projectFileName = args[0];
+            projectFileName = args[0];
         }
 
         setupLogger();
@@ -132,23 +132,23 @@ public class RunCentralisedMAS {
         int errorCode = 0;
 
         try {
-        	InputStream inProject;
-        	if (readFromJAR) {
-        		inProject = RunCentralisedMAS.class.getResource("/"+defaultProjectFileName).openStream();
-        		urlPrefix = Include.CRPrefix + "/";
-        	} else {
-	        	URL file;
-	        	// test if the argument is an URL
-	        	try {
-	        		file = new URL(projectFileName);
-	        		if (projectFileName.startsWith("jar")) {
-	        			urlPrefix = projectFileName.substring(0,projectFileName.indexOf("!")+1) + "/";
-	        		}
-	        	} catch (Exception e) {
-	        		file = new URL("file:"+projectFileName);
-	        	}
-	        	inProject = file.openStream();
-        	}
+            InputStream inProject;
+            if (readFromJAR) {
+                inProject = RunCentralisedMAS.class.getResource("/"+defaultProjectFileName).openStream();
+                urlPrefix = Include.CRPrefix + "/";
+            } else {
+                URL file;
+                // test if the argument is an URL
+                try {
+                    file = new URL(projectFileName);
+                    if (projectFileName.startsWith("jar")) {
+                        urlPrefix = projectFileName.substring(0,projectFileName.indexOf("!")+1) + "/";
+                    }
+                } catch (Exception e) {
+                    file = new URL("file:"+projectFileName);
+                }
+                inProject = file.openStream();
+            }
             jason.mas2j.parser.mas2j parser = new jason.mas2j.parser.mas2j(inProject); 
             project = parser.mas();
             project.setupDefault();
@@ -191,32 +191,32 @@ public class RunCentralisedMAS {
     }
 
     public static void setupLogger() {
-    	if (readFromJAR) {
-    		Handler[] hs = Logger.getLogger("").getHandlers(); 
-    		for (int i = 0; i < hs.length; i++) { 
-    			Logger.getLogger("").removeHandler(hs[i]); 
-    		}
-    		Handler h = new MASConsoleLogHandler();
-    		h.setFormatter(new MASConsoleLogFormatter()); 
-    		Logger.getLogger("").addHandler(h);
-    		Logger.getLogger("").setLevel(Level.INFO);
-    	} else {
-	        // see for a local log configuration
-	        if (new File(logPropFile).exists()) {
-	            try {
-	                LogManager.getLogManager().readConfiguration(new FileInputStream(logPropFile));
-	            } catch (Exception e) {
-	                System.err.println("Error setting up logger:" + e);
-	            }
-	        } else {
-	            try {
-	                LogManager.getLogManager().readConfiguration(RunCentralisedMAS.class.getResource("/templates/" + logPropFile).openStream());
-	            } catch (Exception e) {
-	                System.err.println("Error setting up logger:" + e);
-	                e.printStackTrace();
-	            }
-	        }
-    	}
+        if (readFromJAR) {
+            Handler[] hs = Logger.getLogger("").getHandlers(); 
+            for (int i = 0; i < hs.length; i++) { 
+                Logger.getLogger("").removeHandler(hs[i]); 
+            }
+            Handler h = new MASConsoleLogHandler();
+            h.setFormatter(new MASConsoleLogFormatter()); 
+            Logger.getLogger("").addHandler(h);
+            Logger.getLogger("").setLevel(Level.INFO);
+        } else {
+            // see for a local log configuration
+            if (new File(logPropFile).exists()) {
+                try {
+                    LogManager.getLogManager().readConfiguration(new FileInputStream(logPropFile));
+                } catch (Exception e) {
+                    System.err.println("Error setting up logger:" + e);
+                }
+            } else {
+                try {
+                    LogManager.getLogManager().readConfiguration(RunCentralisedMAS.class.getResource("/templates/" + logPropFile).openStream());
+                } catch (Exception e) {
+                    System.err.println("Error setting up logger:" + e);
+                    e.printStackTrace();
+                }
+            }
+        }
     }
     
     public static void setupDefaultConsoleLogger() {
@@ -395,18 +395,18 @@ public class RunCentralisedMAS {
     }
 
     public void addAg(CentralisedAgArch ag) {
-    	ags.put(ag.getAgName(), ag);
+        ags.put(ag.getAgName(), ag);
     }
     public CentralisedAgArch delAg(String agName) {
-    	return ags.remove(agName);
+        return ags.remove(agName);
     }
     
     public CentralisedAgArch getAg(String agName) {
-    	return ags.get(agName);
+        return ags.get(agName);
     }
     
     protected Map<String,CentralisedAgArch> getAgs() {
-    	return ags;
+        return ags;
     }
     
     protected void startAgs() {
@@ -617,7 +617,7 @@ public class RunCentralisedMAS {
 
         for (AgentParameters ap : project.getAgents()) {
             try {
-            	String tmpAsSrc = ap.asSource.toString();
+                String tmpAsSrc = ap.asSource.toString();
                 
                 // read sources
                 InputStream in = null;

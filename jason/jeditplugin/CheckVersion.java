@@ -34,7 +34,7 @@ public class CheckVersion extends Thread {
             release = p.getProperty("release");
             return version + "." + release;
         } catch (Exception ex) {
-        	System.out.println(ex);
+            System.out.println(ex);
             return null;
         }
     }

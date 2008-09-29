@@ -49,7 +49,7 @@ import org.w3c.dom.Element;
  */
 public class Structure extends Atom {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
     private static Logger logger = Logger.getLogger(Structure.class.getName());
 
     protected static final List<Term> emptyTermList  = new ArrayList<Term>(0);
@@ -79,7 +79,7 @@ public class Structure extends Atom {
     public Structure(String functor, int termsSize) {
         super(functor);
         if (termsSize > 0)
-        	terms = new ArrayList<Term>(termsSize);
+            terms = new ArrayList<Term>(termsSize);
     }
 
     public static Structure parse(String sTerm) {
@@ -108,7 +108,7 @@ public class Structure extends Atom {
         int result = super.calcHashCode();
         final int ts = getArity();
         for (int i=0; i<ts; i++)
-        	result = 7 * result + getTerm(i).hashCode();
+            result = 7 * result + getTerm(i).hashCode();
         return result;
     }
 
@@ -166,11 +166,11 @@ public class Structure extends Atom {
     
     @Override
     public boolean apply(Unifier u) {
-    	boolean r = false;
+        boolean r = false;
         // do not use iterator! (see ListTermImpl class)
         final int tss = getArity();
         for (int i = 0; i < tss; i++) {
-        	boolean tr = getTerm(i).apply(u); 
+            boolean tr = getTerm(i).apply(u); 
             r = r || tr;
         }
         if (r)
@@ -186,7 +186,7 @@ public class Structure extends Atom {
 
     @Override
     public void addTerm(Term t) {
-    	if (t == null) return;
+        if (t == null) return;
         terms.add(t);
         predicateIndicatorCache = null;
         resetHashCodeCache();
@@ -194,16 +194,16 @@ public class Structure extends Atom {
     
     @Override
     public void delTerm(int index) {
-    	terms.remove(index);
+        terms.remove(index);
         predicateIndicatorCache = null;
         resetHashCodeCache();
     }
     
     @Override
     public void addTerms(Term ... ts ) {
-    	for (Term t: ts) {
+        for (Term t: ts) {
             terms.add(t);
-    	}
+        }
         predicateIndicatorCache = null;
         resetHashCodeCache();
     }
@@ -232,7 +232,7 @@ public class Structure extends Atom {
      
     /** returns the i-th term (first term is 0) */
     public Term getTerm(int i) {
-    	return terms.get(i);
+        return terms.get(i);
     }
 
     @Override
@@ -255,7 +255,7 @@ public class Structure extends Atom {
     
     @Override
     public boolean hasTerm() {
-    	return getArity() > 0; // should use getArity to work for list/atom
+        return getArity() > 0; // should use getArity to work for list/atom
     }
     
     @Override
@@ -263,10 +263,10 @@ public class Structure extends Atom {
         return true;
     }
     
-	@Override
-	public boolean isAtom() {
-		return !hasTerm();
-	}
+    @Override
+    public boolean isAtom() {
+        return !hasTerm();
+    }
 
     @Override
     public boolean isGround() {
@@ -282,7 +282,7 @@ public class Structure extends Atom {
     /** Replaces all variables by unnamed variables (_). */
     @Override
     public void makeVarsAnnon() {
-    	makeVarsAnnon(new Unifier());
+        makeVarsAnnon(new Unifier());
     }
     
     /** change all vars by unnamed vars, the unifier un is used to consistently replace vars. */
@@ -292,7 +292,7 @@ public class Structure extends Atom {
         for (int i=0; i<size; i++) {
             Term ti = getTerm(i);
             if (ti.isVar() && !ti.isUnnamedVar()) {
-            	// replace ti to an unnamed var
+                // replace ti to an unnamed var
                 VarTerm vt = un.deref((VarTerm)ti);
                 UnnamedVar uv;
                 if (vt.isUnnamedVar()) {

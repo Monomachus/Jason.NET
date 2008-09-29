@@ -46,7 +46,7 @@ public class dropGoal extends DefaultInternalAction {
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         try {
-			ts.getLogger().info("Deprecated: use fail_goal or succeed_goal instead of .dropGoal.");
+            ts.getLogger().info("Deprecated: use fail_goal or succeed_goal instead of .dropGoal.");
 
             drop(ts, (Literal)args[0], args[1].equals(Literal.LTrue), un);
             return true;

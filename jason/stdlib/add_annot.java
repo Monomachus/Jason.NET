@@ -72,41 +72,41 @@ import jason.asSyntax.Term;
  */
 public class add_annot extends DefaultInternalAction {
 
-	private static InternalAction singleton = null;
-	public static InternalAction create() {
-		if (singleton == null) 
-			singleton = new add_annot();
-		return singleton;
-	}
-	
+    private static InternalAction singleton = null;
+    public static InternalAction create() {
+        if (singleton == null) 
+            singleton = new add_annot();
+        return singleton;
+    }
+    
     @Override public int getMinArgs() { return 3; }
-    @Override public int getMaxArgs() { return 3; }	
+    @Override public int getMaxArgs() { return 3; } 
 
     @Override public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         checkArguments(args);
-		Term result = addAnnotToList(un, args[0], args[1]);
-		return un.unifies(result,args[2]);
-	}
+        Term result = addAnnotToList(un, args[0], args[1]);
+        return un.unifies(result,args[2]);
+    }
 
-	public Term addAnnotToList(Unifier unif, Term l, Term annot) throws JasonException {
-		if (l.isList()) {
-			ListTerm result = new ListTermImpl();
-			for (Term lTerm: (ListTerm)l) {
-				Term t = addAnnotToList( unif, lTerm, annot);
-				if (t != null) {
-					result.add(t);
-				}
-			}
-			return result;
-		} else if (l.isLiteral()) {
-			Literal result;
-			if (l.isAtom())
-				result = new LiteralImpl(((Atom)l).getFunctor());
-			else
-				result = Literal.parseLiteral(l.toString());
-			result.addAnnot(annot);
-			return result;
-		}
-		return l;
-	}	
+    public Term addAnnotToList(Unifier unif, Term l, Term annot) throws JasonException {
+        if (l.isList()) {
+            ListTerm result = new ListTermImpl();
+            for (Term lTerm: (ListTerm)l) {
+                Term t = addAnnotToList( unif, lTerm, annot);
+                if (t != null) {
+                    result.add(t);
+                }
+            }
+            return result;
+        } else if (l.isLiteral()) {
+            Literal result;
+            if (l.isAtom())
+                result = new LiteralImpl(((Atom)l).getFunctor());
+            else
+                result = Literal.parseLiteral(l.toString());
+            result.addAnnot(annot);
+            return result;
+        }
+        return l;
+    }   
 }

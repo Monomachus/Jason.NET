@@ -5,5 +5,5 @@ package jason.jeditplugin;
  * about changes in the MAS execution state (like JasonIDE).
  */
 public interface RunProjectListener {
-	public void masFinished();
+    public void masFinished();
 }

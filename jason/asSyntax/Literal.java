@@ -60,10 +60,10 @@ import java.util.logging.Logger;
  */
 public abstract class Literal extends DefaultTerm implements LogicalFormula {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
     private static Logger logger = Logger.getLogger(Literal.class.getName());
     
-	public static final boolean LPos   = true;
+    public static final boolean LPos   = true;
     public static final boolean LNeg   = false;
     public static final Literal LTrue  = new TrueLiteral();
     public static final Literal LFalse = new FalseLiteral();
@@ -80,16 +80,16 @@ public abstract class Literal extends DefaultTerm implements LogicalFormula {
         return new LiteralImpl(l);
     }    
     
-	public static Literal parseLiteral(String sLiteral) {
-		try {
-			as2j parser = new as2j(new StringReader(sLiteral));
-			return parser.literal();
-		} catch (Exception e) {
-			logger.log(Level.SEVERE,"Error parsing literal " + sLiteral,e);
-			return null;
-		}
+    public static Literal parseLiteral(String sLiteral) {
+        try {
+            as2j parser = new as2j(new StringReader(sLiteral));
+            return parser.literal();
+        } catch (Exception e) {
+            logger.log(Level.SEVERE,"Error parsing literal " + sLiteral,e);
+            return null;
+        }
     }
-	
+    
     public static Literal tryParsingLiteral(String sLiteral) throws ParseException {
         return new as2j(new StringReader(sLiteral)).literal();
     }
@@ -101,9 +101,9 @@ public abstract class Literal extends DefaultTerm implements LogicalFormula {
     public abstract String getFunctor();
     
     @Override
-	public boolean isLiteral() {
-		return true;
-	}
+    public boolean isLiteral() {
+        return true;
+    }
     
     /** returns functor symbol "/" arity */
     public PredicateIndicator getPredicateIndicator() {

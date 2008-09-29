@@ -27,13 +27,13 @@ import org.w3c.dom.Document;
  */
 public class asl2xml  {
 
-	public static void main(String[] args) throws Exception {
-		if (args.length != 1) {
-			System.err.println("The asl code file must be informed");
-			System.exit(1);
-		}
-		new asl2xml().run(args[0]);
-	}
+    public static void main(String[] args) throws Exception {
+        if (args.length != 1) {
+            System.err.println("The asl code file must be informed");
+            System.exit(1);
+        }
+        new asl2xml().run(args[0]);
+    }
 
     void run(String file) throws Exception {
         Agent ag = loadAg(file);
@@ -45,8 +45,8 @@ public class asl2xml  {
     Agent loadAg(String file)  throws Exception {
         Agent ag = new Agent();
         if (ag.parseAS(new File(file))) {
-        	ag.setASLSrc(file);
-        	ag.addInitialBelsInBB();
+            ag.setASLSrc(file);
+            ag.addInitialBelsInBB();
             return ag;
         } else {
             return null;
@@ -83,19 +83,19 @@ public class asl2xml  {
     TransformerFactory fac = null;
     TransformerFactory getFactory() throws Exception {
         if (fac == null) {
-			fac = TransformerFactory.newInstance();
-			fac.setURIResolver(new URIResolver() {
-				public Source resolve(String href, String base) throws TransformerException {
-					try {
-						return new StreamSource(asl2xml.class.getResource("/xml/" + href).openStream());
-					} catch (Exception e) {
-						System.err.println("Error - " + href + "-" + base);
-						e.printStackTrace();
-						return null;
-					}
-				}
-			});
-		}
+            fac = TransformerFactory.newInstance();
+            fac.setURIResolver(new URIResolver() {
+                public Source resolve(String href, String base) throws TransformerException {
+                    try {
+                        return new StreamSource(asl2xml.class.getResource("/xml/" + href).openStream());
+                    } catch (Exception e) {
+                        System.err.println("Error - " + href + "-" + base);
+                        e.printStackTrace();
+                        return null;
+                    }
+                }
+            });
+        }
         return fac;
     }
 

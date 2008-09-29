@@ -46,14 +46,14 @@ public class Unifier implements Cloneable {
      * @deprecated use t.apply(un) instead.
      */
     public void apply(Term t) {
-    	t.apply(this);
+        t.apply(this);
     }
 
     /** 
      * @deprecated use p.apply(un) instead.
      */
     public void apply(Pred p) {
-    	p.apply(this);
+        p.apply(this);
     }
 
     /**
@@ -122,21 +122,21 @@ public class Unifier implements Cloneable {
     */
     public boolean unifiesNoUndo(Term t1g, Term t2g) {
 
-		Pred np1 = null;
-		Pred np2 = null;
-		
-    	if (t1g instanceof Pred && t2g instanceof Pred) {
-    		np1 = (Pred)t1g;
-    		np2 = (Pred)t2g;
+        Pred np1 = null;
+        Pred np2 = null;
         
-    		// tests when np1 or np2 are Vars with annots
-	        if ((np1.isVar() && np1.hasAnnot()) || np2.isVar() && np2.hasAnnot()) {
-	            if (!np1.hasSubsetAnnot(np2, this)) {
-	                return false;
-	            }
-	        }
-    	}
-    	
+        if (t1g instanceof Pred && t2g instanceof Pred) {
+            np1 = (Pred)t1g;
+            np2 = (Pred)t2g;
+        
+            // tests when np1 or np2 are Vars with annots
+            if ((np1.isVar() && np1.hasAnnot()) || np2.isVar() && np2.hasAnnot()) {
+                if (!np1.hasSubsetAnnot(np2, this)) {
+                    return false;
+                }
+            }
+        }
+        
         // unify as Term
         boolean ok = unifyTerms(t1g, t2g);
 
@@ -147,24 +147,24 @@ public class Unifier implements Cloneable {
         //      X[An|R] = p(1)[a,b]
         // X = p(1), An = a, R=[b]
         if (ok && np1 != null) { // they are predicates
-	        if (np1.isVar() && np1.hasAnnot()) {
-	            np1 = deref( (VarTerm)np1);
-	        	Term np1vl = function.get( (VarTerm) np1);
-	        	if (np1vl != null && np1vl.isPred()) {
-	        	    Pred pvl = (Pred)np1vl.clone();
-	        		pvl.clearAnnots();
-	        		bind((VarTerm) np1, pvl);
-	        	}
-	        }
-	        if (np2.isVar() && np2.hasAnnot()) {
-	            np2 = deref( (VarTerm)np2);
-	        	Term np2vl = function.get((VarTerm) np2);
-	        	if (np2vl != null && np2vl.isPred()) {
+            if (np1.isVar() && np1.hasAnnot()) {
+                np1 = deref( (VarTerm)np1);
+                Term np1vl = function.get( (VarTerm) np1);
+                if (np1vl != null && np1vl.isPred()) {
+                    Pred pvl = (Pred)np1vl.clone();
+                    pvl.clearAnnots();
+                    bind((VarTerm) np1, pvl);
+                }
+            }
+            if (np2.isVar() && np2.hasAnnot()) {
+                np2 = deref( (VarTerm)np2);
+                Term np2vl = function.get((VarTerm) np2);
+                if (np2vl != null && np2vl.isPred()) {
                     Pred pvl = (Pred)np2vl.clone(); 
                     pvl.clearAnnots();
                     bind((VarTerm) np2, pvl);
-	        	}
-	        }
+                }
+            }
         }
         return ok;
     }
@@ -216,7 +216,7 @@ public class Unifier implements Cloneable {
         // if any of the terms is not a literal (is a number or a
         // string), they must be equal
         if (!t1g.isLiteral() || !t2g.isLiteral())
-        	return t1g.equals(t2g);
+            return t1g.equals(t2g);
 
         // both terms are literal
 
@@ -230,8 +230,8 @@ public class Unifier implements Cloneable {
         
         // if both are literal, they must have the same negated
         if (t1s.negated() != t2s.negated())
-        	return false;
-        	
+            return false;
+            
         // different functor
         if (!t1s.getFunctor().equals(t2s.getFunctor()))  
             return false;

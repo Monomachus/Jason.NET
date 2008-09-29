@@ -39,53 +39,53 @@ import org.w3c.dom.Element;
  */
 public final class StringTermImpl extends DefaultTerm implements StringTerm {
 
-	private static final long serialVersionUID = 1L;
-	private static Logger logger = Logger.getLogger(StringTermImpl.class.getName());
+    private static final long serialVersionUID = 1L;
+    private static Logger logger = Logger.getLogger(StringTermImpl.class.getName());
     
     private final String value;
 
-	public StringTermImpl() {
-		super();
-		value = null;
-	}
-	
-	public StringTermImpl(String fs) {
-		value = fs;
-	}
-	
-	public StringTermImpl(StringTermImpl t) {
-		value = t.getString();
-	}
+    public StringTermImpl() {
+        super();
+        value = null;
+    }
+    
+    public StringTermImpl(String fs) {
+        value = fs;
+    }
+    
+    public StringTermImpl(StringTermImpl t) {
+        value = t.getString();
+    }
 
-	public String getString() {
-		return value;
-	}
-	
-	public StringTerm clone() {
-		return this;
-	}
-	
-	public static StringTerm parseString(String sTerm) {
-		as2j parser = new as2j(new StringReader(sTerm));
-		try {
-			return (StringTerm)parser.term();
-		} catch (Exception e) {
-			logger.log(Level.SEVERE,"Error parsing string term " + sTerm,e);
-			return null;
-		}
-	}
+    public String getString() {
+        return value;
+    }
+    
+    public StringTerm clone() {
+        return this;
+    }
+    
+    public static StringTerm parseString(String sTerm) {
+        as2j parser = new as2j(new StringReader(sTerm));
+        try {
+            return (StringTerm)parser.term();
+        } catch (Exception e) {
+            logger.log(Level.SEVERE,"Error parsing string term " + sTerm,e);
+            return null;
+        }
+    }
 
     @Override
-	public boolean isString() {
-		return true;
-	}
+    public boolean isString() {
+        return true;
+    }
 
- 	public int length() {
- 		if (value == null)
- 			return 0;
- 		else
- 			return value.length();
-	}
+    public int length() {
+        if (value == null)
+            return 0;
+        else
+            return value.length();
+    }
 
     @Override
     public boolean equals(Object t) {
@@ -100,15 +100,15 @@ public final class StringTermImpl extends DefaultTerm implements StringTerm {
 
     @Override
     protected int calcHashCode() {
-    	if (value == null)
-    		return 0;
-    	else
-    		return value.hashCode();
+        if (value == null)
+            return 0;
+        else
+            return value.hashCode();
     }
-	
-	public String toString() {
-		return "\""+value+"\"";
-	}
+    
+    public String toString() {
+        return "\""+value+"\"";
+    }
 
     /** get as XML */
     public Element getAsDOM(Document document) {

@@ -30,11 +30,11 @@ package jason.asSyntax;
  */
 public class UnnamedVar extends VarTerm {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private static int varCont = 1;
-	private int myId;
-	
+    private static int varCont = 1;
+    private int myId;
+    
     public UnnamedVar() {
         super("_" + (varCont++));
         myId = varCont;
@@ -58,7 +58,7 @@ public class UnnamedVar extends VarTerm {
             newv.myId = this.myId;
             if (hasAnnot())
                 newv.addAnnots(this.getAnnots().cloneLT());
-        	return newv;
+            return newv;
         }
     }
     

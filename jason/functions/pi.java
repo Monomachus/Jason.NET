@@ -15,18 +15,18 @@ import jason.asSyntax.Term;
 */
 public class pi extends DefaultArithFunction  {
 
-	public String getName() {
-	    return "math.pi";
-	}
-	
-	@Override
-	public double evaluate(TransitionSystem ts, Term[] args) throws Exception {
-	    return Math.PI;
-	}
+    public String getName() {
+        return "math.pi";
+    }
+    
+    @Override
+    public double evaluate(TransitionSystem ts, Term[] args) throws Exception {
+        return Math.PI;
+    }
 
-	@Override
-	public boolean checkArity(int a) {
-		return a == 0;
-	}
-	
+    @Override
+    public boolean checkArity(int a) {
+        return a == 0;
+    }
+    
 }

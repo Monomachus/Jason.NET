@@ -16,9 +16,9 @@ import javax.swing.JFrame;
  */
 public class GridWorldView extends JFrame {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	protected int cellSizeW = 0;
+    protected int cellSizeW = 0;
     protected int cellSizeH = 0;
 
     protected GridCanvas     drawArea;
@@ -116,7 +116,7 @@ public class GridWorldView extends JFrame {
         }
         
         if ((model.data[x][y] & GridWorldModel.AGENT) != 0) {
-    		drawAgent(drawArea.getGraphics(), x, y, Color.blue, model.getAgAtPos(x, y));
+            drawAgent(drawArea.getGraphics(), x, y, Color.blue, model.getAgAtPos(x, y));
         }
     }
     
@@ -130,9 +130,9 @@ public class GridWorldView extends JFrame {
     
     class GridCanvas extends Canvas {
         
-		private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 1L;
 
-		public void paint(Graphics g) {
+        public void paint(Graphics g) {
             cellSizeW = drawArea.getWidth() / model.getWidth();
             cellSizeH = drawArea.getHeight() / model.getHeight();
             int mwidth = model.getWidth();

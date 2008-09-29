@@ -25,9 +25,9 @@ import org.gjt.sp.jedit.View;
 
 public class NewProjectGUI extends NewAgentGUI {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	JTextField projName;
+    JTextField projName;
 
     JTextField projDir;
 

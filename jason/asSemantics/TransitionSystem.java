@@ -150,9 +150,9 @@ public class TransitionSystem {
             // get the content, it can be any term (literal, list, number, ...; see ask)
             Term content = null;
             if (m.getPropCont() instanceof Term) {
-            	content = (Term)m.getPropCont();
+                content = (Term)m.getPropCont();
             } else {
-            	content = DefaultTerm.parse(m.getPropCont().toString());
+                content = DefaultTerm.parse(m.getPropCont().toString());
             }
 
             // check if an intention was suspended waiting this message
@@ -189,10 +189,10 @@ public class TransitionSystem {
                 // generate an event
                 Literal received = new LiteralImpl("kqml_received");
                 received.addTerms(
-                		new Atom(m.getSender()),
-                		new Atom(m.getIlForce()),
-                		content,
-                		new Atom(m.getMsgId()));
+                        new Atom(m.getSender()),
+                        new Atom(m.getIlForce()),
+                        content,
+                        new Atom(m.getMsgId()));
 
                 updateEvents(new Event(new Trigger(TEOperator.add, TEType.achieve, received), Intention.EmptyInt));
             }
@@ -361,13 +361,13 @@ public class TransitionSystem {
                 // but, if the intention is not in PA, it means that the intention was dropped
                 // and should not return to I)
                 if (C.getPendingActions().remove(a.getIntention().getId()) != null) {
-    	            if (a.getResult()) {
-    	                // add the intention back in I
-    	                updateIntention();
-    	            	applyClrInt(confP.C.SI);
-    	            } else {
-    	                generateGoalDeletion(JasonException.createBasicErrorAnnots("action_failed", ""));
-    	            }
+                    if (a.getResult()) {
+                        // add the intention back in I
+                        updateIntention();
+                        applyClrInt(confP.C.SI);
+                    } else {
+                        generateGoalDeletion(JasonException.createBasicErrorAnnots("action_failed", ""));
+                    }
                 } else {
                     applyProcAct(); // get next action
                 }
@@ -388,7 +388,7 @@ public class TransitionSystem {
         if (conf.C.hasIntention()) {
             confP.C.SI = conf.ag.selectIntention(conf.C.getIntentions());
             if (confP.C.SI != null) { // the selectIntention function retuned null
-                return;            	
+                return;             
             }
         }
 
@@ -510,21 +510,21 @@ public class TransitionSystem {
             if (conf.ag.believes(f, u)) {
                 updateIntention();
             } else {
-            	boolean fail = true;
-            	if (f instanceof Literal) { // generate event when using literal in the test (no events for log. expr. like ?(a & b))
-            		body = (Literal)f.clone();
-            		if (body.isLiteral()) { // in case body is a var with content that is not a literal (note the VarTerm pass in the instanceof Literal)
-    	                body.makeVarsAnnon(u);
-    	                Trigger te = new Trigger(TEOperator.add, TEType.test, body);
-    	                if (ag.getPL().hasCandidatePlan(te)) {
-    	                    Event evt = new Event(te, conf.C.SI);
-    	                    if (logger.isLoggable(Level.FINE)) logger.fine("Test Goal '" + h + "' failed as simple query. Generating internal event for it: "+te);
-    	                    conf.C.addEvent(evt);
-    	                    confP.step = State.StartRC;
-    	                    fail = false;
-    	                }
-            		}
-            	}
+                boolean fail = true;
+                if (f instanceof Literal) { // generate event when using literal in the test (no events for log. expr. like ?(a & b))
+                    body = (Literal)f.clone();
+                    if (body.isLiteral()) { // in case body is a var with content that is not a literal (note the VarTerm pass in the instanceof Literal)
+                        body.makeVarsAnnon(u);
+                        Trigger te = new Trigger(TEOperator.add, TEType.test, body);
+                        if (ag.getPL().hasCandidatePlan(te)) {
+                            Event evt = new Event(te, conf.C.SI);
+                            if (logger.isLoggable(Level.FINE)) logger.fine("Test Goal '" + h + "' failed as simple query. Generating internal event for it: "+te);
+                            conf.C.addEvent(evt);
+                            confP.step = State.StartRC;
+                            fail = false;
+                        }
+                    }
+                }
                 if (fail) {
                     if (logger.isLoggable(Level.FINE)) logger.fine("Test '"+h+"' failed ("+h.getErrorMsg()+").");
                     generateGoalDeletion();
@@ -654,12 +654,12 @@ public class TransitionSystem {
             //   +!s: !b; !z
             // should became
             //   +!s: !z
-        	im = i.peek();
-        	if (im.isFinished() || !im.unif.unifies(im.getCurrentStep().getBodyTerm(), topLiteral))
-        		im = i.pop(); // +!c above
+            im = i.peek();
+            if (im.isFinished() || !im.unif.unifies(im.getCurrentStep().getBodyTerm(), topLiteral))
+                im = i.pop(); // +!c above
             while (i.size() > 0 &&
-            	   !im.unif.unifies(im.getTrigger().getLiteral(), topLiteral) &&
-            	   !im.unif.unifies(im.getCurrentStep().getBodyTerm(), topLiteral)) {
+                   !im.unif.unifies(im.getTrigger().getLiteral(), topLiteral) &&
+                   !im.unif.unifies(im.getCurrentStep().getBodyTerm(), topLiteral)) {
                 im = i.pop();
             }
         }
@@ -716,8 +716,8 @@ public class TransitionSystem {
     public List<Option> applicablePlans(List<Option> rp) throws JasonException {
         List<Option> ap = null;
         if (rp != null) {
-        	//ap = new ApplPlanTimeOut().get(rp);
-        	
+            //ap = new ApplPlanTimeOut().get(rp);
+            
             for (Option opt: rp) {
                 LogicalFormula context = opt.getPlan().getContext();
                 if (context == null) { // context is true
@@ -774,13 +774,13 @@ public class TransitionSystem {
     
     /** remove the top action and requeue the current intention */
     private void updateIntention() {
-    	if (!conf.C.SI.isFinished()) {
-	        IntendedMeans im = conf.C.SI.peek();
-	        im.removeCurrentStep();
-	        confP.C.addIntention(conf.C.SI);
-    	} else {
-    		logger.fine("trying to update a finished intention!");
-    	}
+        if (!conf.C.SI.isFinished()) {
+            IntendedMeans im = conf.C.SI.peek();
+            im.removeCurrentStep();
+            confP.C.addIntention(conf.C.SI);
+        } else {
+            logger.fine("trying to update a finished intention!");
+        }
     }
 
     /** generate a failure event for the current intention */
@@ -849,14 +849,14 @@ public class TransitionSystem {
 
     public Event findEventForFailure(Intention i, Trigger tevent) {
         Trigger failTrigger = new Trigger(TEOperator.del, tevent.getType(), tevent.getLiteral());
-    	if (i != Intention.EmptyInt) {
-	        ListIterator<IntendedMeans> ii = i.iterator();
-	        while (!getAg().getPL().hasCandidatePlan(failTrigger) && ii.hasPrevious()) {
-	            IntendedMeans im = ii.previous();
-	            tevent = im.getTrigger();
-	            failTrigger = new Trigger(TEOperator.del, tevent.getType(), tevent.getLiteral());
-	        }
-    	}
+        if (i != Intention.EmptyInt) {
+            ListIterator<IntendedMeans> ii = i.iterator();
+            while (!getAg().getPL().hasCandidatePlan(failTrigger) && ii.hasPrevious()) {
+                IntendedMeans im = ii.previous();
+                tevent = im.getTrigger();
+                failTrigger = new Trigger(TEOperator.del, tevent.getType(), tevent.getLiteral());
+            }
+        }
         // if some failure handling plan is found
         if (tevent.isGoal() && getAg().getPL().hasCandidatePlan(failTrigger)) {
             return new Event(failTrigger.clone(), i);
@@ -943,7 +943,7 @@ public class TransitionSystem {
 
             ActionExec action = C.getAction(); 
             if (action != null) {
-            	C.getPendingActions().put(action.getIntention().getId(), action);
+                C.getPendingActions().put(action.getIntention().getId(), action);
                 agArch.act(action, C.getFeedbackActions());
             }
 

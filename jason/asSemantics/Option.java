@@ -37,9 +37,9 @@ import org.w3c.dom.Element;
 
 public class Option implements Serializable {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private Plan    plan;
+    private Plan    plan;
     private Unifier unif;
 
     public Option(Plan p, Unifier u) {

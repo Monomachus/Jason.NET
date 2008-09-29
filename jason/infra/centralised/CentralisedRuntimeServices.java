@@ -20,7 +20,7 @@ public class CentralisedRuntimeServices implements RuntimeServicesInfraTier {
     private RunCentralisedMAS masRunner;
     
     public CentralisedRuntimeServices(RunCentralisedMAS masRunner) {
-    	this.masRunner = masRunner;
+        this.masRunner = masRunner;
     }
     
     public boolean createAgent(String agName, String agSource, String agClass, String archClass, ClassParameters bbPars, Settings stts) throws Exception {
@@ -86,10 +86,10 @@ public class CentralisedRuntimeServices implements RuntimeServicesInfraTier {
         logger.fine("Killing centralised agent " + agName);
         CentralisedAgArch ag = masRunner.getAg(agName);
         if (ag != null) {
-        	ag.stopAg();
-        	return true;
+            ag.stopAg();
+            return true;
         } else {
-        	return false;
+            return false;
         }
     }
 

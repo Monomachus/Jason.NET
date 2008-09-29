@@ -49,32 +49,32 @@ public class RuleToFunction extends DefaultArithFunction  {
         return a == arity;
     }
 
-	@Override
-	public double evaluate(TransitionSystem ts, Term[] args) throws Exception {
-	    // create a literal to perform the query
-	    Literal r;
-	    if (literal.indexOf(".") > 0) // is internal action
-	        r = new InternalActionLiteral(literal);
-	    else
-	        r = new LiteralImpl(literal);
-	    
-	    r.addTerms(args);
-	    VarTerm answer = new VarTerm("__RuleToFunctionResult");
-	    r.addTerm(answer);
-	    
-	    // query the BB
-	    Iterator<Unifier> i = r.logicalConsequence( (ts == null ? null : ts.getAg()), new Unifier());
-	    if (i.hasNext()) {
-	        Term value = i.next().get(answer);
-	        if (value.isNumeric())
-	            return ((NumberTerm)value).solve();
-	        else
-	            throw new JasonException("The result of "+r+"("+value+") is not numeric!");	            
-	    } else 
-	        throw new JasonException("No solution for found for rule "+r);
-	}
-	
-	public String toString() { 
-	    return "function wrapper for "+literal+"/"+arity;
-	}
+    @Override
+    public double evaluate(TransitionSystem ts, Term[] args) throws Exception {
+        // create a literal to perform the query
+        Literal r;
+        if (literal.indexOf(".") > 0) // is internal action
+            r = new InternalActionLiteral(literal);
+        else
+            r = new LiteralImpl(literal);
+        
+        r.addTerms(args);
+        VarTerm answer = new VarTerm("__RuleToFunctionResult");
+        r.addTerm(answer);
+        
+        // query the BB
+        Iterator<Unifier> i = r.logicalConsequence( (ts == null ? null : ts.getAg()), new Unifier());
+        if (i.hasNext()) {
+            Term value = i.next().get(answer);
+            if (value.isNumeric())
+                return ((NumberTerm)value).solve();
+            else
+                throw new JasonException("The result of "+r+"("+value+") is not numeric!");             
+        } else 
+            throw new JasonException("No solution for found for rule "+r);
+    }
+    
+    public String toString() { 
+        return "function wrapper for "+literal+"/"+arity;
+    }
 }

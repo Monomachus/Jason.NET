@@ -37,12 +37,12 @@ public class MG implements Directive {
                 // add bel g
                 Literal ig = goal.copy();
                 ig.addAnnot(BeliefBase.TPercept);
-            	newAg.addInitialBel(goal);
+                newAg.addInitialBel(goal);
 
                 // add -g : true <- !g.
                 newAg.getPL().add(Plan.parse("-"+goal+" <- !"+goal+"."));
 
-            	return newAg;
+                return newAg;
             }
         } catch (Exception e) {
             logger.log(Level.SEVERE,"Directive error.", e);

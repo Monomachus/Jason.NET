@@ -75,7 +75,7 @@ public class DefaultBeliefBase implements BeliefBase {
     }
 
     @SuppressWarnings("unchecked")
-	public Iterator<Literal> getPercepts() {
+    public Iterator<Literal> getPercepts() {
         final Iterator<Literal> i = percepts.iterator();
         return new Iterator<Literal>() {
             Literal current = null;
@@ -115,8 +115,8 @@ public class DefaultBeliefBase implements BeliefBase {
         return add(l, index != 0);
     }
     
-	protected boolean add(Literal l, boolean addInEnd) {
-		if (!l.canBeAddedInBB()) {
+    protected boolean add(Literal l, boolean addInEnd) {
+        if (!l.canBeAddedInBB()) {
             logger.log(Level.SEVERE, "Error: '"+l+"' can not be added in the belief base.");
             return false;
         }
@@ -153,7 +153,7 @@ public class DefaultBeliefBase implements BeliefBase {
         Literal bl = contains(l);
         if (bl != null) {
             if (l.hasSubsetAnnot(bl)) { // e.g. removing b[a] or b[a,d] from BB b[a,b,c]
-            		                    // second case fails
+                                        // second case fails
                 if (l.hasAnnot(TPercept)) {
                     percepts.remove(bl);
                 }
@@ -211,7 +211,7 @@ public class DefaultBeliefBase implements BeliefBase {
     
     /** @deprecated use iterator() instead of getAll */
     public Iterator<Literal> getAll() {
-    	return iterator();
+        return iterator();
     }
     
 
@@ -253,11 +253,11 @@ public class DefaultBeliefBase implements BeliefBase {
     }
 
     public Object clone() {
-    	DefaultBeliefBase bb = new DefaultBeliefBase();
-    	for (Literal b: this) {
-    		bb.add(1, b.copy());
-    	}
-    	return bb;
+        DefaultBeliefBase bb = new DefaultBeliefBase();
+        for (Literal b: this) {
+            bb.add(1, b.copy());
+        }
+        return bb;
     }
     
     public Element getAsDOM(Document document) {
@@ -306,11 +306,11 @@ public class DefaultBeliefBase implements BeliefBase {
         }
         
         protected Object clone() {
-        	BelEntry be = new BelEntry();
-        	for (Literal l: list) {
-        		be.add(l.copy(), false);
-        	}
-        	return be;
+            BelEntry be = new BelEntry();
+            for (Literal l: list) {
+                be.add(l.copy(), false);
+            }
+            return be;
         }
         
         public String toString() {

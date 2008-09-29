@@ -9,14 +9,14 @@ import java.util.List;
  * @author Jomi
  */
 public interface ListTerm extends java.util.List<Term>, Term {
-	
+    
     public void setTerm(Term t);
     public Term getTerm();
     public void setNext(Term l);
     public ListTerm getNext();
-	
+    
     public boolean isEnd();
-	
+    
     public boolean isTail();
     public VarTerm getTail();
     public void setTail(VarTerm v);
