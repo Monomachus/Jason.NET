@@ -69,9 +69,7 @@
     private Term changeToAtom(Object o) {
         Term u = (Term)o;
         if (u.isAtom()) {
-           Atom a = new Atom( ((Structure)u).getFunctor());
-           a.setSrc(u);
-           return a;
+           return new Atom( (Literal)u);
         } else {
            return u;
         }
@@ -548,17 +546,11 @@
       }
       F = pred();
                                                 if (F.getFunctor().equals("if")) {
-                                                               Pred c = new Pred(".if_then_else");
-                                                               c.setTerms(F.getTerms());
-                                                               F = c;
+                                                               F = (Pred)new Pred(".if_then_else").setTerms(F.getTerms());
                                                             } else if (F.getFunctor().equals("while")) {
-                                                               Pred c = new Pred(".loop");
-                                                               c.setTerms(F.getTerms());
-                                                               F = c;
+                                                               F = (Pred)new Pred(".loop").setTerms(F.getTerms());
                                                             } else if (F.getFunctor().equals("for")) {
-                                                               Pred c = new Pred(".foreach");
-                                                               c.setTerms(F.getTerms());
-                                                               F = c;
+                                                               F = (Pred)new Pred(".foreach").setTerms(F.getTerms());
                                                             }
 
                                 if (F.getFunctor().indexOf(".") >= 0) {
@@ -1211,8 +1203,13 @@
     finally { jj_save(0, xla); }
   }
 
-  final private boolean jj_3R_15() {
-    if (jj_3R_17()) return true;
+  final private boolean jj_3R_14() {
+    if (jj_3R_16()) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_17() {
+    if (jj_scan_token(42)) return true;
     return false;
   }
 
@@ -1224,23 +1221,13 @@
     return false;
   }
 
-  final private boolean jj_3R_16() {
-    if (jj_scan_token(27)) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_14() {
-    if (jj_3R_16()) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_17() {
-    if (jj_scan_token(42)) return true;
-    return false;
-  }
-
   final private boolean jj_3R_13() {
     if (jj_scan_token(39)) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_16() {
+    if (jj_scan_token(27)) return true;
     return false;
   }
 
@@ -1262,6 +1249,11 @@
     }
     xsp = jj_scanpos;
     if (jj_3R_15()) jj_scanpos = xsp;
+    return false;
+  }
+
+  final private boolean jj_3R_15() {
+    if (jj_3R_17()) return true;
     return false;
   }
 

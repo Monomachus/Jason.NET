@@ -193,7 +193,8 @@ public abstract class Literal extends DefaultTerm implements LogicalFormula {
     public Literal addTerms(List<Term> l) { logger.log(Level.SEVERE, "addTerms is not implemented in the class "+this.getClass().getSimpleName(), new Exception()); return null; }
     /** returns the i-th term (first term is 0) */
     public Term getTerm(int i)    { logger.log(Level.SEVERE, "getTerm(i) is not implemented in the class "+this.getClass().getSimpleName(), new Exception()); return null; }
-    public void setTerms(List<Term> l) { logger.log(Level.SEVERE, "setTerms is not implemented in the class "+this.getClass().getSimpleName(), new Exception());  }
+    /** set all terms of the literal and return this */
+    public Literal setTerms(List<Term> l) { logger.log(Level.SEVERE, "setTerms is not implemented in the class "+this.getClass().getSimpleName(), new Exception()); return null; }
     public void setTerm(int i, Term t) { logger.log(Level.SEVERE, "setTerm is not implemented in the class "+this.getClass().getSimpleName(), new Exception());  }
     
     // pred

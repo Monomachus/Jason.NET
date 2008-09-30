@@ -212,10 +212,11 @@ public class Structure extends Atom {
     }
  
     @Override
-    public void setTerms(List<Term> l) {
+    public Literal setTerms(List<Term> l) {
         terms = l;
         predicateIndicatorCache = null;
         resetHashCodeCache();
+        return this;
     }
     
     @Override

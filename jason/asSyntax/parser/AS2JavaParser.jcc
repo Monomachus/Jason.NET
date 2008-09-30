@@ -99,9 +99,7 @@ PARSER_BEGIN(as2j)
     private Term changeToAtom(Object o) {
         Term u = (Term)o;
         if (u.isAtom()) {
-           Atom a = new Atom( ((Structure)u).getFunctor());
-           a.setSrc(u);
-           return a;
+           return new Atom( (Literal)u);
         } else {
            return u; 
         }  
@@ -403,17 +401,11 @@ Literal literal() :           { Pred F; Token k; boolean type = Literal.LPos; }
       ]
       F=pred()                { 
          				        if (F.getFunctor().equals("if")) {
-							       Pred c = new Pred(".if_then_else");
-							       c.setTerms(F.getTerms());
-							       F = c;
+							       F = (Pred)new Pred(".if_then_else").setTerms(F.getTerms());
 							    } else if (F.getFunctor().equals("while")) {
-							       Pred c = new Pred(".loop");
-							       c.setTerms(F.getTerms());
-							       F = c;
+							       F = (Pred)new Pred(".loop").setTerms(F.getTerms());
 							    } else if (F.getFunctor().equals("for")) {
-							       Pred c = new Pred(".foreach");
-							       c.setTerms(F.getTerms());
-							       F = c;
+							       F = (Pred)new Pred(".foreach").setTerms(F.getTerms());
 							    }
       
                                 if (F.getFunctor().indexOf(".") >= 0) {

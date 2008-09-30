@@ -290,9 +290,11 @@ public class VarTerm extends LiteralImpl implements NumberTerm, ListTerm, String
     }
 
     @Override
-    public void setTerms(List<Term> l) {
+    public Literal setTerms(List<Term> l) {
         if (value != null && value.isStructure()) {
-            ((Structure)getValue()).setTerms(l);
+            return ((Structure)getValue()).setTerms(l);
+        } else {
+            return this;
         }
     }
 

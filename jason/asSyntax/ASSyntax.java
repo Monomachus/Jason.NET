@@ -43,9 +43,8 @@ import java.io.StringReader;
                             .addAnnots(createAtom("s"), createString("s"));
              
   // create the literal '~p(a,3)[s,"s"]'
-  Literal l4 = createLiteral("p", createAtom("a"), createNumber(3))
-                             .addAnnots(createAtom("s"), createString("s"))
-                             .setNegated(Literal.LNeg);
+  Literal l4 = createLiteral(Literal.LNeg, "p", createAtom("a"), createNumber(3))
+                            .addAnnots(createAtom("s"), createString("s"));
                              
   // or use a parsing (easier but slow)
   Literal l4 = parseLiteral("~p(a,3)[s]");
@@ -56,8 +55,9 @@ import java.io.StringReader;
  */
 public class ASSyntax {
 
+    
     /** 
-     * Creates a new literal, the first argument is the functor (a string)
+     * Creates a new positive literal, the first argument is the functor (a string)
      * and the n remainder arguments are terms. see documentation of this
      * class for examples of use.
      */
@@ -147,4 +147,9 @@ public class ASSyntax {
         return new as2j(new StringReader(sList)).list();
     }
     
+    /** creates a new logical formula  by parsing a string */
+    public static LogicalFormula parseFormula(String sExpr) throws ParseException {
+        return (LogicalFormula)new as2j(new StringReader(sExpr)).log_expr();
+    }
+
 }

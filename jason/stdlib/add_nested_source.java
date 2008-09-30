@@ -100,15 +100,13 @@ public class add_nested_source extends DefaultInternalAction {
             return result;
         } else if (l.isLiteral()) {
             Literal result;
-            if (l.isAtom())
-                result = new LiteralImpl(((Atom)l).getFunctor());
-            else
+            if (l instanceof LiteralImpl)
                 result = (Literal)l.clone();
+            else
+                result = new LiteralImpl((Atom)l);
             
             // create the source annots
-            Pred ts = new Pred("source",1);
-            ts.addTerm(source);
-            ts.addAnnots(result.getAnnots("source"));
+            Literal ts = new Pred("source",1).addTerms(source).addAnnots(result.getAnnots("source"));
             
             result.delSources();
             result.addAnnot(ts);
