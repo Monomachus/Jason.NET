@@ -138,9 +138,8 @@ public class Trigger implements Cloneable {
         return piCache;
     }
     
-    public Trigger apply(Unifier u) {
-        literal.apply(u);
-        return this;
+    public boolean apply(Unifier u) {
+        return literal.apply(u);
     }
 
     public Literal getLiteral() {
