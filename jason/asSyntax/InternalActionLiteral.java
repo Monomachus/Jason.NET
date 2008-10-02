@@ -100,7 +100,7 @@ public class InternalActionLiteral extends LiteralImpl {
             // count the vars of first arg
             if (getTerm(0).isString()) {
                 try {
-                    Trigger te = Trigger.parseTrigger( ((StringTerm)getTerm(0)).getString() );
+                    Trigger te = ASSyntax.parseTrigger( ((StringTerm)getTerm(0)).getString() );
                     te.getLiteral().countVars(c);
                 } catch (Exception e) {
                     e.printStackTrace();

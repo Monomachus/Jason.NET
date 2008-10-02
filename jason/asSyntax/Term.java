@@ -33,10 +33,7 @@ public interface Term extends Cloneable, Comparable<Term>, Serializable, ToDOM {
 
     public boolean equals(Object o);
     
-    /** 
-     *  Replaces variables by their values in the unifier, returns true
-     *  if some variable was applied.  
-     */
+    /** replaces variables by their values in the unifier, returns true if some variable was applied */
     public boolean apply(Unifier u);
 
     /** Removes the value cached for hashCode */

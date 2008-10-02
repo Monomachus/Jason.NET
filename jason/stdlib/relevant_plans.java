@@ -28,6 +28,7 @@ import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.Option;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
+import jason.asSyntax.ASSyntax;
 import jason.asSyntax.ListTerm;
 import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Plan;
@@ -35,6 +36,7 @@ import jason.asSyntax.StringTerm;
 import jason.asSyntax.StringTermImpl;
 import jason.asSyntax.Term;
 import jason.asSyntax.Trigger;
+import jason.asSyntax.parser.ParseException;
 
 import java.util.List;
 
@@ -73,13 +75,21 @@ public class relevant_plans extends DefaultInternalAction {
     @Override public int getMaxArgs() { return 2; }
 
     @Override
+    protected void checkArguments(Term[] args) throws JasonException {
+        super.checkArguments(args);
+        if (!args[0].isString())
+            throw JasonException.createWrongArgument(this,"first argument must be a string");
+    }
+    
+    @Override
 	public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         checkArguments(args);
         
-		StringTerm sTe = (StringTerm) args[0];
-		Trigger te = Trigger.parseTrigger(sTe.getString());
-		if (te == null) {
-			throw new JasonException("The first argument of the 'relevant_plans' internal action is not a triggering event.");
+		Trigger te;
+		try {
+		    te = ASSyntax.parseTrigger(((StringTerm) args[0]).getString());
+		} catch (ParseException e) {
+            throw JasonException.createWrongArgument(this,"first argument '"+args[0]+"' must follow the syntax of a trigger.");
 		}
 		ListTerm lt = new ListTermImpl();
         List<Option> rp = ts.relevantPlans(te);

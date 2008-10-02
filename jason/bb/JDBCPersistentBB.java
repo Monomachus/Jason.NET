@@ -2,7 +2,7 @@ package jason.bb;
 
 import jason.asSemantics.Agent;
 import jason.asSemantics.Unifier;
-import jason.asSyntax.DefaultTerm;
+import jason.asSyntax.ASSyntax;
 import jason.asSyntax.ListTerm;
 import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Literal;
@@ -13,6 +13,7 @@ import jason.asSyntax.StringTerm;
 import jason.asSyntax.StringTermImpl;
 import jason.asSyntax.Structure;
 import jason.asSyntax.Term;
+import jason.asSyntax.parser.ParseException;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -209,6 +210,8 @@ public class JDBCPersistentBB extends ChainBBAdapter {
             }
         } catch (SQLException e) {
             logger.log(Level.SEVERE, "SQL Error", e);
+        } catch (ParseException e) {
+            logger.log(Level.SEVERE, "Parser Error", e);
         } finally {
             try {
                 stmt.close();
@@ -377,8 +380,8 @@ public class JDBCPersistentBB extends ChainBBAdapter {
                             hasNext = rs.next();
                             if (!hasNext) rs.close();
                             return l;
-                        } catch (SQLException e) {
-                            logger.log(Level.SEVERE, "SQL Error", e);
+                        } catch (Exception e) {
+                            logger.log(Level.SEVERE, "Error", e);
                         }
                         return null;
                     }
@@ -441,8 +444,8 @@ public class JDBCPersistentBB extends ChainBBAdapter {
                     }
                 }
             }
-        } catch (SQLException e) {
-            logger.log(Level.SEVERE, "SQL Error", e);
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Error", e);
         } finally {
             try {
                 stmt.close();
@@ -455,7 +458,7 @@ public class JDBCPersistentBB extends ChainBBAdapter {
     
 
     /** translates the current line of a result set into a Literal */
-    protected Literal resultSetToLiteral(ResultSet rs, PredicateIndicator pi) throws SQLException {
+    protected Literal resultSetToLiteral(ResultSet rs, PredicateIndicator pi) throws SQLException, ParseException {
         ResultSetMetaData meta = belsDB.get(pi);
         boolean isJasonTable = isCreatedByJason(pi);
         Literal ldb = new LiteralImpl(pi.getFunctor());
@@ -482,11 +485,11 @@ public class JDBCPersistentBB extends ChainBBAdapter {
                     // there is no var at BB
                     parsed = new StringTermImpl(sc);
                 } else {
-                    parsed = DefaultTerm.parse(sc);
+                    parsed = ASSyntax.parseTerm(sc);
                     
                     // if the parsed term is not equals to sc, try it as string
                     if (!parsed.toString().equals(sc))
-                        parsed = DefaultTerm.parse(sc = "\"" + sc + "\"");
+                        parsed = ASSyntax.parseTerm(sc = "\"" + sc + "\"");
                 }
                 break;
             }

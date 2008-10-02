@@ -30,6 +30,7 @@ import jason.asSemantics.Event;
 import jason.asSemantics.Intention;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
+import jason.asSyntax.ASSyntax;
 import jason.asSyntax.InternalActionLiteral;
 import jason.asSyntax.NumberTerm;
 import jason.asSyntax.NumberTermImpl;
@@ -108,10 +109,9 @@ public class wait extends DefaultInternalAction {
             timeout = (long) time.solve();
         } else if (args[0].isString()) {
             // wait for event
-            StringTerm st = (StringTerm) args[0];
-            st.apply(un);
-            te = Trigger.parseTrigger(st.getString());
-
+            te = ASSyntax.parseTrigger( ((StringTerm) args[0]).getString());
+            te.getLiteral().apply(un);
+            
             if (args.length >= 2)
                 timeout = (long) ((NumberTerm) args[1]).solve();
             if (args.length == 3)

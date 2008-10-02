@@ -30,6 +30,7 @@ import jason.asSemantics.Event;
 import jason.asSemantics.Intention;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
+import jason.asSyntax.ASSyntax;
 import jason.asSyntax.StringTerm;
 import jason.asSyntax.Term;
 import jason.asSyntax.Trigger;
@@ -122,7 +123,7 @@ public class at extends DefaultInternalAction {
             throw new JasonException("The time parameter ('"+time+"') of the internal action 'at' did not parse correctly!");               
         }
         
-        Trigger te = Trigger.parseTrigger(sevent.getString());
+        Trigger te = ASSyntax.parseTrigger(sevent.getString());
 
         ts.getAg().getScheduler().schedule(new CheckDeadline(te, ts), deadline, TimeUnit.MILLISECONDS);
         return true;

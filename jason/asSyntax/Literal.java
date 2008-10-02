@@ -71,7 +71,7 @@ public abstract class Literal extends DefaultTerm implements LogicalFormula {
 
     protected PredicateIndicator predicateIndicatorCache = null; // to not compute it all the time (is is called many many times)
     
-    /** creates a new literal by parsing a string -- ASSyntax.parseLiteral is preferred. */
+    /** creates a new literal by parsing a string -- ASSyntax.parseLiteral or createLiteral are preferred. */
     public static Literal parseLiteral(String sLiteral) {
         try {
             as2j parser = new as2j(new StringReader(sLiteral));
@@ -106,7 +106,7 @@ public abstract class Literal extends DefaultTerm implements LogicalFormula {
 
     /** returns the number of terms of this literal */
     public int getArity()         { return 0;  }
-    /** returns trus if this literal has some term */
+    /** returns true if this literal has some term */
     public boolean hasTerm()      { return false; } 
     /** returns all terms of this literal */
     public List<Term> getTerms()  { return Structure.emptyTermList;   }

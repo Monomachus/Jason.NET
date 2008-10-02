@@ -2,12 +2,12 @@ package test;
 
 import jason.JasonException;
 import jason.asSemantics.Unifier;
+import jason.asSyntax.ASSyntax;
 import jason.asSyntax.LiteralImpl;
 import jason.asSyntax.Plan;
 import jason.asSyntax.PlanBody;
 import jason.asSyntax.PlanBodyImpl;
 import jason.asSyntax.PlanLibrary;
-import jason.asSyntax.Trigger;
 import jason.asSyntax.VarTerm;
 import jason.asSyntax.PlanBody.BodyType;
 import jason.asSyntax.parser.ParseException;
@@ -42,16 +42,16 @@ public class PlanTest extends TestCase {
 
         pl.add(Plan.parse("+!X <- .print(a)."));
         
-        List<Plan> pls = pl.getCandidatePlans(Trigger.parseTrigger("+p(3)"));
+        List<Plan> pls = pl.getCandidatePlans(ASSyntax.parseTrigger("+p(3)"));
         assertEquals(2, pls.size());
 
-        pls = pl.getCandidatePlans(Trigger.parseTrigger("+!p(3)"));
+        pls = pl.getCandidatePlans(ASSyntax.parseTrigger("+!p(3)"));
         assertEquals(3, pls.size());    
 
-        pls = pl.getCandidatePlans(Trigger.parseTrigger("+!bla"));
+        pls = pl.getCandidatePlans(ASSyntax.parseTrigger("+!bla"));
         assertEquals(1, pls.size());    
 
-        pls = pl.getCandidatePlans(Trigger.parseTrigger("+bla"));
+        pls = pl.getCandidatePlans(ASSyntax.parseTrigger("+bla"));
         assertEquals(0, pls.size());    
     }
     

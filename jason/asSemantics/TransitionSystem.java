@@ -26,8 +26,8 @@ package jason.asSemantics;
 import jason.JasonException;
 import jason.RevisionFailedException;
 import jason.architecture.AgArch;
+import jason.asSyntax.ASSyntax;
 import jason.asSyntax.Atom;
-import jason.asSyntax.DefaultTerm;
 import jason.asSyntax.InternalActionLiteral;
 import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Literal;
@@ -43,6 +43,7 @@ import jason.asSyntax.Term;
 import jason.asSyntax.Trigger;
 import jason.asSyntax.Trigger.TEOperator;
 import jason.asSyntax.Trigger.TEType;
+import jason.asSyntax.parser.ParseException;
 import jason.bb.BeliefBase;
 import jason.runtime.Settings;
 
@@ -152,7 +153,12 @@ public class TransitionSystem {
             if (m.getPropCont() instanceof Term) {
                 content = (Term)m.getPropCont();
             } else {
-                content = DefaultTerm.parse(m.getPropCont().toString());
+                try {
+                    content = ASSyntax.parseTerm(m.getPropCont().toString());
+                } catch (ParseException e) {
+                    logger.warning("The content of the message '"+m.getPropCont()+"' is not a term!");
+                    return;
+                }
             }
 
             // check if an intention was suspended waiting this message

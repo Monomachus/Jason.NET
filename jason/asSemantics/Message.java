@@ -24,7 +24,8 @@
 
 package jason.asSemantics;
 
-import jason.asSyntax.DefaultTerm;
+import jason.asSyntax.ASSyntax;
+import jason.asSyntax.parser.ParseException;
 
 import java.io.Serializable;
 
@@ -135,7 +136,7 @@ public class Message implements Serializable {
      * @param msg the string message
      * @return the parsed Message
      */
-    public static Message parseMsg(String msg) {
+    public static Message parseMsg(String msg) throws ParseException {
         int one, two;
         Message newmsg = new Message();
         if (msg.startsWith("<")) {
@@ -155,7 +156,7 @@ public class Message implements Serializable {
             newmsg.receiver = msg.substring(one + 1, two);
             one = msg.indexOf(">", two + 1);
             String content = msg.substring(two + 1, one);
-            newmsg.propCont = DefaultTerm.parse(content);
+            newmsg.propCont = ASSyntax.parseTerm(content);
         }
         return newmsg;
     }

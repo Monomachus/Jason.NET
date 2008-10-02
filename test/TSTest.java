@@ -5,6 +5,7 @@ import jason.asSemantics.Circumstance;
 import jason.asSemantics.Intention;
 import jason.asSemantics.Option;
 import jason.asSemantics.TransitionSystem;
+import jason.asSyntax.ASSyntax;
 import jason.asSyntax.Literal;
 import jason.asSyntax.StringTerm;
 import jason.asSyntax.StringTermImpl;
@@ -36,7 +37,7 @@ public class TSTest extends TestCase {
         Literal content = Literal.parseLiteral("~alliance");
         content.addSource(new Structure("ag1"));
 
-        Trigger te1 = Trigger.parseTrigger("+a(10)");
+        Trigger te1 = ASSyntax.parseTrigger("+a(10)");
 
         try {
             List<Option> rp = ts.relevantPlans(te1);
@@ -54,7 +55,7 @@ public class TSTest extends TestCase {
             e.printStackTrace();
         }
 
-        Trigger te2 = Trigger.parseTrigger("+a(20)");
+        Trigger te2 = ASSyntax.parseTrigger("+a(20)");
 
         try {
             List<Option> rp = ts.relevantPlans(te2);

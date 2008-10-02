@@ -74,6 +74,7 @@ public class Trigger implements Cloneable {
         setTrigOp(op);
     }
 
+    /** prefer to use ASSyntax.parseTrigger */
     public static Trigger parseTrigger(String sTe) {
         as2j parser = new as2j(new StringReader(sTe));
         try {
@@ -137,8 +138,9 @@ public class Trigger implements Cloneable {
         return piCache;
     }
     
-    public boolean apply(Unifier u) {
-        return literal.apply(u);
+    public Trigger apply(Unifier u) {
+        literal.apply(u);
+        return this;
     }
 
     public Literal getLiteral() {

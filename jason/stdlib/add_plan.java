@@ -26,7 +26,7 @@ package jason.stdlib;
 import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
-import jason.asSyntax.DefaultTerm;
+import jason.asSyntax.ASSyntax;
 import jason.asSyntax.ListTerm;
 import jason.asSyntax.StringTerm;
 import jason.asSyntax.Term;
@@ -91,7 +91,7 @@ public class add_plan extends DefaultInternalAction {
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         checkArguments(args);
 
-        Term plans = DefaultTerm.parse(args[0].toString());
+        Term plans = ASSyntax.parseTerm(args[0].toString());
 
         Term source = BeliefBase.ASelf;
         if (args.length > 1)

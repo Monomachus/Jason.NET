@@ -1,6 +1,7 @@
 package jason.asSyntax.patterns.goal;
 
 import jason.asSemantics.Agent;
+import jason.asSyntax.ASSyntax;
 import jason.asSyntax.LogExpr;
 import jason.asSyntax.LogicalFormula;
 import jason.asSyntax.Plan;
@@ -24,7 +25,7 @@ public class SGA implements Directive {
     
     public Agent process(Pred directive, Agent outerContent, Agent innerContent) {
         try {
-            Trigger trigger = Trigger.parseTrigger(((StringTerm)directive.getTerm(0)).getString());
+            Trigger trigger = ASSyntax.parseTrigger(((StringTerm)directive.getTerm(0)).getString());
             LogicalFormula context = LogExpr.parseExpr(((StringTerm)directive.getTerm(1)).getString());
             Term goal = directive.getTerm(2);
             

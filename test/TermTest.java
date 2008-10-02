@@ -1,8 +1,8 @@
 package test;
 
 import jason.asSemantics.Unifier;
+import jason.asSyntax.ASSyntax;
 import jason.asSyntax.Atom;
-import jason.asSyntax.DefaultTerm;
 import jason.asSyntax.ListTerm;
 import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Literal;
@@ -107,9 +107,9 @@ public class TermTest extends TestCase {
         assertEquals(x1.hashCode(), ta.hashCode());
     }
 
-    public void testUnifies() {
+    public void testUnifies() throws ParseException {
         assertTrue(new Unifier().unifies(new Structure("a"), new Structure("a")));
-        assertTrue(new Unifier().unifies(DefaultTerm.parse("a"), DefaultTerm.parse("a")));
+        assertTrue(new Unifier().unifies(ASSyntax.parseTerm("a"), ASSyntax.parseTerm("a")));
         assertTrue(new Unifier().unifies(new Structure("a"), new VarTerm("X")));
         
         Unifier u = new Unifier();
@@ -316,10 +316,10 @@ public class TermTest extends TestCase {
         assertTrue(u.unifies(a,Pred.parsePred("s[b]")));
     }
 
-    public void testAnnotsUnify7() {
+    public void testAnnotsUnify7() throws ParseException {
         // p[a,b,c,d] = p[a,c|R] - ok and R=[b,d]
-        Term t1 = DefaultTerm.parse("p[a,b,c,d]");
-        Term t2 = DefaultTerm.parse("p[a,c|R]");
+        Term t1 = ASSyntax.parseTerm("p[a,b,c,d]");
+        Term t2 = ASSyntax.parseTerm("p[a,c|R]");
         Unifier u = new Unifier();
         assertTrue(u.unifies(t1, t2));
         assertEquals(u.get("R").toString(),"[b,d]");
@@ -330,25 +330,25 @@ public class TermTest extends TestCase {
         assertEquals(u.get("R").toString(),"[b,d]");
 
         // p[H|R] = p[a,b,c,d] - ok and R=[b,c,d], H=a
-        Term t3 = DefaultTerm.parse("p[H|R]");
+        Term t3 = ASSyntax.parseTerm("p[H|R]");
         u = new Unifier();
         assertTrue(u.unifies(t1, t3));
         assertEquals(u.get("H").toString(),"a");
         assertEquals(u.get("R").toString(),"[b,c,d]");
     }  
     
-    public void testApplyAnnots() {
-        Term t1 = DefaultTerm.parse("p[a,X,c,d]");
+    public void testApplyAnnots() throws ParseException {
+        Term t1 = ASSyntax.parseTerm("p[a,X,c,d]");
         Unifier u = new Unifier();
         u.unifies(new VarTerm("X"), new Atom("z"));
         t1.apply(u);
         assertEquals("p[a,z,c,d]",t1.toString());
         
-        t1 = DefaultTerm.parse("p[X,b,c,d]");
+        t1 = ASSyntax.parseTerm("p[X,b,c,d]");
         t1.apply(u);
         assertEquals("p[z,b,c,d]",t1.toString());
 
-        t1 = DefaultTerm.parse("p[a,b,c,X]");
+        t1 = ASSyntax.parseTerm("p[a,b,c,X]");
         t1.apply(u);
         assertEquals("p[a,b,c,z]",t1.toString());
     }
@@ -389,8 +389,8 @@ public class TermTest extends TestCase {
         
         assertEquals(t1.toString(), t2.toString());
         
-        Trigger t3 = Trigger.parseTrigger("+!bid_normally(1)");
-        Trigger t4 = Trigger.parseTrigger("+!bid_normally(N)");
+        Trigger t3 = ASSyntax.parseTrigger("+!bid_normally(1)");
+        Trigger t4 = ASSyntax.parseTrigger("+!bid_normally(N)");
         u = new Unifier();
         u.unifies(t3,t4);
         //System.out.println("u="+u);
@@ -533,9 +533,9 @@ public class TermTest extends TestCase {
         assertEquals("[5,10,b,c,casa,f(4),f(10),g,[3,4],[3,10],[1,1,1]]",l.toString());
     }
     
-    public void testUnify4() {
-        Term a1 = DefaultTerm.parse("a(1)");
-        Term a2 = DefaultTerm.parse("a(X+1)");
+    public void testUnify4() throws ParseException {
+        Term a1 = ASSyntax.parseTerm("a(1)");
+        Term a2 = ASSyntax.parseTerm("a(X+1)");
         Unifier u = new Unifier();
         u.unifies(new VarTerm("X"),new NumberTermImpl(0));
         assertFalse(a1.equals(a2));   
@@ -677,10 +677,6 @@ public class TermTest extends TestCase {
         assertEquals(8,p2.getAnnots().size());
     }
     
-    public static void main(String[] a) {
-        new TermTest().testAnnotsUnify7();
-    }
-
     public void testGetTermsArray() {
         Structure s2 = Structure.parse("a(1,2,3)");
         Term[] a = s2.getTermsArray();

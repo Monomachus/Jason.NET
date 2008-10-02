@@ -50,9 +50,9 @@ import org.w3c.dom.Element;
 public class Plan extends SourceInfo implements Cloneable, Serializable {
     
     private static final long serialVersionUID = 1L;
-    private static final Term TAtomic         = DefaultTerm.parse("atomic");
-    private static final Term TBreakPoint     = DefaultTerm.parse("breakpoint");
-    private static final Term TAllUnifs       = DefaultTerm.parse("all_unifs");
+    private static final Term TAtomic         = ASSyntax.createAtom("atomic");
+    private static final Term TBreakPoint     = ASSyntax.createAtom("breakpoint");
+    private static final Term TAllUnifs       = ASSyntax.createAtom("all_unifs");
     
     private static Logger     logger          = Logger.getLogger(Plan.class.getName());
     

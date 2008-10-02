@@ -9,6 +9,7 @@ import jason.asSemantics.Intention;
 import jason.asSemantics.Option;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
+import jason.asSyntax.ASSyntax;
 import jason.asSyntax.DefaultTerm;
 import jason.asSyntax.ListTerm;
 import jason.asSyntax.ListTermImpl;
@@ -271,7 +272,7 @@ public class StdLibTest extends TestCase {
     
     public void testDropGoal1() throws ParseException {
         assertEquals(intention1.size(), 4);
-        Trigger g = Trigger.parseTrigger("+!g1");
+        Trigger g = ASSyntax.parseTrigger("+!g1");
         assertTrue(intention1.dropGoal(g, new Unifier()));
         assertEquals(intention1.size(), 1);
     }

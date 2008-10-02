@@ -6,7 +6,7 @@ import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.InternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
-import jason.asSyntax.DefaultTerm;
+import jason.asSyntax.ASSyntax;
 import jason.asSyntax.StringTerm;
 import jason.asSyntax.StringTermImpl;
 import jason.asSyntax.Term;
@@ -61,7 +61,7 @@ public class term2string extends DefaultInternalAction {
         
         // case 3, first is var
         if (args[0].isVar() && args[1].isString()) {
-            return un.unifies(args[0], DefaultTerm.parse( ((StringTerm)args[1]).getString() ));
+            return un.unifies(args[0], ASSyntax.parseTerm( ((StringTerm)args[1]).getString() ));
         }
         
         throw new JasonException("invalid case of term2string");

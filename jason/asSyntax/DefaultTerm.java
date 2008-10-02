@@ -34,6 +34,8 @@ import java.util.logging.Logger;
 
 /**
  * Base class for all terms.
+ * 
+ * (this class may be renamed to AbstractTerm infuture releases of Jason)
  */
 public abstract class DefaultTerm extends SourceInfo implements Term, Serializable {
 
@@ -42,6 +44,7 @@ public abstract class DefaultTerm extends SourceInfo implements Term, Serializab
 
     protected Integer hashCodeCache = null;
 
+    /** @deprecated it is preferable to use ASSyntax.parseTerm */
     public static Term parse(String sTerm) {
         as2j parser = new as2j(new StringReader(sTerm));
         try {

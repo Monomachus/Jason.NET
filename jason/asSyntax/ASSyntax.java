@@ -79,8 +79,8 @@ public class ASSyntax {
      * Creates a new structure term, is the functor (a string),
      * and the n remainder arguments are terms.
      */
-    public static Literal createStructure(String functor, Term... terms) {
-        return new Structure(functor).addTerms(terms);
+    public static Structure createStructure(String functor, Term... terms) {
+        return (Structure)new Structure(functor).addTerms(terms);
     }
 
     /** creates a new Atom term */
