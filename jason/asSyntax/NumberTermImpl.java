@@ -57,7 +57,8 @@ public final class NumberTermImpl extends DefaultTerm implements NumberTerm {
     }
     
     public NumberTermImpl(NumberTermImpl t) {
-        value = t.solve();
+        value   = t.solve();
+        srcInfo = t.srcInfo;        
     }
 
     public double solve() {

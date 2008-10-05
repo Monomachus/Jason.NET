@@ -1,65 +1,56 @@
 package jason.asSyntax;
 
 /**
- * Store information about the file source of some data.
+ * Store information about the file source of some term (atom, literal, etc).
+ * (immutable objects)
  */
 public class SourceInfo {
 
-    private String      source  = null; 
-    private int         beginSrcLine = -1; // the line this literal appears in the source
-    private int         endSrcLine   = -1;
+    private final String      source; 
+    private final int         beginSrcLine; // the line this literal appears in the source
+    private final int         endSrcLine;
 
-    public SourceInfo() {        
+    public SourceInfo(String file, int beginLine) {
+        source       = file;
+        beginSrcLine = beginLine;
+        endSrcLine   = beginLine;
     }
-    
+    public SourceInfo(String file, int beginLine, int endLine) {
+        source       = file;
+        beginSrcLine = beginLine;
+        endSrcLine   = endLine;
+    }
     public SourceInfo(SourceInfo o) {
-        setSrc(o);
-    }
-    
-    public void setSrc(SourceInfo o) {
         source       = o.source;
         beginSrcLine = o.beginSrcLine;
         endSrcLine   = o.endSrcLine;
     }
-    public void setSrc(Object o) {
-        if (o instanceof SourceInfo)
-            setSrc((SourceInfo)o);
+    public SourceInfo(DefaultTerm o) {
+        this(o.getSrcInfo());
+    }
+
+    public SourceInfo clone() {
+        return this;
     }
     
-    public void setSrc(String asSource) {
-        source = asSource;
-    }
-    public String getSrc() {
+    public String getSrcFile() {
         return source;
     }
 
-    public void setSrcLine(int i) {
-        beginSrcLine = i;
-    }
     public int getSrcLine() {
         return beginSrcLine;
     }
 
-    public void setSrcLines(int b, int e) {
-        beginSrcLine = b;
-        endSrcLine   = e;
-    }
-
-    public void setBeginSrcLine(int i) {
-        beginSrcLine = i;
-    }
     public int getBeginSrcLine() {
         return beginSrcLine;
     }
 
-    public void setEndSrcLine(int i) {
-        endSrcLine = i;
-    }
     public int getEndSrcLine() {
         return endSrcLine;
     }
 
     public String getErrorMsg() {
-        return getSrc() + (getSrcLine() >= 0 ? ":"+getSrcLine() : "");       
+        return (source == null ? "nofile" : source)
+             + (beginSrcLine >= 0 ? ":"+beginSrcLine : "");       
     }    
 }

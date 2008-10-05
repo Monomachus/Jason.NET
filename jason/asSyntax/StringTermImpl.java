@@ -54,7 +54,8 @@ public final class StringTermImpl extends DefaultTerm implements StringTerm {
     }
     
     public StringTermImpl(StringTermImpl t) {
-        value = t.getString();
+        value   = t.getString();
+        srcInfo = t.srcInfo;        
     }
 
     public String getString() {

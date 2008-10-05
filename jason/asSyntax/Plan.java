@@ -44,10 +44,10 @@ import org.w3c.dom.Element;
  @navassoc - event - Trigger
  @navassoc - context - LogicalFormula
  @navassoc - body - PlanBody
-
+ @navassoc - source - SourceInfo
 
  */
-public class Plan extends SourceInfo implements Cloneable, Serializable {
+public class Plan implements Cloneable, Serializable {
     
     private static final long serialVersionUID = 1L;
     private static final Term TAtomic         = ASSyntax.createAtom("atomic");
@@ -61,6 +61,7 @@ public class Plan extends SourceInfo implements Cloneable, Serializable {
     private LogicalFormula    context;
     private PlanBody          body;
     
+    protected SourceInfo      srcInfo = null;
     
     private boolean isAtomic = false;
     private boolean isAllUnifs = false;
@@ -211,7 +212,7 @@ public class Plan extends SourceInfo implements Cloneable, Serializable {
         
         p.body = (PlanBody)body.clone();
         
-        p.setSrc(this);
+        p.setSrcInfo(srcInfo);
 
         return p;
     }
@@ -230,11 +231,20 @@ public class Plan extends SourceInfo implements Cloneable, Serializable {
         p.context = context;
         p.body    = body.clonePB();
         
-        p.setSrc(this);
+        p.setSrcInfo(srcInfo);
 
         return p;
     }
     
+    
+    public SourceInfo getSrcInfo() {
+        return srcInfo;
+    }
+
+    public void setSrcInfo(SourceInfo s) {
+        srcInfo = s;
+    }
+
     public String toString() {
         return toASString();
     }

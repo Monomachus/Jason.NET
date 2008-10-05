@@ -8,6 +8,8 @@ import java.util.Map;
 
 /**
  * Common interface for all kind of terms
+ * 
+ * @opt nodefillcolor lightgoldenrodyellow
  */
 public interface Term extends Cloneable, Comparable<Term>, Serializable, ToDOM {
 
@@ -37,10 +39,7 @@ public interface Term extends Cloneable, Comparable<Term>, Serializable, ToDOM {
     public boolean apply(Unifier u);
 
     /** Removes the value cached for hashCode */
-    public void resetHashCodeCache();
+    //public void resetHashCodeCache();
     
-    public int getSrcLine();
-    public String getSrc();
-    public String getErrorMsg(); // info for error messages 
-
+    public SourceInfo getSrcInfo();
 }

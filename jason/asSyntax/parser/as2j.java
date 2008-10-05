@@ -28,13 +28,22 @@
 
     public void setAg(Agent ag) { curAg = ag; }
 
-    private String getSourceRef(Object o) {
-        if (o instanceof SourceInfo) {
-           SourceInfo s = (SourceInfo)o;
-           return "["+s.getSrc()+":"+s.getBeginSrcLine()+"]";
-        } else {
-           return "";
-        }
+    private String getSourceRef(SourceInfo s) {
+        if (s == null)
+            return "[]";
+        else
+            return "["+s.getSrcFile()+":"+s.getBeginSrcLine()+"]";
+    }
+    private String getSourceRef(DefaultTerm t) {
+        return getSourceRef( ((DefaultTerm)t).getSrcInfo());
+    }
+    private String getSourceRef(Object t) {
+        if (t instanceof DefaultTerm)
+            return getSourceRef((DefaultTerm)t);
+        else if (t instanceof SourceInfo)
+            return getSourceRef((SourceInfo)t);
+        else
+            return "[]";
     }
 
         private InternalActionLiteral checkInternalActionsInContext(LogicalFormula f, Agent ag) throws Exception {
@@ -69,7 +78,7 @@
     private Term changeToAtom(Object o) {
         Term u = (Term)o;
         if (u.isAtom()) {
-           return new Atom( (Literal)u);
+           return new Atom((Literal)u);
         } else {
            return u;
         }
@@ -178,7 +187,7 @@
                                    if (config.getBoolean(Config.WARN_SING_VAR) && !parsedFiles.contains(asSource)) {
                                       List<VarTerm> singletonVars = p.getSingletonVars();
                                       if (singletonVars.size() > 0) {
-                                         logger.warning(getSourceRef(p)+" warning: the plan for event '"+p.getTrigger()+"' has the following singleton variables: "+singletonVars);
+                                         logger.warning(getSourceRef(p.getSrcInfo())+" warning: the plan for event '"+p.getTrigger()+"' has the following singleton variables: "+singletonVars);
                                       }
                                    }
                                 }
@@ -359,8 +368,7 @@
                          if (B != null && B.getBodyTerm().equals(Literal.LTrue))
                             B = (PlanBody)B.getBodyNext();
                      Plan p = new Plan(L,T,(LogicalFormula)C, B);
-                     p.setSrcLines(start,end);
-                     p.setSrc(asSource);
+                     p.setSrcInfo(new SourceInfo(asSource,start,end));
                      {if (true) return p;}
     throw new Error("Missing return statement in function");
   }
@@ -598,8 +606,7 @@
       throw new ParseException();
     }
                          p = new Pred(K.image);
-                         p.setSrcLine(K.beginLine);
-                         p.setSrc(asSource);
+                         p.setSrcInfo(new SourceInfo(asSource, K.beginLine));
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case 39:
       jj_consume_token(39);
@@ -712,7 +719,7 @@
     case 39:
     case 42:
       f = term_in_list();
-                            last = lt.append(f); lt.setSrcLine(f.getSrcLine()); lt.setSrc(f.getSrc());
+                            last = lt.append(f); lt.setSrcInfo(f.getSrcInfo());
       label_11:
       while (true) {
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -1101,8 +1108,7 @@
     case NUMBER:
       K = jj_consume_token(NUMBER);
                                   NumberTermImpl ni = new NumberTermImpl(K.image);
-                                  ni.setSrcLine(K.beginLine);
-                                  ni.setSrc(asSource);
+                                  ni.setSrcInfo(new SourceInfo(asSource, K.beginLine));
                                   {if (true) return ni;}
       break;
     case 35:
@@ -1149,7 +1155,7 @@
                                {if (true) return l;}
                             } else {
                                ArithFunctionTerm at = new ArithFunctionTerm(af);
-                               at.setSrc(l);
+                               at.setSrcInfo(l.getSrcInfo());
                                at.setTerms(l.getTerms());
                                at.setAgent(curAg);
                                {if (true) return at;}
@@ -1162,7 +1168,7 @@
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case VAR:
       K = jj_consume_token(VAR);
-                      v = new VarTerm(K.image); v.setSrcLine(K.beginLine); v.setSrc(asSource);
+                      v = new VarTerm(K.image); v.setSrcInfo(new SourceInfo(asSource, K.beginLine));
       break;
     case UNNAMEDVAR:
       K = jj_consume_token(UNNAMEDVAR);
@@ -1190,8 +1196,7 @@
                       Token k; StringTermImpl s;
     k = jj_consume_token(STRING);
                       s = new StringTermImpl(k.image.substring(1,k.image.length()-1));
-                      s.setSrcLine(k.beginLine);
-                      s.setSrc(asSource);
+                      s.setSrcInfo(new SourceInfo(asSource,k.beginLine));
                       {if (true) return s;}
     throw new Error("Missing return statement in function");
   }
@@ -1203,13 +1208,13 @@
     finally { jj_save(0, xla); }
   }
 
-  final private boolean jj_3R_14() {
-    if (jj_3R_16()) return true;
+  final private boolean jj_3R_15() {
+    if (jj_3R_17()) return true;
     return false;
   }
 
-  final private boolean jj_3R_17() {
-    if (jj_scan_token(42)) return true;
+  final private boolean jj_3R_14() {
+    if (jj_3R_16()) return true;
     return false;
   }
 
@@ -1218,6 +1223,11 @@
     if (jj_scan_token(TK_BEGIN)) return true;
     if (jj_3R_12()) return true;
     if (jj_scan_token(28)) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_17() {
+    if (jj_scan_token(42)) return true;
     return false;
   }
 
@@ -1249,11 +1259,6 @@
     }
     xsp = jj_scanpos;
     if (jj_3R_15()) jj_scanpos = xsp;
-    return false;
-  }
-
-  final private boolean jj_3R_15() {
-    if (jj_3R_17()) return true;
     return false;
   }
 

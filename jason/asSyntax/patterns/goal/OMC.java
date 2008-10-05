@@ -3,6 +3,7 @@ package jason.asSyntax.patterns.goal;
 import jason.asSemantics.Agent;
 import jason.asSyntax.Plan;
 import jason.asSyntax.Pred;
+import jason.asSyntax.SourceInfo;
 import jason.asSyntax.Term;
 import jason.asSyntax.directives.Directive;
 import jason.asSyntax.directives.DirectiveProcessor;
@@ -32,12 +33,12 @@ public class OMC implements Directive {
             if (newAg != null) {
                 // add +f : true <- .fail_goal(g).
                 Plan pf = Plan.parse("+"+fail+" <- .fail_goal("+goal+").");
-                pf.setSrc(outerContent+"/"+directive);
+                pf.setSrcInfo(new SourceInfo(outerContent+"/"+directive, 0));
                 newAg.getPL().add(pf);
 
                 // add -m : true <- .succeed_goal(g).
                 Plan pm = Plan.parse("-"+motivation+" <- .succeed_goal("+goal+").");
-                pm.setSrc(outerContent+"/"+directive);
+                pm.setSrcInfo(new SourceInfo(outerContent+"/"+directive, 0));
                 newAg.getPL().add(pm);
                 
                 return newAg;

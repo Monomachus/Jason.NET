@@ -82,7 +82,7 @@ public class VarTerm extends LiteralImpl implements NumberTerm, ListTerm, String
         } else {
             // do not call constructor with term parameter!
             VarTerm t = new VarTerm(super.getFunctor());
-            t.setSrc(this);
+            t.srcInfo = this.srcInfo;        
             if (hasAnnot())
                 t.setAnnots(getAnnots().cloneLT());
             return t;

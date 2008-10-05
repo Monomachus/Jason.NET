@@ -49,7 +49,7 @@ public class Atom extends Literal {
         this.functor            = l.getFunctor();
         predicateIndicatorCache = l.predicateIndicatorCache;
         hashCodeCache           = l.hashCodeCache;
-        setSrc(l);        
+        srcInfo                 = l.srcInfo;        
     }
     
     public String getFunctor() {

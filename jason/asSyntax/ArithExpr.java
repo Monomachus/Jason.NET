@@ -126,15 +126,17 @@ public class ArithExpr extends ArithFunctionTerm implements NumberTerm {
         super(oper.toString(),2);
         addTerms(t1, t2);
         op = oper;
-        if (t1 instanceof SourceInfo) setSrc((SourceInfo)t1);
-        else if (t2 instanceof SourceInfo) setSrc((SourceInfo)t2);        
+        if (t1.getSrcInfo() != null)
+            srcInfo = t1.getSrcInfo();
+        else
+            srcInfo = t2.getSrcInfo();
     }
 
     public ArithExpr(ArithmeticOp oper, NumberTerm t1) {
         super(oper.toString(),1);
         addTerm(t1);
         op = oper;
-        setSrc(t1);
+        srcInfo = t1.getSrcInfo();
     }
     
     private ArithExpr(ArithExpr ae) { // for clone

@@ -476,7 +476,7 @@ public class TransitionSystem {
                 im.unif = iu.next();
                 updateIntention();
             } else {
-                String msg = "Constraint "+h+" was not satisfied ("+h.getErrorMsg()+").";
+                String msg = "Constraint "+h+" was not satisfied ("+h.getSrcInfo().getErrorMsg()+").";
                 generateGoalDeletion(JasonException.createBasicErrorAnnots(new Atom("constraint_failed"), msg));
                 logger.fine(msg);
             }
@@ -531,7 +531,7 @@ public class TransitionSystem {
                     }
                 }
                 if (fail) {
-                    if (logger.isLoggable(Level.FINE)) logger.fine("Test '"+h+"' failed ("+h.getErrorMsg()+").");
+                    if (logger.isLoggable(Level.FINE)) logger.fine("Test '"+h+"' failed ("+h.getSrcInfo().getErrorMsg()+").");
                     generateGoalDeletion();
                 }
             }
@@ -881,7 +881,7 @@ public class TransitionSystem {
         Term codeline    = null;
         if (body != null && body instanceof Literal) {
             bodyterm = (Literal)body;
-            codesrc  = new StringTermImpl(bodyterm.getSrc());
+            codesrc  = new StringTermImpl(bodyterm.getSrcFile());
             codeline = new NumberTermImpl(bodyterm.getSrcLine());
         } else {
             bodyterm = new Atom("no_code");
@@ -890,17 +890,17 @@ public class TransitionSystem {
         }
 
         // code
-        Structure code = new Structure("code");
+        Structure code = new Structure("code", 1);
         code.addTerm(bodyterm);
         failAnnots.add(code);
         
         // ASL source
-        Structure src = new Structure("code_src");
+        Structure src = new Structure("code_src", 1);
         src.addTerm(codesrc);
         failAnnots.add(src);                    
 
         // line in the source
-        Structure line = new Structure("code_line");
+        Structure line = new Structure("code_line", 1);
         line.addTerm(codeline);
         failAnnots.add(line);                    
         failEvent.getTrigger().getLiteral().addAnnots(failAnnots);

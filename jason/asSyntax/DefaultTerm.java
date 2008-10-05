@@ -35,14 +35,20 @@ import java.util.logging.Logger;
 /**
  * Base class for all terms.
  * 
- * (this class may be renamed to AbstractTerm infuture releases of Jason)
+ * (this class may be renamed to AbstractTerm in future releases of Jason, so
+ * avoid using it -- use ASSyntax class to create new terms)
+ * 
+ * @navassoc - source - SourceInfo
+ * 
+ * @see ASSyntax
  */
-public abstract class DefaultTerm extends SourceInfo implements Term, Serializable {
+public abstract class DefaultTerm implements Term, Serializable {
 
     private static final long serialVersionUID = 1L;
     private static Logger logger = Logger.getLogger(Term.class.getName());
 
-    protected Integer hashCodeCache = null;
+    protected Integer    hashCodeCache = null;
+    protected SourceInfo srcInfo       = null;
 
     /** @deprecated it is preferable to use ASSyntax.parseTerm */
     public static Term parse(String sTerm) {
@@ -92,5 +98,34 @@ public abstract class DefaultTerm extends SourceInfo implements Term, Serializab
 
     public boolean apply(Unifier u) {
         return false;
+    }
+    
+    public SourceInfo getSrcInfo() {
+        return srcInfo;
+    }
+
+    public void setSrcInfo(SourceInfo s) {
+        srcInfo = s;
+    }
+    
+    public String getSrcFile() {
+        if (srcInfo == null)
+            return null;
+        else
+            return srcInfo.getSrcFile();
+    }
+
+    public int getSrcLine() {
+        if (srcInfo == null)
+            return 0;
+        else
+            return srcInfo.getSrcLine();
+    }
+    
+    public String getErrorMsg() {
+        if (srcInfo == null)
+            return "";
+        else 
+            return srcInfo.getErrorMsg();
     }
 }

@@ -58,13 +58,22 @@ PARSER_BEGIN(as2j)
     
     public void setAg(Agent ag) { curAg = ag; }
 
-    private String getSourceRef(Object o) {
-        if (o instanceof SourceInfo) {
-           SourceInfo s = (SourceInfo)o;
-    	   return "["+s.getSrc()+":"+s.getBeginSrcLine()+"]";
-        } else {
-           return "";
-        }  
+    private String getSourceRef(SourceInfo s) {
+        if (s == null)
+            return "[]";
+        else
+            return "["+s.getSrcFile()+":"+s.getBeginSrcLine()+"]";
+    }
+    private String getSourceRef(DefaultTerm t) {
+        return getSourceRef( ((DefaultTerm)t).getSrcInfo());
+    }
+    private String getSourceRef(Object t) {
+        if (t instanceof DefaultTerm)
+            return getSourceRef((DefaultTerm)t);
+        else if (t instanceof SourceInfo)
+            return getSourceRef((SourceInfo)t);
+        else
+            return "[]";
     }
 
 	private InternalActionLiteral checkInternalActionsInContext(LogicalFormula f, Agent ag) throws Exception {
@@ -99,7 +108,7 @@ PARSER_BEGIN(as2j)
     private Term changeToAtom(Object o) {
         Term u = (Term)o;
         if (u.isAtom()) {
-           return new Atom( (Literal)u);
+           return new Atom((Literal)u);
         } else {
            return u; 
         }  
@@ -192,7 +201,7 @@ boolean agent(Agent a) throws jason.JasonException :
                                    if (config.getBoolean(Config.WARN_SING_VAR) && !parsedFiles.contains(asSource)) {
                                       List<VarTerm> singletonVars = p.getSingletonVars();
                                       if (singletonVars.size() > 0) {
-                                         logger.warning(getSourceRef(p)+" warning: the plan for event '"+p.getTrigger()+"' has the following singleton variables: "+singletonVars);
+                                         logger.warning(getSourceRef(p.getSrcInfo())+" warning: the plan for event '"+p.getTrigger()+"' has the following singleton variables: "+singletonVars);
                                       }
                                    }
                                 }
@@ -305,8 +314,7 @@ Plan plan() :         { Token k;
 	                 if (B != null && B.getBodyTerm().equals(Literal.LTrue))
 	                    B = (PlanBody)B.getBodyNext();
                      Plan p = new Plan(L,T,(LogicalFormula)C, B);
-                     p.setSrcLines(start,end);
-                     p.setSrc(asSource);
+                     p.setSrcInfo(new SourceInfo(asSource,start,end));
                      return p;
                    }
 }
@@ -434,8 +442,7 @@ Pred pred() :         { Token K; Pred p; List l; ListTerm lt; PlanBody b; }
    |
    K=<TK_END>
   )                    { p = new Pred(K.image);
-                         p.setSrcLine(K.beginLine);
-                         p.setSrc(asSource);
+                         p.setSrcInfo(new SourceInfo(asSource, K.beginLine));
                        } 
   
   [
@@ -477,7 +484,7 @@ ListTermImpl list() :     { ListTermImpl lt = new ListTermImpl(); ListTerm last;
 {
   "["
   [
-  f=term_in_list()        { last = lt.append(f); lt.setSrcLine(f.getSrcLine()); lt.setSrc(f.getSrc());}
+  f=term_in_list()        { last = lt.append(f); lt.setSrcInfo(f.getSrcInfo()); }
   ( "," f=term_in_list()  { last = last.append(f); }
   )*
   [ "|"  ( K=<VAR>        { last.setNext(new VarTerm(K.image)); }
@@ -631,8 +638,7 @@ Object arithm_expr_simple():
                                 { Token K; Object t; VarTerm v; }
 {
  ( K = <NUMBER>                 { NumberTermImpl ni = new NumberTermImpl(K.image); 
-                                  ni.setSrcLine(K.beginLine); 
-                                  ni.setSrc(asSource);
+                                  ni.setSrcInfo(new SourceInfo(asSource, K.beginLine)); 
                                   return ni;
                                 }
  | "-" t = arithm_expr_simple() { if (!(t instanceof NumberTerm)) {
@@ -654,7 +660,7 @@ Term function():          { Literal l; }
                                return l;
                             } else {
                                ArithFunctionTerm at = new ArithFunctionTerm(af);
-                               at.setSrc(l);
+                               at.setSrcInfo(l.getSrcInfo());
                                at.setTerms(l.getTerms());
                                at.setAgent(curAg);
                                return at;
@@ -665,7 +671,7 @@ Term function():          { Literal l; }
 
 VarTerm var():      { Token K; VarTerm v; ListTerm lt; }
 {
- ( K = <VAR>        { v = new VarTerm(K.image); v.setSrcLine(K.beginLine); v.setSrc(asSource);}
+ ( K = <VAR>        { v = new VarTerm(K.image); v.setSrcInfo(new SourceInfo(asSource, K.beginLine));}
  | K = <UNNAMEDVAR> { v = new UnnamedVar(K.image); }
  )
  [ 
@@ -677,8 +683,7 @@ VarTerm var():      { Token K; VarTerm v; ListTerm lt; }
 StringTerm string():{ Token k; StringTermImpl s; }
 {
   k = <STRING>      { s = new StringTermImpl(k.image.substring(1,k.image.length()-1)); 
-                      s.setSrcLine(k.beginLine); 
-                      s.setSrc(asSource);
+                      s.setSrcInfo(new SourceInfo(asSource,k.beginLine)); 
                       return s;
                     } 
 }

@@ -40,15 +40,17 @@ public abstract class BinaryStructure extends Structure {
     public BinaryStructure(Term t1, String id, Term t2) {
         super(id,2);
         addTerms( t1, t2 );
-        if (t1 instanceof SourceInfo) setSrc((SourceInfo)t1);
-        else if (t2 instanceof SourceInfo) setSrc((SourceInfo)t2);
+        if (t1.getSrcInfo() != null)
+            srcInfo = t1.getSrcInfo();
+        else
+            srcInfo = t2.getSrcInfo();
     }
 
     /** Constructor for unary operator */
     public BinaryStructure(String id, Term arg) {
         super(id,1);
         addTerm( arg );
-        setSrc(arg);
+        srcInfo = arg.getSrcInfo();
     }
     
     public boolean isUnary() {
