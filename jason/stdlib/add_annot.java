@@ -100,10 +100,11 @@ public class add_annot extends DefaultInternalAction {
             return result;
         } else if (l.isLiteral()) {
             Literal result;
-            if (l.isAtom())
-                result = new LiteralImpl(((Atom)l).getFunctor());
-            else
-                result = Literal.parseLiteral(l.toString());
+            if (l.isAtom()) {
+                result = new LiteralImpl((Atom)l);
+            } else {
+                result = (Literal)l.clone();                
+            }
             result.addAnnot(annot);
             return result;
         }

@@ -40,7 +40,8 @@ public class PlanBodyImpl extends Structure implements PlanBody, Iterable<PlanBo
         super(BODY_PLAN_FUNCTOR, 0);
         term     = b;
         formType = t;
-        setSrcInfo(b.getSrcInfo());
+        if (b != null)
+            srcInfo = b.getSrcInfo();
     }
 
     public void setBodyNext(PlanBody next) {

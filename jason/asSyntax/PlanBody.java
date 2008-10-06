@@ -1,5 +1,10 @@
 package jason.asSyntax;
 
+/**
+ * Interface for elements of a plans's body.
+ * 
+ * @opt nodefillcolor lightgoldenrodyellow
+ */
 public interface PlanBody extends Term {
 
     public enum BodyType {

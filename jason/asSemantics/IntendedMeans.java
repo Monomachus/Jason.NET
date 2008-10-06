@@ -51,25 +51,11 @@ public class IntendedMeans implements Serializable {
         plan = opt.getPlan().cloneOnlyBody();
         unif = opt.getUnifier(); //(Unifier)opt.getUnifier().clone();
         
-        // REMOVED: experimental
-        /*
-        Literal planLiteral = plan.getTrigger().getLiteral();
-        if (planLiteral.hasAnnot()) {
-            planLiteral.getAnnots().apply(unif);
-            // TODO: why?
-        }
-        */
         if (te == null) {
             trigger = plan.getTrigger();
         } else {
             trigger = (Trigger)te.clone();
             trigger.getLiteral().apply(unif);
-            // add annots of the trigger into the plan's te
-            // so that the event +!g[source(ag1)] will add source(ag1)
-            // in the TE of the plan
-            // TODO: why? 
-            // REMOVED: experimental
-            //planLiteral.addAnnots(trigger.getLiteral().getAnnots());
         }
     }
     

@@ -10,7 +10,7 @@ import jason.asSemantics.Option;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.ASSyntax;
-import jason.asSyntax.DefaultTerm;
+import jason.asSyntax.Atom;
 import jason.asSyntax.ListTerm;
 import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Literal;
@@ -27,6 +27,7 @@ import jason.asSyntax.parser.ParseException;
 import jason.bb.BeliefBase;
 import jason.infra.centralised.CentralisedAgArch;
 import jason.stdlib.add_annot;
+import jason.stdlib.add_nested_source;
 import jason.stdlib.add_plan;
 import jason.stdlib.fail_goal;
 import jason.stdlib.relevant_plans;
@@ -66,13 +67,13 @@ public class StdLibTest extends TestCase {
         ag.getPL().add(Plan.parse("-!g1 : true <- j."));
     }
 
-    public void testAddAnnot() {
+    public void testAddAnnot() throws ParseException {
         add_annot aa = new add_annot();
         Unifier u = new Unifier();
 
         Literal msg = Literal.parseLiteral("ok(10)");
         VarTerm X = new VarTerm("X");
-        Term annot = DefaultTerm.parse("source(jomi)");
+        Term annot = ASSyntax.parseTerm("source(jomi)");
         try {
             aa.execute(null, u, new Term[] { msg, annot, X });
         } catch (Exception e) {
@@ -83,21 +84,33 @@ public class StdLibTest extends TestCase {
         assertTrue(((Pred) u.get("X")).hasAnnot(annot));
 
         // testing addAnnot with list
-        ListTerm msgL = (ListTerm) DefaultTerm.parse("[ok(10),[ok(20),ok(30),[ok(40)|[ok(50),ok(60)]]]]");
+        ListTerm msgL = ASSyntax.parseList("[a,ok(10),[ok(20),ok(30),[ok(40)|[ok(50),ok(60)]]]]");
         VarTerm Y = new VarTerm("Y");
-        Term annotL = DefaultTerm.parse("source(rafa)");
-        assertEquals(msgL.toString(), "[ok(10),[ok(20),ok(30),[ok(40),ok(50),ok(60)]]]");
+        Term annotL = ASSyntax.parseTerm("source(rafa)");
+        assertEquals(msgL.toString(), "[a,ok(10),[ok(20),ok(30),[ok(40),ok(50),ok(60)]]]");
         try {
-            aa.execute(null, u, new Term[] { (Term) msgL, annotL, Y });
+            aa.execute(null, u, new Term[] { msgL, annotL, Y });
         } catch (Exception e) {
             e.printStackTrace();
         }
-        // System.out.println("u="+u);
-        assertEquals(((ListTerm) u.get("Y")).toString(),
-                "[ok(10)[source(rafa)],[ok(20)[source(rafa)],ok(30)[source(rafa)],[ok(40)[source(rafa)],ok(50)[source(rafa)],ok(60)[source(rafa)]]]]");
+        assertEquals("[a[source(rafa)],ok(10)[source(rafa)],[ok(20)[source(rafa)],ok(30)[source(rafa)],[ok(40)[source(rafa)],ok(50)[source(rafa)],ok(60)[source(rafa)]]]]",
+                ((ListTerm) u.get("Y")).toString());
     }
 
-    public void testFindAll() throws RevisionFailedException {
+    public void testAddNestedSource() throws Exception {
+        add_nested_source aa = new add_nested_source();
+        Unifier u = new Unifier();
+        VarTerm x = new VarTerm("X");
+        u.unifies(x, new Atom("a"));
+        x.apply(u);
+        Term annot = ASSyntax.parseTerm("jomi");
+        VarTerm r = new VarTerm("R");
+        aa.execute(null, u, new Term[] { x, annot, r });
+        r.apply(u);
+        assertEquals("a[source(jomi)]", r.toString());
+    }
+
+    public void testFindAll() throws RevisionFailedException, ParseException {
         Agent ag = new Agent();
         ag.setLogger(null);
         AgArch arch = new AgArch();
@@ -112,7 +125,7 @@ public class StdLibTest extends TestCase {
         assertEquals(ag.getBB().size(),3);
         
         Unifier u = new Unifier();
-        Term X = DefaultTerm.parse("f(X)");
+        Term X = ASSyntax.parseTerm("f(X)");
         Literal c = Literal.parseLiteral("a(X,x)");
         c.addAnnot(BeliefBase.TSelf);
         VarTerm L = new VarTerm("L");
@@ -249,8 +262,8 @@ public class StdLibTest extends TestCase {
         StringTerm s1 = new StringTermImpl("a");
         StringTerm s2 = new StringTermImpl("bbacca");
 
-        Term t1 = DefaultTerm.parse("a(10)");
-        Term t2 = DefaultTerm.parse("[1,b(xxx,a(10))]");
+        Term t1 = ASSyntax.parseTerm("a(10)");
+        Term t2 = ASSyntax.parseTerm("[1,b(xxx,a(10))]");
 
         VarTerm X = new VarTerm("X");
 
@@ -300,8 +313,8 @@ public class StdLibTest extends TestCase {
     @SuppressWarnings("unchecked")
     public void testMember() throws Exception {
         ListTerm l1 = ListTermImpl.parseList("[a,b,c]");
-        Term ta = DefaultTerm.parse("a");
-        Term td = DefaultTerm.parse("d");
+        Term ta = ASSyntax.parseTerm("a");
+        Term td = ASSyntax.parseTerm("d");
         
         // test member(a,[a,b,c])
         Unifier u = new Unifier();
@@ -316,8 +329,8 @@ public class StdLibTest extends TestCase {
         assertFalse(i.hasNext());
 
         // test member(b(X),[a(1),b(2),c(3)])
-        Term l2 = DefaultTerm.parse("[a(1),b(2),c(3)]");
-        Term tb = DefaultTerm.parse("b(X)");
+        Term l2 = ASSyntax.parseTerm("[a(1),b(2),c(3)]");
+        Term tb = ASSyntax.parseTerm("b(X)");
         u = new Unifier();
         i = (Iterator<Unifier>)new jason.stdlib.member().execute(null, u, new Term[] { tb, l2});
         assertTrue(i != null);
@@ -328,7 +341,7 @@ public class StdLibTest extends TestCase {
         assertEquals(ru.get("X").toString(), "2");
         
         // test member(X,[a,b,c])
-        Term tx = DefaultTerm.parse("X");
+        Term tx = ASSyntax.parseTerm("X");
         u = new Unifier();
         i = (Iterator<Unifier>)new jason.stdlib.member().execute(null, u, new Term[] { tx, l1});
         assertTrue(iteratorSize(i) == 3);
@@ -339,7 +352,7 @@ public class StdLibTest extends TestCase {
         assertFalse(i.hasNext());
 
         // test member(b(X),[a(1),b(2),c(3),b(4)])
-        l2 = DefaultTerm.parse("[a(1),b(2),c(3),b(4)]");
+        l2 = ASSyntax.parseTerm("[a(1),b(2),c(3),b(4)]");
         u = new Unifier();
         i = (Iterator<Unifier>)new jason.stdlib.member().execute(null, u, new Term[] { tb, l2});
         assertTrue(i != null);
@@ -351,7 +364,7 @@ public class StdLibTest extends TestCase {
 
     public void testDelete() throws Exception {
         ListTerm l1 = ListTermImpl.parseList("[a,b,a,c,a]");
-        Term ta = DefaultTerm.parse("a");
+        Term ta = ASSyntax.parseTerm("a");
         VarTerm v = new VarTerm("X");
         
         // test delete(a,[a,b,a,c,a])

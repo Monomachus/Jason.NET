@@ -5,7 +5,6 @@ import jason.asSyntax.parser.as2j;
 
 import java.io.StringReader;
 
-
 /**
   Factory for objects used in Jason AgentSpeak syntax.
   
@@ -49,6 +48,8 @@ import java.io.StringReader;
   // or use a parsing (easier but slow)
   Literal l4 = parseLiteral("~p(a,3)[s]");
   </pre> 
+ 
+  @hidden
   
   @author Jomi
  

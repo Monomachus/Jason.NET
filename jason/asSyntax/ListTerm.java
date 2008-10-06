@@ -5,6 +5,8 @@ import java.util.List;
 
 /**
  * The interface for lists of the AgentSpeak language
+ *  
+ * @opt nodefillcolor lightgoldenrodyellow
  * 
  * @author Jomi
  */

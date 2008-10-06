@@ -39,6 +39,7 @@ import java.util.logging.Logger;
  * avoid using it -- use ASSyntax class to create new terms)
  * 
  * @navassoc - source - SourceInfo
+ * @opt nodefillcolor lightgoldenrodyellow
  * 
  * @see ASSyntax
  */

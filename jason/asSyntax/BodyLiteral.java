@@ -3,6 +3,8 @@ package jason.asSyntax;
 
 /** 
  * @deprecated use PlanBodyImpl instead.
+ * 
+ * @hidden
  */
 public class BodyLiteral extends PlanBodyImpl {
 

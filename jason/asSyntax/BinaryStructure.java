@@ -29,6 +29,8 @@ import org.w3c.dom.Element;
 
 /** 
    Represents a binary/unary logical/relational operator.
+   
+   @opt nodefillcolor lightgoldenrodyellow
  
    @navassoc - left  - Term
    @navassoc - right - Term

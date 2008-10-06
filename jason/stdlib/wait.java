@@ -93,7 +93,7 @@ public class wait extends DefaultInternalAction {
     @Override public boolean suspendIntention() { return true;  } 
     
     @Override public int getMinArgs() { return 1; }
-    @Override public int getMaxArgs() { return 2; }
+    @Override public int getMaxArgs() { return 3; }
 
     @Override
     public Object execute(final TransitionSystem ts, Unifier un, Term[] args) throws Exception {

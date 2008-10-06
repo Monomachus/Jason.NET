@@ -100,11 +100,12 @@ public class add_nested_source extends DefaultInternalAction {
             return result;
         } else if (l.isLiteral()) {
             Literal result;
-            if (l instanceof LiteralImpl)
-                result = (Literal)l.clone();
-            else
+            if (l.isAtom()) {
                 result = new LiteralImpl((Atom)l);
-            
+            } else {
+                result = (Literal)l.clone();                
+            }
+             
             // create the source annots
             Literal ts = new Pred("source",1).addTerms(source).addAnnots(result.getAnnots("source"));
             

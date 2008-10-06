@@ -9,6 +9,8 @@ import java.util.Iterator;
  * Represents a logical formula (p, p & q, not p, 3 > X, ...) which can be 
  * evaluated into a truth value.
  * 
+ * @opt nodefillcolor lightgoldenrodyellow
+ * 
  * @author Jomi
  */
 public interface LogicalFormula extends Term, Cloneable {

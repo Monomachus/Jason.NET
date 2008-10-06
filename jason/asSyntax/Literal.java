@@ -49,7 +49,9 @@ import java.util.logging.Logger;
  
  <p>There are useful static methods in class {@link ASSyntax} to create Literals.
  
- 
+ @navassoc - type - PredicateIndicator
+ @opt nodefillcolor lightgoldenrodyellow
+
  @author jomi
  
  @see ASSyntax

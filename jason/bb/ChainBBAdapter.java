@@ -140,8 +140,7 @@ public class ChainBBAdapter implements BeliefBase {
 
     @Override
     public Object clone() {
-        // TODO Auto-generated method stub
-        return null;
+        return this;
     }
     
     @Override
