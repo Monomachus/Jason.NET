@@ -51,7 +51,7 @@ public class Message implements Serializable {
     }
     
     public Message(String ilf, String s, String r, Object c, String id) {
-        ilForce  = ilf;
+        setIlForce(ilf);
         sender   = s;
         receiver = r;
         propCont = c;
@@ -73,6 +73,11 @@ public class Message implements Serializable {
     }
     
     public void setIlForce(String ilf) {
+        if (ilf.equals("ask-one")) ilf = "askOne";
+        if (ilf.equals("ask-all")) ilf = "askAll";
+        if (ilf.equals("tell-how")) ilf = "tellHow";
+        if (ilf.equals("ask-how")) ilf = "askHow";
+        if (ilf.equals("untell-how")) ilf = "untellHow";
         ilForce = ilf;
     }
     
