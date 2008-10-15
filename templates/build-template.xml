@@ -90,7 +90,7 @@
               failonerror="true" fork="yes" dir="${basedir}" >
             <classpath refid="project.classpath"/>
             <arg line="${mas2j.project.file} ${debug} <RUN-ARGS>"/>
-            <jvmarg line="-Xmx750M"/>    
+            <jvmarg line="-Xmx500M"/>    
         </java>
         <antcall target="user-end" />
     </target>

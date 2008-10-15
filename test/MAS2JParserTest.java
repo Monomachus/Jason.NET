@@ -2,7 +2,9 @@ package test;
 
 import jason.asSyntax.Literal;
 import jason.bb.ChainBB;
+import jason.mas2j.ClassParameters;
 import jason.mas2j.MAS2JProject;
+import jason.mas2j.parser.ParseException;
 import jason.mas2j.parser.mas2j;
 
 import java.io.StringReader;
@@ -81,5 +83,11 @@ public class MAS2JParserTest extends TestCase {
         bb.add(Literal.parseLiteral("b(1)"));
     }
     
-    
+    public void testClassDef() throws ParseException {
+        String archClass = "my.Arch(test)";
+        mas2j parser = new mas2j(new StringReader(archClass));
+        ClassParameters c = parser.classDef();
+        assertEquals("my.Arch", c.getClassName());
+        assertEquals(1,c.getParametersArray().length);
+    }
 }

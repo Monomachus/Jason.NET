@@ -1,10 +1,12 @@
 package jason.asSyntax;
 
+import java.io.Serializable;
+
 /**
  * Store information about the file source of some term (atom, literal, etc).
  * (immutable objects)
  */
-public class SourceInfo {
+public class SourceInfo implements Serializable {
 
     private final String      source; 
     private final int         beginSrcLine; // the line this literal appears in the source
