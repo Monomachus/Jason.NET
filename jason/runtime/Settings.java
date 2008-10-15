@@ -199,6 +199,9 @@ public class Settings {
         sync = pSync;
     }
     
+    public Map<String,Object> getUserParameters() {
+        return userParameters;
+    }
     public String getUserParameter(String key) {
         return (String)userParameters.get(key);
     }

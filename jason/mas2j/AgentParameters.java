@@ -64,6 +64,9 @@ public class AgentParameters {
     public void setArchClass(String c) {
         if (c != null) archClass = new ClassParameters(c);        
     }
+    public void setArchClass(ClassParameters c) {
+        archClass = c;        
+    }
     public void setBB(ClassParameters c) {
         if (c != null) bbClass = c;        
     }

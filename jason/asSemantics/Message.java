@@ -72,6 +72,10 @@ public class Message implements Serializable {
         return ilForce;
     }
     
+    public void setIlForce(String ilf) {
+        ilForce = ilf;
+    }
+    
     public boolean isAsk() {
         return ilForce.startsWith("ask");
     }
