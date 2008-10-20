@@ -82,6 +82,12 @@ public interface BeliefBase extends Iterable<Literal>, Cloneable {
     public Iterator<Literal> getAll();
     
     /** 
+     * Returns an iterator for all literals in BB that match the functor/arity 
+     * of the parameter.<br>
+     */
+    public Iterator<Literal> getCandidateBeliefs(PredicateIndicator pi);
+
+    /** 
      * Returns an iterator for all literals relevant for l's predicate
      * indicator, if l is a var, returns all beliefs.<br>
      * 

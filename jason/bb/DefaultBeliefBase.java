@@ -229,17 +229,24 @@ public class DefaultBeliefBase implements BeliefBase {
         }
     }
 
+    public Iterator<Literal> getCandidateBeliefs(PredicateIndicator pi) {
+        BelEntry entry = belsMap.get(pi);
+        if (entry != null)
+            return Collections.unmodifiableList(entry.list).iterator();
+        else
+            return null;
+    }
+    
     public Iterator<Literal> getCandidateBeliefs(Literal l, Unifier u) {
         if (l.isVar()) {
             // all bels are relevant
             return iterator();
         } else {
             BelEntry entry = belsMap.get(l.getPredicateIndicator());
-            if (entry != null) {
+            if (entry != null)
                 return Collections.unmodifiableList(entry.list).iterator();
-            } else {
+            else
                 return null;
-            }
         }
     }
     

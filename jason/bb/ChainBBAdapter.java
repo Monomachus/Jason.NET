@@ -110,6 +110,10 @@ public class ChainBBAdapter implements BeliefBase {
         return nextBB.iterator();
     }
 
+    public Iterator<Literal> getCandidateBeliefs(PredicateIndicator pi) {
+        return nextBB.getCandidateBeliefs(pi);
+    }
+    
     public Iterator<Literal> getCandidateBeliefs(Literal l, Unifier u) {
         return nextBB.getCandidateBeliefs(l, u);
     }
