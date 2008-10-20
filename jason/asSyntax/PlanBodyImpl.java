@@ -56,15 +56,25 @@ public class PlanBodyImpl extends Structure implements PlanBody, Iterable<PlanBo
     }
     
     public BodyType getBodyType() {
-        return formType;
+        if (term instanceof VarTerm) { // do not use .isVar
+            return ((VarTerm)term).getBodyType();
+        } else {
+            return formType;
+        }
     }
     public void setBodyType(BodyType bt) {
         formType = bt;
     }
     
     public Term getBodyTerm() {
+        if (term instanceof VarTerm) {
+            VarTerm v = (VarTerm)term;
+            if (v.hasValue())
+                return v.getValue();
+        }
         return term;
     }
+    
     public void setBodyTerm(Term t) {
         term = t;
     }

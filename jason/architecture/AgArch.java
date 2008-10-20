@@ -140,7 +140,10 @@ public class AgArch {
     
     /** Gets the agent's name */
     public String getAgName() {
-        return archTier.getAgName();
+        if (archTier == null)
+            return "no-named";
+        else
+            return archTier.getAgName();
     }
 
     /** Sends a Jason message */
