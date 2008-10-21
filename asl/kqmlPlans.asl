@@ -12,7 +12,7 @@
 
 @kqmlReceivedTellStructure
 +!kqml_received(Sender, tell, Content, _) 
-   :  .structure(Content) & 
+   :  .literal(Content) & 
       .ground(Content) &
       not .list(Content)
    <- .add_nested_source(Content, Sender, CA); 
@@ -27,7 +27,7 @@
 
 @kqmlReceivedTellList2
 +!add_all_kqml_received(Sender,[H|T])
-   :  .structure(H) & 
+   :  .literal(H) & 
       .ground(H)
    <- .add_nested_source(H, Sender, CA); 
       +CA;

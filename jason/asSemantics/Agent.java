@@ -661,6 +661,9 @@ public class Agent {
      * and generate the event.
      */
     public boolean delBel(Literal bel) throws RevisionFailedException {
+        if (!bel.hasSource()) {
+            bel.addAnnot(BeliefBase.TSelf);
+        }
         List<Literal>[] result = brf(null, bel, Intention.EmptyInt);
         if (result != null && ts != null) {
             ts.updateEvents(result, Intention.EmptyInt);

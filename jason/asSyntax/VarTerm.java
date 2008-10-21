@@ -904,8 +904,6 @@ public class VarTerm extends LiteralImpl implements NumberTerm, ListTerm, String
     public BodyType getBodyType() {
         if (value != null && getValue() instanceof PlanBody)
             return ((PlanBody) getValue()).getBodyType();
-        else if (value != null && getValue().isInternalAction())
-            return BodyType.internalAction;
         else
             return BodyType.none;
     }
