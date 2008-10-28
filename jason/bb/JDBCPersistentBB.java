@@ -1,5 +1,6 @@
 package jason.bb;
 
+import static jason.asSyntax.ASSyntax.createNumber;
 import jason.asSemantics.Agent;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.ASSyntax;
@@ -14,6 +15,7 @@ import jason.asSyntax.StringTermImpl;
 import jason.asSyntax.Structure;
 import jason.asSyntax.Term;
 import jason.asSyntax.parser.ParseException;
+import jason.asSyntax.parser.TokenMgrError;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -23,6 +25,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -210,8 +213,8 @@ public class JDBCPersistentBB extends ChainBBAdapter {
             }
         } catch (SQLException e) {
             logger.log(Level.SEVERE, "SQL Error", e);
-        } catch (ParseException e) {
-            logger.log(Level.SEVERE, "Parser Error", e);
+        //} catch (ParseException e) {
+        //    logger.log(Level.SEVERE, "Parser Error", e);
         } finally {
             try {
                 stmt.close();
@@ -458,7 +461,8 @@ public class JDBCPersistentBB extends ChainBBAdapter {
     
 
     /** translates the current line of a result set into a Literal */
-    protected Literal resultSetToLiteral(ResultSet rs, PredicateIndicator pi) throws SQLException, ParseException {
+    @SuppressWarnings("deprecation")
+    protected Literal resultSetToLiteral(ResultSet rs, PredicateIndicator pi) throws SQLException {
         ResultSetMetaData meta = belsDB.get(pi);
         boolean isJasonTable = isCreatedByJason(pi);
         Literal ldb = new LiteralImpl(pi.getFunctor());
@@ -467,7 +471,6 @@ public class JDBCPersistentBB extends ChainBBAdapter {
             end = end - extraCols;
         for (int c = 1; c <= end; c++) {
             Term parsed = null;
-            String sc = rs.getString(c);
             switch (meta.getColumnType(c)) {
             case Types.INTEGER:
             case Types.FLOAT:
@@ -475,21 +478,42 @@ public class JDBCPersistentBB extends ChainBBAdapter {
             case Types.DOUBLE:
             case Types.NUMERIC:
             case Types.REAL:
-                parsed = new NumberTermImpl(sc);
+                parsed = new NumberTermImpl(rs.getDouble(c));
+                break;
+
+            case Types.TIMESTAMP:
+                Calendar time = Calendar.getInstance(); 
+                time.setTime(rs.getTimestamp(c));
+                parsed = ASSyntax.createStructure("timestamp", 
+                        createNumber(time.get(Calendar.YEAR)),
+                        createNumber(time.get(Calendar.MONTH)),
+                        createNumber(time.get(Calendar.DAY_OF_MONTH)),
+                        createNumber(time.get(Calendar.HOUR_OF_DAY)),
+                        createNumber(time.get(Calendar.MINUTE)),
+                        createNumber(time.get(Calendar.SECOND)));
                 break;
 
             default:
+                String sc = rs.getString(c);
                 if (sc == null || sc.trim().length() == 0) {
                     parsed = new StringTermImpl("");
                 } else if (Character.isUpperCase(sc.charAt(0))) {
                     // there is no var at BB
                     parsed = new StringTermImpl(sc);
                 } else {
-                    parsed = ASSyntax.parseTerm(sc);
+                    try {
+                        parsed = ASSyntax.parseTerm(sc);
                     
-                    // if the parsed term is not equals to sc, try it as string
-                    if (!parsed.toString().equals(sc))
-                        parsed = ASSyntax.parseTerm(sc = "\"" + sc + "\"");
+                        // if the parsed term is not equals to sc, try it as string
+                        if (!parsed.toString().equals(sc))
+                            parsed = ASSyntax.parseTerm(sc = "\"" + sc + "\"");
+                    } catch (ParseException e) {
+                        // can not be parsed, be a string
+                        parsed = new StringTermImpl(sc);
+                    } catch (TokenMgrError e) {
+                        // can not be parsed, be a string
+                        parsed = new StringTermImpl(sc);                        
+                    }
                 }
                 break;
             }
