@@ -869,41 +869,39 @@ public class TransitionSystem {
         return null;
     }
     
-    private static final Term aNOCODE = new Atom("no_code");
+    private static final Atom aNOCODE = new Atom("no_code");
     private static void setDefaultFailureAnnots(Event failEvent, Term body, List<Term> failAnnots) {
         // add default failure annots
         if (failAnnots == null)
             failAnnots = JasonException.createBasicErrorAnnots( JasonException.UNKNOW_ERROR, "");
+
+        Literal eventLiteral = failEvent.getTrigger().getLiteral();
+        eventLiteral.addAnnots(failAnnots);
         
         // add failure annots in the event related to the code source
-        Literal bodyterm = null;
-        Term codesrc     = null;
-        Term codeline    = null;
+        Literal bodyterm = aNOCODE;
+        Term codesrc     = aNOCODE;
+        Term codeline    = aNOCODE;
         if (body != null && body instanceof Literal) {
             bodyterm = (Literal)body;
-            codesrc  = new StringTermImpl(bodyterm.getSrcFile());
-            codeline = new NumberTermImpl(bodyterm.getSrcLine());
-        } else {
-            bodyterm = new Atom("no_code");
-            codesrc  = aNOCODE;
-            codeline = aNOCODE;            
+            if (bodyterm.getSrcInfo() != null) {
+                if (bodyterm.getSrcInfo().getSrcFile() != null)
+                    codesrc = new StringTermImpl(bodyterm.getSrcInfo().getSrcFile());
+                codeline = new NumberTermImpl(bodyterm.getSrcInfo().getSrcLine());
+            }
         }
 
         // code
-        Structure code = new Structure("code", 1);
-        code.addTerm(bodyterm);
-        failAnnots.add(code);
+        if (eventLiteral.getAnnots("code").isEmpty())
+            eventLiteral.addAnnot(ASSyntax.createStructure("code", bodyterm));
         
         // ASL source
-        Structure src = new Structure("code_src", 1);
-        src.addTerm(codesrc);
-        failAnnots.add(src);                    
+        if (eventLiteral.getAnnots("code_src").isEmpty())
+            eventLiteral.addAnnot(ASSyntax.createStructure("code_src", codesrc));
 
         // line in the source
-        Structure line = new Structure("code_line", 1);
-        line.addTerm(codeline);
-        failAnnots.add(line);                    
-        failEvent.getTrigger().getLiteral().addAnnots(failAnnots);
+        if (eventLiteral.getAnnots("code_line").isEmpty())
+            eventLiteral.addAnnot(ASSyntax.createStructure("code_line", codeline));
     }
         
     public boolean canSleep() {

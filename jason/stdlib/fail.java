@@ -23,10 +23,13 @@
 
 package jason.stdlib;
 
+import jason.JasonException;
 import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.InternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
+import jason.asSyntax.StringTerm;
+import jason.asSyntax.Structure;
 import jason.asSyntax.Term;
 
 /**
@@ -52,12 +55,31 @@ public class fail extends DefaultInternalAction {
         return singleton;
     }
 
-    @Override public int getMinArgs() { return 0; }
-    @Override public int getMaxArgs() { return 0; }
-
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
-        checkArguments(args);
+        if (args.length > 0) { // add all arguments as annotations in the exception
+            // find message
+            Term smsg = null;
+            String msg = "fail";
+            for (Term t: args) {
+                if (t.isStructure() && ((Structure)t).getFunctor().equals("error_msg")) {
+                    smsg = t;
+                    Term tm = ((Structure)t).getTerm(0);
+                    if (tm.isString())
+                        msg = ((StringTerm)tm).getString();
+                    else
+                        msg = tm.toString();
+                    break;
+                }
+            }
+            
+            JasonException e = new JasonException(msg);
+            for (Term t: args) {
+                if (t != smsg)
+                    e.addErrorAnnot(t);
+            }
+            throw e;
+        }
         return false;
     }
 }

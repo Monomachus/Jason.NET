@@ -101,7 +101,8 @@ public class LiteralImpl extends Pred implements LogicalFormula {
 
     @Override    
     public String getErrorMsg() {
-        return "Error in '"+this+"' ("+ super.getErrorMsg() + ")";       
+        String src = getSrcInfo() == null ? "" : " ("+ getSrcInfo().getErrorMsg() + ")"; 
+        return "Error in '"+this+"'"+src;
     }
     
     @Override

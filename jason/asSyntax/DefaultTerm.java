@@ -109,20 +109,6 @@ public abstract class DefaultTerm implements Term, Serializable {
         srcInfo = s;
     }
     
-    public String getSrcFile() {
-        if (srcInfo == null)
-            return null;
-        else
-            return srcInfo.getSrcFile();
-    }
-
-    public int getSrcLine() {
-        if (srcInfo == null)
-            return 0;
-        else
-            return srcInfo.getSrcLine();
-    }
-    
     public String getErrorMsg() {
         if (srcInfo == null)
             return "";

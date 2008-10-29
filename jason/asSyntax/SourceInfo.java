@@ -23,12 +23,15 @@ public class SourceInfo implements Serializable {
         endSrcLine   = endLine;
     }
     public SourceInfo(SourceInfo o) {
-        source       = o.source;
-        beginSrcLine = o.beginSrcLine;
-        endSrcLine   = o.endSrcLine;
-    }
-    public SourceInfo(DefaultTerm o) {
-        this(o.getSrcInfo());
+        if (o == null) {
+            source       = null;
+            beginSrcLine = 0;
+            endSrcLine   = 0;            
+        } else {
+            source       = o.source;
+            beginSrcLine = o.beginSrcLine;
+            endSrcLine   = o.endSrcLine;
+        }
     }
 
     public SourceInfo clone() {

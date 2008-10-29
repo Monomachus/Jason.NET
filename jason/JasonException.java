@@ -26,11 +26,10 @@ package jason;
 
 import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.InternalAction;
+import jason.asSyntax.ASSyntax;
 import jason.asSyntax.Atom;
 import jason.asSyntax.ListTerm;
 import jason.asSyntax.ListTermImpl;
-import jason.asSyntax.StringTermImpl;
-import jason.asSyntax.Structure;
 import jason.asSyntax.Term;
 
 
@@ -44,6 +43,8 @@ public class JasonException extends java.lang.Exception {
     private static final Term defaultError = new Atom("internal_action");
     private Term error = defaultError;
 
+    private ListTerm errorAnnots = null;
+    
     /**
      * Creates a new instance of <code>JasonException</code> without detail message.
      */
@@ -81,8 +82,17 @@ public class JasonException extends java.lang.Exception {
         this.error = error;
     }
 
+    public void addErrorAnnot(Term t) {
+        if (errorAnnots == null)
+            errorAnnots = new ListTermImpl();
+        errorAnnots.append(t);
+    }
+    
     public ListTerm getErrorTerms() {
-        return createBasicErrorAnnots(error, getMessage());
+        ListTerm e = createBasicErrorAnnots(error, getMessage()); 
+        if (errorAnnots != null)
+            e.concat(errorAnnots.cloneLT());
+        return e;
     }
     
     @SuppressWarnings("unchecked")
@@ -107,6 +117,10 @@ public class JasonException extends java.lang.Exception {
         return createBasicErrorAnnots(new Atom(id), msg);
     }
     public static ListTerm createBasicErrorAnnots(Term id, String msg) {
+        return ASSyntax.createList(
+                ASSyntax.createStructure("error", id),
+                ASSyntax.createStructure("error_msg", ASSyntax.createString(msg)));
+        /*
         ListTerm failAnnots = new ListTermImpl();
         Structure e = new Structure("error", 1);
         e.addTerm(id);
@@ -115,5 +129,6 @@ public class JasonException extends java.lang.Exception {
         m.addTerm(new StringTermImpl(msg));
         failAnnots.add(m);
         return failAnnots;
+        */
     }
 }

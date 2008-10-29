@@ -164,6 +164,8 @@ public abstract class Literal extends DefaultTerm implements LogicalFormula {
      * [t(a), t(b), source(tom)]
      * and functor "t",
      * it returns [t(a),t(b)]
+     * 
+     * in case that there is no such an annot, it returns an empty list. 
      */
     public ListTerm getAnnots(String functor) { return new ListTermImpl(); }
     /**

@@ -94,7 +94,10 @@ public final class StringTermImpl extends DefaultTerm implements StringTerm {
 
         if (t != null && t instanceof StringTerm) {
             StringTerm st = (StringTerm)t;
-            return value.equals(st.getString());
+            if (value == null)
+                return st.getString() == null;
+            else
+                return value.equals(st.getString());
         }
         return false;
     }

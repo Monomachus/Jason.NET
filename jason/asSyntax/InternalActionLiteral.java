@@ -142,8 +142,8 @@ public class InternalActionLiteral extends LiteralImpl {
     
     @Override
     public String getErrorMsg() {
-        String line = (getSrcLine() >= 0 ? ":"+getSrcLine() : "");
-        return "Error in internal action '"+this+"' ("+ getSrcFile() + line + ")";      
+        String src = getSrcInfo() == null ? "" : " ("+ getSrcInfo().getErrorMsg() + ")"; 
+        return "Error in internal action '"+this+"'"+ src;      
     }
     
     public InternalActionLiteral clone() {
