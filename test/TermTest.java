@@ -1,5 +1,6 @@
 package test;
 
+import static jason.asSyntax.ASSyntax.*;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.ASSyntax;
 import jason.asSyntax.Atom;
@@ -318,8 +319,8 @@ public class TermTest extends TestCase {
 
     public void testAnnotsUnify7() throws ParseException {
         // p[a,b,c,d] = p[a,c|R] - ok and R=[b,d]
-        Term t1 = ASSyntax.parseTerm("p[a,b,c,d]");
-        Term t2 = ASSyntax.parseTerm("p[a,c|R]");
+        Term t1 = parseTerm("p[a,b,c,d]");
+        Term t2 = parseTerm("p[a,c|R]");
         Unifier u = new Unifier();
         assertTrue(u.unifies(t1, t2));
         assertEquals(u.get("R").toString(),"[b,d]");
@@ -330,7 +331,7 @@ public class TermTest extends TestCase {
         assertEquals(u.get("R").toString(),"[b,d]");
 
         // p[H|R] = p[a,b,c,d] - ok and R=[b,c,d], H=a
-        Term t3 = ASSyntax.parseTerm("p[H|R]");
+        Term t3 = parseTerm("p[H|R]");
         u = new Unifier();
         assertTrue(u.unifies(t1, t3));
         assertEquals(u.get("H").toString(),"a");
@@ -338,17 +339,17 @@ public class TermTest extends TestCase {
     }  
     
     public void testApplyAnnots() throws ParseException {
-        Term t1 = ASSyntax.parseTerm("p[a,X,c,d]");
+        Term t1 = parseTerm("p[a,X,c,d]");
         Unifier u = new Unifier();
         u.unifies(new VarTerm("X"), new Atom("z"));
         t1.apply(u);
         assertEquals("p[a,z,c,d]",t1.toString());
         
-        t1 = ASSyntax.parseTerm("p[X,b,c,d]");
+        t1 = parseTerm("p[X,b,c,d]");
         t1.apply(u);
         assertEquals("p[z,b,c,d]",t1.toString());
 
-        t1 = ASSyntax.parseTerm("p[a,b,c,X]");
+        t1 = parseTerm("p[a,b,c,X]");
         t1.apply(u);
         assertEquals("p[a,b,c,z]",t1.toString());
     }
@@ -678,15 +679,16 @@ public class TermTest extends TestCase {
     }
     
     public void testGetTermsArray() {
-        Structure s2 = Structure.parse("a(1,2,3)");
+        Structure s2 = createStructure("a");
+        s2.addTerms(createNumber(1), createNumber(2), createNumber(3));
         Term[] a = s2.getTermsArray();
         assertEquals(3,a.length);
         assertEquals("1",a[0].toString());
         assertEquals("3",a[2].toString());
     }
     
-    public void testIALiteral() {
-        Literal l = Literal.parseLiteral(".print(a)");
+    public void testIALiteral() throws ParseException {
+        Literal l = parseLiteral(".print(a)");
         assertTrue(l.isInternalAction());
         
         l = Literal.parseLiteral("print(a)");
@@ -703,8 +705,8 @@ public class TermTest extends TestCase {
         assertEquals(0,s.getArity());
     }
 
-    public void testHasVar() {
-        Literal l = Literal.parseLiteral("a(Test,X,Y,b(g([V1,X,V2,V1]),c))[b,source(Y),B,kk(_),oo(oo(OO))]");
+    public void testHasVar() throws ParseException {
+        Literal l = parseLiteral("a(Test,X,Y,b(g([V1,X,V2,V1]),c))[b,source(Y),B,kk(_),oo(oo(OO))]");
         assertTrue(l.hasVar(new VarTerm("X")));
         assertTrue(l.hasVar(new VarTerm("V2")));
         assertTrue(l.hasVar(new VarTerm("OO")));
@@ -755,8 +757,8 @@ public class TermTest extends TestCase {
     }   
     
     
-    public void testAtomParsing() {
-        Literal l = Literal.parseLiteral("b");
+    public void testAtomParsing() throws ParseException {
+        Literal l = parseLiteral("b");
         assertTrue(l instanceof Literal);
         assertTrue(l.isAtom());
 
@@ -764,12 +766,12 @@ public class TermTest extends TestCase {
         @SuppressWarnings("unused")
         Atom x = (Atom)l;
         
-        l = Literal.parseLiteral("b(10,a,c(10,x))[ant1,source(c)]");
+        l = parseLiteral("b(10,a,c(10,x))[ant1,source(c)]");
         assertTrue(l.getTerm(1) instanceof Atom);
         assertFalse(l.getTerm(2).isAtom());
         assertTrue(l.getAnnots().get(0) instanceof Atom);
         
-        l =  Literal.parseLiteral("b(a.r)"); // internal actions should not be atoms
+        l =  parseLiteral("b(a.r)"); // internal actions should not be atoms
         assertFalse(l.getTerm(0).isAtom());
     }
 }

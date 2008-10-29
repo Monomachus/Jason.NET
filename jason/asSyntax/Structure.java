@@ -192,9 +192,8 @@ public class Structure extends Atom {
     
     @Override
     public Literal addTerms(Term ... ts ) {
-        for (Term t: ts) {
+        for (Term t: ts)
             terms.add(t);
-        }
         predicateIndicatorCache = null;
         resetHashCodeCache();
         return this;
@@ -202,9 +201,8 @@ public class Structure extends Atom {
 
     @Override
     public Literal addTerms(List<Term> l) {
-        for (Term t: l) {
+        for (Term t: l)
             terms.add(t);
-        }
         predicateIndicatorCache = null;
         resetHashCodeCache();
         return this;

@@ -81,7 +81,8 @@ public class ASSyntax {
      * and the n remainder arguments are terms.
      */
     public static Structure createStructure(String functor, Term... terms) {
-        return (Structure)new Structure(functor).addTerms(terms);
+        int size = (terms == null || terms.length == 0 ? 3 : terms.length);
+        return (Structure)new Structure(functor, size).addTerms(terms);
     }
 
     /** creates a new Atom term */
