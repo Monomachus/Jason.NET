@@ -183,7 +183,7 @@ public class RunJadeMAS extends RunCentralisedMAS {
                 Thread.sleep(1000); // give 1 second for sniffer to start
             }
            
-        } catch (Exception e) {
+        } catch (Throwable e) {
             logger.log(Level.SEVERE, "Error creating agents: ", e);            
         }
     }
