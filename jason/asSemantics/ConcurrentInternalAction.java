@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit;
 
   Example: a plan may ask something to an user and wait the answer.
   If DefaultInternalAction is used for that, all the agent thread is blocked until
-  the answer. With SuspendInternalAction, only the intention using the IA is
+  the answer. With ConcurrentInternalAction, only the intention using the IA is
   suspended. See demos/gui/gui1.  
 
   The code of an internal action that extends this class looks like:

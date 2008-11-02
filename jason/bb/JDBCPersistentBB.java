@@ -8,6 +8,7 @@ import jason.asSyntax.ListTerm;
 import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Literal;
 import jason.asSyntax.LiteralImpl;
+import jason.asSyntax.NumberTerm;
 import jason.asSyntax.NumberTermImpl;
 import jason.asSyntax.PredicateIndicator;
 import jason.asSyntax.StringTerm;
@@ -23,6 +24,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -461,7 +463,6 @@ public class JDBCPersistentBB extends ChainBBAdapter {
     
 
     /** translates the current line of a result set into a Literal */
-    @SuppressWarnings("deprecation")
     protected Literal resultSetToLiteral(ResultSet rs, PredicateIndicator pi) throws SQLException {
         ResultSetMetaData meta = belsDB.get(pi);
         boolean isJasonTable = isCreatedByJason(pi);
@@ -482,15 +483,7 @@ public class JDBCPersistentBB extends ChainBBAdapter {
                 break;
 
             case Types.TIMESTAMP:
-                Calendar time = Calendar.getInstance(); 
-                time.setTime(rs.getTimestamp(c));
-                parsed = ASSyntax.createStructure("timestamp", 
-                        createNumber(time.get(Calendar.YEAR)),
-                        createNumber(time.get(Calendar.MONTH)),
-                        createNumber(time.get(Calendar.DAY_OF_MONTH)),
-                        createNumber(time.get(Calendar.HOUR_OF_DAY)),
-                        createNumber(time.get(Calendar.MINUTE)),
-                        createNumber(time.get(Calendar.SECOND)));
+                parsed = timestamp2structure(rs.getTimestamp(c));
                 break;
 
             default:
@@ -525,6 +518,7 @@ public class JDBCPersistentBB extends ChainBBAdapter {
         }
         return ldb;
     }
+
     
     protected String getTableName(Literal l) throws SQLException {
         return getTableName(l.getPredicateIndicator());
@@ -610,7 +604,12 @@ public class JDBCPersistentBB extends ChainBBAdapter {
             if (t.isString()) {
                 q.append("'" + ((StringTerm) t).getString() + "'");
             } else {
-                q.append("'" + t.toString() + "'");
+                Timestamp timestamp = structure2timestamp(t);
+                if (timestamp != null) {
+                    q.append("TIMESTAMP '" + structure2timestamp(t) + "'");
+                } else {
+                    q.append("'" + t.toString() + "'");
+                }
             }
             if (i < meta.getColumnCount() - 1) {
                 q.append(",");
@@ -664,4 +663,40 @@ public class JDBCPersistentBB extends ChainBBAdapter {
             }
         }
     }
+
+    public static final String timestampFunctor = "timestamp";
+
+    /** translates a SQL timestamp into a structure like "timestamp(Y,M,D,H,M,S)" */
+    public static Structure timestamp2structure(Timestamp timestamp) throws SQLException {
+        Calendar time = Calendar.getInstance(); 
+        time.setTime(timestamp);
+        return ASSyntax.createStructure(timestampFunctor, 
+                createNumber(time.get(Calendar.YEAR)),
+                createNumber(time.get(Calendar.MONTH)),
+                createNumber(time.get(Calendar.DAY_OF_MONTH)),
+                createNumber(time.get(Calendar.HOUR_OF_DAY)),
+                createNumber(time.get(Calendar.MINUTE)),
+                createNumber(time.get(Calendar.SECOND)));
+    }
+    
+    /** translates structure like "timestamp(Y,M,D,H,M,S)" into a SQL timestamp */
+    @SuppressWarnings("deprecation")
+    public static Timestamp structure2timestamp(Term timestamp) throws SQLException {
+        if (timestamp.isStructure()) {
+            Structure s = (Structure)timestamp;
+            if (s.getFunctor().equals(timestampFunctor) && s.getArity() == 6) {
+                return new Timestamp(
+                        (int)((NumberTerm)s.getTerm(0)).solve() - 1900,
+                        (int)((NumberTerm)s.getTerm(1)).solve(),
+                        (int)((NumberTerm)s.getTerm(2)).solve(),
+                        (int)((NumberTerm)s.getTerm(3)).solve(),
+                        (int)((NumberTerm)s.getTerm(4)).solve(),
+                        (int)((NumberTerm)s.getTerm(5)).solve(),
+                        0
+                        );
+            }
+        }
+        return null;
+    }
+
 }

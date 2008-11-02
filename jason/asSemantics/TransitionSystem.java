@@ -870,6 +870,8 @@ public class TransitionSystem {
     }
     
     private static final Atom aNOCODE = new Atom("no_code");
+    
+    /** add default error annotations (error, error_msg, code, code_src, code_line) in the failure event */
     private static void setDefaultFailureAnnots(Event failEvent, Term body, List<Term> failAnnots) {
         // add default failure annots
         if (failAnnots == null)
