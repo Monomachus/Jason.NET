@@ -78,7 +78,7 @@ public class Rule extends LiteralImpl {
     }
     
     public Rule clone() {
-        Rule r = new Rule(super.copy(), (LogicalFormula)body.clone());
+        Rule r = new Rule((Literal)super.clone(), (LogicalFormula)body.clone());
         r.predicateIndicatorCache = null;
         r.resetHashCodeCache();
         return r; 
