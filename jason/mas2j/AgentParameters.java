@@ -127,5 +127,9 @@ public class AgentParameters {
         }
         
         return stts;
-    }   
+    }
+    
+    public String getAgName() {
+        return name;
+    }
 }
