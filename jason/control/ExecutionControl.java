@@ -137,7 +137,7 @@ public class ExecutionControl {
             lock.lock();
             try {                
                 if (logger.isLoggable(Level.FINE)) {
-                    logger.fine("Agent "+agName+" has finished the cycle "+cycle+", # of finished agents is "+(finished.size()+1)+"/"+nbAgs);
+                    logger.fine("Agent "+agName+" has finished cycle "+cycle+", # of finished agents is "+(finished.size()+1)+"/"+nbAgs);
                     if (breakpoint) logger.fine("Agent "+agName+" reached a breakpoint");               
                 }
 

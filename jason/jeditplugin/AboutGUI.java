@@ -23,7 +23,7 @@ public class AboutGUI {
     
         JOptionPane.showMessageDialog(parent,
         version +  build+
-        "Copyright (C) 2003-2008  Rafael H. Bordini, Jomi F. Hubner, et al.\n\n"+
+        "Copyright (C) 2003-2008  Jomi F. Hubner & Rafael H. Bordini.\n\n"+
         "This library is free software; you can redistribute it and/or\n"+
         "modify it under the terms of the GNU Lesser General Public\n"+
         "License as published by the Free Software Foundation; either\n"+

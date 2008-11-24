@@ -463,7 +463,7 @@ public class ExecutionControlGUI extends ExecutionControl {
         this.breakpoint = breakpoint;
         if (waitSelectedAg) {
             countCycles++;
-            logger.info("Agent "+agName+" has finished the cycle "+cycle);
+            logger.info("Agent "+agName+" has finished cycle "+cycle);
             if (testStop()) {
                 stopRun();
             } else {
@@ -479,7 +479,7 @@ public class ExecutionControlGUI extends ExecutionControl {
     /** called when all agents have finished the current cycle */
     protected void allAgsFinished() {
         if (waitAllAgs) {
-            logger.fine("All agents have finished the cycle "+getCycleNumber());
+            logger.fine("All agents have finished cycle "+getCycleNumber());
             countCycles++;
             if (testStop()) {
                 stopRun();
