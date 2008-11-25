@@ -52,15 +52,15 @@
 
 		<SEQ_REGEXP TYPE="DIGIT" HASH_CHAR="@" AT_WORD_START="TRUE">[@]([[:alnum:]])+</SEQ_REGEXP>
 
-		<SEQ_REGEXP TYPE="LABEL" HASH_CHAR="+" AT_WORD_START="TRUE">[+][a-z]([[:alnum:]])*</SEQ_REGEXP>
-		<SEQ_REGEXP TYPE="LABEL" HASH_CHAR="-" AT_WORD_START="TRUE">[-][a-z]([[:alnum:]])*</SEQ_REGEXP>
-		<SEQ_REGEXP TYPE="MARKUP" HASH_CHAR="+" AT_WORD_START="TRUE">[+][!][a-z]([[:alnum:]])*</SEQ_REGEXP>
-		<SEQ_REGEXP TYPE="MARKUP" HASH_CHAR="+" AT_WORD_START="TRUE">[+][?][a-z]([[:alnum:]])*</SEQ_REGEXP>
-		<SEQ_REGEXP TYPE="MARKUP" HASH_CHAR="-" AT_WORD_START="TRUE">[-][!][a-z]([[:alnum:]])*</SEQ_REGEXP>
-		<SEQ_REGEXP TYPE="MARKUP" HASH_CHAR="-" AT_WORD_START="TRUE">[-][?][a-z]([[:alnum:]])*</SEQ_REGEXP>
- 		<SEQ_REGEXP TYPE="MARKUP" HASH_CHAR="!" AT_WORD_START="TRUE">[!][a-z]([[:alnum:]])*</SEQ_REGEXP>
- 		<SEQ_REGEXP TYPE="MARKUP" HASH_CHAR="!" AT_WORD_START="TRUE">[!][!][a-z]([[:alnum:]])*</SEQ_REGEXP>
-		<SEQ_REGEXP TYPE="MARKUP" HASH_CHAR="?" AT_WORD_START="TRUE">[?][a-z]([[:alnum:]])*</SEQ_REGEXP>		
+		<SEQ_REGEXP TYPE="LABEL" HASH_CHAR="+" AT_WORD_START="TRUE">[+]([~])?[a-z]([[:alnum:]])*</SEQ_REGEXP>
+		<SEQ_REGEXP TYPE="LABEL" HASH_CHAR="-" AT_WORD_START="TRUE">[-]([~])?[a-z]([[:alnum:]])*</SEQ_REGEXP>
+		<SEQ_REGEXP TYPE="MARKUP" HASH_CHAR="+" AT_WORD_START="TRUE">[+][!]([~])?[a-z]([[:alnum:]])*</SEQ_REGEXP>
+		<SEQ_REGEXP TYPE="MARKUP" HASH_CHAR="+" AT_WORD_START="TRUE">[+][?]([~])?[a-z]([[:alnum:]])*</SEQ_REGEXP>
+		<SEQ_REGEXP TYPE="MARKUP" HASH_CHAR="-" AT_WORD_START="TRUE">[-][!]([~])?[a-z]([[:alnum:]])*</SEQ_REGEXP>
+		<SEQ_REGEXP TYPE="MARKUP" HASH_CHAR="-" AT_WORD_START="TRUE">[-][?]([~])?[a-z]([[:alnum:]])*</SEQ_REGEXP>
+ 		<SEQ_REGEXP TYPE="MARKUP" HASH_CHAR="!" AT_WORD_START="TRUE">[!]([~])?[a-z]([[:alnum:]])*</SEQ_REGEXP>
+ 		<SEQ_REGEXP TYPE="MARKUP" HASH_CHAR="!" AT_WORD_START="TRUE">[!]([~])?[!][a-z]([[:alnum:]])*</SEQ_REGEXP>
+		<SEQ_REGEXP TYPE="MARKUP" HASH_CHAR="?" AT_WORD_START="TRUE">[?]([~])?[a-z]([[:alnum:]])*</SEQ_REGEXP>		
 
 		<!-- Vars -->
 		<SEQ_REGEXP TYPE="LITERAL3" HASH_CHAR="A">A([[:alnum:]])*</SEQ_REGEXP>
@@ -146,6 +146,7 @@
 		<SEQ_REGEXP TYPE="LABEL" HASH_CHAR="z">z([[:alnum:]])*</SEQ_REGEXP>
 		<SEQ_REGEXP TYPE="LABEL" HASH_CHAR="w">w([[:alnum:]])*</SEQ_REGEXP>
 		<SEQ_REGEXP TYPE="LABEL" HASH_CHAR="y">y([[:alnum:]])*</SEQ_REGEXP>
+		<SEQ_REGEXP TYPE="LABEL" HASH_CHAR="~">~([[:alnum:]])*</SEQ_REGEXP>
 
 		<!-- plans delimiters -->
 		<SEQ TYPE="KEYWORD1">:</SEQ>
@@ -221,11 +222,11 @@
 		<SEQ TYPE="OPERATOR">div</SEQ>
 		<SEQ TYPE="OPERATOR">mod</SEQ>
 
-		<SEQ_REGEXP TYPE="LABEL" HASH_CHAR="+" AT_WORD_START="TRUE">[+][a-z]([[:alnum:]])*</SEQ_REGEXP>
-		<SEQ_REGEXP TYPE="LABEL" HASH_CHAR="-" AT_WORD_START="TRUE">[-][a-z]([[:alnum:]])*</SEQ_REGEXP>
-		<SEQ_REGEXP TYPE="MARKUP" HASH_CHAR="!" AT_WORD_START="TRUE">[!][a-z]([[:alnum:]])*</SEQ_REGEXP>
-		<SEQ_REGEXP TYPE="MARKUP" HASH_CHAR="!" AT_WORD_START="TRUE">[!][!][a-z]([[:alnum:]])*</SEQ_REGEXP>
-		<SEQ_REGEXP TYPE="MARKUP" HASH_CHAR="?" AT_WORD_START="TRUE">[?][a-z]([[:alnum:]])*</SEQ_REGEXP>		
+		<SEQ_REGEXP TYPE="LABEL" HASH_CHAR="+" AT_WORD_START="TRUE">[+]([~])?[a-z]([[:alnum:]])*</SEQ_REGEXP>
+		<SEQ_REGEXP TYPE="LABEL" HASH_CHAR="-" AT_WORD_START="TRUE">[-]([+])?([~])?[a-z]([[:alnum:]])*</SEQ_REGEXP>
+		<SEQ_REGEXP TYPE="MARKUP" HASH_CHAR="!" AT_WORD_START="TRUE">[!]([~])?[a-z]([[:alnum:]])*</SEQ_REGEXP>
+		<SEQ_REGEXP TYPE="MARKUP" HASH_CHAR="!" AT_WORD_START="TRUE">[!]([~])?[!][a-z]([[:alnum:]])*</SEQ_REGEXP>
+		<SEQ_REGEXP TYPE="MARKUP" HASH_CHAR="?" AT_WORD_START="TRUE">[?]([~])?[a-z]([[:alnum:]])*</SEQ_REGEXP>		
 
 		<!-- Vars -->
 		<SEQ_REGEXP TYPE="LITERAL3" HASH_CHAR="A">A([[:alnum:]])*</SEQ_REGEXP>
