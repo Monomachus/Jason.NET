@@ -77,6 +77,12 @@ public class CentralisedRuntimeServices implements RuntimeServicesInfraTier {
     public Set<String> getAgentsNames() {
         return masRunner.getAgs().keySet();
     }
+    
+    /** @deprecated use getAgentsNames() */
+    public Set<String> getAgentsName() {
+        return getAgentsNames();
+    }
+
 
     public int getAgentsQty() {
         return masRunner.getAgs().keySet().size();

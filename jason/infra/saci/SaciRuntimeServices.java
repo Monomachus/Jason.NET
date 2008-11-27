@@ -94,6 +94,12 @@ public class SaciRuntimeServices implements RuntimeServicesInfraTier {
         }
         return null;
     }
+    
+    /** @deprecated use getAgentsNames() */
+    public Set<String> getAgentsName() {
+        return getAgentsNames();
+    }
+
 
     public int getAgentsQty() {
         try {
