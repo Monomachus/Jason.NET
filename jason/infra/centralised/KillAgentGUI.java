@@ -29,7 +29,7 @@ public class KillAgentGUI extends BaseDialogGUI {
         getContentPane().setLayout(new BorderLayout());
 
         // Fields
-        Vector<String> agNames = new Vector<String>(services.getAgentsName());
+        Vector<String> agNames = new Vector<String>(services.getAgentsNames());
         Collections.sort(agNames);
         lAgs = new JList(agNames);
         lAgs.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);

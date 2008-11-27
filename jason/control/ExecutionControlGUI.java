@@ -290,7 +290,7 @@ public class ExecutionControlGUI extends ExecutionControl {
 
     void setListOfAgsFromInfra() {
         try {
-            for (String ag: getExecutionControlInfraTier().getRuntimeServices().getAgentsName()) {
+            for (String ag: getExecutionControlInfraTier().getRuntimeServices().getAgentsNames()) {
                 listModel.addElement(ag);
             }
         } catch (Exception e) {

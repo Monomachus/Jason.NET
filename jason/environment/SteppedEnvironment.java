@@ -95,7 +95,7 @@ public class SteppedEnvironment extends Environment {
      *  environment.
      */
     protected void updateNumberOfAgents() {
-        setNbAgs(getEnvironmentInfraTier().getRuntimeServices().getAgentsName().size());
+        setNbAgs(getEnvironmentInfraTier().getRuntimeServices().getAgentsNames().size());
     }
 
     /** Returns the number of agents in the MAS (used to test the end of a cycle) */

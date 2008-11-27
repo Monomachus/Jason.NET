@@ -74,7 +74,7 @@ public class CentralisedRuntimeServices implements RuntimeServicesInfraTier {
         return agArch.getUserAgArch();
     }
 
-    public Set<String> getAgentsName() {
+    public Set<String> getAgentsNames() {
         return masRunner.getAgs().keySet();
     }
 

@@ -62,7 +62,7 @@ public class JadeRuntimeServices implements RuntimeServicesInfraTier {
     }
 
     @SuppressWarnings("unchecked")
-    public Set<String> getAgentsName() {
+    public Set<String> getAgentsNames() {
         // TODO: make a cache list and update it when a new agent enters the system
         if (jadeAgent == null) return null;
         try {
@@ -101,7 +101,7 @@ public class JadeRuntimeServices implements RuntimeServicesInfraTier {
 
     public int getAgentsQty() {
         try {
-            return getAgentsName().size();
+            return getAgentsNames().size();
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error getting agents qty", e);
             return 0;

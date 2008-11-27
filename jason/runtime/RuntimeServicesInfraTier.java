@@ -45,7 +45,7 @@ public interface RuntimeServicesInfraTier {
     public boolean killAgent(String agName);
 
     /** Returns a set of all agents' name */
-    public Set<String> getAgentsName();
+    public Set<String> getAgentsNames();
 
     /** Gets the number of agents in the MAS. */
     public int getAgentsQty();
