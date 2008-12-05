@@ -269,24 +269,35 @@ public class JasonID extends JPanel implements EBComponent, RunProjectListener {
 
     void openAgentBuffer(AgentParameters ap) {
         try {
-            boolean newFile = !(new File(ap.asSource.getAbsolutePath()).exists());
-            Buffer nb = org.gjt.sp.jedit.jEdit.openFile(view, ap.asSource.getAbsolutePath());
+            if (ap == null || ap.asSource == null)
+                return;
+
+            // fix file name
+            Buffer projectb = getProjectBuffer();
+            String file = ap.asSource.toString();
+            if (file.indexOf('/') < 0)
+                file = projectb.getDirectory() + "/" + file;
+            file = new File(file).getAbsolutePath();
+
+            boolean newFile = !(new File(file).exists());
+            Buffer nb = org.gjt.sp.jedit.jEdit.openFile(view, file);
             // textArea.append(lstAgs.getSelectedValue()+"");
             if (newFile) {
                 try {
-                    Buffer projectb = getProjectBuffer();
                     ap.asSource = new File(projectb.getDirectory() + ap.name + "." + MAS2JProject.AS_EXT);
                     String agcode = Config.get().getTemplate("agent.asl");
                     agcode = agcode.replace("<AG_NAME>", ap.getAgName());
                     agcode = agcode.replace("<PROJECT_NAME>", projectb.getName());
                     nb.writeLock();
                     nb.insert(0, agcode);
-                    nb.save(view, ap.asSource.getAbsolutePath());
+                    nb.save(view, file);
                 } finally {
                     nb.writeUnlock();
                 }
             }
-        } catch (Exception ex) {}
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
     public void handleMessage(EBMessage message) {
