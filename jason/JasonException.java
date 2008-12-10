@@ -95,7 +95,6 @@ public class JasonException extends java.lang.Exception {
         return e;
     }
     
-    @SuppressWarnings("unchecked")
     public static JasonException createWrongArgumentNb(DefaultInternalAction ia) {
         String msg;
         if (ia.getMinArgs() == ia.getMaxArgs())
@@ -108,7 +107,6 @@ public class JasonException extends java.lang.Exception {
         return new JasonException("The internal action '"+ia.getClass().getSimpleName()+"' has not received the required number of argument(s)."+msg , WRONG_ARGS);
     }
 
-    @SuppressWarnings("unchecked")
     public static JasonException createWrongArgument(InternalAction ia, String reason) {
         return new JasonException("Wrong argument for internal action '"+ia.getClass().getSimpleName()+"': "+reason, WRONG_ARGS);
     }

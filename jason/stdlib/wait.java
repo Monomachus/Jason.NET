@@ -23,6 +23,7 @@
 
 package jason.stdlib;
 
+import jason.JasonException;
 import jason.asSemantics.Circumstance;
 import jason.asSemantics.CircumstanceListener;
 import jason.asSemantics.DefaultInternalAction;
@@ -87,9 +88,8 @@ import java.util.logging.Level;
 public class wait extends DefaultInternalAction {
 
     public static final String waitAtom = ".wait"; 
-    //static Logger logger = Logger.getLogger(wait.class.getName());
 
-    @Override  public boolean canBeUsedInContext() {  return false;  }
+    @Override public boolean canBeUsedInContext() {  return false;  }
     @Override public boolean suspendIntention() { return true;  } 
     
     @Override public int getMinArgs() { return 1; }
@@ -170,20 +170,26 @@ public class wait extends DefaultInternalAction {
                 // add SI again in C.I if it was not removed and this wait was not dropped
                 if (c.getPendingIntentions().remove(sTE) == si && !c.getIntentions().contains(si) && !dropped) {
                     if (stopByTimeout && te != null && elapsedTimeTerm == null) {
-                        // fail the .wait
-                        PlanBody body = si.peek().getPlan().getBody();
-                        body.add(1, new PlanBodyImpl(BodyType.internalAction, new InternalActionLiteral(".fail")));
-                    } 
-                    si.peek().removeCurrentStep();
-                    if (elapsedTimeTerm != null) {
-                        long elapsedTime = System.currentTimeMillis() - startTime;
-                        un.unifies(elapsedTimeTerm, new NumberTermImpl(elapsedTime));
-                    }
-                    if (si.isSuspended()) { // if the intention was suspended by .suspend
-                        String k = suspend.SUSPENDED_INT+si.getId();
-                        c.getPendingIntentions().put(k, si);
+                        // fail the .wait by timeout
+                        if (si.isSuspended()) { // if the intention was suspended by .suspend
+                            PlanBody body = si.peek().getPlan().getBody();
+                            body.add(1, new PlanBodyImpl(BodyType.internalAction, new InternalActionLiteral(".fail")));
+                            c.getPendingIntentions().put(suspend.SUSPENDED_INT+si.getId(), si);
+                        } else {
+                            ts.generateGoalDeletion(si, JasonException.createBasicErrorAnnots("wait_timeout", "timeout in .wait"));
+                        }
                     } else {
-                        c.addIntention(si);
+                        si.peek().removeCurrentStep();
+                        
+                        if (elapsedTimeTerm != null) {
+                            long elapsedTime = System.currentTimeMillis() - startTime;
+                            un.unifies(elapsedTimeTerm, new NumberTermImpl(elapsedTime));
+                        }
+                        if (si.isSuspended()) { // if the intention was suspended by .suspend
+                            c.getPendingIntentions().put(suspend.SUSPENDED_INT+si.getId(), si);
+                        } else {
+                            c.addIntention(si);
+                        }
                     }
                     ts.getUserAgArch().getArchInfraTier().wake();
                 }

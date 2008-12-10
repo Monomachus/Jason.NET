@@ -6,8 +6,8 @@ import jason.asSemantics.Agent;
 import jason.asSemantics.Intention;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
+import jason.asSyntax.ASSyntax;
 import jason.asSyntax.Atom;
-import jason.asSyntax.DefaultTerm;
 import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Literal;
 import jason.asSyntax.LiteralImpl;
@@ -18,6 +18,7 @@ import jason.asSyntax.PredicateIndicator;
 import jason.asSyntax.Structure;
 import jason.asSyntax.Term;
 import jason.asSyntax.VarTerm;
+import jason.asSyntax.parser.ParseException;
 import jason.bb.BeliefBase;
 import jason.bb.DefaultBeliefBase;
 import jason.bb.JDBCPersistentBB;
@@ -184,7 +185,7 @@ public class BeliefBaseTest extends TestCase {
         assertEquals(iteratorSize(bb.iterator()), 0);
     }
 
-    public void testAdd2() {
+    public void testAdd2() throws ParseException {
         BeliefBase bb = new DefaultBeliefBase();
         Literal l1 = Literal.parseLiteral("pos[source(ag1)]");
         assertTrue(bb.add(l1));
@@ -198,7 +199,7 @@ public class BeliefBaseTest extends TestCase {
         u.unifies(c, l3);
         c.apply(u);
         c.addSource(Structure.parse("ag3"));
-        assertTrue(c.hasAnnot(DefaultTerm.parse("source(ag3)")));
+        assertTrue(c.hasAnnot(ASSyntax.parseTerm("source(ag3)")));
         Literal inBB = bb.contains(c); 
         assertTrue(inBB != null);
         assertFalse(c.hasSubsetAnnot(inBB));
@@ -217,7 +218,7 @@ public class BeliefBaseTest extends TestCase {
         u.unifies(c, Literal.parseLiteral("pos"));
         c.apply(u);
         try {
-            new jason.stdlib.add_annot().execute(null, u, new Term[] { c, DefaultTerm.parse("source(ag4)"), ca });
+            new jason.stdlib.add_annot().execute(null, u, new Term[] { c, ASSyntax.parseTerm("source(ag4)"), ca });
         } catch (Exception e) {
             e.printStackTrace();
         }

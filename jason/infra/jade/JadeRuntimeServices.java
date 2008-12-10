@@ -61,7 +61,6 @@ public class JadeRuntimeServices implements RuntimeServicesInfraTier {
         throw new JasonException("clone for JADE is not implemented!");
     }
 
-    @SuppressWarnings("unchecked")
     public Set<String> getAgentsNames() {
         // TODO: make a cache list and update it when a new agent enters the system
         if (jadeAgent == null) return null;

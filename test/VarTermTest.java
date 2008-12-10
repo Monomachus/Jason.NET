@@ -5,8 +5,8 @@ import jason.architecture.AgArch;
 import jason.asSemantics.Agent;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
+import jason.asSyntax.ASSyntax;
 import jason.asSyntax.ArithExpr;
-import jason.asSyntax.DefaultTerm;
 import jason.asSyntax.ListTerm;
 import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Literal;
@@ -19,6 +19,7 @@ import jason.asSyntax.Term;
 import jason.asSyntax.UnnamedVar;
 import jason.asSyntax.VarTerm;
 import jason.asSyntax.ArithExpr.ArithmeticOp;
+import jason.asSyntax.parser.ParseException;
 import jason.asSyntax.parser.SimpleCharStream;
 import jason.asSyntax.parser.Token;
 import jason.asSyntax.parser.as2jTokenManager;
@@ -42,7 +43,7 @@ public class VarTermTest extends TestCase {
     }
 
     /** test when a var is ground with a Term or another var */
-    public void testVarTermAsTerm() {
+    public void testVarTermAsTerm() throws ParseException {
         VarTerm k = new VarTerm("K");
         Unifier u = new Unifier();
         u.unifies(k, new Structure("a1"));
@@ -102,8 +103,8 @@ public class VarTermTest extends TestCase {
         i.next();
         i.next();
         Term third = i.next();
-        Term toi1 = DefaultTerm.parse("a(oi)");
-        Term toi2 = DefaultTerm.parse("a(B)");
+        Term toi1 = ASSyntax.parseTerm("a(oi)");
+        Term toi2 = ASSyntax.parseTerm("a(B)");
         toi2.apply(u);
         assertEquals(toi1,toi2);
         assertTrue(third.equals(toi1));
@@ -378,7 +379,7 @@ public class VarTermTest extends TestCase {
         assertTrue(u.unifies(exp, dois));
     }
     
-    public void testSimple2() {
+    public void testSimple2() throws ParseException {
         VarTerm v = new VarTerm("X");
         assertFalse(v.isAtom());
         assertTrue(v.isVar());
@@ -392,15 +393,15 @@ public class VarTermTest extends TestCase {
         assertFalse(t.isAtom());
         assertTrue(t.isVar());
         
-        t = DefaultTerm.parse("Event");
+        t = ASSyntax.parseTerm("Event");
         assertFalse(t.isAtom());
         assertTrue(t.isVar());
         
     }
     
-    public void testUnify1() {
-        Term a1 = DefaultTerm.parse("s(1,2)");
-        Term a2 = DefaultTerm.parse("s(X1,X2)");
+    public void testUnify1() throws ParseException {
+        Term a1 = ASSyntax.parseTerm("s(1,2)");
+        Term a2 = ASSyntax.parseTerm("s(X1,X2)");
         Unifier u = new Unifier();
         assertTrue(u.unifies(new VarTerm("X1"),new VarTerm("X3")));
         assertTrue(u.unifies(a1,a2));
@@ -429,15 +430,15 @@ public class VarTermTest extends TestCase {
         assertEquals(l.toString(),"op(1)");
     }
     
-    public void testUnnamedVar1() {
-        Term a1 = DefaultTerm.parse("a(_,_)");
-        Term a2 = DefaultTerm.parse("a(10,20)");
-        Term a3 = DefaultTerm.parse("a(30,40)");
+    public void testUnnamedVar1() throws ParseException {
+        Term a1 = ASSyntax.parseTerm("a(_,_)");
+        Term a2 = ASSyntax.parseTerm("a(10,20)");
+        Term a3 = ASSyntax.parseTerm("a(30,40)");
         Unifier u = new Unifier();
         assertTrue(u.unifies(a1,a2));
         assertFalse(u.unifies(a1,a3));
         a1.apply(u);
-        assertEquals(a1.toString(), DefaultTerm.parse("a(10,20)").toString());
+        assertEquals(a1.toString(), ASSyntax.parseTerm("a(10,20)").toString());
     }
     
     public void testUnnamedVar2() {
@@ -461,8 +462,8 @@ public class VarTermTest extends TestCase {
         assertFalse(v.isGround());        
     }
     
-    public void testUnamedVarAnnots() {
-        Term t = DefaultTerm.parse("_[scheme(Id)]");
+    public void testUnamedVarAnnots() throws ParseException {
+        Term t = ASSyntax.parseTerm("_[scheme(Id)]");
         Map<VarTerm,Integer> c = new HashMap<VarTerm, Integer>();
         t.countVars(c);
         assertEquals(1,c.get(new VarTerm("Id")).intValue());

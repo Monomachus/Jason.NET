@@ -185,8 +185,7 @@ public class TransitionSystem {
                 if (intention.peek().getUnif().unifies(send.getTerm(3), content)) {
                     getC().addIntention(intention);
                 } else {
-                    conf.C.SI = intention;
-                    generateGoalDeletion(JasonException.createBasicErrorAnnots("ask_failed", ""));
+                    generateGoalDeletion(intention, JasonException.createBasicErrorAnnots("ask_failed", "answer of ask does no unify forth argument of .send"));
                 }
 
                 // the message is not an ask answer
@@ -371,7 +370,7 @@ public class TransitionSystem {
                         updateIntention();
                         applyClrInt(confP.C.SI);
                     } else {
-                        generateGoalDeletion(JasonException.createBasicErrorAnnots("action_failed", ""));
+                        generateGoalDeletion(conf.C.SI, JasonException.createBasicErrorAnnots("action_failed", ""));
                     }
                 } else {
                     applyProcAct(); // get next action
@@ -459,7 +458,7 @@ public class TransitionSystem {
                     updateIntention();
             } catch (JasonException e) {
                 errorAnnots = e.getErrorTerms();
-                if (!generateGoalDeletion(errorAnnots))
+                if (!generateGoalDeletion(conf.C.SI, errorAnnots))
                     logger.log(Level.SEVERE, body.getErrorMsg()+": "+ e.getMessage());
                 ok = true; // just to not generate the event again
             } catch (Exception e) {
@@ -469,7 +468,7 @@ public class TransitionSystem {
                     logger.log(Level.SEVERE, body.getErrorMsg()+": "+ e.getMessage(), e);
             }
             if (!ok)
-                generateGoalDeletion(errorAnnots);
+                generateGoalDeletion(conf.C.SI, errorAnnots);
 
             break;
 
@@ -480,7 +479,7 @@ public class TransitionSystem {
                 updateIntention();
             } else {
                 String msg = "Constraint "+h+" was not satisfied ("+h.getSrcInfo()+").";
-                generateGoalDeletion(JasonException.createBasicErrorAnnots(new Atom("constraint_failed"), msg));
+                generateGoalDeletion(conf.C.SI, JasonException.createBasicErrorAnnots(new Atom("constraint_failed"), msg));
                 logger.fine(msg);
             }
             break;
@@ -535,7 +534,7 @@ public class TransitionSystem {
                 }
                 if (fail) {
                     if (logger.isLoggable(Level.FINE)) logger.fine("Test '"+h+"' failed ("+h.getSrcInfo()+").");
-                    generateGoalDeletion();
+                    generateGoalDeletion(conf.C.SI, null);
                 }
             }
             break;
@@ -560,7 +559,7 @@ public class TransitionSystem {
                     updateEvents(result,Intention.EmptyInt);
                 }
             } catch (RevisionFailedException re) {
-                generateGoalDeletion();
+                generateGoalDeletion(conf.C.SI, null);
                 break;
             }
 
@@ -595,7 +594,7 @@ public class TransitionSystem {
                     updateIntention();                    
                 }
             } catch (RevisionFailedException re) {
-                generateGoalDeletion();
+                generateGoalDeletion(conf.C.SI, null);
             }
             break;
             
@@ -622,7 +621,7 @@ public class TransitionSystem {
                     updateIntention();                    
                 }
             } catch (RevisionFailedException re) {
-                generateGoalDeletion();
+                generateGoalDeletion(conf.C.SI, null);
             }            
             break;
         }
@@ -793,15 +792,12 @@ public class TransitionSystem {
         }
     }
 
-    /** generate a failure event for the current intention */
-    private void generateGoalDeletion() throws JasonException {
-        generateGoalDeletion(null);
-    }
-    private boolean generateGoalDeletion(List<Term> failAnnots) throws JasonException {
+    /** generate a failure event for an intention */
+    public boolean generateGoalDeletion(Intention i, List<Term> failAnnots) throws JasonException {
         boolean failEeventGenerated = false;
-        IntendedMeans im = conf.C.SI.peek();
+        IntendedMeans im = i.peek();
         if (im.isGoalAdd()) {
-            Event failEvent = findEventForFailure(conf.C.SI, im.getTrigger());
+            Event failEvent = findEventForFailure(i, im.getTrigger());
             if (failEvent != null) {
                 setDefaultFailureAnnots(failEvent, im.getCurrentStep().getBodyTerm(), failAnnots);
                 confP.C.addEvent(failEvent);
@@ -816,10 +812,10 @@ public class TransitionSystem {
         else if (setts.requeue()) {
             // get the external event (or the one that started
             // the whole focus of attention) and requeue it
-            im = conf.C.SI.get(0);
+            im = i.get(0);
             confP.C.addExternalEv(im.getTrigger());
         } else {
-            logger.warning("Could not finish intention: " + conf.C.SI);
+            logger.warning("Could not finish intention: " + i);
         }
         return failEeventGenerated;
     }
