@@ -637,7 +637,7 @@ Object arithm_expr_factor():
 Object arithm_expr_simple():    
                                 { Token K; Object t; VarTerm v; }
 {
- ( K = <NUMBER>                 { NumberTermImpl ni = new NumberTermImpl(K.image); 
+ ( K = <NUMBER>                 { NumberTerm ni = ASSyntax.parseNumber(K.image);
                                   ni.setSrcInfo(new SourceInfo(asSource, K.beginLine)); 
                                   return ni;
                                 }

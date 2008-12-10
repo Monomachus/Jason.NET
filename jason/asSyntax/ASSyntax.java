@@ -4,6 +4,7 @@ import jason.asSyntax.parser.ParseException;
 import jason.asSyntax.parser.as2j;
 
 import java.io.StringReader;
+import java.util.Collection;
 
 /**
   Factory for objects used in Jason AgentSpeak syntax.
@@ -114,12 +115,26 @@ public class ASSyntax {
         return l;
     }
 
+    /** Creates a new list from a collection of terms */
+    public static ListTerm createList(Collection<Term> terms) {
+        ListTerm l = new ListTermImpl();
+        ListTerm tail = l;
+        for (Term t: terms)
+            tail = tail.append(t);
+        return l;
+    }
+    
     
     /** creates a new literal by parsing a string */
     public static Literal parseLiteral(String sLiteral) throws ParseException {
         return new as2j(new StringReader(sLiteral)).literal();
     }
-    
+ 
+    /** creates a new number term by parsing a string */
+    public static NumberTerm parseNumber(String number) throws NumberFormatException {
+        return new NumberTermImpl(Double.parseDouble(number));
+    }
+
     /** creates a new structure (a kind of term) by parsing a string */
     public static Structure parseStructure(String sTerm) throws ParseException {
         Term t = new as2j(new StringReader(sTerm)).term();

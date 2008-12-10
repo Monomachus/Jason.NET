@@ -74,7 +74,6 @@ public class DefaultBeliefBase implements BeliefBase {
         return size;
     }
 
-    @SuppressWarnings("unchecked")
     public Iterator<Literal> getPercepts() {
         final Iterator<Literal> i = percepts.iterator();
         return new Iterator<Literal>() {
@@ -281,7 +280,6 @@ public class DefaultBeliefBase implements BeliefBase {
         final private List<Literal> list = new LinkedList<Literal>(); // maintains the order of the bels
         final private Map<LiteralWrapper,Literal> map = new HashMap<LiteralWrapper,Literal>(); // to fastly find contents, from literal do list index
         
-        @SuppressWarnings("unchecked")
         public void add(Literal l, boolean addInEnd) {
             //try {
                 // minimise the allocation space of terms

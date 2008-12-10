@@ -1,5 +1,6 @@
 package jason.asSemantics;
 
+import jason.JasonException;
 import jason.asSyntax.InternalActionLiteral;
 import jason.asSyntax.PlanBody;
 import jason.asSyntax.PlanBodyImpl;
@@ -120,14 +121,19 @@ public abstract class ConcurrentInternalAction implements InternalAction {
         Intention pi = C.getPendingIntentions().remove(intentionKey);
         if (pi != null) {
             pi.setSuspended(false);
-            C.addIntention(pi); // add it back in I
             pi.peek().removeCurrentStep(); // remove the internal action that put the intention in suspend
+            try {
+                ts.applyClrInt(pi);
+            } catch (JasonException e) {
+                e.printStackTrace();
+            }
             
             if (abort) {
                 // fail the IA
                 PlanBody pbody = pi.peek().getPlan().getBody();
                 pbody.add(0, new PlanBodyImpl(BodyType.internalAction, new InternalActionLiteral(".fail")));
             }
+            C.addIntention(pi); // add it back in I
             ts.getUserAgArch().getArchInfraTier().wake();
         }
     }

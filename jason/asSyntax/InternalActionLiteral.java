@@ -142,7 +142,7 @@ public class InternalActionLiteral extends LiteralImpl {
     
     @Override
     public String getErrorMsg() {
-        String src = getSrcInfo() == null ? "" : " ("+ getSrcInfo().getErrorMsg() + ")"; 
+        String src = getSrcInfo() == null ? "" : " ("+ getSrcInfo() + ")"; 
         return "Error in internal action '"+this+"'"+ src;      
     }
     

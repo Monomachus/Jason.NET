@@ -54,8 +54,8 @@ public class SourceInfo implements Serializable {
         return endSrcLine;
     }
 
-    public String getErrorMsg() {
+    public  String toString() {
         return (source == null ? "nofile" : source)
-             + (beginSrcLine >= 0 ? ":"+beginSrcLine : "");       
-    }    
+        + (beginSrcLine >= 0 ? ":"+beginSrcLine : "");       
+    }
 }

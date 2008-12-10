@@ -1107,7 +1107,7 @@
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case NUMBER:
       K = jj_consume_token(NUMBER);
-                                  NumberTermImpl ni = new NumberTermImpl(K.image);
+                                  NumberTerm ni = ASSyntax.parseNumber(K.image);
                                   ni.setSrcInfo(new SourceInfo(asSource, K.beginLine));
                                   {if (true) return ni;}
       break;

@@ -117,7 +117,7 @@ public class VarTerm extends LiteralImpl implements NumberTerm, ListTerm, String
      */
     public boolean setValue(Term vl) {
         if (vl.isVar()) {
-            logger.warning("Attempted set a variable as a value for a variable, in " + this.getFunctor());
+            logger.log(Level.WARNING, "Attempted set a variable as a value for a variable, in " + this.getFunctor(), new Exception());
             return false;
         }
 
@@ -149,9 +149,14 @@ public class VarTerm extends LiteralImpl implements NumberTerm, ListTerm, String
             Term vl = u.get(this);
             //System.out.println("applying "+this+"="+vl+" un="+u);
             if (vl != null) { // && !(vl instanceof VarsCluster)) {
-                setValue(vl);
-                value.apply(u); // in case t has var args
-                return true;
+                if (!vl.hasVar(this)) {
+                    setValue(vl);
+                    value.apply(u); // in case t has var args
+                    return true;
+                } else {
+                    logger.warning("Value of variable contains itself, variable "+super.getFunctor()+" "+super.getSrcInfo()+", value="+value);                    
+                    return false;
+                }
             }
         } else {
             return getValue().apply(u);

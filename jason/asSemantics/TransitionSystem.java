@@ -463,7 +463,10 @@ public class TransitionSystem {
                     logger.log(Level.SEVERE, body.getErrorMsg()+": "+ e.getMessage());
                 ok = true; // just to not generate the event again
             } catch (Exception e) {
-                logger.log(Level.SEVERE, body.getErrorMsg()+": "+ e.getMessage(), e);
+                if (body == null) 
+                    logger.log(Level.SEVERE, "Body is not a literal for body '"+h+"' and IM "+im, e);
+                else
+                    logger.log(Level.SEVERE, body.getErrorMsg()+": "+ e.getMessage(), e);
             }
             if (!ok)
                 generateGoalDeletion(errorAnnots);
@@ -476,7 +479,7 @@ public class TransitionSystem {
                 im.unif = iu.next();
                 updateIntention();
             } else {
-                String msg = "Constraint "+h+" was not satisfied ("+h.getSrcInfo().getErrorMsg()+").";
+                String msg = "Constraint "+h+" was not satisfied ("+h.getSrcInfo()+").";
                 generateGoalDeletion(JasonException.createBasicErrorAnnots(new Atom("constraint_failed"), msg));
                 logger.fine(msg);
             }
@@ -531,7 +534,7 @@ public class TransitionSystem {
                     }
                 }
                 if (fail) {
-                    if (logger.isLoggable(Level.FINE)) logger.fine("Test '"+h+"' failed ("+h.getSrcInfo().getErrorMsg()+").");
+                    if (logger.isLoggable(Level.FINE)) logger.fine("Test '"+h+"' failed ("+h.getSrcInfo()+").");
                     generateGoalDeletion();
                 }
             }
@@ -626,76 +629,78 @@ public class TransitionSystem {
     }
 
     public void applyClrInt(Intention i) throws JasonException {
-        // Rule ClrInt
-        if (i == null)
-            return;
-        
-        if (i.isFinished()) {
-            // intention finished, remove it
-            confP.C.removeIntention(i);
-            //conf.C.SI = null;
-            return;
-        }
-
-        IntendedMeans im = i.peek();
-        if (!im.isFinished()) {
-            // nothing to do
-            return;
-        }
-
-        // remove the finished IM from the top of the intention
-        IntendedMeans topIM = i.pop();
-        Literal topLiteral = topIM.getTrigger().getLiteral();
-        if (logger.isLoggable(Level.FINE)) logger.fine("Returning from IM "+topIM.getPlan().getLabel()+", te="+topIM.getPlan().getTrigger());
-        
-        // if finished a failure handling IM ...
-        if (im.getTrigger().isGoal() && !im.getTrigger().isAddition() && i.size() > 0) {
-            // needs to get rid of the IM until a goal that
-            // has failure handling. E.g,
-            //   -!b
-            //   +!c
-            //   +!d
-            //   +!b
-            //   +!s: !b; !z
-            // should became
-            //   +!s: !z
-            im = i.peek();
-            if (im.isFinished() || !im.unif.unifies(im.getCurrentStep().getBodyTerm(), topLiteral))
-                im = i.pop(); // +!c above
-            while (i.size() > 0 &&
-                   !im.unif.unifies(im.getTrigger().getLiteral(), topLiteral) &&
-                   !im.unif.unifies(im.getCurrentStep().getBodyTerm(), topLiteral)) {
-                im = i.pop();
+        while (true) { // quit the method by return
+            // Rule ClrInt
+            if (i == null)
+                return;
+            
+            if (i.isFinished()) {
+                // intention finished, remove it
+                confP.C.removeIntention(i);
+                //conf.C.SI = null;
+                return;
             }
-        }
-        if (!i.isFinished()) {
-            im = i.peek(); // +!s or +?s
+    
+            IntendedMeans im = i.peek();
             if (!im.isFinished()) {
-                // removes !b or ?s
-                /* I am trying against  comments below and use topIM.getTrigger!
-                 * since I don't remember why the trigger cann't be used
-                 * probably the reason is the old buggy makeVarAnnos
-                 
-                Term g = im.removeCurrentStep();
-                // make the TE of finished plan ground and unify that
-                // with goal/test in the body (to "return" values).
-                // (it must be the plan TE and not the IM.trigger because the
-                // vars have name only in the plan TE, in the IM.trigger
-                // they are anonymous)                
-                Literal tel = topIM.getPlan().getTrigger().getLiteral();
-                // but import annots from IM.trigger
-                tel.addAnnots(topIM.getTrigger().getLiteral().getAnnots());
-                tel.topLiteral.makeVarsAnnon(topIM.unif); 
-                */
-                // unifies the final event with the body that called it
-                topLiteral.apply(topIM.unif);
-                im.unif.unifies(im.removeCurrentStep(), topLiteral);
+                // nothing to do
+                return;
             }
-        }
+    
+            // remove the finished IM from the top of the intention
+            IntendedMeans topIM = i.pop();
+            Literal topLiteral = topIM.getTrigger().getLiteral();
+            if (logger.isLoggable(Level.FINE)) logger.fine("Returning from IM "+topIM.getPlan().getLabel()+", te="+topIM.getPlan().getTrigger());
+            
+            // if finished a failure handling IM ...
+            if (im.getTrigger().isGoal() && !im.getTrigger().isAddition() && i.size() > 0) {
+                // needs to get rid of the IM until a goal that
+                // has failure handling. E.g,
+                //   -!b
+                //   +!c
+                //   +!d
+                //   +!b
+                //   +!s: !b; !z
+                // should became
+                //   +!s: !z
+                im = i.peek();
+                if (im.isFinished() || !im.unif.unifies(im.getCurrentStep().getBodyTerm(), topLiteral))
+                    im = i.pop(); // +!c above
+                while (i.size() > 0 &&
+                       !im.unif.unifies(im.getTrigger().getLiteral(), topLiteral) &&
+                       !im.unif.unifies(im.getCurrentStep().getBodyTerm(), topLiteral)) {
+                    im = i.pop();
+                }
+            }
+            if (!i.isFinished()) {
+                im = i.peek(); // +!s or +?s
+                if (!im.isFinished()) {
+                    // removes !b or ?s
+                    /* I am trying against  comments below and use topIM.getTrigger!
+                     * since I don't remember why the trigger cann't be used
+                     * probably the reason is the old buggy makeVarAnnos
+                     
+                    Term g = im.removeCurrentStep();
+                    // make the TE of finished plan ground and unify that
+                    // with goal/test in the body (to "return" values).
+                    // (it must be the plan TE and not the IM.trigger because the
+                    // vars have name only in the plan TE, in the IM.trigger
+                    // they are anonymous)                
+                    Literal tel = topIM.getPlan().getTrigger().getLiteral();
+                    // but import annots from IM.trigger
+                    tel.addAnnots(topIM.getTrigger().getLiteral().getAnnots());
+                    tel.topLiteral.makeVarsAnnon(topIM.unif); 
+                    */
+                    // unifies the final event with the body that called it
+                    topLiteral.apply(topIM.unif);
+                    im.unif.unifies(im.removeCurrentStep(), topLiteral);
+                }
+            }
 
-        // the new top may have become
-        // empty! need to keep checking.
-        applyClrInt(i);
+            // the new top may have become
+            // empty! need to keep checking.
+            //applyClrInt(i);
+        }
     }
 
     /**********************************************/

@@ -113,6 +113,6 @@ public abstract class DefaultTerm implements Term, Serializable {
         if (srcInfo == null)
             return "";
         else 
-            return srcInfo.getErrorMsg();
+            return srcInfo.toString();
     }
 }
