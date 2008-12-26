@@ -28,7 +28,7 @@ public class NewEnvironmentGUI extends NewAgentGUI {
         // Fields
 
         envClass = new JTextField(20);
-        createField("Environment class name", envClass, "The name of the environment java class.");
+        createField("Environment class name", envClass, "Enter the name of the environment Java class here.");
 
         JPanel p = new JPanel(new BorderLayout());
         p.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "New environment parameters", TitledBorder.LEFT, TitledBorder.TOP));

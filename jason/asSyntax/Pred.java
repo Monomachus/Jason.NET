@@ -327,13 +327,13 @@ public class Pred extends Structure {
         if (annots != null)
             return annots.remove(createSource(agName));
         else
-        	return false;
+            return false;
     }
 
     public static Term createSource(Term source) {
-    	Structure s = new Structure("source",1);
-    	s.addTerm(source);
-    	return s;
+        Structure s = new Structure("source",1);
+        s.addTerm(source);
+        return s;
     }
     
     @Override
@@ -394,10 +394,10 @@ public class Pred extends Structure {
     @Override
     public void makeVarsAnnon(Unifier un) {
         if (annots != null) {
-        	Iterator<ListTerm> i = annots.listTermIterator();
-        	while (i.hasNext()) {
-        		ListTerm lt = i.next();
-        		Term ta = lt.getTerm();
+            Iterator<ListTerm> i = annots.listTermIterator();
+            while (i.hasNext()) {
+                ListTerm lt = i.next();
+                Term ta = lt.getTerm();
 
                 if (ta.isVar() && !ta.isUnnamedVar()) {
                     // replace ta to an unnamed var
@@ -411,7 +411,7 @@ public class Pred extends Structure {
                     }
                     lt.setTerm(uv);
                 } else if (ta.isStructure()) {
-                	((Structure)ta).makeVarsAnnon(un);
+                    ((Structure)ta).makeVarsAnnon(un);
                 }
             }
         }

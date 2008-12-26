@@ -185,7 +185,7 @@ public class TransitionSystem {
                 if (intention.peek().getUnif().unifies(send.getTerm(3), content)) {
                     getC().addIntention(intention);
                 } else {
-                    generateGoalDeletion(intention, JasonException.createBasicErrorAnnots("ask_failed", "answer of ask does no unify forth argument of .send"));
+                    generateGoalDeletion(intention, JasonException.createBasicErrorAnnots("ask_failed", "reply of an ask message does not unify with forth argument of .send"));
                 }
 
                 // the message is not an ask answer
@@ -463,7 +463,7 @@ public class TransitionSystem {
                 ok = true; // just to not generate the event again
             } catch (Exception e) {
                 if (body == null) 
-                    logger.log(Level.SEVERE, "Body is not a literal for body '"+h+"' and IM "+im, e);
+                    logger.log(Level.SEVERE, "Selected an intention with null body in '"+h+"' and IM "+im, e);
                 else
                     logger.log(Level.SEVERE, body.getErrorMsg()+": "+ e.getMessage(), e);
             }
@@ -804,7 +804,7 @@ public class TransitionSystem {
                 failEeventGenerated = true;
                 if (logger.isLoggable(Level.FINE)) logger.fine("Generating goal deletion " + failEvent.getTrigger() + " from goal: " + im.getTrigger());
             } else {
-                logger.warning("No fail event was generated for " + im.getTrigger());
+                logger.warning("No failure event was generated for " + im.getTrigger());
             }
         }
         // if "discard" is set, we are deleting the whole intention!
@@ -824,7 +824,7 @@ public class TransitionSystem {
     private boolean generateGoalDeletionFromEvent(List<Term> failAnnots) throws JasonException {
         Event ev = conf.C.SE;
         if (ev == null) {
-            logger.warning("** It is not possible to generate a goal deletion event because SE is null! " + conf.C);
+            logger.warning("** It was not possible to generate a goal deletion event because SE is null! " + conf.C);
             return false;
         }
         

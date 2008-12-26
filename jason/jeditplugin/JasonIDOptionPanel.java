@@ -136,14 +136,14 @@ public class JasonIDOptionPanel extends AbstractOptionPane  {
             public void actionPerformed(ActionEvent arg0) {
                 try {
                     JFileChooser chooser = new JFileChooser(System.getProperty("user.dir"));
-                     chooser.setDialogTitle("Select the Java JDK Home directory");
+                     chooser.setDialogTitle("Select the Java JDK home directory");
                     chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
                     if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
                         String javaHome = (new File(chooser.getSelectedFile().getPath())).getCanonicalPath();
                         if (Config.checkJavaHomePath(javaHome)) {
                             javaTF.setText(javaHome);
                         } else {
-                            JOptionPane.showMessageDialog(null, "The selected JDK home directory has not the file bin/javac inside!");
+                            JOptionPane.showMessageDialog(null, "The selected JDK home directory doesn't have the bin/javac file!");
                         }
                     }
                 } catch (Exception e) {}
@@ -172,7 +172,7 @@ public class JasonIDOptionPanel extends AbstractOptionPane  {
                         if (Config.checkAntLib(antLib)) {
                             antTF.setText(antLib);
                         } else {
-                            JOptionPane.showMessageDialog(null, "The selected directory has not the files ant.jar and ant-launcher.jar!");
+                            JOptionPane.showMessageDialog(null, "The selected directory doesn't have the files ant.jar and ant-launcher.jar!");
                         }
                     }
                 } catch (Exception e) {}
@@ -187,7 +187,7 @@ public class JasonIDOptionPanel extends AbstractOptionPane  {
         jadeArgsTF = new JTextField(30);
         JPanel jadeHomePanel = new JPanel(new GridLayout(0,1));
         jadeHomePanel.setBorder(BorderFactory.createTitledBorder(BorderFactory
-                .createEtchedBorder(), "Jade", TitledBorder.LEFT, TitledBorder.TOP));
+                .createEtchedBorder(), "JADE", TitledBorder.LEFT, TitledBorder.TOP));
 
         JPanel jadeJarPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         jadeJarPanel.add(new JLabel("jade.jar location"));
@@ -201,12 +201,12 @@ public class JasonIDOptionPanel extends AbstractOptionPane  {
 
         JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT));
         jadeRmaCB = new JCheckBox();
-        jadeRmaCB.setToolTipText("Whether the Jade management agent should be started in the begin.");
+        jadeRmaCB.setToolTipText("Should the JADE management agent be run at startup?");
         p.add(jadeRmaCB);
         p.add(new JLabel("Start management agent             "));
 
         jadeSnifferCB = new JCheckBox();
-        jadeSnifferCB.setToolTipText("Whether the Jade sniffer agent should be started in the begin and sniffing all agents.");
+        jadeSnifferCB.setToolTipText("Should the JADE sniffer agent be run at startup?");
         p.add(jadeSnifferCB);
         p.add(new JLabel("Start Sniffer"));
         jadeHomePanel.add(p);

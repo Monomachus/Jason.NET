@@ -46,7 +46,7 @@ import java.util.List;
  * 
  * <p>
  * This class normally just calls the AgArchInfraTier methods 
- * implemented by the infrastructure tier (Centralised, Jade, Saci, ...). 
+ * implemented by the infrastructure tier (Centralised, JADE, Saci, ...). 
  * However, the user can customise
  * these methods overriding some of them in his/her arch. class.
  */
@@ -81,7 +81,7 @@ public class AgArch {
             
             ag.initAg(asSrc); // load the source code of the agent
         } catch (Exception e) {
-            throw new JasonException("as2j: error creating the agent class! - ", e);
+            throw new JasonException("as2j: error creating the customised Agent class! - ", e);
         }
     }
 

@@ -48,7 +48,7 @@ public class NewProjectGUI extends NewAgentGUI {
 
         // Fields
         projName = new JTextField(10);
-        createField("Project name", projName, "The project name");
+        createField("Project name", projName, "Enter he project name here");
 
         // projEnv = new JTextField(20);
         // createField("Environment class", projEnv, "The java class that
@@ -85,7 +85,7 @@ public class NewProjectGUI extends NewAgentGUI {
         pFields.add(jasonHomePanel);
 
         projFinalDir = new JLabel();
-        createField("Directory", projFinalDir, "The directory that will be created for the project.");
+        createField("Directory", projFinalDir, "This is the directory that will be created for the new project");
         // doc listener for Final proj dir
         DocumentListener docLis = new DocumentListener() {
             public void insertUpdate(DocumentEvent e) {

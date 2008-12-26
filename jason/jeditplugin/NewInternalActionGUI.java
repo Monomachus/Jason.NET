@@ -29,10 +29,10 @@ public class NewInternalActionGUI extends NewAgentGUI {
 
         // Fields
         iaPkg = new JTextField(20);
-        createField("Java package", iaPkg, "The name of the java package of the new internal action.");
+        createField("Java package", iaPkg, "Enter the name of the Java package of the new internal action here.");
 
         iaClass = new JTextField(20);
-        createField("Internal action name", iaClass, "The name of the new internal action class.");
+        createField("Internal action name", iaClass, "Enter the name of the new internal action class here.");
 
         JPanel p = new JPanel(new BorderLayout());
         p.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "New internal action parameters", TitledBorder.LEFT, TitledBorder.TOP));
@@ -45,11 +45,11 @@ public class NewInternalActionGUI extends NewAgentGUI {
 
     protected boolean ok() {
         if (iaPkg.getText().trim().length() == 0) {
-            JOptionPane.showMessageDialog(this, "An package name must be informed.");
+            JOptionPane.showMessageDialog(this, "A package name must be informed.");
             return false;
         }
         if (iaClass.getText().trim().length() == 0) {
-            JOptionPane.showMessageDialog(this, "A name for the action must be informed.");
+            JOptionPane.showMessageDialog(this, "A name for the internal action must be informed.");
             return false;
         }
 

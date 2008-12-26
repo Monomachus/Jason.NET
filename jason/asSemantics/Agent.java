@@ -141,8 +141,8 @@ public class Agent {
                 logger.warning("The kqmlPlans.asl was not found!");
             }
         } catch (Exception e) {
-            logger.log(Level.SEVERE, "Error creating the agent class!", e);
-            throw new JasonException("Error creating the agent class! - " + e);
+            logger.log(Level.SEVERE, "Error creating customised Agent class!", e);
+            throw new JasonException("Error creating customised Agent class! - " + e);
         }
     }
     
@@ -553,7 +553,7 @@ public class Agent {
                 return true;
             }
         } catch (Exception e) {
-            logger.log(Level.SEVERE, "Error in believe("+bel+","+un+").",e);
+            logger.log(Level.SEVERE, "** Error in method believes("+bel+","+un+").",e);
         }
         return false;
     }

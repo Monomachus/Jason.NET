@@ -111,7 +111,7 @@ public class JasonID extends JPanel implements EBComponent, RunProjectListener {
 
         textArea = new JTextArea(5, 10);
         textArea.setEditable(false);
-        textArea.setText("Jason functions are also available in the Plugin-Jason menu.");
+        textArea.setText("Further Jason functionalities are available in the menu Plugin->Jason.");
 
         JPanel pane = new JPanel(new BorderLayout());
         pane.add(BorderLayout.CENTER, new JScrollPane(textArea));
@@ -393,11 +393,11 @@ public class JasonID extends JPanel implements EBComponent, RunProjectListener {
             textArea.append(" parsed successfully!\n");
             return project;
 
-        } catch (ParseException ex) {
-            textArea.append("\nmas2j: parsing errors found... \n" + ex + "\n");
+        } catch (ParseException ex) {  
+            textArea.append("\nmas2j: syntactic errors found... \n" + ex + "\n");
             JasonProjectSideKickParser.addError(ex, errorSource, projectBufffer.getPath());
         } catch (TokenMgrError ex) {
-            textArea.append("\nmas2j: error parsing tokens ... \n" + ex + "\n");
+            textArea.append("\nmas2j: lexical errors found... \n" + ex + "\n");
         } catch (Exception ex) {
             textArea.append("Error: " + ex);
             ex.printStackTrace();
@@ -425,7 +425,7 @@ public class JasonID extends JPanel implements EBComponent, RunProjectListener {
             return true;
 
         } catch (jason.asSyntax.parser.ParseException ex) {
-            textArea.append("\nas2j: parsing errors found... \n" + ex + "\n");
+            textArea.append("\nas2j: syntactic errors found... \n" + ex + "\n");
             AgentSpeakSideKickParser.addError(ex, errorSource, asFile.getAbsolutePath());
             DockableWindowManager d = view.getDockableWindowManager();
             if (!d.isDockableWindowVisible("error-list")) {
@@ -433,7 +433,7 @@ public class JasonID extends JPanel implements EBComponent, RunProjectListener {
             }
 
         } catch (TokenMgrError ex) {
-            textArea.append("\nmas2j: error parsing tokens ... \n" + ex + "\n");
+            textArea.append("\nmas2j: lexical errors found... \n" + ex + "\n");
         } catch (Exception ex) {
             textArea.append("\nError: " + ex);
             ex.printStackTrace();
@@ -505,19 +505,19 @@ public class JasonID extends JPanel implements EBComponent, RunProjectListener {
                     String jasonJar = Config.get().getJasonJar();
                     if (!Config.checkJar(jasonJar)) {
                         System.err.println("The path to the jason.jar file (" + jasonJar
-                                + ") was not correctly set, the MAS may not run. Go to menu Plugins->Plugins Options->Jason to configure the path.");
+                                + ") was not correctly set: the MAS may not run. Go to menu Plugins->Plugins Options->Jason to configure the path.");
                         return;
                     }
                     String javaHome = Config.get().getJavaHome();
                     if (!Config.checkJavaHomePath(javaHome)) {
                         System.err.println("The Java home directory (" + javaHome
-                                + ") was not correctly set, the MAS may not run. Go to the Plugins->Options->Jason menu to configure the path.");
+                                + ") was not correctly set: the MAS may not run. Go to the Plugins->Options->Jason menu to configure the path.");
                         return;
                     }
                     String antLib = Config.get().getAntLib();
                     if (!Config.checkAntLib(antLib)) {
                         System.err.println("The ant lib directory (" + antLib
-                                + ") was not correctly set, the MAS may not run. Go to the Plugins->Options->Jason menu to configure the path.");
+                                + ") was not correctly set: the MAS may not run. Go to the Plugins->Options->Jason menu to configure the path.");
                         return;
                     }
 
@@ -560,21 +560,21 @@ public class JasonID extends JPanel implements EBComponent, RunProjectListener {
     public void newAg() {
         Buffer b = getProjectBuffer();
         if (b == null) {
-            textArea.setText("There is no Jason project opened to add an agent, create a project first.");
+            textArea.setText("There is no Jason project opened to add an agent to: create a new project first.");
         } else {
-            new NewAgentGUI("Add an agent in project " + b.getName(), b, view, b.getDirectory());
+            new NewAgentGUI("Adding an agent to project " + b.getName(), b, view, b.getDirectory());
         }
     }
 
     public void createEnv() {
         Buffer b = getProjectBuffer();
         if (b == null) {
-            textArea.setText("There is no Jason project opened, create a project first.");
+            textArea.setText("There is no Jason project opened: create a new project first.");
         } else {
             if (b.getText(0, b.getLength()).indexOf("environment") > 0) {
                 textArea.setText("Your project already has an environment definition!");
             } else {
-                new NewEnvironmentGUI("Create environment for project " + b.getName(), b, view);
+                new NewEnvironmentGUI("Creating an environment for project " + b.getName(), b, view);
             }
         }
     }
@@ -582,16 +582,16 @@ public class JasonID extends JPanel implements EBComponent, RunProjectListener {
     public void newIA() {
         Buffer b = getProjectBuffer();
         if (b == null) {
-            textArea.setText("There is no Jason project opened, create a project first.");
+            textArea.setText("There is no Jason project opened: create a new project first.");
         } else {
-            new NewInternalActionGUI("Create new internal action for project " + b.getName(), b, view);
+            new NewInternalActionGUI("Creating new internal action for project " + b.getName(), b, view);
         }
     }
 
     public void editLog() {
         Buffer curBuf = getProjectBuffer();
         if (curBuf == null) {
-            textArea.setText("You can not edit log properties since there is no Jason project opened.");
+            textArea.setText("There is no Jason project opened: you cannot edit logging properties.");
             return;
         }
         try {
@@ -625,7 +625,7 @@ public class JasonID extends JPanel implements EBComponent, RunProjectListener {
     private void asl2txt(asl2xml transformer, String ext) {
         Buffer buf = view.getBuffer();
         if (!buf.getPath().endsWith(MAS2JProject.AS_EXT)) {
-            textArea.setText("\n** The current buffer is not an asl source!");
+            textArea.setText("\n** The current buffer is not an AgentSpeak source!");
             return;
         } else {
             textArea.setText("");

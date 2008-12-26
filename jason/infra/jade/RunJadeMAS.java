@@ -95,7 +95,7 @@ public class RunJadeMAS extends RunCentralisedMAS {
         });
         MASConsoleGUI.get().addButton(btRMA);
 
-        JButton btSniffer = new JButton("Jade Sniffer", new ImageIcon(jade.tools.sniffer.Sniffer.class.getResource("/jade/tools/sniffer/images/sniffer.gif")));
+        JButton btSniffer = new JButton("JADE Sniffer", new ImageIcon(jade.tools.sniffer.Sniffer.class.getResource("/jade/tools/sniffer/images/sniffer.gif")));
         btSniffer.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 try {
