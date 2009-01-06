@@ -532,6 +532,16 @@ public class TermTest extends TestCase {
         l = ListTermImpl.parseList("[b,[1,1,1],c,10,g,casa,f(10),5,[3,10],f(4),[3,4]]");
         Collections.sort(l);
         assertEquals("[5,10,b,c,casa,f(4),f(10),g,[3,4],[3,10],[1,1,1]]",l.toString());
+        
+        Term t1 = ASSyntax.createNumber(10);
+        Term t2 = ASSyntax.createNumber(10);
+        assertEquals(0, t1.compareTo(t2));
+        Term v1 = new VarTerm("X1");
+        Unifier u = new Unifier();
+        u.unifies(v1, t1);
+        v1.apply(u);
+        assertEquals(0, v1.compareTo(t2));
+        assertEquals(0, t2.compareTo(v1));
     }
     
     public void testUnify4() throws ParseException {

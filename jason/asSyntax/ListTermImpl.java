@@ -344,7 +344,6 @@ public class ListTermImpl extends Structure implements ListTerm {
         for (Term t: set)
             tail = tail.append(t.clone());
         return result;
-
     }
 
     /** returns an iterator where each element is a ListTerm */
@@ -508,6 +507,11 @@ public class ListTermImpl extends Structure implements ListTerm {
     public ListIterator<Term> listIterator() {
         return listIterator(0);
     }
+    
+    // TODO: do not base this implementation on get (that is O(n))
+    // conversely, implement all other methods of List based on this iterator
+    // (see AbstractSequentialList)
+    // merge code of ListTermIterator here and use always the same iterator
     public ListIterator<Term> listIterator(final int startIndex) {
         final ListTermImpl list = this;
         return new ListIterator<Term>() {
@@ -527,7 +531,7 @@ public class ListTermImpl extends Structure implements ListTerm {
             public Term next() {
                 last = pos;
                 pos++;
-                return get(last); // TODO: get complexity is O(n)! and sort uses this iterator.... it will be nice to have a get implementation with constant time.
+                return get(last);
             }
             public int nextIndex() {
                 return pos+1;

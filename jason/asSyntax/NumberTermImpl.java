@@ -99,6 +99,7 @@ public final class NumberTermImpl extends DefaultTerm implements NumberTerm {
             NumberTerm st = (NumberTerm)o;
             if (solve() > st.solve()) return 1;
             if (solve() < st.solve()) return -1;
+            return 0;
         }
         if (o instanceof Atom)
             return -1;
