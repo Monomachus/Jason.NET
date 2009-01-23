@@ -418,6 +418,7 @@ public class RunCentralisedMAS {
         }
     }
     
+    /** creates on thread per agent */
     private void createAgsThreads() {
         for (CentralisedAgArch ag : ags.values()) {
             ag.setControlInfraTier(control);
@@ -432,10 +433,14 @@ public class RunCentralisedMAS {
     private BlockingQueue<Runnable> myAgTasks;
     private BlockingQueue<Runnable> mySleepAgs;
     
+    /** creates a pool of threads shared by all agents */
     private void createThreadPool() {
-        myAgTasks = new LinkedBlockingQueue<Runnable>();
+        myAgTasks  = new LinkedBlockingQueue<Runnable>();
         mySleepAgs = new LinkedBlockingQueue<Runnable>();
         
+        // create a thread that
+        // 1. creates the pool
+        // 2. feeds the pool with agent reasoning cycles 
         new Thread("feed-pool") {
             public void run() {
                 // initially, add all agents in the tasks
@@ -459,10 +464,16 @@ public class RunCentralisedMAS {
                 if (poolSize > maxthreads) {
                     poolSize = maxthreads;
                 }
+                
+                // create the pool
                 ExecutorService executor = Executors.newFixedThreadPool(poolSize);
+                
+                // include tasks in the pool
                 while (runner != null) {
                     try {
                         executor.execute(myAgTasks.take());
+                        // note that the agent, when finished the cycle,
+                        // add themselves in the myAgTasks queue
                     } catch (InterruptedException e) { }
                 }
                 executor.shutdownNow();
@@ -486,6 +497,7 @@ public class RunCentralisedMAS {
         }.start();
     }
     
+    /** an agent architecture for the infra based on thread pool */
     private final class CentralisedAgArchForPool extends CentralisedAgArch {
         boolean inSleep;
         
@@ -497,9 +509,8 @@ public class RunCentralisedMAS {
 
         @Override
         public void wake() {
-            if (mySleepAgs.remove(this)) {
+            if (mySleepAgs.remove(this))
                 myAgTasks.offer(this);
-            }
         }
         
         @Override
@@ -507,13 +518,14 @@ public class RunCentralisedMAS {
             if (isRunning()) { 
                 inSleep = false;
                 userAgArch.getTS().reasoningCycle();
-                if (!inSleep) myAgTasks.offer(this);
+                if (!inSleep) 
+                    myAgTasks.offer(this);
             }
         }
     }
     
     protected void stopAgs() {
-        // run the agents
+        // stop the agents
         for (CentralisedAgArch ag : ags.values()) {
             ag.stopAg();
         }
