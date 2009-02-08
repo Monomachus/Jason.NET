@@ -67,6 +67,12 @@ public class ArithFunctionTerm extends Structure implements NumberTerm {
     }
 
     @Override
+    public boolean isLiteral() {
+        return false;
+    }
+    
+
+    @Override
     public boolean isArithExpr() {
         return !isEvaluated();
     }

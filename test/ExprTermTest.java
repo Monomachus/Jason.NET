@@ -5,6 +5,7 @@ import jason.architecture.AgArch;
 import jason.asSemantics.Agent;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
+import jason.asSyntax.ASSyntax;
 import jason.asSyntax.ArithExpr;
 import jason.asSyntax.ArithFunctionTerm;
 import jason.asSyntax.ListTerm;
@@ -13,7 +14,9 @@ import jason.asSyntax.Literal;
 import jason.asSyntax.NumberTerm;
 import jason.asSyntax.NumberTermImpl;
 import jason.asSyntax.RelExpr;
+import jason.asSyntax.Term;
 import jason.asSyntax.VarTerm;
+import jason.asSyntax.parser.ParseException;
 import jason.infra.centralised.CentralisedAgArch;
 
 import java.util.Collections;
@@ -64,7 +67,7 @@ public class ExprTermTest extends TestCase {
         assertEquals(new NumberTermImpl(2.5).hashCode(), nb.hashCode());
     }
 
-    public void testUnify() {
+    public void testUnify1() {
         Literal t1 = (Literal) Literal.parseLiteral("p(X*2)").clone();
         Literal t2 = Literal.parseLiteral("p(Y)");
         Unifier u = new Unifier();
@@ -82,6 +85,23 @@ public class ExprTermTest extends TestCase {
         assertEquals(t2.toString(), "p(10)");
     }
 
+    public void testUnify2() throws ParseException {
+        Unifier u = new Unifier();
+        u.unifies(new VarTerm("X"), new NumberTermImpl(3));
+        Term e1 = ASSyntax.parseTerm("X-1");
+        e1.apply(u);
+        assertTrue(u.unifies(new NumberTermImpl(2), e1));
+        assertTrue(u.unifies(e1, new NumberTermImpl(2)));
+        assertTrue(u.unifies(new NumberTermImpl(2), e1.clone()));
+
+        u.unifies(new VarTerm("Y"), new NumberTermImpl(1));
+        Term e2 = ASSyntax.parseTerm("Y+1");
+        e2.apply(u);
+        assertFalse(e1.isLiteral());
+        assertFalse(e2.isLiteral());
+        assertTrue(u.unifies(e2, e1));
+    }
+    
     public void testAddAddAdd() {
         Literal t1 = Literal.parseLiteral("p(X+1)");
         Unifier u = new Unifier();
