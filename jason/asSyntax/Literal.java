@@ -37,14 +37,17 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- This class represents an abstract literal (an Atom, Structure, Predicate, etc), is is mainly
+ This class represents an abstract literal (an Atom, Structure, Predicate, etc), it is mainly
  the interface of a literal. 
  
- To create a Literal, one of the following classes may be used:
- Atom -- the most simple literal, is composed by a functor (no term, no annots);
- Structure -- has functor and terms;
- Pred -- has functor, terms, and annotations;
- LiteralImpl -- Pred + negation. This latter class supports all the operations of 
+ To create a new Literal, one of the following concrete classes may be used:
+ <ul>
+ <li> Atom -- the most simple literal, is composed by only a functor (no term, no annots);
+ <li> Structure -- has functor and terms;
+ <li> Pred -- has functor, terms, and annotations;
+ <li> LiteralImpl -- Pred + negation. 
+ </ul>
+ The latter class supports all the operations of 
  the Literal interface.
  
  <p>There are useful static methods in class {@link ASSyntax} to create Literals.
