@@ -53,13 +53,18 @@ import java.util.List;
   <li>- plans (list): the list of strings with the code of the relevant
   plans.</li>
   
+  <li><i>- labels</i> (list, optional): the list of labels of the plans.</li>
+
   </ul>
   
   <p>Example:<ul> 
 
-  <li> <code>.relevant_plans("+!go(X,Y)",L)</code>: unifies L with a list of
+  <li> <code>.relevant_plans("+!go(X,Y)",LP)</code>: unifies LP with a list of
   all plans in the agent's plan library that are relevant for the triggering
   event <code>+!go(X,Y)</code>.</li>
+
+  <li> <code>.relevant_plans("+!go(X,Y)",LP, LL)</code>: same as above but also 
+  unifies LL with a list of labels of plans in LP.</li>
 
   </ul>
 
@@ -72,7 +77,7 @@ import java.util.List;
 public class relevant_plans extends DefaultInternalAction {
 
     @Override public int getMinArgs() { return 2; }
-    @Override public int getMaxArgs() { return 2; }
+    @Override public int getMaxArgs() { return 3; }
 
     @Override
     protected void checkArguments(Term[] args) throws JasonException {
@@ -91,7 +96,9 @@ public class relevant_plans extends DefaultInternalAction {
 		} catch (ParseException e) {
             throw JasonException.createWrongArgument(this,"first argument '"+args[0]+"' must follow the syntax of a trigger.");
 		}
+		ListTerm labels = new ListTermImpl();
 		ListTerm lt = new ListTermImpl();
+		ListTerm last = lt;
         List<Option> rp = ts.relevantPlans(te);
         if (rp != null) {
             for (Option opt: rp) {
@@ -101,13 +108,15 @@ public class relevant_plans extends DefaultInternalAction {
                     np.getLabel().delSources();
                 }
                 StringTerm stplan = new StringTermImpl(np.toASString().replaceAll("\\\"", "\\\\\""));
-                lt.add(stplan);
+                last = last.append(stplan);
+                if (args.length == 3) labels.add(np.getLabel());
             }
 		}
 
-		// second arg is a var
-		Term listVar = args[1];
-
-		return un.unifies(lt, listVar);
+        boolean ok = un.unifies(lt, args[1]); // second arg is a var;
+        if (ok && args.length == 3)
+            ok = un.unifies(labels, args[2]);
+        
+        return ok;
 	}
 }

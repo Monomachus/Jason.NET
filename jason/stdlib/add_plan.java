@@ -45,10 +45,10 @@ import jason.bb.BeliefBase;
   AgentSpeak plan and added to the plan library. The syntax of the code within
   the string is the same as ordinary AgentSpeak code.<br/>
   
-  <li><i>+ source</i> (atom [optional]): the source of the
+  <li><i>+ source</i> (atom, optional): the source of the
   plan(s). The default value for the source is <code>self</code>.<br/>
   
-  <li><i>+ position</i> (atom [optional]): if value is "before" the plan
+  <li><i>+ position</i> (atom, optional): if value is "before" the plan
   will be added in the begin of the plan library. 
   The default value is <code>end</code>.<br/>
 
