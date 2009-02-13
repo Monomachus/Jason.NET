@@ -97,7 +97,12 @@ public class create_agent extends DefaultInternalAction {
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         checkArguments(args);
         
-        Term       name   = args[0];
+        String name;
+        if (args[0].isString()) 
+            name = ((StringTerm)args[0]).getString();
+        else
+            name = args[0].toString();
+        
         StringTerm source = (StringTerm)args[1];
 
         File fSource = new File(source.getString());
@@ -126,7 +131,7 @@ public class create_agent extends DefaultInternalAction {
         }
 
         RuntimeServicesInfraTier rs = ts.getUserAgArch().getArchInfraTier().getRuntimeServices();
-        return rs.createAgent(name.toString(), fSource.getAbsolutePath(), agClass, agArchClass, bbPars, ts.getSettings());
+        return rs.createAgent(name, fSource.getAbsolutePath(), agClass, agArchClass, bbPars, ts.getSettings());
     }
     
     private Structure testString(Term t) {
