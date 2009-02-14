@@ -422,42 +422,50 @@ public class VarTerm extends LiteralImpl implements NumberTerm, ListTerm, String
 
     @Override
     public void setAnnots(ListTerm l) {
-        if (value != null && value.isPred())
-            ((Pred) value).setAnnots(l);
+        if (value != null)
+            if (getValue().isPred())
+                ((Pred) value).setAnnots(l);
+            else
+                logger.log(Level.WARNING, "The setAnnots '"+l+"' in "+this+" was lost, since this var value is not a Pred. The value's class is "+getValue().getClass().getName(), new Exception());
         else
             super.setAnnots(l);
     }
 
-    /*
-    @Override
-    public void addAnnot(int index, Term t) {
-        if (value != null && getValue().isPred())
-            ((Pred) getValue()).addAnnot(index, t);
-        else
-            super.addAnnot(index, t);
-    }
-    */
-
     @Override
     public boolean importAnnots(Literal p) {
-        if (value != null && getValue().isPred())
-            return ((Pred) getValue()).importAnnots(p);
+        if (value != null)
+            if (getValue().isPred()) {
+                return ((Pred) getValue()).importAnnots(p);
+            } else {
+                logger.log(Level.WARNING, "The importAnnots '"+p+"' in "+this+" was lost, since this var value is not a Pred. The value's class is "+getValue().getClass().getName(), new Exception());
+                return false;
+            }
         else
             return super.importAnnots(p);
     }
 
     @Override
     public boolean addAnnot(Term t) {
-        if (value != null && getValue().isPred())
-            return ((Pred) getValue()).addAnnot(t);
+        if (value != null)
+            if (getValue().isPred()) {
+                return ((Pred) getValue()).addAnnot(t);
+            } else {
+                logger.log(Level.WARNING, "The add of annotation '"+t+"' in "+this+" was lost, since this var value is not a Pred. The value's class is "+getValue().getClass().getName(), new Exception());
+                return false;
+            }
         else
             return super.addAnnot(t);
     }
 
     @Override
     public Literal addAnnots(List<Term> l) {
-        if (value != null && getValue().isPred())
-            return ((Pred) getValue()).addAnnots(l);
+        if (value != null)
+            if (getValue().isPred()) {
+                return ((Pred) getValue()).addAnnots(l);
+            } else {
+                logger.log(Level.WARNING, "The addAnnots '"+l+"' in "+this+" was lost, since this var value is not a Pred. The value's class is "+getValue().getClass().getName(), new Exception());
+                return null;
+            }
         else
             return super.addAnnots(l);
     }
@@ -531,11 +539,13 @@ public class VarTerm extends LiteralImpl implements NumberTerm, ListTerm, String
 
     @Override
     public void addSource(Term t) {
-        if (value != null && getValue().isPred())
-            ((Pred) getValue()).addSource(t);
+        if (value != null)
+            if (getValue().isPred())
+                ((Pred) getValue()).addSource(t);
+            else
+                logger.log(Level.WARNING, "The addSource '"+t+"' in "+this+" was lost, since this var value is not a Pred. The value's class is "+getValue().getClass().getName(), new Exception());
         else
             super.addSource(t);
-
     }
 
     @Override

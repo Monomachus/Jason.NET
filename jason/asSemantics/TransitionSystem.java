@@ -23,6 +23,7 @@
 
 package jason.asSemantics;
 
+import jade.domain.introspection.GetValue;
 import jason.JasonException;
 import jason.RevisionFailedException;
 import jason.architecture.AgArch;
@@ -41,6 +42,7 @@ import jason.asSyntax.StringTermImpl;
 import jason.asSyntax.Structure;
 import jason.asSyntax.Term;
 import jason.asSyntax.Trigger;
+import jason.asSyntax.VarTerm;
 import jason.asSyntax.Trigger.TEOperator;
 import jason.asSyntax.Trigger.TEType;
 import jason.asSyntax.parser.ParseException;
@@ -543,10 +545,7 @@ public class TransitionSystem {
         case delAddBel: 
             // -+a(1,X) ===> remove a(_,_), add a(1,X)
             // change all vars to anon vars to remove it
-            if (!body.hasSource()) {
-                // do not add source(self) in case the programmer set a source
-                body.addAnnot(BeliefBase.TSelf);
-            }
+            body = addSelfSource(body);
             Literal bc = (Literal)body.clone();
             bc.makeTermsAnnon();
             // to delete, create events as external to avoid that
@@ -567,11 +566,7 @@ public class TransitionSystem {
             
         // Rule AddBel
         case addBel:
-            if (!body.hasSource()) {
-                // do not add source(self) in case the
-                // programmer set the source
-                body.addAnnot(BeliefBase.TSelf);
-            }
+            body = addSelfSource(body);
 
             // calculate focus
             Intention newfocus = Intention.EmptyInt;
@@ -599,10 +594,7 @@ public class TransitionSystem {
             break;
             
         case delBel:
-            if (!body.hasSource()) {
-                // do not add source(self) in case the programmer set a source
-                body.addAnnot(BeliefBase.TSelf);
-            }
+            body = addSelfSource(body);
 
             newfocus = Intention.EmptyInt;
             if (setts.sameFocus())
@@ -625,6 +617,22 @@ public class TransitionSystem {
             }            
             break;
         }
+    }
+    
+    // add the self source in the body in case no other source was given
+    private Literal addSelfSource(Literal body) {
+        // manage the case of var unified with atom
+        if (body instanceof VarTerm) {            
+            Term v = ((VarTerm)body).getValue();
+            if (v != null && v instanceof Atom)
+                body = new LiteralImpl((Atom)v);
+        }
+        if (!body.hasSource()) {
+            // do not add source(self) in case the
+            // programmer set the source
+            body.addAnnot(BeliefBase.TSelf);
+        }
+        return body;
     }
 
     public void applyClrInt(Intention i) throws JasonException {
