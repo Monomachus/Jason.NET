@@ -271,9 +271,11 @@ public class VarTerm extends LiteralImpl implements NumberTerm, ListTerm, String
 
     @Override
     public void addTerm(Term t) {
-        if (value != null && value.isStructure()) {
-            ((Structure)getValue()).addTerm(t);
-        }
+        if (value != null)
+            if (value.isStructure()) 
+                ((Structure)getValue()).addTerm(t);
+            else
+                logger.log(Level.WARNING, "The addTerm '"+t+"' in "+this+" was lost, since this var value is not a Structure. The value's class is "+getValue().getClass().getName(), new Exception());                
     }
 
     @Override
@@ -296,8 +298,13 @@ public class VarTerm extends LiteralImpl implements NumberTerm, ListTerm, String
 
     @Override
     public Literal setTerms(List<Term> l) {
-        if (value != null && value.isStructure()) {
-            return ((Structure)getValue()).setTerms(l);
+        if (value != null) {
+            if (value.isStructure()) {
+                return ((Structure)getValue()).setTerms(l);
+            } else {
+                logger.log(Level.WARNING, "The setTerms '"+l+"' in "+this+" was lost, since this var value is not a Structure. The value's class is "+getValue().getClass().getName(), new Exception());
+                return null;
+            }
         } else {
             return this;
         }
@@ -305,16 +312,20 @@ public class VarTerm extends LiteralImpl implements NumberTerm, ListTerm, String
 
     @Override
     public void setTerm(int i, Term t) {
-        if (value != null && value.isStructure()) {
-            ((Structure)getValue()).setTerm(i,t);
-        }
+        if (value != null)
+            if (value.isStructure())
+                ((Structure)getValue()).setTerm(i,t);
+            else
+                logger.log(Level.WARNING, "The setTerm '"+t+"' in "+this+" was lost, since this var value is not a Structure. The value's class is "+getValue().getClass().getName(), new Exception());                
     }
 
     @Override
     public Literal addTerms(List<Term> l) {
-        if (value != null && value.isStructure()) {
-            return ((Structure)getValue()).addTerms(l);
-        }
+        if (value != null)
+            if (value.isStructure())
+                return ((Structure)getValue()).addTerms(l);
+            else
+                logger.log(Level.WARNING, "The addTerms '"+l+"' in "+this+" was lost, since this var value is not a Structure. The value's class is "+getValue().getClass().getName(), new Exception());                
         return this;
     }
 

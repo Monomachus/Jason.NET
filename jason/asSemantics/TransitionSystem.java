@@ -23,7 +23,6 @@
 
 package jason.asSemantics;
 
-import jade.domain.introspection.GetValue;
 import jason.JasonException;
 import jason.RevisionFailedException;
 import jason.architecture.AgArch;
@@ -194,8 +193,11 @@ public class TransitionSystem {
             } else if (conf.ag.socAcc(m)) {
 
                 // generate an event
+                String sender = m.getSender();
+                if (sender.equals(agArch.getAgName()))
+                    sender = "self";
                 Literal received = new LiteralImpl("kqml_received").addTerms(
-                        new Atom(m.getSender()),
+                        new Atom(sender),
                         new Atom(m.getIlForce()),
                         content,
                         new Atom(m.getMsgId()));
