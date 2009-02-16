@@ -120,13 +120,13 @@ public abstract class Literal extends DefaultTerm implements LogicalFormula {
     /** returns all singleton vars (that appears once) in this literal */
     public List<VarTerm> getSingletonVars() { return new ArrayList<VarTerm>(); }
 
-    /** Replaces all terms by unnamed variables (_). */
+    /** replaces all terms by unnamed variables (_). */
     public void makeTermsAnnon()  {}
-    /** Replaces all variables by unnamed variables (_). */
+    /** replaces all variables by unnamed variables (_). */
     public void makeVarsAnnon()   {}
 
     /**
-     * Replaces all variables of the term for unnamed variables (_).
+     * replaces all variables of the term for unnamed variables (_).
      * 
      * @param un is the unifier that contains the map of replacements
      */
@@ -192,35 +192,34 @@ public abstract class Literal extends DefaultTerm implements LogicalFormula {
 	/* Not implemented methods */
 	
     // structure
-    public void addTerm(Term t) {  logger.log(Level.SEVERE, "addTerm is not implemented in the class "+this.getClass().getSimpleName(), new Exception());  }
-    public void delTerm(int index) { logger.log(Level.SEVERE, "delTerm is not implemented in the class "+this.getClass().getSimpleName(), new Exception());  }
+    public void addTerm(Term t)              { logger.log(Level.SEVERE, "addTerm is not implemented in the class "+this.getClass().getSimpleName(), new Exception());  }
+    public void delTerm(int index)           { logger.log(Level.SEVERE, "delTerm is not implemented in the class "+this.getClass().getSimpleName(), new Exception());  }
     /** adds some terms and return this */
-    public Literal addTerms(Term ... ts ) { logger.log(Level.SEVERE, "addTerms is not implemented in the class "+this.getClass().getSimpleName(), new Exception()); return null; }
+    public Literal addTerms(Term ... ts )    { logger.log(Level.SEVERE, "addTerms is not implemented in the class "+this.getClass().getSimpleName(), new Exception()); return null; }
     /** adds some terms and return this */
-    public Literal addTerms(List<Term> l) { logger.log(Level.SEVERE, "addTerms is not implemented in the class "+this.getClass().getSimpleName(), new Exception()); return null; }
+    public Literal addTerms(List<Term> l)    { logger.log(Level.SEVERE, "addTerms is not implemented in the class "+this.getClass().getSimpleName(), new Exception()); return null; }
     /** returns the i-th term (first term is 0) */
-    public Term getTerm(int i)    { logger.log(Level.SEVERE, "getTerm(i) is not implemented in the class "+this.getClass().getSimpleName(), new Exception()); return null; }
+    public Term getTerm(int i)               { logger.log(Level.SEVERE, "getTerm(i) is not implemented in the class "+this.getClass().getSimpleName(), new Exception()); return null; }
     /** set all terms of the literal and return this */
-    public Literal setTerms(List<Term> l) { logger.log(Level.SEVERE, "setTerms is not implemented in the class "+this.getClass().getSimpleName(), new Exception()); return null; }
-    public void setTerm(int i, Term t) { logger.log(Level.SEVERE, "setTerm is not implemented in the class "+this.getClass().getSimpleName(), new Exception());  }
+    public Literal setTerms(List<Term> l)    { logger.log(Level.SEVERE, "setTerms is not implemented in the class "+this.getClass().getSimpleName(), new Exception()); return null; }
+    public void setTerm(int i, Term t)       { logger.log(Level.SEVERE, "setTerm is not implemented in the class "+this.getClass().getSimpleName(), new Exception());  }
     
     // pred
-    public void setAnnots(ListTerm l) { logger.log(Level.SEVERE, "setAnnots is not implemented in the class "+this.getClass().getSimpleName(), new Exception());  }
-    public boolean addAnnot(Term t) { logger.log(Level.SEVERE, "addAnnot is not implemented in the class "+this.getClass().getSimpleName(), new Exception()); return false; }
+    public void setAnnots(ListTerm l)        { logger.log(Level.SEVERE, "setAnnots is not implemented in the class "+this.getClass().getSimpleName(), new Exception());  }
+    public boolean addAnnot(Term t)          { logger.log(Level.SEVERE, "addAnnot is not implemented in the class "+this.getClass().getSimpleName(), new Exception()); return false; }
     
     /** adds some annots and return this */
     public Literal addAnnots(Term ... terms) { logger.log(Level.SEVERE, "addAnnots is not implemented in the class "+this.getClass().getSimpleName(), new Exception()); return null; }
 
     /** adds some annots and return this */
-    public Literal addAnnots(List<Term> l) { logger.log(Level.SEVERE, "addAnnots is not implemented in the class "+this.getClass().getSimpleName(), new Exception()); return null; }
-    //public void addAnnot(int index, Term t) { logger.log(Level.SEVERE, "addAnnot is not implemented in the class "+this.getClass().getSimpleName(), new Exception());  }
-    public void delAnnot(Term t) { logger.log(Level.SEVERE, "delAnnot is not implemented in the class "+this.getClass().getSimpleName(), new Exception());  }
+    public Literal addAnnots(List<Term> l)   { logger.log(Level.SEVERE, "addAnnots is not implemented in the class "+this.getClass().getSimpleName(), new Exception()); return null; }
+    public void delAnnot(Term t)             { logger.log(Level.SEVERE, "delAnnot is not implemented in the class "+this.getClass().getSimpleName(), new Exception());  }
 
     /**
      * removes all annots in this pred that are in the list <i>l</i>.
      * @return true if some annot was removed.
      */
-    public boolean delAnnots(List<Term> l) { logger.log(Level.SEVERE, "delAnnots is not implemented in the class "+this.getClass().getSimpleName(), new Exception()); return false; }
+    public boolean delAnnots(List<Term> l)   { logger.log(Level.SEVERE, "delAnnots is not implemented in the class "+this.getClass().getSimpleName(), new Exception()); return false; }
 
     /**
      * "import" annots from another predicate <i>p</i>. p will be changed
@@ -233,18 +232,18 @@ public abstract class Literal extends DefaultTerm implements LogicalFormula {
      * 
      * @return true if some annot was imported.
      */
-    public boolean importAnnots(Literal p) { logger.log(Level.SEVERE, "importAnnots is not implemented in the class "+this.getClass().getSimpleName(), new Exception());  return false; }
+    public boolean importAnnots(Literal p)   { logger.log(Level.SEVERE, "importAnnots is not implemented in the class "+this.getClass().getSimpleName(), new Exception());  return false; }
 
     /** adds the annotation source(<i>agName</i>) */
-    public void addSource(Term agName) { logger.log(Level.SEVERE, "addSource is not implemented in the class "+this.getClass().getSimpleName(), new Exception());  }
+    public void addSource(Term agName)       { logger.log(Level.SEVERE, "addSource is not implemented in the class "+this.getClass().getSimpleName(), new Exception());  }
     /** deletes one source(<i>agName</i>) annotation, return true if deleted */
-    public boolean delSource(Term agName) { logger.log(Level.SEVERE, "delSource is not implemented in the class "+this.getClass().getSimpleName(), new Exception());  return false; }
+    public boolean delSource(Term agName)    { logger.log(Level.SEVERE, "delSource is not implemented in the class "+this.getClass().getSimpleName(), new Exception());  return false; }
     /** deletes all source annotations */
-    public void delSources() { logger.log(Level.SEVERE, "delSources is not implemented in the class "+this.getClass().getSimpleName(), new Exception());  }
+    public void delSources()                 { logger.log(Level.SEVERE, "delSources is not implemented in the class "+this.getClass().getSimpleName(), new Exception());  }
 
     // literal    
     /** changes the negation of the literal and return this */
-    public Literal setNegated(boolean b) {  logger.log(Level.SEVERE, "setNegated is not implemented in the class "+this.getClass().getSimpleName(), new Exception()); return null; }
+    public Literal setNegated(boolean b)     { logger.log(Level.SEVERE, "setNegated is not implemented in the class "+this.getClass().getSimpleName(), new Exception()); return null; }
     
     
     /** 

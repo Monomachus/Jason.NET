@@ -31,7 +31,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
-     A rule is a Literal (head) with an optional body, as in "a :- b &amp; c".
+     A rule is a Literal (head) with a body, as in "a :- b &amp; c".
     
      @navassoc - body - LogicalFormula
  */

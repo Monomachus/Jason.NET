@@ -30,7 +30,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
- * Represents an atom (a positive literal with no arguments and no annotations, e.g. "tell", "a").
+ * Represents an atom (a positive literal with no argument and no annotation, e.g. "tell", "a").
  */
 public class Atom extends Literal {
 
