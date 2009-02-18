@@ -223,8 +223,8 @@ public class VarTerm extends LiteralImpl implements NumberTerm, ListTerm, String
 
     @Override
     public PredicateIndicator getPredicateIndicator() {
-        if (value != null && value.isStructure()) {
-            return ((Structure)value).getPredicateIndicator();
+        if (value != null && value.isLiteral()) {
+            return ((Literal)value).getPredicateIndicator();
         } else if (predicateIndicatorCache == null) {
             predicateIndicatorCache = new PredicateIndicator(getFunctor(), 0);
         }

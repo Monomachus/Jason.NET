@@ -40,8 +40,7 @@ import org.w3c.dom.Element;
 
 /**
  * Represents a structure: a functor with <i>n</i> arguments, 
- * e.g.: val(10,x(3)). 
- * <i>n</i> can be 0, so this class also represents atoms.
+ * e.g.: val(10,x(3)).
  *
  * @composed - terms 0..* Term
  */
@@ -246,7 +245,7 @@ public class Structure extends Atom {
     
     @Override
     public boolean hasTerm() {
-        return getArity() > 0; // should use getArity to work for list/atom
+        return getArity() > 0; // should use getArity to work for list
     }
     
     @Override

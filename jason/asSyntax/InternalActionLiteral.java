@@ -44,7 +44,7 @@ import org.w3c.dom.Element;
  @navassoc - ia - InternalAction
 
  */
-public class InternalActionLiteral extends LiteralImpl {
+public class InternalActionLiteral extends Structure {
 
     private static final long serialVersionUID = 1L;
     private static Logger logger = Logger.getLogger(InternalActionLiteral.class.getName());
@@ -57,10 +57,8 @@ public class InternalActionLiteral extends LiteralImpl {
 
     // used by clone
     public InternalActionLiteral(InternalActionLiteral l) {
-        super((LiteralImpl) l);
+        super((Structure) l);
         this.ia = l.ia;
-        predicateIndicatorCache = l.predicateIndicatorCache;
-        hashCodeCache           = l.hashCodeCache;
     }
 
     // used by the parser
@@ -80,11 +78,6 @@ public class InternalActionLiteral extends LiteralImpl {
         return false;
     }
     
-    @Override
-    public boolean canBeAddedInBB() {
-        return false;
-    }
-
     @Override
     public boolean apply(Unifier u) {
         if (this.ia != null && (this.ia instanceof loop || this.ia instanceof foreach))

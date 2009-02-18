@@ -215,6 +215,7 @@ public class ListTermImpl extends Structure implements ListTerm {
         return false;
     }
 
+    @Override
     public boolean apply(Unifier u) {
         if (isEmpty()) {
             return false;

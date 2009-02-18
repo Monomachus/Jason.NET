@@ -29,7 +29,7 @@ public class PlanBodyImpl extends Structure implements PlanBody, Iterable<PlanBo
     private PlanBody    next     = null;
     private BodyType    formType = BodyType.none;
     
-    private boolean     isTerm = false;
+    private boolean     isTerm = false; // it is true when the plan body is used as a term instead of an element of a plan
     
     /** constructor for empty plan body */
     public PlanBodyImpl() {
@@ -138,7 +138,7 @@ public class PlanBodyImpl extends Structure implements PlanBody, Iterable<PlanBo
         // do not apply in next!
         resetHashCodeCache();
         if (term != null && term.apply(u)) {
-            if (term.isPlanBody()) { // we can not have "inner" body literals
+            if (term.isPlanBody()) { // we cannot have "inner" body literals
                 formType = ((PlanBody)term).getBodyType();
                 term     = ((PlanBody)term).getBodyTerm();
             }

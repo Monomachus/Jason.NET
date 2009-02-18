@@ -74,7 +74,7 @@ public abstract class Literal extends DefaultTerm implements LogicalFormula {
     public static final Literal LTrue  = new TrueLiteral();
     public static final Literal LFalse = new FalseLiteral();
 
-    protected PredicateIndicator predicateIndicatorCache = null; // to not compute it all the time (is is called many many times)
+    protected PredicateIndicator predicateIndicatorCache = null; // to not compute it all the time (it is used many many times)
     
     /** creates a new literal by parsing a string -- ASSyntax.parseLiteral or createLiteral are preferred. */
     public static Literal parseLiteral(String sLiteral) {
