@@ -1,7 +1,7 @@
 package jason.asSyntax.patterns.goal;
 
 import jason.asSemantics.Agent;
-import jason.asSyntax.Plan;
+import jason.asSyntax.ASSyntax;
 import jason.asSyntax.Pred;
 import jason.asSyntax.Term;
 import jason.asSyntax.directives.Directive;
@@ -32,7 +32,7 @@ public class RC implements Directive {
             if (newAg != null) {
 
                 // add -m : true <- .succeed_goal(g).
-                newAg.getPL().add(Plan.parse("-"+motivation+" <- .succeed_goal("+goal+")."));
+                newAg.getPL().add(ASSyntax.parsePlan("-"+motivation+" <- .succeed_goal("+goal+")."));
                 
                 return newAg;
             }

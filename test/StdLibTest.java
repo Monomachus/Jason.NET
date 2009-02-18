@@ -1,5 +1,6 @@
 package test;
 
+import jason.JasonException;
 import jason.RevisionFailedException;
 import jason.architecture.AgArch;
 import jason.asSemantics.Agent;
@@ -140,7 +141,7 @@ public class StdLibTest extends TestCase {
         assertEquals(lt.size(), 2);
     }
 
-    public void testGetRelevantPlansAndAddPlan() {
+    public void testGetRelevantPlansAndAddPlan() throws ParseException, JasonException {
         Agent ag = new Agent();
         ag.setLogger(null);
         StringTerm pt1 = new StringTermImpl("@t1 +a : g(10) <- .print(\"ok 10\").");

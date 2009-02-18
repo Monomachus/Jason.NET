@@ -298,7 +298,6 @@ public class ExecutionControlGUI extends ExecutionControl {
         }
     }
     
-    @SuppressWarnings("unchecked")
     private void setupSlider() {
         int size = getCycleNumber();
         Hashtable<Integer,Component> labelTable = new Hashtable<Integer,Component>();

@@ -4,7 +4,6 @@ import jason.asSemantics.Agent;
 import jason.asSyntax.ASSyntax;
 import jason.asSyntax.LogExpr;
 import jason.asSyntax.LogicalFormula;
-import jason.asSyntax.Plan;
 import jason.asSyntax.Pred;
 import jason.asSyntax.StringTerm;
 import jason.asSyntax.Term;
@@ -32,19 +31,19 @@ public class SGA implements Directive {
             Agent newAg = new Agent();
 
             // add t : not f__l(_) & c <- !f__g(g).
-            newAg.getPL().add(Plan.parse(trigger+" : not f__l(_) & " +context +" <- !f__g("+goal+")."));
+            newAg.getPL().add(ASSyntax.parsePlan(trigger+" : not f__l(_) & " +context +" <- !f__g("+goal+")."));
             
             // add t : f__l(_) & c <- +f__l(g).
-            newAg.getPL().add(Plan.parse(trigger+" : f__l(_) & (" +context +") <- +f__l("+goal+")."));
+            newAg.getPL().add(ASSyntax.parsePlan(trigger+" : f__l(_) & (" +context +") <- +f__l("+goal+")."));
             
             // add +!fg(g) : true <- +fl(g); !g; -fl(g)
-            newAg.getPL().add(Plan.parse("+!f__g("+goal+") <- +f__l("+goal+"); !"+goal+"; -f__l("+goal+")."));            
+            newAg.getPL().add(ASSyntax.parsePlan("+!f__g("+goal+") <- +f__l("+goal+"); !"+goal+"; -f__l("+goal+")."));            
             
             // add -!fg(g) : true <- -fl(g)
-            newAg.getPL().add(Plan.parse("-!f__g("+goal+") <- -f__l("+goal+")."));            
+            newAg.getPL().add(ASSyntax.parsePlan("-!f__g("+goal+") <- -f__l("+goal+")."));            
 
             // add -fl(_) : fg(g) <- !fg(g)
-            newAg.getPL().add(Plan.parse("-f__l("+goal+") : f__l("+goal+") <- !f__g("+goal+")."));            
+            newAg.getPL().add(ASSyntax.parsePlan("-f__l("+goal+") : f__l("+goal+") <- !f__g("+goal+")."));            
 
             return newAg;
         } catch (Exception e) {

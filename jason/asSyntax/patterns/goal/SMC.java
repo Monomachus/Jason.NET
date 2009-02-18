@@ -1,7 +1,7 @@
 package jason.asSyntax.patterns.goal;
 
 import jason.asSemantics.Agent;
-import jason.asSyntax.Plan;
+import jason.asSyntax.ASSyntax;
 import jason.asSyntax.Pred;
 import jason.asSyntax.Term;
 import jason.asSyntax.directives.Directive;
@@ -32,7 +32,7 @@ public class SMC implements Directive {
             if (newAg != null) {
 
                 // add +f : true <- .fail_goal(g).
-                newAg.getPL().add(Plan.parse("+"+fail+" <- .fail_goal("+goal+")."));
+                newAg.getPL().add(ASSyntax.parsePlan("+"+fail+" <- .fail_goal("+goal+")."));
                 
                 return newAg;
             }

@@ -1,6 +1,7 @@
 package jason.asSyntax.patterns.goal;
 
 import jason.asSemantics.Agent;
+import jason.asSyntax.ASSyntax;
 import jason.asSyntax.Plan;
 import jason.asSyntax.Pred;
 import jason.asSyntax.SourceInfo;
@@ -32,12 +33,12 @@ public class OMC implements Directive {
             Agent newAg = sd.process(subDir, outerContent, innerContent); 
             if (newAg != null) {
                 // add +f : true <- .fail_goal(g).
-                Plan pf = Plan.parse("+"+fail+" <- .fail_goal("+goal+").");
+                Plan pf = ASSyntax.parsePlan("+"+fail+" <- .fail_goal("+goal+").");
                 pf.setSrcInfo(new SourceInfo(outerContent+"/"+directive, 0));
                 newAg.getPL().add(pf);
 
                 // add -m : true <- .succeed_goal(g).
-                Plan pm = Plan.parse("-"+motivation+" <- .succeed_goal("+goal+").");
+                Plan pm = ASSyntax.parsePlan("-"+motivation+" <- .succeed_goal("+goal+").");
                 pm.setSrcInfo(new SourceInfo(outerContent+"/"+directive, 0));
                 newAg.getPL().add(pm);
                 

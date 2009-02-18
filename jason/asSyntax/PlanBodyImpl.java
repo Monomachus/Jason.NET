@@ -41,8 +41,8 @@ public class PlanBodyImpl extends Structure implements PlanBody, Iterable<PlanBo
         formType = t;
         if (b != null) { 
             srcInfo = b.getSrcInfo();
-            if (b instanceof Literal) {
-                b = ((Literal)b).forceLiteralImplClass();
+            if (b.isAtom()) {
+                b = ((Atom)b).forceFullLiteralImpl();
             }
         }
         term = b;

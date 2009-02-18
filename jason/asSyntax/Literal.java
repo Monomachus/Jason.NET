@@ -379,16 +379,17 @@ public abstract class Literal extends DefaultTerm implements LogicalFormula {
 		}
 	}
 	
-	/** 
-	 * Returns 'this' if this class is LiteralImpl, otherwise, create a new instance of LiteralImpl based on 'this'.
-	 * This method is useful to translate Atoms to LiteralImpl. 
-	 */
-	public Literal forceLiteralImplClass() {
-	    if (this instanceof LiteralImpl) 
-            return this;
-	    else // it is Atom, Structure, Pred but not LiteralImpl
+    /** 
+     * Transforms this into a full literal (which implements all methods of Literal), if it is an Atom; 
+     * otherwise returns 'this'
+     */
+    public Literal forceFullLiteralImpl() {
+        if (this.isAtom() && !(this instanceof LiteralImpl)) 
             return new LiteralImpl(this);
-	}
+        else 
+            return this;
+    }
+	
 	
     @SuppressWarnings("serial")
     static final class TrueLiteral extends LiteralImpl {

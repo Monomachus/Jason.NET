@@ -1,7 +1,7 @@
 package jason.asSyntax.patterns.goal;
 
 import jason.asSemantics.Agent;
-import jason.asSyntax.Plan;
+import jason.asSyntax.ASSyntax;
 import jason.asSyntax.Pred;
 import jason.asSyntax.Term;
 
@@ -26,7 +26,7 @@ public class BDG extends DG {
                 Term goal = directive.getTerm(0);
     
                 // add -!g : true <- !!g.
-                newAg.getPL().add(Plan.parse("-!"+goal+" <- !!"+goal+"."));
+                newAg.getPL().add(ASSyntax.parsePlan("-!"+goal+" <- !!"+goal+"."));
                 
                 return newAg;
             }

@@ -1,5 +1,6 @@
 package test;
 
+import jason.JasonException;
 import jason.asSemantics.Agent;
 import jason.asSemantics.Circumstance;
 import jason.asSemantics.Intention;
@@ -26,7 +27,7 @@ public class TSTest extends TestCase {
         super.setUp();
     }
 
-    public void testRelevant() throws ParseException {
+    public void testRelevant() throws ParseException, JasonException {
         Agent ag = new Agent();
         Circumstance c = new Circumstance();
         StringTerm pt1 = new StringTermImpl("@t1 +a(X) : g(10) <- .print(\"ok 10\").");

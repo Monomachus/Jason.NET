@@ -97,7 +97,7 @@ public class add_annot extends DefaultInternalAction {
             }
             return result;
         } else if (l.isLiteral()) {
-            return ((Literal)l).forceLiteralImplClass().copy().addAnnots(annot);
+            return ((Literal)l).forceFullLiteralImpl().copy().addAnnots(annot);
         }
         return l;
     }   

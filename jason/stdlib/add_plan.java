@@ -102,8 +102,9 @@ public class add_plan extends DefaultInternalAction {
             before = args[2].toString().equals("begin");
 
         if (plans.isList()) { // arg[0] is a list of strings
-            for (Term t: (ListTerm) plans)
-                ts.getAg().getPL().add((StringTerm) t, source);
+            for (Term t: (ListTerm) plans) {
+                ts.getAg().getPL().add((StringTerm) t, source, before);
+            }
         } else { // args[0] is a plan
             ts.getAg().getPL().add((StringTerm) plans, source, before);
         }

@@ -1,12 +1,12 @@
 package jason.asSyntax.patterns.goal;
 
 import jason.asSemantics.Agent;
-import jason.bb.BeliefBase;
+import jason.asSyntax.ASSyntax;
 import jason.asSyntax.Literal;
-import jason.asSyntax.Plan;
 import jason.asSyntax.Pred;
 import jason.asSyntax.directives.Directive;
 import jason.asSyntax.directives.DirectiveProcessor;
+import jason.bb.BeliefBase;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -40,7 +40,7 @@ public class MG implements Directive {
                 newAg.addInitialBel(goal);
 
                 // add -g : true <- !g.
-                newAg.getPL().add(Plan.parse("-"+goal+" <- !"+goal+"."));
+                newAg.getPL().add(ASSyntax.parsePlan("-"+goal+" <- !"+goal+"."));
 
                 return newAg;
             }

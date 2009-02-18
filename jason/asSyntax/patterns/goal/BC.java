@@ -1,7 +1,7 @@
 package jason.asSyntax.patterns.goal;
 
 import jason.asSemantics.Agent;
-import jason.asSyntax.Plan;
+import jason.asSyntax.ASSyntax;
 import jason.asSyntax.Pred;
 import jason.asSyntax.Term;
 import jason.asSyntax.directives.Directive;
@@ -35,7 +35,7 @@ public class BC implements Directive {
             if (newAg != null) {
 
                 // add +!g : true <- !!g.
-                newAg.getPL().add(Plan.parse("+!"+goal+" <- !!"+goal+"."));
+                newAg.getPL().add(ASSyntax.parsePlan("+!"+goal+" <- !!"+goal+"."));
                 
                 return newAg;
             }

@@ -107,6 +107,7 @@ public class Plan implements Cloneable, Serializable {
             context = null;
     }
     
+    /** prefer using ASSyntax.parsePlan */
     public static Plan parse(String sPlan) {
         as2j parser = new as2j(new StringReader(sPlan));
         try {

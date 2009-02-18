@@ -1,6 +1,7 @@
 package jason.asSyntax.patterns.goal;
 
 import jason.asSemantics.Agent;
+import jason.asSyntax.ASSyntax;
 import jason.asSyntax.PlanBody;
 import jason.asSyntax.PlanBodyImpl;
 import jason.asSyntax.Literal;
@@ -28,7 +29,7 @@ public class DG implements Directive {
             Literal goal = Literal.parseLiteral(directive.getTerm(0).toString());
             
             // add +!g : g <- true.
-            newAg.getPL().add(Plan.parse("+!"+goal+" : " +goal+"."));
+            newAg.getPL().add(ASSyntax.parsePlan("+!"+goal+" : " +goal+"."));
             
             // add ?g in the end of all inner plans
             for (Plan p: innerContent.getPL()) {
@@ -38,7 +39,7 @@ public class DG implements Directive {
             }
             
             // add +g : true <- .succeed_goal(g).
-            newAg.getPL().add(Plan.parse("+"+goal+" <- .succeed_goal("+goal+")."));
+            newAg.getPL().add(ASSyntax.parsePlan("+"+goal+" <- .succeed_goal("+goal+")."));
             
             return newAg;
         } catch (Exception e) {

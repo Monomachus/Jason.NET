@@ -28,6 +28,7 @@ package jason.asSyntax;
 import jason.JasonException;
 import jason.asSyntax.Trigger.TEOperator;
 import jason.asSyntax.Trigger.TEType;
+import jason.asSyntax.parser.ParseException;
 import jason.bb.BeliefBase;
 
 import java.util.ArrayList;
@@ -35,8 +36,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -63,7 +62,7 @@ public class PlanLibrary implements Iterable<Plan> {
     
     private static int lastPlanLabel = 0;
 
-    private Logger logger = Logger.getLogger(PlanLibrary.class.getName());  
+    //private Logger logger = Logger.getLogger(PlanLibrary.class.getName());  
     
     /** 
      *  Add a new plan written as a String. The source
@@ -73,9 +72,9 @@ public class PlanLibrary implements Iterable<Plan> {
      *  
      *  The plan is added in the end of the PlanLibrary.
      *  
-     *  returns the plan added, null if it does not work.
+     *  @returns the plan just added
      */
-    public Plan add(StringTerm stPlan, Term tSource) {
+    public Plan add(StringTerm stPlan, Term tSource) throws ParseException, JasonException {
        return add(stPlan, tSource, false); 
     }
     
@@ -89,39 +88,32 @@ public class PlanLibrary implements Iterable<Plan> {
      *  begin of the PlanLibrary; otherwise, it is added in
      *  the end.
      *  
-     *   returns the plan added, null if it does not work.
+     *  @returns the plan just added
      */
-    public Plan add(StringTerm stPlan, Term tSource, boolean before) {
+    public Plan add(StringTerm stPlan, Term tSource, boolean before) throws ParseException, JasonException {
         String sPlan = stPlan.getString();
-        try {
-            // remove quotes \" -> "
-            StringBuilder sTemp = new StringBuilder();
-            for (int c=0; c <sPlan.length(); c++) {
-                if (sPlan.charAt(c) != '\\') {
-                    sTemp.append(sPlan.charAt(c));
-                }
+        // remove quotes \" -> "
+        StringBuilder sTemp = new StringBuilder();
+        for (int c=0; c <sPlan.length(); c++) {
+            if (sPlan.charAt(c) != '\\') {
+                sTemp.append(sPlan.charAt(c));
             }
-            sPlan  = sTemp.toString();
-            Plan p = Plan.parse(sPlan);
-            if (p != null) {
-                int i = plans.indexOf(p);
-                if (i < 0) {
-                    // add label, if necessary
-                    if (p.getLabel() == null) {
-                        p.setLabel(getUniqueLabel());
-                    }
-                    p.getLabel().addSource(tSource);
-                    add(p, before);
-                } else {
-                    p = plans.get(i);
-                    p.getLabel().addSource(tSource);
-                }
-                return p;
-            }
-        } catch (Exception e) {
-            logger.log(Level.SEVERE,"Error adding plan "+stPlan,e);
         }
-        return null;
+        sPlan  = sTemp.toString();
+        Plan p = ASSyntax.parsePlan(sPlan); //Plan.parse(sPlan);
+        int i = plans.indexOf(p);
+        if (i < 0) {
+            // add label, if necessary
+            if (p.getLabel() == null) {
+                p.setLabel(getUniqueLabel());
+            }
+            p.getLabel().addSource(tSource);
+            add(p, before);
+        } else {
+            p = plans.get(i);
+            p.getLabel().addSource(tSource);
+        }
+        return p;
     }
 
 

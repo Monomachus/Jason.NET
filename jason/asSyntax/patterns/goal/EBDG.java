@@ -1,6 +1,7 @@
 package jason.asSyntax.patterns.goal;
 
 import jason.asSemantics.Agent;
+import jason.asSyntax.ASSyntax;
 import jason.asSyntax.Literal;
 import jason.asSyntax.LiteralImpl;
 import jason.asSyntax.LogExpr;
@@ -33,7 +34,7 @@ public class EBDG implements Directive {
             Literal goal = Literal.parseLiteral(directive.getTerm(0).toString());
 
             // add +!g : g <- true.
-            newAg.getPL().add(Plan.parse("+!"+goal+" : " +goal+"."));
+            newAg.getPL().add(ASSyntax.parsePlan("+!"+goal+" : " +goal+"."));
             
             // change all inner plans
             int i = 0;
@@ -64,13 +65,13 @@ public class EBDG implements Directive {
             
 
             // add -!g : true <- !!g.
-            newAg.getPL().add(Plan.parse("-!"+goal+" <- !!"+goal+"."));
+            newAg.getPL().add(ASSyntax.parsePlan("-!"+goal+" <- !!"+goal+"."));
 
             // add +g : true <- .abolish(p__f(_,g)); .succeed_goal(g).
-            newAg.getPL().add(Plan.parse("+"+goal+" <- .abolish(p__f(_,"+goal+")); .succeed_goal("+goal+")."));
+            newAg.getPL().add(ASSyntax.parsePlan("+"+goal+" <- .abolish(p__f(_,"+goal+")); .succeed_goal("+goal+")."));
 
             // add -g <- .abolish(p__f(_,g)).
-            newAg.getPL().add(Plan.parse("-"+goal+" <- .abolish(p__f(_,"+goal+"))."));
+            newAg.getPL().add(ASSyntax.parsePlan("-"+goal+" <- .abolish(p__f(_,"+goal+"))."));
             
             return newAg;
         } catch (Exception e) {
