@@ -38,10 +38,14 @@ public class PlanBodyImpl extends Structure implements PlanBody, Iterable<PlanBo
     
     public PlanBodyImpl(BodyType t, Term b) {
         super(BODY_PLAN_FUNCTOR, 0);
-        term     = b;
         formType = t;
-        if (b != null)
+        if (b != null) { 
             srcInfo = b.getSrcInfo();
+            if (b instanceof Literal) {
+                b = ((Literal)b).forceLiteralImplClass();
+            }
+        }
+        term = b;
     }
 
     public void setBodyNext(PlanBody next) {

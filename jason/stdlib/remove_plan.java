@@ -86,18 +86,18 @@ public class remove_plan extends DefaultInternalAction {
 
         Term source = BeliefBase.ASelf;
     	if (args.length > 1) {
-			source = (Atom)args[1];
+            source = (Atom)args[1];
     	}
     	
     	if (label.isList()) { // arg[0] is a list
-    		boolean r = true;
-    		ListTerm lt = (ListTerm)args[0];
+    	    boolean r = true;
+            ListTerm lt = (ListTerm)args[0];
             for (Term t: lt) {
-    			r = r && ts.getAg().getPL().remove((Atom)t, source);
-    		}
-    		return r;
+                r = r && ts.getAg().getPL().remove((Atom)t, source);
+            }
+            return r;
     	} else { // args[0] is a plan label
-    		return ts.getAg().getPL().remove((Atom)label, source);
+            return ts.getAg().getPL().remove((Atom)label, source);
     	}
     }
 }

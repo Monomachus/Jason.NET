@@ -626,8 +626,8 @@ public class TransitionSystem {
         // manage the case of var unified with atom
         if (body instanceof VarTerm) {            
             Term v = ((VarTerm)body).getValue();
-            if (v != null && v instanceof Atom)
-                body = new LiteralImpl((Atom)v);
+            if (v != null && v instanceof Literal)
+                body = ((Literal)v).forceLiteralImplClass();
         }
         if (!body.hasSource()) {
             // do not add source(self) in case the

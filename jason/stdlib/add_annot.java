@@ -29,11 +29,9 @@ import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.InternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
-import jason.asSyntax.Atom;
 import jason.asSyntax.ListTerm;
 import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Literal;
-import jason.asSyntax.LiteralImpl;
 import jason.asSyntax.Term;
 
 /**
@@ -88,7 +86,7 @@ public class add_annot extends DefaultInternalAction {
         return un.unifies(result,args[2]);
     }
 
-    public Term addAnnotToList(Unifier unif, Term l, Term annot) throws JasonException {
+    protected Term addAnnotToList(Unifier unif, Term l, Term annot) throws JasonException {
         if (l.isList()) {
             ListTerm result = new ListTermImpl();
             for (Term lTerm: (ListTerm)l) {
@@ -99,14 +97,7 @@ public class add_annot extends DefaultInternalAction {
             }
             return result;
         } else if (l.isLiteral()) {
-            Literal result;
-            if (l.isAtom()) {
-                result = new LiteralImpl((Atom)l);
-            } else {
-                result = (Literal)l.clone();                
-            }
-            result.addAnnot(annot);
-            return result;
+            return ((Literal)l).forceLiteralImplClass().copy().addAnnots(annot);
         }
         return l;
     }   
