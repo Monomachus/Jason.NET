@@ -107,20 +107,18 @@ public class drop_intention extends DefaultInternalAction {
             }
         }
     
-        synchronized (C) { // do not allow other threads (.wait) to change the C meanwhile
-            for (Intention i: C.getIntentions()) {
-                if (i.hasTrigger(g, un)) {
-                    C.removeIntention(i);
-                    un = bak.clone();
-                }
+        for (Intention i: C.getIntentions()) {
+            if (i.hasTrigger(g, un)) {
+                C.removeIntention(i);
+                un = bak.clone();
             }
-                
-            // intention may be suspended in PI! (in the new semantics)
-            for (Intention i: C.getPendingIntentions().values()) {
-                if (i.hasTrigger(g, un)) {
-                    C.dropPendingIntention(i);
-                    un = bak.clone();
-                }
+        }
+            
+        // intention may be suspended in PI! (in the new semantics)
+        for (Intention i: C.getPendingIntentions().values()) {
+            if (i.hasTrigger(g, un)) {
+                C.dropPendingIntention(i);
+                un = bak.clone();
             }
         }
     }

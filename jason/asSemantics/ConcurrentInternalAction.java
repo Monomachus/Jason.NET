@@ -113,24 +113,29 @@ public abstract class ConcurrentInternalAction implements InternalAction {
         resume(ts, intentionKey, true);
     }
 
-    synchronized private void resume(TransitionSystem ts, String intentionKey, boolean abort) {
-        Circumstance C = ts.getC();
-        Intention pi = C.getPendingIntentions().remove(intentionKey);
-        if (pi != null) {
-            pi.setSuspended(false);
-            try {
-                if (abort) {
-                    // fail the IA
-                    ts.generateGoalDeletion(pi, null);                
-                } else {
-                    pi.peek().removeCurrentStep(); // remove the internal action that put the intention in suspend
-                    ts.applyClrInt(pi);
-                    C.addIntention(pi); // add it back in I
+    synchronized private void resume(final TransitionSystem ts, final String intentionKey, final boolean abort) {
+        // invoke changes in C latter, so to avoid concurrent changes in C
+        ts.runAtBeginOfNextCycle(new Runnable() {
+            public void run() {
+                Circumstance C = ts.getC();
+                Intention pi = C.getPendingIntentions().remove(intentionKey);
+                if (pi != null) {
+                    pi.setSuspended(false);
+                    try {
+                        if (abort) {
+                            // fail the IA
+                            ts.generateGoalDeletion(pi, null);                
+                        } else {
+                            pi.peek().removeCurrentStep(); // remove the internal action that put the intention in suspend
+                            ts.applyClrInt(pi);
+                            C.addIntention(pi); // add it back in I
+                        }
+                    } catch (JasonException e) {
+                        ts.getLogger().log(Level.SEVERE, "Error resuming intention", e);
+                    }
                 }
-            } catch (JasonException e) {
-                ts.getLogger().log(Level.SEVERE, "Error resuming intention", e);
             }
-            ts.getUserAgArch().getArchInfraTier().wake();
-        }
+        });
+        ts.getUserAgArch().getArchInfraTier().wake();        
     }
 }

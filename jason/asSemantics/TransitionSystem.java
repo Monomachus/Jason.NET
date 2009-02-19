@@ -52,6 +52,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -80,6 +82,8 @@ public class TransitionSystem {
     // object, this is just to make it look more like the SOS
     private TransitionSystem      conf;
 
+    private Queue<Runnable> taskForBeginOfCycle = new ConcurrentLinkedQueue<Runnable>();
+    
     public TransitionSystem(Agent a, Circumstance c, Settings s, AgArch ar) {
         ag     = a;
         C      = c;
@@ -912,6 +916,14 @@ public class TransitionSystem {
                agArch.canSleep();
     }
 
+    /** 
+     * Schedule a task to be executed in the begin of the next reasoning cycle. 
+     * It is used mostly to change the C only by the TS thread (e.g. by .wait)
+     */
+    public void runAtBeginOfNextCycle(Runnable r) {
+        taskForBeginOfCycle.offer(r);
+    }
+    
     /**********************************************************************/
     /* MAIN LOOP */
     /**********************************************************************/
@@ -923,6 +935,13 @@ public class TransitionSystem {
         try {
             C.reset();
 
+            // run tasks allocated to be performed in the begin of the cycle
+            Runnable r = taskForBeginOfCycle.poll();
+            while (r != null) {
+                r.run();
+                r = taskForBeginOfCycle.poll();
+            }
+            
             if (nrcslbr >= setts.nrcbp()) { 
                 nrcslbr = 0;
                 ag.buf(agArch.perceive());

@@ -117,19 +117,17 @@ public class intend extends DefaultInternalAction {
             }
         }
 
-        synchronized (C) { // do not allow other threads (.wait) to change C meanwhile
-            // intention may be suspended in PI! (in the new semantics)
-            if (C.hasPendingIntention()) {
-                for (Intention intention: C.getPendingIntentions().values()) {
-                    if (intention.hasTrigger(g, un))
-                        return true;
-                }
-            }
-    
-            for (Intention i : C.getIntentions()) {
-                if (i.hasTrigger(g, un))
+        // intention may be suspended in PI! (in the new semantics)
+        if (C.hasPendingIntention()) {
+            for (Intention intention: C.getPendingIntentions().values()) {
+                if (intention.hasTrigger(g, un))
                     return true;
             }
+        }
+
+        for (Intention i : C.getIntentions()) {
+            if (i.hasTrigger(g, un))
+                return true;
         }
 
         return false;
