@@ -562,6 +562,10 @@
                                                             }
 
                                 if (F.getFunctor().indexOf(".") >= 0) {
+                                   if (F.hasAnnot())
+                                      {if (true) throw new ParseException(getSourceRef(F)+" Internal actions cannot have annotations.");}
+                                   if (type == Literal.LNeg)
+                                      {if (true) throw new ParseException(getSourceRef(F)+" Internal actions cannot be negated.");}
                                                                    try {
                                                                       {if (true) return new InternalActionLiteral(F, curAg);}
                                    } catch (Exception e) {
@@ -1208,24 +1212,6 @@
     finally { jj_save(0, xla); }
   }
 
-  final private boolean jj_3R_15() {
-    if (jj_3R_17()) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_14() {
-    if (jj_3R_16()) return true;
-    return false;
-  }
-
-  final private boolean jj_3_1() {
-    if (jj_scan_token(27)) return true;
-    if (jj_scan_token(TK_BEGIN)) return true;
-    if (jj_3R_12()) return true;
-    if (jj_scan_token(28)) return true;
-    return false;
-  }
-
   final private boolean jj_3R_17() {
     if (jj_scan_token(42)) return true;
     return false;
@@ -1233,11 +1219,6 @@
 
   final private boolean jj_3R_13() {
     if (jj_scan_token(39)) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_16() {
-    if (jj_scan_token(27)) return true;
     return false;
   }
 
@@ -1259,6 +1240,29 @@
     }
     xsp = jj_scanpos;
     if (jj_3R_15()) jj_scanpos = xsp;
+    return false;
+  }
+
+  final private boolean jj_3_1() {
+    if (jj_scan_token(27)) return true;
+    if (jj_scan_token(TK_BEGIN)) return true;
+    if (jj_3R_12()) return true;
+    if (jj_scan_token(28)) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_15() {
+    if (jj_3R_17()) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_16() {
+    if (jj_scan_token(27)) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_14() {
+    if (jj_3R_16()) return true;
     return false;
   }
 

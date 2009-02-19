@@ -403,7 +403,8 @@ Object body_formula() :
 
 
 /* Literal */
-Literal literal() :           { Pred F; Token k; boolean type = Literal.LPos; }
+Literal literal() :           
+                              { Pred F; Token k; boolean type = Literal.LPos; }
 {
   ( ( [ <TK_NEG>              { type = Literal.LNeg; }
       ]
@@ -417,6 +418,10 @@ Literal literal() :           { Pred F; Token k; boolean type = Literal.LPos; }
 							    }
       
                                 if (F.getFunctor().indexOf(".") >= 0) {
+                                   if (F.hasAnnot())
+                                      throw new ParseException(getSourceRef(F)+" Internal actions cannot have annotations.");
+                                   if (type == Literal.LNeg)
+                                      throw new ParseException(getSourceRef(F)+" Internal actions cannot be negated.");
 								   try {
 								      return new InternalActionLiteral(F, curAg);
                                    } catch (Exception e) {

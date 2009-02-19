@@ -490,27 +490,16 @@ public class TransitionSystem {
 
         // Rule Achieve
         case achieve:
-            if (!body.hasSource()) {
-                // do not add source(self) in case the
-                // programmer set some annotation
-                body.addAnnot(BeliefBase.TSelf);
-            }
-            // free variables in an event cannot conflict with those in the plan
-            body = body.copy();
-            body.makeVarsAnnon(u);
+            body = addSelfSource(body.copy());
+            body.makeVarsAnnon(u); // free variables in an event cannot conflict with those in the plan
             conf.C.addAchvGoal(body, conf.C.SI);
             confP.step = State.StartRC;
             break;
 
         // Rule Achieve as a New Focus (the !! operator)
         case achieveNF:
-            if (!body.hasSource()) {
-                // do not add source(self) in case the
-                // programmer set some annotation
-                body.addAnnot(BeliefBase.TSelf);
-            }
-            body = body.copy();
-            body.makeVarsAnnon(u);
+            body = addSelfSource(body.copy());
+            body.makeVarsAnnon(u); // free variables in an event cannot conflict with those in the plan
             conf.C.addAchvGoal(body, Intention.EmptyInt);
             updateIntention();
             break;

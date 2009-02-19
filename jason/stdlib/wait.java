@@ -167,31 +167,35 @@ public class wait extends DefaultInternalAction {
                 // unregister (for not to receive intentionAdded again)
                 c.removeEventListener(this);
 
-                // add SI again in C.I if it was not removed and this wait was not dropped
-                if (c.getPendingIntentions().remove(sTE) == si && !c.getIntentions().contains(si) && !dropped) {
-                    if (stopByTimeout && te != null && elapsedTimeTerm == null) {
-                        // fail the .wait by timeout
-                        if (si.isSuspended()) { // if the intention was suspended by .suspend
-                            PlanBody body = si.peek().getPlan().getBody();
-                            body.add(1, new PlanBodyImpl(BodyType.internalAction, new InternalActionLiteral(".fail")));
-                            c.getPendingIntentions().put(suspend.SUSPENDED_INT+si.getId(), si);
+                synchronized (c) { // block access to C, so that .drop_desire, for instance, will wait this operation to finish; 
+                                   // otherwise the intention disappears between 'remove from PI' and 'add back to I'   
+                    
+                    // add SI again in C.I if it was not removed and this wait was not dropped
+                    if (c.getPendingIntentions().remove(sTE) == si && !c.getIntentions().contains(si) && !dropped) {
+                        if (stopByTimeout && te != null && elapsedTimeTerm == null) {
+                            // fail the .wait by timeout
+                            if (si.isSuspended()) { // if the intention was suspended by .suspend
+                                PlanBody body = si.peek().getPlan().getBody();
+                                body.add(1, new PlanBodyImpl(BodyType.internalAction, new InternalActionLiteral(".fail")));
+                                c.getPendingIntentions().put(suspend.SUSPENDED_INT+si.getId(), si);
+                            } else {
+                                ts.generateGoalDeletion(si, JasonException.createBasicErrorAnnots("wait_timeout", "timeout in .wait"));
+                            }
                         } else {
-                            ts.generateGoalDeletion(si, JasonException.createBasicErrorAnnots("wait_timeout", "timeout in .wait"));
+                            si.peek().removeCurrentStep();
+                            
+                            if (elapsedTimeTerm != null) {
+                                long elapsedTime = System.currentTimeMillis() - startTime;
+                                un.unifies(elapsedTimeTerm, new NumberTermImpl(elapsedTime));
+                            }
+                            if (si.isSuspended()) { // if the intention was suspended by .suspend
+                                c.getPendingIntentions().put(suspend.SUSPENDED_INT+si.getId(), si);
+                            } else {
+                                c.addIntention(si);
+                            }
                         }
-                    } else {
-                        si.peek().removeCurrentStep();
-                        
-                        if (elapsedTimeTerm != null) {
-                            long elapsedTime = System.currentTimeMillis() - startTime;
-                            un.unifies(elapsedTimeTerm, new NumberTermImpl(elapsedTime));
-                        }
-                        if (si.isSuspended()) { // if the intention was suspended by .suspend
-                            c.getPendingIntentions().put(suspend.SUSPENDED_INT+si.getId(), si);
-                        } else {
-                            c.addIntention(si);
-                        }
+                        ts.getUserAgArch().getArchInfraTier().wake();
                     }
-                    ts.getUserAgArch().getArchInfraTier().wake();
                 }
             } catch (Exception e) {
                 ts.getLogger().log(Level.SEVERE, "Error at .wait thread", e);

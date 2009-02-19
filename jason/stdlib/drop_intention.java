@@ -88,12 +88,6 @@ public class drop_intention extends DefaultInternalAction {
         Unifier bak = un.clone();
         
         Trigger g = new Trigger(TEOperator.add, TEType.achieve, l);
-        for (Intention i: C.getIntentions()) {
-            if (i.hasTrigger(g, un)) {
-                C.removeIntention(i);
-                un = bak.clone();
-            }
-        }
         
         // intention may be suspended in E
         for (Event e: C.getEvents()) {
@@ -112,12 +106,21 @@ public class drop_intention extends DefaultInternalAction {
                 un = bak.clone();
             }
         }
-
-        // intention may be suspended in PI! (in the new semantics)
-        for (Intention i: C.getPendingIntentions().values()) {
-            if (i.hasTrigger(g, un)) {
-                C.dropPendingIntention(i);
-                un = bak.clone();
+    
+        synchronized (C) { // do not allow other threads (.wait) to change the C meanwhile
+            for (Intention i: C.getIntentions()) {
+                if (i.hasTrigger(g, un)) {
+                    C.removeIntention(i);
+                    un = bak.clone();
+                }
+            }
+                
+            // intention may be suspended in PI! (in the new semantics)
+            for (Intention i: C.getPendingIntentions().values()) {
+                if (i.hasTrigger(g, un)) {
+                    C.dropPendingIntention(i);
+                    un = bak.clone();
+                }
             }
         }
     }

@@ -85,12 +85,11 @@ public class drop_desire extends drop_intention {
         while (ie.hasNext()) {
             Event  ei = ie.next();
             Trigger t = ei.getTrigger();
-            if (ei.getIntention() != Intention.EmptyInt) {
+            if (ei.getIntention() != Intention.EmptyInt) { // since the unifier of the intention will not be used, apply it to the event before comparing to the event to be dropped  
                 t = (Trigger) t.clone();
                 t.apply(ei.getIntention().peek().getUnif());
             }
             if (un.clone().unifiesNoUndo(te, t)) {
-                // old implementation: t.setTrigType(Trigger.TEDel); // Just changing "+!g" to "-!g"
                 ie.remove();
             }
         }

@@ -62,7 +62,7 @@ public class InternalActionLiteral extends Structure {
     }
 
     // used by the parser
-    public InternalActionLiteral(Pred p, Agent ag) throws Exception {
+    public InternalActionLiteral(Structure p, Agent ag) throws Exception {
         super(p);
         if (ag != null)
             ia = ag.getIA(getFunctor());

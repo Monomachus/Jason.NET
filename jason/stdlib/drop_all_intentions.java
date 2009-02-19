@@ -74,8 +74,10 @@ public class drop_all_intentions extends DefaultInternalAction {
         checkArguments(args);
         
         Circumstance C = ts.getC();
-        C.clearIntentions();
-        C.clearPendingIntentions();
+        synchronized (C) { // do not allow other threads (.wait) to change C meanwhile
+            C.clearIntentions();
+            C.clearPendingIntentions();
+        }
         C.clearPendingActions();
 
         // drop intentions in E
