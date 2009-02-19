@@ -912,7 +912,9 @@ public class TransitionSystem {
         
     public boolean canSleep() {
         return !conf.C.hasEvent() && !conf.C.hasIntention() && 
-               conf.C.MB.isEmpty() && !conf.C.hasFeedbackAction() && 
+               !conf.C.hasFeedbackAction() &&
+               conf.C.MB.isEmpty() && 
+               taskForBeginOfCycle.isEmpty() &&
                agArch.canSleep();
     }
 
