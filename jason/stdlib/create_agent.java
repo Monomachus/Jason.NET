@@ -89,7 +89,7 @@ public class create_agent extends DefaultInternalAction {
         super.checkArguments(args); // check number of arguments
         if (!args[1].isString())
             throw JasonException.createWrongArgument(this,"second argument must be a string");
-        if (args.length == 3 && !args[2].isString())
+        if (args.length == 3 && !args[2].isList())
             throw JasonException.createWrongArgument(this,"third argument must be a list");  
     }
 
@@ -109,7 +109,6 @@ public class create_agent extends DefaultInternalAction {
         if (!fSource.exists()) {
             throw new JasonException("The source file " + source + " was not found!");
         }
-
         String agClass = null;
         String agArchClass = null;
         ClassParameters bbPars = null;
@@ -129,7 +128,6 @@ public class create_agent extends DefaultInternalAction {
             }
 
         }
-
         RuntimeServicesInfraTier rs = ts.getUserAgArch().getArchInfraTier().getRuntimeServices();
         return rs.createAgent(name, fSource.getAbsolutePath(), agClass, agArchClass, bbPars, ts.getSettings());
     }
