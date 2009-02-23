@@ -1,8 +1,11 @@
 package jason.asSyntax;
 
+import jason.asSemantics.Agent;
 import jason.asSemantics.Unifier;
 
 import java.util.Iterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -22,6 +25,7 @@ import org.w3c.dom.Element;
 public class PlanBodyImpl extends Structure implements PlanBody, Iterable<PlanBody> {
 
     private static final long serialVersionUID = 1L;
+    private static final Logger logger = Logger.getLogger(PlanBodyImpl.class.getName());
 
     public static final String BODY_PLAN_FUNCTOR = ";";
 
@@ -130,7 +134,7 @@ public class PlanBodyImpl extends Structure implements PlanBody, Iterable<PlanBo
     @Override
     public void setTerm(int i, Term t) {
         if (i == 0) term = t;
-        if (i == 1) System.out.println("Should not set next of body literal!");
+        if (i == 1) System.out.println("Should not setTerm(1) of body literal!");
     }
 
     @Override
@@ -145,6 +149,12 @@ public class PlanBodyImpl extends Structure implements PlanBody, Iterable<PlanBo
             return true;
         }
         return false;
+    }
+
+    @Override
+    public Iterator<Unifier> logicalConsequence(Agent ag, Unifier un) {
+        logger.log(Level.WARNING, "PlanBodyImpl cannot be used for logical consequence!", new Exception());
+        return LogExpr.EMPTY_UNIF_LIST.iterator();
     }
     
     @Override

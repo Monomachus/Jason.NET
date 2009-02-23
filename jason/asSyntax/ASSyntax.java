@@ -78,7 +78,7 @@ public class ASSyntax {
     }
 
     /** 
-     * Creates a new structure term, is the functor (a string),
+     * Creates a new structure (compound) term, the first argument is the functor (a string),
      * and the n remainder arguments are terms.
      */
     public static Structure createStructure(String functor, Term... terms) {
@@ -86,7 +86,7 @@ public class ASSyntax {
         return (Structure)new Structure(functor, size).addTerms(terms);
     }
 
-    /** creates a new Atom term */
+    /** creates a new Atom term (an atom is a structure with 0-arity) */
     public static Atom createAtom(String functor) {
         return new Atom(functor);
     }
@@ -104,6 +104,11 @@ public class ASSyntax {
     /** creates a new variable term */
     public static VarTerm createVar(String functor) {
         return new VarTerm(functor);
+    }
+
+    /** creates a new anonymous (or unnamed) variable  */
+    public static VarTerm createVar() {
+        return new UnnamedVar();
     }
 
     /** Creates a new list with n elements, n can be 0 */
@@ -164,7 +169,7 @@ public class ASSyntax {
         return new as2j(new StringReader(sList)).list();
     }
     
-    /** creates a new logical formula  by parsing a string */
+    /** creates a new logical formula by parsing a string */
     public static LogicalFormula parseFormula(String sExpr) throws ParseException {
         return (LogicalFormula)new as2j(new StringReader(sExpr)).log_expr();
     }

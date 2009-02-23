@@ -125,6 +125,7 @@ public class DefaultBeliefBase implements BeliefBase {
             // add only annots
             if (bl.importAnnots(l)) {
                 // check if it needs to be added in the percepts list
+                // (note that l contains only the annots imported)
                 if (l.hasAnnot(TPercept)) {
                     percepts.add(bl);
                 }

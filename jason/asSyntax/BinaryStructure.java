@@ -41,7 +41,8 @@ public abstract class BinaryStructure extends Structure {
     /** Constructor for binary operator */
     public BinaryStructure(Term t1, String id, Term t2) {
         super(id,2);
-        addTerms( t1, t2 );
+        addTerm(t1);
+        addTerm(t2);
         if (t1.getSrcInfo() != null)
             srcInfo = t1.getSrcInfo();
         else

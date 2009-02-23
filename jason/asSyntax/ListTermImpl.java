@@ -23,6 +23,7 @@
 
 package jason.asSyntax;
 
+import jason.asSemantics.Agent;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.parser.as2j;
 
@@ -225,6 +226,12 @@ public class ListTermImpl extends Structure implements ListTerm {
             return rn || rt;
         }
         return false;
+    }
+
+    @Override
+    public Iterator<Unifier> logicalConsequence(Agent ag, Unifier un) {
+        logger.log(Level.WARNING, "ListTermImpl cannot be used for logical consequence!", new Exception());
+        return LogExpr.EMPTY_UNIF_LIST.iterator();
     }
 
     public boolean isTail() {

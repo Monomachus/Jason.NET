@@ -4,6 +4,7 @@ import jason.asSemantics.Agent;
 import jason.asSemantics.ArithFunction;
 import jason.asSemantics.Unifier;
 
+import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -135,6 +136,12 @@ public class ArithFunctionTerm extends Structure implements NumberTerm {
 
     public boolean checkArity(int a) {
         return function != null && function.checkArity(a);
+    }
+    
+    @Override
+    public Iterator<Unifier> logicalConsequence(Agent ag, Unifier un)  {
+        logger.log(Level.WARNING, "Arithmetic term cannot be used for logical consequence!", new Exception());
+        return LogExpr.EMPTY_UNIF_LIST.iterator();
     }
     
     @Override

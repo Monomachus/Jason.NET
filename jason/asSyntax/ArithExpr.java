@@ -124,7 +124,8 @@ public class ArithExpr extends ArithFunctionTerm implements NumberTerm {
 
     public ArithExpr(NumberTerm t1, ArithmeticOp oper, NumberTerm t2) {
         super(oper.toString(),2);
-        addTerms(t1, t2);
+        addTerm(t1);
+        addTerm(t2);
         op = oper;
         if (t1.getSrcInfo() != null)
             srcInfo = t1.getSrcInfo();

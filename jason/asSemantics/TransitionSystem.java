@@ -597,7 +597,7 @@ public class TransitionSystem {
 
             // call BRF
             try {
-                List<Literal>[] result = ag.brf(null,body, conf.C.SI); // the intention is not the new focus
+                List<Literal>[] result = ag.brf(null, body, conf.C.SI); // the intention is not the new focus
                 if (result != null) { // really change something
                     // generate events
                     updateEvents(result,newfocus);
