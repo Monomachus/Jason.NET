@@ -31,6 +31,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.FileWriter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.LogManager;
@@ -199,6 +200,15 @@ public class MASConsoleGUI {
             masConsole.frame.setVisible(false);
         if (out != null)
             out.restoreOriginalOut();
+        try {
+            if (RunCentralisedMAS.getRunner() != null) {
+                FileWriter f = new FileWriter(RunCentralisedMAS.stopMASFileName);
+                f.write(32);
+                f.close();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         masConsole = null;
     }
 

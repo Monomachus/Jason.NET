@@ -620,8 +620,9 @@ public class TransitionSystem {
         if (body instanceof VarTerm) {            
             Term v = ((VarTerm)body).getValue();
             if (v != null && v.isAtom())
-                body = ((Atom)v).forceFullLiteralImpl();
+                body = ((Atom)v);
         }
+        body = body.forceFullLiteralImpl();
         if (!body.hasSource()) {
             // do not add source(self) in case the
             // programmer set the source
