@@ -47,9 +47,6 @@ public interface RuntimeServicesInfraTier {
     /** Returns a set of all agents' name */
     public Set<String> getAgentsNames();
 
-    /** @deprecated use getAgentsNames */
-    public Set<String> getAgentsName();
-
     /** Gets the number of agents in the MAS. */
     public int getAgentsQty();
 

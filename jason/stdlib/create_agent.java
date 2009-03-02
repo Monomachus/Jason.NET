@@ -41,7 +41,7 @@ import java.io.File;
   
   <p>Parameters:<ul>
   
-  <li>+ name (atom): the name for the new agent.<br/>
+  <li>+ name (atom or string): the name for the new agent.<br/>
   
   <li>+ source (string): path to the file where the AgentSpeak code
   for the new agent can be found.<br/>
