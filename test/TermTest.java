@@ -77,6 +77,7 @@ public class TermTest extends TestCase {
         assertEquals(l3, l4);
         
         Term tpos = new Atom("pos");
+        assertFalse(l3.isAtom());
         assertFalse(l3.equals(tpos));
         assertFalse(tpos.equals(l3));
         //System.out.println(new Term("pos")+"="+l3+" --> "+new Term("pos").equals(l3));
@@ -301,6 +302,7 @@ public class TermTest extends TestCase {
         assertFalse(u.unifies(lp, a));
         assertFalse(u.unifies(ln, a));
         assertTrue(u.unifies(a, Literal.parseLiteral("s")));
+        assertTrue(Literal.parseLiteral("s").isAtom());
         assertTrue(Literal.parseLiteral("s").equals(a));
         assertTrue(u.unifies(Literal.parseLiteral("s"), a));
         assertFalse(u.unifies(Literal.parseLiteral("~s"), a));

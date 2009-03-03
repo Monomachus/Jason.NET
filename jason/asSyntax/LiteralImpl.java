@@ -93,8 +93,8 @@ public class LiteralImpl extends Pred implements LogicalFormula {
         if (o instanceof LiteralImpl) {
             final LiteralImpl l = (LiteralImpl) o;
             return type == l.type && hashCode() == l.hashCode() && super.equals(l);
-        } else if (o instanceof Atom) {
-            return !negated() && super.equals(o);
+        } else if (o instanceof Atom && !negated()) {
+            return super.equals(o);
         }
         return false;
     }

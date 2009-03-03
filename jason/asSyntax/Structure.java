@@ -71,7 +71,7 @@ public class Structure extends Atom {
     /** 
      * Create a structure with a defined number of terms.
      * 
-     * It is used by list term and atom to not create the array list for terms. 
+     * It is used by list term, plan body, ... to not create the array list for terms. 
      */
     public Structure(String functor, int termsSize) {
         super(functor);
@@ -126,8 +126,9 @@ public class Structure extends Atom {
 
             return true;
         }
-        if (t instanceof Atom) {
-            return super.equals(t);
+        if (t instanceof Atom && this.isAtom()) {
+            // consider atom equals only when this is an atom
+            return super.equals(t); 
         }
         return false;
     }

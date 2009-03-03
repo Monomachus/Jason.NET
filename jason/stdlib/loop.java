@@ -111,18 +111,20 @@ public class loop extends DefaultInternalAction {
             throw JasonException.createWrongArgumentNb(this);
         }
         
-        LogicalFormula logExpr = (LogicalFormula)args[0]; //.clone();
-        //logExpr.apply(un); // need to apply since the internal action literal for while does not apply
+        LogicalFormula logExpr = (LogicalFormula)args[0]; 
+        // perform one iteration of the loop
         Iterator<Unifier> iu = logExpr.logicalConsequence(ts.getAg(), un); 
         if (iu.hasNext()) { 
-            
             un.compose(iu.next());
             
-            PlanBody whattoadd = (PlanBody)args[1]; //.clone(); 
-            whattoadd.add(new PlanBodyImpl(BodyType.internalAction, whileia.getBodyTerm().clone())); //(PlanBody)whileia.clone()); // add the while after 
+            // add in the current intention:
+            // 1. the body argument and
+            // 2. a copy of the while internal action after the execution of the body
+            //    (to test the loop again)
+            PlanBody whattoadd = (PlanBody)args[1];
+            whattoadd.add(new PlanBodyImpl(BodyType.internalAction, whileia.getBodyTerm().clone()));
             whattoadd.setAsBodyTerm(false);
             whileia.add(1,whattoadd);
-            //System.out.println("new body="+whileia.getBodyNext());
         }
         return true;
     }

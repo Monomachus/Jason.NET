@@ -22,9 +22,9 @@ import jason.asSyntax.Term;
   </ul>
 
   <p>Examples:<ul>
-  <li> <code>.substring(b,"b")</code>: true.
-  <li> <code>.substring(b,X)</code>: unifies X to "b".
-  <li> <code>.substring(X,"b")</code>: unified X to b.
+  <li> <code>.term2string(b,"b")</code>: true.
+  <li> <code>.term2string(b,X)</code>: unifies X with "b".
+  <li> <code>.term2string(X,"b")</code>: unified X with b.
   </ul>
 
   @see jason.stdlib.concat

@@ -425,8 +425,8 @@ public class Pred extends Structure {
         if (o instanceof Pred) {
             final Pred p = (Pred) o;
             return super.equals(o) && this.hasSubsetAnnot(p) && p.hasSubsetAnnot(this);
-        } else if (o instanceof Atom) {
-            return !hasAnnot() && super.equals(o);
+        } else if (o instanceof Atom && !hasAnnot() ) { // if o is some object that extends Atom (e.g. structure), goes to super equals
+            return super.equals(o);                     // consider super equals only when this has no annots
         }
         return false;
     }
