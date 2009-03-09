@@ -85,10 +85,10 @@ public class Message implements Serializable {
         return ilForce.startsWith("ask");
     }
     public boolean isTell() {
-        return ilForce.equals("tell");
+        return ilForce.startsWith("tell");
     }
     public boolean isUnTell() {
-        return ilForce.equals("untell");
+        return ilForce.startsWith("untell");
     }
 
     public boolean isKnownPerformative() {
