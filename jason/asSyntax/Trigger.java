@@ -35,19 +35,21 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /** 
- * Represents an AgentSpeak trigger (like +!g, +p, ...).
- * 
- * It is composed by:
- *    an operator (+ or -);
- *    a type (<empty>, !, or ?);
- *    a literal
- *    
- * @opt attributes    
- * @navassoc - literal   - Literal
- * @navassoc - operator - TEOperator
- * @navassoc - type     - TEType
- */
-public class Trigger implements Cloneable {
+  Represents an AgentSpeak trigger (like +!g, +p, ...).
+  
+  It is composed by:
+     an operator (+ or -);
+     a type (<empty>, !, or ?);
+     a literal
+ 
+  (it extends structure to be used as a term)
+   
+  @opt attributes    
+  @navassoc - literal   - Literal
+  @navassoc - operator - TEOperator
+  @navassoc - type     - TEType
+*/
+public class Trigger extends Structure implements Cloneable {
 
     private static Logger logger = Logger.getLogger(Trigger.class.getName());
       
@@ -62,16 +64,17 @@ public class Trigger implements Cloneable {
         test    { public String toString() { return "?"; } }
     };
     
+    
     private TEOperator operator = TEOperator.add;
     private TEType     type     = TEType.belief;
     private Literal    literal;
 
-    private PredicateIndicator piCache = null;
-    
     public Trigger(TEOperator op, TEType t, Literal l) {
+        super("te", 0);
         literal = l;
         type    = t;
         setTrigOp(op);
+        setSrcInfo(l.getSrcInfo());
     }
 
     /** prefer to use ASSyntax.parseTrigger */
@@ -85,9 +88,45 @@ public class Trigger implements Cloneable {
         }
     }
 
+    // override some structure methods
+    @Override
+    public int getArity() {
+        return 2;
+    }
+    
+    private static final Term ab = new StringTermImpl("+");
+    private static final Term rb = new StringTermImpl("-");
+    private static final Term ag = new StringTermImpl("+!");
+    private static final Term rg = new StringTermImpl("-!");
+    private static final Term at = new StringTermImpl("+?");
+    private static final Term rt = new StringTermImpl("-?");
+
+    @Override
+    public Term getTerm(int i) {
+        switch (1) {
+        case 0: 
+            switch (operator) {
+            case add: 
+                switch (type) {
+                case belief:  return ab;
+                case achieve: return ag;
+                case test:    return at;
+                }
+            case del:
+                switch (type) {
+                case belief:  return rb;
+                case achieve: return rg;
+                case test:    return rt;
+                }
+            }
+        case  1: return literal;
+        default: return null;
+        }
+    }
+    
     public void setTrigOp(TEOperator op) {
         operator = op;
-        piCache  = null;
+        predicateIndicatorCache  = null;
     }
 
     public boolean sameType(Trigger e) {
@@ -103,11 +142,6 @@ public class Trigger implements Cloneable {
         return false;
     }
 
-    @Override
-    public int hashCode() {
-        return getPredicateIndicator().hashCode();
-    }
-
     public boolean isAchvGoal() {
         return type == TEType.achieve;
     }
@@ -121,21 +155,22 @@ public class Trigger implements Cloneable {
     }
 
     public boolean isAddition() {
-        return (operator == TEOperator.add);
+        return operator == TEOperator.add;
     }
 
     public Trigger clone() {
         Trigger c = new Trigger(operator, type, literal.copy());
-        c.piCache = this.piCache;
+        c.predicateIndicatorCache = this.predicateIndicatorCache;
         return c; 
     }   
     
     /** return [+|-][!|?] super.getPredicateIndicator */
+    @Override
     public PredicateIndicator getPredicateIndicator() {
-        if (piCache == null) {
-            piCache = new PredicateIndicator(operator.toString() + type + literal.getFunctor(), literal.getArity());
+        if (predicateIndicatorCache == null) {
+            predicateIndicatorCache = new PredicateIndicator(operator.toString() + type + literal.getFunctor(), literal.getArity());
         }
-        return piCache;
+        return predicateIndicatorCache;
     }
     
     public boolean apply(Unifier u) {
@@ -146,8 +181,9 @@ public class Trigger implements Cloneable {
         return literal;
     }
 
-        public void setLiteral(Literal literal) {
+    public void setLiteral(Literal literal) {
         this.literal = literal;
+        predicateIndicatorCache = null;
     }
     
     public String toString() {

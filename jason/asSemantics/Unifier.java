@@ -76,16 +76,6 @@ public class Unifier implements Cloneable {
         return vl;
     }
 
-    /*
-    public Term get(Term t) {
-        if (t.isVar()) {
-            return function.get( deref((VarTerm) t));
-        } else {
-            return null;
-        }
-    }
-    */
-
     public boolean unifies(Trigger te1, Trigger te2) {
         return te1.sameType(te2) && unifies(te1.getLiteral(), te2.getLiteral());
     }

@@ -23,13 +23,16 @@
 
 package jason.stdlib;
 
+import jason.JasonException;
 import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.ASSyntax;
 import jason.asSyntax.ListTerm;
+import jason.asSyntax.Plan;
 import jason.asSyntax.StringTerm;
 import jason.asSyntax.Term;
+import jason.asSyntax.parser.ParseException;
 import jason.bb.BeliefBase;
 
 
@@ -48,7 +51,7 @@ import jason.bb.BeliefBase;
   <li><i>+ source</i> (atom, optional): the source of the
   plan(s). The default value for the source is <code>self</code>.<br/>
   
-  <li><i>+ position</i> (atom, optional): if value is "before" the plan
+  <li><i>+ position</i> (atom, optional): if the value is "begin" the plan
   will be added in the begin of the plan library. 
   The default value is <code>end</code>.<br/>
 
@@ -91,8 +94,6 @@ public class add_plan extends DefaultInternalAction {
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         checkArguments(args);
 
-        Term plans = ASSyntax.parseTerm(args[0].toString());
-
         Term source = BeliefBase.ASelf;
         if (args.length > 1)
             source = args[1];
@@ -101,13 +102,35 @@ public class add_plan extends DefaultInternalAction {
         if (args.length > 2)
             before = args[2].toString().equals("begin");
 
-        if (plans.isList()) { // arg[0] is a list of strings
-            for (Term t: (ListTerm) plans) {
-                ts.getAg().getPL().add((StringTerm) t, source, before);
+        if (args[0].isList()) { // arg[0] is a list of strings
+            for (Term t: (ListTerm) args[0]) {
+                ts.getAg().getPL().add( transform2plan(t), source, before);
             }
         } else { // args[0] is a plan
-            ts.getAg().getPL().add((StringTerm) plans, source, before);
+            ts.getAg().getPL().add( transform2plan(args[0]), source, before);
         }
         return true;
+    }
+    
+    private Plan transform2plan(Term t) throws ParseException, JasonException {
+        Plan p = null;
+        if (t.isString()) {
+            String sPlan = ((StringTerm)t).getString();
+            // remove quotes \" -> "
+            StringBuilder sTemp = new StringBuilder();
+            for (int c=0; c <sPlan.length(); c++) {
+                if (sPlan.charAt(c) != '\\') {
+                    sTemp.append(sPlan.charAt(c));
+                }
+            }            
+            sPlan  = sTemp.toString();
+            p = ASSyntax.parsePlan(sPlan);
+        } else if (t instanceof Plan) {
+            p = (Plan)t;
+        } else {
+            throw JasonException.createWrongArgument(this, "The term '"+t+"' can not be used as a plan for .add_plan.");
+        }
+        
+        return p;
     }
 }

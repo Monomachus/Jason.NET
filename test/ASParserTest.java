@@ -17,6 +17,8 @@ import jason.asSyntax.NumberTerm;
 import jason.asSyntax.Plan;
 import jason.asSyntax.PlanBody;
 import jason.asSyntax.RelExpr;
+import jason.asSyntax.Structure;
+import jason.asSyntax.Term;
 import jason.asSyntax.parser.ParseException;
 import jason.asSyntax.parser.as2j;
 import jason.infra.centralised.CentralisedAgArch;
@@ -171,7 +173,7 @@ public class ASParserTest extends TestCase {
         
     }
     
-    public void testParsingPlanBody() {
+    public void testParsingPlanBodyTerm1() throws ParseException {
         Literal l = Literal.parseLiteral("p( {a1(f);a2}, a3, {!g}, {?b;.print(oi) }, 10)");
         assertEquals("p({ a1(f); a2 },a3,{ !g },{ ?b; .print(oi) },10)", l.toString());
         assertEquals(5,l.getArity());
@@ -186,6 +188,52 @@ public class ASParserTest extends TestCase {
         assertFalse(l.getTerm(4).isPlanBody());
     }
     
+    public void testParsingPlanBodyTerm2() throws ParseException {
+        Unifier un = new Unifier();
+        Term t = ASSyntax.parseTerm("{ +a(10) }");
+        assertTrue(t.isPlanBody());
+        
+        t = ASSyntax.parseTerm("{ -a; +b }");
+        assertEquals("{ -a; +b }", t.toString());
+        assertTrue(t.isPlanBody());
+        PlanBody pb = (PlanBody)t;
+        assertEquals(2, pb.getPlanSize());
+
+        t = ASSyntax.parseTerm("{ -a : b <- c1; c2 }");
+        assertEquals("-a : b <- c1; c2.", t.toString());
+
+        t = ASSyntax.parseTerm("{ +!a(10) }");
+        assertEquals("+!a(10)", t.toString());
+        assertTrue(t.isStructure());
+        Structure s = (Structure)t;
+        assertEquals(2, s.getArity());
+        assertEquals("te", s.getFunctor());
+        Term te = ASSyntax.parseTerm("{ +!a(X) }");
+        assertTrue(un.unifies(t,te));
+
+        t = ASSyntax.parseTerm("{ !a }");
+        assertTrue(t.isPlanBody());
+        pb = (PlanBody)t;
+        assertEquals(1, pb.getPlanSize());
+        assertEquals("a", pb.getBodyTerm().toString());
+        assertEquals(PlanBody.BodyType.achieve, pb.getBodyType());
+        
+        t = ASSyntax.parseTerm("{ +!a <- +b }");
+        assertEquals("+!a <- +b.", t.toString());
+        assertTrue(t.isStructure());
+        s = (Structure)t;
+        assertEquals(4, s.getArity());
+        assertEquals("plan", s.getFunctor());
+
+        t = ASSyntax.parseTerm("{ +a <- +c }");
+        assertEquals("+a <- +c.", t.toString());
+        assertTrue(t.isStructure());
+        s = (Structure)t;
+        assertEquals(4, s.getArity());
+        assertEquals("plan", s.getFunctor());
+        assertEquals(Literal.LTrue, s.getTerm(2));
+    }    
+
     public void testParsingAllSources() {
         parseDir(new File("./examples"));
         parseDir(new File("./demos"));
@@ -252,4 +300,5 @@ public class ASParserTest extends TestCase {
         ll = ASSyntax.parseList(ll.toString());
         assertEquals("[a,b(5)]", ll.toString());
     }
+    
 }

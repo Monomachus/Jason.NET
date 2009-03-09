@@ -1,6 +1,5 @@
 package test;
 
-import jason.JasonException;
 import jason.RevisionFailedException;
 import jason.architecture.AgArch;
 import jason.asSemantics.Agent;
@@ -141,17 +140,17 @@ public class StdLibTest extends TestCase {
         assertEquals(lt.size(), 2);
     }
 
-    public void testGetRelevantPlansAndAddPlan() throws ParseException, JasonException {
+    public void testGetRelevantPlansAndAddPlan() throws Exception {
         Agent ag = new Agent();
         ag.setLogger(null);
-        StringTerm pt1 = new StringTermImpl("@t1 +a : g(10) <- .print(\"ok 10\").");
-        Plan pa = ag.getPL().add(pt1, null);
+        Plan pa = ASSyntax.parsePlan("@t1 +a : g(10) <- .print(\"ok 10\").");
+        ag.getPL().add(pa, null, false);
         assertTrue(pa != null);
         assertEquals("@t1[source(self)] +a : g(10) <- .print(\"ok 10\").", pa.toASString());
 
-        ag.getPL().add(new StringTermImpl("@t2 +a : g(20) <- .print(\"ok 20\")."), new Structure("nosource"));
+        ag.getPL().add(ASSyntax.parsePlan("@t2 +a : g(20) <- .print(\"ok 20\")."), new Structure("nosource"), false);
         ((Plan) ag.getPL().getPlans().get(1)).getLabel().addSource(new Structure("ag1"));
-        ag.getPL().add(new StringTermImpl("@t3 +b : true <- true."), null);
+        ag.getPL().add(ASSyntax.parsePlan("@t3 +b : true <- true."), null, false);
         //System.out.println(ag.getPL());
         TransitionSystem ts = new TransitionSystem(ag, null, null, null);
 
@@ -159,12 +158,8 @@ public class StdLibTest extends TestCase {
         StringTerm ste = new StringTermImpl("+a");
         VarTerm X = new VarTerm("X");
         //System.out.println(ag.getPL().getAllRelevant(Trigger.parseTrigger(ste.getFunctor()).getPredicateIndicator()));
-        try {
-            new relevant_plans().execute(ts, u, new Term[] { (Term) ste, X });
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        assertTrue(ag.getPL().getPlans().get(0).equals(Plan.parse(pt1.getString())));
+        new relevant_plans().execute(ts, u, new Term[] { ste, X });
+        assertTrue(ag.getPL().getPlans().get(0).equals(pa));
 
         ListTerm plans = (ListTerm) u.get("X");
         //System.out.println("plans="+plans);
@@ -173,33 +168,21 @@ public class StdLibTest extends TestCase {
 
         assertEquals(ag.getPL().getPlans().size(), 3);
         // remove plan t1 from PS
-        try {
-            new remove_plan().execute(ts, new Unifier(), new Term[] { new Pred("t1") });
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        new remove_plan().execute(ts, new Unifier(), new Term[] { new Pred("t1") });
         // ag.getPS().remove(0);
         assertEquals(ag.getPL().getPlans().size(), 2);
 
         // add plans returned from getRelevantPlans
         // using IA addPlan
         Iterator<Term> i = plans.iterator();
-        try {
-            while (i.hasNext()) {
-                StringTerm t = (StringTerm) i.next();
-                new add_plan().execute(ts, new Unifier(), new Term[] { t, new Structure("fromGR") });
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+        while (i.hasNext()) {
+            StringTerm t = (StringTerm) i.next();
+            new add_plan().execute(ts, new Unifier(), new Term[] { t, new Structure("fromGR") });
         }
 
         // add again plans returned from getRelevantPlans
         // using IA addPlan receiving a list of plans
-        try {
-            new add_plan().execute(ts, new Unifier(), new Term[] { (Term) plans, new Structure("fromLT") });
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        new add_plan().execute(ts, new Unifier(), new Term[] { plans, new Structure("fromLT") });
 
         // the plan t2 (first plan now) must have 4 sources
         assertEquals(ag.getPL().get("t2").getLabel().getSources().size(), 4);
@@ -209,20 +192,12 @@ public class StdLibTest extends TestCase {
 
         // remove plan t2,t3 (source = nosource) from PS
         ListTerm llt = ListTermImpl.parseList("[t2,t3]");
-        try {
-            assertTrue((Boolean)new remove_plan().execute(ts, new Unifier(), new Term[] { (Term) llt, new Pred("nosource") }));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        assertTrue((Boolean)new remove_plan().execute(ts, new Unifier(), new Term[] { (Term) llt, new Pred("nosource") }));
         assertEquals(ag.getPL().getPlans().size(), 3);
 
         // remove plan t2,t3 (source = self) from PS
         llt = ListTermImpl.parseList("[t2,t3]");
-        try {
-            assertTrue((Boolean)new remove_plan().execute(ts, new Unifier(), new Term[] { (Term) llt }));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        assertTrue((Boolean)new remove_plan().execute(ts, new Unifier(), new Term[] { (Term) llt }));
         assertEquals(ag.getPL().getPlans().size(), 2);
 
         // the plan t2 (first plan now) must have 3 sources

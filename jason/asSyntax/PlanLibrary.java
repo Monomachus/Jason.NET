@@ -67,12 +67,13 @@ public class PlanLibrary implements Iterable<Plan> {
     /** 
      *  Add a new plan written as a String. The source
      *  normally is "self" or the agent that sent this plan.
-     *  If the already has a plan equals to "stPlan", only a
+     *  If the PL already has a plan equals to "stPlan", only a
      *  new source is added.
      *  
      *  The plan is added in the end of the PlanLibrary.
      *  
      *  @returns the plan just added
+     *  @deprecated parse the plan before (ASSyntax methods) and call add(Plan, ...) methods
      */
     public Plan add(StringTerm stPlan, Term tSource) throws ParseException, JasonException {
        return add(stPlan, tSource, false); 
@@ -81,7 +82,7 @@ public class PlanLibrary implements Iterable<Plan> {
     /** 
      *  Add a new plan written as a String. The source
      *  normally is "self" or the agent that sent this plan.
-     *  If the already has a plan equals to "stPlan", only a
+     *  If the PL already has a plan equals to "stPlan", only a
      *  new source is added.
      *  
      *  If <i>before</i> is true, the plan will be added in the
@@ -89,6 +90,7 @@ public class PlanLibrary implements Iterable<Plan> {
      *  the end.
      *  
      *  @returns the plan just added
+     *  @deprecated parse the plan before (ASSyntax methods) and call add(Plan, ...) methods
      */
     public Plan add(StringTerm stPlan, Term tSource, boolean before) throws ParseException, JasonException {
         String sPlan = stPlan.getString();
@@ -100,22 +102,37 @@ public class PlanLibrary implements Iterable<Plan> {
             }
         }
         sPlan  = sTemp.toString();
-        Plan p = ASSyntax.parsePlan(sPlan); //Plan.parse(sPlan);
+        Plan p = ASSyntax.parsePlan(sPlan);
+        return add(p,tSource,before);
+    }
+
+
+    /** 
+     *  Add a new plan in PL. The source
+     *  normally is "self" or the agent that sent this plan.
+     *  If the PL already has a plan equals to the parameter p, only a
+     *  new source is added.
+     *  
+     *  If <i>before</i> is true, the plan will be added in the
+     *  begin of the PlanLibrary; otherwise, it is added in
+     *  the end.
+     *  
+     *  @returns the plan just added
+     */
+    public Plan add(Plan p, Term source, boolean before) throws JasonException {
         int i = plans.indexOf(p);
         if (i < 0) {
             // add label, if necessary
-            if (p.getLabel() == null) {
+            if (p.getLabel() == null)
                 p.setLabel(getUniqueLabel());
-            }
-            p.getLabel().addSource(tSource);
+            p.getLabel().addSource(source);
             add(p, before);
         } else {
             p = plans.get(i);
-            p.getLabel().addSource(tSource);
+            p.getLabel().addSource(source);
         }
         return p;
     }
-
 
     public void add(Plan p) throws JasonException {
         add(p,false);
@@ -147,7 +164,8 @@ public class PlanLibrary implements Iterable<Plan> {
             p.setLabel(getUniqueLabel());
 
         // add self source
-        if (!p.getLabel().hasSource()) p.getLabel().addAnnot(BeliefBase.TSelf);
+        if (!p.getLabel().hasSource()) 
+            p.getLabel().addAnnot(BeliefBase.TSelf);
 
         planLabels.put(p.getLabel().getFunctor(), p);
 

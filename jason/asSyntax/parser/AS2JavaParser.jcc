@@ -357,14 +357,50 @@ PlanBody plan_body() :     { Object F; PlanBody R = null; }
                            }
 }
 
-PlanBody plan_body_term(): { PlanBody B = null; }
+
+Term plan_term():            { Trigger T = null; Object C = null; PlanBody B = null, B1 = null; Plan P = null; boolean pb = true; Pred L = null; }
+                               // pb = "only plan body"
 {
   "{"
-  B = plan_body()
+  [ [<TK_LABEL_AT> L=pred() { pb = false; } ]
+    T = trigger()           { if (T.getType() != TEType.belief) pb = false; }
+    [ ":" C = log_expr()    { pb = false; } ]
+    [( "<-"                 { pb = false; } 
+     | ";"                  { if (!pb) throw new ParseException(getSourceRef(T)+" Wrong place for ';'"); }
+     )                          
+    ]
+  ] 
+  [ B = plan_body() ]
   "}"
-                           { B.setAsBodyTerm(true); 
-                             return B; 
-                           }
+                         { 
+                             if (T != null) {
+                                // handle the case of "+a1", parsed as TE, need to be changed to plan's body
+                                // handle the case of "+a1; +a2", parsed as "TE; Body"
+                                if (pb) {
+                                  if (T.isAddition())
+                                     B1 = new PlanBodyImpl(BodyType.addBel, T.getLiteral());
+                                  else
+                                     B1 = new PlanBodyImpl(BodyType.delBel, T.getLiteral());
+                                  B1.setAsBodyTerm(true);
+                                  if (B != null) 
+                                     B1.setBodyNext(B); 
+                                  return B1;
+                                }
+                                if (C == null && B == null) {
+                                    // handle the case of a single trigger
+                                	return T;
+                                } else { 
+                                    // handle the case of a entire plan
+                                    Plan p = new Plan(L,T,(LogicalFormula)C, B);
+                                    p.setSrcInfo(T.getSrcInfo());
+                                	return p;
+                                }                                
+                             }
+                             
+                             // the case of a simple plan body term
+                             B.setAsBodyTerm(true); 
+                             return B;
+                         }
 }
 
 
@@ -438,7 +474,7 @@ Literal literal() :
 }
 
 /* Annotated Formulae */
-Pred pred() :         { Token K; Pred p; List l; ListTerm lt; PlanBody b; }
+Pred pred() :         { Token K; Pred p; List l; ListTerm lt; Term b; }
 {
   (
    K=<ATOM>
@@ -454,7 +490,7 @@ Pred pred() :         { Token K; Pred p; List l; ListTerm lt; PlanBody b; }
     "(" l = terms() 
     ")"                { p.setTerms(l); }
   ]
-  ( b=plan_body_term() { p.addTerm(b); }  
+  ( b=plan_term()      { p.addTerm(b); }  
   )*
   [ 
     lt = list()        { p.setAnnots(lt); }
@@ -478,7 +514,7 @@ List terms() :    { ArrayList listTerms = new ArrayList(); Term v; PlanBody o; }
 Term term() :          { Object o; }
 {
   ( o=list()           
-  | o=plan_body_term() 
+  | o=plan_term() 
   | o=log_expr()       // log_expr includes literals/atoms/structures  
   )
                        { return changeToAtom(o); }
@@ -506,7 +542,8 @@ Term term_in_list() :     { Object o; }
 {
   ( o=list()        
   | o=arithm_expr()     
-  | o=string()      
+  | o=string()
+  | o=plan_term()      
   )
                           { return changeToAtom(o); }  
 }
@@ -570,7 +607,7 @@ Object rel_expr() :
        (   op2 = arithm_expr()        
          | op2 = string()               
          | op2 = list()
-         | op2 = plan_body_term()
+         | op2 = plan_term()
        )
 
                                            { if ( ((Term)op1).isInternalAction() && operator != RelationalOp.literalBuilder)

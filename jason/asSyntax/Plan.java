@@ -28,10 +28,6 @@ import jason.asSyntax.parser.as2j;
 
 import java.io.Serializable;
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -39,7 +35,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /** Represents an AgentSpack plan 
-
+    (it extends structure to be used as a term)
+    
  @navassoc - label - Pred
  @navassoc - event - Trigger
  @navassoc - context - LogicalFormula
@@ -47,7 +44,7 @@ import org.w3c.dom.Element;
  @navassoc - source - SourceInfo
 
  */
-public class Plan implements Cloneable, Serializable {
+public class Plan extends Structure implements Cloneable, Serializable {
     
     private static final long serialVersionUID = 1L;
     private static final Term TAtomic         = ASSyntax.createAtom("atomic");
@@ -61,18 +58,18 @@ public class Plan implements Cloneable, Serializable {
     private LogicalFormula    context;
     private PlanBody          body;
     
-    protected SourceInfo      srcInfo = null;
-    
-    private boolean isAtomic = false;
-    private boolean isAllUnifs = false;
+    private boolean isAtomic      = false;
+    private boolean isAllUnifs    = false;
     private boolean hasBreakpoint = false;
     
     // used by clone
     public Plan() {
+        super("plan", 0);
     }
     
     // used by parser
     public Plan(Pred label, Trigger te, LogicalFormula ct, PlanBody bd) {
+        super("plan", 0);
         tevent = te;
         setLabel(label);
         setContext(ct);
@@ -80,6 +77,24 @@ public class Plan implements Cloneable, Serializable {
             body = new PlanBodyImpl();
         else
             body = bd;
+    }
+    
+    @Override
+    public int getArity() {
+        return 4;
+    }
+    
+    private static final Term noLabelAtom = new Atom("nolabel");
+    
+    @Override
+    public Term getTerm(int i) {
+        switch (i) {
+        case 0: return (label == null) ? noLabelAtom : label;
+        case 1: return tevent;
+        case 2: return (context == null) ? Literal.LTrue : context;
+        case 3: return body;
+        default: return null;
+        }
     }
     
     public void setLabel(Pred p) {
@@ -172,32 +187,8 @@ public class Plan implements Cloneable, Serializable {
         }
         return false;
     }
-    
-    public List<VarTerm> getSingletonVars() {
-        Map<VarTerm, Integer> all  = new HashMap<VarTerm, Integer>();
-        tevent.getLiteral().countVars(all);
-        if (context != null) 
-            context.countVars(all);
-        body.countVars(all);
-
-        List<VarTerm> r = new ArrayList<VarTerm>();
-        for (VarTerm k: all.keySet()) {
-            if (all.get(k) == 1 && !k.isUnnamedVar())
-                r.add(k);
-        }
-        return r;
-    }
-    
-    @Override
-    public int hashCode() {
-        int code = 37;
-        if (context != null) code += context.hashCode();
-        if (tevent != null)  code += tevent.hashCode();
-        code += body.hashCode();
-        return code;
-    }
-    
-    public Object clone() {
+        
+    public Term clone() {
         Plan p = new Plan();
         if (label != null) { 
             p.label         = (Pred) label.clone();
@@ -237,15 +228,6 @@ public class Plan implements Cloneable, Serializable {
         return p;
     }
     
-    
-    public SourceInfo getSrcInfo() {
-        return srcInfo;
-    }
-
-    public void setSrcInfo(SourceInfo s) {
-        srcInfo = s;
-    }
-
     public String toString() {
         return toASString();
     }

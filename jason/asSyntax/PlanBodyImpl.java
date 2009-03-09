@@ -45,9 +45,10 @@ public class PlanBodyImpl extends Structure implements PlanBody, Iterable<PlanBo
         formType = t;
         if (b != null) { 
             srcInfo = b.getSrcInfo();
-            if (b.isAtom()) {
-                b = ((Atom)b).forceFullLiteralImpl();
-            }
+            // the atom issue is solved in TS
+            //if (b.isAtom()) {
+            //    b = ((Atom)b).forceFullLiteralImpl();
+            //}
         }
         term = b;
     }

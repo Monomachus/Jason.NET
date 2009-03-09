@@ -764,6 +764,9 @@ public class TermTest extends TestCase {
         p = Plan.parse("+e(x) : a(X) & X > 10 <- .print(W).");
         assertEquals(1, p.getSingletonVars().size());
         
+        p = Plan.parse("+e(x) : a(X, { +!g(W) <- true }) & X > 10 <- .print(W).");
+        assertEquals(0, p.getSingletonVars().size());
+
         p = Plan.parse("+e(x) : a(X) & X > 10 <- .print(_).");
         assertEquals(0, p.getSingletonVars().size());
     }   
