@@ -28,18 +28,19 @@ import jason.asSemantics.InternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.Plan;
-import jason.asSyntax.StringTermImpl;
 import jason.asSyntax.Term;
 
 /**
   <p>Internal action: <b><code>.plan_label(<i>P</i>,<i>L</i>)</code></b>.
   
-  <p>Description: unifies <i>P</i> with a string representing the plan
+  <p>Description: unifies <i>P</i> with a <i>plan term</i> representing the plan
   labeled with the term <i>L</i> within the agent's plan library.
   
   <p>Parameters:<ul>
   
-  <li>- plan (string): the string representing the plan.<br/>
+  <li>- plan (plan term): the term representing the plan, it is
+  a plan enclosed by { and } 
+  (e.g. <code>{+!g : vl(X) <- .print(X)}</code>).<br/>
   
   <li>+ label (structure): the label of that plan.<br/>
   
@@ -47,8 +48,8 @@ import jason.asSyntax.Term;
   
   <p>Example:<ul> 
 
-  <li> <code>.plan_label(P,p1)</code>: unifies P with the string
-  representation of the plan labelled <code>p1</code>.</li>
+  <li> <code>.plan_label(P,p1)</code>: unifies P with the term
+  representation of the plan labeled <code>p1</code>.</li>
 
   </ul>
 
@@ -78,8 +79,9 @@ public class plan_label extends DefaultInternalAction {
         if (p != null) {
         	p = (Plan)p.clone();
             p.getLabel().delSources();
-            String ps = p.toASString().replaceAll("\"", "\\\\\"");
-            return un.unifies(new StringTermImpl(ps), args[0]);
+            //String ps = p.toASString().replaceAll("\"", "\\\\\"");
+            //return un.unifies(new StringTermImpl(ps), args[0]);
+            return un.unifies(p, args[0]);
         } else {
         	return false;
         }

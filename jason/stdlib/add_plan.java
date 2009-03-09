@@ -32,6 +32,7 @@ import jason.asSyntax.ListTerm;
 import jason.asSyntax.Plan;
 import jason.asSyntax.StringTerm;
 import jason.asSyntax.Term;
+import jason.asSyntax.VarTerm;
 import jason.asSyntax.parser.ParseException;
 import jason.bb.BeliefBase;
 
@@ -134,8 +135,10 @@ public class add_plan extends DefaultInternalAction {
             p = ASSyntax.parsePlan(sPlan);
         } else if (t instanceof Plan) {
             p = (Plan)t;
+        } else if (t instanceof VarTerm && ((VarTerm)t).hasValue() && ((VarTerm)t).getValue() instanceof Plan) {
+            p = (Plan)((VarTerm)t).getValue();
         } else {
-            throw JasonException.createWrongArgument(this, "The term '"+t+"' can not be used as a plan for .add_plan.");
+            throw JasonException.createWrongArgument(this, "The term '"+t+"' ("+t.getClass().getSimpleName()+") can not be used as a plan for .add_plan.");
         }
         
         return p;

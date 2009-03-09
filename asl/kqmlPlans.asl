@@ -112,5 +112,11 @@
 // the triggering event
 @kqmlReceivedAskHow
 +!kqml_received(Sender, askHow, Content, MsgId)
-   <- .relevant_plans(Content, ListAsString);
-      .send(Sender, tellHow, ListAsString, MsgId).
+   <- .relevant_plans(Content, ListOfPlans);
+      .send(Sender, tellHow, ListOfPlans, MsgId).
+
+/* general communication error handler */
+
+@kqmlError 
+-!kqml_received(Sender, Per, Content, MsgId)[error(EID), error_msg(EMsg)] 
+   <- .print("Communication error -- ",EID, ": ", EMsg).      
