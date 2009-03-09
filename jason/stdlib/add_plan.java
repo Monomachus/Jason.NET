@@ -43,10 +43,13 @@ import jason.bb.BeliefBase;
   
   <p>Parameters:<ul>
   
-  <li>+ plan(s) (string or list): the string representing the plan to be
-  added. If it is a list, each string in the list will be parsed into an
-  AgentSpeak plan and added to the plan library. The syntax of the code within
-  the string is the same as ordinary AgentSpeak code.<br/>
+  <li>+ plan(s) (plan term, string, or list): the <i>plan term</i> follows the
+  same syntax as AS plans, but are enclosed by { and } 
+  (e.g. <code>{+!g : vl(X) <- .print(X)}</code>). 
+  In case this parameter is a string, the code within the string has to follow the syntax of AS plans
+  (e.g. <code>"+!g : vl(X) <- .print(X)."</code>). 
+  If it is a list, each plan term or string in the list will be parsed into an
+  AgentSpeak plan and added to the plan library.<br/>
   
   <li><i>+ source</i> (atom, optional): the source of the
   plan(s). The default value for the source is <code>self</code>.<br/>
@@ -62,19 +65,23 @@ import jason.bb.BeliefBase;
   
   <p>Examples:<ul> 
 
+  <li> <code>.add_plan({ +b : true &lt;- .print(b) })</code>: adds the plan
+  <code>+b : true &lt;- .print(b).</code> to the agent's plan library
+  with a plan label annotated with <code>source(self)</code>.</li>
+
   <li> <code>.add_plan("+b : true &lt;- .print(b).")</code>: adds the plan
   <code>+b : true &lt;- .print(b).</code> to the agent's plan library
   with a plan label annotated with <code>source(self)</code>.</li>
 
-  <li> <code>.add_plan("+b : true &lt;- .print(b).", rafa)</code>: same as
+  <li> <code>.add_plan({ +b : true &lt;- .print(b) }, rafa)</code>: same as
   the previous example, but the source of the plan is agent
   "rafa".</li>
 
-  <li> <code>.add_plan("+b : true &lt;- .print(b).", rafa, begin)</code>: same as
+  <li> <code>.add_plan({ +b : true &lt;- .print(b) }, rafa, begin)</code>: same as
   the previous example, but the plan is added in the begin of the plan library.</li>
 
-  <li> <code>.add_plan(["+b : true &lt;- .print(b).", "+b : bel &lt;-
-  .print(bel)."], rafa)</code>: adds both plans with "rafa" as their
+  <li> <code>.add_plan([{+b &lt;- .print(b)}, {+b : bel &lt;-
+  .print(bel)}], rafa)</code>: adds both plans with "rafa" as their
   sources.</li>
 
   </ul>
