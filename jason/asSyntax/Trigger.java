@@ -25,6 +25,8 @@
 package jason.asSyntax;
 
 import jason.asSemantics.Unifier;
+import jason.asSyntax.PlanBody.BodyType;
+import jason.asSyntax.parser.ParseException;
 import jason.asSyntax.parser.as2j;
 
 import java.io.StringReader;
@@ -190,6 +192,34 @@ public class Trigger extends Structure implements Cloneable {
         return operator.toString() + type + literal;
     }
     
+    /** try to convert the term t into a trigger, in case t is a trigger term, a string that can be parsed to a trigger, a var with value trigger, .... */
+    public static Trigger tryToGetTrigger(Term t) throws ParseException {
+        if (t instanceof Trigger) {
+            return (Trigger)t;
+        }
+        if (t instanceof VarTerm) {
+            VarTerm v = (VarTerm)t;
+            if (v.hasValue() && v.getValue() instanceof Trigger) {
+                return (Trigger)v.getValue();            
+            }
+            if (v.hasValue() && v.getValue() instanceof Plan) {
+                return ((Plan)v.getValue()).getTrigger();            
+            }
+        }
+        if (t.isString()) {
+            return ASSyntax.parseTrigger(((StringTerm)t).getString());
+        }
+        if (t.isPlanBody()) {
+            PlanBody p = (PlanBody)t;
+            if (p.getPlanSize() == 1) {
+                if (p.getBodyType() == BodyType.addBel)
+                    return new Trigger(TEOperator.add, TEType.belief, (Literal)p.getBodyTerm());
+                if (p.getBodyType() == BodyType.delBel)
+                    return new Trigger(TEOperator.del, TEType.belief, (Literal)p.getBodyTerm());
+            }
+        }
+        return null;
+    }
     
     /** get as XML */
     public Element getAsDOM(Document document) {

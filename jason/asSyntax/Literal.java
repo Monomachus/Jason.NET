@@ -117,8 +117,10 @@ public abstract class Literal extends DefaultTerm implements LogicalFormula {
     public List<Term> getTerms()  { return Structure.emptyTermList;   }
     /** returns all terms of this literal as an array */
     public Term[] getTermsArray() { return getTerms().toArray(Structure.emptyTermArray);  }
+    
+    private static final List<VarTerm> emptyListVar = new ArrayList<VarTerm>();
     /** returns all singleton vars (that appears once) in this literal */
-    public List<VarTerm> getSingletonVars() { return new ArrayList<VarTerm>(); }
+    public List<VarTerm> getSingletonVars() { return emptyListVar; }
 
     /** replaces all terms by unnamed variables (_). */
     public void makeTermsAnnon()  {}

@@ -66,8 +66,9 @@ import jason.bb.BeliefBase;
   by labels <code>l1[source(bob)]</code>, <code>l2[source(bob)]</code>, and
   <code>l3[source(bob)]</code>.</li>
 
+  <li> <code>.relevant_plans({ +!g }, _, L); .remove_plan(LL)</code>: 
+  removes all plans with trigger event <code>+!g</code>.</li>
   </ul>
-
 
   @see jason.stdlib.add_plan
   @see jason.stdlib.plan_label

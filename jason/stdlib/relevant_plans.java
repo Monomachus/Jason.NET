@@ -28,12 +28,9 @@ import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.Option;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
-import jason.asSyntax.ASSyntax;
 import jason.asSyntax.ListTerm;
 import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Plan;
-import jason.asSyntax.StringTerm;
-import jason.asSyntax.StringTermImpl;
 import jason.asSyntax.Term;
 import jason.asSyntax.Trigger;
 import jason.asSyntax.parser.ParseException;
@@ -48,10 +45,10 @@ import java.util.List;
 
   <p>Parameters:<ul>
   
-  <li>+ trigger (string): the string representing the triggering event.</li>
+  <li>+ trigger (trigger): the triggering event, enclosed by { and }.</li>
   
-  <li>- plans (list): the list of strings with the code of the relevant
-  plans.</li>
+  <li>- plans (list of plan terms): the list of plan terms corresponding to 
+  the code of the relevant plans.</li>
   
   <li><i>- labels</i> (list, optional): the list of labels of the plans.</li>
 
@@ -59,11 +56,11 @@ import java.util.List;
   
   <p>Example:<ul> 
 
-  <li> <code>.relevant_plans("+!go(X,Y)",LP)</code>: unifies LP with a list of
+  <li> <code>.relevant_plans({+!go(X,Y)},LP)</code>: unifies LP with a list of
   all plans in the agent's plan library that are relevant for the triggering
   event <code>+!go(X,Y)</code>.</li>
 
-  <li> <code>.relevant_plans("+!go(X,Y)",LP, LL)</code>: same as above but also 
+  <li> <code>.relevant_plans({+!go(X,Y)},LP, LL)</code>: same as above but also 
   unifies LL with a list of labels of plans in LP.</li>
 
   </ul>
@@ -78,24 +75,18 @@ public class relevant_plans extends DefaultInternalAction {
 
     @Override public int getMinArgs() { return 2; }
     @Override public int getMaxArgs() { return 3; }
-
-    @Override
-    protected void checkArguments(Term[] args) throws JasonException {
-        super.checkArguments(args);
-        if (!args[0].isString())
-            throw JasonException.createWrongArgument(this,"first argument must be a string");
-    }
     
     @Override
 	public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         checkArguments(args);
         
-		Trigger te;
+		Trigger te = null;
 		try {
-		    te = ASSyntax.parseTrigger(((StringTerm) args[0]).getString());
-		} catch (ParseException e) {
+		    te = Trigger.tryToGetTrigger(args[0]);
+        } catch (ParseException e) {}
+        if (te == null)
             throw JasonException.createWrongArgument(this,"first argument '"+args[0]+"' must follow the syntax of a trigger.");
-		}
+        
 		ListTerm labels = new ListTermImpl();
 		ListTerm lt = new ListTermImpl();
 		ListTerm last = lt;
@@ -107,9 +98,11 @@ public class relevant_plans extends DefaultInternalAction {
                 if (np.getLabel() != null) {
                     np.getLabel().delSources();
                 }
-                StringTerm stplan = new StringTermImpl(np.toASString().replaceAll("\\\"", "\\\\\""));
-                last = last.append(stplan);
-                if (args.length == 3) labels.add(np.getLabel());
+                //StringTerm stplan = new StringTermImpl(np.toASString().replaceAll("\\\"", "\\\\\""));
+                //last = last.append(stplan);
+                last = last.append(np);
+                if (args.length == 3) 
+                    labels.add(np.getLabel());
             }
 		}
 

@@ -112,7 +112,7 @@
 // the triggering event
 @kqmlReceivedAskHow
 +!kqml_received(Sender, askHow, Content, MsgId)
-   <- .relevant_plans(Content, ListOfPlans);
+   <- .relevant_plans(Content, ListOfPlans); 
       .send(Sender, tellHow, ListOfPlans, MsgId).
 
 /* general communication error handler */
