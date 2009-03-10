@@ -553,11 +553,13 @@
                                 }
                                 if (C == null && B == null) {
                                     // handle the case of a single trigger
+                                    T.setAsTriggerTerm(true);
                                         {if (true) return T;}
                                 } else {
                                     // handle the case of a entire plan
                                     Plan p = new Plan(L,T,(LogicalFormula)C, B);
                                     p.setSrcInfo(T.getSrcInfo());
+                                    p.setAsPlanTerm(true);
                                         {if (true) return p;}
                                 }
                              }
@@ -1317,6 +1319,39 @@
     finally { jj_save(0, xla); }
   }
 
+  final private boolean jj_3R_15() {
+    if (jj_3R_17()) return true;
+    return false;
+  }
+
+  final private boolean jj_3_1() {
+    if (jj_scan_token(27)) return true;
+    if (jj_scan_token(TK_BEGIN)) return true;
+    if (jj_3R_12()) return true;
+    if (jj_scan_token(28)) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_14() {
+    if (jj_3R_16()) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_16() {
+    if (jj_scan_token(27)) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_17() {
+    if (jj_scan_token(42)) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_13() {
+    if (jj_scan_token(39)) return true;
+    return false;
+  }
+
   final private boolean jj_3R_12() {
     Token xsp;
     xsp = jj_scanpos;
@@ -1335,39 +1370,6 @@
     }
     xsp = jj_scanpos;
     if (jj_3R_15()) jj_scanpos = xsp;
-    return false;
-  }
-
-  final private boolean jj_3R_15() {
-    if (jj_3R_17()) return true;
-    return false;
-  }
-
-  final private boolean jj_3_1() {
-    if (jj_scan_token(27)) return true;
-    if (jj_scan_token(TK_BEGIN)) return true;
-    if (jj_3R_12()) return true;
-    if (jj_scan_token(28)) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_16() {
-    if (jj_scan_token(27)) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_14() {
-    if (jj_3R_16()) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_17() {
-    if (jj_scan_token(42)) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_13() {
-    if (jj_scan_token(39)) return true;
     return false;
   }
 

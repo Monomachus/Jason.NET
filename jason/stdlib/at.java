@@ -30,7 +30,6 @@ import jason.asSemantics.Event;
 import jason.asSemantics.Intention;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
-import jason.asSyntax.ASSyntax;
 import jason.asSyntax.StringTerm;
 import jason.asSyntax.Term;
 import jason.asSyntax.Trigger;
@@ -57,14 +56,15 @@ import java.util.concurrent.TimeUnit;
       "d" or "day(s)".
       The default &lt;time_unit> is milliseconds.<br/><br/>
 
-  <li>+ event (string): the event to be created. The string will
-      be parsed as a triggering event (see the <b><i>Jason</i></b> syntax).
+  <li>+ event (trigger term): the event to be created. The event should 
+      follow the Jason Syntax for event and be
+      enclosed by { and }.
       </ul>
   
   <p>Examples:<ul>
-  <li> <code>.at("now +3 minutes", "+!g")</code>: generates the event <code>+!g</code> 3 minutes from now.
-  <li> <code>.at("now +1 m", "+!g")</code>
-  <li> <code>.at("now +2 h", "+!g")</code>
+  <li> <code>.at("now +3 minutes", {+!g})</code>: generates the event <code>+!g</code> 3 minutes from now.
+  <li> <code>.at("now +1 m", {+!g})</code>
+  <li> <code>.at("now +2 h", {+!g})</code>
   </ul>
 
   @see jason.stdlib.wait
@@ -83,7 +83,6 @@ public class at extends DefaultInternalAction {
         
         StringTerm time   = (StringTerm)args[0];
         String     stime  = time.getString();
-        StringTerm sevent = (StringTerm)args[1];
 
         // parse time
         long deadline = -1;
@@ -123,8 +122,8 @@ public class at extends DefaultInternalAction {
             throw new JasonException("The time parameter ('"+time+"') of the internal action 'at' did not parse correctly!");               
         }
         
-        Trigger te = ASSyntax.parseTrigger(sevent.getString());
-
+        Trigger te = Trigger.tryToGetTrigger(args[1]);
+        
         ts.getAg().getScheduler().schedule(new CheckDeadline(te, ts), deadline, TimeUnit.MILLISECONDS);
         return true;
     }

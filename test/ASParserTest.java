@@ -192,6 +192,7 @@ public class ASParserTest extends TestCase {
         Unifier un = new Unifier();
         Term t = ASSyntax.parseTerm("{ +a(10) }");
         assertTrue(t.isPlanBody());
+        assertEquals("{ +a(10) }", t.toString());
         
         t = ASSyntax.parseTerm("{ -a; +b }");
         assertEquals("{ -a; +b }", t.toString());
@@ -200,10 +201,10 @@ public class ASParserTest extends TestCase {
         assertEquals(2, pb.getPlanSize());
 
         t = ASSyntax.parseTerm("{ -a : b <- c1; c2 }");
-        assertEquals("-a : b <- c1; c2.", t.toString());
+        assertEquals("{ -a : b <- c1; c2 }", t.toString());
 
         t = ASSyntax.parseTerm("{ +!a(10) }");
-        assertEquals("+!a(10)", t.toString());
+        assertEquals("{ +!a(10) }", t.toString());
         assertTrue(t.isStructure());
         Structure s = (Structure)t;
         assertEquals(2, s.getArity());
@@ -219,14 +220,14 @@ public class ASParserTest extends TestCase {
         assertEquals(PlanBody.BodyType.achieve, pb.getBodyType());
         
         t = ASSyntax.parseTerm("{ +!a <- +b }");
-        assertEquals("+!a <- +b.", t.toString());
+        assertEquals("{ +!a <- +b }", t.toString());
         assertTrue(t.isStructure());
         s = (Structure)t;
         assertEquals(4, s.getArity());
         assertEquals("plan", s.getFunctor());
 
         t = ASSyntax.parseTerm("{ +a <- +c }");
-        assertEquals("+a <- +c.", t.toString());
+        assertEquals("{ +a <- +c }", t.toString());
         assertTrue(t.isStructure());
         s = (Structure)t;
         assertEquals(4, s.getArity());

@@ -98,6 +98,7 @@ public class relevant_plans extends DefaultInternalAction {
                 if (np.getLabel() != null) {
                     np.getLabel().delSources();
                 }
+                np.setAsPlanTerm(true);
                 //StringTerm stplan = new StringTermImpl(np.toASString().replaceAll("\\\"", "\\\\\""));
                 //last = last.append(stplan);
                 last = last.append(np);

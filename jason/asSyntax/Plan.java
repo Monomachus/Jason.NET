@@ -62,6 +62,8 @@ public class Plan extends Structure implements Cloneable, Serializable {
     private boolean isAllUnifs    = false;
     private boolean hasBreakpoint = false;
     
+    private boolean     isTerm = false; // it is true when the plan body is used as a term instead of an element of a plan
+
     // used by clone
     public Plan() {
         super("plan", 0);
@@ -71,12 +73,15 @@ public class Plan extends Structure implements Cloneable, Serializable {
     public Plan(Pred label, Trigger te, LogicalFormula ct, PlanBody bd) {
         super("plan", 0);
         tevent = te;
+        tevent.setAsTriggerTerm(false);
         setLabel(label);
         setContext(ct);
-        if (bd == null)
+        if (bd == null) {
             body = new PlanBodyImpl();
-        else
+        } else {
             body = bd;
+            body.setAsBodyTerm(false);
+        }
     }
     
     @Override
@@ -122,6 +127,10 @@ public class Plan extends Structure implements Cloneable, Serializable {
             context = null;
     }
     
+    public void setAsPlanTerm(boolean b) {
+        isTerm = b;
+    }
+
     /** prefer using ASSyntax.parsePlan */
     public static Plan parse(String sPlan) {
         as2j parser = new as2j(new StringReader(sPlan));
@@ -205,6 +214,8 @@ public class Plan extends Structure implements Cloneable, Serializable {
         p.body = (PlanBody)body.clone();
         
         p.setSrcInfo(srcInfo);
+        
+        p.isTerm = isTerm;
 
         return p;
     }
@@ -224,6 +235,7 @@ public class Plan extends Structure implements Cloneable, Serializable {
         p.body    = body.clonePB();
         
         p.setSrcInfo(srcInfo);
+        p.isTerm = isTerm;
 
         return p;
     }
@@ -234,10 +246,18 @@ public class Plan extends Structure implements Cloneable, Serializable {
     
     /** returns this plan in a string complaint with AS syntax */
     public String toASString() {
-        return ((label == null) ? "" : "@" + label + " ") + 
+        String b, e;
+        if (isTerm) {
+            b = "{ "; 
+            e = " }";
+        } else {
+            b = ""; 
+            e = ".";
+        }
+        return b+((label == null) ? "" : "@" + label + " ") + 
                tevent + ((context == null) ? "" : " : " + context) +
                (body.isEmptyBody() ? "" : " <- " + body) +
-               ".";
+               e;
     }
     
     /** get as XML */

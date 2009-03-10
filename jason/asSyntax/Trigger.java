@@ -71,6 +71,8 @@ public class Trigger extends Structure implements Cloneable {
     private TEType     type     = TEType.belief;
     private Literal    literal;
 
+    private boolean     isTerm = false; // it is true when the plan body is used as a term instead of an element of a plan
+
     public Trigger(TEOperator op, TEType t, Literal l) {
         super("te", 0);
         literal = l;
@@ -163,6 +165,7 @@ public class Trigger extends Structure implements Cloneable {
     public Trigger clone() {
         Trigger c = new Trigger(operator, type, literal.copy());
         c.predicateIndicatorCache = this.predicateIndicatorCache;
+        c.isTerm = isTerm;
         return c; 
     }   
     
@@ -187,9 +190,21 @@ public class Trigger extends Structure implements Cloneable {
         this.literal = literal;
         predicateIndicatorCache = null;
     }
+
+    public void setAsTriggerTerm(boolean b) {
+        isTerm = b;
+    }
     
     public String toString() {
-        return operator.toString() + type + literal;
+        String b, e;
+        if (isTerm) {
+            b = "{ "; 
+            e = " }";
+        } else {
+            b = ""; 
+            e = "";
+        }
+        return b + operator+ type + literal + e;
     }
     
     /** try to convert the term t into a trigger, in case t is a trigger term, a string that can be parsed to a trigger, a var with value trigger, .... */

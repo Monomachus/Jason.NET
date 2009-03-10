@@ -176,7 +176,7 @@ public class StdLibTest extends TestCase {
         // using IA addPlan
         Iterator<Term> i = plans.iterator();
         while (i.hasNext()) {
-            StringTerm t = (StringTerm) i.next();
+            Term t = i.next();
             new add_plan().execute(ts, new Unifier(), new Term[] { t, new Structure("fromGR") });
         }
 

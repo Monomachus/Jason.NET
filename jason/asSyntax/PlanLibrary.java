@@ -167,6 +167,8 @@ public class PlanLibrary implements Iterable<Plan> {
         if (!p.getLabel().hasSource()) 
             p.getLabel().addAnnot(BeliefBase.TSelf);
 
+        p.setAsPlanTerm(false); // it is not a term anymore
+
         planLabels.put(p.getLabel().getFunctor(), p);
 
         Trigger pte = p.getTrigger();

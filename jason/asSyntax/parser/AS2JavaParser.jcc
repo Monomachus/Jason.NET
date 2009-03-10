@@ -388,11 +388,13 @@ Term plan_term():            { Trigger T = null; Object C = null; PlanBody B = n
                                 }
                                 if (C == null && B == null) {
                                     // handle the case of a single trigger
+                                    T.setAsTriggerTerm(true);
                                 	return T;
                                 } else { 
                                     // handle the case of a entire plan
                                     Plan p = new Plan(L,T,(LogicalFormula)C, B);
                                     p.setSrcInfo(T.getSrcInfo());
+                                    p.setAsPlanTerm(true);
                                 	return p;
                                 }                                
                              }
