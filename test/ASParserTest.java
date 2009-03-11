@@ -174,19 +174,27 @@ public class ASParserTest extends TestCase {
     }
     
     public void testParsingPlanBodyTerm1() throws ParseException {
-        Literal l = Literal.parseLiteral("p( {a1(f);a2}, a3, {!g}, {?b;.print(oi) }, 10)");
-        assertEquals("p({ a1(f); a2 },a3,{ !g },{ ?b; .print(oi) },10)", l.toString());
+        Literal l = ASSyntax.parseLiteral("p( {a1({f}); a2}, a3, {!g}, {?b;.print(oi) }, 10)");
+        assertEquals("p({ a1({ f }); a2 },a3,{ !g },{ ?b; .print(oi) },10)", l.toString());
         assertEquals(5,l.getArity());
         assertTrue(l.getTerm(0) instanceof PlanBody);
         assertTrue(l.getTerm(0).isPlanBody());
         PlanBody pb = (PlanBody)l.getTerm(0);
         assertTrue(pb.isBodyTerm());
+        Structure t0 = (Structure)pb.getBodyTerm();
+        assertTrue(t0.getTerm(0).isPlanBody());
+        pb = pb.getBodyNext();
+        assertEquals("{ a2 }", pb.toString());
 
         assertFalse(l.getTerm(1).isPlanBody());
         assertTrue(l.getTerm(2).isPlanBody());
         assertTrue(l.getTerm(3).isPlanBody());
         assertFalse(l.getTerm(4).isPlanBody());
+        
+        pb = (PlanBody)ASSyntax.parseTerm("{ }");
+        assertEquals(0, pb.getPlanSize());
     }
+    
     
     public void testParsingPlanBodyTerm2() throws ParseException {
         Unifier un = new Unifier();
@@ -199,7 +207,7 @@ public class ASParserTest extends TestCase {
         assertTrue(t.isPlanBody());
         PlanBody pb = (PlanBody)t;
         assertEquals(2, pb.getPlanSize());
-
+        
         t = ASSyntax.parseTerm("{ -a : b <- c1; c2 }");
         assertEquals("{ -a : b <- c1; c2 }", t.toString());
 

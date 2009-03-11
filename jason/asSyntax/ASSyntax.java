@@ -173,9 +173,4 @@ public class ASSyntax {
     public static LogicalFormula parseFormula(String sExpr) throws ParseException {
         return (LogicalFormula)new as2j(new StringReader(sExpr)).log_expr();
     }
-
-    /** creates a new plan's body */
-    public static PlanBody parsePlanBody(String sExpr) throws ParseException {
-        return (PlanBody)new as2j(new StringReader(sExpr)).plan_body();
-    }
 }

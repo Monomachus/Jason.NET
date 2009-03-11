@@ -102,6 +102,16 @@ public class Plan extends Structure implements Cloneable, Serializable {
         }
     }
     
+    @Override
+    public boolean apply(Unifier u) {
+        boolean r = false;
+        // if I am a term, the body also is (for apply)
+        if (isTerm) body.setAsBodyTerm(true);
+        r = super.apply(u);
+        if (isTerm) body.setAsBodyTerm(false);
+        return r;
+    }
+    
     public void setLabel(Pred p) {
         label = p;
         if (p != null && p.hasAnnot()) {

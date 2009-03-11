@@ -361,7 +361,7 @@ PlanBody plan_body() :     { Object F; PlanBody R = null; }
 Term plan_term():            { Trigger T = null; Object C = null; PlanBody B = null, B1 = null; Plan P = null; boolean pb = true; Pred L = null; }
                                // pb = "only plan body"
 {
-  "{"
+  "{" 
   [ [<TK_LABEL_AT> L=pred() { pb = false; } ]
     T = trigger()           { if (T.getType() != TEType.belief) pb = false; }
     [ ":" C = log_expr()    { pb = false; } ]
@@ -400,7 +400,10 @@ Term plan_term():            { Trigger T = null; Object C = null; PlanBody B = n
                              }
                              
                              // the case of a simple plan body term
+                             if (B == null) 
+                             	B = new PlanBodyImpl();
                              B.setAsBodyTerm(true); 
+                             
                              return B;
                          }
 }

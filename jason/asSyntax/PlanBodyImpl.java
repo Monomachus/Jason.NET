@@ -46,9 +46,8 @@ public class PlanBodyImpl extends Structure implements PlanBody, Iterable<PlanBo
         if (b != null) { 
             srcInfo = b.getSrcInfo();
             // the atom issue is solved in TS
-            //if (b.isAtom()) {
+            //if (b.isAtom())
             //    b = ((Atom)b).forceFullLiteralImpl();
-            //}
         }
         term = b;
     }
@@ -82,8 +81,16 @@ public class PlanBodyImpl extends Structure implements PlanBody, Iterable<PlanBo
     public boolean isBodyTerm() {
         return isTerm;
     }
+    
+    @Override
+    public boolean isAtom() {
+        return false;
+    }
+    
     public void setAsBodyTerm(boolean b) {
         isTerm = b;
+        if (getBodyNext() != null)
+            getBodyNext().setAsBodyTerm(b);
     }
     
     @Override
@@ -143,18 +150,31 @@ public class PlanBodyImpl extends Structure implements PlanBody, Iterable<PlanBo
         // do not apply in next! (except in case this is a term)
         boolean ok = false;
         
+        if (next != null && isTerm) {
+            //next.setAsBodyTerm(true); // to force apply in next
+            ok = next.apply(u);
+            //next.setAsBodyTerm(false);
+        }
+        
         if (term != null && term.apply(u)) {
             if (term.isPlanBody()) { // we cannot have "inner" body literals
+                PlanBody baknext = next;
                 formType = ((PlanBody)term).getBodyType();
+                next     = ((PlanBody)term).getBodyNext();
                 term     = ((PlanBody)term).getBodyTerm();
+                if (baknext != null) {
+                    //baknext.setAsBodyTerm(true); // to force apply in next
+                    baknext.apply(u);
+                    //baknext.setAsBodyTerm(false);
+                    getLastBody().add(baknext);
+                }
             }
             ok = true;
         }
-        if (next != null && isTerm && next.apply(u))
-            ok = true;
-        
+
         if (ok)
             resetHashCodeCache();
+
         return ok;
     }
 
@@ -268,18 +288,22 @@ public class PlanBodyImpl extends Structure implements PlanBody, Iterable<PlanBo
         if (term == null) {
             return "";
         } else {
-            String b, e;
-            if (isTerm) {
-                b = "{ "; 
-                e = " }";
-            } else {
-                b = ""; 
-                e = "";
+            StringBuilder out = new StringBuilder();
+            if (isTerm)
+                out.append("{ ");
+            PlanBody pb = this;
+            while (pb != null) {
+                if (pb.getBodyTerm() != null) {
+                    out.append(pb.getBodyType());
+                    out.append(pb.getBodyTerm());
+                }
+                pb = pb.getBodyNext();
+                if (pb != null)
+                    out.append("; ");
             }
-            if (next == null)
-                return b+formType.toString() + term+e;
-            else
-                return b+formType.toString() + term + "; " + next+e;
+            if (isTerm) 
+                out.append(" }"); 
+            return out.toString();
         }
     }
 

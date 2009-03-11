@@ -8,6 +8,7 @@ import jason.asSyntax.Plan;
 import jason.asSyntax.PlanBody;
 import jason.asSyntax.PlanBodyImpl;
 import jason.asSyntax.PlanLibrary;
+import jason.asSyntax.Term;
 import jason.asSyntax.VarTerm;
 import jason.asSyntax.PlanBody.BodyType;
 import jason.asSyntax.parser.ParseException;
@@ -110,6 +111,28 @@ public class PlanTest extends TestCase {
         assertEquals("a1", u.get("A1").toString());
         assertEquals("a2", u.get("A2").toString());
         assertEquals(".print(a); !g1", u.get("A3").toString());  
+    }
+    
+    public void testPlanTermWithVarBody() throws ParseException {
+        Term pt = ASSyntax.parseTerm("{ +!g : c <- B }");
+        assertEquals("{ +!g : c <- B }", pt.toString());
+        assertTrue(pt instanceof Plan);
+        
+        Unifier u = new Unifier();
+        u.unifies(new VarTerm("B"), ASSyntax.parseTerm("{ .print(a); .print(b); .print(c) }"));
+        pt.apply(u);
+        assertEquals("{ +!g : c <- .print(a); .print(b); .print(c) }", pt.toString());
+        
+        
+        pt = ASSyntax.parseTerm("{ +!g : c <- B; a1; B }");
+        pt.apply(u);
+        assertEquals("{ +!g : c <- .print(a); .print(b); .print(c); a1; .print(a); .print(b); .print(c) }", pt.toString());
+        
+        pt = ASSyntax.parseTerm("{ +!g : c <- .print(0); B; B; .print(d); C }");
+        u.unifies(new VarTerm("C"), ASSyntax.parseTerm("{ a1 }"));
+        pt.apply(u);
+        assertEquals(9, ((Plan)pt).getBody().getPlanSize());
+        assertEquals("{ +!g : c <- .print(0); .print(a); .print(b); .print(c); .print(a); .print(b); .print(c); .print(d); a1 }", pt.toString());
     }
     
 }

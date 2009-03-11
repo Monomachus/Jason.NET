@@ -565,7 +565,10 @@
                              }
 
                              // the case of a simple plan body term
+                             if (B == null)
+                                B = new PlanBodyImpl();
                              B.setAsBodyTerm(true);
+
                              {if (true) return B;}
     throw new Error("Missing return statement in function");
   }
@@ -1319,8 +1322,13 @@
     finally { jj_save(0, xla); }
   }
 
-  final private boolean jj_3R_15() {
-    if (jj_3R_17()) return true;
+  final private boolean jj_3R_14() {
+    if (jj_3R_16()) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_17() {
+    if (jj_scan_token(42)) return true;
     return false;
   }
 
@@ -1332,23 +1340,13 @@
     return false;
   }
 
-  final private boolean jj_3R_14() {
-    if (jj_3R_16()) return true;
+  final private boolean jj_3R_13() {
+    if (jj_scan_token(39)) return true;
     return false;
   }
 
   final private boolean jj_3R_16() {
     if (jj_scan_token(27)) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_17() {
-    if (jj_scan_token(42)) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_13() {
-    if (jj_scan_token(39)) return true;
     return false;
   }
 
@@ -1370,6 +1368,11 @@
     }
     xsp = jj_scanpos;
     if (jj_3R_15()) jj_scanpos = xsp;
+    return false;
+  }
+
+  final private boolean jj_3R_15() {
+    if (jj_3R_17()) return true;
     return false;
   }
 
