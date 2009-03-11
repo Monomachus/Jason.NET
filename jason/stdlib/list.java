@@ -33,7 +33,6 @@ import jason.asSyntax.Term;
   @see jason.stdlib.ground
 
 */
-
 public class list extends DefaultInternalAction {
     
     private static InternalAction singleton = null;

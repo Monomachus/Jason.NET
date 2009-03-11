@@ -140,16 +140,22 @@ public class PlanBodyImpl extends Structure implements PlanBody, Iterable<PlanBo
 
     @Override
     public boolean apply(Unifier u) {
-        // do not apply in next!
-        resetHashCodeCache();
+        // do not apply in next! (except in case this is a term)
+        boolean ok = false;
+        
         if (term != null && term.apply(u)) {
             if (term.isPlanBody()) { // we cannot have "inner" body literals
                 formType = ((PlanBody)term).getBodyType();
                 term     = ((PlanBody)term).getBodyTerm();
             }
-            return true;
+            ok = true;
         }
-        return false;
+        if (next != null && isTerm && next.apply(u))
+            ok = true;
+        
+        if (ok)
+            resetHashCodeCache();
+        return ok;
     }
 
     @Override

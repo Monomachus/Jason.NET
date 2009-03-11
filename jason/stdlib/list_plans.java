@@ -7,7 +7,21 @@ import jason.asSyntax.Plan;
 import jason.asSyntax.Term;
 import jason.asSyntax.Trigger;
 
-/** list all plans in PL */
+/**
+<p>Internal action: <b><code>.list_plans</code></b>.
+
+<p>Description: prints out the plans in the plan library. 
+
+<p>Parameter:<ul>
+<li>+ trigger (trigger term, [optional]): list only plan that unifies this parameter as trigger event.<br/>
+</ul>
+
+<p>Examples:<ul>
+<li> <code>.list_plans</code>
+<li> <code>.list_plans({ +g(_) })</code>
+</ul>
+
+*/
 public class list_plans extends DefaultInternalAction {
 
     @Override public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {

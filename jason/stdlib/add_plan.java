@@ -140,7 +140,6 @@ public class add_plan extends DefaultInternalAction {
         } else {
             throw JasonException.createWrongArgument(this, "The term '"+t+"' ("+t.getClass().getSimpleName()+") can not be used as a plan for .add_plan.");
         }
-        
         return p;
     }
 }

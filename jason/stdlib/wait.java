@@ -31,13 +31,11 @@ import jason.asSemantics.Event;
 import jason.asSemantics.Intention;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
-import jason.asSyntax.ASSyntax;
 import jason.asSyntax.InternalActionLiteral;
 import jason.asSyntax.NumberTerm;
 import jason.asSyntax.NumberTermImpl;
 import jason.asSyntax.PlanBody;
 import jason.asSyntax.PlanBodyImpl;
-import jason.asSyntax.StringTerm;
 import jason.asSyntax.Term;
 import jason.asSyntax.Trigger;
 import jason.asSyntax.PlanBody.BodyType;
@@ -49,16 +47,12 @@ import java.util.logging.Level;
   <p>Internal action: <b><code>.wait(<i>E</i>,<i>T</i>)</code></b>.
   
   <p>Description: suspend the intention for the time specified by <i>T</i> (in
-  milliseconds) or until some event <i>E</i> happens. The events are
-  strings in AgentSpeak syntax, e.g. <code>"+bel(33)"</code>,
-  <code>"+!go(X,Y)"</code>. 
+  milliseconds) or until some event <i>E</i> happens. The events follow the 
+  AgentSpeak syntax but are enclosed by { and }, e.g. <code>{+bel(33)}</code>,
+  <code>{+!go(X,Y)}</code>. 
   
-  Although the argument is a string, the variables
-  in the string will be unified with the event, i.e., the unifier might have
-  values for X and Y after the execution of <code>.wait("+!go(X,Y)")</code>.
-
   <p>Parameters:<ul>
-  <li><i>+ event</i> (string): the event to wait for.<br/>
+  <li><i>+ event</i> (trigger term): the event to wait for.<br/>
   <li>+ timeout (number).<br/>
   </ul>
   
@@ -66,18 +60,18 @@ import java.util.logging.Level;
   <p>Examples:<ul>
   <li> <code>.wait(1000)</code>: suspend the intention for 1 second.
 
-  <li> <code>.wait("+b(1)")</code>: suspend the intention until the belief
+  <li> <code>.wait({+b(1)})</code>: suspend the intention until the belief
   <code>b(1)</code> is added in the belief base.
 
-  <li> <code>.wait("+!g", 2000)</code>: suspend the intention until the goal
+  <li> <code>.wait({+!g}, 2000)</code>: suspend the intention until the goal
   <code>g</code> is triggered or 2 seconds have passed, whatever happens
   first. In case the event does not happens in two seconds, the internal action
   fails. 
 
-  <li> <code>.wait("+!g", 2000, EventTime)</code>: suspend the intention until the goal
+  <li> <code>.wait({+!g}, 2000, EventTime)</code>: suspend the intention until the goal
   <code>g</code> is triggered or 2 seconds have passed, whatever happens
   first. 
-  Hence this use of .wait has three arguments, in case the event does not happen in 
+  As this use of .wait has three arguments, in case the event does not happen in 
   two seconds, the internal action does not fail (as in the previous example).
   The third argument will be unified to the 
   elapsed time (in miliseconds) from the start of .wait until the event or timeout. </ul>
@@ -107,10 +101,10 @@ public class wait extends DefaultInternalAction {
             // time in milliseconds
             NumberTerm time = (NumberTerm)args[0];
             timeout = (long) time.solve();
-        } else if (args[0].isString()) {
+        } else { // if (args[0].isString()) 
             // wait for event
-            te = ASSyntax.parseTrigger( ((StringTerm) args[0]).getString());
-            te.getLiteral().apply(un);
+            te = Trigger.tryToGetTrigger(args[0]); //ASSyntax.parseTrigger( ((StringTerm) args[0]).getString());
+                                                   //te.getLiteral().apply(un);
             
             if (args.length >= 2)
                 timeout = (long) ((NumberTerm) args[1]).solve();
