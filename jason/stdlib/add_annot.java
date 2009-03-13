@@ -64,6 +64,12 @@ import jason.asSyntax.Term;
   unifies with <code>[a1[source(jomi)], a2[source(jomi)]]</code>.</li>
 
   </ul>
+
+  <p><b>Note</b>: instead of using this internal action, you can use
+  direct unification. <br> <code>.add_annot(a,source(jomi),B)</code> can
+  be replaced by <code>B = a[source(jomi)]</code>; <br>
+  <code>.add_annot(X,source(jomi),B)</code> can be replaced by <code>B =
+  X[source(jomi)]</code>.
   
   @see jason.stdlib.add_nested_source
 

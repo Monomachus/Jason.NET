@@ -59,15 +59,16 @@ import jason.asSyntax.Term;
   <li> <code>.add_nested_source(a,jomi,B)</code>: <code>B</code>
   unifies with <code>a[source(jomi)]</code>.</li>
 
-  <li> <code>.add_nested_source(a[source(bob)],jomi,B)</code>: <code>B</code>
-  unifies with <code>a[source(jomi)[source(bob)]]</code>.</li>
-
   <li> <code>.add_nested_source([a1,a2], jomi, B)</code>: <code>B</code>
   unifies with <code>[a1[source(jomi)], a2[source(jomi)]]</code>.</li>
 
-  </ul>
+  <li> <code>.add_nested_source(a[source(bob)],jomi,B)</code>:
+  <code>B</code> unifies with <code>a[source(jomi)[source(bob)]]</code>,
+  which means `I believe in <code>a</code> and the source for that is
+  agent jomi, the source for jomi was bob'; bob sent a tell to jomi that
+  sent a tell to me.</li>
 
-  @see jason.stdlib.add_annot
+  </ul>
 
  */
 public class add_nested_source extends DefaultInternalAction {

@@ -42,7 +42,7 @@ import jason.asSyntax.Term;
   
   <p>Parameters:<ul>
   
-  <li>+ name (atom): the name of the agent to be killed.<br/>
+  <li>+ name (atom or string): the name of the agent to be killed.<br/>
 
   </ul>
   
@@ -65,6 +65,11 @@ public class kill_agent extends DefaultInternalAction {
     @Override
 	public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         checkArguments(args);
-        return ts.getUserAgArch().getArchInfraTier().getRuntimeServices().killAgent(args[0].toString());
+        String name;
+        if (args[0].isString()) 
+            name = ((StringTerm)args[0]).getString();
+        else
+            name = args[0].toString();
+        return ts.getUserAgArch().getArchInfraTier().getRuntimeServices().killAgent(name);
 	}
 }

@@ -56,7 +56,7 @@ import java.util.concurrent.TimeUnit;
   <li>+ message (literal): the content of the message.<br/>
   
   <li><i>+ answer</i> (any term [optional]): the answer of an ask
-  message (for performatives askOne and askAll).<br/> 
+  message (for performatives askOne, askAll, and askHow).<br/> 
   
   <li><i>+ timeout</i> (number [optional]): timeout (in milliseconds)
   when waiting for an ask answer.<br/> 
