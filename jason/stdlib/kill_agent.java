@@ -27,7 +27,7 @@ import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.Term;
-
+import jason.asSyntax.StringTerm;
 
 /**
   <p>Internal action: <b><code>.kill_agent</code></b>.
