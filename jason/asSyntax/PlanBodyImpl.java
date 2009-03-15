@@ -144,18 +144,8 @@ public class PlanBodyImpl extends Structure implements PlanBody, Iterable<PlanBo
         if (i == 0) term = t;
         if (i == 1) System.out.println("Should not setTerm(1) of body literal!");
     }
-
-    @Override
-    public boolean apply(Unifier u) {
-        // do not apply in next! (except in case this is a term)
-        boolean ok = false;
-        
-        if (next != null && isTerm) {
-            //next.setAsBodyTerm(true); // to force apply in next
-            ok = next.apply(u);
-            //next.setAsBodyTerm(false);
-        }
-        
+    
+    public boolean applyHead(Unifier u) {
         if (term != null && term.apply(u)) {
             if (term.isPlanBody()) { // we cannot have "inner" body literals
                 PlanBody baknext = next;
@@ -163,14 +153,21 @@ public class PlanBodyImpl extends Structure implements PlanBody, Iterable<PlanBo
                 next     = ((PlanBody)term).getBodyNext();
                 term     = ((PlanBody)term).getBodyTerm();
                 if (baknext != null) {
-                    //baknext.setAsBodyTerm(true); // to force apply in next
                     baknext.apply(u);
-                    //baknext.setAsBodyTerm(false);
                     getLastBody().add(baknext);
                 }
             }
+            return true;
+        }        
+        return false;
+    }
+
+    @Override
+    public boolean apply(Unifier u) {
+        boolean ok = next != null && next.apply(u);
+        
+        if (applyHead(u))
             ok = true;
-        }
 
         if (ok)
             resetHashCodeCache();

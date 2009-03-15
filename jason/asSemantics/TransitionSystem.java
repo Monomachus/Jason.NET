@@ -427,7 +427,7 @@ public class TransitionSystem {
         }
         Unifier     u = im.unif;
         PlanBody    h = im.getCurrentStep();
-        h.apply(u);
+        h.applyHead(u);
         
         Literal body  = null;
         Term    bTerm = h.getBodyTerm();
@@ -540,14 +540,13 @@ public class TransitionSystem {
         case delAddBel: 
             // -+a(1,X) ===> remove a(_,_), add a(1,X)
             // change all vars to anon vars to remove it
-            body = addSelfSource(body);
-            Literal bc = (Literal)body.clone();
-            bc.makeTermsAnnon();
+            body = addSelfSource(body.copy());
+            body.makeTermsAnnon();
             // to delete, create events as external to avoid that
             // remove/add create two events for the same intention
 
             try {
-                List<Literal>[] result = ag.brf(null, bc, conf.C.SI); // the intention is not the new focus
+                List<Literal>[] result = ag.brf(null, body, conf.C.SI); // the intention is not the new focus
                 if (result != null) { // really delete something
                     // generate events
                     updateEvents(result,Intention.EmptyInt);

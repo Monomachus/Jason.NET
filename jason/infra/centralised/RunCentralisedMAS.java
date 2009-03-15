@@ -83,7 +83,7 @@ public class RunCentralisedMAS {
     private CentralisedEnvironment        env         = null;
     private CentralisedExecutionControl   control     = null;
     private boolean                       debug       = false;
-    private Map<String,CentralisedAgArch> ags    = new ConcurrentHashMap<String,CentralisedAgArch>();
+    private Map<String,CentralisedAgArch> ags         = new ConcurrentHashMap<String,CentralisedAgArch>();
 
     public JButton                   btDebug;
     

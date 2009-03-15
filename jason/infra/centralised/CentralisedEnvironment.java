@@ -89,12 +89,10 @@ public class CentralisedEnvironment implements EnvironmentInfraTier {
     
     public void actionExecuted(String agName, Structure actTerm, boolean success, Object infraData) {
         ActionExec action = (ActionExec)infraData;
-        if (success) {
-            action.setResult(true);
-        } else {
-            action.setResult(false);
-        }
-        masRunner.getAg(agName).actionExecuted(action);
+        action.setResult(success);
+        CentralisedAgArch ag = masRunner.getAg(agName);
+        if (ag != null)
+            ag.actionExecuted(action);
     }
     
     
