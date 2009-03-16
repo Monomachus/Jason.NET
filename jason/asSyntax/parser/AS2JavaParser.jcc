@@ -240,8 +240,9 @@ boolean directive(Agent outerAg) throws jason.JasonException :
                                 boolean isEOF = false;
                               }
 {
+  "{"
   ( LOOKAHEAD(4)
-    "{" <TK_BEGIN> dir = pred() "}"
+    <TK_BEGIN> dir = pred() "}"
                               { Agent innerAg = new Agent(); } 
      	isEOF = agent(innerAg)
                               { if (isEOF) 
@@ -250,7 +251,7 @@ boolean directive(Agent outerAg) throws jason.JasonException :
                                    resultOfDirective = DirectiveProcessor.process(dir, outerAg, innerAg); 
                               }
   |
-    "{" dir = pred() "}"
+    dir = pred() "}"
                               { if (dir.toString().equals("end"))
                                    return true;
                                 else
@@ -361,8 +362,9 @@ PlanBody plan_body() :     { Object F; PlanBody R = null; }
 Term plan_term():            { Trigger T = null; Object C = null; PlanBody B = null, B1 = null; Plan P = null; boolean pb = true; Pred L = null; }
                                // pb = "only plan body"
 {
-  "{" 
-  [ [<TK_LABEL_AT> L=pred() { pb = false; } ]
+  "{"  
+  [ LOOKAHEAD(4) 
+    [<TK_LABEL_AT> L=pred() { pb = false; } ]
     T = trigger()           { if (T.getType() != TEType.belief) pb = false; }
     [ ":" C = log_expr()    { pb = false; } ]
     [( "<-"                 { pb = false; } 
@@ -376,7 +378,7 @@ Term plan_term():            { Trigger T = null; Object C = null; PlanBody B = n
                              if (T != null) {
                                 // handle the case of "+a1", parsed as TE, need to be changed to plan's body
                                 // handle the case of "+a1; +a2", parsed as "TE; Body"
-                                if (pb) {
+                                if (pb && L == null) {
                                   if (T.isAddition())
                                      B1 = new PlanBodyImpl(BodyType.addBel, T.getLiteral());
                                   else
@@ -386,7 +388,7 @@ Term plan_term():            { Trigger T = null; Object C = null; PlanBody B = n
                                      B1.setBodyNext(B); 
                                   return B1;
                                 }
-                                if (C == null && B == null) {
+                                if (C == null && B == null && L == null) {
                                     // handle the case of a single trigger
                                     T.setAsTriggerTerm(true);
                                 	return T;

@@ -91,7 +91,7 @@ public class CentralisedEnvironment implements EnvironmentInfraTier {
         ActionExec action = (ActionExec)infraData;
         action.setResult(success);
         CentralisedAgArch ag = masRunner.getAg(agName);
-        if (ag != null)
+        if (ag != null) // the agent may was killed
             ag.actionExecuted(action);
     }
     

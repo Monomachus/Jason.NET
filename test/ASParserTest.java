@@ -19,6 +19,7 @@ import jason.asSyntax.PlanBody;
 import jason.asSyntax.RelExpr;
 import jason.asSyntax.Structure;
 import jason.asSyntax.Term;
+import jason.asSyntax.Trigger;
 import jason.asSyntax.parser.ParseException;
 import jason.asSyntax.parser.as2j;
 import jason.infra.centralised.CentralisedAgArch;
@@ -202,6 +203,14 @@ public class ASParserTest extends TestCase {
         assertTrue(t.isPlanBody());
         assertEquals("{ +a(10) }", t.toString());
         
+        t = ASSyntax.parseTerm("{ @label(a,b,10,test,long,label) +a(10) }");
+        assertTrue(t instanceof Plan);
+        assertEquals("{ @label(a,b,10,test,long,label) +a(10) }", t.toString());
+
+        t = ASSyntax.parseTerm("{ -+a(10) }");
+        assertTrue(t.isPlanBody());
+        assertEquals("{ -+a(10) }", t.toString());
+
         t = ASSyntax.parseTerm("{ -a; +b }");
         assertEquals("{ -a; +b }", t.toString());
         assertTrue(t.isPlanBody());
@@ -209,9 +218,11 @@ public class ASParserTest extends TestCase {
         assertEquals(2, pb.getPlanSize());
         
         t = ASSyntax.parseTerm("{ -a : b <- c1; c2 }");
+        assertTrue(t instanceof Plan);
         assertEquals("{ -a : b <- c1; c2 }", t.toString());
 
         t = ASSyntax.parseTerm("{ +!a(10) }");
+        assertTrue(t instanceof Trigger);
         assertEquals("{ +!a(10) }", t.toString());
         assertTrue(t.isStructure());
         Structure s = (Structure)t;
