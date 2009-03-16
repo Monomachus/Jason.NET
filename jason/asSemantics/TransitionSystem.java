@@ -42,11 +42,14 @@ import jason.asSyntax.Structure;
 import jason.asSyntax.Term;
 import jason.asSyntax.Trigger;
 import jason.asSyntax.VarTerm;
+import jason.asSyntax.PlanBody.BodyType;
 import jason.asSyntax.Trigger.TEOperator;
 import jason.asSyntax.Trigger.TEType;
 import jason.asSyntax.parser.ParseException;
 import jason.bb.BeliefBase;
 import jason.runtime.Settings;
+import jason.stdlib.foreach;
+import jason.stdlib.loop;
 
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -427,10 +430,33 @@ public class TransitionSystem {
         }
         Unifier     u = im.unif;
         PlanBody    h = im.getCurrentStep();
-        h.applyHead(u);
-        
+
+        Term bTerm = h.getBodyTerm();
+        // de-var bTerm
+        while (bTerm instanceof VarTerm) { // TODO: test var in var
+            // h should be ground
+            Term bValue = u.get((VarTerm)bTerm);
+            if (bValue == null) { // the case of !A with A not ground
+                if (!generateGoalDeletion(conf.C.SI, null)) {
+                    logger.log(Level.SEVERE, h.getSrcInfo()+": "+ "Variable '"+bTerm+"' must be ground.");
+                }
+                return;
+            }
+            if (bValue.isPlanBody()) { 
+                if (h.getBodyType() != BodyType.action) { // the case of !A with A unified with +g 
+                    if (!generateGoalDeletion(conf.C.SI, null)) {
+                        logger.log(Level.SEVERE, h.getSrcInfo()+": "+ "The operator '"+h.getBodyType()+"' is lost with the variable unified with a plan body. ");
+                    }
+                    return;
+                }
+                h = (PlanBody)bValue; // TODO: change the current plan for the apply of the plan of VAR // the case of A unified with {a;b;c}
+                bTerm = h.getBodyTerm();
+            } else {
+                bTerm = bValue;
+            }
+        }
+            
         Literal body  = null;
-        Term    bTerm = h.getBodyTerm();
         if (bTerm instanceof Literal)
             body = (Literal)bTerm;
 
@@ -438,6 +464,7 @@ public class TransitionSystem {
 
         // Rule Action
         case action:
+            body = body.copy(); body.apply(u);
             confP.C.A = new ActionExec(body, conf.C.SI);
             break;
 
@@ -446,7 +473,14 @@ public class TransitionSystem {
             List<Term> errorAnnots = null;
             try {
                 InternalAction ia = ((InternalActionLiteral)bTerm).getIA(ag);
-                Object oresult = ia.execute(this, u, body.getTermsArray());
+                // clone and apply args
+                Term[] terms = new Term[body.getArity()];
+                for (int i=0; i<terms.length; i++) {
+                    terms[i] = body.getTerm(i).clone();
+                    if ( !(ia instanceof loop) && !(ia instanceof foreach)) // loop e foreach must not apply
+                        terms[i].apply(u);
+                }
+                Object oresult = ia.execute(this, u, terms);
                 if (oresult != null) {
                     ok = oresult instanceof Boolean && (Boolean)oresult;
                     if (!ok && oresult instanceof Iterator) { // ia result is an Iterator
@@ -494,16 +528,14 @@ public class TransitionSystem {
 
         // Rule Achieve
         case achieve:
-            body = addSelfSource(body.copy());
-            body.makeVarsAnnon(u); // free variables in an event cannot conflict with those in the plan
+            body = prepareBodyForEvent(body, u);
             conf.C.addAchvGoal(body, conf.C.SI);
             confP.step = State.StartRC;
             break;
 
         // Rule Achieve as a New Focus (the !! operator)
         case achieveNF:
-            body = addSelfSource(body.copy());
-            body.makeVarsAnnon(u); // free variables in an event cannot conflict with those in the plan
+            body = prepareBodyForEvent(body, u);
             conf.C.addAchvGoal(body, Intention.EmptyInt);
             updateIntention();
             break;
@@ -516,9 +548,8 @@ public class TransitionSystem {
             } else {
                 boolean fail = true;
                 if (f instanceof Literal) { // generate event when using literal in the test (no events for log. expr. like ?(a & b))
-                    body = (Literal)f.clone();
+                    body = prepareBodyForEvent(body, u);
                     if (body.isLiteral()) { // in case body is a var with content that is not a literal (note the VarTerm pass in the instanceof Literal)
-                        body.makeVarsAnnon(u);
                         Trigger te = new Trigger(TEOperator.add, TEType.test, body);
                         if (ag.getPL().hasCandidatePlan(te)) {
                             Event evt = new Event(te, conf.C.SI);
@@ -540,13 +571,14 @@ public class TransitionSystem {
         case delAddBel: 
             // -+a(1,X) ===> remove a(_,_), add a(1,X)
             // change all vars to anon vars to remove it
-            body = addSelfSource(body.copy());
-            body.makeTermsAnnon();
+            Literal b2 = prepareBodyForEvent(body, u); 
+            b2.makeTermsAnnon(); // do not change body (but b2), to not interfere in addBel
             // to delete, create events as external to avoid that
             // remove/add create two events for the same intention
+            // (in future releases, creates a two branches for this operator)
 
             try {
-                List<Literal>[] result = ag.brf(null, body, conf.C.SI); // the intention is not the new focus
+                List<Literal>[] result = ag.brf(null, b2, conf.C.SI); // the intention is not the new focus
                 if (result != null) { // really delete something
                     // generate events
                     updateEvents(result,Intention.EmptyInt);
@@ -560,15 +592,12 @@ public class TransitionSystem {
             
         // Rule AddBel
         case addBel:
-            body = addSelfSource(body);
+            body = prepareBodyForEvent(body, u);
 
             // calculate focus
             Intention newfocus = Intention.EmptyInt;
             if (setts.sameFocus())
                 newfocus = conf.C.SI;
-
-            // rename free vars
-            body.makeVarsAnnon(u);
             
             // call BRF
             try {
@@ -588,7 +617,7 @@ public class TransitionSystem {
             break;
             
         case delBel:
-            body = addSelfSource(body);
+            body = prepareBodyForEvent(body, u);
 
             newfocus = Intention.EmptyInt;
             if (setts.sameFocus())
@@ -614,17 +643,13 @@ public class TransitionSystem {
     }
     
     // add the self source in the body in case no other source was given
-    private Literal addSelfSource(Literal body) {
-        // manage the case of var unified with atom
-        if (body instanceof VarTerm) {            
-            Term v = ((VarTerm)body).getValue();
-            if (v != null && v.isAtom())
-                body = ((Atom)v);
-        }
+    private Literal prepareBodyForEvent(Literal body, Unifier u) {
+        body = body.copy(); 
+        body.apply(u);
+        body.makeVarsAnnon(u); // free variables in an event cannot conflict with those in the plan
         body = body.forceFullLiteralImpl();
         if (!body.hasSource()) {
-            // do not add source(self) in case the
-            // programmer set the source
+            // do not add source(self) in case the programmer set the source
             body.addAnnot(BeliefBase.TSelf);
         }
         return body;

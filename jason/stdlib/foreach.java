@@ -114,7 +114,7 @@ public class foreach extends DefaultInternalAction {
             // get all solutions for the loop
             // Note: you should get all solutions here, otherwise a concurrent modification will occur for the iterator 
             LogicalFormula logExpr = (LogicalFormula)args[0];
-            iu = logExpr.logicalConsequence(ts.getAg(), un.clone());
+            iu = logExpr.logicalConsequence(ts.getAg(), un);
             List<Unifier> allsol = new ArrayList<Unifier>();
             while (iu.hasNext())
                 allsol.add(iu.next());
@@ -122,6 +122,9 @@ public class foreach extends DefaultInternalAction {
             if (allsol.isEmpty()) // none iteration
                 return true;
             iu = allsol.iterator();
+            
+            foria = new PlanBodyImpl(BodyType.internalAction, foria.getBodyTerm().clone());
+            foria.add(im.getCurrentStep().getBodyNext());
             ((Structure)foria.getBodyTerm()).addTerm(new ObjectTermImpl(iu));
         } else if (args.length == 3) {
             // restore the solutions
@@ -132,16 +135,18 @@ public class foreach extends DefaultInternalAction {
         
         un.clear();
         un.compose(iu.next());
-
         // add in the current intention:
         // 1. the body argument of for and
-        // 2. a copy of the for internal action after the execution of the body
+        // 2. the for internal action after the execution of the body
         //    (to perform the next iteration)
-        PlanBody whattoadd = (PlanBody)args[1].clone();
-        if (iu.hasNext())
-            whattoadd.add(new PlanBodyImpl(BodyType.internalAction, foria.getBodyTerm().clone())); 
+        PlanBody whattoadd = (PlanBody)args[1];
+        if (iu.hasNext()) {
+            whattoadd.add(foria); 
+        } else {
+            whattoadd.add(foria.getBodyNext());
+        }
         whattoadd.setAsBodyTerm(false);
-        foria.add(1,whattoadd);
+        im.insertAsNextStep(whattoadd);
         return true;
     }
 }

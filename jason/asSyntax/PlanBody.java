@@ -1,6 +1,5 @@
 package jason.asSyntax;
 
-import jason.asSemantics.Unifier;
 
 /**
  * Interface for elements of a plans's body.
@@ -29,9 +28,6 @@ public interface PlanBody extends Term {
     public boolean     isEmptyBody();
     public int         getPlanSize();
 
-    /** apply unifier only on first element of the body */
-    public boolean applyHead(Unifier u);
-    
     public void setBodyType(BodyType bt);
     public void setBodyTerm(Term t);
     public void setBodyNext(PlanBody bl);

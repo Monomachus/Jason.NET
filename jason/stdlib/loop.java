@@ -101,8 +101,9 @@ public class loop extends DefaultInternalAction {
             // first execution of while
             checkArguments(args);
             // add backup unifier in the IA
+            whileia = new PlanBodyImpl(BodyType.internalAction, whileia.getBodyTerm().clone());
             ((Structure)whileia.getBodyTerm()).addTerm(new ObjectTermImpl(un.clone()));
-        } else if (args.length == 3) {
+        } else if (args.length == 3) {            
             // restore the unifier of previous iterations
             Unifier ubak = (Unifier)((ObjectTerm)args[2]).getObject();
             un.clear();
@@ -119,12 +120,12 @@ public class loop extends DefaultInternalAction {
             
             // add in the current intention:
             // 1. the body argument and
-            // 2. a copy of the while internal action after the execution of the body
+            // 2. the while internal action after the execution of the body
             //    (to test the loop again)
             PlanBody whattoadd = (PlanBody)args[1];
-            whattoadd.add(new PlanBodyImpl(BodyType.internalAction, whileia.getBodyTerm().clone()));
+            whattoadd.add(whileia);
             whattoadd.setAsBodyTerm(false);
-            whileia.add(1,whattoadd);
+            im.insertAsNextStep(whattoadd);
         }
         return true;
     }

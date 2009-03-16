@@ -43,40 +43,48 @@ public class IntendedMeans implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    protected Unifier unif = null;
-    protected Plan    plan;
-    private   Trigger trigger; // the trigger which created this IM
+    protected Unifier  unif = null;
+    protected PlanBody planBody;
+    protected Plan     plan;
+    private   Trigger  trigger; // the trigger which created this IM
     
     public IntendedMeans(Option opt, Trigger te) {
-        plan = opt.getPlan().cloneOnlyBody();
-        unif = opt.getUnifier(); //(Unifier)opt.getUnifier().clone();
+        plan     = opt.getPlan();
+        planBody = plan.getBody(); 
+        unif     = opt.getUnifier();
         
         if (te == null) {
-            trigger = plan.getTrigger();
+            trigger = plan.getTrigger().clone();
         } else {
-            trigger = (Trigger)te.clone();
-            trigger.getLiteral().apply(unif);
+            trigger = te;
         }
+        trigger.apply(unif);
     }
     
-    private IntendedMeans() {
-        // used for clone
-    }
+    // used by clone
+    private IntendedMeans() {  }
 
     /** removes the current action of the IM and returns the term of the body */
     public Term removeCurrentStep() {
-        PlanBody current = plan.getBody();
-        if (current.isEmptyBody()) {
+        if (isFinished()) {
             return null;
         } else {
-            return current.removeBody(0);
+            Term r = planBody.getBodyTerm();
+            planBody = planBody.getBodyNext();
+            return r;
         }
     }
 
     public PlanBody getCurrentStep() {
-        return plan.getBody();
+        return planBody;
     }
 
+    // used by if/for/loop internal actions
+    public PlanBody insertAsNextStep(PlanBody pb2add) {
+        planBody = new PlanBodyImpl(planBody.getBodyType(), planBody.getBodyTerm());
+        planBody.setBodyNext(pb2add);
+        return planBody; 
+    }
     
     public Plan getPlan() {
         return plan;
@@ -103,7 +111,7 @@ public class IntendedMeans implements Serializable {
     }
     
     public boolean isFinished() {
-        return plan.getBody().isEmptyBody();
+        return planBody == null || planBody.isEmptyBody();
     }
     
     public boolean isGoalAdd() {
@@ -112,23 +120,23 @@ public class IntendedMeans implements Serializable {
 
     public Object clone() {
         IntendedMeans c = new IntendedMeans();
-        c.unif = this.unif.clone();
-        c.plan = (Plan)this.plan.clone();
-        c.trigger = (Trigger)this.trigger.clone(); 
+        c.unif     = this.unif.clone();
+        c.planBody = this.planBody.clonePB();
+        c.trigger  = this.trigger.clone(); 
         return c;
     }
     
     public String toString() {
-        return plan + " / " + unif;
+        return planBody + " / " + unif;
     }
 
     public Term getAsTerm() {
         Structure im = new Structure("im");
         im.addTerm(new StringTermImpl(plan.getLabel().toString()));
-        if (plan.getBody() instanceof PlanBodyImpl) {
+        if (planBody instanceof PlanBodyImpl) {
             ListTerm lt = new ListTermImpl();
-            for (PlanBody bd: (PlanBodyImpl)plan.getBody()) {
-                PlanBody c = (PlanBody)bd.clone();
+            for (PlanBody bd: (PlanBodyImpl)planBody) {
+                PlanBody c = bd.clonePB();
                 c.apply(unif);
                 lt.add(new StringTermImpl(c.getBodyType().toString()+c.getBodyTerm()));
             }
@@ -141,8 +149,8 @@ public class IntendedMeans implements Serializable {
     public Element getAsDOM(Document document) {
         Element eim = (Element) document.createElement("intended-means");
         eim.setAttribute("trigger", trigger.toString());
-        if (plan != null) {
-            eim.appendChild(plan.getAsDOM(document));
+        if (planBody != null) {
+            eim.appendChild(planBody.getAsDOM(document));
         }
         if (unif != null && unif.size() > 0) {
             eim.appendChild(unif.getAsDOM(document));

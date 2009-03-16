@@ -102,9 +102,9 @@ public class if_then_else extends DefaultInternalAction {
 
         if (whattoadd != null) {
             IntendedMeans im = ts.getC().getSelectedIntention().peek();
-            PlanBody ifia = im.getCurrentStep();
+            whattoadd.add(im.getCurrentStep().getBodyNext());
             whattoadd.setAsBodyTerm(false);
-            ifia.add(1,whattoadd);
+            im.insertAsNextStep(whattoadd);
         }
         return true;
     }

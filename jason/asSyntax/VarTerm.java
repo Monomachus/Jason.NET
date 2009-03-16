@@ -955,13 +955,6 @@ public class VarTerm extends LiteralImpl implements NumberTerm, ListTerm, String
             return null;
     }
     
-    public boolean applyHead(Unifier u) {
-        if (value != null && getValue() instanceof PlanBody)
-            return ((PlanBody) getValue()).applyHead(u);
-        else
-            return true;
-    }
-
     public boolean isEmptyBody() {
         if (value != null && getValue() instanceof PlanBody)
             return ((PlanBody) getValue()).isEmptyBody();

@@ -26,8 +26,6 @@ package jason.asSyntax;
 import jason.asSemantics.Agent;
 import jason.asSemantics.InternalAction;
 import jason.asSemantics.Unifier;
-import jason.stdlib.foreach;
-import jason.stdlib.loop;
 
 import java.util.Iterator;
 import java.util.logging.Level;
@@ -76,15 +74,7 @@ public class InternalActionLiteral extends Structure {
     public boolean isAtom() {
         return false;
     }
-    
-    @Override
-    public boolean apply(Unifier u) {
-        if (this.ia != null && (this.ia instanceof loop || this.ia instanceof foreach))
-            return false;
-        else 
-            return super.apply(u);
-    }
-    
+        
     @SuppressWarnings("unchecked")
     public Iterator<Unifier> logicalConsequence(Agent ag, Unifier un) {
         if (ag.getTS().getUserAgArch().isRunning()) {

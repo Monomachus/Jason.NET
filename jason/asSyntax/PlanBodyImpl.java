@@ -145,7 +145,7 @@ public class PlanBodyImpl extends Structure implements PlanBody, Iterable<PlanBo
         if (i == 1) System.out.println("Should not setTerm(1) of body literal!");
     }
     
-    public boolean applyHead(Unifier u) {
+    private boolean applyHead(Unifier u) {
         if (term != null && term.apply(u)) {
             if (term.isPlanBody()) { // we cannot have "inner" body literals
                 PlanBody baknext = next;
