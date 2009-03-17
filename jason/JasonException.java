@@ -118,15 +118,5 @@ public class JasonException extends java.lang.Exception {
         return ASSyntax.createList(
                 ASSyntax.createStructure("error", id),
                 ASSyntax.createStructure("error_msg", ASSyntax.createString(msg)));
-        /*
-        ListTerm failAnnots = new ListTermImpl();
-        Structure e = new Structure("error", 1);
-        e.addTerm(id);
-        failAnnots.add(e);
-        Structure m = new Structure("error_msg", 1);
-        m.addTerm(new StringTermImpl(msg));
-        failAnnots.add(m);
-        return failAnnots;
-        */
     }
 }

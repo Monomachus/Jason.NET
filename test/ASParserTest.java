@@ -20,6 +20,7 @@ import jason.asSyntax.RelExpr;
 import jason.asSyntax.Structure;
 import jason.asSyntax.Term;
 import jason.asSyntax.Trigger;
+import jason.asSyntax.PlanBody.BodyType;
 import jason.asSyntax.parser.ParseException;
 import jason.asSyntax.parser.as2j;
 import jason.infra.centralised.CentralisedAgArch;
@@ -194,6 +195,11 @@ public class ASParserTest extends TestCase {
         
         pb = (PlanBody)ASSyntax.parseTerm("{ }");
         assertEquals(0, pb.getPlanSize());
+
+        pb = (PlanBody)ASSyntax.parseTerm("{ a; B}");
+        assertEquals(2, pb.getPlanSize());
+        assertEquals(BodyType.action, pb.getBodyType());
+        assertEquals(BodyType.action, pb.getBodyNext().getBodyType()); // B must be considered as action, see TS
     }
     
     

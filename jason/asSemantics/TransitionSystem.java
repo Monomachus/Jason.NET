@@ -430,26 +430,32 @@ public class TransitionSystem {
         }
         Unifier     u = im.unif;
         PlanBody    h = im.getCurrentStep();
-
+        
         Term bTerm = h.getBodyTerm();
         // de-var bTerm
-        while (bTerm instanceof VarTerm) { // TODO: test var in var
+        while (bTerm instanceof VarTerm) {
             // h should be ground
             Term bValue = u.get((VarTerm)bTerm);
             if (bValue == null) { // the case of !A with A not ground
-                if (!generateGoalDeletion(conf.C.SI, null)) {
-                    logger.log(Level.SEVERE, h.getSrcInfo()+": "+ "Variable '"+bTerm+"' must be ground.");
+                String msg = h.getSrcInfo()+": "+ "Variable '"+bTerm+"' must be ground.";
+                if (!generateGoalDeletion(conf.C.SI, JasonException.createBasicErrorAnnots("body_var_unground", msg))) {
+                    logger.log(Level.SEVERE, msg);
                 }
                 return;
             }
             if (bValue.isPlanBody()) { 
-                if (h.getBodyType() != BodyType.action) { // the case of !A with A unified with +g 
-                    if (!generateGoalDeletion(conf.C.SI, null)) {
-                        logger.log(Level.SEVERE, h.getSrcInfo()+": "+ "The operator '"+h.getBodyType()+"' is lost with the variable unified with a plan body. ");
+                if (h.getBodyType() != BodyType.action) { // the case of ...; A = { !g }; +g; ....
+                    String msg = h.getSrcInfo()+": "+ "The operator '"+h.getBodyType()+"' is lost with the variable '"+bTerm+"' unified with a plan body '"+bValue+"'. ";
+                    if (!generateGoalDeletion(conf.C.SI, JasonException.createBasicErrorAnnots("body_var_with_op", msg))) {
+                        logger.log(Level.SEVERE, msg);
                     }
                     return;
                 }
-                h = (PlanBody)bValue; // TODO: change the current plan for the apply of the plan of VAR // the case of A unified with {a;b;c}
+                h = (PlanBody)bValue;
+                if (h.getPlanSize() > 1) { // the case of A unified with {a;b;c}
+                    h.add(im.getCurrentStep().getBodyNext());
+                    im.insertAsNextStep(h.getBodyNext());
+                }
                 bTerm = h.getBodyTerm();
             } else {
                 bTerm = bValue;
@@ -678,7 +684,6 @@ public class TransitionSystem {
             IntendedMeans topIM = i.pop();
             Literal topLiteral = topIM.getTrigger().getLiteral();
             if (logger.isLoggable(Level.FINE)) logger.fine("Returning from IM "+topIM.getPlan().getLabel()+", te="+topIM.getPlan().getTrigger());
-            
             // if finished a failure handling IM ...
             if (im.getTrigger().isGoal() && !im.getTrigger().isAddition() && i.size() > 0) {
                 // needs to get rid of the IM until a goal that
@@ -691,8 +696,9 @@ public class TransitionSystem {
                 // should became
                 //   +!s: !z
                 im = i.peek();
-                if (im.isFinished() || !im.unif.unifies(im.getCurrentStep().getBodyTerm(), topLiteral))
+                if (im.isFinished() || !im.unif.unifies(im.getCurrentStep().getBodyTerm(), topLiteral) || im.getCurrentStep().getBodyTerm() instanceof VarTerm) {
                     im = i.pop(); // +!c above
+                }
                 while (i.size() > 0 &&
                        !im.unif.unifies(im.getTrigger().getLiteral(), topLiteral) &&
                        !im.unif.unifies(im.getCurrentStep().getBodyTerm(), topLiteral)) {
@@ -703,30 +709,11 @@ public class TransitionSystem {
                 im = i.peek(); // +!s or +?s
                 if (!im.isFinished()) {
                     // removes !b or ?s
-                    /* I am trying against  comments below and use topIM.getTrigger!
-                     * since I don't remember why the trigger cann't be used
-                     * probably the reason is the old buggy makeVarAnnos
-                     
-                    Term g = im.removeCurrentStep();
-                    // make the TE of finished plan ground and unify that
-                    // with goal/test in the body (to "return" values).
-                    // (it must be the plan TE and not the IM.trigger because the
-                    // vars have name only in the plan TE, in the IM.trigger
-                    // they are anonymous)                
-                    Literal tel = topIM.getPlan().getTrigger().getLiteral();
-                    // but import annots from IM.trigger
-                    tel.addAnnots(topIM.getTrigger().getLiteral().getAnnots());
-                    tel.topLiteral.makeVarsAnnon(topIM.unif); 
-                    */
                     // unifies the final event with the body that called it
                     topLiteral.apply(topIM.unif);
                     im.unif.unifies(im.removeCurrentStep(), topLiteral);
                 }
             }
-
-            // the new top may have become
-            // empty! need to keep checking.
-            //applyClrInt(i);
         }
     }
 
@@ -924,7 +911,7 @@ public class TransitionSystem {
 
         // code
         if (eventLiteral.getAnnots("code").isEmpty())
-            eventLiteral.addAnnot(ASSyntax.createStructure("code", bodyterm));
+            eventLiteral.addAnnot(ASSyntax.createStructure("code", ASSyntax.createString(bodyterm.toString())));
         
         // ASL source
         if (eventLiteral.getAnnots("code_src").isEmpty())
