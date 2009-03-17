@@ -24,13 +24,10 @@
 
 package jason.asSemantics;
 
-import jason.asSyntax.ListTerm;
-import jason.asSyntax.ListTermImpl;
+import jason.asSyntax.ASSyntax;
 import jason.asSyntax.Plan;
 import jason.asSyntax.PlanBody;
 import jason.asSyntax.PlanBodyImpl;
-import jason.asSyntax.StringTermImpl;
-import jason.asSyntax.Structure;
 import jason.asSyntax.Term;
 import jason.asSyntax.Trigger;
 
@@ -131,18 +128,15 @@ public class IntendedMeans implements Serializable {
     }
 
     public Term getAsTerm() {
-        Structure im = new Structure("im");
-        im.addTerm(new StringTermImpl(plan.getLabel().toString()));
         if (planBody instanceof PlanBodyImpl) {
-            ListTerm lt = new ListTermImpl();
-            for (PlanBody bd: (PlanBodyImpl)planBody) {
-                PlanBody c = bd.clonePB();
-                c.apply(unif);
-                lt.add(new StringTermImpl(c.getBodyType().toString()+c.getBodyTerm()));
-            }
-            im.addTerm(lt);
+            //Plan p = new Plan((Pred)plan.getLabel().clone(), getTrigger().clone(), plan.getContext(), planBody.clonePB());
+            //p.makeVarsAnnon();
+            PlanBody bd = (PlanBody)((PlanBodyImpl)planBody.clone()).makeVarsAnnon();
+            bd.setAsBodyTerm(true);
+            return ASSyntax.createStructure("im", ASSyntax.createString(plan.getLabel()), bd);
+        } else {
+            return ASSyntax.createAtom("noimplementedforclass"+planBody.getClass().getSimpleName());
         }
-        return im;        
     }
     
     /** get as XML */

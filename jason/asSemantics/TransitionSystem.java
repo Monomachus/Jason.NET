@@ -684,6 +684,7 @@ public class TransitionSystem {
             IntendedMeans topIM = i.pop();
             Literal topLiteral = topIM.getTrigger().getLiteral();
             if (logger.isLoggable(Level.FINE)) logger.fine("Returning from IM "+topIM.getPlan().getLabel()+", te="+topIM.getPlan().getTrigger());
+            
             // if finished a failure handling IM ...
             if (im.getTrigger().isGoal() && !im.getTrigger().isAddition() && i.size() > 0) {
                 // needs to get rid of the IM until a goal that
@@ -911,7 +912,7 @@ public class TransitionSystem {
 
         // code
         if (eventLiteral.getAnnots("code").isEmpty())
-            eventLiteral.addAnnot(ASSyntax.createStructure("code", ASSyntax.createString(bodyterm.toString())));
+            eventLiteral.addAnnot(ASSyntax.createStructure("code", bodyterm.copy().makeVarsAnnon()));
         
         // ASL source
         if (eventLiteral.getAnnots("code_src").isEmpty())

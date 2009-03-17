@@ -271,12 +271,12 @@ public class Structure extends Atom {
     }
 
     @Override
-    public void makeVarsAnnon() {
-        makeVarsAnnon(new Unifier());
+    public Literal makeVarsAnnon() {
+        return makeVarsAnnon(new Unifier());
     }
     
     @Override
-    public void makeVarsAnnon(Unifier un) { 
+    public Literal makeVarsAnnon(Unifier un) { 
         final int size = getArity();
         for (int i=0; i<size; i++) {
             Term ti = getTerm(i);
@@ -299,6 +299,7 @@ public class Structure extends Atom {
             }
         }
         resetHashCodeCache();
+        return this;
     }
 
     @Override

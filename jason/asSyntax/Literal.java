@@ -125,14 +125,14 @@ public abstract class Literal extends DefaultTerm implements LogicalFormula {
     /** replaces all terms by unnamed variables (_). */
     public void makeTermsAnnon()  {}
     /** replaces all variables by unnamed variables (_). */
-    public void makeVarsAnnon()   {}
+    public Literal makeVarsAnnon()   { return this; }
 
     /**
      * replaces all variables of the term for unnamed variables (_).
      * 
      * @param un is the unifier that contains the map of replacements
      */
-    public void makeVarsAnnon(Unifier un) {}
+    public Literal makeVarsAnnon(Unifier un) { return this; }
 
     /** returns all annotations of the literal */
     public ListTerm getAnnots()     { return null; }

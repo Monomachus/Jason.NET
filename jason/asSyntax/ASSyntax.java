@@ -100,6 +100,10 @@ public class ASSyntax {
     public static StringTerm createString(String s) {
         return new StringTermImpl(s);
     }
+    /** creates a new string term using .toString() of the parameter */
+    public static StringTerm createString(Object o) {
+        return new StringTermImpl(o.toString());
+    }
 
     /** creates a new variable term */
     public static VarTerm createVar(String functor) {

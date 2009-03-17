@@ -392,7 +392,7 @@ public class Pred extends Structure {
 
     
     @Override
-    public void makeVarsAnnon(Unifier un) {
+    public Literal makeVarsAnnon(Unifier un) {
         if (annots != null) {
             Iterator<ListTerm> i = annots.listTermIterator();
             while (i.hasNext()) {
@@ -415,7 +415,7 @@ public class Pred extends Structure {
                 }
             }
         }
-        super.makeVarsAnnon(un);
+        return super.makeVarsAnnon(un);
     }
     
     @Override
