@@ -406,7 +406,7 @@ public class Pred extends Structure {
                     if (vt.isUnnamedVar()) {
                         uv = (UnnamedVar)vt;
                     } else {
-                        uv = new UnnamedVar();
+                        uv = new UnnamedVar("_"+UnnamedVar.getUniqueId()+ta);
                         un.bind(vt, uv);
                     }
                     lt.setTerm(uv);

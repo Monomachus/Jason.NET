@@ -80,6 +80,7 @@ public class plan_label extends DefaultInternalAction {
         	p = (Plan)p.clone();
             p.getLabel().delSources();
             p.setAsPlanTerm(true);
+            p.makeVarsAnnon();
             //String ps = p.toASString().replaceAll("\"", "\\\\\"");
             //return un.unifies(new StringTermImpl(ps), args[0]);
             return un.unifies(p, args[0]);

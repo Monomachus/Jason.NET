@@ -23,10 +23,15 @@
 
 package jason.asSemantics;
 
+import jason.asSyntax.ASSyntax;
+import jason.asSyntax.ListTerm;
+import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Literal;
 import jason.asSyntax.Pred;
+import jason.asSyntax.Structure;
 import jason.asSyntax.Term;
 import jason.asSyntax.Trigger;
+import jason.asSyntax.UnnamedVar;
 import jason.asSyntax.VarTerm;
 
 import java.util.HashMap;
@@ -278,6 +283,19 @@ public class Unifier implements Cloneable {
 
     public String toString() {
         return function.toString();
+    }
+    
+    public Term getAsTerm() {
+        ListTerm lf = new ListTermImpl();
+        ListTerm tail = lf;
+        for (VarTerm k: function.keySet()) {
+            Term vl = function.get(k).clone();
+            if (vl instanceof Literal)
+                ((Literal)vl).makeVarsAnnon();
+            Structure pair = ASSyntax.createStructure("map", new UnnamedVar("_"+UnnamedVar.getUniqueId()+k), vl); // the var must be changed to avoid cyclic references latter
+            tail = tail.append(pair);
+        }
+        return lf;
     }
 
     public int size() {

@@ -41,16 +41,16 @@ import jason.asSyntax.Term;
 
   where each intended means has the form:<br><br>
 
-  <code>im(<i>plan label</i>,<i>plan body term</i>)</code><br><br>
+  <code>im(<i>plan label</i>,<i>plan body term</i>, <i>unification function (a list of maps)</i>)</code><br><br>
 
   For example:<br><br>
 
   <blockquote>
   <code>intention(1,<br>
   [<br>
-  im(l__6[source(self)],{ .current_intention(I); .print(end) }),<br>
-  im(l__5[source(self)],{ .fail}),<br>
-  im(l__4[source(self)],{ !g5(X); .print(endg4) }),<br>
+  im(l__6[source(self)],{ .current_intention(I); .print(end) }, [map(I, ....)]),<br>
+  im(l__5[source(self)],{ .fail }, []),<br>
+  im(l__4[source(self)],{ !g5(X); .print(endg4) }, [map(X, test)]),<br>
   ...<br>
   ])</code>
   </blockquote>

@@ -95,10 +95,10 @@ public class relevant_plans extends DefaultInternalAction {
             for (Option opt: rp) {
                 // remove sources (this IA is used for communication)
                 Plan np = (Plan)opt.getPlan().clone();
-                if (np.getLabel() != null) {
+                if (np.getLabel() != null) 
                     np.getLabel().delSources();
-                }
                 np.setAsPlanTerm(true);
+                np.makeVarsAnnon();
                 //StringTerm stplan = new StringTermImpl(np.toASString().replaceAll("\\\"", "\\\\\""));
                 //last = last.append(stplan);
                 last = last.append(np);

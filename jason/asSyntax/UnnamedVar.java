@@ -42,12 +42,16 @@ public class UnnamedVar extends VarTerm {
 
     public UnnamedVar(String name) {
         super( name.length() == 1 ? "_" + (varCont++) : name);
-        myId = varCont++;
+        myId = varCont;
     }
 
     public UnnamedVar(int id) {
         super("_" + id);
         myId = id;
+    }
+    
+    public static int getUniqueId() {
+        return varCont++;
     }
 
     public Term clone() {

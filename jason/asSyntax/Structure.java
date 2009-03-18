@@ -287,7 +287,7 @@ public class Structure extends Atom {
                 if (vt.isUnnamedVar()) {
                     uv = (UnnamedVar)vt;
                 } else {
-                    uv = new UnnamedVar();
+                    uv = new UnnamedVar( "_"+UnnamedVar.getUniqueId()+ti);
                     un.bind(vt, uv);
                 }
                 setTerm(i,uv);

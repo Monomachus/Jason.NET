@@ -129,11 +129,10 @@ public class IntendedMeans implements Serializable {
 
     public Term getAsTerm() {
         if (planBody instanceof PlanBodyImpl) {
-            //Plan p = new Plan((Pred)plan.getLabel().clone(), getTrigger().clone(), plan.getContext(), planBody.clonePB());
-            //p.makeVarsAnnon();
+            // TODO: use same replacements (Var -> Unnamed var) for the plan and for the unifier
             PlanBody bd = (PlanBody)((PlanBodyImpl)planBody.clone()).makeVarsAnnon();
             bd.setAsBodyTerm(true);
-            return ASSyntax.createStructure("im", ASSyntax.createString(plan.getLabel()), bd);
+            return ASSyntax.createStructure("im", ASSyntax.createString(plan.getLabel()), bd, unif.getAsTerm());
         } else {
             return ASSyntax.createAtom("noimplementedforclass"+planBody.getClass().getSimpleName());
         }

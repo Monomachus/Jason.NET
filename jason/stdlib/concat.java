@@ -53,6 +53,13 @@ import jason.asSyntax.Term;
   <li> <code>.concat([a,b,c],[d,e],[f,g],X)</code>: <code>X</code> unifies with <code>[a,b,c,d,e,f,g]</code>.
   </ul>
 
+  <p>Note: this internal action does not implement backtrack. You if need backtrack, you can add
+  and use the following rules in your code:
+  <pre>
+  concat([ ], L, L).
+  concat([H|T], L, [H|M]) :- concat(T, L, M).
+  </pre>
+
   @see jason.stdlib.delete
   @see jason.stdlib.length
   @see jason.stdlib.member
@@ -94,7 +101,7 @@ public class concat extends DefaultInternalAction {
             return un.unifies(result, args[args.length-1]);
 
         
-        } else {
+        } else if (args[0].isString()) {
             // string concat
             if (!args[args.length-1].isVar() && !args[args.length-1].isString()) {
                 throw JasonException.createWrongArgument(this,"Last argument '"+args[args.length-1]+"' is not a string nor a variable.");
@@ -112,6 +119,8 @@ public class concat extends DefaultInternalAction {
                 sr.append(vl);
             }
             return un.unifies(new StringTermImpl(sr.toString()), args[args.length-1]);
+        } else {
+                throw JasonException.createWrongArgument(this,"First argument '"+args[0]+"' must be a list or string.");
         }
     }
 }

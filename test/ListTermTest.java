@@ -1,6 +1,7 @@
 package test;
 
 import jason.asSemantics.Unifier;
+import jason.asSyntax.ASSyntax;
 import jason.asSyntax.Atom;
 import jason.asSyntax.ListTerm;
 import jason.asSyntax.ListTermImpl;
@@ -21,11 +22,11 @@ public class ListTermTest extends TestCase {
     
     protected void setUp() throws Exception {
         super.setUp();
-        l1 = ListTermImpl.parseList("[a,b,c]");
-        l2 = ListTermImpl.parseList("[a(1,2),b(r,t)|T]");
-        l3 = ListTermImpl.parseList("[A|T]");
-        l4 = ListTermImpl.parseList("[X,b,T]");
-        l5 = ListTermImpl.parseList("[[b,c]]");
+        l1 = ASSyntax.parseList("[a,b,c]");
+        l2 = ASSyntax.parseList("[a(1,2),b(r,t)|T]");
+        l3 = ASSyntax.parseList("[A|T]");
+        l4 = ASSyntax.parseList("[X,b,T]");
+        l5 = ASSyntax.parseList("[[b,c]]");
         //System.out.println("l1="+l1+"\nl2="+l2+"\nl3="+l3+"\nl4="+l4);
         //System.out.println("l5="+l5);
     }
@@ -37,11 +38,17 @@ public class ListTermTest extends TestCase {
         assertEquals(l4.size(), 3);
         assertEquals(l5.size(), 1);
         
-        ListTerm l = new ListTermImpl();
+        ListTerm l = new ListTermImpl(); 
         l.add(new Structure("a"));
         l.add(new Structure("a"));
         l.add(new Structure("a"));
         assertEquals(l.size(), 3);      
+        
+        assertTrue(l1.isList());
+        assertTrue(l2.isList());
+        assertTrue(l3.isList());
+        assertTrue(l4.isList());
+        assertTrue(l5.isList());
     }
 
     public void testToString() {
