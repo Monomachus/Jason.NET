@@ -155,7 +155,7 @@ public class send extends DefaultInternalAction {
         // async ask has a fourth argument and should suspend the intention
         lastSendWasSynAsk = m.isAsk() && args.length > 3;
         if (lastSendWasSynAsk) {
-        	ts.getC().getPendingIntentions().put(m.getMsgId(), ts.getC().getSelectedIntention());
+        	ts.getC().addPendingIntention(m.getMsgId(), ts.getC().getSelectedIntention());
         }
 
         // (un)tell or unknown performative with 4 args is a reply to
@@ -201,7 +201,7 @@ public class send extends DefaultInternalAction {
                 ts.getAg().getScheduler().schedule( new Runnable() {
                     public void run() {
                         // if the intention is still in PI, brings it back to C.I
-                        Intention intention = ts.getC().getPendingIntentions().remove(m.getMsgId());
+                        Intention intention = ts.getC().removePendingIntention(m.getMsgId());
                         if (intention != null) {
                             // unify "timeout" with the fourth parameter of .send
                             Structure send = (Structure)intention.peek().removeCurrentStep();

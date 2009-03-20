@@ -172,7 +172,7 @@ public class TransitionSystem {
             // check if an intention was suspended waiting this message
             Intention intention = null;
             if (m.getInReplyTo() != null) {
-                intention = getC().getPendingIntentions().remove(m.getInReplyTo());
+                intention = getC().removePendingIntention(m.getInReplyTo());
             }
             // is it a pending intention?
             if (intention != null) {
@@ -218,7 +218,7 @@ public class TransitionSystem {
         
         // Rule for atomic, if there is an atomic intention, do not select event
         if (C.hasAtomicIntention()) {
-            confP.step = State.SelInt;
+            confP.step = State.ProcAct; // need to go to ProcAct to see if an atomic intention received a feedback action
             return;            
         }
         
@@ -375,7 +375,7 @@ public class TransitionSystem {
                 // remove the intention from PA (PA has all pending action, including those in FA;
                 // but, if the intention is not in PA, it means that the intention was dropped
                 // and should not return to I)
-                if (C.getPendingActions().remove(a.getIntention().getId()) != null) {
+                if (C.removePendingAction(confP.C.SI.getId()) != null) {
                     if (a.getResult()) {
                         // add the intention back in I
                         updateIntention();
@@ -398,11 +398,12 @@ public class TransitionSystem {
         if (confP.C.SI != null) {
             return;
         }
-
+        
         // Rule SelInt1
-        if (conf.C.hasIntention()) {
+        if (!conf.C.isAtomicIntentionSuspended() && conf.C.hasIntention()) { // the isAtomicIntentionSuspended is necessary because the atomic intention may be suspended (the above removeAtomicInt returns null in that case)
+                                                                             // but no other intention could be selected
             confP.C.SI = conf.ag.selectIntention(conf.C.getIntentions());
-            if (confP.C.SI != null) { // the selectIntention function retuned null
+            if (confP.C.SI != null) { // the selectIntention function returned null
                 return;             
             }
         }
@@ -924,11 +925,12 @@ public class TransitionSystem {
     }
         
     public boolean canSleep() {
-        return !conf.C.hasEvent() && !conf.C.hasIntention() && 
-               !conf.C.hasFeedbackAction() &&
-               conf.C.MB.isEmpty() && 
-               taskForBeginOfCycle.isEmpty() &&
-               agArch.canSleep();
+        return    (C.isAtomicIntentionSuspended() && conf.C.MB.isEmpty())               
+               || (!conf.C.hasEvent() && !conf.C.hasIntention() && 
+                   !conf.C.hasFeedbackAction() &&
+                   conf.C.MB.isEmpty() && 
+                   //taskForBeginOfCycle.isEmpty() &&
+                   agArch.canSleep());
     }
 
     /** 
@@ -982,7 +984,7 @@ public class TransitionSystem {
 
             ActionExec action = C.getAction(); 
             if (action != null) {
-                C.getPendingActions().put(action.getIntention().getId(), action);
+                C.addPendingAction(action);
                 agArch.act(action, C.getFeedbackActions());
             }
 

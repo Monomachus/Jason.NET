@@ -23,6 +23,7 @@
 
 package jason.asSemantics;
 
+import jason.JasonException;
 import jason.asSyntax.Literal;
 import jason.asSyntax.Trigger;
 import jason.asSyntax.Trigger.TEOperator;
@@ -57,6 +58,7 @@ public class Circumstance implements Serializable {
     protected Option                   SO;
     protected Intention                SI;
     private   Intention                AI; // Atomic Intention
+    private   boolean                  atomicIntSuspended = false; // whether the current atomic intention is suspended in PA or PI
 
     private Map<Integer, ActionExec>   PA; // Pending actions, waiting action execution (key is the intention id)
     private List<ActionExec>           FA; // Feedback actions, those that are already executed
@@ -175,14 +177,12 @@ public class Circumstance implements Serializable {
 
     public void addIntention(Intention intention) {
         I.offer(intention);
-        if (intention.isAtomic()) {
+        if (intention.isAtomic())
             setAtomicIntention(intention);
-        }
 
         // notify listeners
-        for (CircumstanceListener el : listeners) {
+        for (CircumstanceListener el : listeners)
             el.intentionAdded(intention);
-        }
     }
 
     public boolean removeIntention(Intention i) {
@@ -217,6 +217,10 @@ public class Circumstance implements Serializable {
 
     public Intention removeAtomicIntention() {
         if (AI != null) {
+            if (atomicIntSuspended) {
+                //throw new JasonException("Internal error: trying to remove the atomic intention, but it is suspended! it should be removed only when back to I!");
+                return null;
+            }
             Intention tmp = AI;
             removeIntention(AI);
             return tmp;
@@ -227,6 +231,12 @@ public class Circumstance implements Serializable {
     public boolean hasAtomicIntention() {
         return AI != null;
     }
+    
+    public boolean isAtomicIntentionSuspended() {
+        return AI != null && atomicIntSuspended;
+    }
+    
+    /** pending intentions */
     
     public Map<String, Intention> getPendingIntentions() {
         return PI;
@@ -240,11 +250,29 @@ public class Circumstance implements Serializable {
         PI.clear();
     }
     
+    public void addPendingIntention(String id, Intention i) {
+        if (i.isAtomic()) {
+            setAtomicIntention(i);
+            atomicIntSuspended = true;
+        }
+        PI.put(id, i);
+    }
+    
+    public Intention removePendingIntention(String id) {
+        Intention i = PI.remove(id);
+        if (i != null && i.isAtomic()) {
+            atomicIntSuspended = false;
+        }
+        return i;
+    }
+    
+    /** removes the intention i from PI and notify listeners that the intention was dropped */
     public boolean dropPendingIntention(Intention i) {
-        Iterator<Intention> it = PI.values().iterator();
-        while (it.hasNext()) {
-            if (it.next().equals(i)) {
-                it.remove();
+        // use a loop instead of get because the intention (the value) is used in the search instead of the key
+        for (String key: PI.keySet()) {
+            Intention pii = PI.get(key);
+            if (pii.equals(i)) {
+                removePendingIntention(key);
                 
                 // check in wait internal action
                 for (CircumstanceListener el : listeners) {
@@ -268,6 +296,8 @@ public class Circumstance implements Serializable {
         return AP;
     }
 
+    /** feedback action */
+        
     public boolean hasFeedbackAction() {
         return !FA.isEmpty();
     }
@@ -281,11 +311,34 @@ public class Circumstance implements Serializable {
             synchronized (FA) {
                 FA.add(act);
             }
+            if (act.getIntention().isAtomic()) {
+                atomicIntSuspended = false;
+            }                        
         }
     }
+    
 
+    /** pending action */
+    
     public Map<Integer, ActionExec> getPendingActions() {
         return PA;
+    }
+    
+    public void addPendingAction(ActionExec a) {
+        Intention i = a.getIntention();
+        if (i.isAtomic()) {
+            setAtomicIntention(i);
+            atomicIntSuspended = true;
+        }
+        PA.put(i.getId(), a);
+    }
+    
+    public ActionExec removePendingAction(int intentionId) {
+        ActionExec a = PA.remove(intentionId);
+        if (a != null && a.getIntention().isAtomic()) {
+            atomicIntSuspended = false;
+        }
+        return a;
     }
     
     public void clearPendingActions() {
@@ -296,11 +349,21 @@ public class Circumstance implements Serializable {
         return PA != null && PA.size() > 0;
     }
 
+    /** removes the intention i from PA and notify listeners that the intention was dropped */
     public boolean dropPendingAction(Intention i) {
+        ActionExec act = removePendingAction(i.getId());
+        if (act != null) {
+            // check in wait internal action
+            for (CircumstanceListener el : listeners) {
+                el.intentionDropped(i);
+            }
+            return true;            
+        }
+        /*
         Iterator<ActionExec> it = PA.values().iterator();
         while (it.hasNext()) {
             if (it.next().getIntention().equals(i)) {
-                it.remove();
+                removePendingAction(i.getId());
                 
                 // check in wait internal action
                 for (CircumstanceListener el : listeners) {
@@ -309,6 +372,7 @@ public class Circumstance implements Serializable {
                 return true;
             }
         }
+        */
         return false;
     }
 

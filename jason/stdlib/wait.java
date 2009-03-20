@@ -143,7 +143,7 @@ public class wait extends DefaultInternalAction {
                 sTE = "time"+(timeout);
             }
             sTE = si.getId()+"/"+sTE;
-            c.getPendingIntentions().put(sTE, si);
+            c.addPendingIntention(sTE, si);
             
             startTime = System.currentTimeMillis();
 
@@ -165,13 +165,13 @@ public class wait extends DefaultInternalAction {
                 public void run() {
                     try {
                         // add SI again in C.I if it was not removed and this wait was not dropped
-                        if (c.getPendingIntentions().remove(sTE) == si && !c.getIntentions().contains(si) && !dropped) {
+                        if (c.removePendingIntention(sTE) == si && !c.getIntentions().contains(si) && !dropped) {
                             if (stopByTimeout && te != null && elapsedTimeTerm == null) {
                                 // fail the .wait by timeout
                                 if (si.isSuspended()) { // if the intention was suspended by .suspend
                                     PlanBody body = si.peek().getPlan().getBody();
                                     body.add(1, new PlanBodyImpl(BodyType.internalAction, new InternalActionLiteral(".fail")));
-                                    c.getPendingIntentions().put(suspend.SUSPENDED_INT+si.getId(), si);
+                                    c.addPendingIntention(suspend.SUSPENDED_INT+si.getId(), si);
                                 } else {
                                     ts.generateGoalDeletion(si, JasonException.createBasicErrorAnnots("wait_timeout", "timeout in .wait"));
                                 }
@@ -183,7 +183,7 @@ public class wait extends DefaultInternalAction {
                                     un.unifies(elapsedTimeTerm, new NumberTermImpl(elapsedTime));
                                 }
                                 if (si.isSuspended()) { // if the intention was suspended by .suspend
-                                    c.getPendingIntentions().put(suspend.SUSPENDED_INT+si.getId(), si);
+                                    c.addPendingIntention(suspend.SUSPENDED_INT+si.getId(), si);
                                 } else {
                                     c.addIntention(si);
                                 }

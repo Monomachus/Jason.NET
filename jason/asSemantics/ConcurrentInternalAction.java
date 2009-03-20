@@ -79,7 +79,7 @@ public abstract class ConcurrentInternalAction implements InternalAction {
         final Circumstance C = ts.getC();
         Intention i = C.getSelectedIntention();
         i.setSuspended(true);
-        C.getPendingIntentions().put(key, i);
+        C.addPendingIntention(key, i);
         
         if (timeout > 0) {
             // schedule a future test of the end of the action
@@ -118,7 +118,7 @@ public abstract class ConcurrentInternalAction implements InternalAction {
         ts.runAtBeginOfNextCycle(new Runnable() {
             public void run() {
                 Circumstance C = ts.getC();
-                Intention pi = C.getPendingIntentions().remove(intentionKey);
+                Intention pi = C.removePendingIntention(intentionKey);
                 if (pi != null) {
                     pi.setSuspended(false);
                     try {

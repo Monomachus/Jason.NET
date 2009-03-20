@@ -95,7 +95,7 @@ public class suspend extends DefaultInternalAction {
             Intention i = C.getSelectedIntention();
             suspendIntention = true;
             i.setSuspended(true);
-            C.getPendingIntentions().put(SELF_SUSPENDED_INT, i);
+            C.addPendingIntention(SELF_SUSPENDED_INT, i);
             return true;
         }
         
