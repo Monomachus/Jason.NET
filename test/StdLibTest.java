@@ -338,6 +338,212 @@ public class StdLibTest extends TestCase {
         assertEquals(i.next().get("X").toString(),"4");
     }
 
+    @SuppressWarnings("unchecked")
+    public void testPrefix() throws Exception {
+        ListTerm l1 = ListTermImpl.parseList("[a,b,c]");
+        ListTerm l2 = ListTermImpl.parseList("[a,b]");
+        ListTerm l3 = ListTermImpl.parseList("[b,c]");
+        
+        // test prefix([a,b,c],[a,b,c])
+        Unifier u = new Unifier();
+        Iterator<Unifier> i = (Iterator<Unifier>)new jason.stdlib.prefix().execute(null, u, new Term[] { l1, l1 });
+        assertTrue(i != null);
+        assertTrue(i.hasNext());
+        assertTrue(i.next().size() == 0);
+
+        // test prefix([a,b],[a,b,c])
+        u = new Unifier();
+        i = (Iterator<Unifier>)new jason.stdlib.prefix().execute(null, u, new Term[] { l2, l1 });
+        assertTrue(i != null);
+        //assertTrue(i.hasNext());
+        //assertTrue(i.next().size() == 0);
+
+        // test prefix([b,c],[a,b,c])
+        u = new Unifier();
+        i = (Iterator<Unifier>)new jason.stdlib.prefix().execute(null, u, new Term[] { l3, l1 });
+        assertFalse(i.hasNext());
+
+        // test prefix([a(X)],[a(1),b(2),c(3)])
+        Term l4 = ASSyntax.parseTerm("[a(1),b(2),c(3)]");
+        Term l5 = ASSyntax.parseTerm("[a(X)]");
+        u = new Unifier();
+        i = (Iterator<Unifier>)new jason.stdlib.prefix().execute(null, u, new Term[] { l5, l4 });
+        assertTrue(i != null);
+        assertTrue(i.hasNext());
+        Unifier ru = i.next();
+        assertTrue(u.size() == 0); // u should not be changed!
+        assertTrue(ru.size() == 1);
+        assertEquals(ru.get("X").toString(), "1");
+        
+        // test prefix(X,[a,b,c])
+        Term tx = ASSyntax.parseTerm("X");
+        u = new Unifier();
+        i = (Iterator<Unifier>)new jason.stdlib.prefix().execute(null, u, new Term[] { tx, l1 });
+        assertTrue(iteratorSize(i) == 3);
+        i = (Iterator<Unifier>)new jason.stdlib.prefix().execute(null, u, new Term[] { tx, l1 });
+        assertEquals(i.next().get("X").toString(),"[a,b,c]");
+        assertEquals(i.next().get("X").toString(),"[a,b]");
+        assertEquals(i.next().get("X").toString(),"[a]");
+        assertFalse(i.hasNext());
+
+    }
+
+    @SuppressWarnings("unchecked")
+    public void testSuffix() throws Exception {
+        ListTerm l1 = ListTermImpl.parseList("[a,b,c]");
+        ListTerm l2 = ListTermImpl.parseList("[b,c]");
+        ListTerm l3 = ListTermImpl.parseList("[a,b]");
+        
+        // test suffix([a,b,c],[a,b,c])
+        Unifier u = new Unifier();
+        Iterator<Unifier> i = (Iterator<Unifier>)new jason.stdlib.suffix().execute(null, u, new Term[] { l1, l1 });
+        assertTrue(i != null);
+        assertTrue(i.hasNext());
+        assertTrue(i.next().size() == 0);
+
+        // test suffix([b,c],[a,b,c])
+        u = new Unifier();
+        i = (Iterator<Unifier>)new jason.stdlib.suffix().execute(null, u, new Term[] { l2, l1 });
+        assertTrue(i != null);
+        //assertTrue(i.hasNext());
+        //assertTrue(i.next().size() == 0);
+
+        // test suffix([a,b],[a,b,c])
+        u = new Unifier();
+        i = (Iterator<Unifier>)new jason.stdlib.suffix().execute(null, u, new Term[] { l3, l1 });
+        assertFalse(i.hasNext());
+
+        // test suffix([c(X)],[a(1),b(2),c(3)])
+        Term l4 = ASSyntax.parseTerm("[a(1),b(2),c(3)]");
+        Term l5 = ASSyntax.parseTerm("[c(X)]");
+        u = new Unifier();
+        i = (Iterator<Unifier>)new jason.stdlib.suffix().execute(null, u, new Term[] { l5, l4 });
+        assertTrue(i != null);
+        assertTrue(i.hasNext());
+        Unifier ru = i.next();
+        assertTrue(u.size() == 0); // u should not be changed!
+        assertTrue(ru.size() == 1);
+        assertEquals(ru.get("X").toString(), "3");
+        
+        // test suffix(X,[a,b,c])
+        Term tx = ASSyntax.parseTerm("X");
+        u = new Unifier();
+        i = (Iterator<Unifier>)new jason.stdlib.suffix().execute(null, u, new Term[] { tx, l1 });
+        assertTrue(iteratorSize(i) == 3);
+        i = (Iterator<Unifier>)new jason.stdlib.suffix().execute(null, u, new Term[] { tx, l1 });
+        assertEquals(i.next().get("X").toString(),"[a,b,c]");
+        assertEquals(i.next().get("X").toString(),"[b,c]");
+        assertEquals(i.next().get("X").toString(),"[c]");
+        assertFalse(i.hasNext());
+
+    }
+    
+    @SuppressWarnings("unchecked")
+    public void testSublist() throws Exception {
+    	
+    	/* As for prefix */
+    	//    	
+        ListTerm l1 = ListTermImpl.parseList("[a,b,c]");
+        ListTerm l2 = ListTermImpl.parseList("[a,b]");
+        ListTerm l3 = ListTermImpl.parseList("[b,c]");
+        
+        // test sublist([a,b,c],[a,b,c])
+        Unifier u = new Unifier();
+        Iterator<Unifier> i = (Iterator<Unifier>)new jason.stdlib.sublist().execute(null, u, new Term[] { l1, l1 });
+        assertTrue(i != null);
+        assertTrue(i.hasNext());
+        assertTrue(i.next().size() == 0);
+
+        // test sublist([a,b],[a,b,c])
+        u = new Unifier();
+        i = (Iterator<Unifier>)new jason.stdlib.sublist().execute(null, u, new Term[] { l2, l1 });
+        assertTrue(i != null);
+        assertTrue(i.hasNext());
+        assertTrue(i.next().size() == 0);
+
+        // test sublist([a(X)],[a(1),b(2),c(3)])
+        Term l4 = ASSyntax.parseTerm("[a(1),b(2),c(3)]");
+        Term l5 = ASSyntax.parseTerm("[a(X)]");
+        u = new Unifier();
+        i = (Iterator<Unifier>)new jason.stdlib.sublist().execute(null, u, new Term[] { l5, l4 });
+        assertTrue(i != null);
+        assertTrue(i.hasNext());
+        Unifier ru = i.next();
+        assertTrue(u.size() == 0); // u should not be changed!
+        assertTrue(ru.size() == 1);
+        assertEquals(ru.get("X").toString(), "1");
+        
+
+        /* As for suffix */
+        //
+        l1 = ListTermImpl.parseList("[a,b,c]");
+        l2 = ListTermImpl.parseList("[b,c]");
+        l3 = ListTermImpl.parseList("[a,b]");
+        
+        // test sublist([b,c],[a,b,c])
+        u = new Unifier();
+        i = (Iterator<Unifier>)new jason.stdlib.sublist().execute(null, u, new Term[] { l2, l1 });
+        assertTrue(i != null);
+        assertTrue(i.hasNext());
+        assertTrue(i.next().size() == 0);
+
+        // test sublist([c(X)],[a(1),b(2),c(3)])
+        l4 = ASSyntax.parseTerm("[a(1),b(2),c(3)]");
+        l5 = ASSyntax.parseTerm("[c(X)]");
+        u = new Unifier();
+        i = (Iterator<Unifier>)new jason.stdlib.sublist().execute(null, u, new Term[] { l5, l4 });
+        assertTrue(i != null);
+        assertTrue(i.hasNext());
+        ru = i.next();
+        assertTrue(u.size() == 0); // u should not be changed!
+        assertTrue(ru.size() == 1);
+        assertEquals(ru.get("X").toString(), "3");
+        
+        
+        /* After passing prefix and suffix, test middle sublist (true and false) */
+        //
+        l1 = ListTermImpl.parseList("[a,b,c]");
+        l2 = ListTermImpl.parseList("[b]");
+        l3 = ListTermImpl.parseList("[d]");
+        
+        // test sublist([b],[a,b,c])
+        u = new Unifier();
+        i = (Iterator<Unifier>)new jason.stdlib.sublist().execute(null, u, new Term[] { l2, l1 });
+        assertTrue(i != null);
+        assertTrue(i.hasNext());
+        assertTrue(i.next().size() == 0);
+
+        // test sublist([d],[a,b,c])
+        u = new Unifier();
+        i = (Iterator<Unifier>)new jason.stdlib.sublist().execute(null, u, new Term[] { l3, l1 });
+        assertFalse(i.hasNext());
+
+        // test sublist([a,c],[a,b,c])
+        l4 = ListTermImpl.parseList("[a,c]");
+        u = new Unifier();
+        i = (Iterator<Unifier>)new jason.stdlib.sublist().execute(null, u, new Term[] { l4, l1 });
+        assertFalse(i.hasNext());
+
+        
+        // Finally, test backtracking
+        // test sublist(X,[a,b,c])
+        Term tx = ASSyntax.parseTerm("X");
+        u = new Unifier();
+        i = (Iterator<Unifier>)new jason.stdlib.sublist().execute(null, u, new Term[] { tx, l1 });
+        assertTrue(iteratorSize(i) == 6);
+        i = (Iterator<Unifier>)new jason.stdlib.sublist().execute(null, u, new Term[] { tx, l1 });
+        assertEquals(i.next().get("X").toString(),"[a,b,c]");
+        assertEquals(i.next().get("X").toString(),"[a,b]");
+        assertEquals(i.next().get("X").toString(),"[a]");
+        assertEquals(i.next().get("X").toString(),"[b,c]");
+        assertEquals(i.next().get("X").toString(),"[b]");
+        assertEquals(i.next().get("X").toString(),"[c]");
+        assertFalse(i.hasNext());
+
+    }
+
+    
+    
     public void testDelete() throws Exception {
         ListTerm l1 = ListTermImpl.parseList("[a,b,a,c,a]");
         Term ta = ASSyntax.parseTerm("a");
