@@ -7,9 +7,7 @@ import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.ListTerm;
 import jason.asSyntax.Term;
-
 import java.util.Iterator;
-import java.util.List;
 
 /**
 
@@ -30,9 +28,9 @@ import java.util.List;
 
   <li> <code>.prefix([a],[a,b,c])</code>: true.</li>
   <li> <code>.prefix([b,c],[a,b,c])</code>: false.</li>
-  <li> <code>.prefix(X,[a,b,c])</code>: unifies X with any suffix of the list, i.e., [a,b,c], [a,b], and [a], in this order;
-                                        note that this is different from what its usual implementation in logic programming would result;
-                                        also, the empty list is not generated as a possibly prefix. </li>
+  <li> <code>.prefix(X,[a,b,c])</code>: unifies X with any prefix of the list, i.e., [a,b,c], [a,b], [a], and [] in this order;
+                                        note that this is different from what its usual implementation in logic programming would result,
+                                        where the various prefixes are returned in increasing lengths instead.</li>
 
   </ul>
 
@@ -43,6 +41,8 @@ import java.util.List;
   @see jason.stdlib.max
   @see jason.stdlib.min
   @see jason.stdlib.reverse
+  @see jason.stdlib.suffix
+  @see jason.stdlib.sublist
 
   @see jason.stdlib.difference
   @see jason.stdlib.intersection
@@ -51,7 +51,11 @@ import java.util.List;
 */
 public class prefix extends DefaultInternalAction {
     
-    private static InternalAction singleton = null;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -4736810884249871078L;
+	private static InternalAction singleton = null;
     public static InternalAction create() {
         if (singleton == null) 
             singleton = new prefix();
@@ -84,6 +88,7 @@ public class prefix extends DefaultInternalAction {
 		
         return new Iterator<Unifier>() {
             Unifier c = null; // the current response (which is an unifier)
+            boolean triedEmpty = false;
             
             public boolean hasNext() {
                 if (c == null) // the first call of hasNext should find the first response 
@@ -102,10 +107,17 @@ public class prefix extends DefaultInternalAction {
                 while (!list.isEmpty()) {
                     c = un.clone();
                     if (c.unifiesNoUndo(sublist, list.clone())) {
-    					((List)list).remove(list.size()-1);
+    					list.removeLast();
                         return; // found another sublist, c is the current response
 					}
-					((List)list).remove(list.size()-1);
+					list.removeLast();
+                }
+                if (!triedEmpty) {
+                	triedEmpty = true;
+                	c = un.clone();
+                    if (c.unifiesNoUndo(sublist, list.clone())) {
+                        return; // found another sublist, c is the current response
+					}                	
                 }
                 c = null; // no more sublists found 
             }

@@ -379,11 +379,12 @@ public class StdLibTest extends TestCase {
         Term tx = ASSyntax.parseTerm("X");
         u = new Unifier();
         i = (Iterator<Unifier>)new jason.stdlib.prefix().execute(null, u, new Term[] { tx, l1 });
-        assertTrue(iteratorSize(i) == 3);
+        assertTrue(iteratorSize(i) == 4);
         i = (Iterator<Unifier>)new jason.stdlib.prefix().execute(null, u, new Term[] { tx, l1 });
         assertEquals(i.next().get("X").toString(),"[a,b,c]");
         assertEquals(i.next().get("X").toString(),"[a,b]");
         assertEquals(i.next().get("X").toString(),"[a]");
+        assertEquals(i.next().get("X").toString(),"[]");
         assertFalse(i.hasNext());
 
     }
@@ -429,11 +430,12 @@ public class StdLibTest extends TestCase {
         Term tx = ASSyntax.parseTerm("X");
         u = new Unifier();
         i = (Iterator<Unifier>)new jason.stdlib.suffix().execute(null, u, new Term[] { tx, l1 });
-        assertTrue(iteratorSize(i) == 3);
+        assertTrue(iteratorSize(i) == 4);
         i = (Iterator<Unifier>)new jason.stdlib.suffix().execute(null, u, new Term[] { tx, l1 });
         assertEquals(i.next().get("X").toString(),"[a,b,c]");
         assertEquals(i.next().get("X").toString(),"[b,c]");
         assertEquals(i.next().get("X").toString(),"[c]");
+        assertEquals(i.next().get("X").toString(),"[]");
         assertFalse(i.hasNext());
 
     }
@@ -530,7 +532,7 @@ public class StdLibTest extends TestCase {
         Term tx = ASSyntax.parseTerm("X");
         u = new Unifier();
         i = (Iterator<Unifier>)new jason.stdlib.sublist().execute(null, u, new Term[] { tx, l1 });
-        assertTrue(iteratorSize(i) == 6);
+        assertTrue(iteratorSize(i) == 7);
         i = (Iterator<Unifier>)new jason.stdlib.sublist().execute(null, u, new Term[] { tx, l1 });
         assertEquals(i.next().get("X").toString(),"[a,b,c]");
         assertEquals(i.next().get("X").toString(),"[a,b]");
@@ -538,6 +540,7 @@ public class StdLibTest extends TestCase {
         assertEquals(i.next().get("X").toString(),"[b,c]");
         assertEquals(i.next().get("X").toString(),"[b]");
         assertEquals(i.next().get("X").toString(),"[c]");
+        assertEquals(i.next().get("X").toString(),"[]");
         assertFalse(i.hasNext());
 
     }

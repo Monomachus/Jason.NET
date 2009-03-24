@@ -7,9 +7,7 @@ import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.ListTerm;
 import jason.asSyntax.Term;
-
 import java.util.Iterator;
-import java.util.List;
 
 /**
 
@@ -35,9 +33,8 @@ import java.util.List;
   <li> <code>.sublist([b,c],[a,b,c])</code>: true.</li>
   <li> <code>.sublist([d],[a,b,c])</code>: false.</li>
   <li> <code>.sublist([a,c],[a,b,c])</code>: false.</li>
-  <li> <code>.sublist(X,[a,b,c])</code>: unifies X with any suffix of the list, i.e., [a,b,c], [a,b], [a], [b,c], [b], [c] in this order;
-                                         note that this is not the order in which its usual implementation would return in logic programming;
-                                         also, the empty list is not generated as a possible sublist.</li>
+  <li> <code>.sublist(X,[a,b,c])</code>: unifies X with any sublist of the list, i.e., [a,b,c], [a,b], [a], [b,c], [b], [c], and [] in this order;
+                                         note that this is not the order in which its usual implementation would return in logic programming (see note on .prefix).</li>
 
   </ul>
 
@@ -48,6 +45,8 @@ import java.util.List;
   @see jason.stdlib.max
   @see jason.stdlib.min
   @see jason.stdlib.reverse
+  @see jason.stdlib.prefix
+  @see jason.stdlib.suffix
 
   @see jason.stdlib.difference
   @see jason.stdlib.intersection
@@ -56,7 +55,11 @@ import java.util.List;
 */
 public class sublist extends DefaultInternalAction {
     
-    private static InternalAction singleton = null;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -1725808189703510112L;
+	private static InternalAction singleton = null;
     public static InternalAction create() {
         if (singleton == null) 
             singleton = new sublist();
@@ -90,6 +93,7 @@ public class sublist extends DefaultInternalAction {
         return new Iterator<Unifier>() {
             Unifier c = null; // the current response (which is an unifier)
             ListTerm list = listOutter.cloneLT();  // used in the inner loop
+            boolean triedEmpty = false;
             
             public boolean hasNext() {
                 if (c == null) // the first call of hasNext should find the first response 
@@ -109,13 +113,20 @@ public class sublist extends DefaultInternalAction {
                 	while (!list.isEmpty()) {
                 		c = un.clone();
                 		if (c.unifiesNoUndo(sublist, list.clone())) {
-                			((List)list).remove(list.size()-1);
+                			list.remove(list.size()-1);
                 			return; // found another sublist, c is the current response
                 		}
-                		((List)list).remove(list.size()-1);
+                		list.remove(list.size()-1);
                 	}
-            		((List)listOutter).remove(0);
+            		listOutter.remove(0);
             		list = listOutter.cloneLT();
+                }
+                if (!triedEmpty) {
+                	triedEmpty = true;
+                	c = un.clone();
+                    if (c.unifiesNoUndo(sublist, list.clone())) {
+                        return; // found another sublist, c is the current response
+					}                	
                 }
                 c = null; // no more sublists found 
             }

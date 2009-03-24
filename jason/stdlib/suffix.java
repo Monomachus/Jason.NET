@@ -7,9 +7,7 @@ import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.ListTerm;
 import jason.asSyntax.Term;
-
 import java.util.Iterator;
-import java.util.List;
 
 /**
 
@@ -30,8 +28,7 @@ import java.util.List;
 
   <li> <code>.suffix([c],[a,b,c])</code>: true.</li>
   <li> <code>.suffix([a,b],[a,b,c])</code>: false.</li>
-  <li> <code>.suffix(X,[a,b,c])</code>: unifies X with any suffix of the list, i.e., [a,b,c], [b,c], and [c], in this order;
-                                        note that the empty list is not returned as a possible suffix.</li>
+  <li> <code>.suffix(X,[a,b,c])</code>: unifies X with any suffix of the list, i.e., [a,b,c], [b,c], [c], and [] in this order.</li>
 
   </ul>
 
@@ -42,6 +39,8 @@ import java.util.List;
   @see jason.stdlib.max
   @see jason.stdlib.min
   @see jason.stdlib.reverse
+  @see jason.stdlib.prefix
+  @see jason.stdlib.sublist
 
   @see jason.stdlib.difference
   @see jason.stdlib.intersection
@@ -50,7 +49,11 @@ import java.util.List;
 */
 public class suffix extends DefaultInternalAction {
     
-    private static InternalAction singleton = null;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 2463927564326061873L;
+	private static InternalAction singleton = null;
     public static InternalAction create() {
         if (singleton == null) 
             singleton = new suffix();
@@ -83,7 +86,7 @@ public class suffix extends DefaultInternalAction {
 		
         return new Iterator<Unifier>() {
             Unifier c = null; // the current response (which is an unifier)
-            
+            boolean triedEmpty = false;
             public boolean hasNext() {
                 if (c == null) // the first call of hasNext should find the first response 
                     find();
@@ -101,10 +104,17 @@ public class suffix extends DefaultInternalAction {
                 while (!list.isEmpty()) {
                     c = un.clone();
                     if (c.unifiesNoUndo(sublist, list.clone())) {
-						((List)list).remove(0);
+						list.remove(0);
                         return; // found another sublist, c is the current response
 					}
-					((List)list).remove(0);
+					list.remove(0);
+                }
+                if (!triedEmpty) {
+                	triedEmpty = true;
+                	c = un.clone();
+                    if (c.unifiesNoUndo(sublist, list.clone())) {
+                        return; // found another sublist, c is the current response
+					}                	
                 }
                 c = null; // no more sublists found 
             }
