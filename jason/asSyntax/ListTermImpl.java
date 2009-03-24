@@ -267,6 +267,27 @@ public class ListTermImpl extends Structure implements ListTerm {
         return null; // !!! no last!!!!
     }
     
+    public ListTerm getPenultimate() {
+        if (getNext() == null)
+            return null;
+        if (isTail())
+            return this;
+        if (getNext().isEnd() && !getNext().isTail())
+            return this;
+        return getNext().getPenultimate();
+    }
+    
+    public Term removeLast() {
+        ListTerm p = getPenultimate();
+        if (p != null) {
+            Term b = p.getTerm();
+            p.setTerm(null);
+            p.setNext(null);
+            return b;
+        } else {
+            return null;
+        }
+    }
     
     /** 
      * Adds a term in the end of the list

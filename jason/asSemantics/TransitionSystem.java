@@ -70,19 +70,12 @@ public class TransitionSystem {
     private AgArch        agArch     = null;
     private Circumstance  C          = null;
     private Settings      setts      = null;
-
-    // first step of the SOS 
-    private State         step       = State.StartRC;                                                                                               
-
-    // number of reasoning cycles since last belief revision
-    private int           nrcslbr;                                                                                                             
+    private State         step       = State.StartRC; // first step of the SOS                                                                                                
+    private int           nrcslbr    = Settings.ODefaultNRC; // number of reasoning cycles since last belief revision                                                                                                             
     
     // both configuration and configuration' point to this
     // object, this is just to make it look more like the SOS
     private TransitionSystem      confP;
-
-    // both configuration and configuration' point to this
-    // object, this is just to make it look more like the SOS
     private TransitionSystem      conf;
 
     private Queue<Runnable> taskForBeginOfCycle = new ConcurrentLinkedQueue<Runnable>();

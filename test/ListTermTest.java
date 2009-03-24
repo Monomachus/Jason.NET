@@ -30,6 +30,20 @@ public class ListTermTest extends TestCase {
         //System.out.println("l1="+l1+"\nl2="+l2+"\nl3="+l3+"\nl4="+l4);
         //System.out.println("l5="+l5);
     }
+    
+    public void testPenultimateAndRemoveLast() {
+        assertEquals("[c]",l1.getPenultimate().toString());
+        assertEquals("[b(r,t)|T]", l2.getPenultimate().toString());
+        assertEquals("[T]", l4.getPenultimate().toString());
+        
+        assertEquals("c",l1.removeLast().toString());
+        assertEquals("[a,b]",l1.toString());
+        assertEquals("T",l4.removeLast().toString());
+        assertEquals("[X,b]",l4.toString());
+        
+        assertEquals("b(r,t)",l2.removeLast().toString());
+        assertEquals("[a(1,2)]",l2.toString());
+    }
 
     public void testSize() {
         assertEquals(l1.size(), 3);

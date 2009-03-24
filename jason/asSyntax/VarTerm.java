@@ -840,6 +840,20 @@ public class VarTerm extends LiteralImpl implements NumberTerm, ListTerm, String
             return null;
     }
 
+    public ListTerm getPenultimate() {
+        if (value != null && getValue().isList())
+            return ((ListTerm) getValue()).getPenultimate();
+        else
+            return null;
+    }
+    
+    public Term removeLast() {
+        if (value != null && getValue().isList())
+            return ((ListTerm) getValue()).removeLast();
+        else
+            return null;
+    }
+
     public ListTerm getNext() {
         if (value != null && getValue().isList())
             return ((ListTerm) getValue()).getNext();

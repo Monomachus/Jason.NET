@@ -23,6 +23,8 @@ public interface ListTerm extends java.util.List<Term>, Term {
     public VarTerm getTail();
     public void setTail(VarTerm v);
     public ListTerm getLast();
+    public ListTerm getPenultimate();
+    public Term     removeLast();
     public ListTerm append(Term t);
     public ListTerm concat(ListTerm lt);
     public ListTerm reverse();

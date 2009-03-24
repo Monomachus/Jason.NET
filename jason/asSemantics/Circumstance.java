@@ -23,7 +23,6 @@
 
 package jason.asSemantics;
 
-import jason.JasonException;
 import jason.asSyntax.Literal;
 import jason.asSyntax.Trigger;
 import jason.asSyntax.Trigger.TEOperator;
