@@ -125,6 +125,8 @@ public class TimeSteppedEnvironment extends Environment {
     @Override
     public void scheduleAction(String agName, Structure action, Object infraData) {
         if (!isRunning()) return;
+        
+        //System.out.println("scheduling "+action+" for "+agName);
         ActRequest newRequest = new ActRequest(agName, action, requiredStepsForAction(agName, action), infraData);
 
         boolean startNew = false;
@@ -170,13 +172,10 @@ public class TimeSteppedEnvironment extends Environment {
         }
         
         if (startNew) {
-            // starts the execution of the next step by another thread, so to not look the agent thread
-            executor.execute(new Runnable() {
-                public void run() {
-                    if (timeoutThread != null) timeoutThread.allAgFinished();
-                    startNewStep();
-                }
-            });         
+            if (timeoutThread != null) 
+                timeoutThread.allAgFinished();
+            else
+                startNewStep();
         }
     }
 
@@ -204,7 +203,9 @@ public class TimeSteppedEnvironment extends Environment {
     
     private void startNewStep() {
         if (!isRunning()) return;
+
         synchronized (requests) {
+            step++;
 
             //logger.info("#"+requests.size());
             //logger.info("#"+overRequests.size());
@@ -250,15 +251,14 @@ public class TimeSteppedEnvironment extends Environment {
                 if (testEndCycle(requests.keySet())) {
                     startNewStep();
                 }
+                
+                stepStarted(step);
             } catch (Exception ie) {
                 if (isRunning() && !(ie instanceof InterruptedException)) {
                     logger.log(Level.WARNING, "act error!",ie);
                 }
             }
-            
         }
-        step++;
-        stepStarted(step);      
     }
     
     /** to be overridden by the user class */
@@ -308,6 +308,7 @@ public class TimeSteppedEnvironment extends Environment {
         Lock lock = new ReentrantLock();
         Condition agActCond = lock.newCondition();
         long timeout = 0;
+        boolean allFinished = false;
 
         public TimeOutThread(long to) {
             super("EnvironmentTimeOutThread");
@@ -316,6 +317,7 @@ public class TimeSteppedEnvironment extends Environment {
         
         public void allAgFinished() {
             lock.lock();
+            allFinished = true;
             agActCond.signal();
             lock.unlock();
         }
@@ -325,15 +327,16 @@ public class TimeSteppedEnvironment extends Environment {
                 while (true) {
                     lock.lock();
                     long lastStepStart = System.currentTimeMillis();
-                    boolean byTimeOut = !agActCond.await(timeout, TimeUnit.MILLISECONDS);
+                    boolean byTimeOut = false;
+                    if (!allFinished) {
+                        byTimeOut = !agActCond.await(timeout, TimeUnit.MILLISECONDS);
+                    }
+                    allFinished = false;
                     long now  = System.currentTimeMillis();
                     long time = (now-lastStepStart);
                     stepFinished(step, time, byTimeOut);
                     lock.unlock();
-                    
-                    if (byTimeOut) {
-                        startNewStep();
-                    }
+                    startNewStep();
                 }
             } catch (InterruptedException e) {              
             } catch (Exception e) {

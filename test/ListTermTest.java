@@ -234,6 +234,29 @@ public class ListTermTest extends TestCase {
         assertEquals("d",a[a.length-1].toString());
     }
     
+    public void testListIterator() {
+        StringBuilder s = new StringBuilder();
+        ListTerm l = l1;
+        while (! l.isEnd()) {
+            s.append(l.toString());
+            l = l.getNext();
+        }
+        s.append(l.toString());
+        assertEquals("[a,b,c][b,c][c][]",s.toString());
+
+        s = new StringBuilder();
+        l = l2;
+        while (! l.isEnd()) {
+            s.append(l.toString());
+            l = l.getNext();
+        }
+        s.append(l.toString());
+        if (l.isTail())
+            s.append(l.getTail());
+        System.out.println(s);
+        assertEquals("[a(1,2),b(r,t)|T][b(r,t)|T]T",s.toString());
+    }
+    
     public void testReverse() {
         ListTerm l = ListTermImpl.parseList("[]");
         assertEquals(l, l.reverse());
