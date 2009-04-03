@@ -42,7 +42,7 @@ Implementation of <b>if</b>.
 <pre>
   if ( <i>logical formula</i> ) {
      <i>plan_body1</i>
-  [ } else { <i>plan_body2</i> ]
+  [ } { <i>plan_body2</i> ]
   };
 </pre>
 </p>
