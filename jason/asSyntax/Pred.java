@@ -394,25 +394,21 @@ public class Pred extends Structure {
     @Override
     public Literal makeVarsAnnon(Unifier un) {
         if (annots != null) {
-            Iterator<ListTerm> i = annots.listTermIterator();
-            while (i.hasNext()) {
-                ListTerm lt = i.next();
+            ListTerm lt = annots;
+            while (!lt.isEmpty()) {
                 Term ta = lt.getTerm();
-
-                if (ta.isVar() && !ta.isUnnamedVar()) {
-                    // replace ta to an unnamed var
-                    VarTerm vt = un.deref((VarTerm)ta);
-                    UnnamedVar uv;
-                    if (vt.isUnnamedVar()) {
-                        uv = (UnnamedVar)vt;
-                    } else {
-                        uv = new UnnamedVar("_"+UnnamedVar.getUniqueId()+ta);
-                        un.bind(vt, uv);
-                    }
+                VarTerm uv = varToReplace(ta, un);
+                if (uv != null)
                     lt.setTerm(uv);
-                } else if (ta.isStructure()) {
+                else if (ta.isStructure())
                     ((Structure)ta).makeVarsAnnon(un);
+                if (lt.isTail()) {
+                    uv = varToReplace(lt.getNext(), un);
+                    if (uv != null)
+                        lt.setNext(uv);
+                    break;
                 }
+                lt = lt.getNext();
             }
         }
         return super.makeVarsAnnon(un);

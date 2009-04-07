@@ -5,9 +5,12 @@ import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.InternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
+import jason.asSyntax.ASSyntax;
 import jason.asSyntax.ListTerm;
 import jason.asSyntax.Term;
+
 import java.util.Iterator;
+import java.util.List;
 
 /**
 
@@ -51,9 +54,6 @@ import java.util.Iterator;
 */
 public class prefix extends DefaultInternalAction {
     
-    /**
-	 * 
-	 */
 	private static final long serialVersionUID = -4736810884249871078L;
 	private static InternalAction singleton = null;
     public static InternalAction create() {
@@ -83,8 +83,7 @@ public class prefix extends DefaultInternalAction {
         // execute the internal action
 
         final Term sublist = args[0];
-//        final Iterator<Term> i = ((ListTerm)args[1]).iterator();
-        final ListTerm list = ((ListTerm)args[1]).cloneLT();
+        final List<Term> list = ((ListTerm)args[1]).getAsList(); // use a Java List for better performance in remove last
 		
         return new Iterator<Unifier>() {
             Unifier c = null; // the current response (which is an unifier)
@@ -105,17 +104,17 @@ public class prefix extends DefaultInternalAction {
             
             void find() {
                 while (!list.isEmpty()) {
+                    ListTerm candidate = ASSyntax.createList(list);
+                    list.remove(list.size()-1);
                     c = un.clone();
-                    if (c.unifiesNoUndo(sublist, list.clone())) {
-    					list.removeLast();
+                    if (c.unifiesNoUndo(sublist, candidate)) {
                         return; // found another sublist, c is the current response
 					}
-					list.removeLast();
                 }
                 if (!triedEmpty) {
                 	triedEmpty = true;
                 	c = un.clone();
-                    if (c.unifiesNoUndo(sublist, list.clone())) {
+                    if (c.unifiesNoUndo(sublist, ASSyntax.createList())) {
                         return; // found another sublist, c is the current response
 					}                	
                 }

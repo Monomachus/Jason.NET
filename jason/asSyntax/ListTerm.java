@@ -35,7 +35,7 @@ public interface ListTerm extends java.util.List<Term>, Term {
     
     public Iterator<ListTerm> listTermIterator();
     public List<Term> getAsList();
-    
+
     /** clone the list term */
     public ListTerm cloneLT();
 }

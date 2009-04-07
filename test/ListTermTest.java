@@ -8,6 +8,7 @@ import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Structure;
 import jason.asSyntax.Term;
 import jason.asSyntax.VarTerm;
+import jason.asSyntax.parser.ParseException;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -127,11 +128,11 @@ public class ListTermTest extends TestCase {
                 i.remove();
             }
         }
-        assertEquals(l1.toString(), "[b2,c]");
+        assertEquals("[b2,c]", l1.toString());
         i = l1.iterator();
         i.next(); i.next(); // c is the current
         i.remove(); // remove c
-        assertEquals(l1.toString(), "[b2]");
+        assertEquals("[b2]", l1.toString());
     }
     
     public void testClone() {
@@ -234,26 +235,34 @@ public class ListTermTest extends TestCase {
         assertEquals("d",a[a.length-1].toString());
     }
     
-    public void testListIterator() {
+    public void testListIterator() throws ParseException {
+        Iterator<Term> it = l1.iterator();
+        assertTrue(it.hasNext()); assertEquals("a", it.next().toString());
+        assertTrue(it.hasNext()); assertEquals("b", it.next().toString());
+        assertTrue(it.hasNext()); assertEquals("c", it.next().toString());
+        assertFalse(it.hasNext()); 
+        
+        it = l2.iterator();
+        assertTrue(it.hasNext()); assertEquals("a(1,2)", it.next().toString());
+        assertTrue(it.hasNext()); assertEquals("b(r,t)", it.next().toString());
+        assertFalse(it.hasNext());
+        
+        it = ASSyntax.parseList("[]").iterator();
+        assertFalse(it.hasNext());        
+        
         StringBuilder s = new StringBuilder();
-        ListTerm l = l1;
-        while (! l.isEnd()) {
-            s.append(l.toString());
-            l = l.getNext();
+        Iterator<ListTerm> i = l1.listTermIterator();
+        while (i.hasNext()) {
+            s.append(i.next());
         }
-        s.append(l.toString());
         assertEquals("[a,b,c][b,c][c][]",s.toString());
 
         s = new StringBuilder();
-        l = l2;
-        while (! l.isEnd()) {
-            s.append(l.toString());
-            l = l.getNext();
+        i = l2.listTermIterator();
+        while (i.hasNext()) {
+            s.append(i.next());
         }
-        s.append(l.toString());
-        if (l.isTail())
-            s.append(l.getTail());
-        System.out.println(s);
+        //System.out.println(s);
         assertEquals("[a(1,2),b(r,t)|T][b(r,t)|T]T",s.toString());
     }
     

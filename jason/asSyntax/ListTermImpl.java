@@ -375,52 +375,65 @@ public class ListTermImpl extends Structure implements ListTerm {
         return result;
     }
 
-    /** returns an iterator where each element is a ListTerm */
+    /** 
+     * gives an iterator that includes the final empty list or tail, 
+     * for [a,b,c] returns [a,b,c]; [b,c]; [c]; and [].
+     * for [a,b|T] returns [a,b|T]; [b|T]; [b|T]; and T.
+     */
     public Iterator<ListTerm> listTermIterator() {
-        final ListTermImpl lt = this;
-        return new Iterator<ListTerm>() {
-            ListTerm nextLT  = lt;
-            ListTerm current = null;
+        return new ListTermIterator<ListTerm>(this) {
+            public ListTerm next() {
+                moveNext();
+                return current;
+            }
+        };
+    }
+    
+
+    /** 
+     * returns an iterator where each element is a Term of this list,
+     * the tail of the list is not considered. 
+     * for [a,b,c] returns 'a', 'b', and 'c'.
+     * for [a,b|T] returns 'a' and 'b'.
+     */  
+    public Iterator<Term> iterator() {
+        return new ListTermIterator<Term>(this) {
             public boolean hasNext() {
                 return nextLT != null && !nextLT.isEmpty() && nextLT.isList(); 
             }
-            public ListTerm next() {
-                current = nextLT;
-                nextLT = nextLT.getNext();
-                return current;
-            }
-            public void remove() {
-                if (current != null) {
-                    if (nextLT != null) {
-                        current.setTerm(nextLT.getTerm());
-                        current.setNext((Term)nextLT.getNext());
-                        nextLT = current;
-                    }
-                }
+            public Term next() {
+                moveNext();
+                return current.getTerm();
             }
         };
+    }
+        
+    private abstract class ListTermIterator<T> implements Iterator<T> {
+        ListTerm nextLT;
+        ListTerm current = null;
+        public ListTermIterator(ListTerm lt) {
+            nextLT = lt;
+        }
+        public boolean hasNext() {
+            return nextLT != null; 
+        }
+        public void moveNext() {
+            current = nextLT;
+            nextLT  = nextLT.getNext();
+        }
+        public void remove() {
+            if (current != null && nextLT != null) {
+                current.setTerm(nextLT.getTerm());
+                current.setNext(nextLT.getNext());
+                nextLT = current;
+            }
+        }
     }
 
-    /** returns an iterator where each element is a Term of this list */
-    public Iterator<Term> iterator() {
-        final Iterator<ListTerm> i = this.listTermIterator();
-        return new Iterator<Term>() {
-            public boolean hasNext() {
-                return i.hasNext();
-            }
-            public Term next() {
-                return i.next().getTerm();
-            }
-            public void remove() {
-                i.remove();
-            }
-        };
-    }
-    
-    
+
     /** 
      * Returns this ListTerm as a Java List. 
-     * Note: the list Tail is considered just as the last element of the list!
+     * Note: the tail of the list, if any, is not included!
      */
     public List<Term> getAsList() {
         List<Term> l = new ArrayList<Term>();
@@ -432,16 +445,17 @@ public class ListTermImpl extends Structure implements ListTerm {
     
     public String toString() {
         StringBuilder s = new StringBuilder("[");
-        Iterator<ListTerm> i = listTermIterator();
-        while (i.hasNext()) {
-            ListTerm lt = i.next();
-            s.append( lt.getTerm() );
-            if (lt.isTail()) {
+        ListTerm l = this;
+        while (!l.isEmpty()) {
+            s.append(l.getTerm());
+            if (l.isTail()) {
                 s.append('|');
-                s.append(lt.getNext());
-            } else if (i.hasNext()) {
-                s.append(',');
+                s.append(l.getNext());
+                break;
             }
+            l = l.getNext();
+            if (!l.isEmpty())
+                s.append(',');
         }
         s.append(']');
         return s.toString();

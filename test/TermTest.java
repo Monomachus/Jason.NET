@@ -608,6 +608,11 @@ public class TermTest extends TestCase {
         l1.countVars(v);
         assertEquals(3, v.size());
         assertEquals("vl("+l1.getTerm(1)+")",l1.getAnnots("vl").get(0).toString());
+        
+        l1 = Literal.parseLiteral("calc(a)[a,b|T]");
+        l1.makeVarsAnnon();
+        assertTrue(l1.toString().contains("_"));
+        assertFalse("calc(a)[a,b|T]".equals(l1.toString()));
     }
     
     public void testMakeVarAnnon4() {

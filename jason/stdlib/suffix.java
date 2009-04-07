@@ -5,8 +5,10 @@ import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.InternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
+import jason.asSyntax.ASSyntax;
 import jason.asSyntax.ListTerm;
 import jason.asSyntax.Term;
+
 import java.util.Iterator;
 
 /**
@@ -49,9 +51,6 @@ import java.util.Iterator;
 */
 public class suffix extends DefaultInternalAction {
     
-    /**
-	 * 
-	 */
 	private static final long serialVersionUID = 2463927564326061873L;
 	private static InternalAction singleton = null;
     public static InternalAction create() {
@@ -81,12 +80,10 @@ public class suffix extends DefaultInternalAction {
         // execute the internal action
 
         final Term sublist = args[0];
-//        final Iterator<Term> i = ((ListTerm)args[1]).iterator();
-        final ListTerm list = ((ListTerm)args[1]).cloneLT();
+        final Iterator<ListTerm> list = ((ListTerm)args[1]).listTermIterator();
 		
         return new Iterator<Unifier>() {
             Unifier c = null; // the current response (which is an unifier)
-            boolean triedEmpty = false;
             public boolean hasNext() {
                 if (c == null) // the first call of hasNext should find the first response 
                     find();
@@ -94,27 +91,22 @@ public class suffix extends DefaultInternalAction {
             }
 
             public Unifier next() {
-                if (c == null) find();
+                if (c == null) 
+                    find();
                 Unifier b = c;
                 find(); // find next response
                 return b;
             }
             
             void find() {
-                while (!list.isEmpty()) {
+                while (list.hasNext()) { 
+                    ListTerm l = list.next();
+                    if (l.isVar()) // the case of the tail of the list
+                        break;
                     c = un.clone();
-                    if (c.unifiesNoUndo(sublist, list.clone())) {
-						list.remove(0);
+                    if (c.unifiesNoUndo(sublist, ASSyntax.createList(l))) {
                         return; // found another sublist, c is the current response
 					}
-					list.remove(0);
-                }
-                if (!triedEmpty) {
-                	triedEmpty = true;
-                	c = un.clone();
-                    if (c.unifiesNoUndo(sublist, list.clone())) {
-                        return; // found another sublist, c is the current response
-					}                	
                 }
                 c = null; // no more sublists found 
             }

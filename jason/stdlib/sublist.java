@@ -5,9 +5,12 @@ import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.InternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
+import jason.asSyntax.ASSyntax;
 import jason.asSyntax.ListTerm;
 import jason.asSyntax.Term;
+
 import java.util.Iterator;
+import java.util.List;
 
 /**
 
@@ -55,9 +58,6 @@ import java.util.Iterator;
 */
 public class sublist extends DefaultInternalAction {
     
-    /**
-	 * 
-	 */
 	private static final long serialVersionUID = -1725808189703510112L;
 	private static InternalAction singleton = null;
     public static InternalAction create() {
@@ -80,20 +80,15 @@ public class sublist extends DefaultInternalAction {
     }
 
     @Override
-    public Object execute(TransitionSystem ts, final Unifier un, Term[] args) throws Exception {
-
+    public Object execute(TransitionSystem ts, final Unifier un, final Term[] args) throws Exception {
         checkArguments(args);
-
-        // execute the internal action
-
         final Term sublist = args[0];
-//        final Iterator<Term> i = ((ListTerm)args[1]).iterator();
-        final ListTerm listOutter = ((ListTerm)args[1]).cloneLT();
 		
         return new Iterator<Unifier>() {
-            Unifier c = null; // the current response (which is an unifier)
-            ListTerm list = listOutter.cloneLT();  // used in the inner loop
-            boolean triedEmpty = false;
+            Unifier  c = null; // the current response (which is an unifier)
+            ListTerm listOutter = ((ListTerm)args[1]);
+            List<Term> list = listOutter.getAsList(); // used in the inner loop, Java List is used for faster remove in the end 
+            boolean  triedEmpty = false;
             
             public boolean hasNext() {
                 if (c == null) // the first call of hasNext should find the first response 
@@ -109,22 +104,25 @@ public class sublist extends DefaultInternalAction {
             }
             
             void find() {
-                while (!listOutter.isEmpty()) {
+                while (listOutter != null && !listOutter.isEmpty()) {
+                    System.out.println(list);
                 	while (!list.isEmpty()) {
-                		c = un.clone();
-                		if (c.unifiesNoUndo(sublist, list.clone())) {
-                			list.remove(list.size()-1);
+                        ListTerm candidate = ASSyntax.createList(list);
+                        list.remove(list.size()-1);
+                        c = un.clone();
+                		if (c.unifiesNoUndo(sublist, candidate)) {
                 			return; // found another sublist, c is the current response
                 		}
-                		list.remove(list.size()-1);
                 	}
-            		listOutter.remove(0);
-            		list = listOutter.cloneLT();
+            		listOutter = listOutter.getNext();
+            		if (listOutter == null || listOutter.isVar()) // the case of lists with tail
+            		    break;
+            		list = listOutter.getAsList(); 
                 }
                 if (!triedEmpty) {
                 	triedEmpty = true;
                 	c = un.clone();
-                    if (c.unifiesNoUndo(sublist, list.clone())) {
+                    if (c.unifiesNoUndo(sublist, ASSyntax.createList())) {
                         return; // found another sublist, c is the current response
 					}                	
                 }

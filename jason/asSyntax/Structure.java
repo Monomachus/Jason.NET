@@ -280,16 +280,8 @@ public class Structure extends Atom {
         final int size = getArity();
         for (int i=0; i<size; i++) {
             Term ti = getTerm(i);
-            if (ti.isVar() && !ti.isUnnamedVar()) {
-                // replace ti to an unnamed var
-                VarTerm vt = un.deref((VarTerm)ti);
-                UnnamedVar uv;
-                if (vt.isUnnamedVar()) {
-                    uv = (UnnamedVar)vt;
-                } else {
-                    uv = new UnnamedVar( "_"+UnnamedVar.getUniqueId()+ti);
-                    un.bind(vt, uv);
-                }
+            VarTerm uv = varToReplace(ti, un);
+            if (uv != null) {
                 setTerm(i,uv);
             } else if (ti.isStructure()) {
                 Structure tis = (Structure)ti;
@@ -302,6 +294,22 @@ public class Structure extends Atom {
         return this;
     }
 
+    protected VarTerm varToReplace(Term t, Unifier un) {
+        if (t.isVar() && !t.isUnnamedVar()) {
+            // replace t to an unnamed var
+            VarTerm vt = un.deref((VarTerm)t);
+            UnnamedVar uv;
+            if (vt.isUnnamedVar()) {
+                uv = (UnnamedVar)vt;
+            } else {
+                uv = new UnnamedVar( "_"+UnnamedVar.getUniqueId()+t);
+                un.bind(vt, uv);
+            }
+            return uv;
+        } else {
+            return null;
+        }
+    }
     @Override
     public void makeTermsAnnon() {
         final int size = getArity();
