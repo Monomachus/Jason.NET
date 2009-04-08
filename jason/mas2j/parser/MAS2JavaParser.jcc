@@ -228,7 +228,7 @@ void agent() :              { Token agName;
   |  
   "#" qty = <NUMBER>      { ag.qty = Integer.parseInt(qty.image); }
   |
-  <AT> host = <STRING>    { ag.host = host.image; }
+  <AT> host = <STRING>    { ag.setHost(host.image); }
   )*
   
   ";"

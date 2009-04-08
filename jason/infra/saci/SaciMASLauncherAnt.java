@@ -88,11 +88,26 @@ public class SaciMASLauncherAnt extends CentralisedMASLauncherAnt implements MAS
         script = replace(script, "<PATH-LIB>", sacipath + "<PATH-LIB>");
 
         // write start saci script
-        String startsaci = "    <property name=\"saci.main\" value=\"saci.tools.SaciMenu\"/> <!-- use \"saci.launcher.LauncherD\" to run saci without a GUI -->\n\n"
-                + "    <target name=\"saci\">\n" + "       <java classname=\"${saci.main}\" failonerror=\"true\" fork=\"yes\" dir=\"${basedir}\">\n"
-                + "          <classpath refid=\"project.classpath\"/>\n" + "          <jvmarg value=\"-Djava.security.policy=jar:file:" + Config.get().getSaciJar()
-                + "!/policy\"/>\n" + "       </java>\n" + "    </target>\n\n" + "    <target name=\"stop-saci\" >\n" + "       <java classname=\"saci.launcher.StopLauncherD\" >\n"
-                + "          <classpath refid=\"project.classpath\"/>\n" + "       </java>\n" + "    </target>\n";
+        String startsaci = 
+                  "    <property name=\"saci.main\" value=\"saci.tools.SaciMenu\"/> <!-- use \"saci.launcher.LauncherD\" to run saci without a GUI -->\n\n"
+                + "    <target name=\"saci\">\n" 
+                + "       <java classname=\"${saci.main}\" failonerror=\"true\" fork=\"yes\" dir=\"${basedir}\">\n"
+                + "          <classpath refid=\"project.classpath\"/>\n" 
+                + "          <jvmarg value=\"-Djava.security.policy=jar:file:" + Config.get().getSaciJar()+ "!/policy\"/>\n" 
+                + "       </java>\n" 
+                + "    </target>\n\n" 
+                + "    <target name=\"stop-saci\" >\n" 
+                + "       <java classname=\"saci.launcher.StopLauncherD\" >\n"
+                + "          <classpath refid=\"project.classpath\"/>\n" 
+                + "       </java>\n" 
+                + "    </target>\n"
+                + "    <target name=\"saci-client\" >\n" 
+                + "       <java classname=\"${saci.main}\" failonerror=\"true\" fork=\"yes\" dir=\"${basedir}\">\n"
+                + "          <classpath refid=\"project.classpath\"/>\n" 
+                + "          <jvmarg value=\"-Djava.security.policy=jar:file:" + Config.get().getSaciJar()+ "!/policy\"/>\n"
+                + "          <arg line=\"-connect localhost\"/>  <!-- replace localhost by the host you are using as master host -->\n"                
+                + "       </java>\n" 
+                + "    </target>\n";
 
         script = replace(script, "<OTHER-TASK>", startsaci);
 
@@ -207,8 +222,8 @@ public class SaciMASLauncherAnt extends CentralisedMASLauncherAnt implements MAS
         if (agp.qty > 1) {
             s.append("\n\t\tqty=\"" + agp.qty + "\" ");
         }
-        if (agp.host != null) {
-            s.append("\n\t\thost=" + agp.host);
+        if (agp.getHost() != null) {
+            s.append("\n\t\thost=" + agp.getHost());
         }
         s.append(" />");
         return s.toString().trim();

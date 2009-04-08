@@ -168,7 +168,7 @@ public class mas2j implements mas2jConstants {
       case AT:
         jj_consume_token(AT);
         host = jj_consume_token(STRING);
-                            ag.host = host.image;
+                            ag.setHost(host.image);
         break;
       default:
         jj_la1[4] = jj_gen;

@@ -23,8 +23,8 @@ public class AgentParameters {
     public ClassParameters     bbClass   = null;
     public ClassParameters     archClass = null;
     public int                 qty       = 1;
-    public String              host      = null;
     public Map<String, String> options   = null;
+    private String              host      = null;
     
     public String toString() {
         return getAsInMASProject();
@@ -57,6 +57,10 @@ public class AgentParameters {
     public ClassParameters getBBClass() {
         return bbClass;
     }
+    
+    public void setHost(String h) { host = h; }
+    public String getHost()       { return host; }
+    
     
     public void setAgClass(String c) {
         if (c != null) agClass = new ClassParameters(c);
@@ -101,7 +105,7 @@ public class AgentParameters {
             s.append("#"+qty+" ");
         }
         if (host != null && host.length() > 0) {
-            s.append("at "+host);
+            s.append("at \""+host+"\"");
         }
         return s.toString().trim() + ";";
     }

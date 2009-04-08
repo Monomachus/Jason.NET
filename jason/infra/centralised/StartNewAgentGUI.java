@@ -175,7 +175,7 @@ public class StartNewAgentGUI extends BaseDialogGUI {
             }
         }
         if (!agHost.getText().trim().equals("localhost")) {
-            ap.host = agHost.getText().trim();
+            ap.setHost(agHost.getText().trim());
         }
         return ap;
     }
