@@ -1,6 +1,7 @@
 package jason.asSyntax.patterns.goal;
 
 import jason.asSemantics.Agent;
+import jason.asSemantics.Unifier;
 import jason.asSyntax.ASSyntax;
 import jason.asSyntax.PlanBody;
 import jason.asSyntax.PlanBodyImpl;
@@ -33,8 +34,14 @@ public class DG implements Directive {
             
             // add ?g in the end of all inner plans
             for (Plan p: innerContent.getPL()) {
-                PlanBody b = new PlanBodyImpl(BodyType.test, goal.copy());
-                p.getBody().add(b);
+                // only for +!g plans
+                if (p.getTrigger().isAchvGoal()) {
+                    Literal planGoal = p.getTrigger().getLiteral();
+                    if (new Unifier().unifies(planGoal, goal)) { // if the plan goal unifier the pattern goal
+                        PlanBody b = new PlanBodyImpl(BodyType.test, planGoal.copy()); //goal.copy());
+                        p.getBody().add(b);
+                    }
+                }
                 newAg.getPL().add(p);
             }
             

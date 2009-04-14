@@ -134,7 +134,6 @@ public class ASParserTest extends TestCase {
         source += "    +!at(X,Y) : not b(X) <- go(3,Y). \n";
         source += " { end }";
 
-
         as2j parser = new as2j(new StringReader(source));
         Agent a = new Agent();
         parser.agent(a);
@@ -142,13 +141,14 @@ public class ASParserTest extends TestCase {
 
         source =  " { begin omc(at(X,Y), no_battery, no_beer) } \n";
         source += "    +!at(X,Y) : b(X) <- go(X,Y). ";
-        source += "    +!at(X,Y) : not b(X) <- go(3,Y). ";
+        source += "    @l1 +!at(X,left(H)) : not b(X) <- go(3,Y). ";
         source += " { end }";
         parser = new as2j(new StringReader(source));
         a = new Agent();
         a.setASLSrc("test1");
         parser.agent(a);
         assertTrue(a.getPL().getPlans().size() == 8);
+        assertEquals("@l1[source(self)] +!at(X,left(H)) : not (b(X)) <- go(3,Y); ?at(X,left(H)).", a.getPL().get("l1").toString());
         
         source =  " { begin mg(at(10,10)) } \n";
         source += "    +!at(X,Y) : b(X) <- go(X,Y). ";

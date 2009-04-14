@@ -1,12 +1,11 @@
 package jason.asSyntax.patterns.goal;
 
 import jason.asSemantics.Agent;
+import jason.asSemantics.Unifier;
 import jason.asSyntax.ASSyntax;
 import jason.asSyntax.Literal;
-import jason.asSyntax.LiteralImpl;
 import jason.asSyntax.LogExpr;
 import jason.asSyntax.LogicalFormula;
-import jason.asSyntax.NumberTermImpl;
 import jason.asSyntax.Plan;
 import jason.asSyntax.PlanBody;
 import jason.asSyntax.PlanBodyImpl;
@@ -39,27 +38,30 @@ public class EBDG implements Directive {
             // change all inner plans
             int i = 0;
             for (Plan p: innerContent.getPL()) {
-                i++;
-                // create p__f(i,g)
-                Literal pi = new LiteralImpl("p__f");
-                pi.addTerm(new NumberTermImpl(i));
-                pi.addTerm(goal);
-                
-                // change context to "not p__f(i,g) & c"
-                LogicalFormula context = p.getContext();
-                if (context == null) {
-                    p.setContext(new LogExpr(LogicalOp.not, pi));
-                } else {
-                    p.setContext(new LogExpr(new LogExpr(LogicalOp.not, pi), LogicalOp.and, context));
+                if (p.getTrigger().isAchvGoal()) {
+                    Literal planGoal = p.getTrigger().getLiteral();
+                    if (new Unifier().unifies(planGoal, goal)) { // if the plan goal unifier the pattern goal
+                        i++;
+                        // create p__f(i,g)
+                        Literal pi = ASSyntax.createLiteral("p__f", ASSyntax.createNumber(i), goal.copy());
+                        
+                        // change context to "not p__f(i,g) & c"
+                        LogicalFormula context = p.getContext();
+                        if (context == null) {
+                            p.setContext(new LogExpr(LogicalOp.not, pi));
+                        } else {
+                            p.setContext(new LogExpr(new LogExpr(LogicalOp.not, pi), LogicalOp.and, context));
+                        }
+                        
+                        // change body
+                        // add +p__f(i,g)
+                        PlanBody b1 = new PlanBodyImpl(BodyType.addBel, pi);
+                        p.getBody().add(0, b1);
+                        // add ?g
+                        PlanBody b2 = new PlanBodyImpl(BodyType.test, planGoal.copy()); //goal.copy());
+                        p.getBody().add(b2);
+                    }
                 }
-                
-                // change body
-                // add +p__f(i,g)
-                PlanBody b1 = new PlanBodyImpl(BodyType.addBel, pi);
-                p.getBody().add(0, b1);
-                // add ?g
-                PlanBody b2 = new PlanBodyImpl(BodyType.test, goal.copy());
-                p.getBody().add(b2);
                 newAg.getPL().add(p);
             }
             

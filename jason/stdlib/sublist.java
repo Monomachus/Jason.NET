@@ -105,8 +105,7 @@ public class sublist extends DefaultInternalAction {
             
             void find() {
                 while (listOutter != null && !listOutter.isEmpty()) {
-                    System.out.println(list);
-                	while (!list.isEmpty()) {
+                    while (!list.isEmpty()) {
                         ListTerm candidate = ASSyntax.createList(list);
                         list.remove(list.size()-1);
                         c = un.clone();
