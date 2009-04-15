@@ -241,7 +241,7 @@ public class MAS2JProject {
         if (getEnvClass() != null && ! getEnvClass().getClassName().equals(jason.environment.Environment.class.getName())) {
             s.append("   environment: "+getEnvClass());
             if (envClass.getHost() != null) {
-                s.append(" at "+envClass.getHost());
+                s.append(" at \""+envClass.getHost()+"\"");
             }
             s.append("\n\n");
         }
@@ -249,7 +249,7 @@ public class MAS2JProject {
         if (getControlClass() != null) {
             s.append("   executionControl: "+getControlClass());
             if (getControlClass().getHost() != null) {
-                s.append(" at "+getControlClass().getHost());
+                s.append(" at \""+getControlClass().getHost()+"\"");
             }
             s.append("\n\n");
         }

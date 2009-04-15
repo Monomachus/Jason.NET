@@ -75,7 +75,10 @@ public class ClassParameters {
     }
 
     public void setHost(String h) {
-        host = h;
+        if (h.startsWith("\""))
+            host = h.substring(1,h.length()-1);
+        else 
+            host = h;
     }
     public String getHost() {
         return host;

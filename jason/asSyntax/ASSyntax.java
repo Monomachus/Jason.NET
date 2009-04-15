@@ -21,7 +21,7 @@ import java.util.Collection;
   ListTerm   l = createList(); // empty list
   ListTerm   f = createList(createAtom("a"), createStructure("b", createNumber(5))); // f = [a,b(5)]
   
-  // or use a parsing (easier but slow)
+  // or use a parsing (easier but slower)
   Term n = parseTerm("5");
   Term t = parseTerm("p(a)");
   Term l = parseTerm("[a,b(5)]");
@@ -46,7 +46,7 @@ import java.util.Collection;
   Literal l4 = createLiteral(Literal.LNeg, "p", createAtom("a"), createNumber(3))
                             .addAnnots(createAtom("s"), createString("s"));
                              
-  // or use a parsing (easier but slow)
+  // or use the parser (easier but slower)
   Literal l4 = parseLiteral("~p(a,3)[s]");
   </pre> 
  
@@ -124,12 +124,12 @@ public class ASSyntax {
         return l;
     }
 
-    /** Creates a new list from a collection of terms */
+    /** Creates a new list from a collection of terms (each element of the collection is cloned) */
     public static ListTerm createList(Collection<Term> terms) {
         ListTerm l = new ListTermImpl();
         ListTerm tail = l;
         for (Term t: terms)
-            tail = tail.append(t);
+            tail = tail.append(t.clone());
         return l;
     }
     
@@ -151,6 +151,11 @@ public class ASSyntax {
             return (Structure)t;
         else
             return new Structure((Literal)t);
+    }
+
+    /** creates a new variable by parsing a string */
+    public static VarTerm parseVar(String sVar) throws ParseException {
+        return new as2j(new StringReader(sVar)).var();
     }
 
     /** creates a new term by parsing a string */

@@ -58,8 +58,15 @@ public class AgentParameters {
         return bbClass;
     }
     
-    public void setHost(String h) { host = h; }
-    public String getHost()       { return host; }
+    public void setHost(String h) {
+        if (h.startsWith("\""))
+            host = h.substring(1,h.length()-1);
+        else 
+            host = h;
+    }
+    public String getHost()       { 
+        return host; 
+    }
     
     
     public void setAgClass(String c) {

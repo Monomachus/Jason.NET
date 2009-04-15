@@ -155,7 +155,7 @@ public class SaciMASLauncherAnt extends CentralisedMASLauncherAnt implements MAS
         // do not use class.getName, it does not work with jason.exe
         out.println("\t\tclass=\"jason.infra.saci.SaciEnvironment\" ");
         if (tmpEnvClass.getHost() != null) {
-            out.println("\t\thost=" + tmpEnvClass.getHost());
+            out.println("\t\thost=\"" + tmpEnvClass.getHost()+"\"");
         }
         out.println("\t/>");
 
@@ -223,7 +223,7 @@ public class SaciMASLauncherAnt extends CentralisedMASLauncherAnt implements MAS
             s.append("\n\t\tqty=\"" + agp.qty + "\" ");
         }
         if (agp.getHost() != null) {
-            s.append("\n\t\thost=" + agp.getHost());
+            s.append("\n\t\thost=\"" + agp.getHost()+"\"");
         }
         s.append(" />");
         return s.toString().trim();

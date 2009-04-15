@@ -66,6 +66,7 @@ public class VarTerm extends LiteralImpl implements NumberTerm, ListTerm, String
         }
     }
 
+    /** @deprecated prefer ASSyntax.parseVar(...) */
     public static VarTerm parseVar(String sVar) {
         as2j parser = new as2j(new StringReader(sVar));
         try {

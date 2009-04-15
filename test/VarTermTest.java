@@ -200,7 +200,7 @@ public class VarTermTest extends TestCase {
         assertTrue(nt.solve() == 1d);
     }
 
-    public void testUnify() {
+    public void testUnify() throws ParseException {
         // var with literal
         VarTerm k = new VarTerm("K");
         Literal l1 = Literal.parseLiteral("~p(a1,a2)[n1,n2]");
@@ -222,8 +222,8 @@ public class VarTermTest extends TestCase {
         assertTrue(u.unifies(k2, l3));
         assertTrue(u.unifies(k2, l1));
 
-        VarTerm v1 = VarTerm.parseVar("Y[b(2)]");
-        VarTerm v2 = VarTerm.parseVar("X");
+        VarTerm v1 = ASSyntax.parseVar("Y[b(2)]");
+        VarTerm v2 = ASSyntax.parseVar("X");
         u.clear();
         u.unifies(v2, Pred.parsePred("a(4)[b(2)]"));
         u.unifies(v1, v2);
@@ -232,9 +232,9 @@ public class VarTermTest extends TestCase {
         assertEquals(v1.hashCode(),vy.hashCode());
     }
 
-    public void testVarWithAnnots1() {
-        VarTerm v1 = VarTerm.parseVar("X[a,b,c]");
-        VarTerm v2 = VarTerm.parseVar("X[a,b]");
+    public void testVarWithAnnots1() throws ParseException {
+        VarTerm v1 = ASSyntax.parseVar("X[a,b,c]");
+        VarTerm v2 = ASSyntax.parseVar("X[a,b]");
         assertTrue(v1.equals(v2));
         v2.addAnnot(new Structure("c"));
         assertTrue(v1.equals(v2));
@@ -265,12 +265,12 @@ public class VarTermTest extends TestCase {
         assertEquals("p(t1,t2)[a,b,c]",v1.toString());
     }
 
-    public void testVarWithAnnots2() {
+    public void testVarWithAnnots2() throws ParseException {
         // test vars annots
 
         // X[a] = Y[a,b] - ok
-        VarTerm v1 = VarTerm.parseVar("X[a]");
-        VarTerm v2 = VarTerm.parseVar("Y[a,b]");
+        VarTerm v1 = ASSyntax.parseVar("X[a]");
+        VarTerm v2 = ASSyntax.parseVar("Y[a,b]");
         Unifier u = new Unifier();
         assertTrue(u.unifies(v1, v2));
 
@@ -284,32 +284,32 @@ public class VarTermTest extends TestCase {
         assertEquals("vvv[a]", v1.toString());
     }
 
-    public void testVarWithAnnots3() {
+    public void testVarWithAnnots3() throws ParseException {
         // X[a,b,c,d] = Y[a,c|R] - ok and R=[b,d]
-        VarTerm v1 = VarTerm.parseVar("X[a,b,c,d]");
-        VarTerm v2 = VarTerm.parseVar("Y[a,c|R]");
+        VarTerm v1 = ASSyntax.parseVar("X[a,b,c,d]");
+        VarTerm v2 = ASSyntax.parseVar("Y[a,c|R]");
         Unifier u = new Unifier();
         assertTrue(u.unifies(v1, v2));
         assertEquals("[b,d]",u.get("R").toString());
     }
     
-    public void testVarWithAnnots4() {
+    public void testVarWithAnnots4() throws ParseException {
         // X[source(A)] = open[source(a)] - ok and A -> a
-        VarTerm v1 = VarTerm.parseVar("X[source(A)]");
+        VarTerm v1 = ASSyntax.parseVar("X[source(A)]");
         Unifier u = new Unifier();
         assertTrue(u.unifies(v1, Literal.parseLiteral("open[source(a)]")));
         assertEquals(u.get("A").toString(),"a");
         assertEquals(u.get("X").toString(),"open");
 
-        VarTerm v2 = VarTerm.parseVar("X[source(self)]");
+        VarTerm v2 = ASSyntax.parseVar("X[source(self)]");
         u = new Unifier();
         assertFalse(u.unifies(v2, Literal.parseLiteral("open[source(a)]")));
     }
 
-    public void testVarWithAnnots5() {
+    public void testVarWithAnnots5() throws ParseException {
         // X[A|R] = p(1)[a,b,c] - ok and 
         // X = p(1), A = a, R=[b,c]
-        VarTerm v = VarTerm.parseVar("X[A|R]");
+        VarTerm v = ASSyntax.parseVar("X[A|R]");
         Unifier u = new Unifier();
         assertTrue(u.unifies(v, Literal.parseLiteral("p(1)[a,b,c]")));
         assertEquals("[b,c]", u.get("R").toString());
@@ -333,7 +333,7 @@ public class VarTermTest extends TestCase {
     */
     
     
-    public void testVarWithAnnotsInLogCons() throws RevisionFailedException {
+    public void testVarWithAnnotsInLogCons() throws RevisionFailedException, ParseException {
         Agent ag = new Agent();
         AgArch arch = new AgArch();
         arch.setArchInfraTier(new CentralisedAgArch());
@@ -343,7 +343,7 @@ public class VarTermTest extends TestCase {
         ag.addBel(Literal.parseLiteral("b2[d]"));
         
         Unifier u = new Unifier();
-        VarTerm v1 = VarTerm.parseVar("P[d]");
+        VarTerm v1 = ASSyntax.parseVar("P[d]");
         assertEquals(2, iteratorSize(ag.getBB().getCandidateBeliefs(v1, null)));
         Iterator<Unifier> i = v1.logicalConsequence(ag, u);
         assertTrue(i.hasNext());
@@ -360,10 +360,6 @@ public class VarTermTest extends TestCase {
             c++;
         }
         return c;
-    }
-
-    public static void main(String[] a) {
-        new VarTermTest().testVarWithAnnots3();
     }
 
     public void testSimple1() {
@@ -389,7 +385,7 @@ public class VarTermTest extends TestCase {
         Token tk = tokens.getNextToken();
         assertEquals(tk.kind, jason.asSyntax.parser.as2jConstants.VAR);
         
-        t = VarTerm.parseVar("Ea");
+        t = ASSyntax.parseVar("Ea");
         assertFalse(t.isAtom());
         assertTrue(t.isVar());
         

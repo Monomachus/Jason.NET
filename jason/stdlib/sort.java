@@ -29,10 +29,12 @@ import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.InternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
+import jason.asSyntax.ASSyntax;
 import jason.asSyntax.ListTerm;
 import jason.asSyntax.Term;
 
 import java.util.Collections;
+import java.util.List;
 
 /**
 
@@ -102,8 +104,8 @@ public class sort extends DefaultInternalAction {
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         checkArguments(args);
-        ListTerm l1 = (ListTerm) args[0].clone();
-        Collections.sort(l1);
-        return un.unifies(l1, args[1]);
+        List<Term> l = ((ListTerm) args[0]).getAsList();
+        Collections.sort(l);
+        return un.unifies(ASSyntax.createList(l), args[1]);
     }
 }

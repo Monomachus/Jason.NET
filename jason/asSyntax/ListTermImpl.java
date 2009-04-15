@@ -432,12 +432,12 @@ public class ListTermImpl extends Structure implements ListTerm {
 
 
     /** 
-     * Returns this ListTerm as a Java List. 
+     * Returns this ListTerm as a Java List (implemented by ArrayList). 
      * Note: the tail of the list, if any, is not included!
      */
     public List<Term> getAsList() {
         List<Term> l = new ArrayList<Term>();
-        for (Term t: this) 
+        for (Term t: this)
             l.add(t);
         return l;
     }
