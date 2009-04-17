@@ -20,10 +20,6 @@ import java.util.Iterator;
   
   </ul>
   
-  <b>Bug</b>: this function does not work when the agent is cloned,
-  and so does not work in centralised/tread pool infrastructure.
-  Use the internal action version for this infrastructure.
-
   @see jason.stdlib.count internal action version
 
   @author Jomi 
@@ -37,7 +33,7 @@ public class Count extends DefaultArithFunction  {
 	@Override
 	public double evaluate(TransitionSystem ts, Term[] args) throws Exception {
 	    if (ts == null) {
-            throw new JasonException("The TransitionSystem parameter of the function '.count' can not be null.");
+            throw new JasonException("The TransitionSystem parameter of the function '.count' cannot be null.");
 	    }
         LogicalFormula logExpr = (LogicalFormula)args[0];
         int n = 0;

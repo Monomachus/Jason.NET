@@ -152,7 +152,7 @@ public class PlanLibrary implements Iterable<Plan> {
             // test if the new plan is equal, in this case, just add a source
             Plan planInPL = get(p.getLabel().getFunctor());
             if (p.equals(planInPL)) {
-                planInPL.getLabel().addSource((Pred) p.getLabel().getSources().get(0));
+                planInPL.getLabel().addSource(p.getLabel().getSources().get(0));
                 return;
             } else {
                 throw new JasonException("There already is a plan with label " + p.getLabel());
@@ -327,10 +327,12 @@ public class PlanLibrary implements Iterable<Plan> {
         return relPlans.get(TE_IDLE.getPredicateIndicator());
     }
 
-    public Object clone() {
+    public PlanLibrary clone() {
         PlanLibrary pl = new PlanLibrary();
         try {
-            pl.addAll(this);
+            for (Plan p: this) { 
+                pl.add((Plan)p.clone(), false);
+            }
         } catch (JasonException e) {
             e.printStackTrace();
         }

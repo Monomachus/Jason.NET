@@ -392,7 +392,7 @@ public class Circumstance implements Serializable {
     }
 
     /** clone E, I, MB, PA, PI, FA, and AI */
-    public Object clone() {
+    public Circumstance clone() {
         Circumstance c = new Circumstance();
         for (Event e: this.E) {
             c.E.add((Event)e.clone());

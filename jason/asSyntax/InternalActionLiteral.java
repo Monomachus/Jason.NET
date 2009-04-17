@@ -98,7 +98,11 @@ public class InternalActionLiteral extends Structure {
             }
         }
         return LogExpr.EMPTY_UNIF_LIST.iterator();  // empty iterator for unifier
-    }   
+    }
+    
+    public void setIA(InternalAction ia) {
+        this.ia = ia; 
+    }
 
     public InternalAction getIA(Agent ag) throws Exception {
         if (ia == null && ag != null)

@@ -26,6 +26,8 @@ package jason.asSemantics;
 import jason.JasonException;
 import jason.RevisionFailedException;
 import jason.architecture.AgArch;
+import jason.asSyntax.ArithFunctionTerm;
+import jason.asSyntax.InternalActionLiteral;
 import jason.asSyntax.Literal;
 import jason.asSyntax.LogicalFormula;
 import jason.asSyntax.Plan;
@@ -189,15 +191,47 @@ public class Agent {
         a.setLogger(arch);
         a.logger.setLevel(this.getTS().getSettings().logLevel());
 
-        a.bb = (BeliefBase)this.bb.clone();
-        a.pl = (PlanLibrary)this.pl.clone();
+        a.bb = this.bb.clone();
+        a.pl = this.pl.clone();
+        try {
+            fixAgInIAandFunctions(a);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         a.aslSource = this.aslSource;
         a.initDefaultFunctions();
-        a.setTS(new TransitionSystem(a, (Circumstance)this.getTS().getC().clone(), this.getTS().getSettings(), arch));
+        a.setTS(new TransitionSystem(a, this.getTS().getC().clone(), this.getTS().getSettings(), arch));
 
         return a;
     }
     
+    private void fixAgInIAandFunctions(Agent a) throws Exception {
+        // find all internal actions and functions and change the pointer for agent
+        for (Plan p: a.getPL()) {
+            // search context
+            if (p.getContext() instanceof Literal)
+                fixAgInIAandFunctions(a, (Literal)p.getContext());
+            
+            // search body
+            if (p.getBody() instanceof Literal)
+                fixAgInIAandFunctions(a, (Literal)p.getBody());
+        }
+    }
+    
+    private void fixAgInIAandFunctions(Agent a, Literal l) throws Exception {
+        // if l is internal action/function
+        if (l instanceof InternalActionLiteral) {
+            ((InternalActionLiteral)l).setIA(null);
+        }
+        if (l instanceof ArithFunctionTerm) {
+            ((ArithFunctionTerm)l).setAgent(a);
+        }
+        for (int i=0; i<l.getArity(); i++) {
+            if (l.getTerm(i) instanceof Literal)
+                fixAgInIAandFunctions(a, (Literal)l.getTerm(i));            
+        }
+    }
+
     public void setLogger(AgArch arch) {
         if (arch != null)
             logger = Logger.getLogger(Agent.class.getName() + "." + arch.getAgName());

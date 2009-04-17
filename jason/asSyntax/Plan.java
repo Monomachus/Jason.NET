@@ -206,15 +206,11 @@ public class Plan extends Structure implements Cloneable, Serializable {
             p.isAllUnifs    = isAllUnifs;
         }
         
-        p.tevent = (Trigger)tevent.clone();
-        
+        p.tevent = tevent.clone();        
         if (context != null) 
             p.context = (LogicalFormula)context.clone();
-        
-        p.body = (PlanBody)body.clone();
-        
+        p.body = body.clonePB();
         p.setSrcInfo(srcInfo);
-        
         p.isTerm = isTerm;
 
         return p;

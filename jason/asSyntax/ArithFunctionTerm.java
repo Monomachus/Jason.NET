@@ -71,7 +71,6 @@ public class ArithFunctionTerm extends Structure implements NumberTerm {
     public boolean isLiteral() {
         return false;
     }
-    
 
     @Override
     public boolean isArithExpr() {
@@ -117,6 +116,9 @@ public class ArithFunctionTerm extends Structure implements NumberTerm {
 
     public void setAgent(Agent ag) {
         agent = ag;
+    }
+    public Agent getAgent() {
+        return agent;
     }
     
     /** computes the value for this arithmetic function (as defined in the NumberTerm interface) */

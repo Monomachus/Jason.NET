@@ -127,5 +127,5 @@ public interface BeliefBase extends Iterable<Literal>, Cloneable {
     /** Gets the BB as XML */
     public Element getAsDOM(Document document);
 
-    public Object clone();
+    public BeliefBase clone();
 }

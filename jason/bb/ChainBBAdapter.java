@@ -143,7 +143,7 @@ public class ChainBBAdapter implements BeliefBase {
     }
 
     @Override
-    public Object clone() {
+    public BeliefBase clone() {
         return this;
     }
     

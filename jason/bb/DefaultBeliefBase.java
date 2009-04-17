@@ -259,7 +259,7 @@ public class DefaultBeliefBase implements BeliefBase {
         return belsMap.toString();
     }
 
-    public Object clone() {
+    public BeliefBase clone() {
         DefaultBeliefBase bb = new DefaultBeliefBase();
         for (Literal b: this) {
             bb.add(1, b.copy());

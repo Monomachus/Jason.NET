@@ -1,17 +1,22 @@
 package test;
 
 import jason.JasonException;
+import jason.architecture.AgArch;
 import jason.asSemantics.Agent;
 import jason.asSemantics.Circumstance;
 import jason.asSemantics.Intention;
+import jason.asSemantics.InternalAction;
 import jason.asSemantics.Option;
 import jason.asSemantics.TransitionSystem;
 import jason.asSyntax.ASSyntax;
+import jason.asSyntax.ArithFunctionTerm;
+import jason.asSyntax.InternalActionLiteral;
 import jason.asSyntax.Literal;
 import jason.asSyntax.Plan;
 import jason.asSyntax.Structure;
 import jason.asSyntax.Trigger;
 import jason.asSyntax.parser.ParseException;
+import jason.runtime.Settings;
 
 import java.util.List;
 import java.util.PriorityQueue;
@@ -118,6 +123,39 @@ public class TSTest extends TestCase {
         public Option selectOption(List<Option> options) {
             return super.selectOption(options);
         }
+    }
+    
+    public void testAgentClone() throws Exception {
+        Agent a = new Agent();
+        new TransitionSystem(a, new Circumstance(), new Settings(), new AgArch()); // just to have a default value for ts
+
+        //a.parseAS(new File());
+        a.initAg("examples/auction/ag3.asl");
+        String p1 = a.getPL().toString();
+        String b1 = a.getBB().toString();
+        InternalAction ia1 = ((InternalActionLiteral)a.getPL().get("prop_alliance").getBody().getBodyTerm()).getIA(null);
+        assertTrue(ia1 != null);
+        // get the arith expr (B+C) from the plan
+        Structure send1 = (Structure)a.getPL().get("palliance").getBody().getBodyNext().getBodyNext().getBodyTerm();
+        ArithFunctionTerm add1  = (ArithFunctionTerm)((Structure)send1.getTerm(2)).getTerm(1);
+        assertEquals("(B+C)", add1.toString());
+
+        // the agent is null here because it is a arith expr
+        assertEquals(null, add1.getAgent());
+        
+        a = a.clone(new AgArch());
+        assertEquals(p1, a.getPL().toString());
+        assertEquals(b1.length(), a.getBB().toString().length());
+
+        InternalAction ia2 = ((InternalActionLiteral)a.getPL().get("prop_alliance").getBody().getBodyTerm()).getIA(null);
+        assertEquals(null, ia2); // the clone have to set null for the IA so they do not share the same implementation
+
+        Structure send2 = (Structure)a.getPL().get("palliance").getBody().getBodyNext().getBodyNext().getBodyTerm();
+        ArithFunctionTerm add2  = (ArithFunctionTerm)((Structure)send2.getTerm(2)).getTerm(1);
+        assertEquals("(B+C)", add2.toString());
+
+        // after clone, the agent in (B+C) must be the cloned agent
+        assertTrue(a == add2.getAgent());
     }
     
 }
