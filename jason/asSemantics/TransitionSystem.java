@@ -978,7 +978,8 @@ public class TransitionSystem {
             ActionExec action = C.getAction(); 
             if (action != null) {
                 C.addPendingAction(action);
-                agArch.act(action, C.getFeedbackActions());
+                // We need to send a wrapper for FA to the user so that add method then calls C.addFA (which control atomic things)
+                agArch.act(action, C.getFeedbackActionsWrapper());
             }
 
         } catch (Exception e) {

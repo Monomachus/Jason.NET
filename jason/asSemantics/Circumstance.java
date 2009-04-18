@@ -29,6 +29,7 @@ import jason.asSyntax.Trigger.TEOperator;
 import jason.asSyntax.Trigger.TEType;
 
 import java.io.Serializable;
+import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -301,8 +302,18 @@ public class Circumstance implements Serializable {
         return !FA.isEmpty();
     }
     
-    public List<ActionExec> getFeedbackActions() {
+    public List<ActionExec> getFeedbackActions() {        
         return FA;
+    }
+    public List<ActionExec> getFeedbackActionsWrapper() {
+        return new AbstractList<ActionExec>() {
+            public boolean add(ActionExec act) {
+                addFeedbackAction(act);
+                return true;
+            }
+            public int size()                { return 0; }
+            public ActionExec get(int index) { return null; }
+        };
     }
     
     public void addFeedbackAction(ActionExec act) {

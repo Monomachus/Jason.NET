@@ -118,15 +118,13 @@ public class foreach extends DefaultInternalAction {
             List<Unifier> allsol = new ArrayList<Unifier>();
             while (iu.hasNext())
                 allsol.add(iu.next());
-            
-            if (allsol.isEmpty()) // none iteration
-                return true;
             iu = allsol.iterator();
-            
             foria = new PlanBodyImpl(BodyType.internalAction, foria.getBodyTerm().clone());
             foria.add(im.getCurrentStep().getBodyNext());
-            ((Structure)foria.getBodyTerm()).addTerm(new ObjectTermImpl(iu));
-        } else if (args.length == 3) {
+            Structure forstructure = (Structure)foria.getBodyTerm();
+            forstructure.addTerm(new ObjectTermImpl(iu));         // store all solutions
+            forstructure.addTerm(new ObjectTermImpl(un.clone())); // backup original unifier
+        } else if (args.length == 4) {
             // restore the solutions
             iu = (Iterator<Unifier>)((ObjectTerm)args[2]).getObject();
         } else {
@@ -134,19 +132,19 @@ public class foreach extends DefaultInternalAction {
         }
         
         un.clear();
-        un.compose(iu.next());
-        // add in the current intention:
-        // 1. the body argument of for and
-        // 2. the for internal action after the execution of the body
-        //    (to perform the next iteration)
-        PlanBody whattoadd = (PlanBody)args[1];
         if (iu.hasNext()) {
+            // add in the current intention:
+            // 1. the body argument of for and
+            // 2. the for internal action after the execution of the body
+            //    (to perform the next iteration)
+            un.compose(iu.next());
+            PlanBody whattoadd = (PlanBody)args[1]; //.clone(); 
             whattoadd.add(foria); 
+            whattoadd.setAsBodyTerm(false);
+            im.insertAsNextStep(whattoadd);
         } else {
-            whattoadd.add(foria.getBodyNext());
+            un.compose((Unifier)((ObjectTerm)args[3]).getObject());
         }
-        whattoadd.setAsBodyTerm(false);
-        im.insertAsNextStep(whattoadd);
         return true;
     }
 }
