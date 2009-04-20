@@ -64,67 +64,67 @@ import java.util.regex.Pattern;
 
 public class puts extends DefaultInternalAction {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	private static InternalAction singleton = null;
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+    private static InternalAction singleton = null;
 
-	public static InternalAction create() {
-		if (singleton == null)
-			singleton = new puts();
-		return singleton;
-	}
+    public static InternalAction create() {
+        if (singleton == null)
+            singleton = new puts();
+        return singleton;
+    }
 
-	//Pattern regex = Pattern.compile("#\\{\\p{Upper}\\p{Alnum}*\\}");
-	Pattern regex = Pattern.compile("#\\{\\p{ASCII}+\\}");
+    //Pattern regex = Pattern.compile("#\\{\\p{Upper}\\p{Alnum}*\\}");
+    Pattern regex = Pattern.compile("#\\{\\p{ASCII}+\\}");
 
-	@Override
-	public Object execute(TransitionSystem ts, Unifier un, Term[] args)
-			throws Exception {
-		if (!args[0].isString()) {
-			return false;
-		}
+    @Override
+    public Object execute(TransitionSystem ts, Unifier un, Term[] args)
+            throws Exception {
+        if (!args[0].isString()) {
+            return false;
+        }
 
-		StringBuffer sb = new StringBuffer();
-		for (Term term : args) {
-			if (!term.isString()) {
-				continue;
-			}
-			StringTerm st = (StringTerm) term;
-			Matcher matcher = regex.matcher(st.getString());
+        StringBuffer sb = new StringBuffer();
+        for (Term term : args) {
+            if (!term.isString()) {
+                continue;
+            }
+            StringTerm st = (StringTerm) term;
+            Matcher matcher = regex.matcher(st.getString());
 
-			while (matcher.find()) {
-				/*
-				 * System.out.println("I found the text \""+matcher.group()+ "\"
-				 * starting at index "+matcher.start()+ " and ending at index
-				 * "+matcher.end());
-				 */
-				String sVar = matcher.group();
-				sVar = sVar.substring(2, sVar.length() - 1);
-				try {
-					Term t = ASSyntax.parseTerm(sVar);
-					//We use t.apply to evaluate any logical or arithmetic expression in Jason
-					t.apply(un);
-					matcher.appendReplacement(sb, t.toString());
-				} catch (ParseException pe) {
-					// TODO: handle exception
-					// TODO: Decide whether or not we should ignore the exception and print the call instead
-					// Right now, if I get a parse error from ASSyntax, I just print the original escaped
-					// sequence, so a user can see that his/her expression was problematic
-					matcher.appendReplacement(sb, "#{"+sVar+"}");
-				}
-				
-			}
-			matcher.appendTail(sb);
-		}
+            while (matcher.find()) {
+                /*
+                 * System.out.println("I found the text \""+matcher.group()+ "\"
+                 * starting at index "+matcher.start()+ " and ending at index
+                 * "+matcher.end());
+                 */
+                String sVar = matcher.group();
+                sVar = sVar.substring(2, sVar.length() - 1);
+                try {
+                    Term t = ASSyntax.parseTerm(sVar);
+                    //We use t.apply to evaluate any logical or arithmetic expression in Jason
+                    t.apply(un);
+                    matcher.appendReplacement(sb, t.toString());
+                } catch (ParseException pe) {
+                    // TODO: handle exception
+                    // TODO: Decide whether or not we should ignore the exception and print the call instead
+                    // Right now, if I get a parse error from ASSyntax, I just print the original escaped
+                    // sequence, so a user can see that his/her expression was problematic
+                    matcher.appendReplacement(sb, "#{"+sVar+"}");
+                }
+                
+            }
+            matcher.appendTail(sb);
+        }
 
-		if (args[args.length - 1].isVar()) {
-			StringTerm stRes = new StringTermImpl(sb.toString());
-			return un.unifies(stRes, args[args.length - 1]);
-		} else {
-			ts.getLogger().info(sb.toString());
-			return true;
-		}
-	}
+        if (args[args.length - 1].isVar()) {
+            StringTerm stRes = new StringTermImpl(sb.toString());
+            return un.unifies(stRes, args[args.length - 1]);
+        } else {
+            ts.getLogger().info(sb.toString());
+            return true;
+        }
+    }
 }

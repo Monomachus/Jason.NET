@@ -51,8 +51,8 @@ import java.util.Iterator;
 */
 public class suffix extends DefaultInternalAction {
     
-	private static final long serialVersionUID = 2463927564326061873L;
-	private static InternalAction singleton = null;
+    private static final long serialVersionUID = 2463927564326061873L;
+    private static InternalAction singleton = null;
     public static InternalAction create() {
         if (singleton == null) 
             singleton = new suffix();
@@ -61,9 +61,9 @@ public class suffix extends DefaultInternalAction {
 
     // Needs exactly 2 arguments
     @Override public int getMinArgs() { return 2; }
-    @Override public int getMaxArgs() { return 2; }	
+    @Override public int getMaxArgs() { return 2; } 
 
-	// improve the check of the arguments to also check the type of the arguments
+    // improve the check of the arguments to also check the type of the arguments
     @Override protected void checkArguments(Term[] args) throws JasonException {
         super.checkArguments(args); // check number of arguments
         if (!args[0].isList() && !args[0].isVar())
@@ -81,7 +81,7 @@ public class suffix extends DefaultInternalAction {
 
         final Term sublist = args[0];
         final Iterator<ListTerm> list = ((ListTerm)args[1]).listTermIterator();
-		
+        
         return new Iterator<Unifier>() {
             Unifier c = null; // the current response (which is an unifier)
             public boolean hasNext() {
@@ -106,7 +106,7 @@ public class suffix extends DefaultInternalAction {
                     c = un.clone();
                     if (c.unifiesNoUndo(sublist, ASSyntax.createList(l))) {
                         return; // found another sublist, c is the current response
-					}
+                    }
                 }
                 c = null; // no more sublists found 
             }

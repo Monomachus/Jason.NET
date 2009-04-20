@@ -54,8 +54,8 @@ import java.util.List;
 */
 public class prefix extends DefaultInternalAction {
     
-	private static final long serialVersionUID = -4736810884249871078L;
-	private static InternalAction singleton = null;
+    private static final long serialVersionUID = -4736810884249871078L;
+    private static InternalAction singleton = null;
     public static InternalAction create() {
         if (singleton == null) 
             singleton = new prefix();
@@ -64,9 +64,9 @@ public class prefix extends DefaultInternalAction {
 
     // Needs exactly 2 arguments
     @Override public int getMinArgs() { return 2; }
-    @Override public int getMaxArgs() { return 2; }	
+    @Override public int getMaxArgs() { return 2; } 
 
-	// improve the check of the arguments to also check the type of the arguments
+    // improve the check of the arguments to also check the type of the arguments
     @Override protected void checkArguments(Term[] args) throws JasonException {
         super.checkArguments(args); // check number of arguments
         if (!args[0].isList() && !args[0].isVar())
@@ -84,7 +84,7 @@ public class prefix extends DefaultInternalAction {
 
         final Term sublist = args[0];
         final List<Term> list = ((ListTerm)args[1]).getAsList(); // use a Java List for better performance in remove last
-		
+        
         return new Iterator<Unifier>() {
             Unifier c = null; // the current response (which is an unifier)
             boolean triedEmpty = false;
@@ -109,14 +109,14 @@ public class prefix extends DefaultInternalAction {
                     c = un.clone();
                     if (c.unifiesNoUndo(sublist, candidate)) {
                         return; // found another sublist, c is the current response
-					}
+                    }
                 }
                 if (!triedEmpty) {
-                	triedEmpty = true;
-                	c = un.clone();
+                    triedEmpty = true;
+                    c = un.clone();
                     if (c.unifiesNoUndo(sublist, ASSyntax.createList())) {
                         return; // found another sublist, c is the current response
-					}                	
+                    }                   
                 }
                 c = null; // no more sublists found 
             }

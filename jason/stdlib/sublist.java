@@ -58,8 +58,8 @@ import java.util.List;
 */
 public class sublist extends DefaultInternalAction {
     
-	private static final long serialVersionUID = -1725808189703510112L;
-	private static InternalAction singleton = null;
+    private static final long serialVersionUID = -1725808189703510112L;
+    private static InternalAction singleton = null;
     public static InternalAction create() {
         if (singleton == null) 
             singleton = new sublist();
@@ -68,9 +68,9 @@ public class sublist extends DefaultInternalAction {
 
     // Needs exactly 2 arguments
     @Override public int getMinArgs() { return 2; }
-    @Override public int getMaxArgs() { return 2; }	
+    @Override public int getMaxArgs() { return 2; } 
 
-	// improve the check of the arguments to also check the type of the arguments
+    // improve the check of the arguments to also check the type of the arguments
     @Override protected void checkArguments(Term[] args) throws JasonException {
         super.checkArguments(args); // check number of arguments
         if (!args[0].isList() && !args[0].isVar())
@@ -83,7 +83,7 @@ public class sublist extends DefaultInternalAction {
     public Object execute(TransitionSystem ts, final Unifier un, final Term[] args) throws Exception {
         checkArguments(args);
         final Term sublist = args[0];
-		
+        
         return new Iterator<Unifier>() {
             Unifier  c = null; // the current response (which is an unifier)
             ListTerm listOutter = ((ListTerm)args[1]);
@@ -109,21 +109,21 @@ public class sublist extends DefaultInternalAction {
                         ListTerm candidate = ASSyntax.createList(list);
                         list.remove(list.size()-1);
                         c = un.clone();
-                		if (c.unifiesNoUndo(sublist, candidate)) {
-                			return; // found another sublist, c is the current response
-                		}
-                	}
-            		listOutter = listOutter.getNext();
-            		if (listOutter == null || listOutter.isVar()) // the case of lists with tail
-            		    break;
-            		list = listOutter.getAsList(); 
+                        if (c.unifiesNoUndo(sublist, candidate)) {
+                            return; // found another sublist, c is the current response
+                        }
+                    }
+                    listOutter = listOutter.getNext();
+                    if (listOutter == null || listOutter.isVar()) // the case of lists with tail
+                        break;
+                    list = listOutter.getAsList(); 
                 }
                 if (!triedEmpty) {
-                	triedEmpty = true;
-                	c = un.clone();
+                    triedEmpty = true;
+                    c = un.clone();
                     if (c.unifiesNoUndo(sublist, ASSyntax.createList())) {
                         return; // found another sublist, c is the current response
-					}                	
+                    }                   
                 }
                 c = null; // no more sublists found 
             }

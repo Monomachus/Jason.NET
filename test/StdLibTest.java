@@ -442,9 +442,9 @@ public class StdLibTest extends TestCase {
     
     @SuppressWarnings("unchecked")
     public void testSublist() throws Exception {
-    	
-    	/* As for prefix */
-    	//    	
+        
+        /* As for prefix */
+        //      
         ListTerm l1 = ListTermImpl.parseList("[a,b,c]");
         ListTerm l2 = ListTermImpl.parseList("[a,b]");
         ListTerm l3 = ListTermImpl.parseList("[b,c]");
