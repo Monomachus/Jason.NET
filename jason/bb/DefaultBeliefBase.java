@@ -37,6 +37,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -54,7 +55,7 @@ public class DefaultBeliefBase implements BeliefBase {
      * belsMap is a table where the key is the bel.getFunctorArity and the value
      * is a list of literals with the same functorArity.
      */
-    private Map<PredicateIndicator, BelEntry> belsMap = new HashMap<PredicateIndicator, BelEntry>();
+    private Map<PredicateIndicator, BelEntry> belsMap = new ConcurrentHashMap<PredicateIndicator, BelEntry>();
 
     private int size = 0;
 
@@ -268,9 +269,18 @@ public class DefaultBeliefBase implements BeliefBase {
     }
     
     public Element getAsDOM(Document document) {
-        Element ebels = (Element) document.createElement("beliefs");
-        for (Literal l: this) {
-            ebels.appendChild(l.getAsDOM(document));
+        int tries = 0;
+        Element ebels = null;
+        while (tries < 10) { // max 10 tries
+            ebels = (Element) document.createElement("beliefs");
+            try { 
+                for (Literal l: this) 
+                    ebels.appendChild(l.getAsDOM(document));
+                break; // quit the loop
+            } catch (Exception e) { // normally concurrent modification, but others happen
+                tries++;
+                // simply tries again
+            }
         }
         return ebels;
     }
@@ -282,12 +292,6 @@ public class DefaultBeliefBase implements BeliefBase {
         final private Map<LiteralWrapper,Literal> map = new HashMap<LiteralWrapper,Literal>(); // to fastly find contents, from literal do list index
         
         public void add(Literal l, boolean addInEnd) {
-            //try {
-                // minimise the allocation space of terms
-            // Moved to the parser.
-            //    if (!l.isAtom()) ((ArrayList) l.getTerms()).trimToSize();
-            //} catch (Exception e) {}
-            
             map.put(new LiteralWrapper(l), l);
             if (addInEnd) {
                 list.add(l);
