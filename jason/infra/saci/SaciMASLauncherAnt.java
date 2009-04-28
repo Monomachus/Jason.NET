@@ -89,7 +89,8 @@ public class SaciMASLauncherAnt extends CentralisedMASLauncherAnt implements MAS
 
         // write start saci script
         String startsaci = 
-                  "    <property name=\"saci.main\" value=\"saci.tools.SaciMenu\"/> <!-- use \"saci.launcher.LauncherD\" to run saci without a GUI -->\n\n"
+                  "    <property name=\"saci.main\" value=\"saci.tools.SaciMenu\"/> <!-- use \"saci.launcher.LauncherD\" to run saci without a GUI -->\n"
+                + "    <property name=\"saci.remote.host\" value=\"localhost\"/>\n\n"
                 + "    <target name=\"saci\">\n" 
                 + "       <java classname=\"${saci.main}\" failonerror=\"true\" fork=\"yes\" dir=\"${basedir}\">\n"
                 + "          <classpath refid=\"project.classpath\"/>\n" 
@@ -102,10 +103,10 @@ public class SaciMASLauncherAnt extends CentralisedMASLauncherAnt implements MAS
                 + "       </java>\n" 
                 + "    </target>\n"
                 + "    <target name=\"saci-client\" >\n" 
-                + "       <java classname=\"${saci.main}\" failonerror=\"true\" fork=\"yes\" dir=\"${basedir}\">\n"
+                + "       <java classname=\"saci.launcher.LauncherD\" failonerror=\"true\" fork=\"yes\" dir=\"${basedir}\">\n"
                 + "          <classpath refid=\"project.classpath\"/>\n" 
                 + "          <jvmarg value=\"-Djava.security.policy=jar:file:" + Config.get().getSaciJar()+ "!/policy\"/>\n"
-                + "          <arg line=\"-connect localhost\"/>  <!-- replace localhost by the host you are using as master host -->\n"                
+                + "          <arg line=\"-connect ${saci.remote.host}\"/>\n"                
                 + "       </java>\n" 
                 + "    </target>\n";
 
