@@ -65,7 +65,7 @@ PARSER_BEGIN(as2j)
             return "["+s.getSrcFile()+":"+s.getBeginSrcLine()+"]";
     }
     private String getSourceRef(DefaultTerm t) {
-        return getSourceRef( ((DefaultTerm)t).getSrcInfo());
+        return getSourceRef( t.getSrcInfo());
     }
     private String getSourceRef(Object t) {
         if (t instanceof DefaultTerm)
@@ -243,7 +243,7 @@ boolean directive(Agent outerAg) throws jason.JasonException :
   "{"
   ( LOOKAHEAD(4)
     <TK_BEGIN> dir = pred() "}"
-                              { Agent innerAg = new Agent(); } 
+                              { Agent innerAg = new Agent(); innerAg.initAg(); } 
      	isEOF = agent(innerAg)
                               { if (isEOF) 
                                    throw new ParseException(getSourceRef(dir)+" The directive '{ begin "+dir+"}' does not end with '{ end }'.");

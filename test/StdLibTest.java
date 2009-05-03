@@ -1,7 +1,6 @@
 package test;
 
 import jason.RevisionFailedException;
-import jason.architecture.AgArch;
 import jason.asSemantics.Agent;
 import jason.asSemantics.Circumstance;
 import jason.asSemantics.IntendedMeans;
@@ -25,7 +24,6 @@ import jason.asSyntax.Trigger;
 import jason.asSyntax.VarTerm;
 import jason.asSyntax.parser.ParseException;
 import jason.bb.BeliefBase;
-import jason.infra.centralised.CentralisedAgArch;
 import jason.stdlib.add_annot;
 import jason.stdlib.add_nested_source;
 import jason.stdlib.add_plan;
@@ -64,6 +62,7 @@ public class StdLibTest extends TestCase {
         p5 = Plan.parse("+!g5 : true <- i.");
         
         ag = new Agent();
+        ag.initAg();
         ag.getPL().add(Plan.parse("-!g1 : true <- j."));
     }
 
@@ -112,10 +111,7 @@ public class StdLibTest extends TestCase {
 
     public void testFindAll() throws RevisionFailedException, ParseException {
         Agent ag = new Agent();
-        ag.setLogger(null);
-        AgArch arch = new AgArch();
-        arch.setArchInfraTier(new CentralisedAgArch());
-        ag.setTS(new TransitionSystem(ag, null, null, arch));
+        ag.initAg();
         
         Literal l1 = Literal.parseLiteral("a(10,x)");
         assertFalse(l1.hasSource());
@@ -142,7 +138,7 @@ public class StdLibTest extends TestCase {
 
     public void testGetRelevantPlansAndAddPlan() throws Exception {
         Agent ag = new Agent();
-        ag.setLogger(null);
+        ag.initAg();
         Plan pa = ASSyntax.parsePlan("@t1 +a : g(10) <- .print(\"ok 10\").");
         ag.getPL().add(pa, null, false);
         assertTrue(pa != null);

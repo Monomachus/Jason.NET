@@ -1,9 +1,7 @@
 package test;
 
 import jason.JasonException;
-import jason.architecture.AgArch;
 import jason.asSemantics.Agent;
-import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.ASSyntax;
 import jason.asSyntax.ArithExpr;
@@ -17,7 +15,6 @@ import jason.asSyntax.RelExpr;
 import jason.asSyntax.Term;
 import jason.asSyntax.VarTerm;
 import jason.asSyntax.parser.ParseException;
-import jason.infra.centralised.CentralisedAgArch;
 
 import java.util.Collections;
 
@@ -207,10 +204,7 @@ public class ExprTermTest extends TestCase {
     
     public void testCount() throws Exception {
         Agent ag = new Agent();
-        ag.initDefaultFunctions();
-        AgArch arch = new AgArch();
-        arch.setArchInfraTier(new CentralisedAgArch());
-        ag.setTS(new TransitionSystem(ag, null, null, arch));
+        ag.initAg();
 
         assertTrue(ag.getFunction(".count",1) != null);
         ag.getBB().add(Literal.parseLiteral("b(10)"));

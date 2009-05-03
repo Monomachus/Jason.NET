@@ -29,6 +29,7 @@ public class SGA implements Directive {
             Term goal = directive.getTerm(2);
             
             Agent newAg = new Agent();
+            newAg.initAg();
 
             // add t : not f__l(_) & c <- !f__g(g).
             newAg.getPL().add(ASSyntax.parsePlan(trigger+" : not f__l(_) & " +context +" <- !f__g("+goal+")."));

@@ -83,16 +83,16 @@ import org.w3c.dom.Element;
 public class Agent {
 
     // Members
-    protected BeliefBase       bb = new DefaultBeliefBase();
-    protected PlanLibrary      pl = new PlanLibrary();
+    protected BeliefBase       bb = null;
+    protected PlanLibrary      pl = null;
     protected TransitionSystem ts = null;
     protected String           aslSource = null;
     
-    private List<Literal>      initialGoals = new ArrayList<Literal>(); // initial goals in the source code
-    private List<Literal>      initialBels  = new ArrayList<Literal>(); // initial beliefs in the source code
+    private List<Literal>      initialGoals = null; // initial goals in the source code
+    private List<Literal>      initialBels  = null; // initial beliefs in the source code
 
-    private Map<String, InternalAction> internalActions = new HashMap<String, InternalAction>();
-    private Map<String, ArithFunction>  functions       = new HashMap<String, ArithFunction>();
+    private Map<String, InternalAction> internalActions = null;
+    private Map<String, ArithFunction>  functions       = null;
     
     private boolean hasCustomSelOp = true;
     
@@ -105,12 +105,26 @@ public class Agent {
         checkCustomSelectOption();
     }
 
+    /** initialise the TS and other components of the agent */
+    public void initAg() {
+        if (bb == null) bb = new DefaultBeliefBase();
+        if (pl == null) pl = new PlanLibrary();
+        
+        if (initialGoals == null) initialGoals = new ArrayList<Literal>();
+        if (initialBels  == null) initialBels  = new ArrayList<Literal>(); 
+
+        if (internalActions == null) internalActions = new HashMap<String, InternalAction>();
+        initDefaultFunctions();
+        
+        if (ts == null) ts = new TransitionSystem(this, new Circumstance(), new Settings(), new AgArch());
+    }
+    
+    
     /** parse and load the agent code, asSrc may be null */
     public void initAg(String asSrc) throws JasonException {
+        initAg();
         // set the agent
         try {
-            initDefaultFunctions();
-
             boolean parsingOk = true;
             if (asSrc != null) {
                 asSrc = asSrc.replaceAll("\\\\", "/");
@@ -180,7 +194,7 @@ public class Agent {
         if (scheduler != null) 
             scheduler.shutdownNow();
     }
-
+    
     /** 
      *  Clone BB, PL, Circumstance. 
      *  A new TS is created (based on the cloned circumstance).
@@ -320,6 +334,8 @@ public class Agent {
     }
     
     public void initDefaultFunctions() {
+        if (functions == null)       
+            functions = new HashMap<String, ArithFunction>();
         addFunction(Count.class, false);
     }
  
@@ -360,6 +376,7 @@ public class Agent {
      *  either global (like math.max) or local (like .count).
      */
     public ArithFunction getFunction(String function, int arity) {
+        if (functions == null) return null;
         ArithFunction af = functions.get(function);
         if (af == null || !af.checkArity(arity))
             // try global function

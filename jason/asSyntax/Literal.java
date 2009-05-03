@@ -255,16 +255,16 @@ public abstract class Literal extends DefaultTerm implements LogicalFormula {
      * Returns an iterator for all unifiers that are logCons.
      */
     public Iterator<Unifier> logicalConsequence(final Agent ag, final Unifier un) {
-        final Iterator<Literal> il = ag.getBB().getCandidateBeliefs(this, un);
+        final Iterator<Literal> il   = ag.getBB().getCandidateBeliefs(this, un);
         if (il == null) // no relevant bels
             return LogExpr.EMPTY_UNIF_LIST.iterator();
+        final AgArch            arch = ag == null ? null : ag.getTS().getUserAgArch();
         
         return new Iterator<Unifier>() {
             Unifier           current = null;
             Iterator<Unifier> ruleIt = null; // current rule solutions iterator
             Rule              rule; // current rule
             Literal           cloneAnnon = null; // a copy of the literal with makeVarsAnnon
-            AgArch            arch = ag.getTS().getUserAgArch();
             boolean           needsUpdate = true;
             
             public boolean hasNext() {
@@ -285,7 +285,7 @@ public abstract class Literal extends DefaultTerm implements LogicalFormula {
             private void get() {
                 needsUpdate = false;
                 current     = null;
-                if (!arch.isRunning()) return;
+                if (arch != null && !arch.isRunning()) return;
                 
                 // try rule iterator
                 while (ruleIt != null && ruleIt.hasNext()) {

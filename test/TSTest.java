@@ -33,11 +33,11 @@ public class TSTest extends TestCase {
 
     public void testRelevant() throws ParseException, JasonException {
         Agent ag = new Agent();
-        Circumstance c = new Circumstance();
+        ag.initAg();
         ag.getPL().add(ASSyntax.parsePlan("@t1 +a(X) : g(10) <- .print(\"ok 10\")."), new Structure("nosource"), false);
         ag.getPL().add((Plan)ASSyntax.parseTerm("{ @t2 +a(X) : true <- .print(\"ok 20\") }"), new Structure("nosource"), false);
         ag.getPL().add(ASSyntax.parsePlan("@t3 +b : true <- true."), new Structure("nosource"), false);
-        TransitionSystem ts = new TransitionSystem(ag, c, null, null);
+        TransitionSystem ts = ag.getTS(); 
         Literal content = Literal.parseLiteral("~alliance");
         content.addSource(new Structure("ag1"));
 

@@ -1,10 +1,8 @@
 package test;
 
 import jason.RevisionFailedException;
-import jason.architecture.AgArch;
 import jason.asSemantics.Agent;
 import jason.asSemantics.Intention;
-import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.ASSyntax;
 import jason.asSyntax.Atom;
@@ -22,7 +20,6 @@ import jason.asSyntax.parser.ParseException;
 import jason.bb.BeliefBase;
 import jason.bb.DefaultBeliefBase;
 import jason.bb.JDBCPersistentBB;
-import jason.infra.centralised.CentralisedAgArch;
 
 import java.util.Iterator;
 import java.util.List;
@@ -253,9 +250,7 @@ public class BeliefBaseTest extends TestCase {
     
     public void testRemWithUnnamedVar() {
         Agent ag = new Agent();
-        AgArch arch = new AgArch();
-        arch.setArchInfraTier(new CentralisedAgArch());
-        ag.setTS(new TransitionSystem(ag, null, null, arch));
+        ag.initAg();
 
         ag.getBB().add(Literal.parseLiteral("pos(2,3)"));
         Unifier u = new Unifier();
@@ -271,9 +266,7 @@ public class BeliefBaseTest extends TestCase {
     @SuppressWarnings("unused")
     public void testLogCons() {
         Agent ag = new Agent();
-        AgArch arch = new AgArch();
-        arch.setArchInfraTier(new CentralisedAgArch());
-        ag.setTS(new TransitionSystem(ag, null, null, arch));
+        ag.initAg();
 
         ag.getBB().add(Literal.parseLiteral("a(10)"));
         ag.getBB().add(Literal.parseLiteral("a(20)"));
@@ -525,9 +518,7 @@ public class BeliefBaseTest extends TestCase {
     @SuppressWarnings("unchecked")
     public void testBelBRF() throws RevisionFailedException {
         Agent ag = new Agent();
-        AgArch arch = new AgArch();
-        arch.setArchInfraTier(new CentralisedAgArch());
-        ag.setTS(new TransitionSystem(ag, null, null, arch));
+        ag.initAg();
 
         ag.getBB().add(Literal.parseLiteral("a(10)"));
         ag.getBB().add(Literal.parseLiteral("a(20)[a]"));
@@ -598,6 +589,7 @@ public class BeliefBaseTest extends TestCase {
     
     public void testClone() {
         Agent ag = new Agent();
+        ag.initAg();
         ag.getBB().add(1,Literal.parseLiteral("a(10)"));
         ag.getBB().add(1,Literal.parseLiteral("a(20)[a]"));
         ag.getBB().add(1,Literal.parseLiteral("a(30)[a,b]"));
@@ -605,7 +597,7 @@ public class BeliefBaseTest extends TestCase {
         ag.getBB().add(1,Literal.parseLiteral("c(y)"));
         ag.getBB().add(Literal.parseLiteral("c(20)"));
         BeliefBase c = (BeliefBase)ag.getBB().clone();
-        assertEquals(ag.getBB().toString(), c.toString());
+        assertEquals(ag.getBB().size(), c.size());
     }
     
     @SuppressWarnings("unchecked")

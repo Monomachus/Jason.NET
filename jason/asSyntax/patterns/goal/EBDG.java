@@ -29,6 +29,7 @@ public class EBDG implements Directive {
     public Agent process(Pred directive, Agent outerContent, Agent innerContent) {
         try {
             Agent newAg = new Agent();
+            newAg.initAg();
             
             Literal goal = Literal.parseLiteral(directive.getTerm(0).toString());
 

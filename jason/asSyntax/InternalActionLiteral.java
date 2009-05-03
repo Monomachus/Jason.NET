@@ -77,7 +77,7 @@ public class InternalActionLiteral extends Structure {
         
     @SuppressWarnings("unchecked")
     public Iterator<Unifier> logicalConsequence(Agent ag, Unifier un) {
-        if (ag.getTS().getUserAgArch().isRunning()) {
+        if (ag == null || ag.getTS().getUserAgArch().isRunning()) {
             try {
                 // clone terms array
                 Term[] clone = getTermsArray();

@@ -4,9 +4,7 @@ import static jason.asSyntax.ASSyntax.createAtom;
 import static jason.asSyntax.ASSyntax.createLiteral;
 import static jason.asSyntax.ASSyntax.createNumber;
 import static jason.asSyntax.ASSyntax.createString;
-import jason.architecture.AgArch;
 import jason.asSemantics.Agent;
-import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.ASSyntax;
 import jason.asSyntax.ListTerm;
@@ -23,7 +21,6 @@ import jason.asSyntax.Trigger;
 import jason.asSyntax.PlanBody.BodyType;
 import jason.asSyntax.parser.ParseException;
 import jason.asSyntax.parser.as2j;
-import jason.infra.centralised.CentralisedAgArch;
 import jason.mas2j.MAS2JProject;
 import jason.mas2j.parser.mas2j;
 
@@ -43,10 +40,7 @@ public class ASParserTest extends TestCase {
 
     public void testKQML() {
         Agent ag = new Agent();
-        ag.setLogger(null);
-        AgArch arch = new AgArch();
-        arch.setArchInfraTier(new CentralisedAgArch());
-        ag.setTS(new TransitionSystem(ag, null, null, arch));
+        ag.initAg();
 
         assertTrue(ag.parseAS(new File("src/asl/kqmlPlans.asl")));
         assertTrue(ag.parseAS(new File("examples/auction/ag1.asl")));
@@ -136,8 +130,9 @@ public class ASParserTest extends TestCase {
 
         as2j parser = new as2j(new StringReader(source));
         Agent a = new Agent();
+        a.initAg();
         parser.agent(a);
-        assertEquals(a.getPL().getPlans().size(), 7);
+        assertEquals(7, a.getPL().getPlans().size());
 
         source =  " { begin omc(at(X,Y), no_battery, no_beer) } \n";
         source += "    +!at(X,Y) : b(X) <- go(X,Y). ";
@@ -145,6 +140,7 @@ public class ASParserTest extends TestCase {
         source += " { end }";
         parser = new as2j(new StringReader(source));
         a = new Agent();
+        a.initAg();
         a.setASLSrc("test1");
         parser.agent(a);
         assertTrue(a.getPL().getPlans().size() == 8);
@@ -156,6 +152,7 @@ public class ASParserTest extends TestCase {
         source += " { end }";
         parser = new as2j(new StringReader(source));
         a = new Agent();
+        a.initAg();
         parser.agent(a);
         //for (Plan p: a.getPL().getPlans()) {
         //    System.out.println(p);
@@ -167,11 +164,12 @@ public class ASParserTest extends TestCase {
         source += " { end }";
         parser = new as2j(new StringReader(source));
         a = new Agent();
+        a.initAg();
         parser.agent(a);
         //for (Plan p: a.getPL().getPlans()) {
         //    System.out.println(p);
         //}
-        assertTrue(a.getPL().getPlans().size() == 5);
+        assertEquals(5, a.getPL().getPlans().size());
         
     }
     
@@ -283,6 +281,8 @@ public class ASParserTest extends TestCase {
                         parseDir(f);
                     } else if (f.getName().endsWith(MAS2JProject.AS_EXT)) {
                         as2j parser = new as2j(new FileInputStream(f));
+                        //Agent ag = new Agent();
+                        //ag.init();
                         parser.agent((Agent)null);
                     } else if (f.getName().endsWith(MAS2JProject.EXT)) {
                         mas2j parser = new mas2j(new FileInputStream(f));

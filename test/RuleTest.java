@@ -1,14 +1,11 @@
 package test;
 
-import jason.architecture.AgArch;
 import jason.asSemantics.Agent;
-import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.Literal;
 import jason.asSyntax.LogExpr;
 import jason.asSyntax.Rule;
 import jason.asSyntax.VarTerm;
-import jason.infra.centralised.CentralisedAgArch;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -25,9 +22,7 @@ public class RuleTest extends TestCase {
  
     public void testLogCons() {
         Agent ag = new Agent();
-        AgArch arch = new AgArch();
-        arch.setArchInfraTier(new CentralisedAgArch());
-        ag.setTS(new TransitionSystem(ag, null, null, arch));
+        ag.initAg();
 
         ag.getBB().add(Literal.parseLiteral("a(10)"));
         ag.getBB().add(Literal.parseLiteral("a(20)"));
@@ -79,9 +74,7 @@ public class RuleTest extends TestCase {
 
     public void testLogCons2() {
         Agent ag = new Agent();
-        AgArch arch = new AgArch();
-        arch.setArchInfraTier(new CentralisedAgArch());
-        ag.setTS(new TransitionSystem(ag, null, null, arch));
+        ag.initAg();
         
         Rule r = new Rule(Literal.parseLiteral("r([],a(X),b(X,4))"), Literal.parseLiteral("true"));
         ag.getBB().add(r);
@@ -98,9 +91,7 @@ public class RuleTest extends TestCase {
 
     public void testLogConsRec() {
         Agent ag = new Agent();
-        AgArch arch = new AgArch();
-        arch.setArchInfraTier(new CentralisedAgArch());
-        ag.setTS(new TransitionSystem(ag, null, null, arch));
+        ag.initAg();
         
         // add 
         // min([],M,M).

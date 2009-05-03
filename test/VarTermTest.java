@@ -1,9 +1,7 @@
 package test;
 
 import jason.RevisionFailedException;
-import jason.architecture.AgArch;
 import jason.asSemantics.Agent;
-import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.ASSyntax;
 import jason.asSyntax.ArithExpr;
@@ -23,7 +21,6 @@ import jason.asSyntax.parser.ParseException;
 import jason.asSyntax.parser.SimpleCharStream;
 import jason.asSyntax.parser.Token;
 import jason.asSyntax.parser.as2jTokenManager;
-import jason.infra.centralised.CentralisedAgArch;
 
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -335,9 +332,7 @@ public class VarTermTest extends TestCase {
     
     public void testVarWithAnnotsInLogCons() throws RevisionFailedException, ParseException {
         Agent ag = new Agent();
-        AgArch arch = new AgArch();
-        arch.setArchInfraTier(new CentralisedAgArch());
-        ag.setTS(new TransitionSystem(ag, null, null, arch));
+        ag.initAg();
 
         ag.addBel(Literal.parseLiteral("b1[b]"));
         ag.addBel(Literal.parseLiteral("b2[d]"));

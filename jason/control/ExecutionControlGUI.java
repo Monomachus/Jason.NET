@@ -224,8 +224,7 @@ public class ExecutionControlGUI extends ExecutionControl {
         jList = new JList(listModel);
         spList = new JPanel(new BorderLayout());
         spList.add(BorderLayout.CENTER, new JScrollPane(jList));
-        spList.setBorder(BorderFactory.createTitledBorder(BorderFactory
-                .createEtchedBorder(), "Agents", TitledBorder.LEFT, TitledBorder.TOP));
+        spList.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Agents", TitledBorder.LEFT, TitledBorder.TOP));
         jList.addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent e) {
                 String ag = jList.getSelectedValue().toString();

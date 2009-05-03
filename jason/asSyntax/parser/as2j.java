@@ -35,7 +35,7 @@
             return "["+s.getSrcFile()+":"+s.getBeginSrcLine()+"]";
     }
     private String getSourceRef(DefaultTerm t) {
-        return getSourceRef( ((DefaultTerm)t).getSrcInfo());
+        return getSourceRef( t.getSrcInfo());
     }
     private String getSourceRef(Object t) {
         if (t instanceof DefaultTerm)
@@ -251,7 +251,7 @@
       jj_consume_token(TK_BEGIN);
       dir = pred();
       jj_consume_token(28);
-                                Agent innerAg = new Agent();
+                                Agent innerAg = new Agent(); innerAg.initAg();
       isEOF = agent(innerAg);
                                 if (isEOF)
                                    {if (true) throw new ParseException(getSourceRef(dir)+" The directive '{ begin "+dir+"}' does not end with '{ end }'.");}

@@ -158,7 +158,7 @@ public class AgArch {
 
     /** Checks whether the agent is running */
     public boolean isRunning() {
-        return archTier.isRunning();
+        return archTier == null || archTier.isRunning();
     }
     
     /** sets the number of the current cycle in the sync execution mode */
