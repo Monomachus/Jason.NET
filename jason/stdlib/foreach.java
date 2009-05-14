@@ -118,6 +118,8 @@ public class foreach extends DefaultInternalAction {
             List<Unifier> allsol = new ArrayList<Unifier>();
             while (iu.hasNext())
                 allsol.add(iu.next());
+            if (allsol.isEmpty())
+                return true;
             iu = allsol.iterator();
             foria = new PlanBodyImpl(BodyType.internalAction, foria.getBodyTerm().clone());
             foria.add(im.getCurrentStep().getBodyNext());
