@@ -71,7 +71,7 @@ public class Environment {
 
     protected ExecutorService executor; // the thread pool used to execute actions
 
-    /** creates an environment class with n threads to execute actions requited by the agents */
+    /** creates an environment class with n threads to execute actions required by the agents */
     public Environment(int n) {
         // creates a thread pool with n threads
         executor = Executors.newFixedThreadPool(n);
@@ -118,7 +118,7 @@ public class Environment {
         return environmentInfraTier;
     }
 
-    public Logger getLoger() {
+    public Logger getLogger() {
         return logger;
     }
     
@@ -324,7 +324,7 @@ public class Environment {
     }
     
     /**
-     * Execute an action on the environment. This method is probably overridden in the user environment class.
+     * Executes an action on the environment. This method is probably overridden in the user environment class.
      */
     public boolean executeAction(String agName, Structure act) {
         logger.info("The action "+act+" done by "+agName+" is not implemented in the default environment.");

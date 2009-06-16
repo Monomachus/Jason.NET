@@ -208,7 +208,7 @@ public abstract class Literal extends DefaultTerm implements LogicalFormula {
     
     // pred
     public void setAnnots(ListTerm l)        { logger.log(Level.SEVERE, "setAnnots is not implemented in the class "+this.getClass().getSimpleName(), new Exception());  }
-    public boolean addAnnot(Term t)          { logger.log(Level.SEVERE, "addAnnot is not implemented in the class "+this.getClass().getSimpleName(), new Exception()); return false; }
+    public boolean addAnnot(Term t)          { logger.log(Level.SEVERE, "addAnnot("+t+") is not implemented in the class "+this.getClass().getSimpleName()+" of object "+this, new Exception()); return false; }
     
     /** adds some annots and return this */
     public Literal addAnnots(Term ... terms) { logger.log(Level.SEVERE, "addAnnots is not implemented in the class "+this.getClass().getSimpleName(), new Exception()); return null; }
