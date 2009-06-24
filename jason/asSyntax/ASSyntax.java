@@ -134,6 +134,13 @@ public class ASSyntax {
     }
     
     
+    /** Creates a new rule with a head and a body */
+    public static Rule createRule(Literal head, LogicalFormula body) {
+        return new Rule(head,body);
+    }
+    
+    
+    
     /** creates a new literal by parsing a string */
     public static Literal parseLiteral(String sLiteral) throws ParseException {
         return new as2j(new StringReader(sLiteral)).literal();
@@ -181,5 +188,10 @@ public class ASSyntax {
     /** creates a new logical formula by parsing a string */
     public static LogicalFormula parseFormula(String sExpr) throws ParseException {
         return (LogicalFormula)new as2j(new StringReader(sExpr)).log_expr();
+    }
+    
+    /** creates a new rule by parsing a string */
+    public static Rule parseRule(String sRule) throws ParseException {
+        return (Rule)new as2j(new StringReader(sRule)).belief();
     }
 }

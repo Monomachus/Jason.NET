@@ -259,12 +259,18 @@ public class ListTermImpl extends Structure implements ListTerm {
     
     /** get the last ListTerm of this List */
     public ListTerm getLast() {
+        ListTerm r = this;
+        while (!r.isEnd() && r.getNext() != null)
+            r = r.getNext();
+        return r;
+        /* recursive implementation 
         if (isEnd()) {
             return this;
         } else if (next != null) {
             return getNext().getLast();
         } 
         return null; // !!! no last!!!!
+        */
     }
     
     public ListTerm getPenultimate() {
@@ -306,7 +312,6 @@ public class ListTermImpl extends Structure implements ListTerm {
         }
     }
 
-    
     /** 
      * Adds a list in the end of this list.
      * This method do not clone <i>lt</i>.
@@ -475,7 +480,7 @@ public class ListTermImpl extends Structure implements ListTerm {
         }
     }
     public boolean add(Term o) {
-        return append(o) != null;
+        return getLast().append(o) != null;
     }
 
     @SuppressWarnings("unchecked")
