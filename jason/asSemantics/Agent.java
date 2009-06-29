@@ -580,7 +580,7 @@ public class Agent {
         // checking all percepts for new beliefs
         for (Literal lp : percepts) {
             try {
-                lp = lp.copy();
+                lp = lp.copy().forceFullLiteralImpl();
                 lp.addAnnot(BeliefBase.TPercept);
                 if (getBB().add(lp)) {
                     Trigger te = new Trigger(TEOperator.add, TEType.belief, lp);
