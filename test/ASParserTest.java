@@ -327,4 +327,15 @@ public class ASParserTest extends TestCase {
         assertEquals("[a,b(5)]", ll.toString());
     }
     
+    public void testParserPartial() throws ParseException {
+        Term t;
+        try {
+            t = ASSyntax.parseFormula("(X>1) & (X<3) (Y>5) & (X<7)");
+            assertTrue(t == null);
+        } catch (ParseException e) {
+            // ok, the exception must be thrown above
+        }
+        t = ASSyntax.parseFormula("(X>1) & (X<3) | (Y>5) & (X<7)");
+        assertEquals("(((X > 1) & (X < 3)) | ((Y > 5) & (X < 7)))", t.toString());
+    }
 }

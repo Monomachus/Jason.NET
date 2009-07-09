@@ -195,12 +195,12 @@ public class ArithExpr extends ArithFunctionTerm implements NumberTerm {
 
     /** gets the LHS of this Expression */
     public NumberTerm getLHS() {
-        return (NumberTerm)getTerm(1);
+        return (NumberTerm)getTerm(0);
     }
 
     /** gets the RHS of this Expression */
     public NumberTerm getRHS() {
-        return (NumberTerm)getTerm(0);
+        return (NumberTerm)getTerm(1);
     }
 
     @Override

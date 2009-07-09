@@ -24,7 +24,7 @@
 
     private static Logger logger = Logger.getLogger("aslparser");
     private static Set<String> parsedFiles = new HashSet<String>();
-    private static Config config = Config.get();
+    private static Config config = Config.get(false);
 
     public void setAg(Agent ag) { curAg = ag; }
 

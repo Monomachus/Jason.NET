@@ -2,6 +2,7 @@ package jason.asSyntax;
 
 import jason.asSyntax.parser.ParseException;
 import jason.asSyntax.parser.as2j;
+import jason.asSyntax.parser.as2jConstants;
 
 import java.io.StringReader;
 import java.util.Collection;
@@ -57,6 +58,10 @@ import java.util.Collection;
  */
 public class ASSyntax {
 
+    // ----
+    // ---- createX methods
+    // ----
+    
     
     /** 
      * Creates a new positive literal, the first argument is the functor (a string)
@@ -139,21 +144,31 @@ public class ASSyntax {
         return new Rule(head,body);
     }
     
-    
+    // ----
+    // ---- parseX methods
+    // ----
     
     /** creates a new literal by parsing a string */
     public static Literal parseLiteral(String sLiteral) throws ParseException {
-        return new as2j(new StringReader(sLiteral)).literal();
+        //return new as2j(new StringReader(sLiteral)).literal();
+        as2j parser = new as2j(new StringReader(sLiteral));
+        Literal l = parser.literal();
+        if (parser.getNextToken().kind != as2jConstants.EOF) 
+            throw new ParseException("Expected <EOF> after "+l+" for parameter '"+sLiteral+"'");
+        return l;
     }
  
     /** creates a new number term by parsing a string */
-    public static NumberTerm parseNumber(String number) throws NumberFormatException {
-        return new NumberTermImpl(Double.parseDouble(number));
+    public static NumberTerm parseNumber(String sNumber) throws NumberFormatException {
+        return new NumberTermImpl(Double.parseDouble(sNumber));
     }
 
     /** creates a new structure (a kind of term) by parsing a string */
-    public static Structure parseStructure(String sTerm) throws ParseException {
-        Term t = new as2j(new StringReader(sTerm)).term();
+    public static Structure parseStructure(String sStructure) throws ParseException {
+        as2j parser = new as2j(new StringReader(sStructure));
+        Term t = parser.term();
+        if (parser.getNextToken().kind != as2jConstants.EOF) 
+            throw new ParseException("Expected <EOF> after "+t+" for parameter '"+sStructure+"'");
         if (t instanceof Structure) 
             return (Structure)t;
         else
@@ -162,36 +177,71 @@ public class ASSyntax {
 
     /** creates a new variable by parsing a string */
     public static VarTerm parseVar(String sVar) throws ParseException {
-        return new as2j(new StringReader(sVar)).var();
+        //return new as2j(new StringReader(sVar)).var();
+        as2j parser = new as2j(new StringReader(sVar));
+        VarTerm v = parser.var();
+        if (parser.getNextToken().kind != as2jConstants.EOF) 
+            throw new ParseException("Expected <EOF> after "+v+" for parameter '"+sVar+"'");
+        return v;
     }
 
     /** creates a new term by parsing a string */
     public static Term parseTerm(String sTerm) throws ParseException {
-        return new as2j(new StringReader(sTerm)).term();
+        //return new as2j(new StringReader(sTerm)).term();
+        as2j parser = new as2j(new StringReader(sTerm));
+        Term t = parser.term();
+        if (parser.getNextToken().kind != as2jConstants.EOF) 
+            throw new ParseException("Expected <EOF> after "+t+" for parameter '"+sTerm+"'");
+        return t;
     }
     
     /** creates a new plan by parsing a string */
     public static Plan parsePlan(String sPlan) throws ParseException {
-        return new as2j(new StringReader(sPlan)).plan();
+        //return new as2j(new StringReader(sPlan)).plan();
+        as2j parser = new as2j(new StringReader(sPlan));
+        Plan p = parser.plan();
+        if (parser.getNextToken().kind != as2jConstants.EOF) 
+            throw new ParseException("Expected <EOF> after "+p+" for parameter '"+sPlan+"'");
+        return p;
     }
 
     /** creates a new trigger by parsing a string */
     public static Trigger parseTrigger(String sTe) throws ParseException {
-        return new as2j(new StringReader(sTe)).trigger();
+        //return new as2j(new StringReader(sTe)).trigger();
+        as2j parser = new as2j(new StringReader(sTe));
+        Trigger te = parser.trigger();
+        if (parser.getNextToken().kind != as2jConstants.EOF) 
+            throw new ParseException("Expected <EOF> after "+te+" for parameter '"+sTe+"'");
+        return te;
     }
 
     /** creates a new list by parsing a string */
     public static ListTerm parseList(String sList) throws ParseException {
-        return new as2j(new StringReader(sList)).list();
+        //return new as2j(new StringReader(sList)).list();
+        as2j parser = new as2j(new StringReader(sList));
+        ListTerm l = parser.list();
+        if (parser.getNextToken().kind != as2jConstants.EOF) 
+            throw new ParseException("Expected <EOF> after "+l+" for parameter '"+sList+"'");
+        return l;
     }
     
     /** creates a new logical formula by parsing a string */
     public static LogicalFormula parseFormula(String sExpr) throws ParseException {
-        return (LogicalFormula)new as2j(new StringReader(sExpr)).log_expr();
+        //return (LogicalFormula)new as2j(new StringReader(sExpr)).log_expr();
+        as2j parser = new as2j(new StringReader(sExpr));
+        LogicalFormula l = (LogicalFormula)parser.log_expr();
+        if (parser.getNextToken().kind != as2jConstants.EOF) 
+            throw new ParseException("Expected <EOF> after "+l+" for parameter '"+sExpr+"'");
+        return l;
     }
     
     /** creates a new rule by parsing a string */
     public static Rule parseRule(String sRule) throws ParseException {
-        return (Rule)new as2j(new StringReader(sRule)).belief();
+        //return (Rule)new as2j(new StringReader(sRule)).belief();
+        as2j parser = new as2j(new StringReader(sRule));
+        Rule r = (Rule)parser.belief();
+        if (parser.getNextToken().kind != as2jConstants.EOF) 
+            throw new ParseException("Expected <EOF> after "+r+" for parameter '"+sRule+"'");
+        return r;
     }
 }
