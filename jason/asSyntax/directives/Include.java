@@ -66,6 +66,7 @@ public class Include implements Directive {
             }
 
             Agent ag = new Agent();
+            ag.initAg();
             ag.setASLSrc(file);
             as2j parser = new as2j(in); 
             parser.agent(ag);
