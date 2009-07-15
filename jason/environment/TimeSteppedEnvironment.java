@@ -73,7 +73,14 @@ public class TimeSteppedEnvironment extends Environment {
         requests = new HashMap<String,ActRequest>();
         overRequests = new LinkedList<ActRequest>();
         step = 0;
-        if (timeoutThread != null) timeoutThread.allAgFinished();
+        if (timeoutThread == null) {
+            if (stepTimeout > 0) {
+                timeoutThread = new TimeOutThread(stepTimeout);
+                timeoutThread.start();
+            }
+        } else {
+            timeoutThread.allAgFinished();
+        }
         stepStarted(step);
     }
 
@@ -132,14 +139,14 @@ public class TimeSteppedEnvironment extends Environment {
         boolean startNew = false;
         
         synchronized (requests) { // lock access to requests
-            if (nbAgs < 0 || timeoutThread == null) {
+            if (nbAgs < 0) { // || timeoutThread == null) {
                 // initialise dynamic information
                 // (must be in sync part, so that more agents do not start the timeout thread)
                 updateNumberOfAgents();
-                if (stepTimeout > 0 && timeoutThread == null) {
+                /*if (stepTimeout > 0 && timeoutThread == null) {
                     timeoutThread = new TimeOutThread(stepTimeout);
                     timeoutThread.start();
-                }
+                }*/
             }
 
             // if the agent already has an action scheduled, fail the first
@@ -248,7 +255,7 @@ public class TimeSteppedEnvironment extends Environment {
                 
                 // the over requests could complete the requests
                 // so test end of step again
-                if (testEndCycle(requests.keySet())) {
+                if (nbAgs > 0 && testEndCycle(requests.keySet())) {
                     startNewStep();
                 }
                 
@@ -266,7 +273,7 @@ public class TimeSteppedEnvironment extends Environment {
     }
 
     /** to be overridden by the user class */
-    protected void stepFinished(int step, long time, boolean timeout) {     
+    protected void stepFinished(int step, long elapsedTime, boolean byTimeout) {     
     }
     
     protected int requiredStepsForAction(String agName, Structure action) {
