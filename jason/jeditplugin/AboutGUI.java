@@ -39,7 +39,7 @@ public class AboutGUI {
         "Copyright Photo RMN (Agence Photographique de la Reunion des\n"+
         "Musees Nationaux, France). Photograph by Herve Lewandowski.\n\n"+
         "To contact the authors:\n"+
-        "http://www.dur.ac.uk/r.bordini\n"+
+        "http://www.inf.ufrgs.br/~bordini\n"+
         "http://www.emse.fr/~hubner",
         "JasonID - About",
         JOptionPane.INFORMATION_MESSAGE,

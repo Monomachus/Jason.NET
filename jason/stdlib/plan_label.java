@@ -16,8 +16,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 // 
 // To contact the authors:
-// http://www.dur.ac.uk/r.bordini
-// http://www.inf.furb.br/~jomi
+// http://www.inf.ufrgs.br/~bordini
+// http://www.das.ufsc.br/~jomi
 //
 //----------------------------------------------------------------------------
 
