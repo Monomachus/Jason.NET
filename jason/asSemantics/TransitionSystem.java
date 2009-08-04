@@ -29,7 +29,6 @@ import jason.architecture.AgArch;
 import jason.asSyntax.ASSyntax;
 import jason.asSyntax.Atom;
 import jason.asSyntax.InternalActionLiteral;
-import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Literal;
 import jason.asSyntax.LiteralImpl;
 import jason.asSyntax.LogicalFormula;
@@ -176,12 +175,8 @@ public class TransitionSystem {
                 // if the answer was tell 3, unifies X=3
                 // if the answer was untell 3, unifies X=false
                 Structure send = (Structure)intention.peek().removeCurrentStep();
-                if (m.isUnTell()) {
-                    if (send.getTerm(1).toString().equals("askOne")) {
-                        content = Literal.LFalse;
-                    } else { // the .send is askAll
-                        content = new ListTermImpl(); // the answer is an empty list
-                    }
+                if (m.isUnTell() && send.getTerm(1).toString().equals("askOne")) {
+                    content = Literal.LFalse;
                 }
                 if (intention.peek().getUnif().unifies(send.getTerm(3), content)) {
                     getC().addIntention(intention);

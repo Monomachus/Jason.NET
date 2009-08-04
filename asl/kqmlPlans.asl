@@ -82,11 +82,6 @@
 -!kqml_received(Sender, askOne, Content, MsgId)
    <- .send(Sender, untell, Content, MsgId).      
 
-@kqmlReceivedAskAll1
-+!kqml_received(Sender, askAll, Content, MsgId)
-   :  not Content
-   <- .send(Sender, untell, Content, MsgId).
-
 @kqmlReceivedAskAll2
 +!kqml_received(Sender, askAll, Content, MsgId)
    <- .findall(Content, Content, List); 
