@@ -181,7 +181,7 @@ public class TransitionSystem {
                 if (intention.peek().getUnif().unifies(send.getTerm(3), content)) {
                     getC().addIntention(intention);
                 } else {
-                    generateGoalDeletion(intention, JasonException.createBasicErrorAnnots("ask_failed", "reply of an ask message does not unify with forth argument of .send"));
+                    generateGoalDeletion(intention, JasonException.createBasicErrorAnnots("ask_failed", "reply of an ask message ('"+content+"') does not unify with fourth argument of .send ('"+send.getTerm(3)+"')"));
                 }
 
                 // the message is not an ask answer

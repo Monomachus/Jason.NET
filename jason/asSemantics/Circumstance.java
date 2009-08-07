@@ -192,9 +192,10 @@ public class Circumstance implements Serializable {
         boolean removed = I.remove(i);
 
         // notify listeners
-        for (CircumstanceListener el : listeners) {
-            el.intentionAdded(i);
-        }
+        if (removed)
+            for (CircumstanceListener el : listeners)
+                el.intentionDropped(i);
+
         return removed;
     }
 

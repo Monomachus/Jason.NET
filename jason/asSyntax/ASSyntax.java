@@ -205,6 +205,16 @@ public class ASSyntax {
         return p;
     }
 
+    /** creates a new plan body by parsing a string */
+    public static PlanBody parsePlanBody(String sPlanBody) throws ParseException {
+        //return new as2j(new StringReader(sPlan)).plan();
+        as2j parser = new as2j(new StringReader(sPlanBody));
+        PlanBody p = parser.plan_body();
+        if (parser.getNextToken().kind != as2jConstants.EOF) 
+            throw new ParseException("Expected <EOF> after "+p+" for parameter '"+sPlanBody+"'");
+        return p;
+    }
+
     /** creates a new trigger by parsing a string */
     public static Trigger parseTrigger(String sTe) throws ParseException {
         //return new as2j(new StringReader(sTe)).trigger();
