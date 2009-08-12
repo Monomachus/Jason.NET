@@ -198,15 +198,17 @@ public class PlanBodyImpl extends Structure implements PlanBody, Iterable<PlanBo
         return formType.hashCode() + super.calcHashCode();
     }
 
+    /** clone the plan body and adds it in the end of this plan */
     public boolean add(PlanBody bl) {
         if (term == null) {
             bl = bl.clonePB();
             swap(bl);
             this.next = bl.getBodyNext();
-        } else if (next == null)
+        } else if (next == null) {
             next = bl;
-        else 
+        } else { 
             next.add(bl);
+        }
         return true;
     }
 
