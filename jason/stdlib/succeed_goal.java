@@ -111,7 +111,7 @@ public class succeed_goal extends DefaultInternalAction {
                 // test in the event
                 Trigger t = e.getTrigger();
                 if (i != Intention.EmptyInt && i.size() > 0) {
-                    t = (Trigger) t.clone();
+                    t = t.clone();
                     t.apply(i.peek().getUnif());
                 }
                 if (un.unifies(t, g)) {
@@ -153,11 +153,11 @@ public class succeed_goal extends DefaultInternalAction {
         if (i != null && i.dropGoal(g, un)) {
             // continue the intention
             if (!i.isFinished()) { // could be finished after i.dropGoal() !!
-                i.peek().removeCurrentStep();
+                if (ts.getC().getSelectedIntention() != i) // if i is not the current intention, remove
+                    i.peek().removeCurrentStep();
                 ts.applyClrInt(i);
                 return 1;
-            }
-            else {
+            } else {
                 ts.applyClrInt(i);
                 return 3;
             }
