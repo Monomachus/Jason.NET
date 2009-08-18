@@ -183,7 +183,7 @@ public class GridWorldModel {
         return isFree(l.x, l.y);
     }
 
-    /** returns true if the location x,y has no obstacle neither agent */
+    /** returns true if the location x,y has neither obstacle nor agent */
     public boolean isFree(int x, int y) {
         return inGrid(x, y) && (data[x][y] & OBSTACLE) == 0 && (data[x][y] & AGENT) == 0;
     }

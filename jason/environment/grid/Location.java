@@ -26,6 +26,9 @@ public final class Location {
     public boolean isInArea(Location tl, Location br) {
         return x >= tl.x && x <= br.x && y >= tl.y && y <= br.y;
     }
+    public boolean isInArea(Area a) {
+        return a.contains(this);
+    }
     public boolean isNeigbour(Location l) {
         return 
             distance(l) == 1 ||
