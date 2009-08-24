@@ -557,7 +557,7 @@ public class TransitionSystem {
                 }
                 if (fail) {
                     if (logger.isLoggable(Level.FINE)) logger.fine("Test '"+h+"' failed ("+h.getSrcInfo()+").");
-                    generateGoalDeletion(conf.C.SI, null);
+                    generateGoalDeletion(conf.C.SI, JasonException.createBasicErrorAnnots("test_goal_failed", "Failed to test '"+h+"'"));
                 }
             }
             break;
@@ -579,7 +579,7 @@ public class TransitionSystem {
                     updateEvents(result,Intention.EmptyInt);
                 }
             } catch (RevisionFailedException re) {
-                generateGoalDeletion(conf.C.SI, null);
+                generateGoalDeletion(conf.C.SI, JasonException.createBasicErrorAnnots("belief_revision_failed", "BRF failed for '"+body+"'"));
                 break;
             }
 
