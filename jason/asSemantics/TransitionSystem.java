@@ -423,7 +423,13 @@ public class TransitionSystem {
         Term bTerm = h.getBodyTerm();
         // de-var bTerm
         while (bTerm instanceof VarTerm) {
-            // h should be ground
+            // check if bTerm is ground
+            if (bTerm.isGround()) {
+                bTerm = ((VarTerm)bTerm).getValue();
+                continue; // restart the loop
+            }
+            
+            // h should be 'groundable' (considering the current unifier)
             Term bValue = u.get((VarTerm)bTerm);
             if (bValue == null) { // the case of !A with A not ground
                 String msg = h.getSrcInfo()+": "+ "Variable '"+bTerm+"' must be ground.";
