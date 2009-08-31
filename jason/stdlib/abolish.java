@@ -54,8 +54,8 @@ public class abolish extends DefaultInternalAction {
 
     @Override protected void checkArguments(Term[] args) throws JasonException {
         super.checkArguments(args); // check number of arguments
-        if (!args[0].isLiteral())
-            throw JasonException.createWrongArgument(this,"first argument must be a literal");
+        if (!args[0].isLiteral() & !args[0].isVar())
+            throw JasonException.createWrongArgument(this,"first argument must be a literal or variable.");
     }
     
     @Override public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {

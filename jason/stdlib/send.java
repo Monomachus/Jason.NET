@@ -175,9 +175,10 @@ public class send extends DefaultInternalAction {
                 for (Term t: (ListTerm)to) {
                     if (t.isAtom() || t.isString()) {
                         String rec = t.toString();
-                        if (t.isString()) {
+                        if (t.isString()) 
                             rec = ((StringTerm)t).getString();
-                        }
+                        if (rec.equals("self"))
+                            rec = ts.getUserAgArch().getAgName();
                         m.setReceiver(rec);
                         ts.getUserAgArch().sendMsg(m);
                     } else {
@@ -187,9 +188,10 @@ public class send extends DefaultInternalAction {
             }
         } else {
             String rec = to.toString();
-            if (to.isString()) {
+            if (to.isString())
                 rec = ((StringTerm)to).getString();
-            }
+            if (rec.equals("self"))
+                rec = ts.getUserAgArch().getAgName();
             m.setReceiver(rec);
             ts.getUserAgArch().sendMsg(m);
         }
