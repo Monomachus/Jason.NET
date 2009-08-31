@@ -42,7 +42,7 @@ public class ArithFunctionTerm extends Structure implements NumberTerm {
     }
 
     public ArithFunctionTerm(ArithFunctionTerm af) {
-        super(af);
+        super(af); // clone args from af
         value    = af.value;
         function = af.function;
         agent    = af.agent;
@@ -186,10 +186,11 @@ public class ArithFunctionTerm extends Structure implements NumberTerm {
 
     @Override
     public NumberTerm clone() {
-        if (isEvaluated())
+        if (isEvaluated()) {
             return value;
-        else
+        } else {
             return new ArithFunctionTerm(this);
+        }
     } 
     
     public Element getAsDOM(Document document) {

@@ -21,22 +21,15 @@ public final class Area {
         return new Location( (tl.x + br.x)/2, (tl.y + br.y)/2);
     }
 
+    /* -- wrong code!
     public int distanceMaxBorder(Location l) {
         if (contains(l)) 
             return 0;
         int x = Math.min( Math.abs(tl.x - l.x), Math.abs(br.x - l.x));
         int y = Math.min( Math.abs(tl.y - l.y), Math.abs(br.y - l.y));
         return Math.min(x,y);
-        
-        /*
-        int min = Integer.MAX_VALUE;
-        if (Math.abs(tl.x - l.x) < min) min = Math.abs(tl.x - l.x);
-        if (Math.abs(br.x - l.x) < min) min = Math.abs(br.x - l.x);
-        if (Math.abs(tl.y - l.y) < min) min = Math.abs(tl.y - l.y);
-        if (Math.abs(br.y - l.y) < min) min = Math.abs(br.y - l.y);
-        return min;
-         */
     }
+         */
     
     
     @Override

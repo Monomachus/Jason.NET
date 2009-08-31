@@ -28,7 +28,7 @@ public abstract class DefaultArithFunction implements ArithFunction, Serializabl
     public boolean allowUngroundTerms() {
         return false;
     }
-    
+
     @Override
     public String toString() {
         return "function "+getName();
