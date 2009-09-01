@@ -37,13 +37,14 @@ import jason.asSyntax.Term;
   "-" operator, an event will be generated for each deletion.
   
   <p>Parameters:<ul>
-  <li>+ pattern (literal): the "pattern" for what should be removed.<br/>
+  <li>+ pattern (literal or variable): the "pattern" for what should be removed.<br/>
   </ul>
   
   <p>Examples:<ul>
   <li> <code>.abolish(b(_))</code>: remove all <code>b/1</code> beliefs, regardless of the argument value.</li>
   <li> <code>.abolish(c(_,t))</code>: remove all <code>c/2</code> beliefs where the second argument is <code>2</code>.</li>
   <li> <code>.abolish(c(_,_)[source(ag1)])</code>: remove all <code>c/2</code> beliefs that have <code>ag1</code> as source.</li>
+  <li> <code>.abolish(_[source(ag1)])</code>: remove any beliefs that have <code>ag1</code> as source.</li>
   </ul>
 
  */
