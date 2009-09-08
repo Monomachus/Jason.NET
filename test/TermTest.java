@@ -171,7 +171,6 @@ public class TermTest extends TestCase {
         assertEquals(u.get("Z4").toString(), "a");
     }
     
-
     public void testAnnotsUnify1() {
         Unifier u = new Unifier();
         Pred p1, p2;

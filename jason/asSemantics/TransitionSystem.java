@@ -47,8 +47,6 @@ import jason.asSyntax.Trigger.TEType;
 import jason.asSyntax.parser.ParseException;
 import jason.bb.BeliefBase;
 import jason.runtime.Settings;
-import jason.stdlib.foreach;
-import jason.stdlib.loop;
 
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -478,7 +476,7 @@ public class TransitionSystem {
                 Term[] terms = new Term[body.getArity()];
                 for (int i=0; i<terms.length; i++) {
                     terms[i] = body.getTerm(i).clone();
-                    if ( !(ia instanceof loop) && !(ia instanceof foreach)) // loop e foreach must not apply
+                    if ( ia.applyBeforeExecute())
                         terms[i].apply(u);
                 }
                 Object oresult = ia.execute(this, u, terms);
@@ -645,12 +643,11 @@ public class TransitionSystem {
     
     // add the self source in the body in case no other source was given
     private Literal prepareBodyForEvent(Literal body, Unifier u) {
-        body = body.copy(); 
+        body = body.copy();
         body.apply(u);
         body.makeVarsAnnon(u); // free variables in an event cannot conflict with those in the plan
         body = body.forceFullLiteralImpl();
-        if (!body.hasSource()) {
-            // do not add source(self) in case the programmer set the source
+        if (!body.hasSource()) { // do not add source(self) in case the programmer set the source
             body.addAnnot(BeliefBase.TSelf);
         }
         return body;
@@ -678,7 +675,7 @@ public class TransitionSystem {
             // remove the finished IM from the top of the intention
             IntendedMeans topIM = i.pop();
             Literal topLiteral = topIM.getTrigger().getLiteral();
-            if (logger.isLoggable(Level.FINE)) logger.fine("Returning from IM "+topIM.getPlan().getLabel()+", te="+topIM.getPlan().getTrigger());
+            if (logger.isLoggable(Level.FINE)) logger.fine("Returning from IM "+topIM.getPlan().getLabel()+", te="+topIM.getPlan().getTrigger()+" unif="+topIM.unif);
             
             // if finished a failure handling IM ...
             if (im.getTrigger().isGoal() && !im.getTrigger().isAddition() && i.size() > 0) {

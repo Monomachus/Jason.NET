@@ -44,6 +44,7 @@ public class asl2xml  {
 
     Agent loadAg(String file)  throws Exception {
         Agent ag = new Agent();
+        ag.initAg();
         if (ag.parseAS(new File(file))) {
             ag.setASLSrc(file);
             ag.addInitialBelsInBB();
@@ -56,6 +57,7 @@ public class asl2xml  {
     public String transform(String agCode) throws Exception {
         jason.asSyntax.parser.as2j parser = new jason.asSyntax.parser.as2j(new StringReader(agCode));
         Agent ag = new Agent();
+        ag.initAg();
         parser.agent(ag);
         return transform(ag.getAgProgram());
     }

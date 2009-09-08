@@ -19,6 +19,7 @@ public class DefaultInternalAction implements InternalAction, Serializable {
 
     public boolean suspendIntention()   { return false;  }
     public boolean canBeUsedInContext() { return true;  }
+    public boolean applyBeforeExecute() { return true; } 
 
     public int getMinArgs() { return 0; }
     public int getMaxArgs() { return Integer.MAX_VALUE; }

@@ -39,6 +39,9 @@ public interface InternalAction {
     /** Return true if the internal action can be used in plans' context */
     boolean canBeUsedInContext();
     
+    /** Return true if the unifier have to be applied the the internal action's arguments before calling execute */
+    public boolean applyBeforeExecute();
+    
     /** Executes the internal action. It should return a Boolean or
      *  an Iterator<Unifier>. A true boolean return means that the IA was
      *  successfully executed. An Iterator result means that there is 

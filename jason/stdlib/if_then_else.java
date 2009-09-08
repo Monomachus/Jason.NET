@@ -72,6 +72,8 @@ public class if_then_else extends DefaultInternalAction {
         return singleton;
     }
     
+    @Override public boolean applyBeforeExecute() { return false; } 
+
     @Override public int getMinArgs() { return 2; }
     @Override public int getMaxArgs() { return 3; }
     

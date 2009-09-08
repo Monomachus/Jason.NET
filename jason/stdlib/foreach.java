@@ -86,6 +86,8 @@ public class foreach extends DefaultInternalAction {
             singleton = new foreach();
         return singleton;
     }
+
+    @Override public boolean applyBeforeExecute() { return false; } 
     
     @Override public int getMinArgs() { return 2; }
     @Override public int getMaxArgs() { return 2; }

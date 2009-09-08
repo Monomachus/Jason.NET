@@ -300,7 +300,7 @@ public class Structure extends Atom {
             VarTerm vt = un.deref((VarTerm)t);
             UnnamedVar uv;
             if (vt.isUnnamedVar()) {
-                uv = (UnnamedVar)vt;
+                uv = (UnnamedVar)vt.clone();
             } else {
                 uv = new UnnamedVar( "_"+UnnamedVar.getUniqueId()+t);
                 un.bind(vt, uv);

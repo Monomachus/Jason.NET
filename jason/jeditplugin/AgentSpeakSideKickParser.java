@@ -39,6 +39,7 @@ public class AgentSpeakSideKickParser extends sidekick.SideKickParser {
             jason.asSyntax.parser.as2j parser = new jason.asSyntax.parser.as2j(new StringReader(text));
             
             Agent ag = new Agent();
+            ag.initAg();
             parser.agent(ag);
             
             // create nodes 
@@ -104,9 +105,8 @@ public class AgentSpeakSideKickParser extends sidekick.SideKickParser {
         }
 
         private Position toPos(Buffer buffer, int line) {
-            if ((line - 1) > buffer.getLineCount()) {
+            if ((line - 1) > buffer.getLineCount())
                 return buffer.createPosition(buffer.getLength() - 1);
-            }
             int offset = buffer.getLineStartOffset(line - 1);
             if (offset >= buffer.getLength()) {
                 return buffer.createPosition(buffer.getLength() - 1);
