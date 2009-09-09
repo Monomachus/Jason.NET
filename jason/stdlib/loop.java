@@ -29,6 +29,7 @@ import jason.asSemantics.IntendedMeans;
 import jason.asSemantics.InternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
+import jason.asSyntax.Literal;
 import jason.asSyntax.LogicalFormula;
 import jason.asSyntax.ObjectTerm;
 import jason.asSyntax.ObjectTermImpl;
@@ -79,8 +80,14 @@ public class loop extends DefaultInternalAction {
         return singleton;
     }
     
-    @Override public boolean applyBeforeExecute() { return false; } 
-    
+    @Override public Term[] prepareArguments(Literal body, Unifier un) {
+        Term[] terms = new Term[body.getArity()];
+        for (int i=0; i<terms.length; i++) {
+            terms[i] = body.getTerm(i).clone();
+        }
+        return terms;
+    }
+        
     @Override public int getMinArgs() { return 2; }
     @Override public int getMaxArgs() { return 2; }
     

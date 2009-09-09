@@ -29,6 +29,7 @@ import jason.environment.Environment;
 import jason.environment.EnvironmentInfraTier;
 import jason.runtime.RuntimeServicesInfraTier;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -58,10 +59,14 @@ public class SaciEnvironment extends saci.Agent implements EnvironmentInfraTier 
     public SaciEnvironment() {
     }
 
-    public void informAgsEnvironmentChanged() {
+    public void informAgsEnvironmentChanged(String... agents) {
         try {
-            saci.Message m = new saci.Message("(tell :content environmentChanged)");
-            mbox.broadcast(m);
+            if (agents.length == 0) {
+                saci.Message m = new saci.Message("(tell :content environmentChanged)");
+                mbox.broadcast(m);
+            } else {
+                informAgsEnvironmentChanged(Arrays.asList(agents));
+            }
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error sending notifyEvents ", e);
         }

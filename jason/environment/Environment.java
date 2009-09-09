@@ -122,15 +122,18 @@ public class Environment {
         return logger;
     }
     
+    /**
+     * @deprecated use version with String... parameter
+     */
     public void informAgsEnvironmentChanged(Collection<String> agents) {
         if (environmentInfraTier != null) {
             environmentInfraTier.informAgsEnvironmentChanged(agents);
         }
     }
 
-    public void informAgsEnvironmentChanged() {
+    public void informAgsEnvironmentChanged(String... agents) {
         if (environmentInfraTier != null) {
-            environmentInfraTier.informAgsEnvironmentChanged();
+            environmentInfraTier.informAgsEnvironmentChanged(agents);
         }
     }
 

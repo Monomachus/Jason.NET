@@ -35,15 +35,18 @@ import java.util.Collection;
 public interface EnvironmentInfraTier {
 
     /** 
-     * Sends a message to all agents notifying them that the environment has changed 
-     * (called by the user environment). 
+     * Sends a message to the given agents notifying them that the environment has changed 
+     * (called by the user environment). If no agent is informed, the notification is sent 
+     * to all agents.
      */
-    public void informAgsEnvironmentChanged();
+    public void informAgsEnvironmentChanged(String... agents);
 
     /**
      * Sends a message to a set of agents notifying them that the environment has changed. 
      * The collection has the agents' names. 
-     * (called by the user environment). 
+     * (called by the user environment).
+     * 
+     * @deprecated use the informAgsEnvironmentChanged with String... parameter 
      */
     public void informAgsEnvironmentChanged(Collection<String> agents);
 

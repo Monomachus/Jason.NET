@@ -31,6 +31,7 @@ import jason.asSemantics.IntendedMeans;
 import jason.asSemantics.InternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
+import jason.asSyntax.Literal;
 import jason.asSyntax.LogicalFormula;
 import jason.asSyntax.PlanBody;
 import jason.asSyntax.Term;
@@ -72,7 +73,16 @@ public class if_then_else extends DefaultInternalAction {
         return singleton;
     }
     
-    @Override public boolean applyBeforeExecute() { return false; } 
+    @Override public Term[] prepareArguments(Literal body, Unifier un) {
+        Term[] terms = new Term[body.getArity()];
+        for (int i=0; i<terms.length; i++) {
+            terms[i] = body.getTerm(i).clone(); 
+            // TODO: why do we need this clone? (without cloning a stack overflow is produced in Jason Team 09
+        } 
+        return terms;
+        //return body.getTermsArray();
+    }
+    
 
     @Override public int getMinArgs() { return 2; }
     @Override public int getMaxArgs() { return 3; }

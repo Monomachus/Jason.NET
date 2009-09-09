@@ -38,6 +38,7 @@ import jason.environment.EnvironmentInfraTier;
 import jason.mas2j.ClassParameters;
 import jason.runtime.RuntimeServicesInfraTier;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
@@ -170,8 +171,11 @@ public class JadeEnvironment extends JadeAg implements EnvironmentInfraTier {
         }                            
     }
 
-    public void informAgsEnvironmentChanged() {
-        broadcast(new Message("tell", null, null, "environmentChanged"));
+    public void informAgsEnvironmentChanged(String... agents) {
+        if (agents.length == 0)
+            broadcast(new Message("tell", null, null, "environmentChanged"));
+        else
+            informAgsEnvironmentChanged(Arrays.asList(agents));
     }
 
     public void informAgsEnvironmentChanged(Collection<String> agentsToNotify) {

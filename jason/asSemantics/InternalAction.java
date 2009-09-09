@@ -23,6 +23,7 @@
 
 package jason.asSemantics;
 
+import jason.asSyntax.Literal;
 import jason.asSyntax.Term;
 
 /**
@@ -39,8 +40,8 @@ public interface InternalAction {
     /** Return true if the internal action can be used in plans' context */
     boolean canBeUsedInContext();
     
-    /** Return true if the unifier have to be applied the the internal action's arguments before calling execute */
-    public boolean applyBeforeExecute();
+    /** Prepare body's terms to be used in 'execute', normally it consist of cloning and applying each term */
+    public Term[] prepareArguments(Literal body, Unifier un);
     
     /** Executes the internal action. It should return a Boolean or
      *  an Iterator<Unifier>. A true boolean return means that the IA was

@@ -472,14 +472,8 @@ public class TransitionSystem {
             List<Term> errorAnnots = null;
             try {
                 InternalAction ia = ((InternalActionLiteral)bTerm).getIA(ag);
-                // clone and apply args
-                Term[] terms = new Term[body.getArity()];
-                for (int i=0; i<terms.length; i++) {
-                    terms[i] = body.getTerm(i).clone();
-                    if ( ia.applyBeforeExecute())
-                        terms[i].apply(u);
-                }
-                Object oresult = ia.execute(this, u, terms);
+                Term[] terms      = ia.prepareArguments(body, u); // clone and apply args
+                Object oresult    = ia.execute(this, u, terms);
                 if (oresult != null) {
                     ok = oresult instanceof Boolean && (Boolean)oresult;
                     if (!ok && oresult instanceof Iterator) { // ia result is an Iterator
