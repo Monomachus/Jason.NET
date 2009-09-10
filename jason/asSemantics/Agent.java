@@ -213,6 +213,7 @@ public class Agent {
             e.printStackTrace();
         }
         a.aslSource = this.aslSource;
+        a.internalActions = new HashMap<String, InternalAction>();
         a.initDefaultFunctions();
         a.setTS(new TransitionSystem(a, this.getTS().getC().clone(), this.getTS().getSettings(), arch));
 

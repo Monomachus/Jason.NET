@@ -74,13 +74,7 @@ public class if_then_else extends DefaultInternalAction {
     }
     
     @Override public Term[] prepareArguments(Literal body, Unifier un) {
-        Term[] terms = new Term[body.getArity()];
-        for (int i=0; i<terms.length; i++) {
-            terms[i] = body.getTerm(i).clone(); 
-            // TODO: why do we need this clone? (without cloning a stack overflow is produced in Jason Team 09
-        } 
-        return terms;
-        //return body.getTermsArray();
+        return body.getTermsArray();
     }
     
 
@@ -106,10 +100,10 @@ public class if_then_else extends DefaultInternalAction {
             
         Iterator<Unifier> iu = logExpr.logicalConsequence(ts.getAg(), un);
         if (iu.hasNext()) { // .if THEN
-            whattoadd = (PlanBody)args[1];
+            whattoadd = (PlanBody)args[1].clone(); // need to clone due to setAsBodyTerm(false)
             un.compose(iu.next());
         } else if (args.length == 3) { // .if ELSE
-            whattoadd = (PlanBody)args[2];
+            whattoadd = (PlanBody)args[2].clone();
         }
 
         if (whattoadd != null) {

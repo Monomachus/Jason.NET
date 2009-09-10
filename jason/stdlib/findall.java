@@ -29,6 +29,7 @@ import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.ListTerm;
 import jason.asSyntax.ListTermImpl;
+import jason.asSyntax.Literal;
 import jason.asSyntax.LogicalFormula;
 import jason.asSyntax.Term;
 
@@ -78,6 +79,10 @@ public class findall extends DefaultInternalAction {
 
     @Override public int getMinArgs() { return 3; }
     @Override public int getMaxArgs() { return 3; }
+
+    @Override public Term[] prepareArguments(Literal body, Unifier un) {
+        return body.getTermsArray(); // we do not need clone neither apply for this internal action
+    }
 
     @Override protected void checkArguments(Term[] args) throws JasonException {
         super.checkArguments(args); // check number of arguments

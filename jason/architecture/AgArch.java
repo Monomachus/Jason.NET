@@ -76,10 +76,10 @@ public class AgArch {
             new TransitionSystem(ag, new Circumstance(), stts, this);
 
             BeliefBase bb = (BeliefBase) Class.forName(bbPars.getClassName()).newInstance();
-            ag.setBB(bb); // the agent's BB have to be already set for the BB initialisation
-            bb.init(ag, bbPars.getParametersArray());
-            
+            ag.setBB(bb); // the agent's BB have to be already set for the BB initialisation, and the agent initialised
             ag.initAg(asSrc); // load the source code of the agent
+
+            bb.init(ag, bbPars.getParametersArray());            
         } catch (Exception e) {
             throw new JasonException("as2j: error creating the customised Agent class! - ", e);
         }

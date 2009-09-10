@@ -88,9 +88,11 @@ public class PlanBodyImpl extends Structure implements PlanBody, Iterable<PlanBo
     }
     
     public void setAsBodyTerm(boolean b) {
-        isTerm = b;
-        if (getBodyNext() != null)
-            getBodyNext().setAsBodyTerm(b);
+        if (b != isTerm) {
+            isTerm = b;
+            if (getBodyNext() != null) // goes deep only if changed
+                getBodyNext().setAsBodyTerm(b);
+        }
     }
     
     @Override

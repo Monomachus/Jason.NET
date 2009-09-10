@@ -1,6 +1,7 @@
 package jason.asSemantics;
 
 import jason.JasonException;
+import jason.asSyntax.Literal;
 import jason.asSyntax.Term;
 
 import java.util.concurrent.TimeUnit;
@@ -60,6 +61,15 @@ public abstract class ConcurrentInternalAction implements InternalAction {
 
     public boolean suspendIntention() {
         return true;
+    }
+    
+    public Term[] prepareArguments(Literal body, Unifier un) {
+        Term[] terms = new Term[body.getArity()];
+        for (int i=0; i<terms.length; i++) {
+            terms[i] = body.getTerm(i).clone();
+            terms[i].apply(un);
+        }
+        return terms;
     }
     
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {

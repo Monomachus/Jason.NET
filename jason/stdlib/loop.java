@@ -81,11 +81,12 @@ public class loop extends DefaultInternalAction {
     }
     
     @Override public Term[] prepareArguments(Literal body, Unifier un) {
-        Term[] terms = new Term[body.getArity()];
+        /*Term[] terms = new Term[body.getArity()];
         for (int i=0; i<terms.length; i++) {
             terms[i] = body.getTerm(i).clone();
         }
-        return terms;
+        return terms;*/
+        return body.getTermsArray();
     }
         
     @Override public int getMinArgs() { return 2; }
@@ -132,7 +133,7 @@ public class loop extends DefaultInternalAction {
             // 1. the body argument and
             // 2. the while internal action after the execution of the body
             //    (to test the loop again)
-            PlanBody whattoadd = (PlanBody)args[1];
+            PlanBody whattoadd = (PlanBody)args[1].clone();
             whattoadd.add(whileia); // the add clones whileia
             whattoadd.setAsBodyTerm(false);
             im.insertAsNextStep(whattoadd);

@@ -79,15 +79,9 @@ public class InternalActionLiteral extends Structure {
     public Iterator<Unifier> logicalConsequence(Agent ag, Unifier un) {
         if (ag == null || ag.getTS().getUserAgArch().isRunning()) {
             try {
-                // clone terms array
-                Term[] clone = getTermsArray();
-                for (int i=0; i<clone.length; i++) {
-                    clone[i] = clone[i].clone();
-                    clone[i].apply(un);
-                }
-    
+                InternalAction ia = getIA(ag);
                 // calls IA's execute method
-                Object oresult = getIA(ag).execute(ag.getTS(), un, clone);
+                Object oresult = ia.execute(ag.getTS(), un, ia.prepareArguments(this, un));
                 if (oresult instanceof Boolean && (Boolean)oresult) {
                     return LogExpr.createUnifIterator(un);
                 } else if (oresult instanceof Iterator) {

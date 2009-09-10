@@ -89,11 +89,13 @@ public class foreach extends DefaultInternalAction {
     }
 
     @Override public Term[] prepareArguments(Literal body, Unifier un) {
-        Term[] terms = new Term[body.getArity()];
+        /*Term[] terms = new Term[body.getArity()];
         for (int i=0; i<terms.length; i++) {
             terms[i] = body.getTerm(i).clone();
         }
         return terms;
+        */
+        return body.getTermsArray();
     }
     
     @Override public int getMinArgs() { return 2; }
@@ -149,7 +151,7 @@ public class foreach extends DefaultInternalAction {
             // 2. the for internal action after the execution of the body
             //    (to perform the next iteration)
             un.compose(iu.next());
-            PlanBody whattoadd = (PlanBody)args[1]; //.clone(); 
+            PlanBody whattoadd = (PlanBody)args[1].clone(); 
             whattoadd.add(foria); 
             whattoadd.setAsBodyTerm(false);
             im.insertAsNextStep(whattoadd);
