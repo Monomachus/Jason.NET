@@ -133,7 +133,7 @@ public class LiteralImpl extends Pred implements LogicalFormula {
     @Override 
     public PredicateIndicator getPredicateIndicator() {
         if (predicateIndicatorCache == null)
-            predicateIndicatorCache = new PredicateIndicator(((type == LPos) ? "" : "~")+getFunctor(),getArity());
+            predicateIndicatorCache = new PredicateIndicator(((type == LPos) ? getFunctor() : "~"+getFunctor()),getArity());
         return predicateIndicatorCache;
     }
     
