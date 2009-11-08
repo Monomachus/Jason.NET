@@ -1,6 +1,9 @@
 package test;
 
-import static jason.asSyntax.ASSyntax.*;
+import static jason.asSyntax.ASSyntax.createNumber;
+import static jason.asSyntax.ASSyntax.createStructure;
+import static jason.asSyntax.ASSyntax.parseLiteral;
+import static jason.asSyntax.ASSyntax.parseTerm;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.ASSyntax;
 import jason.asSyntax.Atom;
@@ -9,6 +12,8 @@ import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Literal;
 import jason.asSyntax.LiteralImpl;
 import jason.asSyntax.NumberTermImpl;
+import jason.asSyntax.ObjectTerm;
+import jason.asSyntax.ObjectTermImpl;
 import jason.asSyntax.Plan;
 import jason.asSyntax.Pred;
 import jason.asSyntax.Structure;
@@ -20,9 +25,11 @@ import jason.asSyntax.Trigger.TEOperator;
 import jason.asSyntax.Trigger.TEType;
 import jason.asSyntax.parser.ParseException;
 import jason.bb.BeliefBase;
+import jason.bb.DefaultBeliefBase;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import junit.framework.TestCase;
@@ -792,5 +799,28 @@ public class TermTest extends TestCase {
         
         l =  parseLiteral("b(a.r)"); // internal actions should not be atoms
         assertFalse(l.getTerm(0).isAtom());
+    }
+
+    // Tests sent by Tim Cleaver (in jason-bugs list)
+    public void testObTerm() {
+        ObjectTerm term = new ObjectTermImpl("test");
+        assertTrue(term.equals(term));
+
+        assertTrue(new Unifier().unifies(new ObjectTermImpl("test"), new ObjectTermImpl("test")));
+        String string = "test";
+        assertTrue(new Unifier().unifies(new ObjectTermImpl(string), new ObjectTermImpl(string)));
+
+        BeliefBase base = new DefaultBeliefBase();
+        base.add(ASSyntax.createLiteral("test", new ObjectTermImpl("test")));
+        Iterator<Literal> iterator = base.getCandidateBeliefs(ASSyntax.createLiteral("test", new ObjectTermImpl("test")), new Unifier());
+        assertTrue(iterator != null && iterator.hasNext());
+
+        Literal result = iterator.next();
+        assertTrue(result.getFunctor().equals("test"));
+        assertTrue(result.getTerm(0).getClass().equals(ObjectTermImpl.class));
+        assertTrue(result.getTerm(0).equals(new ObjectTermImpl("test")));
+
+        assertFalse(iterator.hasNext());
+
     }
 }
