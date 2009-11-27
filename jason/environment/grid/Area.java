@@ -1,6 +1,8 @@
 package jason.environment.grid;
 
-public final class Area {
+import java.io.Serializable;
+
+public final class Area implements Serializable {
     public final Location tl, br;
     
     public Area(int topLeftX, int topLeftY, int bottonRightX, int bottonRightY) {

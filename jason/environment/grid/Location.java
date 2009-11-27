@@ -1,6 +1,8 @@
 package jason.environment.grid;
 
-public final class Location {
+import java.io.Serializable;
+
+public final class Location implements Serializable {
     public int x, y;
     
     public Location(int x, int y) {

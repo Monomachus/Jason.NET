@@ -242,24 +242,18 @@ public class JadeAgArch extends JadeAg implements AgArchInfraTier {
                     String ilForce   = aclToKqml(m.getPerformative());
                     String sender    = m.getSender().getLocalName();
                     String replyWith = m.getReplyWith();
-                    if (replyWith == null || replyWith.length() == 0) replyWith = "noid";
                     String irt       = m.getInReplyTo();
-                
-                    Object propCont = null;
-                    try {
-                        propCont = m.getContentObject();
-                    } catch (UnreadableException e) {
-                        if (m.getLanguage() == null || !m.getLanguage().equals("AgentSpeak")) {
-                            // not AS messages are treated as string 
-                            propCont = new StringTermImpl(m.getContent());
-                            
-                            // also remembers conversation ID
-                            if (!replyWith.equals("noid") && m.getConversationId() != null)
-                                conversationIds.put(replyWith, m.getConversationId());
-                        } else {
-                            propCont = m.getContent();
+
+                    // also remembers conversation ID
+                    if (replyWith != null && replyWith.length() > 0) {
+                        if (m.getConversationId() != null) {
+                            conversationIds.put(replyWith, m.getConversationId());
                         }
+                    } else {
+                        replyWith = "noid";
                     }
+                
+                    Object propCont = translateContentToJason(m);
                     if (propCont != null) {
                         jason.asSemantics.Message im = new jason.asSemantics.Message(ilForce, sender, getLocalName(), propCont, replyWith);
                         if (irt != null) {
@@ -272,6 +266,22 @@ public class JadeAgArch extends JadeAg implements AgArchInfraTier {
                 logger.log(Level.SEVERE, "Error receiving message.", e);
             }
         } while (m != null);
+    }
+    
+    /** returns the content of the message m and implements some pro-processing of the content, if necessary */
+    protected Object translateContentToJason(ACLMessage m) {
+        Object propCont = null;
+        try {
+            propCont = m.getContentObject();
+        } catch (UnreadableException e) {
+            if (m.getLanguage() == null || !m.getLanguage().equals("AgentSpeak")) {
+                // not AS messages are treated as string 
+                propCont = new StringTermImpl(m.getContent());
+            } else {
+                propCont = m.getContent();
+            }
+        }
+        return propCont;
     }
 
     boolean isActionFeedback(ACLMessage m) {
