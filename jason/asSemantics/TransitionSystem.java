@@ -310,7 +310,7 @@ public class TransitionSystem {
         // get all relevant plans for the selected event
         //Trigger te = (Trigger) conf.C.SE.trigger.clone();
         List<Plan> candidateRPs = conf.ag.pl.getCandidatePlans(conf.C.SE.trigger);
-        if (candidateRPs != null) {
+        if (candidateRPs != null && !candidateRPs.isEmpty()) {
             for (Plan pl : candidateRPs) {
                 Unifier relUn = pl.isRelevant(conf.C.SE.trigger);
                 if (relUn != null) { // is relevant
@@ -709,7 +709,7 @@ public class TransitionSystem {
     /**********************************************/
 
     public List<Option> relevantPlans(Trigger teP) throws JasonException {
-        Trigger te = (Trigger) teP.clone();
+        Trigger te = teP.clone();
         List<Option> rp = null;
         List<Plan> candidateRPs = conf.ag.pl.getCandidatePlans(te);
         if (candidateRPs != null) {

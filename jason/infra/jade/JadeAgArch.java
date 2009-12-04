@@ -90,15 +90,19 @@ public class JadeAgArch extends JadeAg implements AgArchInfraTier {
                 archClassName = ap.archClass.getClassName();
                 agClassName   = ap.agClass.getClassName();
                 bbPars        = ap.getBBClass();
-                stts          = ap.getAsSetts((Boolean)args[1], (Boolean)args[2]); // TODO: get this parameters
+                stts          = ap.getAsSetts((Boolean)args[1], (Boolean)args[2]); // TODO: develop a way to get debug and sync parameters
 
             } else {
                 // read arguments
-                // [0] is the file with AS source for the agent
-                // arch <arch class>
-                // ag <agent class>
-                // bb < belief base class >
-                // option < options >
+                // if [0] is mas2j // TODO this
+                //    read all parameters form [1] (including aslSource and directives)
+                //    create the agents indicated by [2]              
+                // else
+                //    [0] is the file with AS source for the agent
+                //    arch <arch class>
+                //    ag <agent class>
+                //    bb < belief base class >
+                //    option < options >
 
                 asSource = args[0].toString();
         
@@ -107,7 +111,6 @@ public class JadeAgArch extends JadeAg implements AgArchInfraTier {
                 agClassName    = jason.asSemantics.Agent.class.getName();
                 bbPars         = new ClassParameters(jason.bb.DefaultBeliefBase.class.getName());
                 stts           = new Settings();
-        
         
                 int i=1;
                 while (i < args.length) {

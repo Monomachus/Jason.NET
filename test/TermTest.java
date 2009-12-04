@@ -585,7 +585,7 @@ public class TermTest extends TestCase {
         assertTrue(u.unifies(l1, l2));      
 
         l3.makeVarsAnnon();
-        u.clear();      
+        u.clear();
         assertFalse(u.unifies(l1, l3));     
 
         l4.makeVarsAnnon();

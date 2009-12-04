@@ -672,7 +672,7 @@
                                                                       {if (true) return new InternalActionLiteral(F, curAg);}
                                    } catch (Exception e) {
                                       if (getArithFunction(F) == null) // it is not a registered function
-                                         logger.warning(getSourceRef(F)+" warning: The internal action class for '"+F+"' was not found!");
+                                         logger.warning(getSourceRef(F)+" warning: The internal action class for '"+F+"' was not loaded! Error: "+e);
                                    }
                                 }
                                 {if (true) return new LiteralImpl(type,F);}

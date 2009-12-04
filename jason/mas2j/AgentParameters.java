@@ -24,7 +24,7 @@ public class AgentParameters {
     public ClassParameters     archClass = null;
     public int                 qty       = 1;
     public Map<String, String> options   = null;
-    private String              host      = null;
+    private String             host      = null;
     
     public String toString() {
         return getAsInMASProject();
