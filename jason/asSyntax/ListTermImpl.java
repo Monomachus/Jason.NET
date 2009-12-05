@@ -198,6 +198,11 @@ public class ListTermImpl extends Structure implements ListTerm {
         return true;
     }
 
+    @Override
+    public boolean isLiteral() {
+        return false;
+    }
+
     public boolean isEmpty() {
         return term == null;
     }

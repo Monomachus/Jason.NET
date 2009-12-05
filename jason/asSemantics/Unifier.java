@@ -210,8 +210,9 @@ public class Unifier implements Cloneable {
         
         // if any of the terms is not a literal (is a number or a
         // string), they must be equal
-        if (!t1g.isLiteral() || !t2g.isLiteral())
-            return t1g.equals(t2g);
+        // (for unification, lists are literals)
+        if (!t1g.isLiteral() && !t1g.isList() || !t2g.isLiteral() && !t2g.isList())
+        	return t1g.equals(t2g);
 
         // both terms are literal
 
