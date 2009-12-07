@@ -154,8 +154,10 @@ public class RunCentralisedMAS {
             project.setupDefault();
 
             project.registerDirectives();
+            // set the aslSrcPath in the include
+            ((Include)DirectiveProcessor.getDirective("include")).setSourcePath(project.getSourcePaths());
             
-            runner.createAg(project, debug);
+            runner.createAgents(project, debug);
             runner.startAgs();
             runner.startSyncMode();
 
@@ -327,7 +329,7 @@ public class RunCentralisedMAS {
         return project;
     }
 
-    protected void createAg(MAS2JProject project, boolean debug) throws JasonException {
+    protected void createAgents(MAS2JProject project, boolean debug) throws JasonException {
         // create environment
         logger.fine("Creating environment " + project.getEnvClass());
         env = new CentralisedEnvironment(project.getEnvClass(), this);
@@ -338,10 +340,7 @@ public class RunCentralisedMAS {
         Agent pag = null;
         
         project.fixAgentsSrc(urlPrefix);
-        
-        // set the aslSrcPath in the include
-        ((Include)DirectiveProcessor.getDirective("include")).setSourcePath(project.getSourcePaths());
-        
+                
         // create the agents
         for (AgentParameters ap : project.getAgents()) {
             try {

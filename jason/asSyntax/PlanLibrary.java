@@ -273,16 +273,24 @@ public class PlanLibrary implements Iterable<Plan> {
 
 	/** remove the plan with label <i>pLabel</i> */
     public Plan remove(String pLabel) {
-        Plan p = (Plan) planLabels.remove(pLabel);
+        Plan p = planLabels.remove(pLabel);
 
         // remove it from plans' list
         plans.remove(p);
 
         if (p.getTrigger().getLiteral().isVar()) {
             varPlans.remove(p);
-            // remove p from all entries
-            for (List<Plan> lp: relPlans.values())
+            // remove p from all entries and
+            // clean empty entries
+            Iterator<PredicateIndicator> ipi = relPlans.keySet().iterator();
+            while (ipi.hasNext()) {
+                PredicateIndicator pi = ipi.next();
+                List<Plan> lp = relPlans.get(pi); 
                 lp.remove(p);
+                if (lp.isEmpty()) {
+                    ipi.remove();
+                }
+            }
         } else {
             List<Plan> codesList = relPlans.get(p.getTrigger().getPredicateIndicator());
             codesList.remove(p);
@@ -300,8 +308,7 @@ public class PlanLibrary implements Iterable<Plan> {
     }
 
     public boolean hasCandidatePlan(Trigger te) {
-        List<Plan> l = getCandidatePlans(te);
-        return l != null && ! l.isEmpty();
+        return getCandidatePlans(te) != null;
     }
 
     
@@ -313,12 +320,14 @@ public class PlanLibrary implements Iterable<Plan> {
     public List<Plan> getCandidatePlans(Trigger te) {
         List<Plan> l = relPlans.get(te.getPredicateIndicator());
         if ((l == null || l.isEmpty()) && !varPlans.isEmpty()) {  // no rel plan, try varPlan
-            l = new ArrayList<Plan>();
             for (Plan p: varPlans)
-                if (p.getTrigger().sameType(te))
+                if (p.getTrigger().sameType(te)) {
+                    if (l == null)
+                        l = new ArrayList<Plan>();
                     l.add(p);
+                }
         }
-        return l;
+        return l; // if no rel plan, have to return null instead of empty list
     }
 
     public static final Trigger TE_IDLE = new Trigger(TEOperator.add, TEType.achieve, new Atom("idle"));

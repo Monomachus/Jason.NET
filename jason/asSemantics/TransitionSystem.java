@@ -310,7 +310,7 @@ public class TransitionSystem {
         // get all relevant plans for the selected event
         //Trigger te = (Trigger) conf.C.SE.trigger.clone();
         List<Plan> candidateRPs = conf.ag.pl.getCandidatePlans(conf.C.SE.trigger);
-        if (candidateRPs != null && !candidateRPs.isEmpty()) {
+        if (candidateRPs != null) {
             for (Plan pl : candidateRPs) {
                 Unifier relUn = pl.isRelevant(conf.C.SE.trigger);
                 if (relUn != null) { // is relevant

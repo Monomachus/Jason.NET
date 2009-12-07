@@ -126,7 +126,7 @@ public class RunJadeMAS extends RunCentralisedMAS {
     }
     
     @Override
-    protected void createAg(MAS2JProject project, boolean debug) throws JasonException {
+    protected void createAgents(MAS2JProject project, boolean debug) throws JasonException {
         if (!startContainer()) return;
         try {
             // create environment

@@ -53,7 +53,7 @@ public class PlanTest extends TestCase {
         assertEquals(1, pls.size());    
 
         pls = pl.getCandidatePlans(ASSyntax.parseTrigger("+bla"));
-        assertEquals(0, pls.size());    
+        assertNull(pls);    
     }
     
     public void testParser1() {

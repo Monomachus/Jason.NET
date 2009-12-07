@@ -18,12 +18,18 @@ import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Literal;
 import jason.asSyntax.StringTermImpl;
 import jason.asSyntax.Term;
+import jason.asSyntax.directives.DirectiveProcessor;
+import jason.asSyntax.directives.Include;
 import jason.infra.centralised.RunCentralisedMAS;
 import jason.mas2j.AgentParameters;
 import jason.mas2j.ClassParameters;
+import jason.mas2j.MAS2JProject;
+import jason.mas2j.parser.ParseException;
 import jason.runtime.RuntimeServicesInfraTier;
-import jason.runtime.Settings;
 
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
@@ -72,118 +78,132 @@ public class JadeAgArch extends JadeAg implements AgArchInfraTier {
         logger.info("starting "+getLocalName());
         try {
     
-            // default values for args
-            String asSource        = null;
-            String archClassName   = null;
-            String agClassName     = null;
-            ClassParameters bbPars = null;
-            Settings stts          = null;
-
-            Object[] args = getArguments();
-            if (args == null) {
-                logger.info("No AgentSpeak source informed!");
-                return;
-            }
-            if (args[0] instanceof AgentParameters) {
-                AgentParameters ap = (AgentParameters)args[0];
-                asSource      = ap.asSource.getAbsolutePath();
-                archClassName = ap.archClass.getClassName();
-                agClassName   = ap.agClass.getClassName();
-                bbPars        = ap.getBBClass();
-                stts          = ap.getAsSetts((Boolean)args[1], (Boolean)args[2]); // TODO: develop a way to get debug and sync parameters
-
-            } else {
-                // read arguments
-                // if [0] is mas2j // TODO this
-                //    read all parameters form [1] (including aslSource and directives)
-                //    create the agents indicated by [2]              
-                // else
-                //    [0] is the file with AS source for the agent
-                //    arch <arch class>
-                //    ag <agent class>
-                //    bb < belief base class >
-                //    option < options >
-
-                asSource = args[0].toString();
+            AgentParameters ap = parseParameters();
+            if (ap != null) {
+                userAgArch = (AgArch) Class.forName(ap.archClass.getClassName()).newInstance();
+                userAgArch.setArchInfraTier(this);
+                userAgArch.initAg(ap.agClass.getClassName(), ap.getBBClass(), ap.asSource.getAbsolutePath(), ap.getAsSetts(false, false));
+                logger.setLevel(userAgArch.getTS().getSettings().logLevel());
         
-                // default values for args
-                archClassName  = AgArch.class.getName();
-                agClassName    = jason.asSemantics.Agent.class.getName();
-                bbPars         = new ClassParameters(jason.bb.DefaultBeliefBase.class.getName());
-                stts           = new Settings();
-        
-                int i=1;
-                while (i < args.length) {
-                    
-                    if (args[i].toString().equals("arch")) {
-                        i++;
-                        archClassName = args[i].toString();
-                    } else if (args[i].toString().equals("ag")) {
-                        i++;
-                        agClassName = args[i].toString();
-                    }
-
-                    // TODO: read custom BB and settings from arguments 
-
-                    i++;
-                }       
+                registerAgInDF();
+                
+                tsBehaviour = new JasonTSReasoner();
+                addBehaviour(tsBehaviour);
+                
+                logger.fine("Created from source "+ap.asSource);
             }
-
-            userAgArch = (AgArch) Class.forName(archClassName).newInstance();
-            userAgArch.setArchInfraTier(this);
-            userAgArch.initAg(agClassName, bbPars, asSource, stts);
-            logger.setLevel(userAgArch.getTS().getSettings().logLevel());
-    
-            // DF register
-            DFAgentDescription dfa = new DFAgentDescription();
-            dfa.setName(getAID());
-            ServiceDescription vc = new ServiceDescription();
-            vc.setType("jason");
-            vc.setName(dfName);
-            dfa.addServices(vc);
-            try {
-                DFService.register(this,dfa);
-            } catch (FIPAException e) {
-                logger.log(Level.SEVERE, "Error registering agent in DF", e);
-            }
-            
-            tsBehaviour = new CyclicBehaviour() {
-                TransitionSystem ts = userAgArch.getTS();
-                public void action() {
-                    if (ts.getSettings().isSync()) {
-                        if (processExecutionControlOntologyMsg()) {
-                            // execute a cycle in sync mode
-                            ts.reasoningCycle();
-                            boolean isBreakPoint = false;
-                            try {
-                                isBreakPoint = ts.getC().getSelectedOption().getPlan().hasBreakpoint();
-                                if (logger.isLoggable(Level.FINE)) logger.fine("Informing controller that I finished a reasoning cycle "+userAgArch.getCycleNumber()+". Breakpoint is " + isBreakPoint);
-                            } catch (NullPointerException e) {
-                                // no problem, there is no sel opt, no plan ....
-                            }
-                            informCycleFinished(isBreakPoint, userAgArch.getCycleNumber());
-
-                        } else {
-                            block(1000);
-                        }
-                    } else {
-                        if (enterInSleepMode) {
-                            block(1000);
-                            enterInSleepMode = false;
-                        } else {
-                            ts.reasoningCycle();
-                        }
-                    }
-                }
-            };
-            addBehaviour(tsBehaviour);
-
-            logger.fine("Created from source "+asSource);
         } catch (Exception e) {
             logger.log(Level.SEVERE,"Error creating JADE architecture.",e);
         }
     }
 
+    protected AgentParameters parseParameters() throws ParseException, IOException {
+
+        Object[] args = getArguments();
+        if (args == null || args.length == 0) {
+            logger.info("No AgentSpeak source informed!");
+            return null;
+        }
+
+        // read arguments
+        // if [0] is an instance of AgentParameters
+        //    read parameters from [0] 
+        // else if [0] is j-project 
+        //    read all parameters form [1] (including aslSource and directives)
+        //    create the agents indicated by [2]              
+        // else
+        //    [0] is the file with AS source for the agent
+        //    arch <arch class>
+        //    ag <agent class>
+        //    bb < belief base class >
+        //    option < options >
+
+        if (args[0] instanceof AgentParameters) {
+            return (AgentParameters)args[0];
+        } else if (args[0].toString().equals("j-project")) { // load parameters from .mas2j
+            if (args.length != 3) {
+                logger.log(Level.SEVERE, "To start agents from .mas2j file, you have to provide as parameters: (j-project, <file.mas2j>, <nameofagent in mas2j>)");
+                return null;
+            }
+            jason.mas2j.parser.mas2j parser = new jason.mas2j.parser.mas2j(new FileReader(args[1].toString())); 
+            MAS2JProject project = parser.mas();
+            project.setupDefault();
+
+            project.registerDirectives();
+            ((Include)DirectiveProcessor.getDirective("include")).setSourcePath(project.getSourcePaths());
+            
+            AgentParameters ap = project.getAg(args[2].toString());
+            if (ap == null)
+                logger.log(Level.SEVERE, "There is no agent '"+args[2]+"' in project '"+args[1]+"'.");
+            if (ap.qty > 1)
+                logger.warning("Ignoring quantity of agents from mas2j, jade arch creates only ONE agent.");
+            return ap;
+            
+        } else { // load parameters from shell
+            AgentParameters ap = new AgentParameters();
+            ap.setupDefault();
+            ap.asSource = new File(args[0].toString());
+        
+            int i=1;
+            while (i < args.length) {                
+                if (args[i].toString().equals("arch")) {
+                    i++;
+                    ap.archClass = new ClassParameters(args[i].toString());
+                } else if (args[i].toString().equals("ag")) {
+                    i++;
+                    ap.agClass = new ClassParameters(args[i].toString());
+                }
+                i++;
+            }
+            return ap;
+        }
+    }
+    
+    private void registerAgInDF() {
+        // DF register
+        DFAgentDescription dfa = new DFAgentDescription();
+        dfa.setName(getAID());
+        ServiceDescription vc = new ServiceDescription();
+        vc.setType("jason");
+        vc.setName(dfName);
+        dfa.addServices(vc);
+        try {
+            DFService.register(this,dfa);
+        } catch (FIPAException e) {
+            logger.log(Level.SEVERE, "Error registering agent in DF", e);
+        }
+    }
+
+    class JasonTSReasoner extends CyclicBehaviour {
+        TransitionSystem ts = userAgArch.getTS();
+        public void action() {
+            if (ts.getSettings().isSync()) {
+                if (processExecutionControlOntologyMsg()) {
+                    // execute a cycle in sync mode
+                    ts.reasoningCycle();
+                    boolean isBreakPoint = false;
+                    try {
+                        isBreakPoint = ts.getC().getSelectedOption().getPlan().hasBreakpoint();
+                        if (logger.isLoggable(Level.FINE)) logger.fine("Informing controller that I finished a reasoning cycle "+userAgArch.getCycleNumber()+". Breakpoint is " + isBreakPoint);
+                    } catch (NullPointerException e) {
+                        // no problem, there is no sel opt, no plan ....
+                    }
+                    informCycleFinished(isBreakPoint, userAgArch.getCycleNumber());
+
+                } else {
+                    block(1000);
+                }
+            } else {
+                if (enterInSleepMode) {
+                    block(1000);
+                    enterInSleepMode = false;
+                } else {
+                    ts.reasoningCycle();
+                }
+            }
+        }
+    }
+    
     @Override
     public void doDelete() {
         try {
