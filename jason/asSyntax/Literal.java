@@ -292,8 +292,14 @@ public abstract class Literal extends DefaultTerm implements LogicalFormula {
                     // unifies the rule head with the result of rule evaluation
                     Unifier ruleUn = ruleIt.next(); // evaluation result
                     Literal rhead  = rule.headClone();
+
+                    // unnamed vars should be replaced (see bug of Tim Cleaver)
+                    replaceUnnamedVarsToUnnamedVars(rhead);
+
+                    // then apply and replace other free variables
                     rhead.apply(ruleUn);
                     rhead.makeVarsAnnon(ruleUn);
+                    
                     
                     Unifier unC = un.clone();
                     if (unC.unifiesNoUndo(Literal.this, rhead)) {
@@ -339,6 +345,17 @@ public abstract class Literal extends DefaultTerm implements LogicalFormula {
         };
     }   
 
+    private void replaceUnnamedVarsToUnnamedVars(Literal l) {
+        final int size = l.getArity();
+        for (int i=0; i<size; i++) {
+            Term ti = l.getTerm(i);
+            if (ti.isUnnamedVar()) {
+                l.setTerm(i, new UnnamedVar());
+            } else if (ti instanceof Literal) {
+                replaceUnnamedVarsToUnnamedVars((Literal)ti);
+            }
+        }                    
+    }
     
 	/** returns this literal as a list with three elements: [functor, list of terms, list of annots] */
 	public ListTerm getAsListOfTerms() {

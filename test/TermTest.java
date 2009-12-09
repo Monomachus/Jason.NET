@@ -636,7 +636,6 @@ public class TermTest extends TestCase {
         }
         */
         l.makeVarsAnnon(u);
-        //System.out.println(u+ " "+l);
         assertEquals("p(_2)", l.toString());
     }
 

@@ -298,18 +298,18 @@ public class Structure extends Atom {
         if (t.isVar() && !t.isUnnamedVar()) {
             // replace t to an unnamed var
             VarTerm vt = un.deref((VarTerm)t);
-            UnnamedVar uv;
             if (vt.isUnnamedVar()) {
-                uv = (UnnamedVar)vt.clone();
+                return (UnnamedVar)vt.clone();
             } else {
-                uv = new UnnamedVar( "_"+UnnamedVar.getUniqueId()+t);
+                UnnamedVar uv = new UnnamedVar( "_"+UnnamedVar.getUniqueId()+t);
                 un.bind(vt, uv);
+                return uv;
             }
-            return uv;
         } else {
             return null;
         }
     }
+    
     @Override
     public void makeTermsAnnon() {
         final int size = getArity();
