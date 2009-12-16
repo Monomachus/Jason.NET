@@ -36,8 +36,10 @@ import jason.asSyntax.Structure;
 import jason.environment.Environment;
 import jason.environment.EnvironmentInfraTier;
 import jason.mas2j.ClassParameters;
+import jason.mas2j.MAS2JProject;
 import jason.runtime.RuntimeServicesInfraTier;
 
+import java.io.FileReader;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -74,13 +76,29 @@ public class JadeEnvironment extends JadeAg implements EnvironmentInfraTier {
                     userEnv = (Environment) Class.forName(ep.getClassName()).newInstance();
                     userEnv.setEnvironmentInfraTier(this);
                     userEnv.init(ep.getParametersArray());
-                } else {
+
+                } else if (args[0].toString().equals("j-project")) { // load parameters from .mas2j
+                    if (args.length != 2) {
+                        logger.log(Level.SEVERE, "To start the environment from .mas2j file, you have to provide as parameters: (j-project <file.mas2j>)");
+                        return;
+                    }
+                    jason.mas2j.parser.mas2j parser = new jason.mas2j.parser.mas2j(new FileReader(args[1].toString())); 
+                    MAS2JProject project = parser.mas();
+                    project.setupDefault();
+
+                    ClassParameters ep = project.getEnvClass();
+                    userEnv = (Environment) Class.forName(ep.getClassName()).newInstance();
+                    userEnv.setEnvironmentInfraTier(this);
+                    userEnv.init(ep.getParametersArray());
+                
+                } else { // assume first parameter as class name, remaining environment args
                     userEnv = (Environment) Class.forName(args[0].toString()).newInstance();
                     userEnv.setEnvironmentInfraTier(this);
-                    //userEnv.init(ep.getParametersArray());
-                    if (args.length > 1) {
-                        logger.warning("Environment arguments is not implemented yet (ask it to us if you need)!");
-                    }
+                    
+                    String[] envArgs = new String[args.length-1];
+                    for (int i=1; i<args.length; i++)
+                        envArgs[i-1] = args[1].toString();
+                    userEnv.init(envArgs);
                 }
             } else {
                 logger.warning("Using default environment.");

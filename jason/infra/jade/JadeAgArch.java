@@ -14,6 +14,7 @@ import jason.architecture.AgArch;
 import jason.architecture.AgArchInfraTier;
 import jason.asSemantics.ActionExec;
 import jason.asSemantics.TransitionSystem;
+import jason.asSyntax.ASSyntax;
 import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Literal;
 import jason.asSyntax.StringTermImpl;
@@ -122,7 +123,7 @@ public class JadeAgArch extends JadeAg implements AgArchInfraTier {
             return (AgentParameters)args[0];
         } else if (args[0].toString().equals("j-project")) { // load parameters from .mas2j
             if (args.length != 3) {
-                logger.log(Level.SEVERE, "To start agents from .mas2j file, you have to provide as parameters: (j-project, <file.mas2j>, <nameofagent in mas2j>)");
+                logger.log(Level.SEVERE, "To start agents from .mas2j file, you have to provide as parameters: (j-project <file.mas2j> <nameofagent in mas2j>)");
                 return null;
             }
             jason.mas2j.parser.mas2j parser = new jason.mas2j.parser.mas2j(new FileReader(args[1].toString())); 
@@ -141,7 +142,6 @@ public class JadeAgArch extends JadeAg implements AgArchInfraTier {
             
         } else { // load parameters from shell
             AgentParameters ap = new AgentParameters();
-            ap.setupDefault();
             ap.asSource = new File(args[0].toString());
         
             int i=1;
@@ -296,12 +296,23 @@ public class JadeAgArch extends JadeAg implements AgArchInfraTier {
         Object propCont = null;
         try {
             propCont = m.getContentObject();
-        } catch (UnreadableException e) {
-            if (m.getLanguage() == null || !m.getLanguage().equals("AgentSpeak")) {
+            if (propCont instanceof String) {
+                // try to parse as term
+                try {
+                    propCont = ASSyntax.parseTerm((String)propCont);
+                } catch (Exception e) {  // no problem 
+                }
+            }            
+        } catch (UnreadableException e) { // no problem try another thing
+        }
+        
+        if (propCont == null) { // still null
+            // try to parse as term
+            try {
+                propCont = ASSyntax.parseTerm(m.getContent());
+            } catch (Exception e) {
                 // not AS messages are treated as string 
                 propCont = new StringTermImpl(m.getContent());
-            } else {
-                propCont = m.getContent();
             }
         }
         return propCont;

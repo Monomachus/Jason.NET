@@ -156,8 +156,6 @@ public class RunJadeMAS extends RunCentralisedMAS {
             // create the agents
             for (AgentParameters ap : project.getAgents()) {
                 try {
-                    ap.setupDefault();
-
                     String agName = ap.name;
     
                     for (int cAg = 0; cAg < ap.qty; cAg++) {

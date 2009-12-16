@@ -26,6 +26,10 @@ public class AgentParameters {
     public Map<String, String> options   = null;
     private String             host      = null;
     
+    public AgentParameters() {
+        setupDefault();
+    }
+    
     public String toString() {
         return getAsInMASProject();
     }

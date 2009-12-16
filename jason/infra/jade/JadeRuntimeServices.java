@@ -44,7 +44,6 @@ public class JadeRuntimeServices implements RuntimeServicesInfraTier {
             ap.setArchClass(archClass);
             ap.setBB(bbPars);
             ap.asSource = new File(agSource);
-            ap.setupDefault();        
             
             if (stts == null) stts = new Settings();
             

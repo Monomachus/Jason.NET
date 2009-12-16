@@ -344,7 +344,6 @@ public class RunCentralisedMAS {
         // create the agents
         for (AgentParameters ap : project.getAgents()) {
             try {
-                ap.setupDefault();
                 
                 String agName = ap.name;
 

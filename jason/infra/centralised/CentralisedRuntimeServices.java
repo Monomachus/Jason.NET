@@ -33,7 +33,6 @@ public class CentralisedRuntimeServices implements RuntimeServicesInfraTier {
         ap.setAgClass(agClass);
         ap.setArchClass(archClass);
         ap.setBB(bbPars);
-        ap.setupDefault();        
         
         if (stts == null) stts = new Settings();
         
