@@ -101,7 +101,7 @@
     label_1:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case 27:
+      case 26:
         ;
         break;
       default:
@@ -131,7 +131,7 @@
       label_3:
       while (true) {
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-        case 27:
+        case 26:
           ;
           break;
         default:
@@ -145,7 +145,7 @@
     label_4:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case 31:
+      case 30:
         ;
         break;
       default:
@@ -157,7 +157,7 @@
       label_5:
       while (true) {
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-        case 27:
+        case 26:
           ;
           break;
         default:
@@ -172,8 +172,8 @@
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case TK_LABEL_AT:
+      case 33:
       case 34:
-      case 35:
         ;
         break;
       default:
@@ -220,7 +220,7 @@
       label_8:
       while (true) {
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-        case 27:
+        case 26:
           ;
           break;
         default:
@@ -246,11 +246,11 @@
                                 Agent resultOfDirective = null;
                                 Agent bakAg = curAg;
                                 boolean isEOF = false;
-    jj_consume_token(27);
+    jj_consume_token(26);
     if (jj_2_1(4)) {
       jj_consume_token(TK_BEGIN);
       dir = pred();
-      jj_consume_token(28);
+      jj_consume_token(27);
                                 Agent innerAg = new Agent(); innerAg.initAg();
       isEOF = agent(innerAg);
                                 if (isEOF)
@@ -263,7 +263,7 @@
       case TK_END:
       case ATOM:
         dir = pred();
-        jj_consume_token(28);
+        jj_consume_token(27);
                                 if (dir.toString().equals("end"))
                                    {if (true) return true;}
                                 else
@@ -289,8 +289,8 @@
                      Literal h; Object t;
     h = literal();
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case 29:
-      jj_consume_token(29);
+    case 28:
+      jj_consume_token(28);
       t = log_expr();
                                h = new Rule(h,(LogicalFormula)t);
                                // warning only not parsed files
@@ -305,7 +305,7 @@
       jj_la1[9] = jj_gen;
       ;
     }
-    jj_consume_token(30);
+    jj_consume_token(29);
                                {if (true) return h;}
     throw new Error("Missing return statement in function");
   }
@@ -313,9 +313,9 @@
 /* Initial goals */
   final public Literal initial_goal() throws ParseException {
                            Literal g;
-    jj_consume_token(31);
-    g = literal();
     jj_consume_token(30);
+    g = literal();
+    jj_consume_token(29);
                            {if (true) return g;}
     throw new Error("Missing return statement in function");
   }
@@ -340,8 +340,8 @@
     }
     T = trigger();
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case 32:
-      k = jj_consume_token(32);
+    case 31:
+      k = jj_consume_token(31);
       C = log_expr();
                                    if (start == -1) start = k.beginLine;
       break;
@@ -350,8 +350,8 @@
       ;
     }
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case 33:
-      k = jj_consume_token(33);
+    case 32:
+      k = jj_consume_token(32);
       B = plan_body();
                                    if (start == -1) start = k.beginLine;
       break;
@@ -359,7 +359,7 @@
       jj_la1[12] = jj_gen;
       ;
     }
-    k = jj_consume_token(30);
+    k = jj_consume_token(29);
                                    if (start == -1) start = k.beginLine;
                      end = k.beginLine;
                      InternalActionLiteral ial = null;
@@ -380,12 +380,12 @@
                                 TEType     teType = TEType.belief;
                                         Literal F;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case 34:
-      jj_consume_token(34);
+    case 33:
+      jj_consume_token(33);
                  teOp = TEOperator.add;
       break;
-    case 35:
-      jj_consume_token(35);
+    case 34:
+      jj_consume_token(34);
                  teOp = TEOperator.del;
       break;
     default:
@@ -394,15 +394,15 @@
       throw new ParseException();
     }
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case 31:
-    case 36:
+    case 30:
+    case 35:
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case 31:
-        jj_consume_token(31);
+      case 30:
+        jj_consume_token(30);
                  teType = TEType.achieve;
         break;
-      case 36:
-        jj_consume_token(36);
+      case 35:
+        jj_consume_token(35);
                  teType = TEType.test;
         break;
       default:
@@ -442,8 +442,8 @@
                              Object F; PlanBody R = null;
     F = body_formula();
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case 37:
-      jj_consume_token(37);
+    case 36:
+      jj_consume_token(36);
                              if (!(F instanceof PlanBody)) {if (true) throw new ParseException(getSourceRef(F)+" "+F+" is not a body literal!");}
       R = plan_body();
       break;
@@ -460,7 +460,7 @@
 
   final public Term plan_term() throws ParseException {
                                Trigger T = null; Object C = null; PlanBody B = null, B1 = null; Plan P = null; boolean pb = true; Pred L = null;
-    jj_consume_token(27);
+    jj_consume_token(26);
     if (jj_2_2(4)) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case TK_LABEL_AT:
@@ -475,8 +475,8 @@
       T = trigger();
                               if (T.getType() != TEType.belief) pb = false;
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case 32:
-        jj_consume_token(32);
+      case 31:
+        jj_consume_token(31);
         C = log_expr();
                               pb = false;
         break;
@@ -485,15 +485,15 @@
         ;
       }
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case 33:
-      case 37:
+      case 32:
+      case 36:
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-        case 33:
-          jj_consume_token(33);
+        case 32:
+          jj_consume_token(32);
                               pb = false;
           break;
-        case 37:
-          jj_consume_token(37);
+        case 36:
+          jj_consume_token(36);
                               if (!pb) {if (true) throw new ParseException(getSourceRef(T)+" Wrong place for ';'");}
           break;
         default:
@@ -521,19 +521,19 @@
     case STRING:
     case ATOM:
     case UNNAMEDVAR:
-    case 31:
+    case 30:
+    case 33:
     case 34:
     case 35:
-    case 36:
+    case 37:
     case 38:
-    case 39:
       B = plan_body();
       break;
     default:
       jj_la1[22] = jj_gen;
       ;
     }
-    jj_consume_token(28);
+    jj_consume_token(27);
                              if (T != null) {
                                 // handle the case of "+a1", parsed as TE, need to be changed to plan's body
                                 // handle the case of "+a1; +a2", parsed as "TE; Body"
@@ -572,34 +572,34 @@
   final public Object body_formula() throws ParseException {
                          BodyType formType = BodyType.action;  Object B;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case 31:
+    case 30:
+    case 33:
     case 34:
     case 35:
-    case 36:
-    case 38:
+    case 37:
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case 31:
-        jj_consume_token(31);
+      case 30:
+        jj_consume_token(30);
                          formType = BodyType.achieve;
         break;
-      case 38:
-        jj_consume_token(38);
+      case 37:
+        jj_consume_token(37);
                          formType = BodyType.achieveNF;
-        break;
-      case 36:
-        jj_consume_token(36);
-                         formType = BodyType.test;
-        break;
-      case 34:
-        jj_consume_token(34);
-                         formType = BodyType.addBel;
         break;
       case 35:
         jj_consume_token(35);
+                         formType = BodyType.test;
+        break;
+      case 33:
+        jj_consume_token(33);
+                         formType = BodyType.addBel;
+        break;
+      case 34:
+        jj_consume_token(34);
                          formType = BodyType.delBel;
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-        case 34:
-          jj_consume_token(34);
+        case 33:
+          jj_consume_token(33);
                          formType = BodyType.delAddBel;
           break;
         default:
@@ -714,10 +714,10 @@
                          p = new Pred(K.image);
                          p.setSrcInfo(new SourceInfo(asSource, K.beginLine));
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case 39:
-      jj_consume_token(39);
+    case 38:
+      jj_consume_token(38);
       l = terms();
-      jj_consume_token(40);
+      jj_consume_token(39);
                          p.setTerms(l);
       break;
     default:
@@ -727,7 +727,7 @@
     label_9:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case 27:
+      case 26:
         ;
         break;
       default:
@@ -738,7 +738,7 @@
                          p.addTerm(b);
     }
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case 42:
+    case 41:
       lt = list();
                          p.setAnnots(lt);
       break;
@@ -758,14 +758,14 @@
     label_10:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case 41:
+      case 40:
         ;
         break;
       default:
         jj_la1[32] = jj_gen;
         break label_10;
       }
-      jj_consume_token(41);
+      jj_consume_token(40);
       v = term();
                          listTerms.add(v);
     }
@@ -777,10 +777,10 @@
   final public Term term() throws ParseException {
                          Object o;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case 42:
+    case 41:
       o = list();
       break;
-    case 27:
+    case 26:
       o = plan_term();
       break;
     case VAR:
@@ -794,8 +794,8 @@
     case STRING:
     case ATOM:
     case UNNAMEDVAR:
-    case 35:
-    case 39:
+    case 34:
+    case 38:
       o = log_expr();
       break;
     default:
@@ -809,7 +809,7 @@
 
   final public ListTermImpl list() throws ParseException {
                             ListTermImpl lt = new ListTermImpl(); ListTerm last; Token K; Term f;
-    jj_consume_token(42);
+    jj_consume_token(41);
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case VAR:
     case TK_TRUE:
@@ -821,29 +821,29 @@
     case STRING:
     case ATOM:
     case UNNAMEDVAR:
-    case 27:
-    case 35:
-    case 39:
-    case 42:
+    case 26:
+    case 34:
+    case 38:
+    case 41:
       f = term_in_list();
                             last = lt.append(f); lt.setSrcInfo(f.getSrcInfo());
       label_11:
       while (true) {
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-        case 41:
+        case 40:
           ;
           break;
         default:
           jj_la1[34] = jj_gen;
           break label_11;
         }
-        jj_consume_token(41);
+        jj_consume_token(40);
         f = term_in_list();
                             last = last.append(f);
       }
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case 43:
-        jj_consume_token(43);
+      case 42:
+        jj_consume_token(42);
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case VAR:
           K = jj_consume_token(VAR);
@@ -853,7 +853,7 @@
           K = jj_consume_token(UNNAMEDVAR);
                             last.setNext(new UnnamedVar(K.image));
           break;
-        case 42:
+        case 41:
           f = list();
                             last = last.concat((ListTerm)f);
           break;
@@ -872,7 +872,7 @@
       jj_la1[37] = jj_gen;
       ;
     }
-    jj_consume_token(44);
+    jj_consume_token(43);
                             {if (true) return lt;}
     throw new Error("Missing return statement in function");
   }
@@ -881,7 +881,7 @@
   final public Term term_in_list() throws ParseException {
                             Object o;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case 42:
+    case 41:
       o = list();
       break;
     case VAR:
@@ -893,14 +893,14 @@
     case NUMBER:
     case ATOM:
     case UNNAMEDVAR:
-    case 35:
-    case 39:
+    case 34:
+    case 38:
       o = arithm_expr();
       break;
     case STRING:
       o = string();
       break;
-    case 27:
+    case 26:
       o = plan_term();
       break;
     default:
@@ -917,8 +917,8 @@
                               Object t1, t2;
     t1 = log_expr_trm();
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case 43:
-      jj_consume_token(43);
+    case 42:
+      jj_consume_token(42);
       t2 = log_expr();
                               {if (true) return new LogExpr((LogicalFormula)t1,LogicalOp.or,(LogicalFormula)t2);}
       break;
@@ -934,8 +934,8 @@
                               Object t1, t2;
     t1 = log_expr_factor();
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case 45:
-      jj_consume_token(45);
+    case 44:
+      jj_consume_token(44);
       t2 = log_expr_trm();
                               {if (true) return new LogExpr((LogicalFormula)t1,LogicalOp.and,(LogicalFormula)t2);}
       break;
@@ -965,8 +965,8 @@
     case STRING:
     case ATOM:
     case UNNAMEDVAR:
-    case 35:
-    case 39:
+    case 34:
+    case 38:
       t = rel_expr();
                                       {if (true) return t;}
       break;
@@ -999,8 +999,8 @@
     case NUMBER:
     case ATOM:
     case UNNAMEDVAR:
-    case 35:
-    case 39:
+    case 34:
+    case 38:
       op1 = arithm_expr();
       break;
     case STRING:
@@ -1012,6 +1012,7 @@
       throw new ParseException();
     }
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case 45:
     case 46:
     case 47:
     case 48:
@@ -1019,38 +1020,37 @@
     case 50:
     case 51:
     case 52:
-    case 53:
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case 45:
+        jj_consume_token(45);
+                                             operator = RelationalOp.lt;
+        break;
       case 46:
         jj_consume_token(46);
-                                             operator = RelationalOp.lt;
+                                             operator = RelationalOp.lte;
         break;
       case 47:
         jj_consume_token(47);
-                                             operator = RelationalOp.lte;
+                                             operator = RelationalOp.gt;
         break;
       case 48:
         jj_consume_token(48);
-                                             operator = RelationalOp.gt;
+                                             operator = RelationalOp.gte;
         break;
       case 49:
         jj_consume_token(49);
-                                             operator = RelationalOp.gte;
+                                             operator = RelationalOp.eq;
         break;
       case 50:
         jj_consume_token(50);
-                                             operator = RelationalOp.eq;
+                                             operator = RelationalOp.dif;
         break;
       case 51:
         jj_consume_token(51);
-                                             operator = RelationalOp.dif;
+                                             operator = RelationalOp.unify;
         break;
       case 52:
         jj_consume_token(52);
-                                             operator = RelationalOp.unify;
-        break;
-      case 53:
-        jj_consume_token(53);
                                              operator = RelationalOp.literalBuilder;
         break;
       default:
@@ -1068,17 +1068,17 @@
       case NUMBER:
       case ATOM:
       case UNNAMEDVAR:
-      case 35:
-      case 39:
+      case 34:
+      case 38:
         op2 = arithm_expr();
         break;
       case STRING:
         op2 = string();
         break;
-      case 42:
+      case 41:
         op2 = list();
         break;
-      case 27:
+      case 26:
         op2 = plan_term();
         break;
       default:
@@ -1106,15 +1106,15 @@
     t1 = arithm_expr_trm();
                                 op = ArithmeticOp.none;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case 33:
     case 34:
-    case 35:
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case 34:
-        jj_consume_token(34);
+      case 33:
+        jj_consume_token(33);
                                 op = ArithmeticOp.plus;
         break;
-      case 35:
-        jj_consume_token(35);
+      case 34:
+        jj_consume_token(34);
                                 op = ArithmeticOp.minus;
         break;
       default:
@@ -1146,15 +1146,15 @@
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case TK_INTDIV:
     case TK_INTMOD:
+    case 53:
     case 54:
-    case 55:
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case 54:
-        jj_consume_token(54);
+      case 53:
+        jj_consume_token(53);
                                   op = ArithmeticOp.times;
         break;
-      case 55:
-        jj_consume_token(55);
+      case 54:
+        jj_consume_token(54);
                                   op = ArithmeticOp.div;
         break;
       case TK_INTDIV:
@@ -1192,8 +1192,8 @@
     t1 = arithm_expr_simple();
                                   op = ArithmeticOp.none;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case 56:
-      jj_consume_token(56);
+    case 55:
+      jj_consume_token(55);
                                   op = ArithmeticOp.pow;
       t2 = arithm_expr_factor();
                                   if (!(t1 instanceof NumberTerm)) {
@@ -1221,18 +1221,18 @@
                                   ni.setSrcInfo(new SourceInfo(asSource, K.beginLine));
                                   {if (true) return ni;}
       break;
-    case 35:
-      jj_consume_token(35);
+    case 34:
+      jj_consume_token(34);
       t = arithm_expr_simple();
                                   if (!(t instanceof NumberTerm)) {
                                     {if (true) throw new ParseException(getSourceRef(t)+" The argument '"+t+"' of operator '-' is not numeric or variable.");}
                                   }
                                   {if (true) return new ArithExpr(ArithmeticOp.minus, (NumberTerm)t);}
       break;
-    case 39:
-      jj_consume_token(39);
+    case 38:
+      jj_consume_token(38);
       t = log_expr();
-      jj_consume_token(40);
+      jj_consume_token(39);
                                   {if (true) return t;}
       break;
     case VAR:
@@ -1290,7 +1290,7 @@
       throw new ParseException();
     }
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case 42:
+    case 41:
       lt = list();
                       v.setAnnots(lt);
       break;
@@ -1358,12 +1358,12 @@
   }
 
   final private boolean jj_3R_32() {
-    if (jj_scan_token(37)) return true;
+    if (jj_scan_token(36)) return true;
     return false;
   }
 
   final private boolean jj_3R_31() {
-    if (jj_scan_token(33)) return true;
+    if (jj_scan_token(32)) return true;
     return false;
   }
 
@@ -1378,7 +1378,7 @@
   }
 
   final private boolean jj_3R_16() {
-    if (jj_scan_token(32)) return true;
+    if (jj_scan_token(31)) return true;
     if (jj_3R_30()) return true;
     return false;
   }
@@ -1407,13 +1407,13 @@
   }
 
   final private boolean jj_3R_34() {
-    if (jj_scan_token(27)) return true;
+    if (jj_scan_token(26)) return true;
     Token xsp;
     xsp = jj_scanpos;
     if (jj_3_2()) jj_scanpos = xsp;
     xsp = jj_scanpos;
     if (jj_3R_46()) jj_scanpos = xsp;
-    if (jj_scan_token(28)) return true;
+    if (jj_scan_token(27)) return true;
     return false;
   }
 
@@ -1489,11 +1489,11 @@
   }
 
   final private boolean jj_3R_35() {
-    if (jj_scan_token(42)) return true;
+    if (jj_scan_token(41)) return true;
     Token xsp;
     xsp = jj_scanpos;
     if (jj_3R_47()) jj_scanpos = xsp;
-    if (jj_scan_token(44)) return true;
+    if (jj_scan_token(43)) return true;
     return false;
   }
 
@@ -1503,7 +1503,7 @@
   }
 
   final private boolean jj_3R_41() {
-    if (jj_scan_token(36)) return true;
+    if (jj_scan_token(35)) return true;
     return false;
   }
 
@@ -1520,7 +1520,7 @@
   }
 
   final private boolean jj_3R_40() {
-    if (jj_scan_token(31)) return true;
+    if (jj_scan_token(30)) return true;
     return false;
   }
 
@@ -1545,7 +1545,7 @@
   }
 
   final private boolean jj_3R_26() {
-    if (jj_scan_token(35)) return true;
+    if (jj_scan_token(34)) return true;
     return false;
   }
 
@@ -1555,7 +1555,7 @@
   }
 
   final private boolean jj_3R_25() {
-    if (jj_scan_token(34)) return true;
+    if (jj_scan_token(33)) return true;
     return false;
   }
 
@@ -1610,7 +1610,7 @@
   }
 
   final private boolean jj_3R_85() {
-    if (jj_scan_token(39)) return true;
+    if (jj_scan_token(38)) return true;
     return false;
   }
 
@@ -1620,7 +1620,7 @@
   }
 
   final private boolean jj_3R_84() {
-    if (jj_scan_token(35)) return true;
+    if (jj_scan_token(34)) return true;
     return false;
   }
 
@@ -1640,7 +1640,7 @@
   }
 
   final private boolean jj_3R_18() {
-    if (jj_scan_token(39)) return true;
+    if (jj_scan_token(38)) return true;
     if (jj_3R_33()) return true;
     return false;
   }
@@ -1675,7 +1675,7 @@
   final private boolean jj_3R_12() {
     Token xsp;
     xsp = jj_scanpos;
-    if (jj_scan_token(20)) {
+    if (jj_scan_token(19)) {
     jj_scanpos = xsp;
     if (jj_scan_token(14)) {
     jj_scanpos = xsp;
@@ -1694,7 +1694,7 @@
   }
 
   final private boolean jj_3R_38() {
-    if (jj_scan_token(31)) return true;
+    if (jj_scan_token(30)) return true;
     return false;
   }
 
@@ -1757,33 +1757,33 @@
   final private boolean jj_3_1() {
     if (jj_scan_token(TK_BEGIN)) return true;
     if (jj_3R_12()) return true;
-    if (jj_scan_token(28)) return true;
+    if (jj_scan_token(27)) return true;
     if (jj_3R_13()) return true;
     return false;
   }
 
   final private boolean jj_3R_36() {
-    if (jj_scan_token(27)) return true;
+    if (jj_scan_token(26)) return true;
     return false;
   }
 
   final private boolean jj_3R_79() {
-    if (jj_scan_token(35)) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_78() {
     if (jj_scan_token(34)) return true;
     return false;
   }
 
+  final private boolean jj_3R_78() {
+    if (jj_scan_token(33)) return true;
+    return false;
+  }
+
   final private boolean jj_3R_77() {
-    if (jj_scan_token(36)) return true;
+    if (jj_scan_token(35)) return true;
     return false;
   }
 
   final private boolean jj_3R_76() {
-    if (jj_scan_token(38)) return true;
+    if (jj_scan_token(37)) return true;
     return false;
   }
 
@@ -1807,7 +1807,7 @@
   }
 
   final private boolean jj_3R_75() {
-    if (jj_scan_token(31)) return true;
+    if (jj_scan_token(30)) return true;
     return false;
   }
 
@@ -1896,10 +1896,10 @@
       jj_la1_1();
    }
    private static void jj_la1_0() {
-      jj_la1_0 = new int[] {0x8000000,0x10cb00,0x8000000,0x80000000,0x8000000,0x10000,0x10cb00,0x8000000,0x10c000,0x20000000,0x10000,0x0,0x0,0x0,0x80000000,0x80000000,0x30cb80,0x0,0x10000,0x0,0x0,0x0,0x803acf80,0x0,0x80000000,0x80000000,0x800,0x10cb00,0x10c000,0x0,0x8000000,0x0,0x0,0x83acf80,0x0,0x200080,0x0,0x83acb80,0x83acb80,0x0,0x0,0x3acf80,0x3acb80,0x0,0x83acb80,0x0,0x0,0x0,0x3000,0x3000,0x0,0x32cb80,0x200080,0x0,};
+      jj_la1_0 = new int[] {0x4000000,0x8cb00,0x4000000,0x40000000,0x4000000,0x10000,0x8cb00,0x4000000,0x8c000,0x10000000,0x10000,0x80000000,0x0,0x0,0x40000000,0x40000000,0x18cb80,0x0,0x10000,0x80000000,0x0,0x0,0x401ecf80,0x0,0x40000000,0x40000000,0x800,0x8cb00,0x8c000,0x0,0x4000000,0x0,0x0,0x41ecf80,0x0,0x100080,0x0,0x41ecb80,0x41ecb80,0x0,0x0,0x1ecf80,0x1ecb80,0x0,0x41ecb80,0x0,0x0,0x0,0x3000,0x3000,0x0,0x1acb80,0x100080,0x0,};
    }
    private static void jj_la1_1() {
-      jj_la1_1 = new int[] {0x0,0x0,0x0,0x0,0x0,0xc,0x0,0x0,0x0,0x0,0x0,0x1,0x2,0xc,0x10,0x10,0x0,0x20,0x0,0x1,0x22,0x22,0xdc,0x4,0x5c,0x5c,0x0,0x0,0x0,0x80,0x0,0x400,0x200,0x488,0x200,0x400,0x800,0x488,0x488,0x800,0x2000,0x88,0x88,0x3fc000,0x488,0x3fc000,0xc,0xc,0xc00000,0xc00000,0x1000000,0x88,0x0,0x400,};
+      jj_la1_1 = new int[] {0x0,0x0,0x0,0x0,0x0,0x6,0x0,0x0,0x0,0x0,0x0,0x0,0x1,0x6,0x8,0x8,0x0,0x10,0x0,0x0,0x11,0x11,0x6e,0x2,0x2e,0x2e,0x0,0x0,0x0,0x40,0x0,0x200,0x100,0x244,0x100,0x200,0x400,0x244,0x244,0x400,0x1000,0x44,0x44,0x1fe000,0x244,0x1fe000,0x6,0x6,0x600000,0x600000,0x800000,0x44,0x0,0x200,};
    }
   final private JJCalls[] jj_2_rtns = new JJCalls[2];
   private boolean jj_rescan = false;
@@ -2076,8 +2076,8 @@
 
   public ParseException generateParseException() {
     jj_expentries.removeAllElements();
-    boolean[] la1tokens = new boolean[57];
-    for (int i = 0; i < 57; i++) {
+    boolean[] la1tokens = new boolean[56];
+    for (int i = 0; i < 56; i++) {
       la1tokens[i] = false;
     }
     if (jj_kind >= 0) {
@@ -2096,7 +2096,7 @@
         }
       }
     }
-    for (int i = 0; i < 57; i++) {
+    for (int i = 0; i < 56; i++) {
       if (la1tokens[i]) {
         jj_expentry = new int[1];
         jj_expentry[0] = i;

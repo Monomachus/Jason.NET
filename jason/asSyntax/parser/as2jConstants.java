@@ -15,15 +15,14 @@ public interface as2jConstants {
   int TK_END = 15;
   int TK_LABEL_AT = 16;
   int NUMBER = 17;
-  int EXPONENT = 18;
-  int STRING = 19;
-  int ATOM = 20;
-  int UNNAMEDVAR = 21;
-  int CHAR = 22;
-  int LETTER = 23;
-  int LC_LETTER = 24;
-  int UP_LETTER = 25;
-  int DIGIT = 26;
+  int STRING = 18;
+  int ATOM = 19;
+  int UNNAMEDVAR = 20;
+  int CHAR = 21;
+  int LETTER = 22;
+  int LC_LETTER = 23;
+  int UP_LETTER = 24;
+  int DIGIT = 25;
 
   int DEFAULT = 0;
 
@@ -46,7 +45,6 @@ public interface as2jConstants {
     "\"end\"",
     "\"@\"",
     "<NUMBER>",
-    "<EXPONENT>",
     "<STRING>",
     "<ATOM>",
     "<UNNAMEDVAR>",

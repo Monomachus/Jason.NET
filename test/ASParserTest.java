@@ -7,6 +7,7 @@ import static jason.asSyntax.ASSyntax.createString;
 import jason.asSemantics.Agent;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.ASSyntax;
+import jason.asSyntax.ArithExpr;
 import jason.asSyntax.ListTerm;
 import jason.asSyntax.Literal;
 import jason.asSyntax.LogExpr;
@@ -21,6 +22,7 @@ import jason.asSyntax.Trigger;
 import jason.asSyntax.PlanBody.BodyType;
 import jason.asSyntax.parser.ParseException;
 import jason.asSyntax.parser.as2j;
+import jason.asSyntax.parser.as2jConstants;
 import jason.mas2j.MAS2JProject;
 import jason.mas2j.parser.mas2j;
 
@@ -117,7 +119,12 @@ public class ASParserTest extends TestCase {
         assertTrue(t1 != null);
         solve = ((LogExpr) t1).logicalConsequence(null, new Unifier());
         assertTrue(solve.hasNext());
-
+        
+        as2j parser = new as2j(new StringReader("E+1"));
+        parser.getNextToken();
+        assertEquals(parser.token.kind, as2jConstants.VAR);
+        t1 = ASSyntax.parseFormula("E+1");
+        assertTrue(t1 instanceof ArithExpr);
     }
 
     public void testDirectives() throws Exception {
