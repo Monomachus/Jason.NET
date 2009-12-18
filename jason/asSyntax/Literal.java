@@ -264,7 +264,6 @@ public abstract class Literal extends DefaultTerm implements LogicalFormula {
             Unifier           current = null;
             Iterator<Unifier> ruleIt = null; // current rule solutions iterator
             Rule              rule; // current rule
-            Literal           cloneAnnon = null; // a copy of the literal with makeVarsAnnon
             boolean           needsUpdate = true;
             
             public boolean hasNext() {
@@ -291,40 +290,28 @@ public abstract class Literal extends DefaultTerm implements LogicalFormula {
                 while (ruleIt != null && ruleIt.hasNext()) {
                     // unifies the rule head with the result of rule evaluation
                     Unifier ruleUn = ruleIt.next(); // evaluation result
-                    Literal rhead  = rule.headClone();
-
-                    // unnamed vars should be replaced (see bug of Tim Cleaver)
-                    replaceUnnamedVarsToUnnamedVars(rhead);
-
-                    // then apply and replace other free variables
-                    rhead.apply(ruleUn);
-                    rhead.makeVarsAnnon(ruleUn);
-                    
-                    
-                    Unifier unC = un.clone();
-                    if (unC.unifiesNoUndo(Literal.this, rhead)) {
-                        current = unC;
+                    if (ruleUn.unifiesNoUndo(Literal.this, rule)) {
+                        current = ruleUn;
                         return;
                     }
                 }
                 
                 // try literal iterator
+                //
+                // we make the variables in the belief (be it a fact or rule) and not
+                // in this as this may be included in the scope of a plan. if we rename
+                // the variables in this and it is in the scope of a plan then the
+                // variables in the event and the body of the plan won't reflect the
+                // naming. thus, making the resulting unifier not reflect the entire
+                // scope of the plan.                
                 while (il.hasNext()) {
                     Literal b = il.next(); // b is the relevant entry in BB
                     if (b.isRule()) {
-                        rule = (Rule)b;
-                        
-                        // create a copy of this literal, ground it and 
-                        // make its vars anonymous, 
-                        // it is used to define what will be the unifier used
-                        // inside the rule.
-                        if (cloneAnnon == null) {
-                            cloneAnnon = Literal.this.copy();
-                            cloneAnnon.apply(un);
-                            cloneAnnon.makeVarsAnnon(un);
-                        }
-                        Unifier ruleUn = new Unifier();
-                        if (ruleUn.unifiesNoUndo(cloneAnnon, rule)) { // the rule head unifies with the literal
+                        rule = (Rule)b.clone();
+                        rule.makeVarsAnnon(); // make the variables in the rule anonymous 
+                        Unifier ruleUn = un.clone();
+                        if (ruleUn.unifiesNoUndo(Literal.this, rule)) { 
+                            // the rule head unifies with the literal so match the body                        
                             ruleIt = rule.getBody().logicalConsequence(ag,ruleUn);
                             get();
                             if (current != null) { // if it get a value
@@ -333,7 +320,7 @@ public abstract class Literal extends DefaultTerm implements LogicalFormula {
                         }
                     } else {
                         Unifier u = un.clone();
-                        if (u.unifiesNoUndo(Literal.this, b)) {
+                        if (u.unifiesNoUndo(Literal.this, b)) { // b.copy().makeVarsAnnon())) { 
                             current = u;
                             return;
                         }
@@ -345,18 +332,6 @@ public abstract class Literal extends DefaultTerm implements LogicalFormula {
         };
     }   
 
-    private void replaceUnnamedVarsToUnnamedVars(Literal l) {
-        final int size = l.getArity();
-        for (int i=0; i<size; i++) {
-            Term ti = l.getTerm(i);
-            if (ti.isUnnamedVar()) {
-                l.setTerm(i, new UnnamedVar());
-            } else if (ti instanceof Literal) {
-                replaceUnnamedVarsToUnnamedVars((Literal)ti);
-            }
-        }                    
-    }
-    
 	/** returns this literal as a list with three elements: [functor, list of terms, list of annots] */
 	public ListTerm getAsListOfTerms() {
 		ListTerm l = new ListTermImpl();
@@ -425,6 +400,11 @@ public abstract class Literal extends DefaultTerm implements LogicalFormula {
         public Iterator<Unifier> logicalConsequence(final Agent ag, final Unifier un) {
         	return LogExpr.createUnifIterator(un);            
         }
+    	
+    	 @Override
+    	 public Literal clone() {
+    	     return this;
+    	 }
     }
     
     @SuppressWarnings("serial")
@@ -441,6 +421,11 @@ public abstract class Literal extends DefaultTerm implements LogicalFormula {
         @Override
         public Iterator<Unifier> logicalConsequence(final Agent ag, final Unifier un) {
         	return LogExpr.EMPTY_UNIF_LIST.iterator();            
+        }
+        
+        @Override
+        public Literal clone() {
+            return this;
         }
     }
 }

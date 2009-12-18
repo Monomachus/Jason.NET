@@ -23,6 +23,8 @@
 
 package jason.asSyntax;
 
+import jason.asSemantics.Unifier;
+
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -75,6 +77,13 @@ public class Rule extends LiteralImpl {
     
     public LogicalFormula getBody() {
         return body;
+    }
+    
+    @Override
+    public Literal makeVarsAnnon(Unifier un) {
+        if (body instanceof Literal)
+            ((Literal)body).makeVarsAnnon(un);
+        return super.makeVarsAnnon(un);
     }
     
     public Rule clone() {

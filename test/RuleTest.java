@@ -2,9 +2,11 @@ package test;
 
 import jason.asSemantics.Agent;
 import jason.asSemantics.Unifier;
+import jason.asSyntax.ASSyntax;
 import jason.asSyntax.Literal;
 import jason.asSyntax.LogExpr;
 import jason.asSyntax.Rule;
+import jason.asSyntax.Structure;
 import jason.asSyntax.VarTerm;
 
 import java.util.HashMap;
@@ -80,12 +82,20 @@ public class RuleTest extends TestCase {
         ag.getBB().add(r);
 
         Iterator<Unifier> iun = Literal.parseLiteral("r([],a(20),X)").logicalConsequence(ag, new Unifier());
-        assertEquals(iun.next().get("X").toString(),"b(20,4)");
-
-        iun = Literal.parseLiteral("r([],a(20),b(X,Y))").logicalConsequence(ag, new Unifier());
+        //assertEquals(iun.next().get("X").toString(),"b(20,4)");
+        assertTrue(iun.hasNext());
+        Literal result = Literal.parseLiteral("r([],a(20),X)");
         Unifier u = iun.next();
-        assertEquals(u.get("X").toString(),"20");
-        assertEquals(u.get("Y").toString(),"4");
+        assertTrue(u.get("X").isStructure());
+        assertEquals( ((Structure)u.get("X")).getArity(), 2);
+        assertEquals( ((Structure)u.get("X")).getFunctor(), "b");
+        result.apply(u);
+        assertEquals(result, Literal.parseLiteral("r([],a(20),b(20,4))"));
+        
+        iun = Literal.parseLiteral("r([],a(20),b(X,Y))").logicalConsequence(ag, new Unifier());
+        u = iun.next();
+        assertEquals(u.get("X"), ASSyntax.createNumber(20));
+        assertEquals(u.get("Y"), ASSyntax.createNumber(4));
     
     }    
 

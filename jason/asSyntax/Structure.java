@@ -281,19 +281,47 @@ public class Structure extends Atom {
         for (int i=0; i<size; i++) {
             Term ti = getTerm(i);
             VarTerm uv = varToReplace(ti, un);
-            if (uv != null) {
+            if (uv != null)
                 setTerm(i,uv);
-            } else if (ti.isStructure()) {
-                Structure tis = (Structure)ti;
-                if (tis.hasTerm()) {
-                    tis.makeVarsAnnon(un);
-                }
-            }
+            else if (ti instanceof Structure)
+                ((Structure)ti).makeVarsAnnon(un);
         }
         resetHashCodeCache();
         return this;
     }
 
+    protected VarTerm varToReplace(Term t, Unifier un) {
+        if (!t.isVar())
+            return null;
+        VarTerm vt    = (VarTerm)t;
+        VarTerm deref = un.deref(vt);
+        if (deref.isUnnamedVar())
+            return new UnnamedVar();
+
+        // if the variable hasn't been renamed given the input unifier, then rename it.
+        if (deref.equals(vt)) {
+            // forget the name
+            VarTerm var = new VarTerm("_" + UnnamedVar.getUniqueId() + t);
+            // if deref has annotations then we need to replicate these in the new variable
+            if (deref.hasAnnot()) {
+                var.setAnnots(deref.getAnnots().cloneLT());
+                var.makeVarsAnnon(un);
+            }
+            un.bind(deref, var);
+            return var;
+        }
+        // otherwise it has already been renamed in this scope so return
+        // the existing renaming
+        // ensure that if the input term has an annotation and the existing
+        // renaming doesn't then we add the anonymized annotations
+        if (vt.hasAnnot() && !deref.hasAnnot()) {
+            deref.setAnnots(vt.getAnnots().cloneLT());
+            deref.makeVarsAnnon(un);
+        }       
+        return deref;
+    }
+
+    /*
     protected VarTerm varToReplace(Term t, Unifier un) {
         if (t.isVar() && !t.isUnnamedVar()) {
             // replace t to an unnamed var
@@ -309,6 +337,7 @@ public class Structure extends Atom {
             return null;
         }
     }
+    */
     
     @Override
     public void makeTermsAnnon() {

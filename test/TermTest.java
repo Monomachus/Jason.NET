@@ -16,6 +16,7 @@ import jason.asSyntax.ObjectTerm;
 import jason.asSyntax.ObjectTermImpl;
 import jason.asSyntax.Plan;
 import jason.asSyntax.Pred;
+import jason.asSyntax.StringTermImpl;
 import jason.asSyntax.Structure;
 import jason.asSyntax.Term;
 import jason.asSyntax.Trigger;
@@ -27,9 +28,11 @@ import jason.asSyntax.parser.ParseException;
 import jason.bb.BeliefBase;
 import jason.bb.DefaultBeliefBase;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import junit.framework.TestCase;
@@ -601,10 +604,21 @@ public class TermTest extends TestCase {
         l2.makeVarsAnnon();
         u.clear();
         assertTrue(u.unifies(l1, l2));
+        
+        // ensure that the anonymized instance of AgY unified to 32
+        assertEquals(u.get((VarTerm) l1.getTerm(0)), new NumberTermImpl(32));
+        // ensure that the first anonymized instance of QuadY2 unifies to 33
+        assertEquals(u.get((VarTerm) l1.getTerm(1)), new NumberTermImpl(33));
+        // ensure that the second anonymized instance of QuadY2 unifies to 33
+        assertEquals(u.get((VarTerm) l1.getTerm(2)), new NumberTermImpl(33));
+        // ensure that the anonymized instance of V unifies to 33
+        assertEquals(u.get((VarTerm) l2.getTerm(2)), new NumberTermImpl(33));
+        
         l2.apply(u);
         assertEquals("calc(32,33,33)", l2.toString());
         l1.apply(u);
         assertEquals("calc(32,33,33)", l1.toString());
+
     }
 
     public void testMakeVarAnnon3() {
@@ -636,7 +650,17 @@ public class TermTest extends TestCase {
         }
         */
         l.makeVarsAnnon(u);
-        assertEquals("p(_2)", l.toString());
+        // ensure that X derefs to _2
+        assertTrue(u.deref(new VarTerm("X")).equals(new UnnamedVar(2)));
+        // ensure that unifying a value with X will bind a value for all aliases as well.
+        Term val = new StringTermImpl("value");
+        u.unifies(new VarTerm("X"), val);
+        assertTrue(u.get(new VarTerm("X")).equals(val));
+        assertTrue(u.get(new VarTerm("Y")).equals(val));
+        assertTrue(u.get(new VarTerm("Z")).equals(val));
+        assertTrue(u.get(new UnnamedVar(4)).equals(val));
+        assertTrue(u.get(new UnnamedVar(2)).equals(val));
+        assertTrue(u.get(new UnnamedVar(10)).equals(val));
     }
 
     public void testMakeVarAnnon5() {
@@ -646,6 +670,32 @@ public class TermTest extends TestCase {
         l.makeVarsAnnon(u);
         assertEquals(l.getTerm(0), l.getTerm(1));
         assertEquals("[s("+l.getTerm(0)+")]", l.getAnnots().toString());
+    }
+    
+    // test from Tim Cleaver
+    public void testMakeVarsAnnon6() {
+        // if we make a literal anonymous multiple times, the instances should not
+        // be equal but should eb unifiable.
+        Literal literal = Literal.parseLiteral("literal(Variable, _)");
+        List<Literal> literals = new ArrayList<Literal>();
+        literals.add(literal);
+        // create a list of anonymized l1s
+        for (int i = 0; i < 5; i++) {
+            literals.add((literal.copy()).makeVarsAnnon());
+        }
+        // ensure that all the anonymizations of Variable are different
+        // ensure that all the anonymizations of _ are different
+        // ensure that all pairs are unifiable
+        for (Literal l1 : literals) {
+            for (Literal l2 : literals) {
+                if (l1 == l2) {
+                    continue;
+                }
+                assertFalse(l1.getTerm(0).equals(l2.getTerm(0)));
+                assertFalse(l1.getTerm(1).equals(l2.getTerm(1)));
+                assertTrue(new Unifier().unifies(l1, l2));
+            }
+        }
     }
     
     public void testAddAnnots() {

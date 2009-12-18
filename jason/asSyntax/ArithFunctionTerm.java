@@ -66,7 +66,16 @@ public class ArithFunctionTerm extends Structure implements NumberTerm {
     public boolean isStructure() {
         return false;
     }
-
+    
+    @Override
+    public Literal makeVarsAnnon(Unifier un) {
+        if (isEvaluated()) {
+            return null;
+        } else {
+            return super.makeVarsAnnon(un);            
+        }
+    }
+    
     @Override
     public boolean isLiteral() {
         return false;
@@ -81,7 +90,7 @@ public class ArithFunctionTerm extends Structure implements NumberTerm {
     public boolean isEvaluated() {
         return value != null;
     }
-
+    
     @Override
     public boolean isGround() {
         return isEvaluated() || super.isGround();
@@ -97,7 +106,8 @@ public class ArithFunctionTerm extends Structure implements NumberTerm {
      */
     @Override
     public boolean apply(Unifier u) {
-        if (isEvaluated()) return false;
+        if (isEvaluated()) 
+            return false;
         
         super.apply(u);
         if ((function != null && function.allowUngroundTerms()) || isGround()) {

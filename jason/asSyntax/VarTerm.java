@@ -414,6 +414,16 @@ public class VarTerm extends LiteralImpl implements NumberTerm, ListTerm, String
     }
 
     @Override
+    public Literal makeVarsAnnon(Unifier un) {
+        if (value == null)
+            return super.makeVarsAnnon(un);
+        else if (getValue().isLiteral())
+            return ((Literal)getValue()).makeVarsAnnon(un);
+        else
+            return null;
+    }
+    
+    @Override
     public String toString() {
         if (value == null) {
             String s = getFunctor();
@@ -436,7 +446,7 @@ public class VarTerm extends LiteralImpl implements NumberTerm, ListTerm, String
     public void setAnnots(ListTerm l) {
         if (value != null)
             if (getValue().isPred())
-                ((Pred) value).setAnnots(l);
+                ((Pred) getValue()).setAnnots(l);
             else
                 logger.log(Level.WARNING, "The setAnnots '"+l+"' in "+this+" was lost, since this var value is not a Pred. The value's class is "+getValue().getClass().getName(), new Exception());
         else

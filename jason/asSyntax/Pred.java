@@ -400,7 +400,7 @@ public class Pred extends Structure {
                 VarTerm uv = varToReplace(ta, un);
                 if (uv != null)
                     lt.setTerm(uv);
-                else if (ta.isStructure())
+                else if (ta instanceof Structure)
                     ((Structure)ta).makeVarsAnnon(un);
                 if (lt.isTail()) {
                     uv = varToReplace(lt.getNext(), un);
