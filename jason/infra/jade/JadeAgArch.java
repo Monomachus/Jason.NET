@@ -111,7 +111,7 @@ public class JadeAgArch extends JadeAg implements AgArchInfraTier {
         //    read parameters from [0] 
         // else if [0] is j-project 
         //    read all parameters form [1] (including aslSource and directives)
-        //    create the agents indicated by [2]              
+        //    create the agent indicated by [2]              
         // else
         //    [0] is the file with AS source for the agent
         //    arch <arch class>
@@ -134,10 +134,13 @@ public class JadeAgArch extends JadeAg implements AgArchInfraTier {
             ((Include)DirectiveProcessor.getDirective("include")).setSourcePath(project.getSourcePaths());
             
             AgentParameters ap = project.getAg(args[2].toString());
-            if (ap == null)
+            if (ap == null) {
                 logger.log(Level.SEVERE, "There is no agent '"+args[2]+"' in project '"+args[1]+"'.");
-            if (ap.qty > 1)
-                logger.warning("Ignoring quantity of agents from mas2j, jade arch creates only ONE agent.");
+            } else {    
+                ap.fixSrc(project.getSourcePaths(), null);
+                if (ap.qty > 1)
+                    logger.warning("Ignoring quantity of agents from mas2j, jade arch creates only ONE agent.");
+            }
             return ap;
             
         } else { // load parameters from shell
