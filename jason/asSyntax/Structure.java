@@ -296,7 +296,7 @@ public class Structure extends Atom {
         VarTerm vt    = (VarTerm)t;
         VarTerm deref = un.deref(vt);
         if (deref.isUnnamedVar())
-            return new UnnamedVar();
+           return new UnnamedVar();
 
         // if the variable hasn't been renamed given the input unifier, then rename it.
         if (deref.equals(vt)) {
@@ -310,8 +310,10 @@ public class Structure extends Atom {
             un.bind(deref, var);
             return var;
         }
+        
         // otherwise it has already been renamed in this scope so return
         // the existing renaming
+        deref = (VarTerm)deref.clone();
         // ensure that if the input term has an annotation and the existing
         // renaming doesn't then we add the anonymized annotations
         if (vt.hasAnnot() && !deref.hasAnnot()) {

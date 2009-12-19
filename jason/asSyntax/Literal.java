@@ -263,6 +263,7 @@ public abstract class Literal extends DefaultTerm implements LogicalFormula {
         return new Iterator<Unifier>() {
             Unifier           current = null;
             Iterator<Unifier> ruleIt = null; // current rule solutions iterator
+            Literal           cloneAnnon = null; // a copy of the literal with makeVarsAnnon
             Rule              rule; // current rule
             boolean           needsUpdate = true;
             
@@ -281,6 +282,7 @@ public abstract class Literal extends DefaultTerm implements LogicalFormula {
                 return a;
             }
 
+            /*
             private void get() {
                 needsUpdate = false;
                 current     = null;
@@ -326,7 +328,61 @@ public abstract class Literal extends DefaultTerm implements LogicalFormula {
                         }
                     }
                 }
+            }*/
+            
+            private void get() {
+                needsUpdate = false;
+                current     = null;
+                if (arch != null && !arch.isRunning()) return;
+                
+                // try rule iterator
+                while (ruleIt != null && ruleIt.hasNext()) {
+                    // unifies the rule head with the result of rule evaluation
+                    Unifier ruleUn = ruleIt.next(); // evaluation result
+                    Literal rhead  = rule.headClone();
+                    rhead.apply(ruleUn);
+                    rhead.makeVarsAnnon(ruleUn);
+                    
+                    Unifier unC = un.clone();
+                    if (unC.unifiesNoUndo(Literal.this, rhead)) {
+                        current = unC;
+                        return;
+                    }
+                }
+                
+                // try literal iterator
+                while (il.hasNext()) {
+                    Literal b = il.next(); // b is the relevant entry in BB
+                    if (b.isRule()) {
+                        rule = (Rule)b;
+                        
+                        // create a copy of this literal, ground it and 
+                        // make its vars anonymous, 
+                        // it is used to define what will be the unifier used
+                        // inside the rule.
+                        if (cloneAnnon == null) {
+                            cloneAnnon = Literal.this.copy();
+                            cloneAnnon.apply(un);
+                            cloneAnnon.makeVarsAnnon(un);
+                        }
+                        Unifier ruleUn = new Unifier();
+                        if (ruleUn.unifiesNoUndo(cloneAnnon, rule)) { // the rule head unifies with the literal
+                            ruleIt = rule.getBody().logicalConsequence(ag,ruleUn);
+                            get();
+                            if (current != null) { // if it get a value
+                                return;
+                            }
+                        }
+                    } else {
+                        Unifier u = un.clone();
+                        if (u.unifiesNoUndo(Literal.this, b)) {
+                            current = u;
+                            return;
+                        }
+                    }
+                }
             }
+            
 
             public void remove() {}
         };
