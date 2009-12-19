@@ -43,8 +43,8 @@ Implementation of <b>if</b>.
 <pre>
   if ( <i>logical formula</i> ) {
      <i>plan_body1</i>
-  [ } { <i>plan_body2</i> ]
-  };
+  [ } else { <i>plan_body2</i> ]
+  }
 </pre>
 </p>
 
@@ -56,8 +56,8 @@ otherwise, <i>plan_body2</i> is executed.</p>
 +event : context
   <- ....
      if (vl(X) & X > 10) { // where vl(X) is a belief
-       .print("value > 10")
-     };
+       .print("value > 10");
+     }
      ....
 </pre>
 The unification is changed by the evaluation of the logical formula, i.e., X might have a value after if.

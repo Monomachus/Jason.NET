@@ -442,46 +442,52 @@ public abstract class Literal extends DefaultTerm implements LogicalFormula {
 	
 	
     @SuppressWarnings("serial")
-    static final class TrueLiteral extends LiteralImpl {
+    static final class TrueLiteral extends Atom {
     	public TrueLiteral() {
-    		super("true", 0);
+    		super("true");
 		}
 
+    	/*
     	@Override
         public boolean canBeAddedInBB() {
     		return false;
     	}
+    	*/
         
     	@Override
         public Iterator<Unifier> logicalConsequence(final Agent ag, final Unifier un) {
         	return LogExpr.createUnifIterator(un);            
         }
     	
-    	 @Override
-    	 public Literal clone() {
-    	     return this;
-    	 }
+    	/*
+    	@Override
+    	public Literal clone() {
+    	    return this;
+    	}*/
     }
     
     @SuppressWarnings("serial")
-	static final class FalseLiteral extends LiteralImpl {
+	static final class FalseLiteral extends Atom {
     	public FalseLiteral() {
-    		super("false", 0);
+    		super("false");
 		}
 
+    	/*
     	@Override
         public boolean canBeAddedInBB() {
     		return false;
     	}
+    	*/
     	
         @Override
         public Iterator<Unifier> logicalConsequence(final Agent ag, final Unifier un) {
         	return LogExpr.EMPTY_UNIF_LIST.iterator();            
         }
         
+        /*
         @Override
         public Literal clone() {
             return this;
-        }
+        }*/
     }
 }

@@ -14,15 +14,19 @@ public interface as2jConstants {
   int TK_BEGIN = 14;
   int TK_END = 15;
   int TK_LABEL_AT = 16;
-  int NUMBER = 17;
-  int STRING = 18;
-  int ATOM = 19;
-  int UNNAMEDVAR = 20;
-  int CHAR = 21;
-  int LETTER = 22;
-  int LC_LETTER = 23;
-  int UP_LETTER = 24;
-  int DIGIT = 25;
+  int TK_IF = 17;
+  int TK_ELSE = 18;
+  int TK_FOR = 19;
+  int TK_WHILE = 20;
+  int NUMBER = 21;
+  int STRING = 22;
+  int ATOM = 23;
+  int UNNAMEDVAR = 24;
+  int CHAR = 25;
+  int LETTER = 26;
+  int LC_LETTER = 27;
+  int UP_LETTER = 28;
+  int DIGIT = 29;
 
   int DEFAULT = 0;
 
@@ -44,6 +48,10 @@ public interface as2jConstants {
     "\"begin\"",
     "\"end\"",
     "\"@\"",
+    "\"if\"",
+    "\"else\"",
+    "\"for\"",
+    "\"while\"",
     "<NUMBER>",
     "<STRING>",
     "<ATOM>",
@@ -64,9 +72,9 @@ public interface as2jConstants {
     "\"-\"",
     "\"?\"",
     "\";\"",
-    "\"!!\"",
     "\"(\"",
     "\")\"",
+    "\"!!\"",
     "\",\"",
     "\"[\"",
     "\"|\"",

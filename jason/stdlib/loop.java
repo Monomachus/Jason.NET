@@ -48,7 +48,7 @@ Implementation of <b>while</b>.
 <pre>
   while ( <i>logical formula</i> ) {
      <i>plan_body</i>
-  };
+  }
 </pre>
 </p>
 
@@ -60,8 +60,8 @@ Implementation of <b>while</b>.
   <- ....
      while(vl(X) & X > 10) { // where vl(X) is a belief
        .print("value > 10");
-        -+vl(X+1)
-     };
+       -+vl(X+1);
+     }
      ....
 </pre>
 The unification resulted from the evaluation of the logical formula is used only inside the loop,

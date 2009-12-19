@@ -144,6 +144,11 @@ TOKEN : {
 | <TK_END:    "end" >
 | <TK_LABEL_AT: "@"> // special chars
 
+| <TK_IF:     "if" >
+| <TK_ELSE:   "else" >
+| <TK_FOR:    "for" >
+| <TK_WHILE:  "while" >
+
 // Numbers
 |  <NUMBER: ["0"-"9"] (["0"-"9"])*
           | (["0"-"9"])* "." (["0"-"9"])+ (["e","E"] (["+","-"])? (["0"-"9"])+)?
@@ -343,70 +348,92 @@ Trigger trigger() :
 
 
 /* Plan body */
-PlanBody plan_body() :     { Object F; PlanBody R = null; }
+PlanBody plan_body() :     { Object F; PlanBody R = null; boolean hasPV = false; boolean isControl = true; }
 {
-  F = body_formula()       
-                 
-  [ ";"                    { if (!(F instanceof PlanBody)) throw new ParseException(getSourceRef(F)+" "+F+" is not a body literal!");  }
-    R = plan_body()        
-  ]
-                           { if (F instanceof PlanBody) {
+( F = stmtIF()            
+| F = stmtFOR()
+| F = stmtWHILE()
+| F = body_formula()       { isControl = false; if (!(F instanceof PlanBody)) throw new ParseException(getSourceRef(F)+" "+F+" is not a body literal!");  }
+)
+  // TODO: NOTE: in future releases, when old syntax for if/while/for could be forgotten, 
+  // change to:
+  //  ( F = stmtIF()       ( R = plan_body() | "." )
+  //  | F = stmtFOR()      ( R = plan_body() | "." )
+  //  | F = stmtWHILE()    ( R = plan_body() | "." )
+  //  | F = body_formula() (";" R = plan_body() | ".")  
+  
+  [ ";"                    { hasPV = true; }
+  ] 
+  [ R = plan_body() ]        
+                           { if (R != null) {
+                                if (!isControl && !hasPV) {
+                                     throw new ParseException(getSourceRef(F)+" Expected ';' after '"+F+"'.");
+                                }
                                 ((PlanBody)F).setBodyNext( R );
                              }
+                             
                              return (PlanBody)F;
                            }
 }
 
 
-Term plan_term():            { Trigger T = null; Object C = null; PlanBody B = null, B1 = null; Plan P = null; boolean pb = true; Pred L = null; }
-                               // pb = "only plan body"
+PlanBody stmtIF() :    { Object B; Term T1; Term T2 = null; Literal stmtLiteral; boolean useElse = false; }
 {
-  "{"  
-  [ LOOKAHEAD(4) 
-    [<TK_LABEL_AT> L=pred() { pb = false; } ]
-    T = trigger()           { if (T.getType() != TEType.belief) pb = false; }
-    [ ":" C = log_expr()    { pb = false; } ]
-    [( "<-"                 { pb = false; } 
-     | ";"                  { if (!pb) throw new ParseException(getSourceRef(T)+" Wrong place for ';'"); }
-     )                          
-    ]
-  ] 
-  [ B = plan_body() ]
-  "}"
-                         { 
-                             if (T != null) {
-                                // handle the case of "+a1", parsed as TE, need to be changed to plan's body
-                                // handle the case of "+a1; +a2", parsed as "TE; Body"
-                                if (pb && L == null) {
-                                  if (T.isAddition())
-                                     B1 = new PlanBodyImpl(BodyType.addBel, T.getLiteral());
-                                  else
-                                     B1 = new PlanBodyImpl(BodyType.delBel, T.getLiteral());
-                                  B1.setAsBodyTerm(true);
-                                  if (B != null) 
-                                     B1.setBodyNext(B); 
-                                  return B1;
+   <TK_IF>
+   "("
+   B = log_expr()
+   ")"
+   T1 = plan_term()
+   [ [ <TK_ELSE>       { useElse = true; } 
+     ]
+     T2 = plan_term()
+   ]
+                       { try {
+                            if (T2 == null) {
+                                stmtLiteral = new InternalActionLiteral(ASSyntax.createStructure(".if_then_else", (Term)B, T1), curAg);
+                            } else {
+                                stmtLiteral = new InternalActionLiteral(ASSyntax.createStructure(".if_then_else", (Term)B, T1, T2), curAg);
+                                if (! useElse) {
+                                   logger.warning(getSourceRef(stmtLiteral)+" warning: use keyword 'else' before the else part of if.");
                                 }
-                                if (C == null && B == null && L == null) {
-                                    // handle the case of a single trigger
-                                    T.setAsTriggerTerm(true);
-                                	return T;
-                                } else { 
-                                    // handle the case of a entire plan
-                                    Plan p = new Plan(L,T,(LogicalFormula)C, B);
-                                    p.setSrcInfo(T.getSrcInfo());
-                                    p.setAsPlanTerm(true);
-                                	return p;
-                                }                                
-                             }
-                             
-                             // the case of a simple plan body term
-                             if (B == null) 
-                             	B = new PlanBodyImpl();
-                             B.setAsBodyTerm(true); 
-                             
-                             return B;
+                            }
+                            return new PlanBodyImpl(BodyType.internalAction, stmtLiteral);
+                         } catch (Exception e) {
+                            e.printStackTrace();
                          }
+                       }
+}
+
+PlanBody stmtFOR() :   { Object B; Term T1; Literal stmtLiteral; }
+{
+   <TK_FOR>
+   "("
+   B = log_expr()
+   ")"
+   T1 = plan_term()
+                       { try {
+                            stmtLiteral = new InternalActionLiteral(ASSyntax.createStructure(".foreach", (Term)B, T1), curAg);
+                            return new PlanBodyImpl(BodyType.internalAction, stmtLiteral);
+                         } catch (Exception e) {
+                            e.printStackTrace();
+                         }
+                       }
+}
+
+PlanBody stmtWHILE() : { Object B; Term T1; Literal stmtLiteral; }
+{
+   <TK_WHILE>
+   "("
+   B = log_expr()
+   ")"
+   T1 = plan_term()
+                       { try {
+                            stmtLiteral = new InternalActionLiteral(ASSyntax.createStructure(".loop", (Term)B, T1), curAg);
+                            return new PlanBodyImpl(BodyType.internalAction, stmtLiteral);
+                         } catch (Exception e) {
+                            e.printStackTrace();
+                         }
+                       }
 }
 
 
@@ -443,6 +470,57 @@ Object body_formula() :
                        }
 }
 
+Term plan_term():            { Trigger T = null; Object C = null; PlanBody B = null, B1 = null; Plan P = null; boolean pb = true; Pred L = null; }
+                               // pb = "only plan body"
+{
+  "{"  
+  [ LOOKAHEAD(4) 
+    [<TK_LABEL_AT> L=pred() { pb = false; } ]
+    T = trigger()           { if (T.getType() != TEType.belief) pb = false; }
+    [ ":" C = log_expr()    { pb = false; } ]
+    [( "<-"                 { pb = false; } 
+     | ";"                  { if (!pb) throw new ParseException(getSourceRef(T)+" Wrong place for ';'"); }
+     )                          
+    ]
+  ] 
+  [ B = plan_body() ]
+  "}"
+                         { 
+                             if (T != null) {
+                                // handle the case of "+a1", parsed as TE, need to be changed to plan's body
+                                // handle the case of "+a1; +a2", parsed as "TE; Body"
+                                if (pb && L == null) {
+                                  if (T.isAddition())
+                                     B1 = new PlanBodyImpl(BodyType.addBel, T.getLiteral());
+                                  else
+                                     B1 = new PlanBodyImpl(BodyType.delBel, T.getLiteral());
+                                  B1.setAsBodyTerm(true);
+                                  if (B != null) 
+                                     B1.setBodyNext(B); 
+                                  return B1;
+                                }
+                                if (C == null && B == null && L == null) {
+                                    // handle the case of a single trigger
+                                    T.setAsTriggerTerm(true);
+                                    return T;
+                                } else { 
+                                    // handle the case of a entire plan
+                                    Plan p = new Plan(L,T,(LogicalFormula)C, B);
+                                    p.setSrcInfo(T.getSrcInfo());
+                                    p.setAsPlanTerm(true);
+                                    return p;
+                                }                                
+                             }
+                             
+                             // the case of a simple plan body term
+                             if (B == null) 
+                                B = new PlanBodyImpl();
+                             B.setAsBodyTerm(true); 
+                             
+                             return B;
+                         }
+}
+
 
 /* Literal */
 Literal literal() :           
@@ -451,14 +529,6 @@ Literal literal() :
   ( ( [ <TK_NEG>              { type = Literal.LNeg; }
       ]
       F=pred()                { 
-         				        if (F.getFunctor().equals("if")) {
-							       F = (Pred)new Pred(".if_then_else").setTerms(F.getTerms());
-							    } else if (F.getFunctor().equals("while")) {
-							       F = (Pred)new Pred(".loop").setTerms(F.getTerms());
-							    } else if (F.getFunctor().equals("for")) {
-							       F = (Pred)new Pred(".foreach").setTerms(F.getTerms());
-							    }
-      
                                 if (F.getFunctor().indexOf(".") >= 0) {
                                    if (F.hasAnnot())
                                       throw new ParseException(getSourceRef(F)+" Internal actions cannot have annotations.");

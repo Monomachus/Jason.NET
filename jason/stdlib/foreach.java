@@ -50,7 +50,7 @@ Implementation of <b>for</b>.
 <pre>
   for ( <i>logical formula</i> ) {
      <i>plan_body</i>
-  };
+  }
 </pre>
 </p>
 
@@ -61,14 +61,14 @@ Implementation of <b>for</b>.
 +event : context
   <- ....
      for ( vl(X) ) {
-        .print(X)     // print all values of X
-     };
+        .print(X);     // print all values of X
+     }
      for ( .member(X,[a,b,c]) ) {
-        .print(X)    // print all members of the list
-     };
+        .print(X);    // print all members of the list
+     }
      for ( .range(I,1,10) ) {
-        .print(I)    // print all values from 1 to 10
-     };
+        .print(I);    // print all values from 1 to 10
+     }
      ....
 </pre>
 The unification resulted from the evaluation of the logical formula is used only inside the loop,
