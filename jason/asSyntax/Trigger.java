@@ -107,7 +107,7 @@ public class Trigger extends Structure implements Cloneable {
 
     @Override
     public Term getTerm(int i) {
-        switch (1) {
+        switch (i) {
         case 0: 
             switch (operator) {
             case add: 
