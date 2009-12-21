@@ -11,6 +11,10 @@ public final class Location implements Serializable {
     }
     
     /** calculates the Manhattan distance between two points */
+    public int distanceManhattan(Location l) {
+        return Math.abs(x - l.x) + Math.abs(y - l.y);
+    }
+    /** calculates the Manhattan distance between two points */
     public int distance(Location l) {
         return Math.abs(x - l.x) + Math.abs(y - l.y);
     }
@@ -20,7 +24,11 @@ public final class Location implements Serializable {
         return Math.sqrt(Math.pow(x - l.x, 2) + Math.pow(y - l.y, 2));
     }
 
-    /** returns Math.max( Math.abs(this.x - l.x) , Math.abs(this.y - l.y)) */
+    /** returns the chessboard king (or Chebyshev) distance between two locations : max( |this.x - l.x| , |this.y - l.y|) */
+    public int distanceChebyshev(Location l) {
+        return Math.max( Math.abs(this.x - l.x) , Math.abs(this.y - l.y));
+    }
+    /** @deprecated renamed to distanceChessboard */
     public int maxBorder(Location l) {
         return Math.max( Math.abs(this.x - l.x) , Math.abs(this.y - l.y));
     }

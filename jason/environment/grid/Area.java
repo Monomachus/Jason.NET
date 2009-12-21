@@ -23,16 +23,19 @@ public final class Area implements Serializable {
         return new Location( (tl.x + br.x)/2, (tl.y + br.y)/2);
     }
 
-    /* -- wrong code!
+    /** @deprecated renamed to chebyshevDistanceToBorder */
     public int distanceMaxBorder(Location l) {
+        return chebyshevDistanceToBorder(l);
+    }
+    
+    /** returns the minimal distance from <i>l</i> to the border of the area */    
+    public int chebyshevDistanceToBorder(Location l) {
         if (contains(l)) 
             return 0;
         int x = Math.min( Math.abs(tl.x - l.x), Math.abs(br.x - l.x));
         int y = Math.min( Math.abs(tl.y - l.y), Math.abs(br.y - l.y));
-        return Math.min(x,y);
+        return Math.max(x,y);
     }
-         */
-    
     
     @Override
     public int hashCode() {

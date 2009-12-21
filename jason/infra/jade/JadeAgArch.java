@@ -173,7 +173,13 @@ public class JadeAgArch extends JadeAg implements AgArchInfraTier {
         try {
             DFService.register(this,dfa);
         } catch (FIPAException e) {
-            logger.log(Level.SEVERE, "Error registering agent in DF", e);
+            try {
+                DFService.deregister(this);
+                DFService.register(this,dfa);
+            } catch (Exception ex) {
+                logger.log(Level.SEVERE, "Error registering agent in DF", e);
+                logger.log(Level.SEVERE, "Error unregistering agent in DF", ex);
+            }
         }
     }
 
