@@ -91,10 +91,19 @@ public class ListTermImpl extends Structure implements ListTerm {
         return t;
     }
     
+    /** make a hard copy of the terms */
     public ListTerm cloneLT() {
         return clone();
     }
     
+    /** make a shallow copy of the list (terms are not cloned, only the structure) */
+    public ListTerm cloneLTShallow() {
+        ListTermImpl t = new ListTermImpl();
+        if (term != null) t.term = this.term;
+        if (next != null) t.next = this.next.clone();
+        return t;
+    }
+
     @Override
     public boolean equals(Object t) {
         if (t == null) return false;
@@ -316,6 +325,17 @@ public class ListTermImpl extends Structure implements ListTerm {
             return getNext().append(t);
         }
     }
+    
+    /** 
+     * insert a term in the begin of this list
+     * @return the new starter of the list
+     */
+    public ListTerm insert(Term t) {
+        ListTerm n = new ListTermImpl(term,next);
+        this.term = t;
+        this.next = n;
+        return n;
+    }
 
     /** 
      * Adds a list in the end of this list.
@@ -477,9 +497,7 @@ public class ListTermImpl extends Structure implements ListTerm {
     
     public void add(int index, Term o) {
         if (index == 0) {
-            ListTerm n = new ListTermImpl(term,next);
-            this.term = o;
-            this.next = n;
+            insert(o);
         } else if (index > 0 && getNext() != null) {
             getNext().add(index-1,o);
         }
@@ -561,7 +579,7 @@ public class ListTermImpl extends Structure implements ListTerm {
         return listIterator(0);
     }
     
-    // TODO: do not base this implementation on get (that is O(n))
+    // TODO: do not base th implementation of listIterator on get (that is O(n))
     // conversely, implement all other methods of List based on this iterator
     // (see AbstractSequentialList)
     // merge code of ListTermIterator here and use always the same iterator

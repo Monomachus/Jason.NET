@@ -101,9 +101,7 @@ public final class NumberTermImpl extends DefaultTerm implements NumberTerm {
             if (solve() < st.solve()) return -1;
             return 0;
         }
-        if (o instanceof Atom)
-            return -1;
-        return super.compareTo(o);    
+        return -1;
     }
 
     public String toString() {

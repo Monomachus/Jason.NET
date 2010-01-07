@@ -113,7 +113,7 @@ public class RunCentralisedMAS {
 
         setupLogger();
 
-        if (args.length == 2) {
+        if (args.length >= 2) {
             if (args[1].equals("-debug")) {
                 debug = true;
                 Logger.getLogger("").setLevel(Level.FINE);
@@ -157,7 +157,7 @@ public class RunCentralisedMAS {
             // set the aslSrcPath in the include
             ((Include)DirectiveProcessor.getDirective("include")).setSourcePath(project.getSourcePaths());
             
-            runner.createAgents(project, debug);
+            runner.createAgs(project, debug);
             runner.startAgs();
             runner.startSyncMode();
 
@@ -329,7 +329,7 @@ public class RunCentralisedMAS {
         return project;
     }
 
-    protected void createAgents(MAS2JProject project, boolean debug) throws JasonException {
+    protected void createAgs(MAS2JProject project, boolean debug) throws JasonException {
         // create environment
         logger.fine("Creating environment " + project.getEnvClass());
         env = new CentralisedEnvironment(project.getEnvClass(), this);
@@ -353,6 +353,8 @@ public class RunCentralisedMAS {
                     String numberedAg = agName;
                     if (ap.qty > 1) {
                         numberedAg += (cAg + 1);
+                        // cannot add zeros before, it causes many compatibility problems and breaks dynamic creation 
+                        // numberedAg += String.format("%0"+String.valueOf(ap.qty).length()+"d", cAg + 1);
                     }
                     logger.fine("Creating agent " + numberedAg + " (" + (cAg + 1) + "/" + ap.qty + ")");
                     CentralisedAgArch agArch;

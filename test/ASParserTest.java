@@ -315,14 +315,14 @@ public class ASParserTest extends TestCase {
         // create the literal 'p(a,3)[s,"s"]'
         l = createLiteral("p", createAtom("a"), createNumber(3))
                              .addAnnots(createAtom("s"), createString("s"));
-        assertEquals("p(a,3)[s,\"s\"]", l.toString());
+        assertEquals("p(a,3)[\"s\",s]", l.toString());
              
         // create the literal '~p(a,3)[s,"s"]'
         l = createLiteral(Literal.LNeg, "p", createAtom("a"), createNumber(3))
                              .addAnnots(createAtom("s"), createString("s"));
-        assertEquals("~p(a,3)[s,\"s\"]", l.toString());
+        assertEquals("~p(a,3)[\"s\",s]", l.toString());
         l = ASSyntax.parseLiteral(l.toString());
-        assertEquals("~p(a,3)[s,\"s\"]", l.toString());
+        assertEquals("~p(a,3)[\"s\",s]", l.toString());
         
         ListTerm   ll = ASSyntax.createList(); // empty list
         assertEquals("[]", ll.toString());

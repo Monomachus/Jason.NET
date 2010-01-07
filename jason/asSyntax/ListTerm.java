@@ -26,6 +26,8 @@ public interface ListTerm extends java.util.List<Term>, Term {
     public ListTerm getPenultimate();
     public Term     removeLast();
     public ListTerm append(Term t);
+    public ListTerm insert(Term t);
+
     public ListTerm concat(ListTerm lt);
     public ListTerm reverse();
     
@@ -38,4 +40,7 @@ public interface ListTerm extends java.util.List<Term>, Term {
 
     /** clone the list term */
     public ListTerm cloneLT();
+    
+    /** make a shallow copy of the list (terms are not cloned, only the structure) */
+    public ListTerm cloneLTShallow();
 }

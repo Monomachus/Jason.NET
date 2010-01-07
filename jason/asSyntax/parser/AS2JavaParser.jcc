@@ -391,8 +391,10 @@ PlanBody stmtIF() :    { Object B; Term T1; Term T2 = null; Literal stmtLiteral;
                        { try {
                             if (T2 == null) {
                                 stmtLiteral = new InternalActionLiteral(ASSyntax.createStructure(".if_then_else", (Term)B, T1), curAg);
+                                stmtLiteral.setSrcInfo( ((Term)B).getSrcInfo() );
                             } else {
                                 stmtLiteral = new InternalActionLiteral(ASSyntax.createStructure(".if_then_else", (Term)B, T1, T2), curAg);
+                                stmtLiteral.setSrcInfo( ((Term)B).getSrcInfo() );
                                 if (! useElse) {
                                    logger.warning(getSourceRef(stmtLiteral)+" warning: use keyword 'else' before the else part of if.");
                                 }
@@ -413,6 +415,7 @@ PlanBody stmtFOR() :   { Object B; Term T1; Literal stmtLiteral; }
    T1 = plan_term()
                        { try {
                             stmtLiteral = new InternalActionLiteral(ASSyntax.createStructure(".foreach", (Term)B, T1), curAg);
+                            stmtLiteral.setSrcInfo( ((Term)B).getSrcInfo() );
                             return new PlanBodyImpl(BodyType.internalAction, stmtLiteral);
                          } catch (Exception e) {
                             e.printStackTrace();
@@ -429,6 +432,7 @@ PlanBody stmtWHILE() : { Object B; Term T1; Literal stmtLiteral; }
    T1 = plan_term()
                        { try {
                             stmtLiteral = new InternalActionLiteral(ASSyntax.createStructure(".loop", (Term)B, T1), curAg);
+                            stmtLiteral.setSrcInfo( ((Term)B).getSrcInfo() );
                             return new PlanBodyImpl(BodyType.internalAction, stmtLiteral);
                          } catch (Exception e) {
                             e.printStackTrace();

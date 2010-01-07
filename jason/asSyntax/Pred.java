@@ -27,6 +27,7 @@ import jason.asSemantics.Unifier;
 import jason.asSyntax.parser.as2j;
 
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -97,72 +98,86 @@ public class Pred extends Structure {
     public boolean apply(Unifier u) {
         boolean r = super.apply(u);
         if (annots != null) {
-            boolean ra = annots.apply(u);
-            r = r || ra;
+            // if some annotation has variables that become ground, they need to be replaced in the list to maintain the order
+            List<Term> toAdd = null; 
+            Iterator<ListTerm> i = annots.listTermIterator();
+            while (i.hasNext()) {
+                ListTerm lt = i.next();
+                if (lt.isTail() && lt.getTail().apply(u)) { // have to test tail before term, since term test may lead to i.remove that remove also the tail
+                    r = true;
+                    lt.getTerm().apply(u); // apply for the term
+                    setAnnots(annots); // sort all annots given in from tail ground
+                    break; // the iterator is inconsistent
+                } else if (lt.getTerm() != null && lt.getTerm().apply(u)) {
+                    r = true;
+                    if (toAdd == null) 
+                        toAdd = new ArrayList<Term>();
+                    toAdd.add( lt.getTerm() );
+                    i.remove();
+                }
+            }            
+            if (toAdd != null)
+                for (Term t: toAdd)
+                    addAnnot(t);
         }
         return r;
     }
     
     @Override       
     public void setAnnots(ListTerm l) {
-        annots = l;
-        if (annots != null && annots.isEmpty()) annots = null;
+        annots = null;
+        Iterator<ListTerm> i = l.listTermIterator();
+        while (i.hasNext()) {
+            ListTerm lt = i.next();
+            if (lt.getTerm() == null)
+                return;
+            addAnnot(lt.getTerm()); // use addAnnot to sort them
+            if (lt.isTail()) {
+                annots.setTail(lt.getTail());
+                return;
+            }
+        }
     }
 
     @Override       
     public boolean addAnnot(Term t) {
-        if (annots == null) annots = new ListTermImpl();
-        if (!annots.contains(t)) {
-            annots.add(t);
-            return true;
+        if (annots == null) 
+            annots = new ListTermImpl();
+        Iterator<ListTerm> i = annots.listTermIterator();
+        while (i.hasNext()) {
+            ListTerm lt = i.next();
+            int c = t.compareTo(lt.getTerm());
+            if (c == 0) { // equals
+                return false;
+            } else if (c < 0) {
+                lt.insert(t);
+                return true;
+            }
         }
         return false;
     }
 
     @Override       
     public Literal addAnnots(List<Term> l) {
-        if (l == null || l.isEmpty()) return this;
-        ListTerm tail;
-        if (annots == null) {
-            annots = new ListTermImpl();
-            tail = annots;
-        } else {
-            tail= annots.getLast();
-        }
-        for (Term t : l) {
-            if (!annots.contains(t)) 
-                tail = tail.append(t);
-        }
+        if (l != null) 
+            for (Term t : l) 
+                addAnnot(t);
         return this;
     }
 
     @Override       
     public Literal addAnnots(Term ... l) {
-        ListTerm tail;
-        if (annots == null) {
-            annots = new ListTermImpl();
-            tail = annots;
-        } else {
-            tail= annots.getLast();
-        }
-        for (Term t : l) {
-            if (!annots.contains(t)) 
-                tail = tail.append(t);
-        }
+        for (Term t : l)
+            addAnnot(t);
         return this;
     }
 
-    /*
     @Override       
-    public void addAnnot(int index, Term t) {
-        if (annots == null) annots = new ListTermImpl();
-        if (!annots.contains(t)) annots.add(index, t);
-    }
-    */
-
-    @Override       
-    public void delAnnot(Term t) {
-        if (annots != null) annots.remove(t);
+    public boolean delAnnot(Term t) {
+        if (annots == null)
+            return false;
+        else
+            return annots.remove(t); // TODO: use the sorted annots to reduce search (as in addAnnot)
     }
 
     @Override       
@@ -177,8 +192,20 @@ public class Pred extends Structure {
 
     @Override       
     public boolean hasAnnot(Term t) {
-        if (annots == null) return false;
-        return annots.contains(t);
+        if (annots == null) 
+            return false;
+        // annots are ordered
+        Iterator<ListTerm> i = annots.listTermIterator();
+        while (i.hasNext()) {
+            ListTerm lt = i.next();
+            int c = t.compareTo(lt.getTerm());
+            if (c == 0) { // equals
+                return true;
+            } else if (c < 0) {
+                return false;
+            }
+        }
+        return false; //annots.contains(t);
     }
 
     @Override       
@@ -188,11 +215,13 @@ public class Pred extends Structure {
 
     @Override
     public boolean hasVar(VarTerm t) {
-        if (super.hasVar(t)) return true;
+        if (super.hasVar(t)) 
+            return true;
         if (annots != null)
-            for (Term v: annots)
+            for (Term v: annots) {
                 if (v.hasVar(t)) 
                     return true;
+            }
         return false;
     }
     
@@ -200,27 +229,23 @@ public class Pred extends Structure {
     public void countVars(Map<VarTerm, Integer> c) {
         super.countVars(c);
         if (annots != null)
-            for (Term t: annots)
+            for (Term t: annots) {
                 t.countVars(c);
+            }
     }
 
     @Override       
     public boolean importAnnots(Literal p) {
         boolean imported = false;
         if (p.hasAnnot()) {
-            if (annots == null) annots = new ListTermImpl();
-            ListTerm tail = annots.getLast();
-            
             Iterator<Term> i = p.getAnnots().iterator();
             while (i.hasNext()) {
                 Term t = i.next();
                 // p will only contain the annots actually added (for Event)
-                if (!annots.contains(t)) {
-                    tail = tail.append(t.clone());
+                if (addAnnot(t.clone())) {
                     imported = true;
                 } else {
-                    // Remove what is not new from p
-                    i.remove();
+                    i.remove(); // Remove what is not new from p
                 }
             }
         }
@@ -232,7 +257,7 @@ public class Pred extends Structure {
         boolean removed = false;
         if (l != null && this.hasAnnot()) {
             for (Term t: l) { 
-                boolean r = annots.remove(t);
+                boolean r = delAnnot(t);
                 removed = removed || r;
             }
         }
@@ -257,64 +282,103 @@ public class Pred extends Structure {
 
     @Override
     public boolean hasSubsetAnnot(Literal p) {
-        if (annots == null) return true;
-        if (hasAnnot() && !p.hasAnnot()) return false;
-        for (Term myAnnot : annots) {
-            if (!p.hasAnnot(myAnnot)) {
+        if (annots == null) 
+            return true;
+        if (hasAnnot() && !p.hasAnnot()) 
+            return false;
+        
+        // both has annots (annots are ordered)
+        Iterator<Term> i2 = p.getAnnots().iterator();
+        int c = -1;
+        for (Term myAnnot : annots) { // all my annots should be member of p annots
+            // move i2 until it is >= myAnnot
+            if (!i2.hasNext())
                 return false;
+            while (i2.hasNext()) {
+                Term t = i2.next();
+                c = myAnnot.compareTo(t);
+                if (c <= 0)
+                    break; // found my annot in p's annots OR my annot is not in p's annots, stop searching 
             }
+            if (c != 0)
+                return false;            
         }
         return true;
     }
 
     @Override
     public boolean hasSubsetAnnot(Literal p, Unifier u) {
-        //return getSubsetAnnots(p,u,null);
+        if (annots == null) 
+            return true;
+        if (!p.hasAnnot()) 
+            return false;
+
+        Term thisTail    = null;
+
+        // since p's annots will be changed, clone the list (but not the terms)
+        ListTerm pAnnots     = p.getAnnots().cloneLTShallow();
+        VarTerm  pTail       = pAnnots.getTail();
+        Term pAnnot          = null;
+        ListTerm pAnnotsTail = null;
+
+        Iterator<Term> i2 = pAnnots.iterator();
+        boolean i2Reset   = false;
         
-        if (annots == null) return true;
-        if (!p.hasAnnot()) return false;
-
-        // since p's annots will be changed, clone them
-        ListTerm pannots = p.getAnnots().cloneLT();
-
-        VarTerm pTail = null;
-        if (pannots.getTail() instanceof VarTerm) pTail = (VarTerm)pannots.getTail();
-
-        for (Term annot : annots) {
+        Iterator<ListTerm> i1 = annots.listTermIterator(); // use this iterator to get the tail of the list
+        while (i1.hasNext()) {
+            ListTerm lt = i1.next();
+            Term annot = lt.getTerm();
+            if (annot == null)
+                break;
+            if (lt.isTail())
+                thisTail = lt.getTail();
+            if (annot.isVar() && !i2Reset) { // when we arrive to the vars in the annots of this, we need to start searching from the begin again
+                i2Reset = true;
+                i2 = pAnnots.iterator();
+                pAnnot = null;
+            }
+            
             // search annot in p's annots
             boolean ok = false;
-            Iterator<Term> j = pannots.iterator();
-            while (j.hasNext() && !ok) {
-                Term pAnnot = j.next();
-                if (u.unifiesNoUndo(annot, pAnnot)) {
+
+            while (true) {
+                if (pAnnot != null && u.unifiesNoUndo(annot, pAnnot)) {
                     ok = true;
-                    j.remove();
+                    i2.remove();
+                    pAnnot = i2.next();
+                    break;
+                } else if (pAnnot != null && pAnnot.compareTo(annot) > 0) {
+                    break; // quite the loop, the current p annot is greater than this annot, so annot is not in p's annots
+                } else if (i2.hasNext()) {
+                    pAnnot = i2.next();
+                } else {
+                    break;
                 }
             }
+            
             // if p has a tail, add annot in p's tail
             if (!ok && pTail != null) {
-                ListTerm pAnnotsTail = (ListTerm) u.get(pTail);
-                if (pAnnotsTail == null) {
-                    pAnnotsTail = new ListTermImpl();
-                    u.unifies(pTail, pAnnotsTail);
+                if (pAnnotsTail == null) { 
                     pAnnotsTail = (ListTerm)u.get(pTail);
+                    if (pAnnotsTail == null) {
+                        pAnnotsTail = new ListTermImpl();
+                        u.unifies(pTail, pAnnotsTail);
+                        pAnnotsTail = (ListTerm)u.get(pTail);
+                    }
                 }
-                pAnnotsTail.add(annot);
+                pAnnotsTail.add(annot.clone());
                 ok = true;
             }
-            if (!ok) return false;
+            if (!ok) 
+                return false;
         }
 
         // if this Pred has a Tail, unify it with p remaining annots
-        Term thisTail = annots.getTail();
-        if (thisTail instanceof VarTerm) {
-            u.unifies(thisTail, pannots);
-        }
-
+        if (thisTail != null)  
+            u.unifies(thisTail, pAnnots);
+        
         return true;
     }
-
-    
     
     @Override
     public void addSource(Term agName) {
@@ -325,7 +389,7 @@ public class Pred extends Structure {
     @Override
     public boolean delSource(Term agName) {
         if (annots != null)
-            return annots.remove(createSource(agName));
+            return delAnnot(createSource(agName));
         else
             return false;
     }
@@ -385,7 +449,7 @@ public class Pred extends Structure {
     @Override
     public boolean hasSource(Term agName) {
         if (annots != null) {
-            return annots.contains(createSource(agName));
+            return hasAnnot(createSource(agName));
         }
         return false;
     }
@@ -435,7 +499,8 @@ public class Pred extends Structure {
     @Override
     public int compareTo(Term t) {
         int c = super.compareTo(t);
-        if (c != 0) return c;
+        if (c != 0) 
+            return c;
         
         if (t.isPred()) {
             Pred tAsPred = (Pred)t;
@@ -446,7 +511,8 @@ public class Pred extends Structure {
             Iterator<Term> pai = tAsPred.getAnnots().iterator();
             for (Term a : getAnnots()) {
                 c = a.compareTo(pai.next());
-                if (c != 0) return c;
+                if (c != 0) 
+                    return c;
             }
 
             final int ats = getAnnots().size();

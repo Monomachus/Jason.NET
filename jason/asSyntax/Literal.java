@@ -215,7 +215,7 @@ public abstract class Literal extends DefaultTerm implements LogicalFormula {
 
     /** adds some annots and return this */
     public Literal addAnnots(List<Term> l)   { logger.log(Level.SEVERE, "addAnnots is not implemented in the class "+this.getClass().getSimpleName(), new Exception()); return null; }
-    public void delAnnot(Term t)             { logger.log(Level.SEVERE, "delAnnot is not implemented in the class "+this.getClass().getSimpleName(), new Exception());  }
+    public boolean delAnnot(Term t)          { logger.log(Level.SEVERE, "delAnnot is not implemented in the class "+this.getClass().getSimpleName(), new Exception());  return false; }
 
     /**
      * removes all annots in this pred that are in the list <i>l</i>.

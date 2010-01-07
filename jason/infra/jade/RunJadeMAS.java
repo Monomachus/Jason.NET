@@ -126,7 +126,7 @@ public class RunJadeMAS extends RunCentralisedMAS {
     }
     
     @Override
-    protected void createAgents(MAS2JProject project, boolean debug) throws JasonException {
+    protected void createAgs(MAS2JProject project, boolean debug) throws JasonException {
         if (!startContainer()) return;
         try {
             // create environment
@@ -160,7 +160,8 @@ public class RunJadeMAS extends RunCentralisedMAS {
     
                     for (int cAg = 0; cAg < ap.qty; cAg++) {
                         String numberedAg = agName;
-                        if (ap.qty > 1) numberedAg += (cAg + 1);
+                        if (ap.qty > 1)
+                            numberedAg += (cAg + 1); //String.format("%0"+String.valueOf(ap.qty).length()+"d", cAg + 1);
                         logger.fine("Creating agent " + numberedAg + " (" + (cAg + 1) + "/" + ap.qty + ")");
                         AgentController ac = cc.createNewAgent(numberedAg, JadeAgArch.class.getName(), new Object[] { ap, debug, project.getControlClass() != null });
                         ags.put(numberedAg,ac);

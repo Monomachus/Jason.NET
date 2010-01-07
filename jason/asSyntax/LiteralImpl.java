@@ -107,13 +107,14 @@ public class LiteralImpl extends Pred implements LogicalFormula {
     
     @Override
     public int compareTo(Term t) {
+        if (t == null) 
+            return -1;
         if (t.isLiteral()) {
             Literal tl = (Literal)t;
-            if (!negated() && tl.negated()) {
+            if (!negated() && tl.negated())
                 return -1;
-            } if (negated() && !tl.negated()) {
+            else if (negated() && !tl.negated())
                 return 1;
-            }
         }
         return super.compareTo(t);
     }        

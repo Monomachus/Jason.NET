@@ -218,11 +218,11 @@ public class TermTest extends TestCase {
         p2.addAnnot(new VarTerm("Y"));
         u = new Unifier();
         // pos(1)[X,ag2] = pos(1)[ag1,Y]
-        assertTrue(u.unifies(p1, p2));
+        //assertTrue(u.unifies(p1, p2));
         //System.out.println("u="+u);
         
         p1.addAnnot(new VarTerm("Z"));
-        p2.addAnnot(new Structure("ag3"));
+        p2.addAnnot(new Structure("ag2"));
         p2.addAnnot(new Structure("ag4"));
         //System.out.println("p1="+p1+"; p2="+p2);
         u = new Unifier();
@@ -330,11 +330,11 @@ public class TermTest extends TestCase {
 
     public void testAnnotsUnify7() throws ParseException {
         // p[a,b,c,d] = p[a,c|R] - ok and R=[b,d]
-        Term t1 = parseTerm("p[a,b,c,d]");
-        Term t2 = parseTerm("p[a,c|R]");
+        Term t1 = parseTerm("p[c,a,b,d,c]");
+        Term t2 = parseTerm("p[c,a,c|R]");
         Unifier u = new Unifier();
         assertTrue(u.unifies(t1, t2));
-        assertEquals(u.get("R").toString(),"[b,d]");
+        assertEquals("[b,d]",u.get("R").toString());
         
         // p[a,c|R] = p[a,b,c,d] - ok and R=[b,d]
         u = new Unifier();
@@ -348,17 +348,17 @@ public class TermTest extends TestCase {
         assertEquals(u.get("H").toString(),"a");
         assertEquals(u.get("R").toString(),"[b,c,d]");
     }  
-    
+
     public void testApplyAnnots() throws ParseException {
         Term t1 = parseTerm("p[a,X,c,d]");
         Unifier u = new Unifier();
         u.unifies(new VarTerm("X"), new Atom("z"));
         t1.apply(u);
-        assertEquals("p[a,z,c,d]",t1.toString());
+        assertEquals("p[a,c,d,z]",t1.toString());
         
         t1 = parseTerm("p[X,b,c,d]");
         t1.apply(u);
-        assertEquals("p[z,b,c,d]",t1.toString());
+        assertEquals("p[b,c,d,z]",t1.toString());
 
         t1 = parseTerm("p[a,b,c,X]");
         t1.apply(u);
@@ -438,15 +438,37 @@ public class TermTest extends TestCase {
         assertFalse(new Unifier().unifies(Literal.parseLiteral("~c(t)"), Literal.parseLiteral("c(t)")));
     }
     
-    public void testSubsetAnnot() {
+    public void testSubsetAnnot() throws ParseException {
         Pred p1 = Pred.parsePred("p1(t1,t2)[a1,a(2,3),a(3)]");
+        assertTrue(p1.hasAnnot(parseTerm("a1")));
+        assertTrue(p1.hasAnnot(parseTerm("a(2,3)")));
+        assertTrue(p1.hasAnnot(parseTerm("a(3)")));
+        assertFalse(p1.hasAnnot(parseTerm("a(4)")));
+        assertFalse(p1.hasAnnot(parseTerm("a")));
+        assertFalse(p1.hasAnnot(parseTerm("4")));
+        assertTrue(p1.hasSubsetAnnot(p1));
+        assertTrue(p1.hasSubsetAnnot(p1, new Unifier()));        
+        
         Pred p2 = Pred.parsePred("p2(t1,t2)[a(2,3),a(3)]");
         assertTrue(p2.hasSubsetAnnot(p1));
-        //assertTrue(p2.getSubsetAnnots(p1.getAnnots(), new Unifier(), null));
-
         assertFalse(p1.hasSubsetAnnot(p2));
-        //assertFalse(p1.getSubsetAnnots(p2.getAnnots(), new Unifier(), null));
+        assertTrue(p2.hasSubsetAnnot(p1, new Unifier()));
+        assertFalse(p1.hasSubsetAnnot(p2, new Unifier()));
         
+        Literal l1 = Literal.parseLiteral("pos[source(ag3)]");
+        Literal l2 = Literal.parseLiteral("pos[source(ag1),source(ag2)]");
+        assertFalse(l1.hasSubsetAnnot(l2));
+        assertFalse(l2.hasSubsetAnnot(l1));
+        assertFalse(l1.hasSubsetAnnot(l2, new Unifier()));
+        assertFalse(l2.hasSubsetAnnot(l1, new Unifier()));
+        
+        l1 = Literal.parseLiteral("pos[a,b,source(ag1),source(percept)]");
+        l2 = Literal.parseLiteral("pos[a]");
+        assertFalse(l1.hasSubsetAnnot(l2));
+        assertTrue(l2.hasSubsetAnnot(l1));
+        assertFalse(l1.hasSubsetAnnot(l2, new Unifier()));
+        assertTrue(l2.hasSubsetAnnot(l1, new Unifier()));
+                                                 
         Pred p3 = Pred.parsePred("p2(t1,t2)[a(A,_),a(X)]");
         Unifier u = new Unifier();
         assertTrue(p3.hasSubsetAnnot(p2,u));
@@ -462,7 +484,7 @@ public class TermTest extends TestCase {
         
         u = new Unifier();
         assertTrue(p1.hasSubsetAnnot(p4, u));
-        assertEquals(u.get("T").toString(), "[a(2,3),a(3)]");
+        assertEquals(u.get("T").toString(), "[a(3),a(2,3)]");
 
         Pred p5 = Pred.parsePred("p1(t1,t2)[a1|[a(2,3),a(3)]]");
         u = new Unifier();
@@ -477,8 +499,50 @@ public class TermTest extends TestCase {
 
         u = new Unifier();
         assertTrue(p6.hasSubsetAnnot(p1, u));
-        assertEquals(u.get("T").toString(), "[a(2,3),a(3)]");
+        assertEquals(u.get("T").toString(), "[a(3),a(2,3)]");
         assertTrue(p1.hasSubsetAnnot(p6, u));
+
+        // test many vars
+        l1 = Literal.parseLiteral(                         "p[4,W,a,b,X,Y,e,Z]");
+        assertTrue( Literal.parseLiteral("p[4]").hasSubsetAnnot(l1));
+        assertTrue( Literal.parseLiteral("p[4]").hasSubsetAnnot(l1, new Unifier()));
+        u = new Unifier();
+        assertTrue(l1.hasSubsetAnnot( Literal.parseLiteral("p[4,5,a,b,c,d,e,f]"), u));
+        assertEquals( 4, u.size()); // all var of l1 needs a value
+        assertEquals("5", u.get("W").toString());
+        assertEquals("c", u.get("X").toString());
+        assertEquals("d", u.get("Y").toString());
+        assertEquals("f", u.get("Z").toString());
+
+        l1 = Literal.parseLiteral(                         "p[4,W,a,b,X,Y,e,Z,U]");
+        u = new Unifier();
+        assertFalse(l1.hasSubsetAnnot( Literal.parseLiteral("p[4,5,a,b,c,d,e,f]"), u));
+
+        // test clone of annot used in hasSubsetAnnot
+        l1 = Literal.parseLiteral("p[b(3),a(Y)|T]");
+        l2 = Literal.parseLiteral("p[a(1),c(H),b(X),d(4)]");
+        u = new Unifier();
+        assertTrue( l2.hasSubsetAnnot(l1, u));
+        assertEquals( "1", u.get("Y").toString());
+        assertEquals( "3", u.get("X").toString());
+        assertEquals( "[c(H),d(4)]", u.get("T").toString());
+        // if we apply H n l2, we should not change H on the unifier
+        u.unifies(new Atom("xx"), new VarTerm("H"));
+        l2.apply(u);
+        assertEquals( "[c(H),d(4)]", u.get("T").toString());
+
+        // test clone of pannot used in hasSubsetAnnot
+        l1 = Literal.parseLiteral("p[b(3),a(Y)|T]");
+        l2 = Literal.parseLiteral("p[a(1),c(H),b(X),d(4)]");
+        u = new Unifier();
+        assertTrue( l1.hasSubsetAnnot(l2, u));
+        assertEquals( "1", u.get("Y").toString());
+        assertEquals( "3", u.get("X").toString());
+        assertEquals( "[c(H),d(4)]", u.get("T").toString());
+        // if we apply H n l2, we should not change H on the unifier
+        u.unifies(new Atom("xx"), new VarTerm("H"));
+        l2.apply(u);
+        assertEquals( "[c(H),d(4)]", u.get("T").toString());    
     }
     
     public void testAnnotUnifAsList() {
@@ -492,29 +556,37 @@ public class TermTest extends TestCase {
         p2 = Pred.parsePred("p(t1,B)[a(X)|R]");
 
         assertTrue(u.unifies(p2,p1));
-        assertEquals(u.get("R").toString(),"[z,a(2,3),a(3)]");
+        assertEquals("[z,a(3),a(2,3)]", u.get("R").toString());
         
         u = new Unifier();
         assertTrue(u.unifies(p1,p2));
         //System.out.println(u+"-"+p2);
         p2.apply(u);
-        assertEquals(p2.toString(),"p(t1,t2)[a(1),z,a(2,3),a(3)]");
+        assertEquals("p(t1,t2)[z,a(1),a(3),a(2,3)]", p2.toString());
     }
     
-    public void testCompare() {
+    public void testCompare() throws ParseException {
+        // order is: numbers, strings, lists, literals (by arity, functor, terms, annots), variables
+        // variables must be the last, subsetannots requires that
+        
         Pred p1 = Pred.parsePred("a");
         Pred p2 = Pred.parsePred("b");
         
         assertEquals(p1.compareTo(p2), -1);
+        assertEquals(p1.compareTo(null), -1);
         assertEquals(p2.compareTo(p1), 1);
         assertEquals(p1.compareTo(p1), 0);
         
         p1 = Pred.parsePred("a(3)[3]");
         p2 = Pred.parsePred("a(3)[10]");
-        Pred p3 = Pred.parsePred("a(3)[10]");
+        Pred p3 = Pred.parsePred("a(3)[10]");        
         assertEquals(1, p2.compareTo(p1));
         assertEquals(-1, p1.compareTo(p2));
         assertEquals(0, p2.compareTo(p3));
+        
+        Term p4 = parseTerm("a");
+        assertTrue(p1.compareTo(p4) > 0);
+        assertTrue(p4.compareTo(p1) < 0);
 
         Literal l1 = Literal.parseLiteral("~a(3)");
         Literal l2 = Literal.parseLiteral("a(3)");
@@ -523,26 +595,24 @@ public class TermTest extends TestCase {
         assertTrue(l1.compareTo(l3) == 1);
         assertTrue(l2.compareTo(l3) == -1);
 
-        assertTrue(l2.compareTo(new Atom("g")) < 0);
-        assertTrue(new Atom("g").compareTo(l2) > 0);
+        assertTrue(l2.compareTo(new Atom("g")) > 0);
+        assertTrue(new Atom("g").compareTo(l2) < 0);
         assertTrue(new Atom("g").compareTo(new Atom("g")) == 0);
 
-        
-        ListTerm l = ListTermImpl.parseList("[~a(3),a(3),a(10)[30],a(10)[5]]");
-        Collections.sort(l);
-        assertEquals(l.toString(), "[a(3),a(10)[5],a(10)[30],~a(3)]");
-        
         ListTerm lt1 = ListTermImpl.parseList("[3,10]");
         ListTerm lt2 = ListTermImpl.parseList("[3,4]");
         ListTerm lt3 = ListTermImpl.parseList("[1,1,1]");
         assertTrue(lt1.compareTo(lt2) > 0);
         assertTrue(lt1.compareTo(lt3) < 0);
-
-        assertTrue(lt1.compareTo(p1) > 0);
+        assertTrue(lt1.compareTo(p1) < 0);
+        
+        ListTerm l = ListTermImpl.parseList("[C,b(4),A,4,b(1,1),\"x\",[],[c],[a],[b,c],[a,b],~a(3),a(e,f),b,a(3),b(3),a(10)[30],a(10)[5],a,a(d,e)]");
+        Collections.sort(l);
+        assertEquals("[4,\"x\",[],[a],[c],[a,b],[b,c],a,b,a(3),a(10)[5],a(10)[30],b(3),b(4),a(d,e),a(e,f),b(1,1),~a(3),A,C]", l.toString());
         
         l = ListTermImpl.parseList("[b,[1,1,1],c,10,g,casa,f(10),5,[3,10],f(4),[3,4]]");
         Collections.sort(l);
-        assertEquals("[5,10,b,c,casa,f(4),f(10),g,[3,4],[3,10],[1,1,1]]",l.toString());
+        assertEquals("[5,10,[3,4],[3,10],[1,1,1],b,c,casa,g,f(4),f(10)]",l.toString());
         
         Term t1 = ASSyntax.createNumber(10);
         Term t2 = ASSyntax.createNumber(10);
@@ -701,8 +771,9 @@ public class TermTest extends TestCase {
     public void testAddAnnots() {
         Literal p1 = Literal.parseLiteral("p1");
         Literal p2 = Literal.parseLiteral("p2[a1,a2]");
-        Literal p3 = Literal.parseLiteral("p3[a2,a3,a4,a5,a6,a7,a8]");
+        Literal p3 = Literal.parseLiteral("p3[a2,a3,a4,a8,a5,a6,a7]");
         
+        assertEquals("p3[a2,a3,a4,a5,a6,a7,a8]",p3.toString()); // annots should be ordered
         p1.addAnnots(Literal.parseLiteral("p").getAnnots());
         assertFalse(p1.hasAnnot());
         
@@ -728,7 +799,7 @@ public class TermTest extends TestCase {
     public void testImportAnnots() {
         Literal p1 = Literal.parseLiteral("p1");
         Literal p2 = Literal.parseLiteral("p2[a1,a2]");
-        Literal p3 = Literal.parseLiteral("p3[a2,a3,a4,a5,a6,a7,a8]");
+        Literal p3 = Literal.parseLiteral("p3[a2,a3,a8,a4,a5,a6,a7]");
         
         assertTrue(p1.importAnnots(p2));
         assertEquals(2,p1.getAnnots().size());

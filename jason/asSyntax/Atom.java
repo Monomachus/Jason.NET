@@ -78,13 +78,14 @@ public class Atom extends Literal {
     }
     
     public int compareTo(Term t) {
+        if (t == null) return -1; // null should be first (required for addAnnot)
         if (t.isNumeric()) return 1;
         
         // this is a list and the other not
-        if (isList() && !t.isList()) return 1;
+        if (isList() && !t.isList()) return -1;
 
         // this is not a list and the other is
-        if (!isList() && t.isList()) return -1;
+        if (!isList() && t.isList()) return 1;
 
         // both are lists, check the size
         if (isList() && t.isList()) {
@@ -96,10 +97,18 @@ public class Atom extends Literal {
             if (l2s > l1s) return -1;
             return 0; // need to check elements (in Structure class)
         }
-        
-        if (t instanceof Atom) { 
-            Atom tAsAtom = (Atom)t;
-            return getFunctor().compareTo(tAsAtom.getFunctor());
+        if (t.isVar())
+            return -1;
+        if (t instanceof Literal) { 
+            Literal tAsLit = (Literal)t;
+            final int ma = getArity();
+            final int oa = tAsLit.getArity();
+            if (ma < oa) 
+                return -1;
+            else if (ma > oa) 
+                return 1;
+            else
+                return getFunctor().compareTo(tAsLit.getFunctor());
         } 
 
         return super.compareTo(t);

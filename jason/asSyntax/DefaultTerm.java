@@ -94,7 +94,10 @@ public abstract class DefaultTerm implements Term, Serializable {
     }
     
     public int compareTo(Term t) {
-        return this.toString().compareTo(t.toString());
+        if (t == null) 
+            return -1;
+        else
+            return this.toString().compareTo(t.toString());
     }
 
     public boolean apply(Unifier u) {

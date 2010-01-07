@@ -98,6 +98,7 @@ public class VarTerm extends LiteralImpl implements NumberTerm, ListTerm, String
         return (ListTerm)clone();
     }
     
+    
     @Override
     public boolean isVar() {
         return value == null;
@@ -199,10 +200,12 @@ public class VarTerm extends LiteralImpl implements NumberTerm, ListTerm, String
     public int compareTo(Term t) {
         if (value != null)
             return value.compareTo(t);
-        else if (t.isUnnamedVar())
+        else if (t == null || t.isUnnamedVar())
             return -1;
-        else
-            return super.compareTo(t);
+        else if (t.isVar())
+            return getFunctor().compareTo(((VarTerm)t).getFunctor());
+        else 
+            return 1; 
     }
 
     // ----------
@@ -509,11 +512,11 @@ public class VarTerm extends LiteralImpl implements NumberTerm, ListTerm, String
     }
 
     @Override
-    public void delAnnot(Term t) {
+    public boolean delAnnot(Term t) {
         if (value != null && getValue().isPred())
-            ((Pred) getValue()).delAnnot(t);
+            return ((Pred) getValue()).delAnnot(t);
         else
-            super.delAnnot(t);
+            return super.delAnnot(t);
     }
 
     @Override
@@ -802,6 +805,12 @@ public class VarTerm extends LiteralImpl implements NumberTerm, ListTerm, String
         else
             return null;
     }
+    public ListTerm insert(Term t) {
+        if (value != null && getValue().isList())
+            return ((ListTerm) getValue()).insert(t);
+        else
+            return null;
+    }
     public ListTerm concat(ListTerm lt) {
         if (value != null && getValue().isList())
             return ((ListTerm) getValue()).concat(lt);
@@ -917,7 +926,13 @@ public class VarTerm extends LiteralImpl implements NumberTerm, ListTerm, String
             return -1;
     }
 
-    
+    public ListTerm cloneLTShallow() {
+        if (value != null && getValue().isList())
+            return ((ListTerm) getValue()).cloneLTShallow();
+        else
+            return null;        
+    }
+
     
     // -----------------------
     // StringTerm interface implementation

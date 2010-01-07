@@ -143,9 +143,6 @@ public class Structure extends Atom {
 
             final int ma = getArity();
             final int oa = tAsStruct.getArity();
-            if (ma < oa) return -1;
-            if (ma > oa) return 1;
-
             for (int i=0; i<ma && i<oa; i++) {
                 c = getTerm(i).compareTo(tAsStruct.getTerm(i));
                 if (c != 0) 

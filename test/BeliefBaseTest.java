@@ -197,6 +197,7 @@ public class BeliefBaseTest extends TestCase {
         c.apply(u);
         c.addSource(Structure.parse("ag3"));
         assertTrue(c.hasAnnot(ASSyntax.parseTerm("source(ag3)")));
+        assertTrue(c.hasSource(ASSyntax.parseTerm("ag3")));
         Literal inBB = bb.contains(c); 
         assertTrue(inBB != null);
         assertFalse(c.hasSubsetAnnot(inBB));
