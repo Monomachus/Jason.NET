@@ -113,5 +113,5 @@
 /* general communication error handler */
 
 @kqmlError 
--!kqml_received(Sender, Per, Content, MsgId)[error(EID), error_msg(EMsg)] 
+-!kqml_received(_Sender, _Per, _Content, _MsgId)[error(EID), error_msg(EMsg)] 
    <- .print("Communication error -- ",EID, ": ", EMsg).      

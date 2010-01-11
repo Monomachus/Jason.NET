@@ -218,10 +218,9 @@ public class Pred extends Structure {
         if (super.hasVar(t)) 
             return true;
         if (annots != null)
-            for (Term v: annots) {
+            for (Term v: annots)
                 if (v.hasVar(t)) 
                     return true;
-            }
         return false;
     }
     
