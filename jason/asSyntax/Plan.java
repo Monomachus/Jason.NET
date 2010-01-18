@@ -102,6 +102,16 @@ public class Plan extends Structure implements Cloneable, Serializable {
         }
     }
     
+    @Override
+    public void setTerm(int i, Term t) {
+        switch (i) {
+        case 0: label   = (Pred)t; break;
+        case 1: tevent  = (Trigger)t; break;
+        case 2: context = (LogicalFormula)t; break;
+        case 3: body    = (PlanBody)t; break;
+        }
+    }
+    
     public void setLabel(Pred p) {
         label = p;
         if (p != null && p.hasAnnot()) {

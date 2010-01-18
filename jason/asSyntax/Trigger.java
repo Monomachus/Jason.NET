@@ -56,8 +56,11 @@ public class Trigger extends Structure implements Cloneable {
     private static Logger logger = Logger.getLogger(Trigger.class.getName());
       
     public enum TEOperator { 
-        add { public String toString() { return "+"; } }, 
-        del { public String toString() { return "-"; } }
+        add     { public String toString() { return "+"; } }, 
+        del     { public String toString() { return "-"; } },
+        end     { public String toString() { return "*"; } },
+        suspend { public String toString() { return "|"; } },
+        resume  { public String toString() { return ">"; } }
     };
     
     public enum TEType { 
@@ -97,34 +100,23 @@ public class Trigger extends Structure implements Cloneable {
     public int getArity() {
         return 2;
     }
-    
-    private static final Term ab = new StringTermImpl("+");
-    private static final Term rb = new StringTermImpl("-");
-    private static final Term ag = new StringTermImpl("+!");
-    private static final Term rg = new StringTermImpl("-!");
-    private static final Term at = new StringTermImpl("+?");
-    private static final Term rt = new StringTermImpl("-?");
 
     @Override
     public Term getTerm(int i) {
         switch (i) {
-        case 0: 
-            switch (operator) {
-            case add: 
-                switch (type) {
-                case belief:  return ab;
-                case achieve: return ag;
-                case test:    return at;
-                }
-            case del:
-                switch (type) {
-                case belief:  return rb;
-                case achieve: return rg;
-                case test:    return rt;
-                }
-            }
-        case  1: return literal;
+        case 0: return new StringTermImpl(operator.toString() + type.toString()); 
+        case 1: return literal;
         default: return null;
+        }
+    }
+    
+    @Override
+    public void setTerm(int i, Term t) {
+        switch (i) {
+        case 0: 
+            logger.warning("setTerm(i,t) for i=0 -- the operator -- , IS NOT IMPLEMENTED YET!!!");
+            break;
+        case  1: literal = (Literal)t; break;
         }
     }
     
@@ -132,6 +124,12 @@ public class Trigger extends Structure implements Cloneable {
         operator = op;
         predicateIndicatorCache  = null;
     }
+    
+    /** returns true if the operator in this trigger is related to meta events: suspend, resume, end goal */ 
+    public boolean isMetaOp() {
+        return operator == TEOperator.end || operator == TEOperator.suspend || operator == TEOperator.resume;
+    }
+    
 
     public boolean sameType(Trigger e) {
         return operator == e.operator && type == e.type;
@@ -152,8 +150,12 @@ public class Trigger extends Structure implements Cloneable {
 
     public boolean isGoal() {
         return type == TEType.achieve || type == TEType.test;
-    }
+    }    
 
+    public TEOperator getOperator() {
+        return operator;
+    }
+    
     public TEType getType() {
         return type;
     }
