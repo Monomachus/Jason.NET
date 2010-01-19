@@ -57,7 +57,6 @@ import java.util.regex.Pattern;
  * 
  * </ul>
  * 
- * @see act.puts
  * @author Felipe Meneguzzi (http://www.meneguzzi.eu/felipe)
  * 
  */
@@ -77,7 +76,7 @@ public class puts extends DefaultInternalAction {
     }
 
     //Pattern regex = Pattern.compile("#\\{\\p{Upper}\\p{Alnum}*\\}");
-    Pattern regex = Pattern.compile("#\\{\\p{ASCII}+\\}");
+    Pattern regex = Pattern.compile("#\\{\\p{Alnum}+\\}");
 
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args)
