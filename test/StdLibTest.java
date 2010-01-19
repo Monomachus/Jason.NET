@@ -264,8 +264,10 @@ public class StdLibTest extends TestCase {
 
     public void testDropGoal2() throws Exception {
         Circumstance c = new Circumstance();
+        Agent ag = new Agent();
+        ag.initAg();
         c.addIntention(intention1);
-        TransitionSystem ts = new TransitionSystem(null, c, null, null);
+        TransitionSystem ts = new TransitionSystem(ag, c, null, null);
         new succeed_goal().drop(ts, Literal.parseLiteral("g2"), new Unifier());
         assertEquals(intention1.size(), 1);
         intention1.push(new IntendedMeans(new Option(p4,new Unifier()), null));

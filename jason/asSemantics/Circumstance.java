@@ -65,7 +65,7 @@ public class Circumstance implements Serializable {
     
     private Map<String, Intention>     PI; // pending intentions, intentions suspended by any other reason                                                        
 
-    private List<CircumstanceListener> listeners = new CopyOnWriteArrayList<CircumstanceListener>();
+    private List<CircumstanceListener> listeners = null; 
 
     public Circumstance() {
         create();
@@ -75,8 +75,8 @@ public class Circumstance implements Serializable {
     /** creates new collections for E, I, MB, PA, PI, and FA */
     public void create() {
         // use LinkedList since we use a lot of remove(0) in selectEvent
-        E = new ConcurrentLinkedQueue<Event>();
-        I = new ConcurrentLinkedQueue<Intention>();
+        E  = new ConcurrentLinkedQueue<Event>();
+        I  = new ConcurrentLinkedQueue<Intention>();
         MB = new LinkedList<Message>();
         PA = new ConcurrentHashMap<Integer, ActionExec>();
         PI = new ConcurrentHashMap<String, Intention>();
@@ -93,8 +93,10 @@ public class Circumstance implements Serializable {
         SI = null;
     }
 
-    public void addAchvGoal(Literal l, Intention i) {
-        addEvent(new Event(new Trigger(TEOperator.add, TEType.achieve, l), i));
+    public Event addAchvGoal(Literal l, Intention i) {
+        Event evt = new Event(new Trigger(TEOperator.add, TEType.achieve, l), i);
+        addEvent(evt);
+        return evt;
     }
 
     public void addExternalEv(Trigger trig) {
@@ -107,10 +109,10 @@ public class Circumstance implements Serializable {
         E.add(ev);
 
         // notify listeners
-        for (CircumstanceListener el : listeners) {
-            el.eventAdded(ev);
-        }
-    }
+        if (listeners != null)
+            for (CircumstanceListener el : listeners) 
+                el.eventAdded(ev);
+    }   
 
     public boolean removeEvent(Event ev) {
         return E.remove(ev);
@@ -144,15 +146,21 @@ public class Circumstance implements Serializable {
     /** Listeners */
 
     public void addEventListener(CircumstanceListener el) {
+        if (listeners == null)
+            listeners = new CopyOnWriteArrayList<CircumstanceListener>();
         listeners.add(el);
     }
 
     public void removeEventListener(CircumstanceListener el) {
-        listeners.remove(el);
+        if (el != null) {
+            listeners.remove(el);
+            if (listeners.isEmpty())
+                listeners = null;
+        }
     }
 
     public boolean hasListener() {
-        return !listeners.isEmpty();
+        return listeners != null && !listeners.isEmpty();
     }
 
     public Collection<CircumstanceListener> getListeners() {
@@ -180,9 +188,10 @@ public class Circumstance implements Serializable {
         if (intention.isAtomic())
             setAtomicIntention(intention);
 
-        // notify listeners
-        for (CircumstanceListener el : listeners)
-            el.intentionAdded(intention);
+        // notify 
+        if (listeners != null)
+            for (CircumstanceListener el : listeners)
+                el.intentionAdded(intention);
     }
 
     public boolean removeIntention(Intention i) {
@@ -192,7 +201,7 @@ public class Circumstance implements Serializable {
         boolean removed = I.remove(i);
 
         // notify listeners
-        if (removed)
+        if (removed && listeners != null)
             for (CircumstanceListener el : listeners)
                 el.intentionDropped(i);
 
@@ -203,11 +212,10 @@ public class Circumstance implements Serializable {
     public void clearIntentions() {
         setAtomicIntention(null);
         
-        for (CircumstanceListener el : listeners) {
-            for (Intention i: I) {
-                el.intentionAdded(i);
-            }            
-        }
+        if (listeners != null)
+            for (CircumstanceListener el : listeners)
+                for (Intention i: I) 
+                    el.intentionDropped(i);
         
         I.clear();
     }
@@ -276,9 +284,9 @@ public class Circumstance implements Serializable {
                 removePendingIntention(key);
                 
                 // check in wait internal action
-                for (CircumstanceListener el : listeners) {
-                    el.intentionDropped(i);
-                }
+                if (listeners != null)
+                    for (CircumstanceListener el : listeners) 
+                        el.intentionDropped(i);
                 return true;
             }
         }
@@ -365,9 +373,10 @@ public class Circumstance implements Serializable {
         ActionExec act = removePendingAction(i.getId());
         if (act != null) {
             // check in wait internal action
-            for (CircumstanceListener el : listeners) {
-                el.intentionDropped(i);
-            }
+            if (listeners != null)
+                for (CircumstanceListener el : listeners) 
+                    el.intentionDropped(i);
+            
             return true;            
         }
         /*

@@ -28,6 +28,7 @@ import jason.RevisionFailedException;
 import jason.architecture.AgArch;
 import jason.asSyntax.ASSyntax;
 import jason.asSyntax.Atom;
+import jason.asSyntax.BinaryStructure;
 import jason.asSyntax.InternalActionLiteral;
 import jason.asSyntax.Literal;
 import jason.asSyntax.LiteralImpl;
@@ -70,6 +71,8 @@ public class TransitionSystem {
     private State         step       = State.StartRC; // first step of the SOS                                                                                                
     private int           nrcslbr    = Settings.ODefaultNRC; // number of reasoning cycles since last belief revision                                                                                                             
     
+    private GoalListener  goalListener = null;
+    
     // both configuration and configuration' point to this
     // object, this is just to make it look more like the SOS
     private TransitionSystem      confP;
@@ -111,6 +114,18 @@ public class TransitionSystem {
             logger = Logger.getLogger(TransitionSystem.class.getName() + "." + arch.getAgName());
         else
             logger = Logger.getLogger(TransitionSystem.class.getName());
+    }
+    
+    
+    /** sets an object that will be notified about events on goals (creation, suspension, ...) */
+    public void setGoalListener(GoalListener gl) {
+        goalListener = gl;
+    }
+    public GoalListener getGoalListener() {
+        return goalListener;
+    }
+    public void removeGoalListener() {
+        goalListener = null;
     }
 
     /** ******************************************************************* */
@@ -522,14 +537,16 @@ public class TransitionSystem {
         // Rule Achieve
         case achieve:
             body = prepareBodyForEvent(body, u);
-            conf.C.addAchvGoal(body, conf.C.SI);
+            Event evt = conf.C.addAchvGoal(body, conf.C.SI);
+            if (goalListener != null) goalListener.goalStarted(evt);
             confP.step = State.StartRC;
             break;
 
         // Rule Achieve as a New Focus (the !! operator)
         case achieveNF:
             body = prepareBodyForEvent(body, u);
-            conf.C.addAchvGoal(body, Intention.EmptyInt);
+            evt  = conf.C.addAchvGoal(body, Intention.EmptyInt);
+            if (goalListener != null) goalListener.goalStarted(evt);
             updateIntention();
             break;
 
@@ -540,12 +557,14 @@ public class TransitionSystem {
                 updateIntention();
             } else {
                 boolean fail = true;
-                if (f instanceof Literal) { // generate event when using literal in the test (no events for log. expr. like ?(a & b))
+                // generate event when using literal in the test (no events for log. expr. like ?(a & b))
+                if (f.isLiteral() && !(f instanceof BinaryStructure)) { 
                     body = prepareBodyForEvent(body, u);
                     if (body.isLiteral()) { // in case body is a var with content that is not a literal (note the VarTerm pass in the instanceof Literal)
                         Trigger te = new Trigger(TEOperator.add, TEType.test, body);
+                        evt = new Event(te, conf.C.SI);
+                        if (goalListener != null) goalListener.goalStarted(evt);
                         if (ag.getPL().hasCandidatePlan(te)) {
-                            Event evt = new Event(te, conf.C.SI);
                             if (logger.isLoggable(Level.FINE)) logger.fine("Test Goal '" + h + "' failed as simple query. Generating internal event for it: "+te);
                             conf.C.addEvent(evt);
                             confP.step = State.StartRC;
@@ -668,8 +687,20 @@ public class TransitionSystem {
     
             // remove the finished IM from the top of the intention
             IntendedMeans topIM = i.pop();
-            Literal topLiteral = topIM.getTrigger().getLiteral();
+            Trigger topTrigger = topIM.getTrigger();
+            Literal topLiteral = topTrigger.getLiteral();
             if (logger.isLoggable(Level.FINE)) logger.fine("Returning from IM "+topIM.getPlan().getLabel()+", te="+topIM.getPlan().getTrigger()+" unif="+topIM.unif);
+            
+            // produce *! event
+            if (topTrigger.getOperator() == TEOperator.add && topTrigger.isGoal()) {
+                if (goalListener != null) 
+                    goalListener.goalFinished(topTrigger);
+                Trigger eEnd = new Trigger(TEOperator.end, topTrigger.getType(), topLiteral.copy());
+                if (ag.getPL().hasCandidatePlan(eEnd)) {
+                    getC().addEvent(new Event(eEnd, null)); // TODO: discuss whether put this event on top of i or null
+                    //return; // if event on top of i, return here
+                }
+            }
             
             // if finished a failure handling IM ...
             if (im.getTrigger().isGoal() && !im.getTrigger().isAddition() && i.size() > 0) {
@@ -799,6 +830,11 @@ public class TransitionSystem {
         boolean failEeventGenerated = false;
         IntendedMeans im = i.peek();
         if (im.isGoalAdd()) {
+            // notify listener
+            if (goalListener != null)
+                goalListener.goalFailed(im.getTrigger());
+            
+            // produce failure event
             Event failEvent = findEventForFailure(i, im.getTrigger());
             if (failEvent != null) {
                 setDefaultFailureAnnots(failEvent, im.getCurrentStep().getBodyTerm(), failAnnots);
@@ -833,6 +869,11 @@ public class TransitionSystem {
         Trigger tevent = ev.trigger;
         boolean failEeventGenerated = false;
         if (tevent.isAddition() && tevent.isGoal()) {
+            // notify listener
+            if (goalListener != null)
+                goalListener.goalFailed(tevent);
+            
+            // produce failure event
             Event failEvent = findEventForFailure(ev.intention, tevent);
             if (failEvent != null) {
                 setDefaultFailureAnnots(failEvent, tevent.getLiteral(), failAnnots);
@@ -860,13 +901,16 @@ public class TransitionSystem {
         if (i != Intention.EmptyInt) {
             ListIterator<IntendedMeans> ii = i.iterator();
             while (!getAg().getPL().hasCandidatePlan(failTrigger) && ii.hasPrevious()) {
+                // TODO: pop IM until +!g or *!g (this TODO is valid only if meta events are pushed on top of the intention)
+                // If *!g is found first, no failure event
+                // - while popping, if some meta event (* > !) is in the stack, stop and simple pop instead of producing an failure event
                 IntendedMeans im = ii.previous();
                 tevent = im.getTrigger();
                 failTrigger = new Trigger(TEOperator.del, tevent.getType(), tevent.getLiteral());
             }
         }
         // if some failure handling plan is found
-        if (tevent.isGoal() && getAg().getPL().hasCandidatePlan(failTrigger)) {
+        if (tevent.isGoal() && tevent.isAddition() && getAg().getPL().hasCandidatePlan(failTrigger)) {
             return new Event(failTrigger.clone(), i);
         }
         return null;
@@ -969,7 +1013,7 @@ public class TransitionSystem {
 
             ActionExec action = C.getAction(); 
             if (action != null) {
-                C.addPendingAction(action);
+                C.addPendingAction(action);                
                 // We need to send a wrapper for FA to the user so that add method then calls C.addFA (which control atomic things)
                 agArch.act(action, C.getFeedbackActionsWrapper());
             }

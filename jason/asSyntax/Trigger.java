@@ -47,7 +47,7 @@ import org.w3c.dom.Element;
   (it extends structure to be used as a term)
    
   @opt attributes    
-  @navassoc - literal   - Literal
+  @navassoc - literal  - Literal
   @navassoc - operator - TEOperator
   @navassoc - type     - TEType
 */

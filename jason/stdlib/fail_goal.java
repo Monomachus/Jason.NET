@@ -89,11 +89,15 @@ public class fail_goal extends succeed_goal {
     int dropIntention(Intention i, Trigger g, TransitionSystem ts, Unifier un) throws JasonException {
         if (i != null) {
         	if (i.dropGoal(g, un)) {
+        	    // notify listener
+                if (ts.getGoalListener() != null)
+                    ts.getGoalListener().goalFailed(g);
+                
                 // generate failure event
 	            Event failEvent = null;
 	            if (!i.isFinished()) {
 	                failEvent = ts.findEventForFailure(i, i.peek().getTrigger());
-	            } else { // it was a intention with g as the only IM (that was dropped), normally when !! is used
+	            } else { // it was an intention with g as the only IM (that was dropped), normally when !! is used
 	                failEvent = ts.findEventForFailure(i, g); // find fail event for the goal just dropped	            	
 	            }
 	            if (failEvent != null) {

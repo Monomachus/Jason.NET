@@ -105,7 +105,7 @@ public class Agent {
         checkCustomSelectOption();
     }
 
-    /** initialise the TS and other components of the agent */
+    /** Initialises the TS and other components of the agent */
     public void initAg() {
         if (bb == null) bb = new DefaultBeliefBase();
         if (pl == null) pl = new PlanLibrary();

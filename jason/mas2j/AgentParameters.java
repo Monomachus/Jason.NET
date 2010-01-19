@@ -1,6 +1,7 @@
 package jason.mas2j;
 
 import jason.architecture.AgArch;
+import jason.asSemantics.Agent;
 import jason.asSyntax.directives.Include;
 import jason.bb.DefaultBeliefBase;
 import jason.runtime.Settings;
@@ -103,13 +104,13 @@ public class AgentParameters {
             }
             s.append("] ");
         }
-        if (archClass != null && archClass.getClassName().length() > 0) {
+        if (archClass != null && archClass.getClassName().length() > 0 && !archClass.getClassName().equals(AgArch.class.getName())) {
             s.append("agentArchClass "+archClass+" ");
         }
-        if (agClass != null && agClass.getClassName().length() > 0) {
+        if (agClass != null && agClass.getClassName().length() > 0 && !agClass.getClassName().equals(Agent.class.getName())) {
             s.append("agentClass "+agClass+" ");
         }
-        if (bbClass != null && bbClass.getClassName().length() > 0) {
+        if (bbClass != null && bbClass.getClassName().length() > 0 && !bbClass.getClassName().equals(DefaultBeliefBase.class.getName())) {
             s.append("beliefBaseClass "+bbClass+" ");
         }
         if (qty > 1) {

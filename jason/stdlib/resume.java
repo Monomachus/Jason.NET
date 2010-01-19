@@ -26,6 +26,7 @@ package jason.stdlib;
 import jason.JasonException;
 import jason.asSemantics.Circumstance;
 import jason.asSemantics.DefaultInternalAction;
+import jason.asSemantics.Event;
 import jason.asSemantics.Intention;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
@@ -90,17 +91,27 @@ public class resume extends DefaultInternalAction {
                     ik.remove();
                     
                     // remove the IA .suspend in case of self-suspend
-                    if (k.equals(suspend.SELF_SUSPENDED_INT)) {
+                    if (k.equals(suspend.SELF_SUSPENDED_INT))
                         i.peek().removeCurrentStep();
-                    }
                     
                     // add it back in I if not in PA
-                    if (! C.getPendingActions().containsKey(i.getId())) {
+                    if (! C.getPendingActions().containsKey(i.getId()))
                         C.addIntention(i);
-                    }
+                    
+                    // notify listeners
+                    produceGoalResumedEvent(ts, g);
                 }
             }
         }
         return true;
     }        
+    
+    protected void produceGoalResumedEvent(TransitionSystem ts, Trigger goal) {
+        if (ts.getGoalListener() != null)
+            ts.getGoalListener().goalResumed(goal);
+        
+        Trigger tg = new Trigger(TEOperator.resume, goal.getType(), goal.getLiteral().copy());
+        if (ts.getAg().getPL().hasCandidatePlan(tg))
+            ts.getC().addEvent(new Event(tg, null)); // TODO: discuss whether put this event on top of i or null
+    }
 }

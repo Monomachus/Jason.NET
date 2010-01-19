@@ -334,6 +334,9 @@ Trigger trigger() :
 {
   ( "+"        { teOp = TEOperator.add; }
   | "-"        { teOp = TEOperator.del; }
+  | "*"        { teOp = TEOperator.end; }
+  | "|"        { teOp = TEOperator.suspend; }
+  | ">"        { teOp = TEOperator.resume; }
   )
   
   [ ( "!"      { teType = TEType.achieve; }

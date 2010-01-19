@@ -96,6 +96,8 @@ public class suspend extends DefaultInternalAction {
             suspendIntention = true;
             i.setSuspended(true);
             C.addPendingIntention(SELF_SUSPENDED_INT, i);
+            if (i.peek().isGoalAdd())
+                produceGoalSuspendedEvent(ts,i.peek().getTrigger());
             return true;
         }
         
@@ -112,6 +114,7 @@ public class suspend extends DefaultInternalAction {
             if (i.hasTrigger(g, un)) {
                 i.setSuspended(true);
                 C.getPendingIntentions().put(k, i);
+                produceGoalSuspendedEvent(ts,g);
             }
         }
         
@@ -119,6 +122,7 @@ public class suspend extends DefaultInternalAction {
         for (Intention i: C.getPendingIntentions().values()) {
             if (i.hasTrigger(g, un)) { 
                 i.setSuspended(true);
+                produceGoalSuspendedEvent(ts,g);
             }
         }
 
@@ -127,6 +131,7 @@ public class suspend extends DefaultInternalAction {
                 i.setSuspended(true);
                 C.removeIntention(i);
                 C.getPendingIntentions().put(k, i);
+                produceGoalSuspendedEvent(ts,g);
             }
         }
         
@@ -136,6 +141,7 @@ public class suspend extends DefaultInternalAction {
             suspendIntention = true;
             i.setSuspended(true);
             C.getPendingIntentions().put(SELF_SUSPENDED_INT, i);
+            produceGoalSuspendedEvent(ts,g);
         }
             
         // suspending G in Events
@@ -148,11 +154,21 @@ public class suspend extends DefaultInternalAction {
                 i.setSuspended(true);
                 C.removeEvent(e);                    
                 C.getPendingIntentions().put(k, i);
+                produceGoalSuspendedEvent(ts,g);
             } else if (i == Intention.EmptyInt && un.unifies(e.getTrigger(), g)) { // the case of !!
                 ts.getLogger().warning("** NOT IMPLEMENTED ** (suspend of !!)");
             }
         }
         return true;
+    }
+    
+    protected void produceGoalSuspendedEvent(TransitionSystem ts, Trigger goal) {
+        if (ts.getGoalListener() != null)
+            ts.getGoalListener().goalSuspended(goal);
+        
+        Trigger tg = new Trigger(TEOperator.suspend, goal.getType(), goal.getLiteral().copy());
+        if (ts.getAg().getPL().hasCandidatePlan(tg))
+            ts.getC().addEvent(new Event(tg, null)); // TODO: discuss whether put this event on top of i or null
     }
 
     @Override

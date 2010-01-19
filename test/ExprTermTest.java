@@ -17,6 +17,7 @@ import jason.asSyntax.VarTerm;
 import jason.asSyntax.parser.ParseException;
 
 import java.util.Collections;
+import java.util.Iterator;
 
 import junit.framework.TestCase;
 
@@ -36,6 +37,7 @@ public class ExprTermTest extends TestCase {
         assertEquals(nb.solve(),new NumberTermImpl(5).solve());
 
         nb = ArithExpr.parseExpr("3+2*5");
+        assertFalse(nb.isLiteral());
         assertTrue(nb.solve() == 13);
 
         nb = ArithExpr.parseExpr("(3+2)*5");
@@ -215,5 +217,21 @@ public class ExprTermTest extends TestCase {
         ArithFunctionTerm nb = (ArithFunctionTerm)ArithExpr.parseExpr(ag,".count(b(_))");
         nb.apply(new Unifier());
         assertEquals(2.0,nb.solve());
+    }
+    
+    public void testRelExpType() throws ParseException {
+        assertTrue(ASSyntax.parseFormula("N>1").isLiteral()); // they need to be literal for unification test
+        assertTrue(ASSyntax.parseFormula("a & b").isLiteral());
+        
+        Literal l = ASSyntax.parseLiteral("b(_, (B & not X))");
+        Unifier u = new Unifier();
+        l.makeVarsAnnon(u);
+        assertEquals(2, u.size());
+        Agent ag = new Agent(); ag.initAg();
+        ag.getBB().add(ASSyntax.parseLiteral("b(10, (vl(X) & not X > 10))"));
+        Iterator<Unifier> i = l.logicalConsequence(ag, new Unifier());
+        assertTrue(i.hasNext());
+        l.apply(i.next());
+        assertEquals("b(10,(vl(X) & not ((X > 10))))", l.toString());
     }
 }
