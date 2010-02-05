@@ -1,7 +1,7 @@
 ### Plugin properties
 
 plugin.jason.jeditplugin.JasonIDPlugin.name=Jason
-plugin.jason.jeditplugin.JasonIDPlugin.version=0.2
+plugin.jason.jeditplugin.JasonIDPlugin.version=0.3
 plugin.jason.jeditplugin.JasonIDPlugin.author=Jomi F. Hubner
 plugin.jason.jeditplugin.JasonIDPlugin.docs=index.html
 plugin.jason.jeditplugin.JasonIDPlugin.activate=startup

@@ -3,7 +3,7 @@
 #
 firstTime=false
 view.fontsize=14
-view.antiAlias=true
+view.antiAlias=subpixel
 view.eolMarkers=false
 view.gutter.lineNumbers=true
 view.toolbar.alternateLayout=true
@@ -17,6 +17,8 @@ buffertabs.color-variation=true
 buffertabs.icons=true
 buffertabs.enable=true
 buffertabs.location=top
+buffertabs.close-tab-on.single-middle-click=false
+buffertabs.close-tab-on.double-left-click=false
 error-list.dock-position=bottom
 projectviewer.dock-position=left
 buffer.sidekick.keystroke-parse=true

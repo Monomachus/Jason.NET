@@ -4,6 +4,7 @@ import jason.JasonException;
 import jason.asSyntax.Literal;
 import jason.asSyntax.Term;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
@@ -115,15 +116,15 @@ public abstract class ConcurrentInternalAction implements InternalAction {
     
     /** resume the intention identified by intentionKey */
     public void resumeInt(TransitionSystem ts, String intentionKey) {
-        resume(ts, intentionKey, false);
+        resume(ts, intentionKey, false, null);
     }
 
     /** fails the intention identified by intentionKey */
     public void failInt(TransitionSystem ts, String intentionKey) {
-        resume(ts, intentionKey, true);
+        resume(ts, intentionKey, true, JasonException.createBasicErrorAnnots( "fail_resume", "Error resuming pending intention"));
     }
 
-    synchronized private void resume(final TransitionSystem ts, final String intentionKey, final boolean abort) {
+    synchronized public static void resume(final TransitionSystem ts, final String intentionKey, final boolean abort, final List<Term> failAnnots) {
         // invoke changes in C latter, so to avoid concurrent changes in C
         ts.runAtBeginOfNextCycle(new Runnable() {
             public void run() {
@@ -134,7 +135,7 @@ public abstract class ConcurrentInternalAction implements InternalAction {
                     try {
                         if (abort) {
                             // fail the IA
-                            ts.generateGoalDeletion(pi, null);                
+                            ts.generateGoalDeletion(pi, failAnnots);             
                         } else {
                             pi.peek().removeCurrentStep(); // remove the internal action that put the intention in suspend
                             ts.applyClrInt(pi);
