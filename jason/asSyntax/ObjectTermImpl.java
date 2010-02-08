@@ -30,8 +30,18 @@ public class ObjectTermImpl extends DefaultTerm implements ObjectTerm {
     public boolean equals(Object o) {
         if (this.o == null) return false;
         if (o == null) return false;
-        if (!(o instanceof ObjectTermImpl)) return false;
-        return this.o.equals(((ObjectTermImpl) o).o);
+        
+        if (o instanceof ObjectTermImpl) {
+            return this.o.equals(((ObjectTermImpl) o).o);
+        }
+        
+        if (o instanceof VarTerm) {
+            Term value = ((VarTerm) o).getValue();
+            if (value instanceof ObjectTermImpl) {
+                return this.o.equals(((ObjectTermImpl) value).o);
+            }
+        }
+        return false;        
     }
     
     @Override

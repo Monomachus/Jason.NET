@@ -943,4 +943,13 @@ public class TermTest extends TestCase {
         assertFalse(iterator.hasNext());
 
     }
+    
+    public void testVarObTerm() {
+        ObjectTerm term = new ObjectTermImpl("test");
+        VarTerm variable = new VarTerm("Variable");
+        variable.setValue(term);
+        assertTrue(term.equals(variable));
+        assertTrue(variable.equals(term));
+        assertTrue(variable.equals(new ObjectTermImpl("test")));
+    }    
 }
