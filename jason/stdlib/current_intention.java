@@ -88,6 +88,7 @@ import jason.asSyntax.Term;
   @see jason.stdlib.succeed_goal
   @see jason.stdlib.fail_goal
   @see jason.stdlib.suspend
+  @see jason.stdlib.suspended
   @see jason.stdlib.resume
 */
 public class current_intention extends DefaultInternalAction {

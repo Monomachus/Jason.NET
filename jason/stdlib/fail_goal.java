@@ -68,6 +68,7 @@ import jason.asSyntax.Trigger.TEOperator;
   @see jason.stdlib.succeed_goal
   @see jason.stdlib.current_intention
   @see jason.stdlib.suspend
+  @see jason.stdlib.suspended
   @see jason.stdlib.resume
   
  */

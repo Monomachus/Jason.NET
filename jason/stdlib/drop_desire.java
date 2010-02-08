@@ -65,6 +65,8 @@ import java.util.Iterator;
   @see jason.stdlib.succeed_goal
   @see jason.stdlib.fail_goal
   @see jason.stdlib.intend
+  @see jason.stdlib.suspend
+  @see jason.stdlib.suspended
 
 
  */

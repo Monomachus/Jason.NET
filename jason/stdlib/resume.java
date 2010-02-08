@@ -61,6 +61,7 @@ import java.util.Iterator;
   @see jason.stdlib.fail_goal
   @see jason.stdlib.current_intention
   @see jason.stdlib.suspend
+  @see jason.stdlib.suspended
    
  */
 public class resume extends DefaultInternalAction {

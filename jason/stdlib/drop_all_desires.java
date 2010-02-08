@@ -55,6 +55,7 @@ import jason.asSyntax.Term;
   @see jason.stdlib.fail_goal
   @see jason.stdlib.current_intention
   @see jason.stdlib.suspend
+  @see jason.stdlib.suspended
   @see jason.stdlib.resume
 
  */

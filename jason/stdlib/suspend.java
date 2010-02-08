@@ -54,6 +54,7 @@ import jason.asSyntax.Trigger.TEType;
 
   </ul>
 
+  @see jason.stdlib.suspended
   @see jason.stdlib.intend
   @see jason.stdlib.desire
   @see jason.stdlib.drop_all_desires
