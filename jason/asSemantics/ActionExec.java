@@ -41,6 +41,8 @@ public class ActionExec implements Serializable {
     private Literal   action;
     private Intention intention;
     private boolean   result;
+    private Literal   failureReason;
+    private String    failureMsg;
     
     public ActionExec(Literal ac, Intention i) {
         action = ac;
@@ -76,6 +78,17 @@ public class ActionExec implements Serializable {
     }
     public void setResult(boolean ok) {
         result = ok;
+    }
+    
+    public void setFailureReason(Literal reason, String msg) {
+        failureReason = reason;
+        failureMsg    = msg;
+    }
+    public String getFailureMsg() {
+        return failureMsg;
+    }
+    public Literal getFailureReason() {
+        return failureReason;
     }
     
     public String toString() {

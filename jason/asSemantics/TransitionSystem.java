@@ -30,6 +30,7 @@ import jason.asSyntax.ASSyntax;
 import jason.asSyntax.Atom;
 import jason.asSyntax.BinaryStructure;
 import jason.asSyntax.InternalActionLiteral;
+import jason.asSyntax.ListTerm;
 import jason.asSyntax.Literal;
 import jason.asSyntax.LiteralImpl;
 import jason.asSyntax.LogicalFormula;
@@ -382,7 +383,12 @@ public class TransitionSystem {
                         updateIntention();
                         applyClrInt(confP.C.SI);
                     } else {
-                        generateGoalDeletion(conf.C.SI, JasonException.createBasicErrorAnnots("action_failed", ""));
+                        String reason = a.getFailureMsg();
+                        if (reason == null) reason = "";
+                        ListTerm annots = JasonException.createBasicErrorAnnots("action_failed", reason);
+                        if (a.getFailureReason() != null) 
+                            annots.append(a.getFailureReason());
+                        generateGoalDeletion(conf.C.SI, annots);
                     }
                 } else {
                     applyProcAct(); // get next action
