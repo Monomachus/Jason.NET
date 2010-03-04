@@ -405,6 +405,40 @@ public class ListTermImpl extends Structure implements ListTerm {
         return result;
     }
 
+    /**   returns all subsets that take k elements of this list */ 
+    public List<List<Term>> subSets(int k) {
+        List<List<Term>> result = new ArrayList<List<Term>>();
+        generateSubSets(new ArrayList<Term>(), getAsList(), k, result);
+        return result;
+    }
+    private static void generateSubSets(List<Term> prefix, List<Term> elements, int k, List<List<Term>> result) {
+        if (k == 0) {
+            result.add(prefix);
+        } else {
+            int esize = elements.size();
+            for (int i = 0; i < esize; i++) {
+                List<Term> np = new ArrayList<Term>(prefix); // prepare new prefix
+                np.add(elements.get(i));
+                generateSubSets(np, elements.subList(i+1, esize), k-1, result);
+            }
+        }
+    }      
+    /*
+    public List<List<Term>> subSets(int k, Set<PredicateIndicator> types) {
+        List<List<Term>> result = new ArrayList<List<Term>>();
+        List<Term> annots = new ArrayList<Term>();
+        for (Term t: this) 
+            if (t.isLiteral()) {
+                if (types.contains( ((Literal)t).getPredicateIndicator() ))
+                    annots.add(t);
+            } else {
+                annots.add(t);                
+            }
+        
+        generateSubSets(new ArrayList<Term>(), annots, k, result);
+        return result;
+    }     
+     */
     /** 
      * gives an iterator that includes the final empty list or tail, 
      * for [a,b,c] returns [a,b,c]; [b,c]; [c]; and [].

@@ -124,19 +124,22 @@ public class Pred extends Structure {
     }
     
     @Override       
-    public void setAnnots(ListTerm l) {
+    public Literal setAnnots(ListTerm l) {
         annots = null;
+        if (l == null)
+            return this;
         Iterator<ListTerm> i = l.listTermIterator();
         while (i.hasNext()) {
             ListTerm lt = i.next();
             if (lt.getTerm() == null)
-                return;
+                return this;
             addAnnot(lt.getTerm()); // use addAnnot to sort them
             if (lt.isTail()) {
                 annots.setTail(lt.getTail());
-                return;
+                return this;
             }
         }
+        return this;
     }
 
     @Override       

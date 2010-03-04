@@ -324,5 +324,17 @@ public class ListTermTest extends TestCase {
         assertEquals("[a,b,d,e]", l3.difference(l1).toString());
         assertEquals("[]", l1.difference(l2).toString());
     }
+    
+    public void testSubSet() {
+        ListTerm l3 = ListTermImpl.parseList("[a,b,c,8]");
+        /*Set<PredicateIndicator> types = new HashSet<PredicateIndicator>();
+        types.add( ((Literal)l3.get(1) ).getPredicateIndicator());
+        types.add( ((Literal)l3.get(2) ).getPredicateIndicator());
+        types.add( ((Literal)l3.get(3) ).getPredicateIndicator());*/
+        assertEquals("[[a], [b], [c], [8]]", l3.subSets(1).toString());
+        assertEquals("[[a, b], [a, c], [a, 8], [b, c], [b, 8], [c, 8]]", l3.subSets(2).toString());
+        assertEquals("[[a, b, c], [a, b, 8], [a, c, 8], [b, c, 8]]", l3.subSets(3).toString());
+        assertEquals("[[a, b, c, 8]]", l3.subSets(4).toString());
+    }
 
 }

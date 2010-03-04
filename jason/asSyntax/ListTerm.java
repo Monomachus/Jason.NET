@@ -35,6 +35,10 @@ public interface ListTerm extends java.util.List<Term>, Term {
     public ListTerm intersection(ListTerm lt);
     public ListTerm difference(ListTerm lt);
     
+    /** returns all subsets that take k elements of this list */ 
+    public List<List<Term>> subSets(int k);
+
+    
     public Iterator<ListTerm> listTermIterator();
     public List<Term> getAsList();
 

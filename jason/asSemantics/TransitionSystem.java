@@ -271,6 +271,7 @@ public class TransitionSystem {
             applyRelApplPlRule2("applicable");
     }
 
+    /** generates goal deletion event */
     private void applyRelApplPlRule2(String m) throws JasonException {
         confP.step = State.ProcAct; // default next step
         if (conf.C.SE.trigger.isGoal()) {
@@ -472,7 +473,12 @@ public class TransitionSystem {
                 }
                 bTerm = h.getBodyTerm();
             } else {
+                ListTerm annots = ((VarTerm)bTerm).getAnnots();
                 bTerm = bValue;
+                if (bTerm instanceof Literal && annots != null) {
+                    bTerm = ((Literal)bTerm).forceFullLiteralImpl();
+                    ((Literal)bTerm).addAnnots(annots);
+                }
             }
         }
             

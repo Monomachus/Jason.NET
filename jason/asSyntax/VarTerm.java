@@ -446,16 +446,17 @@ public class VarTerm extends LiteralImpl implements NumberTerm, ListTerm, String
     // ----------
 
     @Override
-    public void setAnnots(ListTerm l) {
+    public Literal setAnnots(ListTerm l) {
         if (value != null)
             if (getValue().isPred())
-                ((Pred) getValue()).setAnnots(l);
+                return ((Pred) getValue()).setAnnots(l);
             else
                 logger.log(Level.WARNING, "The setAnnots '"+l+"' in "+this+" was lost, since this var value is not a Pred. The value's class is "+getValue().getClass().getName(), new Exception());
         else
-            super.setAnnots(l);
+            return super.setAnnots(l);
+        return this;
     }
-
+    
     @Override
     public boolean importAnnots(Literal p) {
         if (value != null)
@@ -768,6 +769,13 @@ public class VarTerm extends LiteralImpl implements NumberTerm, ListTerm, String
     public List<Term> subList(int arg0, int arg1) {
         if (value != null && getValue().isList())
             return ((ListTerm) getValue()).subList(arg0, arg1);
+        else
+            return null;
+    }
+    
+    public List<List<Term>> subSets(int k) {
+        if (value != null && getValue().isList())
+            return ((ListTerm) getValue()).subSets(k);
         else
             return null;
     }

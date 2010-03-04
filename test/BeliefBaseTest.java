@@ -356,6 +356,26 @@ public class BeliefBaseTest extends TestCase {
         assertEquals(ag.findBel(Literal.parseLiteral("k(X,c)"), new Unifier()).toString(), "k(20,c)");
     }
     
+    
+    public void testLogConsWithAnnotsBacktracking() {
+        Agent ag = new Agent();
+        ag.initAg();
+
+        ag.getBB().add(Literal.parseLiteral("p(10)[source(ag1),source(ag2),b,40,2]"));
+        ag.getBB().add(Literal.parseLiteral("p(10)[source(ag3),source(ag2),b,40,2]"));
+        ag.getBB().add(Literal.parseLiteral("p(20)[source(ag4),source(ag2),b,u,k]"));
+        ag.getBB().add(Literal.parseLiteral("p(30)[source(ag5),source(ag2),40,u,k]"));
+
+        Iterator<Unifier> iun = Literal.parseLiteral("p(Y)[source(X),b]").logicalConsequence(ag, new Unifier());
+        int c = 0;
+        while (iun.hasNext()) {
+            iun.next();
+            c++;
+        }
+        assertEquals(5, c);
+    }
+    
+    
     public void testPercept1() {
         BeliefBase bb = new DefaultBeliefBase();
         assertTrue(bb.add(Literal.parseLiteral("a[source(percept)]")));

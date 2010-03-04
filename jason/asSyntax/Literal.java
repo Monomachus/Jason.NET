@@ -207,7 +207,7 @@ public abstract class Literal extends DefaultTerm implements LogicalFormula {
     public void setTerm(int i, Term t)       { logger.log(Level.SEVERE, "setTerm is not implemented in the class "+this.getClass().getSimpleName(), new Exception());  }
     
     // pred
-    public void setAnnots(ListTerm l)        { logger.log(Level.SEVERE, "setAnnots is not implemented in the class "+this.getClass().getSimpleName(), new Exception());  }
+    public Literal setAnnots(ListTerm l)         { logger.log(Level.SEVERE, "setAnnots is not implemented in the class "+this.getClass().getSimpleName(), new Exception()); return null; }
     public boolean addAnnot(Term t)          { logger.log(Level.SEVERE, "addAnnot("+t+") is not implemented in the class "+this.getClass().getSimpleName()+" of object "+this, new Exception()); return false; }
     
     /** adds some annots and return this */
@@ -258,7 +258,9 @@ public abstract class Literal extends DefaultTerm implements LogicalFormula {
         final Iterator<Literal> il   = ag.getBB().getCandidateBeliefs(this, un);
         if (il == null) // no relevant bels
             return LogExpr.EMPTY_UNIF_LIST.iterator();
-        final AgArch            arch = ag == null ? null : ag.getTS().getUserAgArch();
+        
+        final AgArch            arch     = (ag == null ? null : ag.getTS().getUserAgArch());
+        final int               nbAnnots = (hasAnnot() ? getAnnots().size() : 0);
         
         return new Iterator<Unifier>() {
             Unifier           current = null;
@@ -266,6 +268,9 @@ public abstract class Literal extends DefaultTerm implements LogicalFormula {
             Literal           cloneAnnon = null; // a copy of the literal with makeVarsAnnon
             Rule              rule; // current rule
             boolean           needsUpdate = true;
+            
+            Iterator<List<Term>>  annotsOptions = null;
+            Literal               belInBB = null;
             
             public boolean hasNext() {
                 if (needsUpdate)
@@ -282,58 +287,21 @@ public abstract class Literal extends DefaultTerm implements LogicalFormula {
                 return a;
             }
 
-            /*
             private void get() {
                 needsUpdate = false;
                 current     = null;
                 if (arch != null && !arch.isRunning()) return;
                 
-                // try rule iterator
-                while (ruleIt != null && ruleIt.hasNext()) {
-                    // unifies the rule head with the result of rule evaluation
-                    Unifier ruleUn = ruleIt.next(); // evaluation result
-                    if (ruleUn.unifiesNoUndo(Literal.this, rule)) {
-                        current = ruleUn;
+                // try annots iterator
+                while (annotsOptions != null && annotsOptions.hasNext()) {
+                    Literal belToTry = belInBB.copy().setAnnots(null).addAnnots( annotsOptions.next() );
+                    
+                    Unifier u = un.clone();
+                    if (u.unifiesNoUndo(Literal.this, belToTry)) {
+                        current = u;
                         return;
-                    }
+                    }                    
                 }
-                
-                // try literal iterator
-                //
-                // we make the variables in the belief (be it a fact or rule) and not
-                // in this as this may be included in the scope of a plan. if we rename
-                // the variables in this and it is in the scope of a plan then the
-                // variables in the event and the body of the plan won't reflect the
-                // naming. thus, making the resulting unifier not reflect the entire
-                // scope of the plan.                
-                while (il.hasNext()) {
-                    Literal b = il.next(); // b is the relevant entry in BB
-                    if (b.isRule()) {
-                        rule = (Rule)b.clone();
-                        rule.makeVarsAnnon(); // make the variables in the rule anonymous 
-                        Unifier ruleUn = un.clone();
-                        if (ruleUn.unifiesNoUndo(Literal.this, rule)) { 
-                            // the rule head unifies with the literal so match the body                        
-                            ruleIt = rule.getBody().logicalConsequence(ag,ruleUn);
-                            get();
-                            if (current != null) { // if it get a value
-                                return;
-                            }
-                        }
-                    } else {
-                        Unifier u = un.clone();
-                        if (u.unifiesNoUndo(Literal.this, b)) { // b.copy().makeVarsAnnon())) { 
-                            current = u;
-                            return;
-                        }
-                    }
-                }
-            }*/
-            
-            private void get() {
-                needsUpdate = false;
-                current     = null;
-                if (arch != null && !arch.isRunning()) return;
                 
                 // try rule iterator
                 while (ruleIt != null && ruleIt.hasNext()) {
@@ -352,9 +320,9 @@ public abstract class Literal extends DefaultTerm implements LogicalFormula {
                 
                 // try literal iterator
                 while (il.hasNext()) {
-                    Literal b = il.next(); // b is the relevant entry in BB
-                    if (b.isRule()) {
-                        rule = (Rule)b;
+                    belInBB = il.next(); // b is the relevant entry in BB
+                    if (belInBB.isRule()) {
+                        rule = (Rule)belInBB;
                         
                         // create a copy of this literal, ground it and 
                         // make its vars anonymous, 
@@ -369,15 +337,26 @@ public abstract class Literal extends DefaultTerm implements LogicalFormula {
                         if (ruleUn.unifiesNoUndo(cloneAnnon, rule)) { // the rule head unifies with the literal
                             ruleIt = rule.getBody().logicalConsequence(ag,ruleUn);
                             get();
-                            if (current != null) { // if it get a value
+                            if (current != null) // if it get a value
+                                return;
+                        }
+                    } else { // not rule
+                        if (nbAnnots > 0) { // try annots backtracking
+                            if (belInBB.hasAnnot()) {
+                                int nbAnnotsB = belInBB.getAnnots().size();
+                                if (nbAnnotsB >= nbAnnots) {
+                                    annotsOptions = belInBB.getAnnots().subSets( nbAnnots ).iterator();
+                                    get();
+                                    if (current != null) // if it get a value
+                                        return;
+                                }
+                            }
+                        } else {
+                            Unifier u = un.clone();
+                            if (u.unifiesNoUndo(Literal.this, belInBB)) {
+                                current = u;
                                 return;
                             }
-                        }
-                    } else {
-                        Unifier u = un.clone();
-                        if (u.unifiesNoUndo(Literal.this, b)) {
-                            current = u;
-                            return;
                         }
                     }
                 }
