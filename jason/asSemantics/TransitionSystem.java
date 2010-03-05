@@ -453,17 +453,15 @@ public class TransitionSystem {
             Term bValue = u.get((VarTerm)bTerm);
             if (bValue == null) { // the case of !A with A not ground
                 String msg = h.getSrcInfo()+": "+ "Variable '"+bTerm+"' must be ground.";
-                if (!generateGoalDeletion(conf.C.SI, JasonException.createBasicErrorAnnots("body_var_unground", msg))) {
+                if (!generateGoalDeletion(conf.C.SI, JasonException.createBasicErrorAnnots("body_var_unground", msg)))
                     logger.log(Level.SEVERE, msg);
-                }
                 return;
             }
             if (bValue.isPlanBody()) { 
                 if (h.getBodyType() != BodyType.action) { // the case of ...; A = { !g }; +g; ....
                     String msg = h.getSrcInfo()+": "+ "The operator '"+h.getBodyType()+"' is lost with the variable '"+bTerm+"' unified with a plan body '"+bValue+"'. ";
-                    if (!generateGoalDeletion(conf.C.SI, JasonException.createBasicErrorAnnots("body_var_with_op", msg))) {
+                    if (!generateGoalDeletion(conf.C.SI, JasonException.createBasicErrorAnnots("body_var_with_op", msg))) 
                         logger.log(Level.SEVERE, msg);
-                    }
                     return;
                 }
                 h = (PlanBody)bValue;
@@ -475,7 +473,7 @@ public class TransitionSystem {
             } else {
                 ListTerm annots = ((VarTerm)bTerm).getAnnots();
                 bTerm = bValue;
-                if (bTerm instanceof Literal && annots != null) {
+                if (bTerm.isLiteral() && annots != null) {
                     bTerm = ((Literal)bTerm).forceFullLiteralImpl();
                     ((Literal)bTerm).addAnnots(annots);
                 }
