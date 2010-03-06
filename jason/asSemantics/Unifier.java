@@ -212,7 +212,7 @@ public class Unifier implements Cloneable {
         // string), they must be equal
         // (for unification, lists are literals)
         if (!t1g.isLiteral() && !t1g.isList() || !t2g.isLiteral() && !t2g.isList())
-        	return t1g.equals(t2g);
+            return t1g.equals(t2g);
 
         // both terms are literal
 
