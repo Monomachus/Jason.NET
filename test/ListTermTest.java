@@ -331,10 +331,18 @@ public class ListTermTest extends TestCase {
         types.add( ((Literal)l3.get(1) ).getPredicateIndicator());
         types.add( ((Literal)l3.get(2) ).getPredicateIndicator());
         types.add( ((Literal)l3.get(3) ).getPredicateIndicator());*/
-        assertEquals("[[a], [b], [c], [8]]", l3.subSets(1).toString());
-        assertEquals("[[a, b], [a, c], [a, 8], [b, c], [b, 8], [c, 8]]", l3.subSets(2).toString());
-        assertEquals("[[a, b, c], [a, b, 8], [a, c, 8], [b, c, 8]]", l3.subSets(3).toString());
-        assertEquals("[[a, b, c, 8]]", l3.subSets(4).toString());
+        assertEquals("[[a], [b], [c], [8]]", iterator2list(l3.subSets(1)).toString());
+        assertEquals("[[a, b], [a, c], [a, 8], [b, c], [b, 8], [c, 8]]", iterator2list(l3.subSets(2)).toString());
+        assertEquals("[[a, b, c], [a, b, 8], [a, c, 8], [b, c, 8]]", iterator2list(l3.subSets(3)).toString());
+        assertEquals("[[a, b, c, 8]]", iterator2list(l3.subSets(4)).toString());
+    }
+    
+    @SuppressWarnings("unchecked")
+    List iterator2list(Iterator i) {
+        List l = new ArrayList();
+        while (i.hasNext())
+            l.add(i.next());
+        return l;
     }
 
 }

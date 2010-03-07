@@ -773,7 +773,7 @@ public class VarTerm extends LiteralImpl implements NumberTerm, ListTerm, String
             return null;
     }
     
-    public List<List<Term>> subSets(int k) {
+    public Iterator<List<Term>> subSets(int k) {
         if (value != null && getValue().isList())
             return ((ListTerm) getValue()).subSets(k);
         else

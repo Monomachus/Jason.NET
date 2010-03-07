@@ -23,7 +23,7 @@ public class AboutGUI {
     
         JOptionPane.showMessageDialog(parent,
         version +  build+
-        "Copyright (C) 2003-2008  Jomi F. Hubner & Rafael H. Bordini.\n\n"+
+        "Copyright (C) 2003-2010  Jomi F. Hubner & Rafael H. Bordini.\n\n"+
         "This library is free software; you can redistribute it and/or\n"+
         "modify it under the terms of the GNU Lesser General Public\n"+
         "License as published by the Free Software Foundation; either\n"+
@@ -40,7 +40,7 @@ public class AboutGUI {
         "Musees Nationaux, France). Photograph by Herve Lewandowski.\n\n"+
         "To contact the authors:\n"+
         "http://www.inf.ufrgs.br/~bordini\n"+
-        "http://www.emse.fr/~hubner",
+        "http://www.das.ufsc.br/~jomi",
         "JasonID - About",
         JOptionPane.INFORMATION_MESSAGE,
         new ImageIcon(JasonID.class.getResource("/images/Jason-GMoreau-Small.jpg")));

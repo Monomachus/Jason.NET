@@ -31,6 +31,7 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
@@ -405,7 +406,60 @@ public class ListTermImpl extends Structure implements ListTerm {
         return result;
     }
 
-    /**   returns all subsets that take k elements of this list */ 
+    /** returns all subsets that take k elements of this list */
+    public Iterator<List<Term>> subSets(int k) {
+        // DFS algorithm
+        final List<SubSetSearchState> open = new LinkedList<SubSetSearchState>(); // states to explore
+        open.add(new SubSetSearchState(new ArrayList<Term>(), getAsList(), k)); // initial state (root of search tree)
+        return new Iterator<List<Term>>() {
+            List<Term> next = null;
+            
+            public boolean hasNext() {
+                if (next == null) 
+                    getNext();
+                return next != null;
+            }
+            
+            public List<Term> next() {
+                List<Term> r = next;
+                getNext();
+                return r;
+            }
+            
+            void getNext() {
+                while (! open.isEmpty() ) {
+                    SubSetSearchState s = open.remove(0);
+                    if (s.k == 0) {
+                        next = s.prefix;
+                        return;
+                    } else {
+                        s.addNexts(open);
+                    }
+                }
+                next = null;
+            }
+            
+            public void remove() { }
+        };
+    }
+    
+    class SubSetSearchState {
+        List<Term> prefix, elements; 
+        int k;
+        SubSetSearchState(List<Term> p, List<Term> e, int k) {  
+            prefix = p; elements = e; this.k = k; 
+        }
+        void addNexts(List<SubSetSearchState> open) {
+            int esize = elements.size();
+            for (int i = esize-1; i >= 0; i--) {
+                List<Term> np = new ArrayList<Term>(prefix);
+                np.add(elements.get(i));
+                open.add(0, new SubSetSearchState(np, elements.subList(i+1, esize), k-1));
+            }
+        }
+    }
+    
+    /*
     public List<List<Term>> subSets(int k) {
         List<List<Term>> result = new ArrayList<List<Term>>();
         generateSubSets(new ArrayList<Term>(), getAsList(), k, result);
@@ -422,7 +476,9 @@ public class ListTermImpl extends Structure implements ListTerm {
                 generateSubSets(np, elements.subList(i+1, esize), k-1, result);
             }
         }
-    }      
+    }
+    */
+    
     /*
     public List<List<Term>> subSets(int k, Set<PredicateIndicator> types) {
         List<List<Term>> result = new ArrayList<List<Term>>();

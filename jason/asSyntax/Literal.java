@@ -345,7 +345,7 @@ public abstract class Literal extends DefaultTerm implements LogicalFormula {
                             if (belInBB.hasAnnot()) {
                                 int nbAnnotsB = belInBB.getAnnots().size();
                                 if (nbAnnotsB >= nbAnnots) {
-                                    annotsOptions = belInBB.getAnnots().subSets( nbAnnots ).iterator();
+                                    annotsOptions = belInBB.getAnnots().subSets( nbAnnots );
                                     get();
                                     if (current != null) // if it get a value
                                         return;
