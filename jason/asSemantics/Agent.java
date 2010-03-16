@@ -652,7 +652,7 @@ public class Agent {
         List<Literal>[] result = null;
         try {
             if (beliefToAdd != null) {
-                if (logger.isLoggable(Level.FINE)) logger.fine("adding belief " + beliefToAdd);
+                if (logger.isLoggable(Level.FINE)) logger.fine("Adding belief " + beliefToAdd);
                 
                 if (getBB().add(beliefToAdd)) {
                     result = new List[2];
@@ -669,7 +669,7 @@ public class Agent {
                     u = new Unifier();
                 }
     
-                if (logger.isLoggable(Level.FINE)) logger.fine("doing brf for " + beliefToDel + " in BB=" + believes(beliefToDel, u));
+                if (logger.isLoggable(Level.FINE)) logger.fine("Doing brf for " + beliefToDel + " in BB=" + believes(beliefToDel, u));
                 
                 if (believes(beliefToDel, u)) {
                     beliefToDel.apply(u);

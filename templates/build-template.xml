@@ -40,7 +40,7 @@
         <condition property="srcdir" value="${basedir}/src/java" else="${basedir}" >
             <available file="${basedir}/src/java" />
         </condition>
-        <javac srcdir="${srcdir}" destdir="${build.dir}" debug="true" optimize="true" >
+        <javac srcdir="${srcdir}" destdir="${build.dir}" debug="true" optimize="true" includeantruntime="false" >
             <classpath refid="project.classpath"/>
         </javac>
     </target>

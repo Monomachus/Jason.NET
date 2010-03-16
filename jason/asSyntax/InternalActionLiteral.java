@@ -27,6 +27,7 @@ import jason.asSemantics.Agent;
 import jason.asSemantics.InternalAction;
 import jason.asSemantics.Unifier;
 
+import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -87,6 +88,11 @@ public class InternalActionLiteral extends Structure {
                 } else if (oresult instanceof Iterator) {
                     return ((Iterator<Unifier>)oresult);
                 }
+            } catch (ConcurrentModificationException e) {
+                System.out.println("*-*-* .count concurrent exception - try later");
+                // try again later
+                try { Thread.sleep(200); } catch (InterruptedException e1) {                }
+                return logicalConsequence(ag, un);
             } catch (Exception e) {
                 logger.log(Level.SEVERE, getErrorMsg() + ": " + e.getMessage(), e);
             }
