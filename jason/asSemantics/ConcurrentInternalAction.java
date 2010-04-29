@@ -139,7 +139,7 @@ public abstract class ConcurrentInternalAction implements InternalAction {
                         } else {
                             pi.peek().removeCurrentStep(); // remove the internal action that put the intention in suspend
                             ts.applyClrInt(pi);
-                            C.addIntention(pi); // add it back in I
+                            C.resumeIntention(pi); // add it back in I
                         }
                     } catch (JasonException e) {
                         ts.getLogger().log(Level.SEVERE, "Error resuming intention", e);

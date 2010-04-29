@@ -56,11 +56,9 @@ public class Trigger extends Structure implements Cloneable {
     private static Logger logger = Logger.getLogger(Trigger.class.getName());
       
     public enum TEOperator { 
-        add     { public String toString() { return "+"; } }, 
-        del     { public String toString() { return "-"; } },
-        end     { public String toString() { return "*"; } },
-        suspend { public String toString() { return "|"; } },
-        resume  { public String toString() { return ">"; } }
+        add        { public String toString() { return "+"; } }, 
+        del        { public String toString() { return "-"; } },
+        goalState  { public String toString() { return "^"; } },
     };
     
     public enum TEType { 
@@ -123,11 +121,6 @@ public class Trigger extends Structure implements Cloneable {
     public void setTrigOp(TEOperator op) {
         operator = op;
         predicateIndicatorCache  = null;
-    }
-    
-    /** returns true if the operator in this trigger is related to meta events: suspend, resume, end goal */ 
-    public boolean isMetaOp() {
-        return operator == TEOperator.end || operator == TEOperator.suspend || operator == TEOperator.resume;
     }
     
 

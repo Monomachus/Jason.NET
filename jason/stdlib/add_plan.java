@@ -25,6 +25,7 @@ package jason.stdlib;
 
 import jason.JasonException;
 import jason.asSemantics.DefaultInternalAction;
+import jason.asSemantics.GoalListenerForMetaEvents;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.ASSyntax;
@@ -117,6 +118,10 @@ public class add_plan extends DefaultInternalAction {
         } else { // args[0] is a plan
             ts.getAg().getPL().add( transform2plan(args[0]), source, before);
         }
+        
+        if (ts.getAg().getPL().hasMetaEventPlans())
+            ts.addGoalListener(new GoalListenerForMetaEvents(ts));
+
         return true;
     }
     

@@ -26,7 +26,6 @@ package jason.stdlib;
 import jason.JasonException;
 import jason.asSemantics.Circumstance;
 import jason.asSemantics.DefaultInternalAction;
-import jason.asSemantics.Event;
 import jason.asSemantics.Intention;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
@@ -97,22 +96,11 @@ public class resume extends DefaultInternalAction {
                     
                     // add it back in I if not in PA
                     if (! C.getPendingActions().containsKey(i.getId()))
-                        C.addIntention(i);
-                    
-                    // notify listeners
-                    produceGoalResumedEvent(ts, g);
+                        C.resumeIntention(i);
                 }
             }
         }
         return true;
     }        
     
-    protected void produceGoalResumedEvent(TransitionSystem ts, Trigger goal) {
-        if (ts.getGoalListener() != null)
-            ts.getGoalListener().goalResumed(goal);
-        
-        Trigger tg = new Trigger(TEOperator.resume, goal.getType(), goal.getLiteral().copy());
-        if (ts.getAg().getPL().hasCandidatePlan(tg))
-            ts.getC().addEvent(new Event(tg, null)); // TODO: discuss whether put this event on top of i or null
-    }
 }

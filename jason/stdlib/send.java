@@ -209,7 +209,7 @@ public class send extends DefaultInternalAction {
                             Structure send = (Structure)intention.peek().removeCurrentStep();
                             intention.peek().getUnif().unifies(send.getTerm(3), new Atom("timeout"));
                             // add the intention back in C.I
-                            ts.getC().addIntention(intention);
+                            ts.getC().resumeIntention(intention);
                             ts.getUserAgArch().getArchInfraTier().wake();                                
                         }
                     }

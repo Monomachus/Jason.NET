@@ -28,6 +28,7 @@ import jason.asSemantics.ActionExec;
 import jason.asSemantics.Circumstance;
 import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.Event;
+import jason.asSemantics.GoalListener;
 import jason.asSemantics.Intention;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
@@ -95,7 +96,7 @@ public class succeed_goal extends DefaultInternalAction {
         
         for (Intention i: C.getIntentions()) {
             if (dropIntention(i, g, ts, un) > 1) {
-                C.removeIntention(i);
+                C.dropIntention(i);
             }
         }
         
@@ -126,10 +127,12 @@ public class succeed_goal extends DefaultInternalAction {
             Intention i = a.getIntention();
             int r = dropIntention(i, g, ts, un);
             if (r > 0) { // i was changed
-                C.dropPendingAction(i); // remove i from PA
-                if (r == 1) {           // i must continue running
-                    C.addIntention(i);  // and put the intention back in I
-                }                       // if r > 1, the event was generated and i will be back soon
+                if (r == 1) {                          // i must continue running
+                    C.removePendingAction(i.getId());  // remove i from PA
+                    C.resumeIntention(i);              // and put the intention back in I
+                } else {                               // if r > 1, the event was generated and i will be back soon
+                    C.dropPendingAction(i);
+                }
             }
         }
         
@@ -137,9 +140,11 @@ public class succeed_goal extends DefaultInternalAction {
         for (Intention i: C.getPendingIntentions().values()) {
             int r = dropIntention(i, g, ts, un);
             if (r > 0) { 
-                C.dropPendingIntention(i); 
                 if (r == 1) { 
-                    C.addIntention(i); 
+                    C.removePendingIntention(i.getId()); 
+                    C.resumeIntention(i); 
+                } else {
+                    C.dropPendingIntention(i);
                 }
             }
         }
@@ -152,6 +157,10 @@ public class succeed_goal extends DefaultInternalAction {
      */
     int dropIntention(Intention i, Trigger g, TransitionSystem ts, Unifier un) throws JasonException {
         if (i != null && i.dropGoal(g, un)) {
+            if (ts.hasGoalListener())
+                for (GoalListener gl: ts.getGoalListeners())
+                    gl.goalFinished(g);
+
             // continue the intention
             if (!i.isFinished()) { // could be finished after i.dropGoal() !!
                 if (ts.getC().getSelectedIntention() != i) // if i is not the current intention, remove
@@ -170,6 +179,9 @@ public class succeed_goal extends DefaultInternalAction {
         Circumstance C = ts.getC();
         C.removeEvent(e);
         if (i != null) {
+            if (ts.hasGoalListener())
+                for (GoalListener gl: ts.getGoalListeners())
+                    gl.goalFinished(e.getTrigger());
             i.peek().removeCurrentStep();
             ts.applyClrInt(i);
             C.addIntention(i);

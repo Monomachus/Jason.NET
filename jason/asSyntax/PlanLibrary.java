@@ -60,6 +60,8 @@ public class PlanLibrary implements Iterable<Plan> {
     /** A map from labels to plans */
     private Map<String,Plan> planLabels = new HashMap<String,Plan>();
     
+    private boolean hasMetaEventPlans = false; 
+    
     private static int lastPlanLabel = 0;
 
     //private Logger logger = Logger.getLogger(PlanLibrary.class.getName());  
@@ -200,6 +202,9 @@ public class PlanLibrary implements Iterable<Plan> {
                 codesList.add(p);
         }
 
+        if (pte.getOperator() == TEOperator.goalState)
+            hasMetaEventPlans = true;
+        
         if (before)
             plans.add(0,p);
         else
@@ -216,6 +221,10 @@ public class PlanLibrary implements Iterable<Plan> {
         for (Plan p: plans) { 
             add(p, false);
         }
+    }
+    
+    public boolean hasMetaEventPlans() {
+        return hasMetaEventPlans; 
     }
 
     /** add a label to the plan */

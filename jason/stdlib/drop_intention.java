@@ -110,7 +110,7 @@ public class drop_intention extends DefaultInternalAction {
     
         for (Intention i: C.getIntentions()) {
             if (i.hasTrigger(g, un)) {
-                C.removeIntention(i);
+                C.dropIntention(i);
                 un = bak.clone();
             }
         }

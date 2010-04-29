@@ -119,7 +119,13 @@ public class Circumstance implements Serializable {
     }
     
     public void clearEvents() {
-        E.clear();
+        // notify listeners
+        if (listeners != null)
+            for (CircumstanceListener el : listeners)
+                for (Event ev: E)
+                    el.intentionDropped(ev.getIntention());
+        
+        E.clear();        
     }
 
     public Queue<Event> getEvents() {
@@ -194,20 +200,34 @@ public class Circumstance implements Serializable {
                 el.intentionAdded(intention);
     }
 
+    /** add the intention back to I, and also notify meta listeners that the goals are resumed  */
+    public void resumeIntention(Intention intention) {
+        addIntention(intention);
+        
+        // notify meta event listeners
+        if (listeners != null)
+            for (CircumstanceListener el : listeners)
+                el.intentionResumed(intention);
+    }
+
     public boolean removeIntention(Intention i) {
         if (i == AI) {
             setAtomicIntention(null);
         }
-        boolean removed = I.remove(i);
-
-        // notify listeners
-        if (removed && listeners != null)
-            for (CircumstanceListener el : listeners)
-                el.intentionDropped(i);
-
-        return removed;
+        return I.remove(i);
     }
 
+    /** removes and produces events to signal that the intention was dropped */
+    public boolean dropIntention(Intention i) {
+        if (removeIntention(i)) {
+            if (listeners != null)
+                for (CircumstanceListener el : listeners)
+                    el.intentionDropped(i);
+            return true;
+        } else {
+            return false;
+        }
+    }
     
     public void clearIntentions() {
         setAtomicIntention(null);
@@ -256,6 +276,12 @@ public class Circumstance implements Serializable {
     }
     
     public void clearPendingIntentions() {
+        // notify listeners
+        if (listeners != null)
+            for (CircumstanceListener el : listeners)
+                for (Intention i: PI.values())
+                    el.intentionDropped(i);
+        
         PI.clear();
     }
     
@@ -265,14 +291,26 @@ public class Circumstance implements Serializable {
             atomicIntSuspended = true;
         }
         PI.put(id, i);
+        
+        if (listeners != null)
+            for (CircumstanceListener el : listeners)
+                el.intentionSuspended(i, id);
     }
     
-    public Intention removePendingIntention(String id) {
-        Intention i = PI.remove(id);
+    public Intention removePendingIntention(String pendingId) {
+        Intention i = PI.remove(pendingId);
         if (i != null && i.isAtomic()) {
             atomicIntSuspended = false;
         }
         return i;
+    }
+    public Intention removePendingIntention(int intentionId) {
+        for (String key: PI.keySet()) {
+            Intention pii = PI.get(key);
+            if (pii.getId() == intentionId) 
+                return removePendingIntention(key);
+        }
+        return null;
     }
     
     /** removes the intention i from PI and notify listeners that the intention was dropped */
@@ -361,6 +399,12 @@ public class Circumstance implements Serializable {
     }
     
     public void clearPendingActions() {
+        // notify listeners
+        if (listeners != null)
+            for (CircumstanceListener el : listeners)
+                for (ActionExec act: PA.values())
+                    el.intentionDropped(act.getIntention());
+        
         PA.clear();
     }
 

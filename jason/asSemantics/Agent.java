@@ -143,11 +143,15 @@ public class Agent {
                 }
             }
 
+            
             if (parsingOk) {
+                if (getPL().hasMetaEventPlans())
+                    getTS().addGoalListener(new GoalListenerForMetaEvents(getTS()));
+                
                 addInitialBelsInBB();
                 addInitialGoalsInTS();
             }
-
+            
             // kqml Plans at the end of the ag PS
             if (JasonException.class.getResource("/asl/kqmlPlans.asl") != null) { 
                 setASLSrc("kqmlPlans.asl");
@@ -216,7 +220,8 @@ public class Agent {
         a.internalActions = new HashMap<String, InternalAction>();
         a.initDefaultFunctions();
         a.setTS(new TransitionSystem(a, this.getTS().getC().clone(), this.getTS().getSettings(), arch));
-
+        if (a.getPL().hasMetaEventPlans())
+            a.getTS().addGoalListener(new GoalListenerForMetaEvents(a.getTS()));
         return a;
     }
     
@@ -425,7 +430,7 @@ public class Agent {
             g.makeVarsAnnon();
             if (! g.hasSource())
                 g.addAnnot(BeliefBase.TSelf);
-            getTS().getC().addAchvGoal(g,Intention.EmptyInt);
+            getTS().getC().addAchvGoal(g,Intention.EmptyInt);            
         }
     }
 
@@ -444,6 +449,8 @@ public class Agent {
             for (Plan p: a.getPL()) {
                 this.getPL().add(p, false);
             }
+            if (getPL().hasMetaEventPlans())
+                getTS().addGoalListener(new GoalListenerForMetaEvents(getTS()));            
         }
     }
     

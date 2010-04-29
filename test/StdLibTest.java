@@ -268,6 +268,7 @@ public class StdLibTest extends TestCase {
         ag.initAg();
         c.addIntention(intention1);
         TransitionSystem ts = new TransitionSystem(ag, c, null, null);
+        assertFalse(ts.hasGoalListener());
         new succeed_goal().drop(ts, Literal.parseLiteral("g2"), new Unifier());
         assertEquals(intention1.size(), 1);
         intention1.push(new IntendedMeans(new Option(p4,new Unifier()), null));

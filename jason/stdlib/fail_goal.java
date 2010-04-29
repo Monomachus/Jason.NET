@@ -25,6 +25,7 @@ package jason.stdlib;
 
 import jason.JasonException;
 import jason.asSemantics.Event;
+import jason.asSemantics.GoalListener;
 import jason.asSemantics.Intention;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
@@ -91,8 +92,9 @@ public class fail_goal extends succeed_goal {
         if (i != null) {
         	if (i.dropGoal(g, un)) {
         	    // notify listener
-                if (ts.getGoalListener() != null)
-                    ts.getGoalListener().goalFailed(g);
+                if (ts.hasGoalListener())
+                    for (GoalListener gl: ts.getGoalListeners())
+                        gl.goalFailed(g);
                 
                 // generate failure event
 	            Event failEvent = null;

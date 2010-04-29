@@ -185,7 +185,7 @@ public class wait extends DefaultInternalAction {
                                 if (si.isSuspended()) { // if the intention was suspended by .suspend
                                     c.addPendingIntention(suspend.SUSPENDED_INT+si.getId(), si);
                                 } else {
-                                    c.addIntention(si);
+                                    c.resumeIntention(si);
                                 }
                             }
                         }    
@@ -211,7 +211,8 @@ public class wait extends DefaultInternalAction {
         }
 
         public void intentionAdded(Intention i) { }
-        
+        public void intentionResumed(Intention i) { }
+        public void intentionSuspended(Intention i, String reason) { }
         public String toString() {
             return sTE;
         }

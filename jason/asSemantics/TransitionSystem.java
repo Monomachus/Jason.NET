@@ -50,6 +50,7 @@ import jason.asSyntax.parser.ParseException;
 import jason.bb.BeliefBase;
 import jason.runtime.Settings;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -72,7 +73,7 @@ public class TransitionSystem {
     private State         step       = State.StartRC; // first step of the SOS                                                                                                
     private int           nrcslbr    = Settings.ODefaultNRC; // number of reasoning cycles since last belief revision                                                                                                             
     
-    private GoalListener  goalListener = null;
+    private List<GoalListener>  goalListeners = null;
     
     // both configuration and configuration' point to this
     // object, this is just to make it look more like the SOS
@@ -118,15 +119,25 @@ public class TransitionSystem {
     }
     
     
-    /** sets an object that will be notified about events on goals (creation, suspension, ...) */
-    public void setGoalListener(GoalListener gl) {
-        goalListener = gl;
+    /** adds an object that will be notified about events on goals (creation, suspension, ...) */
+    public void addGoalListener(GoalListener gl) {
+        if (goalListeners == null)
+            goalListeners = new ArrayList<GoalListener>();
+        else 
+            // do not install two MetaEventGoalListener
+            for (GoalListener g: goalListeners)
+                if (g instanceof GoalListenerForMetaEvents)
+                    return;
+        goalListeners.add(gl);
     }
-    public GoalListener getGoalListener() {
-        return goalListener;
+    public boolean hasGoalListener() {
+        return goalListeners != null && !goalListeners.isEmpty();
     }
-    public void removeGoalListener() {
-        goalListener = null;
+    public List<GoalListener> getGoalListeners() {
+        return goalListeners;
+    }
+    public boolean removeGoalListener(GoalListener gl) {
+        return goalListeners.remove(gl);
     }
 
     /** ******************************************************************* */
@@ -193,7 +204,7 @@ public class TransitionSystem {
                     content = Literal.LFalse;
                 }
                 if (intention.peek().getUnif().unifies(send.getTerm(3), content)) {
-                    getC().addIntention(intention);
+                    getC().resumeIntention(intention);
                 } else {
                     generateGoalDeletion(intention, JasonException.createBasicErrorAnnots("ask_failed", "reply of an ask message ('"+content+"') does not unify with fourth argument of .send ('"+send.getTerm(3)+"')"));
                 }
@@ -549,7 +560,6 @@ public class TransitionSystem {
         case achieve:
             body = prepareBodyForEvent(body, u);
             Event evt = conf.C.addAchvGoal(body, conf.C.SI);
-            if (goalListener != null) goalListener.goalStarted(evt);
             confP.step = State.StartRC;
             break;
 
@@ -557,7 +567,6 @@ public class TransitionSystem {
         case achieveNF:
             body = prepareBodyForEvent(body, u);
             evt  = conf.C.addAchvGoal(body, Intention.EmptyInt);
-            if (goalListener != null) goalListener.goalStarted(evt);
             updateIntention();
             break;
 
@@ -574,7 +583,6 @@ public class TransitionSystem {
                     if (body.isLiteral()) { // in case body is a var with content that is not a literal (note the VarTerm pass in the instanceof Literal)
                         Trigger te = new Trigger(TEOperator.add, TEType.test, body);
                         evt = new Event(te, conf.C.SI);
-                        if (goalListener != null) goalListener.goalStarted(evt);
                         if (ag.getPL().hasCandidatePlan(te)) {
                             if (logger.isLoggable(Level.FINE)) logger.fine("Test Goal '" + h + "' failed as simple query. Generating internal event for it: "+te);
                             conf.C.addEvent(evt);
@@ -685,7 +693,7 @@ public class TransitionSystem {
             
             if (i.isFinished()) {
                 // intention finished, remove it
-                confP.C.removeIntention(i);
+                confP.C.dropIntention(i);
                 //conf.C.SI = null;
                 return;
             }
@@ -702,18 +710,14 @@ public class TransitionSystem {
             Literal topLiteral = topTrigger.getLiteral();
             if (logger.isLoggable(Level.FINE)) logger.fine("Returning from IM "+topIM.getPlan().getLabel()+", te="+topIM.getPlan().getTrigger()+" unif="+topIM.unif);
             
-            // produce *! event
+            // produce ^!g[state(finished)] event
             if (topTrigger.getOperator() == TEOperator.add && topTrigger.isGoal()) {
-                if (goalListener != null) 
-                    goalListener.goalFinished(topTrigger);
-                Trigger eEnd = new Trigger(TEOperator.end, topTrigger.getType(), topLiteral.copy());
-                if (ag.getPL().hasCandidatePlan(eEnd)) {
-                    getC().addEvent(new Event(eEnd, null)); // TODO: discuss whether put this event on top of i or null
-                    //return; // if event on top of i, return here
-                }
+                if (hasGoalListener())
+                    for (GoalListener gl: goalListeners)
+                        gl.goalFinished(topTrigger);
             }
             
-            // if finished a failure handling IM ...
+            // if has finished a failure handling IM ...
             if (im.getTrigger().isGoal() && !im.getTrigger().isAddition() && i.size() > 0) {
                 // needs to get rid of the IM until a goal that
                 // has failure handling. E.g,
@@ -842,8 +846,9 @@ public class TransitionSystem {
         IntendedMeans im = i.peek();
         if (im.isGoalAdd()) {
             // notify listener
-            if (goalListener != null)
-                goalListener.goalFailed(im.getTrigger());
+            if (hasGoalListener())
+                for (GoalListener gl: goalListeners)
+                    gl.goalFailed(im.getTrigger());
             
             // produce failure event
             Event failEvent = findEventForFailure(i, im.getTrigger());
@@ -881,8 +886,9 @@ public class TransitionSystem {
         boolean failEeventGenerated = false;
         if (tevent.isAddition() && tevent.isGoal()) {
             // notify listener
-            if (goalListener != null)
-                goalListener.goalFailed(tevent);
+            if (hasGoalListener())
+                for (GoalListener gl: goalListeners)
+                    gl.goalFailed(tevent);
             
             // produce failure event
             Event failEvent = findEventForFailure(ev.intention, tevent);
@@ -1029,6 +1035,11 @@ public class TransitionSystem {
                 C.addPendingAction(action);                
                 // We need to send a wrapper for FA to the user so that add method then calls C.addFA (which control atomic things)
                 agArch.act(action, C.getFeedbackActionsWrapper());
+                
+                if (hasGoalListener())
+                    for (GoalListener gl: getGoalListeners())
+                        for (IntendedMeans im: action.getIntention().getIMs())
+                            gl.goalSuspended(im.getTrigger(), "action");
             }
 
         } catch (Exception e) {
