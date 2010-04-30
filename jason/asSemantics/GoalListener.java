@@ -5,7 +5,7 @@ import jason.asSyntax.Trigger;
 /** call-back interface to be notified about events on goals */
 public interface GoalListener {
     
-    public enum GoalStates { started, suspended, resumed, pending, finished, failed } ; 
+    public enum GoalStates { started, suspended, resumed, finished, failed } ; 
     
     /** method called when a new goal is produced by operator ! */
     public void goalStarted(Event goal); 

@@ -388,14 +388,10 @@ public class Circumstance implements Serializable {
             atomicIntSuspended = true;
         }
         PA.put(i.getId(), a);
-    }
-    
-    public ActionExec removePendingAction(int intentionId) {
-        ActionExec a = PA.remove(intentionId);
-        if (a != null && a.getIntention().isAtomic()) {
-            atomicIntSuspended = false;
-        }
-        return a;
+        
+        if (listeners != null)
+            for (CircumstanceListener el : listeners)
+                el.intentionSuspended(i, "action "+a.getActionTerm());
     }
     
     public void clearPendingActions() {
@@ -410,6 +406,15 @@ public class Circumstance implements Serializable {
 
     public boolean hasPendingAction() {
         return PA != null && PA.size() > 0;
+    }
+
+    
+    public ActionExec removePendingAction(int intentionId) {
+        ActionExec a = PA.remove(intentionId);
+        if (a != null && a.getIntention().isAtomic()) {
+            atomicIntSuspended = false;
+        }
+        return a;
     }
 
     /** removes the intention i from PA and notify listeners that the intention was dropped */

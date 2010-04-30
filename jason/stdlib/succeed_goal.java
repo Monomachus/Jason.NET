@@ -127,12 +127,10 @@ public class succeed_goal extends DefaultInternalAction {
             Intention i = a.getIntention();
             int r = dropIntention(i, g, ts, un);
             if (r > 0) { // i was changed
-                if (r == 1) {                          // i must continue running
-                    C.removePendingAction(i.getId());  // remove i from PA
-                    C.resumeIntention(i);              // and put the intention back in I
-                } else {                               // if r > 1, the event was generated and i will be back soon
-                    C.dropPendingAction(i);
-                }
+                C.removePendingAction(i.getId());  // remove i from PA
+                if (r == 1) {                      // i must continue running
+                    C.resumeIntention(i);          // and put the intention back in I
+                }                                  // if r > 1, the event was generated and i will be back soon
             }
         }
         
@@ -140,11 +138,9 @@ public class succeed_goal extends DefaultInternalAction {
         for (Intention i: C.getPendingIntentions().values()) {
             int r = dropIntention(i, g, ts, un);
             if (r > 0) { 
+                C.removePendingIntention(i.getId()); 
                 if (r == 1) { 
-                    C.removePendingIntention(i.getId()); 
                     C.resumeIntention(i); 
-                } else {
-                    C.dropPendingIntention(i);
                 }
             }
         }

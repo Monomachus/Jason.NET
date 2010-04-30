@@ -51,10 +51,12 @@ import jason.bb.BeliefBase;
 import jason.runtime.Settings;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
@@ -118,31 +120,75 @@ public class TransitionSystem {
             logger = Logger.getLogger(TransitionSystem.class.getName());
     }
     
+    // ---------------------------------------------------------
+    //    Goal Listeners support methods
+    
+    private Map<GoalListener,CircumstanceListener> listenersMap; // map the circumstance listeners created for the goal listeners, used in remove goal listener
     
     /** adds an object that will be notified about events on goals (creation, suspension, ...) */
-    public void addGoalListener(GoalListener gl) {
-        if (goalListeners == null)
+    public void addGoalListener(final GoalListener gl) {
+        if (goalListeners == null) {
             goalListeners = new ArrayList<GoalListener>();
-        else 
+            listenersMap  = new HashMap<GoalListener, CircumstanceListener>();
+        } else { 
             // do not install two MetaEventGoalListener
             for (GoalListener g: goalListeners)
                 if (g instanceof GoalListenerForMetaEvents)
                     return;
+        }
+        
+        // we need to add a listener in C to map intention events to goal events
+        CircumstanceListener cl = new CircumstanceListener() {
+            
+            public void intentionDropped(Intention i) {
+                for (IntendedMeans im: i.getIMs()) 
+                    if (im.getTrigger().isAddition() && im.getTrigger().isGoal()) 
+                        gl.goalFinished(im.getTrigger());                         
+            }
+            
+            public void intentionSuspended(Intention i, String reason) {
+                for (IntendedMeans im: i.getIMs()) 
+                    if (im.getTrigger().isAddition() && im.getTrigger().isGoal()) 
+                        gl.goalSuspended(im.getTrigger(), reason);                         
+            }
+            
+            public void intentionResumed(Intention i) {
+                for (IntendedMeans im: i.getIMs()) 
+                    if (im.getTrigger().isAddition() && im.getTrigger().isGoal()) 
+                        gl.goalResumed(im.getTrigger());                         
+            }
+            
+            public void eventAdded(Event e) {
+                if (e.getTrigger().isAddition() && e.getTrigger().isGoal())
+                    gl.goalStarted(e);
+            }
+            
+            public void intentionAdded(Intention i) {  }
+        };
+        C.addEventListener(cl);
+        listenersMap.put(gl,cl);
+
         goalListeners.add(gl);
     }
+    
     public boolean hasGoalListener() {
         return goalListeners != null && !goalListeners.isEmpty();
     }
+    
     public List<GoalListener> getGoalListeners() {
         return goalListeners;
     }
+    
     public boolean removeGoalListener(GoalListener gl) {
+        CircumstanceListener cl = listenersMap.get(gl);
+        if (cl != null) C.removeEventListener(cl);
         return goalListeners.remove(gl);
     }
 
     /** ******************************************************************* */
     /* SEMANTIC RULES */
     /** ******************************************************************* */
+    
     private void applySemanticRule() throws JasonException {
         // check the current step in the reasoning cycle
         // only the main parts of the interpretation appear here
@@ -395,6 +441,11 @@ public class TransitionSystem {
                         // add the intention back in I
                         updateIntention();
                         applyClrInt(confP.C.SI);
+                        
+                        if (hasGoalListener())
+                            for (GoalListener gl: getGoalListeners())
+                                for (IntendedMeans im: confP.C.SI.getIMs())
+                                    gl.goalResumed(im.getTrigger());
                     } else {
                         String reason = a.getFailureMsg();
                         if (reason == null) reason = "";
@@ -1035,11 +1086,6 @@ public class TransitionSystem {
                 C.addPendingAction(action);                
                 // We need to send a wrapper for FA to the user so that add method then calls C.addFA (which control atomic things)
                 agArch.act(action, C.getFeedbackActionsWrapper());
-                
-                if (hasGoalListener())
-                    for (GoalListener gl: getGoalListeners())
-                        for (IntendedMeans im: action.getIntention().getIMs())
-                            gl.goalSuspended(im.getTrigger(), "action");
             }
 
         } catch (Exception e) {
