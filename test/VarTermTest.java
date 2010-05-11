@@ -525,5 +525,13 @@ public class VarTermTest extends TestCase {
         y.apply(u);
         assertTrue(x.compareTo(y) < 0);
         assertTrue(y.compareTo(x) > 0);
+        
+        // Tim Cleaver tests 
+        assertTrue(new NumberTermImpl(1).compareTo(new VarTerm("X")) < 0);
+        assertTrue(new VarTerm("X").compareTo(new NumberTermImpl(1)) > 0);
+        VarTerm X = new VarTerm("X");
+        X.setValue(new NumberTermImpl(2));
+        assertTrue(X.compareTo(new NumberTermImpl(1)) > 0);
+        assertTrue(new NumberTermImpl(1).compareTo(X) < 0);
     }
 }

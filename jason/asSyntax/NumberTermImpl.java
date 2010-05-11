@@ -95,6 +95,9 @@ public final class NumberTermImpl extends DefaultTerm implements NumberTerm {
     
     @Override
     public int compareTo(Term o) {
+        if (o instanceof VarTerm) {
+            return o.compareTo(this) * -1;
+        }
         if (o instanceof NumberTerm) {
             NumberTerm st = (NumberTerm)o;
             if (solve() > st.solve()) return 1;
