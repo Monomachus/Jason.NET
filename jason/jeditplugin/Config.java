@@ -334,6 +334,15 @@ public class Config extends Properties {
         }
     }
 
+    public String getJasonBuiltDate() {
+        try {
+            Properties p = new Properties();
+            p.load(Config.class.getResource("/dist.properties").openStream());
+            return p.get("build.date").toString();
+        } catch (Exception ex) {
+            return "?";
+        }
+    }
     void tryToFixJarFileConf(String jarEntry, String jarName, int minSize) {
         String jarFile = getProperty(jarEntry);
         if (jarFile == null || !checkJar(jarFile)) {

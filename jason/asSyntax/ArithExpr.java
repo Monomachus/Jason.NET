@@ -38,7 +38,7 @@ import org.w3c.dom.Element;
  
   @navassoc - op - ArithmeticOp
  */
-public class ArithExpr extends ArithFunctionTerm implements NumberTerm {
+public class ArithExpr extends ArithFunctionTerm {
 
     private static final long serialVersionUID = 1L;
     private static Logger logger = Logger.getLogger(ArithExpr.class.getName());

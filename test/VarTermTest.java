@@ -5,6 +5,7 @@ import jason.asSemantics.Agent;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.ASSyntax;
 import jason.asSyntax.ArithExpr;
+import jason.asSyntax.Atom;
 import jason.asSyntax.ListTerm;
 import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Literal;
@@ -12,6 +13,7 @@ import jason.asSyntax.LiteralImpl;
 import jason.asSyntax.NumberTerm;
 import jason.asSyntax.NumberTermImpl;
 import jason.asSyntax.Pred;
+import jason.asSyntax.StringTermImpl;
 import jason.asSyntax.Structure;
 import jason.asSyntax.Term;
 import jason.asSyntax.UnnamedVar;
@@ -525,6 +527,25 @@ public class VarTermTest extends TestCase {
         y.apply(u);
         assertTrue(x.compareTo(y) < 0);
         assertTrue(y.compareTo(x) > 0);
+
+        assertTrue(new StringTermImpl("z").compareTo(new VarTerm("X")) < 0);
+        assertTrue(new VarTerm("X").compareTo(new StringTermImpl("z")) > 0);
+        VarTerm Z = new VarTerm("Z");
+        Z.setValue(new StringTermImpl("z"));
+        assertFalse(Z.compareTo(new StringTermImpl("z")) > 0);
+        assertFalse(Z.compareTo(new StringTermImpl("z")) < 0);
+        assertFalse(new StringTermImpl("z").compareTo(Z) > 0);
+        assertFalse(new StringTermImpl("z").compareTo(Z) < 0);
+        assertTrue(new StringTermImpl("z").compareTo(Z) == 0);
+        assertTrue(Z.compareTo(new StringTermImpl("z")) == 0);
+
+        ListTerm l = ASSyntax.createList(new Atom("a"), new Atom("c"));
+        assertTrue(l.compareTo(new VarTerm("X")) < 0);
+        assertTrue(new VarTerm("X").compareTo(l) > 0);
+        VarTerm L = new VarTerm("L");
+        L.setValue(ASSyntax.createList(new Atom("a"), new Atom("b")));
+        assertTrue(L.compareTo(l) < 0);
+        assertTrue(l.compareTo(L) > 0);
         
         // Tim Cleaver tests 
         assertTrue(new NumberTermImpl(1).compareTo(new VarTerm("X")) < 0);

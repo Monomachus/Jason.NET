@@ -1,5 +1,6 @@
 package jason.jeditplugin;
 
+import java.io.FileReader;
 import java.util.Properties;
 
 import javax.swing.ImageIcon;
@@ -10,16 +11,35 @@ public class AboutGUI {
 
     // TODO: put the copyright of the image bellow it.
 
-    public static void show(JFrame parent) {
-        String version = "";
-        String build = "";
-    
+    static String version = "unknown version";
+    static String build   = "unknown build";
+
+    static void setVersion() {
+        Properties p = new Properties();
         try {
-            Properties p = new Properties();
             p.load(JasonID.class.getResource("/dist.properties").openStream());
-            version = "Jason " + p.get("version") + "." + p.get("release");
-            build = " build on " + p.get("build.date") + "\n\n";
-        } catch (Exception ex) { }
+        } catch (Exception e1) { 
+            try {
+                p.load(new FileReader("bin/dist.properties"));
+            } catch (Exception e2) {
+                try {
+                    p.load(new FileReader("../bin/dist.properties"));
+                } catch (Exception e3) {
+                    return;
+                }
+            }
+        }     
+        version = "Jason " + p.get("version") + "." + p.get("release");
+        build = " built on " + p.get("build.date") + "\n\n";
+    }
+
+    public static void main(String[] args) {
+        setVersion();
+        System.out.println(version + build);
+    }
+    
+    public static void show(JFrame parent) {
+        setVersion();
     
         JOptionPane.showMessageDialog(parent,
         version +  build+

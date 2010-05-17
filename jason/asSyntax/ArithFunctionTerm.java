@@ -165,12 +165,22 @@ public class ArithFunctionTerm extends Structure implements NumberTerm {
 
     @Override
     public int compareTo(Term o) {
-        try {
+        /*if (o instanceof NumberTerm) {
             NumberTerm st = (NumberTerm)o;
             if (solve() > st.solve()) return 1;
             if (solve() < st.solve()) return -1;
-        } catch (Exception e) {}
-        return 0;    
+        } 
+        return 0; */    
+        if (o instanceof VarTerm) {
+            return o.compareTo(this) * -1;
+        }
+        if (o instanceof NumberTerm) {
+            NumberTerm st = (NumberTerm)o;
+            if (solve() > st.solve()) return 1;
+            if (solve() < st.solve()) return -1;
+            return 0;
+        }
+        return -1;
     }
 
     @Override

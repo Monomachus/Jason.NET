@@ -61,6 +61,7 @@ import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
@@ -104,8 +105,10 @@ public class RunCentralisedMAS {
                 readFromJAR = true;
                 Config.get(false); // to void to call fix/store the configuration in this case everything is read from a jar/jnlp file
             } else {
+                System.out.println("Jason "+Config.get().getJasonRunningVersion());
                 System.err.println("You should inform the MAS project file.");
-                System.exit(1);
+                JOptionPane.showMessageDialog(null,"Jason version "+Config.get().getJasonRunningVersion()+" library built on "+Config.get().getJasonBuiltDate(),"Jason", JOptionPane.INFORMATION_MESSAGE);
+                System.exit(0);
             }
         } else {
             projectFileName = args[0];
