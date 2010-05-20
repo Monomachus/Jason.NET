@@ -110,6 +110,16 @@ public final class StringTermImpl extends DefaultTerm implements StringTerm {
             return value.hashCode();
     }
     
+    @Override
+    public int compareTo(Term o) {
+        if (o instanceof VarTerm)
+            return o.compareTo(this) * -1;
+        if (o instanceof NumberTerm) 
+             return 1;
+        return super.compareTo(o);
+    }
+
+    
     public String toString() {
         return "\""+value+"\"";
     }

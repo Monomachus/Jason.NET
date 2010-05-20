@@ -130,6 +130,17 @@ public class ListTermImpl extends Structure implements ListTerm {
         return code;
     }
     
+    @Override
+    public int compareTo(Term o) {
+        if (o instanceof VarTerm) 
+            return o.compareTo(this) * -1;
+        if ((o instanceof NumberTerm)) 
+            return 1;
+        if (o instanceof StringTerm) 
+            return 1;
+        return super.compareTo(o);
+    }
+    
     public void setTerm(Term t) {
         term = t;
     }

@@ -623,6 +623,11 @@ public class TermTest extends TestCase {
         v1.apply(u);
         assertEquals(0, v1.compareTo(t2));
         assertEquals(0, t2.compareTo(v1));
+        
+        assertTrue(new StringTermImpl("string").compareTo(new NumberTermImpl(1)) > 0);
+        assertTrue(new NumberTermImpl(1).compareTo(new StringTermImpl("string")) < 0);
+        assertTrue(new StringTermImpl("string").compareTo(new ListTermImpl()) < 0);
+        assertTrue(new ListTermImpl().compareTo(new StringTermImpl("string")) > 0);
     }
     
     public void testUnify4() throws ParseException {
