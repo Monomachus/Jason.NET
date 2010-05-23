@@ -680,7 +680,7 @@ public class ListTermImpl extends Structure implements ListTerm {
         return listIterator(0);
     }
     
-    // TODO: do not base th implementation of listIterator on get (that is O(n))
+    // TODO: do not base the implementation of listIterator on get (that is O(n))
     // conversely, implement all other methods of List based on this iterator
     // (see AbstractSequentialList)
     // merge code of ListTermIterator here and use always the same iterator
