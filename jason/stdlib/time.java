@@ -55,7 +55,7 @@ public class time extends DefaultInternalAction {
         checkArguments(args);
 
         Calendar now = new GregorianCalendar();
-        return un.unifies(args[0], new NumberTermImpl(now.get(Calendar.HOUR))) &&
+        return un.unifies(args[0], new NumberTermImpl(now.get(Calendar.HOUR_OF_DAY))) &&
                un.unifies(args[1], new NumberTermImpl(now.get(Calendar.MINUTE))) &&
                un.unifies(args[2], new NumberTermImpl(now.get(Calendar.SECOND)));
     }
