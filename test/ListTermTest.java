@@ -337,6 +337,21 @@ public class ListTermTest extends TestCase {
         assertEquals("[[a, b, c, 8]]", iterator2list(l3.subSets(4)).toString());
     }
     
+    public void testMkVarAn() {
+        ListTermImpl l = (ListTermImpl)ListTermImpl.parseList("[use(car,Agent)]");
+        l.makeVarsAnnon();
+        assertTrue(l.toString().indexOf("_") > 0);
+        
+        l = (ListTermImpl)ListTermImpl.parseList("[use(car,Agent)]");
+        
+        VarTerm v = new VarTerm("V");
+        Unifier u = new Unifier();
+        u.unifies(v, l);
+        v.apply(u);
+        v.makeVarsAnnon();
+        assertTrue(v.toString().indexOf("_") > 0);
+    }
+    
     @SuppressWarnings("unchecked")
     List iterator2list(Iterator i) {
         List l = new ArrayList();

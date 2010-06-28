@@ -420,7 +420,7 @@ public class VarTerm extends LiteralImpl implements NumberTerm, ListTerm, String
     public Literal makeVarsAnnon(Unifier un) {
         if (value == null)
             return super.makeVarsAnnon(un);
-        else if (getValue().isLiteral())
+        else if (getValue().isLiteral() || getValue().isList())
             return ((Literal)getValue()).makeVarsAnnon(un);
         else
             return null;

@@ -96,7 +96,6 @@ public class findall extends DefaultInternalAction {
 
         Term var = args[0];
         LogicalFormula logExpr = (LogicalFormula)args[1];
-
         ListTerm all = new ListTermImpl();
         ListTerm tail = all;
         Iterator<Unifier> iu = logExpr.logicalConsequence(ts.getAg(), un);
