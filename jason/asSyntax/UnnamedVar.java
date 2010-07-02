@@ -71,9 +71,9 @@ public class UnnamedVar extends VarTerm {
             return super.compareTo(t);
         } else if (t instanceof UnnamedVar) {
             if (myId > ((UnnamedVar)t).myId)
-                return -1;
-            else if (myId < ((UnnamedVar)t).myId)
                 return 1;
+            else if (myId < ((UnnamedVar)t).myId)
+                return -1;
             else
                 return 0;
         } else if (t instanceof VarTerm) {

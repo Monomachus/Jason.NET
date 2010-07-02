@@ -309,7 +309,8 @@ public abstract class Literal extends DefaultTerm implements LogicalFormula {
                     Unifier ruleUn = ruleIt.next(); // evaluation result
                     Literal rhead  = rule.headClone();
                     rhead.apply(ruleUn);
-                    rhead.makeVarsAnnon(ruleUn);
+                    useDerefVars(rhead, ruleUn); // replace vars by the bottom in the var clusters (e.g. X=_2; Y=_2, a(X,Y) ===> A(_2,_2))
+                    rhead.makeVarsAnnon(); // to remove vars in head with original names
                     
                     Unifier unC = un.clone();
                     if (unC.unifiesNoUndo(Literal.this, rhead)) {
@@ -331,7 +332,7 @@ public abstract class Literal extends DefaultTerm implements LogicalFormula {
                         if (cloneAnnon == null) {
                             cloneAnnon = Literal.this.copy();
                             cloneAnnon.apply(un);
-                            cloneAnnon.makeVarsAnnon(un);
+                            cloneAnnon.makeVarsAnnon();
                         }
                         Unifier ruleUn = new Unifier();
                         if (ruleUn.unifiesNoUndo(cloneAnnon, rule)) { // the rule head unifies with the literal
@@ -366,7 +367,22 @@ public abstract class Literal extends DefaultTerm implements LogicalFormula {
             public void remove() {}
         };
     }   
-
+    
+    
+    private void useDerefVars(Term p, Unifier un) {
+        if (p instanceof Literal) {
+            Literal l = (Literal)p;
+            for (int i=0; i<l.getArity(); i++) {
+                Term t = l.getTerm(i);
+                if (t.isVar()) {
+                    l.setTerm(i, un.deref( (VarTerm)t));
+                } else {
+                    useDerefVars(t, un);                    
+                }
+            }
+        }
+    }
+    
 	/** returns this literal as a list with three elements: [functor, list of terms, list of annots] */
 	public ListTerm getAsListOfTerms() {
 		ListTerm l = new ListTermImpl();

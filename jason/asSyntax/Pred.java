@@ -463,15 +463,12 @@ public class Pred extends Structure {
             ListTerm lt = annots;
             while (!lt.isEmpty()) {
                 Term ta = lt.getTerm();
-                VarTerm uv = varToReplace(ta, un);
-                if (uv != null)
-                    lt.setTerm(uv);
+                if (ta.isVar())
+                    lt.setTerm(varToReplace(ta, un));
                 else if (ta instanceof Structure)
                     ((Structure)ta).makeVarsAnnon(un);
-                if (lt.isTail()) {
-                    uv = varToReplace(lt.getNext(), un);
-                    if (uv != null)
-                        lt.setNext(uv);
+                if (lt.isTail() && lt.getNext().isVar()) {
+                    lt.setNext(varToReplace(lt.getNext(), un));
                     break;
                 }
                 lt = lt.getNext();

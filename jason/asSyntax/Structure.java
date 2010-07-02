@@ -277,9 +277,8 @@ public class Structure extends Atom {
         final int size = getArity();
         for (int i=0; i<size; i++) {
             Term ti = getTerm(i);
-            VarTerm uv = varToReplace(ti, un);
-            if (uv != null)
-                setTerm(i,uv);
+            if (ti.isVar())
+                setTerm(i,varToReplace(ti, un));
             else if (ti instanceof Structure)
                 ((Structure)ti).makeVarsAnnon(un);
         }
@@ -288,17 +287,15 @@ public class Structure extends Atom {
     }
 
     protected VarTerm varToReplace(Term t, Unifier un) {
-        if (!t.isVar())
-            return null;
         VarTerm vt    = (VarTerm)t;
         VarTerm deref = un.deref(vt);
-        if (deref.isUnnamedVar())
-           return new UnnamedVar();
+        //if (deref.isUnnamedVar())
+           //return new UnnamedVar();
 
         // if the variable hasn't been renamed given the input unifier, then rename it.
         if (deref.equals(vt)) {
             // forget the name
-            VarTerm var = new VarTerm("_" + UnnamedVar.getUniqueId() + t);
+            VarTerm var = new UnnamedVar("_" + UnnamedVar.getUniqueId() + t);
             // if deref has annotations then we need to replicate these in the new variable
             if (deref.hasAnnot()) {
                 var.setAnnots(deref.getAnnots().cloneLT());

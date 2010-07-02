@@ -725,8 +725,8 @@ public class TermTest extends TestCase {
         }
         */
         l.makeVarsAnnon(u);
-        // ensure that X derefs to _2
-        assertTrue(u.deref(new VarTerm("X")).equals(new UnnamedVar(2)));
+        // ensure that X derefs to _10
+        assertTrue(u.deref(new VarTerm("X")).equals(new UnnamedVar(10)));
         // ensure that unifying a value with X will bind a value for all aliases as well.
         Term val = new StringTermImpl("value");
         u.unifies(new VarTerm("X"), val);
@@ -745,6 +745,17 @@ public class TermTest extends TestCase {
         l.makeVarsAnnon(u);
         assertEquals(l.getTerm(0), l.getTerm(1));
         assertEquals("[s("+l.getTerm(0)+")]", l.getAnnots().toString());
+    }
+    
+    public void testMakeVarAnnon6() {
+        UnnamedVar v1 = new UnnamedVar();
+        UnnamedVar v2 = new UnnamedVar();
+        
+        Literal l = ASSyntax.createLiteral("p", v1, v2, ASSyntax.createList(v1,v2));
+        l.makeVarsAnnon();
+        
+        // vars inside the list should be replaced as var placed in term0 and term1
+        assertEquals(l.getTerm(0).toString(), ((ListTerm)l.getTerm(2)).get(0).toString());
     }
     
     // test from Tim Cleaver
