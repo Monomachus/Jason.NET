@@ -507,13 +507,15 @@ public class TransitionSystem {
         // de-var bTerm
         while (bTerm instanceof VarTerm) {
             // check if bTerm is ground
-            if (bTerm.isGround()) {
+            //if (bTerm.isGround()) {
+            if (((VarTerm)bTerm).hasValue()) {
                 bTerm = ((VarTerm)bTerm).getValue();
                 continue; // restart the loop
             }
             
             // h should be 'groundable' (considering the current unifier)
             Term bValue = u.get((VarTerm)bTerm);
+            //System.out.println("*** "+bTerm+"="+bValue+"  "+bTerm.isGround()+"  "+u);           
             if (bValue == null) { // the case of !A with A not ground
                 String msg = h.getSrcInfo()+": "+ "Variable '"+bTerm+"' must be ground.";
                 if (!generateGoalDeletion(conf.C.SI, JasonException.createBasicErrorAnnots("body_var_unground", msg)))
