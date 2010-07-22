@@ -140,8 +140,14 @@ public class Environment {
     /**
      * Returns percepts for an agent.  A full copy of both common
      * and agent's percepts lists is returned.
+     * 
+     * It returns null if the agent's perception doesn't changed since
+     * last call.
+     * 
+     * This method is to be called by TS and should not be called 
+     * by other objects.
      */
-    public List<Literal> getPercepts(String agName) {
+    public List<Literal> getPercepts(String agName) { // TODO in a future release, call this method doPerception, and get simply returns the list
         
         // check whether this agent needs the current version of perception
         if (uptodateAgs.contains(agName)) {
@@ -172,7 +178,36 @@ public class Environment {
         
         return p;
     }
-
+    
+    /**
+     *  Returns a copy of the perception for an agent. 
+     * 
+     *  It is the same list returned by getPercepts, but 
+     *  doesn't consider the last call of the method.
+     */
+    public List<Literal> consultPercepts(String agName) {
+        int size = percepts.size();
+        List<Literal> agl = agPercepts.get(agName);
+        if (agl != null) {
+            size += agl.size();
+        }
+        List<Literal> p = new ArrayList<Literal>(size);
+        
+        if (! percepts.isEmpty()) { // has global perception?
+            synchronized (percepts) {
+                // make a local copy of the environment percepts
+                // Note: a deep copy will be done by BB.add
+                p.addAll(percepts);
+            }
+        }
+        if (agl != null) { // add agent personal perception
+            synchronized (agl) {
+                p.addAll(agl);
+            }
+        }    
+        return p;
+    }
+    
     /** Adds a perception for all agents */
     public void addPercept(Literal per) {
         if (per != null) {

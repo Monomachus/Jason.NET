@@ -518,7 +518,7 @@ public class TransitionSystem {
             //System.out.println("*** "+bTerm+"="+bValue+"  "+bTerm.isGround()+"  "+u);           
             if (bValue == null) { // the case of !A with A not ground
                 String msg = h.getSrcInfo()+": "+ "Variable '"+bTerm+"' must be ground.";
-                if (!generateGoalDeletion(conf.C.SI, JasonException.createBasicErrorAnnots("body_var_unground", msg)))
+                if (!generateGoalDeletion(conf.C.SI, JasonException.createBasicErrorAnnots("body_var_without_value", msg)))
                     logger.log(Level.SEVERE, msg);
                 return;
             }
