@@ -192,6 +192,10 @@ public class ListTermTest extends TestCase {
 
         lf = ListTermImpl.parseList("[c,b,a,x,y]");
         assertTrue(u.unifies(l5,lf));
+        
+        ListTerm ll = lf.cloneLT();
+        ll.concat(lf.cloneLT());
+        assertEquals("[c,b,a,x,y,c,b,a,x,y]", ll.toString());
     }
     
     public void testTail() {
