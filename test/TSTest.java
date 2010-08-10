@@ -83,7 +83,7 @@ public class TSTest extends TestCase {
         Intention i2 = new Intention(); 
         
         Intention i3 = new Intention(); 
-        i3.setAtomic(true);
+        i3.setAtomic(1);
         assertTrue(i3.isAtomic());
         
         Intention i4 = new Intention();

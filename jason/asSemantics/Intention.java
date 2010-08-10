@@ -52,12 +52,12 @@ public class Intention implements Serializable, Comparable<Intention> {
     private static       int idCount = 0;
 
     private int     id;
-    private boolean isAtomic    = false;
+    private int     atomicCount    = 0; // how many atomic intended means there are in the intention
     private boolean isSuspended = false;
     
     private Stack<IntendedMeans> intendedMeans = new Stack<IntendedMeans>();
 
-    // static private Logger logger = Logger.getLogger(Intention.class.getName());
+    //static private Logger logger = Logger.getLogger(Intention.class.getName());
 
     public Intention() {
         id = ++idCount;
@@ -69,9 +69,8 @@ public class Intention implements Serializable, Comparable<Intention> {
 
     public void push(IntendedMeans im) {
         intendedMeans.push(im);
-        if (im.isAtomic()) {
-            isAtomic = true;
-        }
+        if (im.isAtomic()) 
+            atomicCount++;
     }
 
     public IntendedMeans peek() {
@@ -85,15 +84,26 @@ public class Intention implements Serializable, Comparable<Intention> {
     public IntendedMeans pop() {
         IntendedMeans top = intendedMeans.pop();
 
-        isAtomic = false;
-        for (IntendedMeans im : intendedMeans) {
-            if (im.isAtomic()) {
-                isAtomic = true;
-                break;
-            }
+        if (isAtomic() && top.isAtomic()) {
+            atomicCount--;
+            /* for (IntendedMeans im : intendedMeans) {
+                if (im.isAtomic()) {
+                    isAtomic = true;
+                    break;
+                }
+            }*/
         }
         return top;
     }
+
+    public boolean isAtomic() {
+        return atomicCount > 0;
+    }
+    
+    public void setAtomic(int a) { // used for test
+        atomicCount = a;
+    }
+    
 
     public ListIterator<IntendedMeans> iterator() {
         return intendedMeans.listIterator(intendedMeans.size());
@@ -107,14 +117,6 @@ public class Intention implements Serializable, Comparable<Intention> {
         return intendedMeans.size();
     }
 
-    public boolean isAtomic() {
-        return isAtomic;
-    }
-    
-    public void setAtomic(boolean b) {
-        isAtomic = b;
-    }
-    
     public void setSuspended(boolean b) {
         isSuspended = b;
     }
@@ -161,8 +163,10 @@ public class Intention implements Serializable, Comparable<Intention> {
     
     /** implements atomic intentions > not atomic intentions */
     public int compareTo(Intention o) {
-        if (o.isAtomic && !this.isAtomic) return 1;
-        if (this.isAtomic && !o.isAtomic) return -1;
+        //if (o.isAtomic() && !this.isAtomic()) return 1;
+        //if (this.isAtomic() && !o.isAtomic()) return -1;
+        if (o.atomicCount > this.atomicCount) return 1;
+        if (this.atomicCount > o.atomicCount) return -1;
         return 0;
     }
     
@@ -180,7 +184,7 @@ public class Intention implements Serializable, Comparable<Intention> {
     public Intention clone() {
         Intention i = new Intention();
         i.id = id;
-        i.isAtomic = isAtomic;
+        i.atomicCount = atomicCount;
         i.intendedMeans = new Stack<IntendedMeans>();
         for (IntendedMeans im: intendedMeans) {
             i.intendedMeans.add((IntendedMeans)im.clone());
