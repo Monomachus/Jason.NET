@@ -490,17 +490,23 @@ public class TermTest extends TestCase {
         u = new Unifier();
         assertTrue(p1.hasSubsetAnnot(p5, u));
 
-        Pred p6 = Pred.parsePred("p1(t1,t2)[a1|T]");
-
-        //r.clear();
-        //assertTrue(p6.getSubsetAnnots(p1.getAnnots(),new Unifier(),r));
-        //System.out.println("p6="+p6+"; p1="+p1+" r="+r);
-        //assertEquals(r.get(0).get("T").toString(), "[a(2,3),a(3)]");
-
+        Pred p6 = Pred.parsePred("p1(t1,t2)[a(3)|T]");
         u = new Unifier();
         assertTrue(p6.hasSubsetAnnot(p1, u));
-        assertEquals(u.get("T").toString(), "[a(3),a(2,3)]");
+        assertEquals(u.get("T").toString(), "[a1,a(2,3)]");
         assertTrue(p1.hasSubsetAnnot(p6, u));
+
+        Pred p7 = Pred.parsePred("p1(t1,t2)[A|T]");
+        u = new Unifier();
+        assertTrue(p7.hasSubsetAnnot(p1, u));
+        assertEquals("a1", u.get("A").toString() );
+        assertEquals("[a(3),a(2,3)]", u.get("T").toString());
+        assertTrue(p1.hasSubsetAnnot(p7, u));
+
+        u = new Unifier();
+        assertTrue(p1.hasSubsetAnnot(p7, u));
+        assertEquals("a1", u.get("A").toString() );
+        assertEquals("[a(3),a(2,3)]", u.get("T").toString());
 
         // test many vars
         l1 = Literal.parseLiteral(                         "p[4,W,a,b,X,Y,e,Z]");

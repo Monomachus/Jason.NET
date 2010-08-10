@@ -585,6 +585,8 @@ public class ListTermImpl extends Structure implements ListTerm {
                 break;
             }
             l = l.getNext();
+            if (l == null)
+                break;
             if (!l.isEmpty())
                 s.append(',');
         }
