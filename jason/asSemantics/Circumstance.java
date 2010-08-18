@@ -65,7 +65,7 @@ public class Circumstance implements Serializable {
     
     private Map<String, Intention>     PI; // pending intentions, intentions suspended by any other reason                                                        
 
-    private List<CircumstanceListener> listeners = null; 
+    private List<CircumstanceListener> listeners = new CopyOnWriteArrayList<CircumstanceListener>(); 
 
     public Circumstance() {
         create();
@@ -152,21 +152,22 @@ public class Circumstance implements Serializable {
     /** Listeners */
 
     public void addEventListener(CircumstanceListener el) {
-        if (listeners == null)
-            listeners = new CopyOnWriteArrayList<CircumstanceListener>();
+        //if (listeners == null)
+        //    listeners = new CopyOnWriteArrayList<CircumstanceListener>();
         listeners.add(el);
     }
 
     public void removeEventListener(CircumstanceListener el) {
         if (el != null) {
             listeners.remove(el);
-            if (listeners.isEmpty())
-                listeners = null;
+            //if (listeners.isEmpty())
+            //    listeners = null;
         }
     }
 
     public boolean hasListener() {
-        return listeners != null && !listeners.isEmpty();
+        //return listeners != null && !listeners.isEmpty();
+        return !listeners.isEmpty();
     }
 
     public Collection<CircumstanceListener> getListeners() {

@@ -17,7 +17,7 @@ import java.util.Map;
  * indexed for faster access.
  * 
  * <p>E.g. in a .mas2j project file:<br/>
- * <code>agents: bob beliefBaseClass agent.IndexedBB("student(key,_)", "depot(_,_,_)")</code>
+ * <code>agents: bob beliefBaseClass jason.bb.IndexedBB("student(key,_)", "depot(_,_,_)")</code>
  * <br/>
  * The belief "student/2" has the first argument as its key, so the BB will never has
  * two students with the same key. Or, two students in the BB will have two different keys.
