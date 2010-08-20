@@ -93,15 +93,18 @@ public class succeed_goal extends DefaultInternalAction {
     public void drop(TransitionSystem ts, Literal l, Unifier un) throws Exception {
         Trigger g = new Trigger(TEOperator.add, TEType.achieve, l);
         Circumstance C = ts.getC();
+        Unifier bak = un.clone();
         
         for (Intention i: C.getIntentions()) {
             if (dropIntention(i, g, ts, un) > 1) {
                 C.dropIntention(i);
+                un = bak.clone();
             }
         }
         
         // dropping the current intention?
         dropIntention(C.getSelectedIntention(), g, ts, un);
+        un = bak.clone();
             
         // dropping G in Events
         for (Event e: C.getEvents()) {
@@ -109,6 +112,7 @@ public class succeed_goal extends DefaultInternalAction {
             Intention i = e.getIntention();
             if (dropIntention(i, g, ts, un) > 1) {
                 C.removeEvent(e);
+                un = bak.clone();
             } else {
                 // test in the event
                 Trigger t = e.getTrigger();
@@ -118,6 +122,7 @@ public class succeed_goal extends DefaultInternalAction {
                 }
                 if (un.unifies(t, g)) {
                     dropInEvent(ts,e,i);
+                    un = bak.clone();
                 }
             }
         }
@@ -131,6 +136,7 @@ public class succeed_goal extends DefaultInternalAction {
                 if (r == 1) {                      // i must continue running
                     C.resumeIntention(i);          // and put the intention back in I
                 }                                  // if r > 1, the event was generated and i will be back soon
+                un = bak.clone();
             }
         }
         
@@ -142,6 +148,7 @@ public class succeed_goal extends DefaultInternalAction {
                 if (r == 1) { 
                     C.resumeIntention(i); 
                 }
+                un = bak.clone();
             }
         }
     }
