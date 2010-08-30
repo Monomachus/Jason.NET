@@ -369,7 +369,7 @@ public class RunCentralisedMAS {
                     agArch.setAgName(numberedAg);
                     agArch.setEnvInfraTier(env);
                     if (isPool && cAg > 0) {
-                        // creation by cloning previous agent
+                        // creation by cloning previous agent (which are faster -- no parsing, for instance)
                         agArch.initAg(ap.archClass.getClassName(), pag, this);
                     } else {
                         // normal creation

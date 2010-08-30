@@ -5,7 +5,10 @@ import jason.jeditplugin.Config;
 import jason.jeditplugin.MASLauncherInfraTier;
 import jason.mas2j.AgentParameters;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.util.Iterator;
@@ -15,27 +18,41 @@ import java.util.Iterator;
  */
 public class JadeMASLauncherAnt extends CentralisedMASLauncherAnt implements MASLauncherInfraTier {
 
-    public static String snifferConfFile = "sniffer.properties";
+    public static String snifferConfFile       = "sniffer.properties";
+    public static String customSnifferConfFile = "c-sniffer.properties";
     //private static Logger logger = Logger.getLogger(JadeMASLauncherAnt.class.getName());
 
     protected String replaceMarks(String script, boolean debug) {
         // create sniffer file
-        File sFile = new File(project.getDirectory()+File.separator+snifferConfFile);
+        File sFile  = new File(project.getDirectory()+File.separator+snifferConfFile);
+        File csFile = new File(project.getDirectory()+File.separator+customSnifferConfFile);
         try {
-            sFile.delete();
-            if (Config.get().getBoolean(Config.JADE_SNIFFER)) {
-                PrintWriter out = new PrintWriter(new FileWriter(sFile));
-                out.print("preload=");
-                Iterator<AgentParameters> i = project.getAgents().iterator();
-                while (i.hasNext()) {
-                    AgentParameters ap = i.next();
-                    out.print(ap.name);
-                    if (i.hasNext()) out.print(";");
+            if (csFile.exists()) {
+                BufferedReader in = new BufferedReader(new FileReader(csFile));
+                BufferedWriter out = new BufferedWriter(new FileWriter(sFile));
+                String line;
+                while ( (line=in.readLine()) != null) {
+                    out.write(line+"\n");
                 }
-                out.println();
                 out.close();
+            } else {
+                sFile.delete();
+                if (Config.get().getBoolean(Config.JADE_SNIFFER)) {
+                    PrintWriter out = new PrintWriter(new FileWriter(sFile));
+                    out.print("preload=");
+                    Iterator<AgentParameters> i = project.getAgents().iterator();
+                    while (i.hasNext()) {
+                        AgentParameters ap = i.next();
+                        out.print(ap.name);
+                        if (i.hasNext()) out.print(";");
+                    }
+                    out.println();
+                    out.close();
+                }
             }
-        } catch (Exception _) {}
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
         
         // replace build.xml tags
         String jadeJar = Config.get().getJadeJar();

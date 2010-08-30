@@ -101,7 +101,7 @@ public class CentralisedAgArch implements Runnable, AgArchInfraTier {
     }
 
     /** init the agent based on another agent */
-    void initAg(String agArchClass, Agent ag, RunCentralisedMAS masRunner) throws JasonException {
+    public void initAg(String agArchClass, Agent ag, RunCentralisedMAS masRunner) throws JasonException {
         try {
             this.masRunner = masRunner; 
             userAgArch = (AgArch) Class.forName(agArchClass).newInstance();
