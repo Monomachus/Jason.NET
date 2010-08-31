@@ -13,6 +13,7 @@ import jason.functions.Min;
 import jason.functions.Random;
 import jason.functions.Round;
 import jason.functions.Sqrt;
+import jason.functions.StdDev;
 import jason.functions.Sum;
 import jason.functions.ceil;
 import jason.functions.e;
@@ -42,6 +43,7 @@ public class FunctionRegister implements Directive {
         addFunction(Max.class);
         addFunction(Min.class);
         addFunction(Sum.class);
+        addFunction(StdDev.class);
         addFunction(Average.class);
         addFunction(Length.class);
         addFunction(Random.class);

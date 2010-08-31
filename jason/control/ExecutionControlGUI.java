@@ -189,7 +189,9 @@ public class ExecutionControlGUI extends ExecutionControl {
         jTA.setText("<html><body>Select the agent to inspect.</body></html>");
         
         JPanel spTA = new JPanel(new BorderLayout());
-        spTA.add(BorderLayout.CENTER, new JScrollPane(jTA));
+        JScrollPane scpTA = new JScrollPane(jTA);
+        //scpTA.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+        spTA.add(BorderLayout.CENTER, scpTA);
         spTA.setBorder(BorderFactory.createTitledBorder(BorderFactory
                 .createEtchedBorder(), "Agent Inspection", TitledBorder.LEFT, TitledBorder.TOP));
 
