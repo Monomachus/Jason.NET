@@ -452,7 +452,9 @@ public class TransitionSystem {
                         ListTerm annots = JasonException.createBasicErrorAnnots("action_failed", reason);
                         if (a.getFailureReason() != null) 
                             annots.append(a.getFailureReason());
-                        generateGoalDeletion(conf.C.SI, annots);
+                        if (!generateGoalDeletion(conf.C.SI, annots)) {
+                            C.removeAtomicIntention(); // if (potential) atomic intention is not removed, it will be selected in selInt and runs again
+                        }
                     }
                 } else {
                     applyProcAct(); // get next action
