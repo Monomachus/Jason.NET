@@ -284,7 +284,7 @@ public class Config extends Properties {
             if (!f.getParentFile().exists()) {
                 f.getParentFile().mkdirs();
             }
-
+            System.out.println("Storing configuration at "+f);
             super.store(new FileOutputStream(f), "Jason user configuration");
         } catch (Exception e) {
             System.err.println("Error writting preferences");

@@ -246,6 +246,12 @@ public class Agent {
         if (l instanceof ArithFunctionTerm) {
             ((ArithFunctionTerm)l).setAgent(a);
         }
+        if (l instanceof Rule) {
+            LogicalFormula f = ((Rule)l).getBody();
+            if (f instanceof Literal) {
+                fixAgInIAandFunctions(a, (Literal)f);
+            }
+        }
         for (int i=0; i<l.getArity(); i++) {
             if (l.getTerm(i) instanceof Literal)
                 fixAgInIAandFunctions(a, (Literal)l.getTerm(i));            
@@ -442,15 +448,21 @@ public class Agent {
         if (a != null) {
             for (Literal b: a.initialBels) {
                 this.addInitialBel(b);
+                try {
+                    fixAgInIAandFunctions(this,b);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
-            for (Literal g: a.initialGoals) {
+            
+            for (Literal g: a.initialGoals) 
                 this.addInitialGoal(g);
-            }
-            for (Plan p: a.getPL()) {
+            
+            for (Plan p: a.getPL()) 
                 this.getPL().add(p, false);
-            }
+
             if (getPL().hasMetaEventPlans())
-                getTS().addGoalListener(new GoalListenerForMetaEvents(getTS()));            
+                getTS().addGoalListener(new GoalListenerForMetaEvents(getTS()));
         }
     }
     

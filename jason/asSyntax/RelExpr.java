@@ -94,7 +94,7 @@ public class RelExpr extends BinaryStructure implements LogicalFormula {
         case lte: if (xp.compareTo(yp)  <= 0) return LogExpr.createUnifIterator(un);  break;
         case eq : if (xp.equals(yp))          return LogExpr.createUnifIterator(un);  break;
         case dif: if (!xp.equals(yp))         return LogExpr.createUnifIterator(un);  break;
-        case unify: if (un.unifies(xp,yp))    return LogExpr.createUnifIterator(un);  break;
+        case unify: if (un.unifies(xp,yp))    return LogExpr.createUnifIterator(un);  break; 
 
         case literalBuilder: 
             try {

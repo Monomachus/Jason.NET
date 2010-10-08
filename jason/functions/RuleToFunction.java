@@ -48,7 +48,12 @@ public class RuleToFunction extends DefaultArithFunction  {
     public boolean checkArity(int a) {
         return a == arity;
     }
-
+    
+    @Override
+    public boolean allowUngroundTerms() {
+        return true;
+    }
+    
     @Override
     public double evaluate(TransitionSystem ts, Term[] args) throws Exception {
         // create a literal to perform the query
@@ -69,9 +74,9 @@ public class RuleToFunction extends DefaultArithFunction  {
             if (value.isNumeric())
                 return ((NumberTerm)value).solve();
             else
-                throw new JasonException("The result of "+r+"("+value+") is not numeric!");             
+                throw new JasonException("The result of "+r+" (="+value+") is not numeric!");             
         } else 
-            throw new JasonException("No solution for found for rule "+r);
+            throw new JasonException("No solution was found for rule "+r);
     }
     
     public String toString() { 

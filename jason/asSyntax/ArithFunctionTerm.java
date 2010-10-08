@@ -206,11 +206,10 @@ public class ArithFunctionTerm extends Structure implements NumberTerm {
 
     @Override
     public NumberTerm clone() {
-        if (isEvaluated()) {
+        if (isEvaluated()) 
             return value;
-        } else {
+        else 
             return new ArithFunctionTerm(this);
-        }
     } 
     
     public Element getAsDOM(Document document) {
