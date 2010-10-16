@@ -218,7 +218,7 @@ public class Environment {
         }
     }
 
-    /** Removes a perception in the common perception list */
+    /** Removes a perception from the common perception list */
     public boolean removePercept(Literal per) {
         if (per != null) {
             uptodateAgs.clear();
@@ -227,7 +227,7 @@ public class Environment {
         return false;
     }
     
-    /** Removes all percepts in the common perception list that unifies with <i>per</i>.
+    /** Removes all percepts from the common perception list that unifies with <i>per</i>.
      *  
      *  Example: removePerceptsByUnif(Literal.parseLiteral("position(_)")) will remove 
      *  all percepts that unifies "position(_)".
@@ -340,6 +340,13 @@ public class Environment {
                 agl.clear();
             }
         }
+    }
+    
+    /** Clears all perception (from common list and individual perceptions) */
+    public void clearAllPercepts() {
+        clearPercepts();
+        for (String ag: agPercepts.keySet()) 
+            clearPercepts(ag);
     }
     
     /** 
