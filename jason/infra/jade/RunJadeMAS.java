@@ -44,6 +44,7 @@ import jason.runtime.MASConsoleGUI;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
@@ -65,19 +66,36 @@ public class RunJadeMAS extends RunCentralisedMAS {
 
     public static String controllerName  = "j_controller";
     public static String environmentName = "j_environment";
-    
+        
     private static Logger logger = Logger.getLogger(RunJadeMAS.class.getName());
     
     private AgentController envc, crtc;
     private Map<String,AgentController> ags = new HashMap<String,AgentController>();
 
-    private ContainerController cc;    
+    private ContainerController cc;
+    
+    private String targetContainer  = null; // start only agents of this container
+    private ArrayList<String> initArgs   = new ArrayList<String>();
+    private ProfileImpl profile; // profile used to start jade container
     
     public static void main(String[] args) {
         runner = new RunJadeMAS();
         runner.init(args);
     }
     
+    @Override
+    public void init(String[] args) {
+        // test if a container is informed
+        for (int i=1; i<args.length; i++) {
+            initArgs.add(args[i]);
+            if (args[i].equals("-container-name")) {
+                targetContainer = args[i+1];
+            }
+        }
+
+        super.init(args);
+    }
+
     @Override
     protected void createButtons() {
         createStopButton();
@@ -106,48 +124,61 @@ public class RunJadeMAS extends RunCentralisedMAS {
             }
         });
         MASConsoleGUI.get().addButton(btSniffer);
-
     }
 
+    
     protected boolean startContainer() {
         try {
             // source based on jade.Boot
-            ProfileImpl profile = new BootProfileImpl(prepareArgs(Config.get().getJadeArrayArgs()));
-            if (profile.getBooleanProperty(Profile.MAIN, true)) 
+            profile = new BootProfileImpl(prepareArgs( (String[])initArgs.toArray(new String[0])));
+            
+            if (profile.getBooleanProperty(Profile.MAIN, true)) { 
                 cc = Runtime.instance().createMainContainer(profile);
-            else
+            } else {
                 cc = Runtime.instance().createAgentContainer(profile);
+            }            
             //Runtime.instance().setCloseVM(true); // Exit the JVM when there are no more containers around
             return cc != null;
         } catch (Throwable e) {
-            logger.warning("Error starting JADE:"+e);
+            logger.log(Level.WARNING,"Error starting JADE",e);
             return false;
         }
     }
     
     @Override
     protected void createAgs(MAS2JProject project, boolean debug) throws JasonException {
-        if (!startContainer()) return;
-        try {
-            // create environment
-            logger.fine("Creating environment " + project.getEnvClass());
-            envc = cc.createNewAgent(environmentName, JadeEnvironment.class.getName(), new Object[] { project.getEnvClass() });
-        } catch (Exception e) {
-            logger.log(Level.SEVERE, "Error creating the environment: ", e);
+        if (!startContainer()) 
             return;
+        
+        if (profile.getBooleanProperty(Profile.MAIN, true)) { 
+            try {
+                // create environment
+                logger.fine("Creating environment " + project.getEnvClass());
+                envc = cc.createNewAgent(environmentName, JadeEnvironment.class.getName(), new Object[] { project.getEnvClass() });
+            } catch (Exception e) {
+                logger.log(Level.SEVERE, "Error creating the environment: ", e);
+                return;
+            }
+
+            try {
+                // create controller
+                ClassParameters controlClass = project.getControlClass();
+                if (debug && controlClass == null) {
+                    controlClass = new ClassParameters(ExecutionControlGUI.class.getName());
+                }
+                if (controlClass != null) {
+                    logger.fine("Creating controller " + controlClass);
+                    crtc = cc.createNewAgent(controllerName, JadeExecutionControl.class.getName(), new Object[] { controlClass });
+                }
+            } catch (Exception e) {
+                logger.log(Level.SEVERE, "Error creating the controller: ", e);
+                return;
+            }
+        
         }
+        
+        // create agents
         try {
-
-            // create controller
-            ClassParameters controlClass = project.getControlClass();
-            if (debug && controlClass == null) {
-                controlClass = new ClassParameters(ExecutionControlGUI.class.getName());
-            }
-            if (controlClass != null) {
-                logger.fine("Creating controller " + controlClass);
-                crtc = cc.createNewAgent(controllerName, JadeExecutionControl.class.getName(), new Object[] { controlClass });
-            }
-
             project.fixAgentsSrc(null);
 
             // set the aslSrcPath in the include
@@ -157,6 +188,10 @@ public class RunJadeMAS extends RunCentralisedMAS {
             for (AgentParameters ap : project.getAgents()) {
                 try {
                     String agName = ap.name;
+                    if (ap.getHost() != null && targetContainer != null && !ap.getHost().equals(targetContainer))
+                        continue; // skip this agent, it is not for this container
+                    if (ap.getHost() == null && !profile.getBooleanProperty(Profile.MAIN, true))
+                        continue; // skip this agent, agents without host will be placed in the main container
     
                     for (int cAg = 0; cAg < ap.qty; cAg++) {
                         String numberedAg = agName;
@@ -171,17 +206,18 @@ public class RunJadeMAS extends RunCentralisedMAS {
                 }
             }
     
-            // create rma
-            if (Config.get().getBoolean(Config.JADE_RMA)) {
-                cc.createNewAgent("RMA", jade.tools.rma.rma.class.getName(), null).start();
-            }
-
-            // create sniffer
-            if (Config.get().getBoolean(Config.JADE_SNIFFER)) {
-                cc.createNewAgent("Sniffer", jade.tools.sniffer.Sniffer.class.getName(), null).start();
-                Thread.sleep(1000); // give 1 second for sniffer to start
-            }
-           
+            if (profile.getBooleanProperty(Profile.MAIN, true)) { 
+                // create rma
+                if (Config.get().getBoolean(Config.JADE_RMA)) {
+                    cc.createNewAgent("RMA", jade.tools.rma.rma.class.getName(), null).start();
+                }
+    
+                // create sniffer
+                if (Config.get().getBoolean(Config.JADE_SNIFFER)) {
+                    cc.createNewAgent("Sniffer", jade.tools.sniffer.Sniffer.class.getName(), null).start();
+                    Thread.sleep(1000); // give 1 second for sniffer to start
+                }
+            }           
         } catch (Throwable e) {
             logger.log(Level.SEVERE, "Error creating agents: ", e);            
         }
@@ -287,6 +323,7 @@ public class RunJadeMAS extends RunCentralisedMAS {
         int n = 0;
         boolean endCommand =
             false;    // true when there are no more options on the command line
+        @SuppressWarnings("rawtypes")
         Vector results = new Vector();
 
         while ((n < args.length) &&!endCommand) {
@@ -332,6 +369,14 @@ public class RunJadeMAS extends RunCentralisedMAS {
                     printUsageInfo = true;
                 } else {
                     results.add("name:" + args[n]);
+                }
+            } else if (theArg.equalsIgnoreCase("-container-name")) {
+                if (++n == args.length) {
+                    System.err.println("Missing container name");
+
+                    printUsageInfo = true;
+                } else {
+                    results.add("container-name:" + args[n]);
                 }
             } else if (theArg.equalsIgnoreCase("-imtp")) {
                 if (++n == args.length) {

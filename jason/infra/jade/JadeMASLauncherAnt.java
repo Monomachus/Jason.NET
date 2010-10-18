@@ -1,5 +1,8 @@
 package jason.infra.jade;
 
+import jason.asSyntax.ASSyntax;
+import jason.asSyntax.StringTerm;
+import jason.asSyntax.parser.ParseException;
 import jason.infra.centralised.CentralisedMASLauncherAnt;
 import jason.jeditplugin.Config;
 import jason.jeditplugin.MASLauncherInfraTier;
@@ -11,7 +14,9 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.PrintWriter;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 
 /**
  * Creates the script build.xml to launch the MAS using JADE.
@@ -78,6 +83,61 @@ public class JadeMASLauncherAnt extends CentralisedMASLauncherAnt implements MAS
         
         
         script = replace(script, "<PATH-LIB>", jadepath + "\n\t<PATH-LIB>");
+        
+        String startContainers = 
+            "    <target name=\"main-container\" depends=\"compile\" >\n" 
+          + "        <echo message=\"Starting JADE Main-Container\" />\n"
+          + "        <java classname=\"jason.infra.jade.RunJadeMAS\" failonerror=\"true\" fork=\"yes\" dir=\"${basedir}\" >\n"
+          + "            <classpath refid=\"project.classpath\"/>\n"
+          + "            <arg line=\"${mas2j.project.file} -container-name Main-Container "+Config.get().getJadeArgs()+"\"/>\n"
+          + "          <jvmarg line=\"-Xmx500M -Xss8M\"/>\n"
+          + "        </java>\n"
+          + "    </target>\n\n";
+        
+        // collect containers
+        Set<String> containers = new HashSet<String>();
+        for (AgentParameters ap: project.getAgents()) {
+            if (ap.getHost() != null && !ap.getHost().isEmpty() && !ap.getHost().equals("Main-Container"))
+                containers.add(ap.getHost());
+        }
+
+        String mainHost;
+        mainHost = project.getInfrastructure().getParameter("main_container_host");
+        if (mainHost == null) {
+            mainHost = "localhost";
+        } else {
+            try {
+                mainHost = ((StringTerm)ASSyntax.parseLiteral(mainHost).getTerm(0)).getString();
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+        for (String container: containers) {
+            StringBuilder agents = new StringBuilder();
+            String sep = " ";
+            for (AgentParameters ap: project.getAgents()) {
+                if (ap.getHost() != null && ap.getHost().equals(container)) {
+                    for (int cAg = 0; cAg < ap.qty; cAg++) {
+                        String numberedAg = ap.getAgName();
+                        if (ap.qty > 1)
+                            numberedAg += (cAg + 1); //String.format("%0"+String.valueOf(ap.qty).length()+"d", cAg + 1);
+                        agents.append(sep+numberedAg+":jason.infra.jade.JadeAgArch(j-project,"+project.getProjectFile().getName()+","+ap.getAgName()+")");
+                        sep = ";";
+                    }                    
+                }
+            }
+            startContainers += 
+                "    <target name=\""+container+"\" depends=\"compile\" >\n" +
+                "        <echo message=\"Starting JADE Container "+container+"\" />\n"+
+                "        <java classname=\"jade.Boot\" failonerror=\"true\" fork=\"yes\" dir=\"${basedir}\" >\n"+
+                "            <classpath refid=\"project.classpath\"/>\n"+
+                "            <arg line=\"-container -host "+mainHost+" -container-name "+container+" "+agents+"\"/>\n"+
+                "            <jvmarg line=\"-Xmx500M -Xss8M\"/>\n"+    
+                "        </java>\n"+
+                "    </target>\n\n";
+        }  
+
+        script = replace(script, "<OTHER-TASK>", startContainers);
 
         return super.replaceMarks(script, debug);
     }

@@ -119,6 +119,9 @@ public class TransitionSystem {
         else
             logger = Logger.getLogger(TransitionSystem.class.getName());
     }
+    public void setLogger(Logger l) {
+        logger = l;
+    }
     
     // ---------------------------------------------------------
     //    Goal Listeners support methods

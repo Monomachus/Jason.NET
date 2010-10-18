@@ -46,6 +46,12 @@ public class ClassParameters {
     public String getParameter(int index) {
         return parameters.get(index);
     }
+    public String getParameter(String startWith) {
+        for (String s: parameters) 
+            if (s.startsWith(startWith))
+                return s;
+        return null;
+    }
     public boolean hasParameter(String s) {
         return parameters.contains(s);
     }

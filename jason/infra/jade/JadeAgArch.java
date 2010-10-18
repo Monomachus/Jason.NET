@@ -36,7 +36,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.w3c.dom.Document;
 
@@ -75,7 +74,7 @@ public class JadeAgArch extends JadeAg implements AgArchInfraTier {
     @Override
     protected void setup() {
         RunCentralisedMAS.setupLogger();
-        logger = Logger.getLogger(JadeAgArch.class.getName() + "." + getAgName());
+        logger = jade.util.Logger.getMyLogger(this.getClass().getName() + "." + getAgName());
         logger.info("starting "+getLocalName());
         try {
     
@@ -87,7 +86,7 @@ public class JadeAgArch extends JadeAg implements AgArchInfraTier {
                 logger.setLevel(userAgArch.getTS().getSettings().logLevel());
         
                 registerAgInDF();
-                
+            
                 tsBehaviour = new JasonTSReasoner();
                 addBehaviour(tsBehaviour);
                 
@@ -98,6 +97,13 @@ public class JadeAgArch extends JadeAg implements AgArchInfraTier {
         }
     }
 
+    /*
+    @Override
+    protected void afterMove() {
+        super.afterMove();
+    }
+    */
+    
     protected AgentParameters parseParameters() throws ParseException, IOException {
 
         Object[] args = getArguments();
@@ -118,7 +124,6 @@ public class JadeAgArch extends JadeAg implements AgArchInfraTier {
         //    ag <agent class>
         //    bb < belief base class >
         //    option < options >
-
         if (args[0] instanceof AgentParameters) {
             return (AgentParameters)args[0];
         } else if (args[0].toString().equals("j-project")) { // load parameters from .mas2j
@@ -138,8 +143,8 @@ public class JadeAgArch extends JadeAg implements AgArchInfraTier {
                 logger.log(Level.SEVERE, "There is no agent '"+args[2]+"' in project '"+args[1]+"'.");
             } else {    
                 ap.fixSrc(project.getSourcePaths(), null);
-                if (ap.qty > 1)
-                    logger.warning("Ignoring quantity of agents from mas2j, jade arch creates only ONE agent.");
+                //if (ap.qty > 1)
+                //    logger.warning("Ignoring quantity of agents from mas2j, jade arch creates only ONE agent.");
             }
             return ap;
             
@@ -391,6 +396,7 @@ public class JadeAgArch extends JadeAg implements AgArchInfraTier {
         if (!isRunning()) return null;
         if (getEnvironmentAg() == null) return null;
         
+        @SuppressWarnings("rawtypes")
         List percepts = null;
         try {
             ACLMessage askMsg = new ACLMessage(ACLMessage.QUERY_REF);

@@ -287,6 +287,7 @@ public class ASParserTest extends TestCase {
                     if (f.isDirectory()) {
                         parseDir(f);
                     } else if (f.getName().endsWith(MAS2JProject.AS_EXT)) {
+                        if (f.getName().equals("search.asl"))  continue; // ignore this file 
                         as2j parser = new as2j(new FileInputStream(f));
                         //Agent ag = new Agent();
                         //ag.init();
