@@ -83,7 +83,8 @@ public class JadeAgArch extends JadeAg implements AgArchInfraTier {
                 userAgArch = (AgArch) Class.forName(ap.archClass.getClassName()).newInstance();
                 userAgArch.setArchInfraTier(this);
                 userAgArch.initAg(ap.agClass.getClassName(), ap.getBBClass(), ap.asSource.getAbsolutePath(), ap.getAsSetts(false, false));
-                logger.setLevel(userAgArch.getTS().getSettings().logLevel());
+                if (userAgArch.getTS().getSettings().verbose() >= 0)
+                    logger.setLevel(userAgArch.getTS().getSettings().logLevel());
         
                 registerAgInDF();
             

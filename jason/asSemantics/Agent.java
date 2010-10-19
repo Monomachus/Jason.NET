@@ -207,7 +207,8 @@ public class Agent {
         Agent a = new Agent();
         
         a.setLogger(arch);
-        a.logger.setLevel(this.getTS().getSettings().logLevel());
+        if (this.getTS().getSettings().verbose() >= 0)
+            a.logger.setLevel(this.getTS().getSettings().logLevel());
 
         a.bb = this.bb.clone();
         a.pl = this.pl.clone();
@@ -519,7 +520,8 @@ public class Agent {
     public void setTS(TransitionSystem ts) {
         this.ts = ts;
         setLogger(ts.getUserAgArch());
-        logger.setLevel(ts.getSettings().logLevel());        
+        if (ts.getSettings().verbose() >= 0)
+            logger.setLevel(ts.getSettings().logLevel());        
     }
 
     public TransitionSystem getTS() {

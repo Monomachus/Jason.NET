@@ -118,7 +118,8 @@ public class CentralisedAgArch implements Runnable, AgArchInfraTier {
     
     public void setLogger() {
         logger = Logger.getLogger(CentralisedAgArch.class.getName() + "." + getAgName());
-        logger.setLevel(userAgArch.getTS().getSettings().logLevel());       
+        if (userAgArch.getTS().getSettings().verbose() >= 0)
+            logger.setLevel(userAgArch.getTS().getSettings().logLevel());       
     }
     
     public Logger getLogger() {

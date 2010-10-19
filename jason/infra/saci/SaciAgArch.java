@@ -131,7 +131,8 @@ public class SaciAgArch extends saci.Agent implements AgArchInfraTier {
             userAgArch = (AgArch) Class.forName(archClassName).newInstance();
             userAgArch.setArchInfraTier(this);
             userAgArch.initAg(agClassName, bbPars, asSource, stts);
-            logger.setLevel(userAgArch.getTS().getSettings().logLevel());
+            if (userAgArch.getTS().getSettings().verbose() >= 0)
+                logger.setLevel(userAgArch.getTS().getSettings().logLevel());
         } catch (Exception e) {
             running = false;
             throw new JasonException("as2j: error creating the agent class! - " + e.getMessage());

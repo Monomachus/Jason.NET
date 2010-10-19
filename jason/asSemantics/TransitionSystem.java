@@ -103,7 +103,7 @@ public class TransitionSystem {
         nrcslbr = setts.nrcbp(); // to do BR to start with
 
         setLogger(agArch);
-        if (setts != null)
+        if (setts != null && setts.verbose() >= 0)
             logger.setLevel(setts.logLevel());
         
         if (a != null)

@@ -40,7 +40,7 @@ public class Settings {
     public static final boolean   OSameFocus      = true;
     public static final boolean   ONewFocus       = false;
     public static final int       ODefaultNRC     = 1;
-    public static final int       ODefaultVerbose = 1;
+    public static final int       ODefaultVerbose = -1;
     public static final boolean   ODefaultSync    = false;
     
     private static Logger logger = Logger.getLogger(Settings.class.getName());          
