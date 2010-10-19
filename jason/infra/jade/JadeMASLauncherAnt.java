@@ -1,6 +1,7 @@
 package jason.infra.jade;
 
 import jason.asSyntax.ASSyntax;
+import jason.asSyntax.Literal;
 import jason.asSyntax.StringTerm;
 import jason.asSyntax.parser.ParseException;
 import jason.infra.centralised.CentralisedMASLauncherAnt;
@@ -84,8 +85,9 @@ public class JadeMASLauncherAnt extends CentralisedMASLauncherAnt implements MAS
         
         script = replace(script, "<PATH-LIB>", jadepath + "\n\t<PATH-LIB>");
         
-        String startContainers = 
-            "    <target name=\"main-container\" depends=\"compile\" >\n" 
+        String startContainers = "";
+         /*
+            "    <target name=\"Main-Container\" depends=\"compile\" >\n" 
           + "        <echo message=\"Starting JADE Main-Container\" />\n"
           + "        <java classname=\"jason.infra.jade.RunJadeMAS\" failonerror=\"true\" fork=\"yes\" dir=\"${basedir}\" >\n"
           + "            <classpath refid=\"project.classpath\"/>\n"
@@ -93,14 +95,8 @@ public class JadeMASLauncherAnt extends CentralisedMASLauncherAnt implements MAS
           + "          <jvmarg line=\"-Xmx500M -Xss8M\"/>\n"
           + "        </java>\n"
           + "    </target>\n\n";
+        */
         
-        // collect containers
-        Set<String> containers = new HashSet<String>();
-        for (AgentParameters ap: project.getAgents()) {
-            if (ap.getHost() != null && !ap.getHost().isEmpty() && !ap.getHost().equals("Main-Container"))
-                containers.add(ap.getHost());
-        }
-
         String mainHost;
         mainHost = project.getInfrastructure().getParameter("main_container_host");
         if (mainHost == null) {
@@ -112,16 +108,59 @@ public class JadeMASLauncherAnt extends CentralisedMASLauncherAnt implements MAS
                 e.printStackTrace();
             }
         }
-        for (String container: containers) {
-            StringBuilder agents = new StringBuilder();
-            String sep = " ";
+        
+        // identify type of allocation (by class of info in .mas2h)
+        ContainerAllocation allocator = null;
+        String allocationClass = project.getInfrastructure().getParameter("container_allocation");
+        if (allocationClass != null) {
+            try {
+                Literal literalArgs = ASSyntax.parseLiteral(allocationClass);
+                String   className  = ((StringTerm)literalArgs.getTerm(0)).getString();
+                
+                //URLClassLoader loader = new URLClassLoader(new URL[] { 
+                //        new File(".").toURI().toURL(), 
+                //        new File("./bin/classes").toURI().toURL() });
+                allocator = (ContainerAllocation)Class.forName(className).newInstance();
+                allocator.init(new String[] { ((StringTerm)literalArgs.getTerm(1)).getString() }, project);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } 
+    
+        // collect containers in a set
+        Set<String> containers = new HashSet<String>();
+        if (allocator == null) {
             for (AgentParameters ap: project.getAgents()) {
-                if (ap.getHost() != null && ap.getHost().equals(container)) {
-                    for (int cAg = 0; cAg < ap.qty; cAg++) {
-                        String numberedAg = ap.getAgName();
-                        if (ap.qty > 1)
-                            numberedAg += (cAg + 1); //String.format("%0"+String.valueOf(ap.qty).length()+"d", cAg + 1);
-                        agents.append(sep+numberedAg+":jason.infra.jade.JadeAgArch(j-project,"+project.getProjectFile().getName()+","+ap.getAgName()+")");
+                if (ap.getHost() != null && !ap.getHost().isEmpty())
+                    containers.add(ap.getHost());
+            }
+        } else {
+            containers.addAll( allocator.getContainers() );
+        }
+
+        //containers.remove("Main-Container"); // do not generate script for main containers
+        // script for the container's agents
+        for (String container: containers) {
+            String sep = " ";
+            String args = "-container -host "+mainHost+" -container-name "+container+" ";
+            
+            StringBuilder agents = new StringBuilder();
+            if (container.equals("Main-Container")) {
+                // include environment
+                agents.append(RunJadeMAS.environmentName+":"+JadeEnvironment.class.getName()+"(j-project,"+project.getProjectFile().getName()+")");
+                args = Config.get().getJadeArgs();
+                if (Config.get().getBoolean(Config.JADE_RMA)) 
+                    args += " -gui ";
+                sep = ";";
+            }
+            for (AgentParameters ap: project.getAgents()) {
+                for (int cAg = 0; cAg < ap.qty; cAg++) {
+                    String numberedAg = ap.getAgName();
+                    if (ap.qty > 1)
+                        numberedAg += (cAg + 1);
+                    if ( (ap.getHost() != null && ap.getHost().equals(container)) || 
+                         (allocator != null && allocator.allocateAgent(numberedAg) != null && allocator.allocateAgent(numberedAg).equals(container))) {                        
+                        agents.append(sep+numberedAg+":"+JadeAgArch.class.getName()+"(j-project,"+project.getProjectFile().getName()+","+ap.getAgName()+")");
                         sep = ";";
                     }                    
                 }
@@ -131,7 +170,7 @@ public class JadeMASLauncherAnt extends CentralisedMASLauncherAnt implements MAS
                 "        <echo message=\"Starting JADE Container "+container+"\" />\n"+
                 "        <java classname=\"jade.Boot\" failonerror=\"true\" fork=\"yes\" dir=\"${basedir}\" >\n"+
                 "            <classpath refid=\"project.classpath\"/>\n"+
-                "            <arg line=\"-container -host "+mainHost+" -container-name "+container+" "+agents+"\"/>\n"+
+                "            <arg line=\""+args+" -agents "+agents+"\"/>\n"+
                 "            <jvmarg line=\"-Xmx500M -Xss8M\"/>\n"+    
                 "        </java>\n"+
                 "    </target>\n\n";

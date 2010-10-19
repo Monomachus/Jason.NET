@@ -35,6 +35,7 @@ import jason.asSyntax.Literal;
 import jason.asSyntax.Structure;
 import jason.environment.Environment;
 import jason.environment.EnvironmentInfraTier;
+import jason.infra.centralised.RunCentralisedMAS;
 import jason.mas2j.ClassParameters;
 import jason.mas2j.MAS2JProject;
 import jason.runtime.RuntimeServicesInfraTier;
@@ -44,7 +45,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * This class implements the Jade version of the environment
@@ -54,8 +54,6 @@ import java.util.logging.Logger;
  */
 @SuppressWarnings("serial")
 public class JadeEnvironment extends JadeAg implements EnvironmentInfraTier {
-
-    private static Logger logger = Logger.getLogger(JadeEnvironment.class.getName());
 
     public static String actionOntology     = "AS-actions";
     public static String perceptionOntology = "AS-perception";
@@ -68,6 +66,8 @@ public class JadeEnvironment extends JadeAg implements EnvironmentInfraTier {
     @Override
     public void setup()  {
         // create the user environment
+        RunCentralisedMAS.setupLogger();
+        logger.fine("Starting JadeEnvironment.");
         try {
             Object[] args = getArguments();
             if (args != null && args.length > 0) {
@@ -90,6 +90,7 @@ public class JadeEnvironment extends JadeAg implements EnvironmentInfraTier {
                     userEnv = (Environment) Class.forName(ep.getClassName()).newInstance();
                     userEnv.setEnvironmentInfraTier(this);
                     userEnv.init(ep.getParametersArray());
+                    logger.fine("Init of environmend, via j-project, done.");
                 
                 } else { // assume first parameter as class name, remaining environment args
                     userEnv = (Environment) Class.forName(args[0].toString()).newInstance();
@@ -121,7 +122,8 @@ public class JadeEnvironment extends JadeAg implements EnvironmentInfraTier {
         } catch (FIPAException e) {
             logger.log(Level.SEVERE, "Error registering environment in DF", e);
         }
-
+        logger.fine("Registry in the DF done.");
+        
         try {
             // add a message handler to answer perception asks
             // and actions asks
@@ -164,7 +166,8 @@ public class JadeEnvironment extends JadeAg implements EnvironmentInfraTier {
                     }
                 }
             });
-
+            logger.fine("setup done");
+            
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error starting agent", e);
         }

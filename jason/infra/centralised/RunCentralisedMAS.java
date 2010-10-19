@@ -195,7 +195,7 @@ public class RunCentralisedMAS {
         return runner.debug;
     }
 
-    public static void setupLogger() {
+    public static synchronized void setupLogger() {
         if (readFromJAR) {
             Handler[] hs = Logger.getLogger("").getHandlers(); 
             for (int i = 0; i < hs.length; i++) { 

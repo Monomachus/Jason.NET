@@ -36,7 +36,7 @@ public abstract class JadeAg extends Agent {
     
     private static final long serialVersionUID = 1L;
 
-    protected Logger logger = jade.util.Logger.getMyLogger(this.getClass().getName()); //Logger.getLogger(JadeAg.class.getName());
+    protected Logger logger = jade.util.Logger.getMyLogger(this.getClass().getName());
 
     protected static int rwid = 0; // reply-with counter
     protected boolean running = true;
