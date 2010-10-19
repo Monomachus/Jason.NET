@@ -55,7 +55,7 @@
     : .list(Content)
    <- !add_all_kqml_achieve(Sender,Content).
 
-	  
+      
 @kqmlReceivedAchieveList1
 +!add_all_kqml_achieve(_,[]).   
 
@@ -65,7 +65,7 @@
       !!CA;
       !add_all_kqml_achieve(Sender,T).
 
-	  
+      
 @kqmlReceivedUnAchieve[atomic]
 +!kqml_received(_, unachieve, Content, _)
    <- .drop_desire(Content).
