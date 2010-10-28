@@ -69,7 +69,7 @@ public class JadeMASLauncherAnt extends CentralisedMASLauncherAnt implements MAS
         script = replace(script, "<PROJECT-RUNNER-CLASS>", RunJadeMAS.class.getName());
 
         String jadepath = "\t<pathelement location=\"" + Config.get().getJadeJar() + "\"/>";
-        try {
+        /*try {
             String http = new File(Config.get().getJadeJar()).getAbsoluteFile().getParent() + "/http.jar";
             jadepath += "\n\t<pathelement location=\"" + http + "\"/>";
         } catch (Exception _) {}
@@ -80,7 +80,7 @@ public class JadeMASLauncherAnt extends CentralisedMASLauncherAnt implements MAS
         try {
             String jar = new File(Config.get().getJadeJar()).getAbsoluteFile().getParent() + "/commons-codec-1.3.jar";
             jadepath += "\n\t<pathelement location=\"" + jar + "\"/>";
-        } catch (Exception _) {}
+        } catch (Exception _) {}*/
         
         
         script = replace(script, "<PATH-LIB>", jadepath + "\n\t<PATH-LIB>");
@@ -129,6 +129,7 @@ public class JadeMASLauncherAnt extends CentralisedMASLauncherAnt implements MAS
     
         // collect containers in a set
         Set<String> containers = new HashSet<String>();
+        containers.add("Main-Container");
         if (allocator == null) {
             for (AgentParameters ap: project.getAgents()) {
                 if (ap.getHost() != null && !ap.getHost().isEmpty())
@@ -138,7 +139,6 @@ public class JadeMASLauncherAnt extends CentralisedMASLauncherAnt implements MAS
             containers.addAll( allocator.getContainers() );
         }
 
-        //containers.remove("Main-Container"); // do not generate script for main containers
         // script for the container's agents
         for (String container: containers) {
             String sep = " ";

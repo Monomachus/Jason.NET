@@ -206,7 +206,7 @@ public class RunCentralisedMAS {
             Logger.getLogger("").addHandler(h);
             Logger.getLogger("").setLevel(Level.INFO);
         } else {
-            // see for a local log configuration
+            // checks a local log configuration file
             if (new File(logPropFile).exists()) {
                 try {
                     LogManager.getLogManager().readConfiguration(new FileInputStream(logPropFile));
