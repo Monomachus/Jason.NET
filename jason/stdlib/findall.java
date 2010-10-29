@@ -73,7 +73,8 @@ import java.util.Iterator;
   </ul>
 
 
-  @see jason.stdlib.count
+  @see jason.stdlib.count 
+  @see jason.stdlib.setof
 */
 public class findall extends DefaultInternalAction {
 
@@ -81,7 +82,7 @@ public class findall extends DefaultInternalAction {
     @Override public int getMaxArgs() { return 3; }
 
     @Override public Term[] prepareArguments(Literal body, Unifier un) {
-        return body.getTermsArray(); // we do not need clone neither apply for this internal action
+        return body.getTermsArray(); // we do not need to clone nor to apply for this internal action
     }
 
     @Override protected void checkArguments(Term[] args) throws JasonException {
