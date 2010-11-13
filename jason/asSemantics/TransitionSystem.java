@@ -911,7 +911,9 @@ public class TransitionSystem {
             // produce failure event
             Event failEvent = findEventForFailure(i, im.getTrigger());
             if (failEvent != null) {
-                setDefaultFailureAnnots(failEvent, im.getCurrentStep().getBodyTerm(), failAnnots);
+                Term bodyPart = im.getCurrentStep().getBodyTerm().clone();
+                bodyPart.apply(im.unif);
+                setDefaultFailureAnnots(failEvent, bodyPart, failAnnots);
                 confP.C.addEvent(failEvent);
                 failEeventGenerated = true;
                 if (logger.isLoggable(Level.FINE)) logger.fine("Generating goal deletion " + failEvent.getTrigger() + " from goal: " + im.getTrigger());

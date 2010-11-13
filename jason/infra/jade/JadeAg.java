@@ -62,6 +62,7 @@ public abstract class JadeAg extends Agent {
                 acl.setConversationId(convid);
             }
         }
+        if (logger.isLoggable(Level.FINE)) logger.fine("Sending message: " + acl);
         send(acl);
     }
 
@@ -114,7 +115,7 @@ public abstract class JadeAg extends Agent {
     }
 
     protected ACLMessage jasonToACL(Message m) throws IOException {
-        ACLMessage acl = new ACLMessage(kqmlToACL(m.getIlForce()));
+        ACLMessage acl = kqmlToACL(m.getIlForce());
         // send content as string if it is a Term/String (it is better for interoperability)
         if (m.getPropCont() instanceof Term || m.getPropCont() instanceof String) {
             acl.setContent(m.getPropCont().toString());         
@@ -129,16 +130,23 @@ public abstract class JadeAg extends Agent {
         return acl;
     }
     
-    public static int kqmlToACL(String p) {
+    public static ACLMessage kqmlToACL(String p) {
         if (p.equals("tell")) {
-            return ACLMessage.INFORM;
+            return new ACLMessage(ACLMessage.INFORM);
         } else if (p.equals("askOne")) {
-            return ACLMessage.QUERY_REF;
+            return new ACLMessage(ACLMessage.QUERY_REF);
         } else if (p.equals("achieve")) {
-            return ACLMessage.REQUEST;
-        } else if (p.equals("untell")) {
-            return UNTELL;
-        } else if (p.equals("unachieve")) {
+            return new ACLMessage(ACLMessage.REQUEST);
+        } else if (p.equals("untell") || 
+                   p.equals("unachieve") ||
+                   p.equals("askAll") ||
+                   p.equals("askHow") ||
+                   p.equals("tellHow") ||
+                   p.equals("untellHow")) {
+            ACLMessage m = new ACLMessage(ACLMessage.INFORM_REF);
+            m.addUserDefinedParameter("kqml-performative", p);
+            return m;
+        /*} else if (p.equals("unachieve")) {
             return UNACHIEVE;
         } else if (p.equals("askAll")) {
             return ASKALL;
@@ -147,25 +155,30 @@ public abstract class JadeAg extends Agent {
         } else if (p.equals("tellHow")) {
             return TELLHOW;
         } else if (p.equals("untellHow")) {
-            return UNTELLHOW;
+            return UNTELLHOW;*/
         }
-        
-        return ACLMessage.getInteger(p);            
+        return new ACLMessage(ACLMessage.getInteger(p));            
     }
     
-    public static String aclToKqml(int p) {
-        switch(p) {
+    public static String aclToKqml(ACLMessage m) {
+        switch(m.getPerformative()) {
         case ACLMessage.INFORM: return "tell"; 
         case ACLMessage.QUERY_REF: return "askOne";
         case ACLMessage.REQUEST: return "achieve";
-        case UNTELL: return "untell";
+        /*case UNTELL: return "untell";
         case UNACHIEVE: return "unachieve";
         case ASKALL: return "askAll";
         case ASKHOW: return "askHow";
         case TELLHOW: return "tellHow";
-        case UNTELLHOW: return "untellHow";
+        case UNTELLHOW: return "untellHow";*/
+        case ACLMessage.INFORM_REF: 
+            String kp = m.getUserDefinedParameter("kqml-performative");
+            if (kp != null) {
+                return kp;
+            }
+            break;
         }
-        return ACLMessage.getPerformative(p).toLowerCase().replaceAll("-", "_");    
+        return ACLMessage.getPerformative(m.getPerformative()).toLowerCase().replaceAll("-", "_");    
     }
     
 }

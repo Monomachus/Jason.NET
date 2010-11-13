@@ -277,7 +277,7 @@ public class JadeAgArch extends JadeAg implements AgArchInfraTier {
                         continue;
                     }
                     
-                    String ilForce   = aclToKqml(m.getPerformative());
+                    String ilForce   = aclToKqml(m);
                     String sender    = m.getSender().getLocalName();
                     String replyWith = m.getReplyWith();
                     String irt       = m.getInReplyTo();
@@ -397,7 +397,6 @@ public class JadeAgArch extends JadeAg implements AgArchInfraTier {
         if (!isRunning()) return null;
         if (getEnvironmentAg() == null) return null;
         
-        @SuppressWarnings("rawtypes")
         List percepts = null;
         try {
             ACLMessage askMsg = new ACLMessage(ACLMessage.QUERY_REF);

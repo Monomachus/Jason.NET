@@ -65,8 +65,9 @@ public class AgArch {
     
     /**
      * Creates the agent class defined by <i>agClass</i>, default is
-     * jason.asSemantics.Agent. The agent class will parse the
-     * source code, create the transition system (TS), ...
+     * jason.asSemantics.Agent. 
+     * Creates the TS for the agent.
+     * Creates the belief base for the agent. 
      */
     public void initAg(String agClass, ClassParameters bbPars, String asSrc, Settings stts) throws JasonException {
         // set the agent

@@ -26,6 +26,7 @@ package jason.asSemantics;
 import jason.JasonException;
 import jason.RevisionFailedException;
 import jason.architecture.AgArch;
+import jason.asSyntax.ASSyntax;
 import jason.asSyntax.ArithFunctionTerm;
 import jason.asSyntax.InternalActionLiteral;
 import jason.asSyntax.Literal;
@@ -33,6 +34,7 @@ import jason.asSyntax.LogicalFormula;
 import jason.asSyntax.Plan;
 import jason.asSyntax.PlanLibrary;
 import jason.asSyntax.Rule;
+import jason.asSyntax.Term;
 import jason.asSyntax.Trigger;
 import jason.asSyntax.Trigger.TEOperator;
 import jason.asSyntax.Trigger.TEType;
@@ -148,7 +150,9 @@ public class Agent {
                 if (getPL().hasMetaEventPlans())
                     getTS().addGoalListener(new GoalListenerForMetaEvents(getTS()));
                 
+                addInitialBelsFromProjectInBB();
                 addInitialBelsInBB();
+                addInitialGoalsFromProjectInBB();
                 addInitialGoalsInTS();
             }
             
@@ -400,10 +404,10 @@ public class Agent {
             return null;
     }
 
-    
-    public void addInitialGoal(Literal g) {
-        initialGoals.add(g);
-    }
+    /** Belief b will be stored to be included as an ordinary belief when the agent will start running.
+     *  This method is usually called by the parser; at compile time, when the TS may not be ready yet and thus
+     *  no events can be produced. Beliefs are then scheduled here to be definitely included later when the 
+     *  TS is ready. */
     public void addInitialBel(Literal b) {
         initialBels.add(b);
     }
@@ -432,6 +436,28 @@ public class Agent {
         initialBels.clear();
     }
     
+    protected void addInitialBelsFromProjectInBB() {
+        String sBels = getTS().getSettings().getUserParameter("beliefs");
+        if (sBels != null) {
+            if (sBels.startsWith("\"") && sBels.endsWith("\""))
+                sBels = sBels.substring(1, sBels.length()-1);
+            try {
+                for (Term t: ASSyntax.parseList("["+sBels+"]")) {
+                    getBB().add((Literal)t);
+                }
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "Initial beliefs from project '["+sBels+"]' is not a list of literals.");
+            }
+        }
+    }
+
+    
+    /** goal g will be stored to be included as an initial goal when the agent will start running */
+    public void addInitialGoal(Literal g) {
+        initialGoals.add(g);
+    }
+    
+    /** includes all initial goals in the agent reasoner */
     public void addInitialGoalsInTS() {
         for (Literal g: initialGoals) {
             g.makeVarsAnnon();
@@ -441,6 +467,26 @@ public class Agent {
         }
     }
 
+    protected void addInitialGoalsFromProjectInBB() {
+        String sGoals = getTS().getSettings().getUserParameter("goals");
+        if (sGoals != null) {
+            if (sGoals.startsWith("\"") && sGoals.endsWith("\""))
+                sGoals = sGoals.substring(1, sGoals.length()-1);
+            try {
+                for (Term t: ASSyntax.parseList("["+sGoals+"]")) {
+                    Literal g = (Literal)t;
+                    g.makeVarsAnnon();
+                    if (! g.hasSource())
+                        g.addAnnot(BeliefBase.TSelf);
+                    getTS().getC().addAchvGoal(g,Intention.EmptyInt);            
+                }
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "Initial goals from project '["+sGoals+"]' is not a list of literals.");
+            }
+        }
+    }
+
+    
     /** Imports beliefs, plans and initial goals from another agent. Initial beliefs and goals 
      *  are stored in "initialBels" and "initialGoals" lists but not included in the BB / TS.
      *  The methods addInitialBelsInBB and addInitialGoalsInTS should be called in the sequel to
