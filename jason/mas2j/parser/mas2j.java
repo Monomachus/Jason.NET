@@ -120,6 +120,7 @@ public class mas2j implements mas2jConstants {
                               Token qty; Token value;
                               Token host;
                               AgentParameters ag = new AgentParameters();
+                              Map opts;
     agName = jj_consume_token(ASID);
                               ag.name = agName.image;
                               ag.asSource = new File(agName.image+".asl");
@@ -132,7 +133,8 @@ public class mas2j implements mas2jConstants {
       jj_la1[2] = jj_gen;
       ;
     }
-    ag.options = ASoptions();
+    opts = ASoptions();
+                             ag.setOptions(opts);
     label_2:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {

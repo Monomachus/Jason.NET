@@ -207,6 +207,7 @@ void agent() :              { Token agName;
                               Token qty; Token value;
                               Token host; 
                               AgentParameters ag = new AgentParameters();
+                              Map opts;
                             }
 {
   agName = <ASID>           
@@ -217,7 +218,7 @@ void agent() :              { Token agName;
                             
   [ ag.asSource  = fileName() ]
 
-  ag.options = ASoptions()        
+  opts = ASoptions()       { ag.setOptions(opts); }        
 
   (
   <ASAGARCHCLASS> ag.archClass = classDef()

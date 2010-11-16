@@ -241,12 +241,12 @@ public class SaciMASLauncherAnt extends CentralisedMASLauncherAnt implements MAS
             s += v + "synchronised=true";
             v = ",";
         }
-        Iterator<String> i = agp.options.keySet().iterator();
+        Iterator<String> i = agp.getOptions().keySet().iterator();
         while (i.hasNext()) {
             String key = i.next();
             if (!(debug && key.equals("verbose"))) {
                 if (!((forceSync || debug) && key.equals("synchronised"))) {
-                    s += v + key + "=" + changeQuotes((String) agp.options.get(key));
+                    s += v + key + "=" + changeQuotes((String) agp.getOptions().get(key));
                     v = ",";
                 }
             }

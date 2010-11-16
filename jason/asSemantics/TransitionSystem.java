@@ -1128,4 +1128,9 @@ public class TransitionSystem {
     public Logger getLogger() {
         return logger;
     }
+    
+    @Override
+    public String toString() {
+        return "TS of agent "+getUserAgArch().getAgName();
+    }
 }

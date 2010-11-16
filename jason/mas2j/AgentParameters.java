@@ -7,6 +7,7 @@ import jason.bb.DefaultBeliefBase;
 import jason.runtime.Settings;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -18,14 +19,14 @@ import java.util.Map;
  * @author jomi
  */
 public class AgentParameters {
-    public String              name      = null;
-    public File                asSource  = null;
-    public ClassParameters     agClass   = null;
-    public ClassParameters     bbClass   = null;
-    public ClassParameters     archClass = null;
-    public int                 qty       = 1;
-    public Map<String, String> options   = null;
-    private String             host      = null;
+    public String               name      = null;
+    public File                 asSource  = null;
+    public ClassParameters      agClass   = null;
+    public ClassParameters      bbClass   = null;
+    public ClassParameters      archClass = null;
+    public int                  qty       = 1;
+    private Map<String, String> options   = null;
+    private String              host      = null;
     
     public AgentParameters() {
         setupDefault();
@@ -87,12 +88,27 @@ public class AgentParameters {
         if (c != null) bbClass = c;        
     }
     
+    public void setOptions(Map<String,String> m) {
+        for (String k: m.keySet())
+            addOption(k, m.get(k));
+    }
+    
+    public void addOption(String k, String vl) {
+        if (options == null)
+            options = new HashMap<String, String>();
+        options.put(k, vl);
+    }
+    
+    public Map<String,String> getOptions() {
+        return options;
+    }
+    
     public String getAsInMASProject() {
         StringBuilder s = new StringBuilder(name+" ");
         if (asSource != null && !asSource.getName().startsWith(name)) {
             s.append(asSource+" ");
         }
-        if (options != null && options.size() > 0) {
+        if (options != null && !options.isEmpty()) {
             s.append("[");
             Iterator<String> i = options.keySet().iterator();
             while (i.hasNext()) {

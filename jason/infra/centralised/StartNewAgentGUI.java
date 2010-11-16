@@ -10,7 +10,6 @@ import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.util.HashMap;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -148,8 +147,7 @@ public class StartNewAgentGUI extends BaseDialogGUI {
         }
 
         if (verbose.getSelectedIndex() != 1) {
-            ap.options = new HashMap<String,String>();
-            ap.options.put("verbose", verbose.getSelectedIndex() + "");
+            ap.addOption("verbose", verbose.getSelectedIndex() + "");
         }
 
         if (agSource.getText().trim().length() > 0) {

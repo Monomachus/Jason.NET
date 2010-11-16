@@ -203,6 +203,9 @@ public class Settings {
         return userParameters;
     }
     public String getUserParameter(String key) {
-        return (String)userParameters.get(key);
+        String vl = (String)userParameters.get(key);
+        if (vl.startsWith("\"") && vl.endsWith("\"")) 
+            vl = vl.substring(1, vl.length()-1);
+        return vl;
     }
 }

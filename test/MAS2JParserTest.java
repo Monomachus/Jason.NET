@@ -54,7 +54,7 @@ public class MAS2JParserTest extends TestCase {
             
             //project.writeXMLScript(System.out);
             //project.writeScripts(true);
-            Map ag1Opt = project.getAg("ag1").options;
+            Map ag1Opt = project.getAg("ag1").getOptions();
             assertEquals(ag1Opt.size(),3);
             
             assertEquals(project.getDirectiveClasses().size(),2);
