@@ -19,6 +19,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import c4jason.CartagoEnvironment;
+
 /**
  * Creates the script build.xml to launch the MAS using JADE.
  */
@@ -83,7 +85,7 @@ public class JadeMASLauncherAnt extends CentralisedMASLauncherAnt implements MAS
         } catch (Exception _) {}*/
         
         
-        script = replace(script, "<PATH-LIB>", jadepath + "\n\t<PATH-LIB>");
+        script = replace(script, "<PATH-LIB>", jadepath + "\n<PATH-LIB>");
         
         String startContainers = "";
          /*
@@ -146,19 +148,22 @@ public class JadeMASLauncherAnt extends CentralisedMASLauncherAnt implements MAS
             
             StringBuilder agents = new StringBuilder();
             if (container.equals("Main-Container")) {
-                // include environment
-                agents.append(RunJadeMAS.environmentName+":"+JadeEnvironment.class.getName()+"(j-project,"+project.getProjectFile().getName()+")");
+                // include environment (if not cartago)
+                if (! project.getEnvClass().getClassName().equals(CartagoEnvironment.class.getName())) {
+                    agents.append(RunJadeMAS.environmentName+":"+JadeEnvironment.class.getName()+"(j-project,"+project.getProjectFile().getName()+")");
+                    sep = ";";
+                }
                 args = Config.get().getJadeArgs();
                 if (Config.get().getBoolean(Config.JADE_RMA)) 
                     args += " -gui ";
-                sep = ";";
             }
             for (AgentParameters ap: project.getAgents()) {
                 for (int cAg = 0; cAg < ap.qty; cAg++) {
                     String numberedAg = ap.getAgName();
                     if (ap.qty > 1)
                         numberedAg += (cAg + 1);
-                    if ( (ap.getHost() != null && ap.getHost().equals(container)) || 
+                    if ( (container.equals("Main-Container") && ap.getHost() == null) ||
+                         (ap.getHost() != null && ap.getHost().equals(container)) || 
                          (allocator != null && allocator.allocateAgent(numberedAg) != null && allocator.allocateAgent(numberedAg).equals(container))) {                        
                         agents.append(sep+numberedAg+":"+JadeAgArch.class.getName()+"(j-project,"+project.getProjectFile().getName()+","+ap.getAgName()+")");
                         sep = ";";

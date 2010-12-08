@@ -39,6 +39,8 @@ import java.util.logging.Level;
 
 import org.w3c.dom.Document;
 
+import c4jason.CartagoEnvironment;
+
 
 /**
  * Implementation of the Jade Architecture to run Jason agents
@@ -147,6 +149,11 @@ public class JadeAgArch extends JadeAg implements AgArchInfraTier {
                 //if (ap.qty > 1)
                 //    logger.warning("Ignoring quantity of agents from mas2j, jade arch creates only ONE agent.");
             }
+            
+            // The case CARTAGO+JADE
+            if (project.getEnvClass().getClassName().equals(CartagoEnvironment.class.getName()) && project.getInfrastructure().getClassName().equals("Jade")) {
+                startCartagoNode(project.getEnvClass().getParametersArray());           
+            }
             return ap;
             
         } else { // load parameters from shell
@@ -166,6 +173,15 @@ public class JadeAgArch extends JadeAg implements AgArchInfraTier {
             }
             return ap;
         }
+    }
+    
+    private static boolean cartagoStarted = false;
+    public static synchronized void startCartagoNode(String[] args) {
+        if (!cartagoStarted) {
+            CartagoEnvironment env = new CartagoEnvironment();
+            env.init(args);
+        }
+        cartagoStarted = true;
     }
     
     private void registerAgInDF() {

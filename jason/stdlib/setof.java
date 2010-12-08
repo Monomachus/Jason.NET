@@ -35,7 +35,7 @@ public class setof extends DefaultInternalAction {
 
         Term var = args[0];
         LogicalFormula logExpr = (LogicalFormula)args[1];
-		Set<Term> all = new TreeSet<Term>();
+        Set<Term> all = new TreeSet<Term>();
         Iterator<Unifier> iu = logExpr.logicalConsequence(ts.getAg(), un);
         while (iu.hasNext()) {
             Unifier nu = iu.next();
@@ -45,8 +45,8 @@ public class setof extends DefaultInternalAction {
         }
         return un.unifies(args[2], setToList(all));
     }
-	
-	// copy the set to a new list
+    
+    // copy the set to a new list
     private ListTerm setToList(Set<Term> set) {
         ListTerm result = new ListTermImpl();
         ListTerm tail = result;

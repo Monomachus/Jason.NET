@@ -13,6 +13,8 @@ import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import c4jason.CartagoEnvironment;
+
 /**
  * Write the Ant script to run the MAS in centralised infrastructure and
  * start this script.
@@ -177,10 +179,17 @@ public class CentralisedMASLauncherAnt implements MASLauncherInfraTier {
 
         // add lib/*.jar
         String lib = "";
-        if (new File(dDir + File.separator + "lib").exists()) {
-            lib = "        <fileset dir=\"${basedir}/lib\" >  <include name=\"*.jar\" /> </fileset>\n";
+
+        // if cartago env
+        if (project.getEnvClass().getClassName().equals(CartagoEnvironment.class.getName())) {
+            lib += "        <pathelement location=\""+Config.get().getJasonHome()+"/lib/cartago.jar\"/>\n";
+            lib += "        <pathelement location=\""+Config.get().getJasonHome()+"/lib/c4jason.jar\"/>\n";            
         }
 
+        if (new File(dDir + File.separator + "lib").exists()) {
+            lib += "        <fileset dir=\"${basedir}/lib\" >  <include name=\"*.jar\" /> </fileset>\n";
+        }
+        
         // add classpath defined in the project .mas2j
         for (String cp: project.getClassPaths()) {
             int apos = cp.indexOf("*"); 
@@ -205,7 +214,7 @@ public class CentralisedMASLauncherAnt implements MASLauncherInfraTier {
                 lib += "        <fileset dir=\""+dir+"\" >  <include name=\""+files+"\" /> </fileset>\n";               
             }
         }
-
+        
         script = replace(script, "<PATH-LIB>", lib);
 
         script = replace(script, "<PROJECT-RUNNER-CLASS>", jason.infra.centralised.RunCentralisedMAS.class.getName());
