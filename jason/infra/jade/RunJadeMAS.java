@@ -153,8 +153,13 @@ public class RunJadeMAS extends RunCentralisedMAS {
         if (profile.getBooleanProperty(Profile.MAIN, true)) { 
             try {
                 // create environment
-                logger.fine("Creating environment " + project.getEnvClass());
-                envc = cc.createNewAgent(environmentName, JadeEnvironment.class.getName(), new Object[] { project.getEnvClass() });
+                    // the cartago + jade case
+                if (JadeAgArch.isCartagoJadeCase(project)) {
+                    JadeAgArch.startCartagoNode(getProject().getEnvClass().getParametersArray());           
+                } else {
+                    logger.fine("Creating environment " + project.getEnvClass());
+                    envc = cc.createNewAgent(environmentName, JadeEnvironment.class.getName(), new Object[] { project.getEnvClass() });                        
+                }
             } catch (Exception e) {
                 logger.log(Level.SEVERE, "Error creating the environment: ", e);
                 return;
@@ -225,11 +230,12 @@ public class RunJadeMAS extends RunCentralisedMAS {
 
     @Override
     protected void startAgs() {
-        if (envc == null) return;
         try {
-            envc.start();
+            if (envc != null)
+                envc.start();
             
-            if (crtc != null) crtc.start();
+            if (crtc != null) 
+                crtc.start();
 
             // run the agents
             for (AgentController ag : ags.values()) {

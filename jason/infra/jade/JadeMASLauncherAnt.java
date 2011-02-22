@@ -19,8 +19,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import c4jason.CartagoEnvironment;
-
 /**
  * Creates the script build.xml to launch the MAS using JADE.
  */
@@ -149,7 +147,7 @@ public class JadeMASLauncherAnt extends CentralisedMASLauncherAnt implements MAS
             StringBuilder agents = new StringBuilder();
             if (container.equals("Main-Container")) {
                 // include environment (if not cartago)
-                if (! project.getEnvClass().getClassName().equals(CartagoEnvironment.class.getName())) {
+                if (!JadeAgArch.isCartagoJadeCase(project)) {
                     agents.append(RunJadeMAS.environmentName+":"+JadeEnvironment.class.getName()+"(j-project,"+project.getProjectFile().getName()+")");
                     sep = ";";
                 }

@@ -151,7 +151,7 @@ public class JadeAgArch extends JadeAg implements AgArchInfraTier {
             }
             
             // The case CARTAGO+JADE
-            if (project.getEnvClass().getClassName().equals(CartagoEnvironment.class.getName()) && project.getInfrastructure().getClassName().equals("Jade")) {
+            if (isCartagoJadeCase(project)) {
                 startCartagoNode(project.getEnvClass().getParametersArray());           
             }
             return ap;
@@ -175,11 +175,20 @@ public class JadeAgArch extends JadeAg implements AgArchInfraTier {
         }
     }
     
+    public static boolean isCartagoJadeCase(MAS2JProject project) {
+        return 
+            project.getEnvClass() != null && 
+            project.getEnvClass().getClassName().equals(CartagoEnvironment.class.getName()) && 
+            project.isJade();
+    }
+    
     private static boolean cartagoStarted = false;
     public static synchronized void startCartagoNode(String[] args) {
         if (!cartagoStarted) {
+            System.out.print("Starting cartago node....");
             CartagoEnvironment env = new CartagoEnvironment();
             env.init(args);
+            System.out.println("ok.");
         }
         cartagoStarted = true;
     }

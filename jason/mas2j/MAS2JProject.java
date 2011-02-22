@@ -108,6 +108,10 @@ public class MAS2JProject {
         return infrastructure;
     }
 
+    public boolean isJade() {
+        return getInfrastructure().getClassName().equals("Jade");
+    }
+    
     public void setEnvClass(ClassParameters e) {
         envClass = e;
     }
