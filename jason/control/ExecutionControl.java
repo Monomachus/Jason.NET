@@ -81,8 +81,10 @@ public class ExecutionControl {
                             }
                             
                             // update number of agents if finished by timeout
-                            if (to)
+                            if (to) {
+                                if (logger.isLoggable(Level.FINE)) logger.fine("Cycle "+getCycleNumber()+" finished by timeout!");
                                 updateNumberOfAgents();
+                            }
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -130,7 +132,7 @@ public class ExecutionControl {
      * annotation. 
       */
     public void receiveFinishedCycle(String agName, boolean breakpoint, int cycle) {
-        if (nbAgs < 0 || cycle != this.cycleNumber) {
+        if (nbAgs < 0 || cycle != this.cycleNumber || finished.size()+1 > nbAgs) {
             updateNumberOfAgents(); 
         }
         if (cycle == this.cycleNumber && runningCycle) { // the agent finished the current cycle

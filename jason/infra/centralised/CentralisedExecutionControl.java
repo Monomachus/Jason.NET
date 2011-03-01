@@ -30,6 +30,8 @@ import jason.control.ExecutionControlInfraTier;
 import jason.mas2j.ClassParameters;
 import jason.runtime.RuntimeServicesInfraTier;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -47,6 +49,8 @@ public class CentralisedExecutionControl implements ExecutionControlInfraTier {
 
     private static Logger logger = Logger.getLogger(CentralisedExecutionControl.class.getName());
 
+    protected ExecutorService executor = Executors.newSingleThreadExecutor();
+    
     public CentralisedExecutionControl(ClassParameters userControlClass, RunCentralisedMAS masRunner) throws JasonException {
         this.masRunner = masRunner;
         try {
@@ -80,13 +84,17 @@ public class CentralisedExecutionControl implements ExecutionControlInfraTier {
         infraArch.receiveSyncSignal();
     }
 
-    public void informAllAgsToPerformCycle(int cycle) {
-        synchronized (masRunner.getAgs()) {
-            for (CentralisedAgArch ag: masRunner.getAgs().values()) {
-                ag.getUserAgArch().setCycleNumber(cycle);
-                ag.receiveSyncSignal();
+    public void informAllAgsToPerformCycle(final int cycle) {
+        executor.execute(new Runnable() {
+            public void run() {
+                synchronized (masRunner.getAgs()) {
+                    for (CentralisedAgArch ag: masRunner.getAgs().values()) {
+                        ag.getUserAgArch().setCycleNumber(cycle);
+                        ag.receiveSyncSignal();
+                    }
+                }
             }
-        }
+        });
     }
 
     public Document getAgState(String agName) {
