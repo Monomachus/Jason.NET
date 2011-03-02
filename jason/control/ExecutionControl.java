@@ -56,6 +56,7 @@ public class ExecutionControl {
     private Set<String> finished = new HashSet<String>(); // the agents that have finished its reasoning cycle
     private int     cycleNumber = 0;
     private boolean runningCycle = true;
+    private boolean isRunning    = true;
 
     private int nbAgs = -1;
     
@@ -72,9 +73,11 @@ public class ExecutionControl {
             public void run() {
                 lock.lock();
                 try {
-                    while (true) {
+                    while (isRunning) {
                         try {
                             boolean to = !agFinishedCond.await(getCycleTimeout(), TimeUnit.MILLISECONDS); // waits signal
+                            if (!isRunning)
+                                break;
                             if (runtime != null && runningCycle) { 
                                 runningCycle = false;
                                 allAgsFinished();
@@ -182,6 +185,7 @@ public class ExecutionControl {
      * This method is called when MAS execution is being finished
      */
     public void stop() {
+        isRunning = false;
     }
     
     /** Called when all agents have finished the current cycle */
@@ -189,6 +193,10 @@ public class ExecutionControl {
         startNewCycle();
         infraControl.informAllAgsToPerformCycle(cycleNumber);
         logger.fine("starting cycle "+cycleNumber);
+    }
+    
+    public boolean isRunning() {
+        return isRunning;
     }
 
     public int getCycleNumber() {

@@ -1056,7 +1056,8 @@ public class TransitionSystem {
     /**********************************************************************/
     public void reasoningCycle() {
         if (logger.isLoggable(Level.FINE)) logger.fine("Start new reasoning cycle");
-
+        agArch.reasoningCycleStarting();
+        
         try {
             C.reset();
 

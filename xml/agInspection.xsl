@@ -36,7 +36,10 @@
     <xsl:template match="agent">
         <html>
             <span style="{$h-style}"><font size="+2">
-                    Inspection of agent <b><xsl:value-of select="@name"/></b> (cycle #<xsl:value-of select="@cycle"/>)
+                    Inspection of agent <b><xsl:value-of select="@name"/></b> 
+                    <xsl:if test="@cycle != 0">
+                        (cycle #<xsl:value-of select="@cycle"/>)
+                    </xsl:if>
             </font></span>
             
             <table border="0" cellspacing="3" cellpadding="6" >
