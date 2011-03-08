@@ -43,11 +43,14 @@ public class Message implements Serializable {
     
     public final static String[] knownPerformatives = {"tell","untell","achieve","unachieve","askOne","askAll","tellHow", "untellHow","askHow"};
     
+    public final static String msgIdPrefix        = "mid";
+    public final static String msgIdSyncAskPrefix = "midsa";
+    
     public Message() {
     }
 
     public Message(String ilf, String s, String r, Object c) {
-        this(ilf, s, r, c, "mid"+(idCount++));
+        this(ilf, s, r, c, msgIdPrefix+(idCount++));
     }
     
     public Message(String ilf, String s, String r, Object c, String id) {
@@ -57,7 +60,6 @@ public class Message implements Serializable {
         propCont = c;
         msgId    = id;
     }
-
     
     public Message(Message m) {
         ilForce  = m.ilForce;
@@ -66,6 +68,10 @@ public class Message implements Serializable {
         propCont = m.propCont;
         msgId    = m.msgId;
         inReplyTo= m.inReplyTo;
+    }
+
+    public void setSyncAskMsgId() {
+        msgId = msgIdSyncAskPrefix+(idCount++);
     }
     
     public String getIlForce() {
@@ -89,6 +95,10 @@ public class Message implements Serializable {
     }
     public boolean isUnTell() {
         return ilForce.startsWith("untell");
+    }
+    
+    public boolean isReplyToSyncAsk() {
+        return inReplyTo != null && inReplyTo.startsWith(msgIdSyncAskPrefix);
     }
 
     public boolean isKnownPerformative() {

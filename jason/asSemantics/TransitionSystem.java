@@ -286,17 +286,21 @@ public class TransitionSystem {
                 // the message is not an ask answer
             } else if (conf.ag.socAcc(m)) {
 
-                // generate an event
-                String sender = m.getSender();
-                if (sender.equals(agArch.getAgName()))
-                    sender = "self";
-                Literal received = new LiteralImpl("kqml_received").addTerms(
-                        new Atom(sender),
-                        new Atom(m.getIlForce()),
-                        content,
-                        new Atom(m.getMsgId()));
-
-                updateEvents(new Event(new Trigger(TEOperator.add, TEType.achieve, received), Intention.EmptyInt));
+                if (! m.isReplyToSyncAsk()) { // ignore answer after the timeout
+                    // generate an event
+                    String sender = m.getSender();
+                    if (sender.equals(agArch.getAgName()))
+                        sender = "self";
+                    Literal received = new LiteralImpl("kqml_received").addTerms(
+                            new Atom(sender),
+                            new Atom(m.getIlForce()),
+                            content,
+                            new Atom(m.getMsgId()));
+    
+                    updateEvents(new Event(new Trigger(TEOperator.add, TEType.achieve, received), Intention.EmptyInt));
+                } else {
+                    logger.fine("Ignoring message "+m+" because it is received after the timeout.");
+                }
             }
         }
     }

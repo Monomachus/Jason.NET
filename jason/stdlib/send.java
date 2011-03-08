@@ -157,6 +157,7 @@ public class send extends DefaultInternalAction {
         // async ask has a fourth argument and should suspend the intention
         lastSendWasSynAsk = m.isAsk() && args.length > 3;
         if (lastSendWasSynAsk) {
+            m.setSyncAskMsgId();
         	ts.getC().addPendingIntention(m.getMsgId(), ts.getC().getSelectedIntention());
         }
 
