@@ -32,10 +32,12 @@ import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.Atom;
 import jason.asSyntax.ListTerm;
+import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.NumberTerm;
 import jason.asSyntax.StringTerm;
 import jason.asSyntax.Structure;
 import jason.asSyntax.Term;
+import jason.asSyntax.VarTerm;
 
 import java.util.concurrent.TimeUnit;
 
@@ -138,7 +140,7 @@ public class send extends DefaultInternalAction {
     public Object execute(final TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         checkArguments(args);
         
-        Term to   = args[0];
+        final Term to   = args[0];
         Term ilf  = args[1];
         Term pcnt = args[2];
         
@@ -169,31 +171,11 @@ public class send extends DefaultInternalAction {
     
         // send the message
         if (to.isList()) {
-            if (m.isAsk() && args.length > 3) {
-                throw new JasonException("Cannot send 'ask' to a list of receivers!");                                                   
-            } else {
-                for (Term t: (ListTerm)to) {
-                    if (t.isAtom() || t.isString()) {
-                        String rec = t.toString();
-                        if (t.isString()) 
-                            rec = ((StringTerm)t).getString();
-                        if (rec.equals("self"))
-                            rec = ts.getUserAgArch().getAgName();
-                        m.setReceiver(rec);
-                        ts.getUserAgArch().sendMsg(m);
-                    } else {
-                        throw new JasonException("The TO parameter ('"+t+"') of the internal action 'send' is not an atom!");
-                    }
-                }
+            for (Term t: (ListTerm)to) {
+                delegateSendToArch(t, ts, m);
             }
         } else {
-            String rec = to.toString();
-            if (to.isString())
-                rec = ((StringTerm)to).getString();
-            if (rec.equals("self"))
-                rec = ts.getUserAgArch().getAgName();
-            m.setReceiver(rec);
-            ts.getUserAgArch().sendMsg(m);
+            delegateSendToArch(to, ts, m);
         }
         
         if (lastSendWasSynAsk && args.length == 5) {
@@ -202,12 +184,22 @@ public class send extends DefaultInternalAction {
             if (tto.isNumeric()) {
                 ts.getAg().getScheduler().schedule( new Runnable() {
                     public void run() {
-                        // if the intention is still in PI, brings it back to C.I
+                        // if the intention is still in PI, brings it back to C.I with the timeout
                         Intention intention = ts.getC().removePendingIntention(m.getMsgId());
                         if (intention != null) {
                             // unify "timeout" with the fourth parameter of .send
                             Structure send = (Structure)intention.peek().removeCurrentStep();
-                            intention.peek().getUnif().unifies(send.getTerm(3), new Atom("timeout"));
+                            Term timeoutAns = null;
+                            if (to.isList()) {
+                                VarTerm answers = new VarTerm("AnsList___"+m.getMsgId());
+                                Unifier un = intention.peek().getUnif();
+                                timeoutAns = un.get(answers);
+                                if (timeoutAns == null)
+                                    timeoutAns = new ListTermImpl();
+                            } else {
+                                timeoutAns = new Atom("timeout");
+                            }
+                            intention.peek().getUnif().unifies(send.getTerm(3), timeoutAns);
                             // add the intention back in C.I
                             ts.getC().resumeIntention(intention);
                             ts.getUserAgArch().getArchInfraTier().wake();                                
@@ -222,6 +214,21 @@ public class send extends DefaultInternalAction {
         return true;
     }
 
+    private void delegateSendToArch(Term to, TransitionSystem ts, Message m) throws Exception {
+        if (!to.isAtom() && !to.isString()) 
+            throw new JasonException("The TO parameter ('"+to+"') of the internal action 'send' is not an atom!");
+
+        String rec = null;
+        if (to.isString())
+            rec = ((StringTerm)to).getString();
+        else
+            rec = to.toString();
+        if (rec.equals("self"))
+            rec = ts.getUserAgArch().getAgName();
+        m.setReceiver(rec);
+        ts.getUserAgArch().sendMsg(m);
+    }
+    
     @Override
     public boolean suspendIntention() {
         return lastSendWasSynAsk;

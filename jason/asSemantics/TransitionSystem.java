@@ -31,6 +31,7 @@ import jason.asSyntax.Atom;
 import jason.asSyntax.BinaryStructure;
 import jason.asSyntax.InternalActionLiteral;
 import jason.asSyntax.ListTerm;
+import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Literal;
 import jason.asSyntax.LiteralImpl;
 import jason.asSyntax.LogicalFormula;
@@ -238,7 +239,7 @@ public class TransitionSystem {
             // check if an intention was suspended waiting this message
             Intention intention = null;
             if (m.getInReplyTo() != null) {
-                intention = getC().removePendingIntention(m.getInReplyTo());
+                intention = getC().getPendingIntentions().get(m.getInReplyTo());
             }
             // is it a pending intention?
             if (intention != null) {
@@ -248,14 +249,38 @@ public class TransitionSystem {
                 //    .send(ag1,askOne, value, X)
                 // if the answer was tell 3, unifies X=3
                 // if the answer was untell 3, unifies X=false
-                Structure send = (Structure)intention.peek().removeCurrentStep();
+                Structure send = (Structure)intention.peek().getCurrentStep().getBodyTerm();
                 if (m.isUnTell() && send.getTerm(1).toString().equals("askOne")) {
                     content = Literal.LFalse;
+                } else if (content.isLiteral()) { // adds source in the content if possible
+                    ((Literal)content).addSource(new Atom(m.getSender()));
+                } else if (send.getTerm(1).toString().equals("askAll") && content.isList()) { // adds source in each answer if possible
+                    ListTerm tail = new ListTermImpl();
+                    for (Term t: ((ListTerm)content)) {
+                        if (t.isLiteral()) 
+                            ((Literal)t).addSource(new Atom(m.getSender()));
+                        tail.append(t);
+                    }
+                    content = tail;
                 }
-                if (intention.peek().getUnif().unifies(send.getTerm(3), content)) {
-                    getC().resumeIntention(intention);
+                
+                // test the case of sync ask with many receivers
+                if (send.getTerm(0).isList()) { // send to many receivers
+                    // put the answers in the unifier
+                    VarTerm answers = new VarTerm("AnsList___"+m.getInReplyTo());
+                    Unifier un = intention.peek().getUnif();
+                    ListTerm listOfAnswers = (ListTerm)un.get(answers);
+                    if (listOfAnswers == null) {
+                        listOfAnswers = new ListTermImpl();
+                        un.unifies(answers, listOfAnswers);
+                    }
+                    listOfAnswers.append(content);
+                    int nbReceivers = ((ListTerm)send.getTerm(0)).size();
+                    if (listOfAnswers.size() == nbReceivers) { // all agents have answered
+                        resumeSyncAskIntention(m.getInReplyTo(), send.getTerm(3), listOfAnswers);
+                    }
                 } else {
-                    generateGoalDeletion(intention, JasonException.createBasicErrorAnnots("ask_failed", "reply of an ask message ('"+content+"') does not unify with fourth argument of .send ('"+send.getTerm(3)+"')"));
+                    resumeSyncAskIntention(m.getInReplyTo(), send.getTerm(3), content);
                 }
 
                 // the message is not an ask answer
@@ -274,6 +299,17 @@ public class TransitionSystem {
                 updateEvents(new Event(new Trigger(TEOperator.add, TEType.achieve, received), Intention.EmptyInt));
             }
         }
+    }
+    
+    private void resumeSyncAskIntention(String msgId, Term answerVar, Term answerValue) throws JasonException {
+        Intention i = getC().removePendingIntention(msgId);
+        i.peek().removeCurrentStep(); // removes the .send in the plan body
+        if (i.peek().getUnif().unifies(answerVar, answerValue)) {
+            getC().resumeIntention(i);
+        } else {
+            generateGoalDeletion(i, JasonException.createBasicErrorAnnots("ask_failed", "reply of an ask message ('"+answerValue+"') does not unify with fourth argument of .send ('"+answerVar+"')"));
+        }                        
+        
     }
 
     private void applySelEv() throws JasonException {
