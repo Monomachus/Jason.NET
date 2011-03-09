@@ -44,7 +44,7 @@ public class Message implements Serializable {
     public final static String[] knownPerformatives = {"tell","untell","achieve","unachieve","askOne","askAll","tellHow", "untellHow","askHow"};
     
     public final static String msgIdPrefix        = "mid";
-    public final static String msgIdSyncAskPrefix = "midsa";
+    public final static String msgIdSyncAskPrefix = "samid";
     
     public Message() {
     }
