@@ -358,6 +358,21 @@ public class AgArch {
         
         // assume xml output
         mindInspectorTransformer = new asl2xml();
+        
+        // create directories
+        mindInspectorDirectory += "/"+getAgName();
+        File dirmind = new File(mindInspectorDirectory); 
+        if (!dirmind.exists()) // create agent dir
+            dirmind.mkdirs();
+
+        // create a directory for this execution
+        int c = 0;
+        String d = mindInspectorDirectory+"/run-"+c;
+        while (new File(d).exists()) {
+            d = mindInspectorDirectory+"/run-"+(c++);
+        }
+        mindInspectorDirectory = d;
+        new File(mindInspectorDirectory).mkdirs();
     }
 
     
@@ -381,11 +396,8 @@ public class AgArch {
                     mindInspectorHistorySlider.setValue(mindInspectorHistory.size()-1);
                 }
             } else if (mindInspectorDirectory != null) { // output on file
-                File dirmind = new File(mindInspectorDirectory+"/"+getAgName());
-                if (!dirmind.exists())
-                    dirmind.mkdirs();
-                String filename = String.format("%5d.xml",fileCounter++).replaceAll(" ","0");
-                FileWriter outmind = new FileWriter(new File(dirmind+"/"+filename));
+                String filename = String.format("%6d.xml",fileCounter++).replaceAll(" ","0");
+                FileWriter outmind = new FileWriter(new File(mindInspectorDirectory+"/"+filename));
                 outmind.write(sMind);
                 outmind.close();
             }
