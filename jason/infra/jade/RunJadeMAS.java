@@ -81,10 +81,12 @@ public class RunJadeMAS extends RunCentralisedMAS {
     public static void main(String[] args) {
         runner = new RunJadeMAS();
         runner.init(args);
+        runner.waitEnd();
+        runner.finish();
     }
     
     @Override
-    public void init(String[] args) {
+    public int init(String[] args) {
         // test if a container is informed
         for (int i=1; i<args.length; i++) {
             initArgs.add(args[i]);
@@ -93,7 +95,7 @@ public class RunJadeMAS extends RunCentralisedMAS {
             }
         }
 
-        super.init(args);
+        return super.init(args);
     }
 
     @Override

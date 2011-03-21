@@ -95,9 +95,11 @@ public class RunCentralisedMAS {
     public static void main(String[] args) {
         runner = new RunCentralisedMAS();
         runner.init(args);
+        runner.waitEnd();
+        runner.finish();
     }
     
-    public void init(String[] args) {
+    public int init(String[] args) {
         String projectFileName = null;
         if (args.length < 1) {
             if (RunCentralisedMAS.class.getResource("/"+defaultProjectFileName) != null) {
@@ -170,7 +172,7 @@ public class RunCentralisedMAS {
                 createButtons();
             }
 
-            runner.waitEnd();
+            //runner.waitEnd();
             errorCode = 0;
 
         } catch (FileNotFoundException e1) {
@@ -183,12 +185,14 @@ public class RunCentralisedMAS {
             logger.log(Level.SEVERE, "Error!?: ", e);
             errorCode = 4;
         }
+        
         System.out.flush();
         System.err.flush();
 
         if (!MASConsoleGUI.hasConsole() && errorCode != 0) {
             System.exit(errorCode);
         }
+        return errorCode;
     }
 
     public static boolean isDebug() {
@@ -566,7 +570,7 @@ public class RunCentralisedMAS {
         }
     }
 
-    protected void waitEnd() {
+    public void waitEnd() {
         try {
             // wait a file called .stop___MAS to be created!
             File stop = new File(stopMASFileName);
@@ -579,7 +583,6 @@ public class RunCentralisedMAS {
             if (stop.exists()) {
                 stop.delete();
             }
-            finish();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -599,6 +602,9 @@ public class RunCentralisedMAS {
                 }
             }.start();
             
+            System.out.flush();
+            System.err.flush();
+
             if (MASConsoleGUI.hasConsole()) { // should close first! (case where console is in pause)
                 MASConsoleGUI.get().close();
             }
