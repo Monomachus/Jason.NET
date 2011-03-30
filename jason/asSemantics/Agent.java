@@ -439,8 +439,6 @@ public class Agent {
     protected void addInitialBelsFromProjectInBB() {
         String sBels = getTS().getSettings().getUserParameter("beliefs");
         if (sBels != null) {
-            if (sBels.startsWith("\"") && sBels.endsWith("\""))
-                sBels = sBels.substring(1, sBels.length()-1);
             try {
                 for (Term t: ASSyntax.parseList("["+sBels+"]")) {
                     getBB().add((Literal)t);
@@ -470,8 +468,6 @@ public class Agent {
     protected void addInitialGoalsFromProjectInBB() {
         String sGoals = getTS().getSettings().getUserParameter("goals");
         if (sGoals != null) {
-            if (sGoals.startsWith("\"") && sGoals.endsWith("\""))
-                sGoals = sGoals.substring(1, sGoals.length()-1);
             try {
                 for (Term t: ASSyntax.parseList("["+sGoals+"]")) {
                     Literal g = (Literal)t;

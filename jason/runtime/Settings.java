@@ -204,8 +204,10 @@ public class Settings {
     }
     public String getUserParameter(String key) {
         String vl = (String)userParameters.get(key);
-        if (vl != null && vl.startsWith("\"") && vl.endsWith("\"")) 
+        if (vl != null && vl.startsWith("\"") && vl.endsWith("\"")) {
             vl = vl.substring(1, vl.length()-1);
+            vl = vl.replaceAll("\\\\\"", "\"");        
+        }
         return vl;
     }
 }
