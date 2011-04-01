@@ -107,6 +107,7 @@ public class Include implements Directive {
             } else if (srcpath != null) {
                 for (String path: srcpath) {
                     String newname = urlPrefix + path + "/" + f;
+                    newname = newname.replaceAll("\\./", "");
                     if (testURLSrc(newname)) {
                         return newname;
                     }
