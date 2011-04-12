@@ -154,6 +154,7 @@ public class Agent {
                 addInitialBelsInBB();
                 addInitialGoalsFromProjectInBB();
                 addInitialGoalsInTS();
+                fixAgInIAandFunctions(this); // used to fix agent reference in functions used inside includes
             }
             
             // kqml Plans at the end of the ag PS
