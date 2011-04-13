@@ -209,7 +209,16 @@ public class Agent {
      *  A new TS is created (based on the cloned circumstance).
      */
     public Agent clone(AgArch arch) {
-        Agent a = new Agent();
+        Agent a = null;
+        try {
+            a = this.getClass().newInstance();
+        } catch (InstantiationException e1) {
+            logger.severe(" cannot create derived class" +e1);
+            return null;
+        } catch (IllegalAccessException e2) {
+            logger.severe(" cannot create derived class" +e2);
+            return null;
+        }
         
         a.setLogger(arch);
         if (this.getTS().getSettings().verbose() >= 0)
