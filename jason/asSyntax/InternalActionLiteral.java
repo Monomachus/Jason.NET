@@ -37,7 +37,7 @@ import org.w3c.dom.Element;
 
 
 /**
- A particular type of literal used to represent internal actions (has a "." in the functor).
+ A particular type of literal used to represent internal actions (which has a "." in the functor).
 
  @navassoc - ia - InternalAction
 
@@ -47,7 +47,7 @@ public class InternalActionLiteral extends Structure {
     private static final long serialVersionUID = 1L;
     private static Logger logger = Logger.getLogger(InternalActionLiteral.class.getName());
     
-    private InternalAction ia = null; // reference to the object that implements the internal action
+    private InternalAction ia = null; // reference to the object that implements the internal action, stored here to speed up the process of looking for the IA class inside the agent 
     
     public InternalActionLiteral(String functor) {
         super(functor);

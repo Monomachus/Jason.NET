@@ -247,7 +247,7 @@ public class Agent {
     private void fixAgInIAandFunctions(Agent a, Literal l) throws Exception {
         // if l is internal action/function
         if (l instanceof InternalActionLiteral) {
-            ((InternalActionLiteral)l).setIA(null);
+            ((InternalActionLiteral)l).setIA(null); // reset the IA in the literal, the IA there will be updated next getIA call
         }
         if (l instanceof ArithFunctionTerm) {
             ((ArithFunctionTerm)l).setAgent(a);

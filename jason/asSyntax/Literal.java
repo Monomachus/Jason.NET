@@ -259,7 +259,7 @@ public abstract class Literal extends DefaultTerm implements LogicalFormula {
         if (il == null) // no relevant bels
             return LogExpr.EMPTY_UNIF_LIST.iterator();
         
-        final AgArch            arch     = (ag == null ? null : ag.getTS().getUserAgArch());
+        final AgArch            arch     = (ag != null && ag.getTS() != null ? ag.getTS().getUserAgArch() : null);
         final int               nbAnnots = (hasAnnot() && getAnnots().getTail() == null ? getAnnots().size() : 0); // if annots contains a tail (as in p[A|R]), do not backtrack on annots
         
         return new Iterator<Unifier>() {

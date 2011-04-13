@@ -127,21 +127,19 @@ public class TSTest extends TestCase {
     
     public void testAgentClone() throws Exception {
         Agent a = new Agent();
-        new TransitionSystem(a, new Circumstance(), new Settings(), new AgArch()); // just to have a default value for ts
 
-        //a.parseAS(new File());
         a.initAg("examples/auction/ag3.asl");
         String p1 = a.getPL().toString();
         String b1 = a.getBB().toString();
-        InternalAction ia1 = ((InternalActionLiteral)a.getPL().get("prop_alliance").getBody().getBodyTerm()).getIA(null);
+        InternalAction ia1 = ((InternalActionLiteral)a.getPL().get("prop_alliance").getBody().getBodyTerm()).getIA(a);
         assertTrue(ia1 != null);
         // get the arith expr (B+C) from the plan
         Structure send1 = (Structure)a.getPL().get("palliance").getBody().getBodyNext().getBodyNext().getBodyTerm();
         ArithFunctionTerm add1  = (ArithFunctionTerm)((Structure)send1.getTerm(2)).getTerm(1);
         assertEquals("(B+C)", add1.toString());
 
-        // the agent is null here because it is a arith expr
-        assertEquals(null, add1.getAgent());
+        // the agent is null here because it is an arith expr
+        //assertEquals(null, add1.getAgent());
         
         a = a.clone(new AgArch());
         assertEquals(p1, a.getPL().toString());
