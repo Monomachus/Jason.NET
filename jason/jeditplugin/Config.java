@@ -323,6 +323,12 @@ public class Config extends Properties {
     public String getInfrastructureFactoryClass(String infraId) {
         return get("infrastructure." + infraId).toString();
     }
+    public void setInfrastructureFactoryClass(String infraId, String factory) {
+        put("infrastructure." + infraId, factory);
+    }
+    public void removeInfrastructureFactoryClass(String infraId) {
+        remove("infrastructure." + infraId);
+    }
 
     public String getJasonRunningVersion() {
         try {
