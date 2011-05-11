@@ -55,22 +55,22 @@ public class ConfigGUI {
     
     private static final long serialVersionUID = 1L;
 
-    JTextField jasonTF;
-    JTextField javaTF;
-    JTextField antTF;
-    JTextArea infraTP;
+    protected JTextField jasonTF;
+    protected JTextField javaTF;
+    protected JTextField antTF;
+    protected JTextArea infraTP;
     //JCheckBox  insideJIDECBox;
-    JCheckBox  closeAllCBox;
-    JCheckBox  checkVersionCBox;
-    JCheckBox  warnSingVarsCBox;
+    protected JCheckBox  closeAllCBox;
+    protected JCheckBox  checkVersionCBox;
+    protected JCheckBox  warnSingVarsCBox;
 
-    JTextField saciTF;
-    JTextField jadeJarTF;
-    JTextField jadeArgsTF;
-    JCheckBox  jadeSnifferCB;
-    JCheckBox  jadeRmaCB;
+    protected JTextField saciTF;
+    protected JTextField jadeJarTF;
+    protected JTextField jadeArgsTF;
+    protected JCheckBox  jadeSnifferCB;
+    protected JCheckBox  jadeRmaCB;
 
-    static Config userProperties = Config.get();
+    protected static Config userProperties = Config.get();
 
     static {
         String currJasonVersion = userProperties.getJasonRunningVersion();
@@ -96,8 +96,16 @@ public class ConfigGUI {
     }
     
     public static void main(String[] args) {
-        final ConfigGUI jid = new ConfigGUI();
-        JFrame f = new JFrame("Jason Configuration -- "+userProperties.getProperty("version"));
+        new ConfigGUI().run();
+    }
+    
+    protected static ConfigGUI getNewInstance() {
+        return new ConfigGUI();
+    }
+    
+    public void run() {
+        final ConfigGUI jid = getNewInstance();
+        JFrame f = new JFrame(jid.getWindowTitle());
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
         JPanel pBt = new JPanel(new FlowLayout());
@@ -126,6 +134,10 @@ public class ConfigGUI {
         f.setVisible(true);
     }
     
+    protected String getWindowTitle() {
+        return "Jason Configuration -- "+userProperties.getProperty("version");
+    }
+
     public JPanel getJasonConfigPanel() {    
         JPanel pop = new JPanel();
         pop.setLayout(new BoxLayout(pop, BoxLayout.Y_AXIS));
@@ -319,7 +331,7 @@ public class ConfigGUI {
         return pop;
     }
 
-    private JButton createBrowseButton(final String jarfile, final JTextField tf) {
+    protected JButton createBrowseButton(final String jarfile, final JTextField tf) {
         JButton bt = new JButton("Browse");
         bt.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {

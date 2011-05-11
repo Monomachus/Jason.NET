@@ -161,7 +161,7 @@ public class CentralisedAgArch implements Runnable, AgArchInfraTier {
     private Object syncStopRun = new Object();
 
     private Thread myThread = null;
-    protected void setThread(Thread t) { 
+    public void setThread(Thread t) { 
         myThread = t;
         myThread.setName(agName);
     }

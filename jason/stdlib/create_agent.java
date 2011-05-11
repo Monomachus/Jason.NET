@@ -129,7 +129,9 @@ public class create_agent extends DefaultInternalAction {
 
         }
         RuntimeServicesInfraTier rs = ts.getUserAgArch().getArchInfraTier().getRuntimeServices();
-        return rs.createAgent(name, fSource.getAbsolutePath(), agClass, agArchClass, bbPars, ts.getSettings());
+        name = rs.createAgent(name, fSource.getAbsolutePath(), agClass, agArchClass, bbPars, ts.getSettings());
+        rs.startAgent(name);
+        return true;
     }
     
     private Structure testString(Term t) {

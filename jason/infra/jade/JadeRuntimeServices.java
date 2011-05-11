@@ -33,7 +33,7 @@ public class JadeRuntimeServices implements RuntimeServicesInfraTier {
         jadeAgent = ag;
     }
     
-    public boolean createAgent(String agName, String agSource, String agClass, String archClass, ClassParameters bbPars, Settings stts) throws Exception {
+    public String createAgent(String agName, String agSource, String agClass, String archClass, ClassParameters bbPars, Settings stts) throws Exception {
         try {
             if (logger.isLoggable(Level.FINE)) {
                 logger.fine("Creating jade agent " + agName + "from source " + agSource + "(agClass=" + agClass + ", archClass=" + archClass + ", settings=" + stts);
@@ -49,11 +49,15 @@ public class JadeRuntimeServices implements RuntimeServicesInfraTier {
             
             cc.createNewAgent(agName, JadeAgArch.class.getName(), new Object[] { ap, false, false }).start();
             
-            return true;
+            return agName;
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error creating agent " + agName, e);
         }
-        return false;
+        return null;
+    }
+    
+    public void startAgent(String agName) {
+        // nothing to do, the jade create new agent is enough
     }
 
     public AgArch clone(jason.asSemantics.Agent source, String archClassName, String agName) throws JasonException {

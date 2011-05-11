@@ -24,9 +24,14 @@ public interface RuntimeServicesInfraTier {
      * 
      * <p> Example: createAgent("bob", "bob.asl", "mypkg.MyAgent",
      * null, null, null);
+     * 
+     * Returns the name of the agent
      */
-    public boolean createAgent(String agName, String agSource, String agClass, String archClass, ClassParameters bbPars, Settings stts) throws Exception;
+    public String createAgent(String agName, String agSource, String agClass, String archClass, ClassParameters bbPars, Settings stts) throws Exception;
 
+    /** start (e.g. create thread) the agent */
+    public void startAgent(String agName);
+    
     /**
      * Clones an agent
      * 

@@ -126,7 +126,8 @@ public class StartNewAgentGUI extends BaseDialogGUI {
                             name = name + (i + 1);
                         }
                         // TODO: implements bb class
-                        services.createAgent(name, ap.asSource.getAbsolutePath(), agClass, archClass, null, ap.getAsSetts(debug, fs));
+                        name = services.createAgent(name, ap.asSource.getAbsolutePath(), agClass, archClass, null, ap.getAsSetts(debug, fs));
+                        services.startAgent(name);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();

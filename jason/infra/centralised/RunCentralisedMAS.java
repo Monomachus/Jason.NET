@@ -80,25 +80,23 @@ public class RunCentralisedMAS {
     private   static String            urlPrefix     = "";
     private   static boolean           readFromJAR   = false;
     private   static MAS2JProject      project;
+    private   static boolean           debug         = false;
     
     private CentralisedEnvironment        env         = null;
     private CentralisedExecutionControl   control     = null;
-    private boolean                       debug       = false;
     private Map<String,CentralisedAgArch> ags         = new ConcurrentHashMap<String,CentralisedAgArch>();
 
     public JButton                   btDebug;
     
-    public RunCentralisedMAS() {
-        runner = this;
-    }
-    
-    public static void main(String[] args) {
+    public static void main(String[] args) throws JasonException {
         runner = new RunCentralisedMAS();
         runner.init(args);
+        runner.create();
+        runner.start();
         runner.waitEnd();
         runner.finish();
     }
-    
+        
     public int init(String[] args) {
         String projectFileName = null;
         if (args.length < 1) {
@@ -162,9 +160,7 @@ public class RunCentralisedMAS {
             // set the aslSrcPath in the include
             ((Include)DirectiveProcessor.getDirective("include")).setSourcePath(project.getSourcePaths());
             
-            runner.createAgs(project, debug);
-            runner.startAgs();
-            runner.startSyncMode();
+            project.fixAgentsSrc(urlPrefix);
 
             if (MASConsoleGUI.hasConsole()) {
                 MASConsoleGUI.get().setTitle("MAS Console - " + project.getSocName());
@@ -195,8 +191,21 @@ public class RunCentralisedMAS {
         return errorCode;
     }
 
+    /** create environment, agents, controller */
+    public void create() throws JasonException {
+        createEnvironment();
+        createAgs();
+        createController();        
+    }
+    
+    /** start agents, .... */
+    public void start() {
+        startAgs();
+        startSyncMode();        
+    }
+    
     public static boolean isDebug() {
-        return runner.debug;
+        return debug;
     }
 
     public static synchronized void setupLogger() {
@@ -336,18 +345,17 @@ public class RunCentralisedMAS {
         return project;
     }
 
-    protected void createAgs(MAS2JProject project, boolean debug) throws JasonException {
-        // create environment
+    public void createEnvironment() throws JasonException {
         logger.fine("Creating environment " + project.getEnvClass());
         env = new CentralisedEnvironment(project.getEnvClass(), this);
-
+    }
+    
+    public void createAgs() throws JasonException {
         boolean isPool = project.getInfrastructure().hasParameter("pool");
         if (isPool) logger.info("Creating agents....");
         int nbAg = 0;
         Agent pag = null;
         
-        project.fixAgentsSrc(urlPrefix);
-                
         // create the agents
         for (AgentParameters ap : project.getAgents()) {
             try {
@@ -373,7 +381,7 @@ public class RunCentralisedMAS {
                     agArch.setAgName(numberedAg);
                     agArch.setEnvInfraTier(env);
                     if (isPool && cAg > 0) {
-                        // creation by cloning previous agent (which are faster -- no parsing, for instance)
+                        // creation by cloning previous agent (which is faster -- no parsing, for instance)
                         agArch.initAg(ap.archClass.getClassName(), pag, this);
                     } else {
                         // normal creation
@@ -389,8 +397,9 @@ public class RunCentralisedMAS {
         }
         
         if (isPool) logger.info("Created "+nbAg+" agents.");
+    }
 
-        // create controller
+    public void createController() throws JasonException {
         ClassParameters controlClass = project.getControlClass();
         if (debug && controlClass == null) {
             controlClass = new ClassParameters(ExecutionControlGUI.class.getName());
@@ -398,9 +407,9 @@ public class RunCentralisedMAS {
         if (controlClass != null) {
             logger.fine("Creating controller " + controlClass);
             control = new CentralisedExecutionControl(controlClass, this);
-        }
+        }        
     }
-
+    
     public void addAg(CentralisedAgArch ag) {
         ags.put(ag.getAgName(), ag);
     }
@@ -412,7 +421,7 @@ public class RunCentralisedMAS {
         return ags.get(agName);
     }
     
-    protected Map<String,CentralisedAgArch> getAgs() {
+    public Map<String,CentralisedAgArch> getAgs() {
         return ags;
     }
     

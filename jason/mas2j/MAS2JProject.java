@@ -306,7 +306,7 @@ public class MAS2JProject {
                 String facClass = Config.get().getInfrastructureFactoryClass(infrastructure.getClassName());
                 infraFac = (InfrastructureFactory)Class.forName(facClass).newInstance();
             } catch (Exception e) { 
-                throw new JasonException("The project's infrastructure ('"+infrastructure+"') is unknown!");
+                throw new JasonException("The project's infrastructure ('"+infrastructure.getClassName()+"') is unknown! \n"+e);
             }
         }
         return infraFac;

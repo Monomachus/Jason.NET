@@ -44,7 +44,7 @@ public class SaciRuntimeServices implements RuntimeServicesInfraTier {
         }
     }
 
-    public boolean createAgent(String agName, String agSource, String agClass, String archClass, ClassParameters bbPars, Settings stts) throws Exception {
+    public String createAgent(String agName, String agSource, String agClass, String archClass, ClassParameters bbPars, Settings stts) throws Exception {
         try {
             logger.fine("Creating saci agent from source " + agSource);
 
@@ -73,11 +73,14 @@ public class SaciRuntimeServices implements RuntimeServicesInfraTier {
             // c1.addArg("host", "?");
             l.execCommand(c1);
             logger.fine("Agent " + agName + " created!");
-            return true;
+            return agName;
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error creating agent", e);
         }
-        return false;
+        return null;
+    }
+    
+    public void startAgent(String agName) {
     }
     
     public AgArch clone(Agent source, String archClassName, String agName) throws JasonException {

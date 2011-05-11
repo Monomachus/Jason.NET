@@ -38,7 +38,6 @@ import jason.infra.centralised.RunCentralisedMAS;
 import jason.jeditplugin.Config;
 import jason.mas2j.AgentParameters;
 import jason.mas2j.ClassParameters;
-import jason.mas2j.MAS2JProject;
 import jason.runtime.MASConsoleGUI;
 
 import java.awt.event.ActionEvent;
@@ -148,7 +147,7 @@ public class RunJadeMAS extends RunCentralisedMAS {
     }
     
     @Override
-    protected void createAgs(MAS2JProject project, boolean debug) throws JasonException {
+    public void createAgs() throws JasonException {
         if (!startContainer()) 
             return;
         
@@ -156,11 +155,11 @@ public class RunJadeMAS extends RunCentralisedMAS {
             try {
                 // create environment
                     // the cartago + jade case
-                if (JadeAgArch.isCartagoJadeCase(project)) {
+                if (JadeAgArch.isCartagoJadeCase(getProject())) {
                     JadeAgArch.startCartagoNode(getProject().getEnvClass().getParametersArray());           
                 } else {
-                    logger.fine("Creating environment " + project.getEnvClass());
-                    envc = cc.createNewAgent(environmentName, JadeEnvironment.class.getName(), new Object[] { project.getEnvClass() });                        
+                    logger.fine("Creating environment " + getProject().getEnvClass());
+                    envc = cc.createNewAgent(environmentName, JadeEnvironment.class.getName(), new Object[] { getProject().getEnvClass() });                        
                 }
             } catch (Exception e) {
                 logger.log(Level.SEVERE, "Error creating the environment: ", e);
@@ -169,8 +168,8 @@ public class RunJadeMAS extends RunCentralisedMAS {
 
             try {
                 // create controller
-                ClassParameters controlClass = project.getControlClass();
-                if (debug && controlClass == null) {
+                ClassParameters controlClass = getProject().getControlClass();
+                if (isDebug() && controlClass == null) {
                     controlClass = new ClassParameters(ExecutionControlGUI.class.getName());
                 }
                 if (controlClass != null) {
@@ -186,13 +185,11 @@ public class RunJadeMAS extends RunCentralisedMAS {
         
         // create agents
         try {
-            project.fixAgentsSrc(null);
-
             // set the aslSrcPath in the include
-            ((Include)DirectiveProcessor.getDirective("include")).setSourcePath(project.getSourcePaths());
+            ((Include)DirectiveProcessor.getDirective("include")).setSourcePath(getProject().getSourcePaths());
             
             // create the agents
-            for (AgentParameters ap : project.getAgents()) {
+            for (AgentParameters ap : getProject().getAgents()) {
                 try {
                     String agName = ap.name;
                     if (ap.getHost() != null && targetContainer != null && !ap.getHost().equals(targetContainer))
@@ -205,7 +202,7 @@ public class RunJadeMAS extends RunCentralisedMAS {
                         if (ap.qty > 1)
                             numberedAg += (cAg + 1); //String.format("%0"+String.valueOf(ap.qty).length()+"d", cAg + 1);
                         logger.fine("Creating agent " + numberedAg + " (" + (cAg + 1) + "/" + ap.qty + ")");
-                        AgentController ac = cc.createNewAgent(numberedAg, JadeAgArch.class.getName(), new Object[] { ap, debug, project.getControlClass() != null });
+                        AgentController ac = cc.createNewAgent(numberedAg, JadeAgArch.class.getName(), new Object[] { ap, isDebug(), getProject().getControlClass() != null });
                         ags.put(numberedAg,ac);
                     }
                 } catch (Exception e) {
