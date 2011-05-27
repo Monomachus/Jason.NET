@@ -28,10 +28,15 @@ import jason.asSemantics.ActionExec;
 import jason.asSemantics.Circumstance;
 import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.Event;
+import jason.asSemantics.IntendedMeans;
 import jason.asSemantics.Intention;
+import jason.asSemantics.Option;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.Literal;
+import jason.asSyntax.Plan;
+import jason.asSyntax.PlanBody.BodyType;
+import jason.asSyntax.PlanBodyImpl;
 import jason.asSyntax.Term;
 import jason.asSyntax.Trigger;
 import jason.asSyntax.Trigger.TEOperator;
@@ -143,14 +148,26 @@ public class suspend extends DefaultInternalAction {
         for (Event e: C.getEvents()) {
             i = e.getIntention();
             if ( i != null && 
-                    (i.hasTrigger(g, un)) ||       // the goal is in the i's stack of IM
-                     un.unifies(e.getTrigger(), g) // the goal is the trigger of the event
-                    ) {
+                    (i.hasTrigger(g, un) ||       // the goal is in the i's stack of IM
+                     un.unifies(g, e.getTrigger())  // the goal is the trigger of the event
+                    )
+                ) {
                 i.setSuspended(true);
                 C.removeEvent(e);                    
                 C.addPendingIntention(k, i);
-            } else if (i == Intention.EmptyInt && un.unifies(e.getTrigger(), g)) { // the case of !!
-                ts.getLogger().warning("** NOT IMPLEMENTED ** (suspend of !!)");
+            } else if (i == Intention.EmptyInt && un.unifies(g, e.getTrigger())) { // the case of !!
+                // creates an intention to suspend the "event"
+                i = new Intention();
+                i.push(new IntendedMeans(
+                        new Option(
+                                new Plan(null, e.getTrigger(), Literal.LTrue, 
+                                        new PlanBodyImpl(BodyType.achieveNF, e.getTrigger().getLiteral())), 
+                                new Unifier()), 
+                        e.getTrigger()));
+                e.setIntention(i);
+                i.setSuspended(true);
+                C.removeEvent(e);                    
+                C.addPendingIntention(k, i);
             }
         }
         return true;

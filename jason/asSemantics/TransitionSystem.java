@@ -335,7 +335,8 @@ public class TransitionSystem {
 
             // Rule SelEv1
             confP.C.SE = conf.ag.selectEvent(confP.C.getEvents());
-            if (logger.isLoggable(Level.FINE)) logger.fine("Selected event "+confP.C.SE);
+            if (logger.isLoggable(Level.FINE)) 
+                logger.fine("Selected event "+confP.C.SE);
             if (confP.C.SE != null) {
                 if (ag.hasCustomSelectOption() || setts.verbose() == 2) // verbose == 2 means debug mode 
                     confP.step = State.RelPl;

@@ -50,6 +50,9 @@ public class Event implements Serializable {
     public Intention getIntention() {
         return intention;
     }
+    public void setIntention(Intention i) {
+        intention = i;
+    }
     
     public boolean sameTE(Object t) {
         return trigger.equals(t);

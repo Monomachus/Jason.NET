@@ -106,13 +106,33 @@ public class Circumstance implements Serializable {
     /** Events */
 
     public void addEvent(Event ev) {
-        E.add(ev);
+        E.add(ev);        
 
         // notify listeners
         if (listeners != null)
             for (CircumstanceListener el : listeners) 
                 el.eventAdded(ev);
-    }   
+    }
+    
+    public void insertMetaEvent(Event ev) {
+        // meta events have to be placed in the begin of the queue, but not before other meta events
+        List<Event> newE = new ArrayList<Event>(E); // make a list of events to find the best place to insert the new event
+        int pos = 0;
+        for (Event e: newE) {
+            if (!e.getTrigger().isMetaEvent()) {
+                break;
+            }
+            pos++;
+        }
+        newE.add(pos,ev);
+        E.clear();
+        E.addAll(newE);
+
+        // notify listeners
+        if (listeners != null)
+            for (CircumstanceListener el : listeners) 
+                el.eventAdded(ev);
+    }
 
     public boolean removeEvent(Event ev) {
         return E.remove(ev);
