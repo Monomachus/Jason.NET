@@ -375,29 +375,27 @@ public class TransitionSystem {
     /** generates goal deletion event */
     private void applyRelApplPlRule2(String m) throws JasonException {
         confP.step = State.ProcAct; // default next step
-        if (conf.C.SE.trigger.isGoal()) {
+        if (conf.C.SE.trigger.isGoal() && !conf.C.SE.trigger.isMetaEvent()) {
             // can't carry on, no relevant/applicable plan.
             String msg = "Found a goal for which there is no "+m+" plan:" + conf.C.SE;
             if (!generateGoalDeletionFromEvent(JasonException.createBasicErrorAnnots("no_"+m, msg))) 
                 logger.warning(msg);                
+        } else if (conf.C.SE.isInternal()) {
+            // e.g. belief addition as internal event, just go ahead
+            // but note that the event was relevant, yet it is possible
+            // the programmer just wanted to add the belief and it was
+            // relevant by chance, so just carry on instead of dropping the
+            // intention
+            confP.C.SI = conf.C.SE.intention;
+            updateIntention();
+        } else if (setts.requeue()) {  
+            // if external, then needs to check settings
+            confP.C.addEvent(conf.C.SE);
         } else {
-            if (conf.C.SE.isInternal()) {
-                // e.g. belief addition as internal event, just go ahead
-                // but note that the event was relevant, yet it is possible
-                // the programmer just wanted to add the belief and it was
-                // relevant by chance, so just carry on instead of dropping the
-                // intention
-                confP.C.SI = conf.C.SE.intention;
-                updateIntention();
-            } else if (setts.requeue()) {  
-                // if external, then needs to check settings
-                confP.C.addEvent(conf.C.SE);
-            } else {
-                // current event is external and irrelevant,
-                // discard that event and select another one
-                confP.step = State.SelEv;
-            }
-        }        
+            // current event is external and irrelevant,
+            // discard that event and select another one
+            confP.step = State.SelEv;
+        }
     }
     
 

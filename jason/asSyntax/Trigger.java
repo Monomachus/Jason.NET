@@ -145,6 +145,10 @@ public class Trigger extends Structure implements Cloneable {
         return type == TEType.achieve || type == TEType.test;
     }    
 
+    public boolean isMetaEvent() {
+        return operator == TEOperator.goalState;
+    }
+    
     public TEOperator getOperator() {
         return operator;
     }
