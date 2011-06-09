@@ -83,17 +83,25 @@ public class drop_desire extends drop_intention {
     
     public void dropEvt(Circumstance C, Literal l, Unifier un) {
         Trigger te = new Trigger(TEOperator.add, TEType.achieve, l);
-        Iterator<Event> ie = C.getEvents().iterator();
+        
+        // search in E
+        dropEvt(te, un, C.getEvents().iterator());
+        
+        // search in PE (only the event need to be checked, the related intention is handeled by dropInt)
+        dropEvt(te, un, C.getPendingEvents().values().iterator());
+    }
+    
+    private static void dropEvt(Trigger te, Unifier un, Iterator<Event> ie) {
         while (ie.hasNext()) {
             Event  ei = ie.next();
             Trigger t = ei.getTrigger();
             if (ei.getIntention() != Intention.EmptyInt) { // since the unifier of the intention will not be used, apply it to the event before comparing to the event to be dropped  
-                t = (Trigger) t.clone();
+                t = t.clone();
                 t.apply(ei.getIntention().peek().getUnif());
             }
             if (un.clone().unifiesNoUndo(te, t)) {
                 ie.remove();
             }
         }
-    }
+    }    
 }

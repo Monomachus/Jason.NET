@@ -72,6 +72,7 @@ public class drop_all_events extends DefaultInternalAction {
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         checkArguments(args);
         ts.getC().clearEvents();
+        ts.getC().clearPendingEvents();
         return true;
     }
 }

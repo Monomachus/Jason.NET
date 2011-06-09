@@ -64,6 +64,7 @@ public class Circumstance implements Serializable {
     private List<ActionExec>           FA; // Feedback actions, those that are already executed
     
     private Map<String, Intention>     PI; // pending intentions, intentions suspended by any other reason                                                        
+    private Map<String, Event>         PE; // pending events, events suspended by .suspend                                                        
 
     private List<CircumstanceListener> listeners = new CopyOnWriteArrayList<CircumstanceListener>(); 
 
@@ -80,6 +81,7 @@ public class Circumstance implements Serializable {
         MB = new LinkedList<Message>();
         PA = new ConcurrentHashMap<Integer, ActionExec>();
         PI = new ConcurrentHashMap<String, Intention>();
+        PE = new ConcurrentHashMap<String, Event>();
         FA = new ArrayList<ActionExec>();       
     }
     
@@ -352,6 +354,41 @@ public class Circumstance implements Serializable {
         return false;
     }
 
+   /** pending events */
+    
+    public Map<String, Event> getPendingEvents() {
+        return PE;
+    }
+
+    public boolean hasPendingEvent() {
+        return PE != null && PE.size() > 0;
+    }
+    
+    public void clearPendingEvents() {
+        // notify listeners
+        if (listeners != null)
+            for (CircumstanceListener el : listeners)
+                for (Event e: PE.values())
+                    if (e.getIntention() != null)
+                        el.intentionDropped(e.getIntention());
+        
+        PE.clear();
+    }
+    
+    public void addPendingEvent(String id, Event e) {
+        PE.put(id, e);
+        
+        if (listeners != null && e.getIntention() != null)
+            for (CircumstanceListener el : listeners)
+                el.intentionSuspended(e.getIntention(), id);
+    }
+    
+    public Event removePendingEvent(String pendingId) {
+        return PE.remove(pendingId);
+    }
+
+    /** actions */
+    
     public ActionExec getAction() {
         return A;
     }
@@ -500,6 +537,9 @@ public class Circumstance implements Serializable {
         for (String k: this.PI.keySet()) {
             c.PI.put(k, (Intention)PI.get(k).clone());
         }
+        for (String k: this.PE.keySet()) {
+            c.PE.put(k, (Event)PE.get(k).clone());
+        }
         for (ActionExec ae: FA) {
             c.FA.add((ActionExec)ae.clone());
         }
@@ -508,19 +548,16 @@ public class Circumstance implements Serializable {
 
 
     /** get the agent circumstance as XML */
-    @SuppressWarnings("unchecked")
     public Element getAsDOM(Document document) {
         Element c = (Element) document.createElement("circumstance");
         Element e;
-        Iterator i;
 
         // MB
         if (getMailBox() != null && !getMailBox().isEmpty()) {
             Element ms = (Element) document.createElement("mailbox");
-            i = getMailBox().iterator();
-            while (i.hasNext()) {
+            for (Message m: getMailBox()) {
                 e = (Element) document.createElement("message");
-                e.appendChild(document.createTextNode(i.next().toString()));
+                e.appendChild(document.createTextNode(m.toString()));
                 ms.appendChild(e);
             }
             c.appendChild(ms);
@@ -530,10 +567,8 @@ public class Circumstance implements Serializable {
         Element events = (Element) document.createElement("events");
         boolean add = false;
         if (E != null && !E.isEmpty()) {
-            i = E.iterator();
-            while (i.hasNext()) {
+            for (Event evt: E) {
                 add = true;
-                Event evt = (Event) i.next();
                 e = evt.getAsDOM(document);
                 events.appendChild(e);
             }
@@ -543,6 +578,14 @@ public class Circumstance implements Serializable {
             e = getSelectedEvent().getAsDOM(document);
             e.setAttribute("selected", "true");
             events.appendChild(e);
+        }
+        if (hasPendingEvent()) {
+            for (String k: PE.keySet()) {
+                add = true;
+                e = PE.get(k).getAsDOM(document);
+                e.setAttribute("pending", k);
+                events.appendChild(e);                
+            }
         }
         if (add) {
             c.appendChild(events);
@@ -576,9 +619,7 @@ public class Circumstance implements Serializable {
         }
 
         if (getRelevantPlans() != null && !getRelevantPlans().isEmpty()) {
-            i = getRelevantPlans().iterator();
-            while (i.hasNext()) {
-                Option o = (Option) i.next();
+            for (Option o: getRelevantPlans()) {
                 if (!alreadyIn.contains(o)) {
                     alreadyIn.add(o);
                     e = o.getAsDOM(document);
@@ -631,7 +672,7 @@ public class Circumstance implements Serializable {
         }
 
         Element acts = (Element) document.createElement("actions");
-        alreadyIn = new ArrayList();
+        alreadyIn = new ArrayList<Object>();
 
         // action
         if (getAction() != null) {
@@ -664,9 +705,7 @@ public class Circumstance implements Serializable {
 
         // FA
         if (hasFeedbackAction()) {
-            i = getFeedbackActions().iterator();
-            while (i.hasNext()) {
-                ActionExec o = (ActionExec) i.next();
+            for (ActionExec o: getFeedbackActions()) {
                 if (!alreadyIn.contains(o)) {
                     alreadyIn.add(o);
                     e = o.getAsDOM(document);

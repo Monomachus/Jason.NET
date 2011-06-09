@@ -28,15 +28,10 @@ import jason.asSemantics.ActionExec;
 import jason.asSemantics.Circumstance;
 import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.Event;
-import jason.asSemantics.IntendedMeans;
 import jason.asSemantics.Intention;
-import jason.asSemantics.Option;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.Literal;
-import jason.asSyntax.Plan;
-import jason.asSyntax.PlanBody.BodyType;
-import jason.asSyntax.PlanBodyImpl;
 import jason.asSyntax.Term;
 import jason.asSyntax.Trigger;
 import jason.asSyntax.Trigger.TEOperator;
@@ -147,6 +142,14 @@ public class suspend extends DefaultInternalAction {
         // suspending G in Events
         for (Event e: C.getEvents()) {
             i = e.getIntention();
+            if (un.unifies(g, e.getTrigger()) || (i != null && i.hasTrigger(g, un))) {
+                C.removeEvent(e);
+                C.addPendingEvent(k, e);
+                if (i != null)
+                    i.setSuspended(true);                
+            }
+            
+            /*
             if ( i != null && 
                     (i.hasTrigger(g, un) ||       // the goal is in the i's stack of IM
                      un.unifies(g, e.getTrigger())  // the goal is the trigger of the event
@@ -169,7 +172,10 @@ public class suspend extends DefaultInternalAction {
                 C.removeEvent(e);                    
                 C.addPendingIntention(k, i);
             }
+            */                
         }
+        
+        // TODO: consider the case of suspending something that is already suspended. 
         return true;
     }
 

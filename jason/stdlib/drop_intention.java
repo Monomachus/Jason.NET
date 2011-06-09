@@ -90,11 +90,18 @@ public class drop_intention extends DefaultInternalAction {
         
         Trigger g = new Trigger(TEOperator.add, TEType.achieve, l);
         
-        // intention may be suspended in E
+        // intention may be suspended in E or PE
         for (Event e: C.getEvents()) {
             Intention i = e.getIntention();
             if (i != null && i.hasTrigger(g, un)) {
                 C.removeEvent(e);
+                un = bak.clone();
+            }
+        }
+        for (String k: C.getPendingEvents().keySet()) {
+            Intention i = C.getPendingEvents().get(k).getIntention();
+            if (i != null && i.hasTrigger(g, un)) {
+                C.removePendingEvent(k);
                 un = bak.clone();
             }
         }

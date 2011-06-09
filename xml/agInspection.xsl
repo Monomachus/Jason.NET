@@ -196,6 +196,7 @@
                 <xsl:if test="@selected='true'">
                     <b>X</b>
                 </xsl:if>
+                <xsl:value-of select="@pending" />
             </td>
             
             <td valign="top" style="{$td-style}">

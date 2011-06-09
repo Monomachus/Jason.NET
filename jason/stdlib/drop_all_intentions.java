@@ -27,7 +27,6 @@ package jason.stdlib;
 import jason.asSemantics.Circumstance;
 import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.Event;
-import jason.asSemantics.Intention;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.Term;
@@ -81,9 +80,16 @@ public class drop_all_intentions extends DefaultInternalAction {
 
         // drop intentions in E
         for (Event e: C.getEvents()) {
-            // it is not an external event
-            if (e.getIntention() != Intention.EmptyInt) {
+            if (e.isInternal()) {
                 C.removeEvent(e);
+            }
+        }
+
+        // drop intentions in PE
+        for (String ek: C.getPendingEvents().keySet()) {
+            Event e = C.getPendingEvents().get(ek);
+            if (e.isInternal()) {
+                C.removePendingEvent(ek);
             }
         }
 

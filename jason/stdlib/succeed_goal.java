@@ -110,8 +110,12 @@ public class succeed_goal extends DefaultInternalAction {
         for (Event e: C.getEvents()) {
             // test in the intention
             Intention i = e.getIntention();
-            if (dropIntention(i, g, ts, un) > 1) {
+            int r = dropIntention(i, g, ts, un);
+            if (r > 0) {
                 C.removeEvent(e);
+                if (r == 1) {
+                    C.resumeIntention(i);
+                }
                 un = bak.clone();
             } else {
                 // test in the event
@@ -120,13 +124,39 @@ public class succeed_goal extends DefaultInternalAction {
                     t = t.clone();
                     t.apply(i.peek().getUnif());
                 }
-                if (un.unifies(t, g)) {
+                if (un.unifies(g, t)) {                    
                     dropInEvent(ts,e,i);
                     un = bak.clone();
                 }
             }
         }
         
+        // dropping G in Pending Events
+        for (String ek: C.getPendingEvents().keySet()) {
+            // test in the intention
+            Event e = C.getPendingEvents().get(ek);
+            Intention i = e.getIntention();
+            int r = dropIntention(i, g, ts, un);
+            if (r > 0) {
+                C.removePendingEvent(ek);
+                if (r == 1) {
+                    C.resumeIntention(i);
+                }
+                un = bak.clone();
+            } else {
+                // test in the event
+                Trigger t = e.getTrigger();
+                if (i != Intention.EmptyInt && i.size() > 0) {
+                    t = t.clone();
+                    t.apply(i.peek().getUnif());
+                }
+                if (un.unifies(g, t)) {
+                    dropInEvent(ts,e,i);
+                    un = bak.clone();
+                }
+            }
+        }
+
         // dropping from Pending Actions
         for (ActionExec a: C.getPendingActions().values()) {
             Intention i = a.getIntention();

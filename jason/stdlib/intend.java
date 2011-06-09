@@ -104,8 +104,14 @@ public class intend extends DefaultInternalAction {
                 return true;
         }
 
-        // intention may be suspended in E
+        // intention may be in E
         for (Event evt : C.getEvents()) {
+            if (evt.getIntention() != null && evt.getIntention().hasTrigger(g, un))
+                return true;
+        }
+        
+        // intention may be suspended in PE
+        for (Event evt : C.getPendingEvents().values()) {
             if (evt.getIntention() != null && evt.getIntention().hasTrigger(g, un))
                 return true;
         }

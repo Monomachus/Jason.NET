@@ -26,6 +26,7 @@ package jason.stdlib;
 import jason.JasonException;
 import jason.asSemantics.Circumstance;
 import jason.asSemantics.DefaultInternalAction;
+import jason.asSemantics.Event;
 import jason.asSemantics.Intention;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
@@ -81,6 +82,7 @@ public class resume extends DefaultInternalAction {
         Trigger      g = new Trigger(TEOperator.add, TEType.achieve, (Literal)args[0]);
         Circumstance C = ts.getC();
         
+        // Search the goal in PI
         Iterator<String> ik = C.getPendingIntentions().keySet().iterator();
         while (ik.hasNext()) {
             String k = ik.next();
@@ -97,6 +99,22 @@ public class resume extends DefaultInternalAction {
                     // add it back in I if not in PA
                     if (! C.getPendingActions().containsKey(i.getId()))
                         C.resumeIntention(i);
+                }
+            }
+        }
+        
+        // Search the goal in PE
+        ik = C.getPendingEvents().keySet().iterator();
+        while (ik.hasNext()) {
+            String k = ik.next();
+            if (k.startsWith(suspend.SUSPENDED_INT)) {
+                Event e = C.getPendingEvents().get(k);
+                Intention i = e.getIntention();
+                if (un.unifies(g, e.getTrigger()) || (i != null && i.hasTrigger(g, un))) {
+                    ik.remove();
+                    C.addEvent(e);                    
+                    if (i != null)
+                        i.setSuspended(false);                
                 }
             }
         }

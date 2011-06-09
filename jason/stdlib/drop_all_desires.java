@@ -65,6 +65,7 @@ public class drop_all_desires extends drop_all_intentions {
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         super.execute(ts, un, args);
         ts.getC().clearEvents();
+        ts.getC().clearPendingEvents();
         return true;
     }
 }
