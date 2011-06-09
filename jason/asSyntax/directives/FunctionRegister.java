@@ -57,7 +57,7 @@ public class FunctionRegister implements Directive {
         addFunction(time.class);
     }
     
-    private static void addFunction(Class<? extends ArithFunction> c) {
+    public static void addFunction(Class<? extends ArithFunction> c) {
         try {
             ArithFunction af = c.newInstance();
             functions.put(af.getName(), af);
