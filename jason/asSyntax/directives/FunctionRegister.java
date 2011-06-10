@@ -39,28 +39,42 @@ public class FunctionRegister implements Directive {
 
     // add known global functions (can be computed without an agent reference)
     static {
-        addFunction(Abs.class);
-        addFunction(Max.class);
-        addFunction(Min.class);
-        addFunction(Sum.class);
-        addFunction(StdDev.class);
-        addFunction(Average.class);
-        addFunction(Length.class);
-        addFunction(Random.class);
-        addFunction(Round.class);
-        addFunction(Sqrt.class);
-        addFunction(pi.class);
-        addFunction(e.class);
-        addFunction(floor.class);
-        addFunction(ceil.class);
-        addFunction(log.class);
-        addFunction(time.class);
+        addJasonFunction(Abs.class);
+        addJasonFunction(Max.class);
+        addJasonFunction(Min.class);
+        addJasonFunction(Sum.class);
+        addJasonFunction(StdDev.class);
+        addJasonFunction(Average.class);
+        addJasonFunction(Length.class);
+        addJasonFunction(Random.class);
+        addJasonFunction(Round.class);
+        addJasonFunction(Sqrt.class);
+        addJasonFunction(pi.class);
+        addJasonFunction(e.class);
+        addJasonFunction(floor.class);
+        addJasonFunction(ceil.class);
+        addJasonFunction(log.class);
+        addJasonFunction(time.class);
     }
     
-    public static void addFunction(Class<? extends ArithFunction> c) {
+    private static void addJasonFunction(Class<? extends ArithFunction> c) {
         try {
             ArithFunction af = c.newInstance();
             functions.put(af.getName(), af);
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Error registering function "+c.getName(),e);
+        }
+    }
+
+    /** add new global function (shared among all agents in the JVM) */
+    public static void addFunction(Class<? extends ArithFunction> c) {
+        try {
+            ArithFunction af = c.newInstance();
+            String error = FunctionRegister.checkFunctionName(af.getName());
+            if (error != null)
+                logger.warning(error);
+            else
+                functions.put(af.getName(), af);
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error registering function "+c.getName(),e);
         }
