@@ -233,10 +233,11 @@ public class Agent {
         }
         a.aslSource = this.aslSource;
         a.internalActions = new HashMap<String, InternalAction>();
-        a.initDefaultFunctions();
         a.setTS(new TransitionSystem(a, this.getTS().getC().clone(), this.getTS().getSettings(), arch));
         if (a.getPL().hasMetaEventPlans())
             a.getTS().addGoalListener(new GoalListenerForMetaEvents(a.getTS()));
+        
+        a.initAg(); //for initDefaultFunctions() and for overridden/custom agent 
         return a;
     }
     
