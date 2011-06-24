@@ -107,8 +107,8 @@ public class CentralisedAgArch implements Runnable, AgArchInfraTier {
             userAgArch = (AgArch) Class.forName(agArchClass).newInstance();
             userAgArch.setArchInfraTier(this);
 
-            Agent agClone = ag.clone(userAgArch);
-            userAgArch.setTS(agClone.getTS());
+            userAgArch.initAg(ag);
+            
             setLogger();
         } catch (Exception e) {
             running = false;

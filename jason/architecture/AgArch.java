@@ -131,6 +131,12 @@ public class AgArch {
             throw new JasonException("as2j: error creating the customised Agent class! - ", e);
         }
     }
+    
+    /** Init the Agent instance by cloning another */
+    public void initAg(Agent ag) {
+        Agent agClone = ag.clone(this);
+        setTS(agClone.getTS());
+    }
 
     /**
      * A call-back method called by TS 
