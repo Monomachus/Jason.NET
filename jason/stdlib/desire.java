@@ -70,15 +70,11 @@ public class desire extends intend {
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         checkArguments(args);
-        if (args[0].isGround())
-            return desires(ts.getC(),(Literal)args[0],un);
-        else 
-            return allDesires(ts.getC(),(Literal)args[0],un);
+        return allDesires(ts.getC(),(Literal)args[0],un);
     }
     
+    /*
     public boolean desires(Circumstance C, Literal l, Unifier un) {
-        return allDesires(C, l, un).hasNext();
-        /*
         Trigger teFromL = new Trigger(TEOperator.add, TEType.achieve, l);
 
         // we need to check the selected event in this cycle (already removed from E)
@@ -107,8 +103,8 @@ public class desire extends intend {
         }
 
         return super.intends(C, l, un); // Int subset Des (see the formal definitions)
-        */
     }
+     */
     
     enum Step { selEvt, evt, useIntends, end }
 

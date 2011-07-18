@@ -157,7 +157,7 @@ public class wait extends DefaultInternalAction {
         }
 
         void resume(final boolean stopByTimeout) {
-            // unregister (for not to receive intentionAdded again)
+            // unregister (to not receive intentionAdded again)
             c.removeEventListener(this);
 
             // invoke changes in C latter, so to avoid concurrent changes in C

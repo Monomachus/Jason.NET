@@ -84,15 +84,11 @@ public class intend extends DefaultInternalAction {
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         checkArguments(args);
-        if (args[0].isGround())
-            return intends(ts.getC(),(Literal)args[0],un);
-        else 
-            return allIntentions(ts.getC(),(Literal)args[0],un);
+        return allIntentions(ts.getC(),(Literal)args[0],un);
     }
-    
+
+    /*
     public boolean intends(Circumstance C, Literal l, Unifier un) {
-        return allIntentions(C, l, un).hasNext();
-        /*
         Trigger g = new Trigger(TEOperator.add, TEType.achieve, l);
 
         // we need to check the intention in the selected event in this cycle!!!
@@ -145,8 +141,8 @@ public class intend extends DefaultInternalAction {
         }
 
         return false;
-        */
     }
+     */
 
     enum Step { selEvt, selInt, evt, pendEvt, pendAct, pendInt, intentions, end }
 
@@ -215,8 +211,9 @@ public class intend extends DefaultInternalAction {
                         Event e = evtIterator.next();
                         if (e.getIntention() != null && e.getIntention().hasTrigger(g, solution))
                             return;
-                    } 
-                    curStep = Step.pendEvt; // set next step                    
+                    } else {
+                        curStep = Step.pendEvt; // set next step
+                    }
                     find();
                     return;
                     
@@ -229,8 +226,9 @@ public class intend extends DefaultInternalAction {
                         Event e = pendEvtIterator.next();
                         if (e.getIntention() != null && e.getIntention().hasTrigger(g, solution))
                             return;
+                    } else {
+                        curStep = Step.pendAct; // set next step
                     }
-                    curStep = Step.pendAct; // set next step                    
                     find();
                     return;
                     
@@ -245,9 +243,12 @@ public class intend extends DefaultInternalAction {
                             ActionExec ac = pendActIterator.next();
                             if (ac.getIntention().hasTrigger(g, solution))
                                 return;
+                        } else {
+                            curStep = Step.pendInt; // set next step                                                
                         }
+                    } else {
+                        curStep = Step.pendInt; // set next step                    
                     }
-                    curStep = Step.pendInt; // set next step                    
                     find();
                     return;
 
@@ -260,11 +261,15 @@ public class intend extends DefaultInternalAction {
                         if (pendIntIterator.hasNext()) {
                             solution = un.clone();
                             Intention i = pendIntIterator.next();
+                            //System.out.println("try "+i+" for "+g+" = "+i.hasTrigger(g, solution));
                             if (i.hasTrigger(g, solution))
                                 return;
+                        } else {
+                            curStep = Step.intentions; // set next step                                                
                         }
+                    } else {
+                        curStep = Step.intentions; // set next step                    
                     }
-                    curStep = Step.intentions; // set next step                    
                     find();
                     return;
 
@@ -277,9 +282,9 @@ public class intend extends DefaultInternalAction {
                         Intention i = intInterator.next();
                         if (i.hasTrigger(g, solution))
                             return;
+                    } else {
+                        curStep = Step.end; // set next step
                     }
-                    curStep = Step.end; // set next step                    
-                    
                 }
                 solution = null; // nothing found
             }
