@@ -1446,7 +1446,7 @@
   final public StringTerm string() throws ParseException {
                       Token k; StringTermImpl s;
     k = jj_consume_token(STRING);
-                      s = new StringTermImpl(k.image.substring(1,k.image.length()-1));
+                      s = new StringTermImpl(k.image.substring(1,k.image.length()-1).replaceAll("\\\\n", "\n"));
                       s.setSrcInfo(new SourceInfo(asSource,k.beginLine));
                       {if (true) return s;}
     throw new Error("Missing return statement in function");

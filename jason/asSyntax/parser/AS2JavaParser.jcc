@@ -805,7 +805,7 @@ VarTerm var():      { Token K; VarTerm v; ListTerm lt; }
 
 StringTerm string():{ Token k; StringTermImpl s; }
 {
-  k = <STRING>      { s = new StringTermImpl(k.image.substring(1,k.image.length()-1)); 
+  k = <STRING>      { s = new StringTermImpl(k.image.substring(1,k.image.length()-1).replaceAll("\\\\n", "\n")); 
                       s.setSrcInfo(new SourceInfo(asSource,k.beginLine)); 
                       return s;
                     } 

@@ -24,6 +24,8 @@
 
 package jason.stdlib;
 
+import java.util.Iterator;
+
 import jason.JasonException;
 import jason.asSemantics.ActionExec;
 import jason.asSemantics.Circumstance;
@@ -75,17 +77,22 @@ public class intend extends DefaultInternalAction {
 
     @Override protected void checkArguments(Term[] args) throws JasonException {
         super.checkArguments(args); // check number of arguments
-        if (!args[0].isLiteral())
-            throw JasonException.createWrongArgument(this,"first argument must be a literal");
+        if (!args[0].isLiteral() && !args[0].isVar())
+            throw JasonException.createWrongArgument(this,"first argument must be a literal or variable");
     }
 
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         checkArguments(args);
-        return intends(ts.getC(),(Literal)args[0],un);
+        if (args[0].isGround())
+            return intends(ts.getC(),(Literal)args[0],un);
+        else 
+            return allIntentions(ts.getC(),(Literal)args[0],un);
     }
     
     public boolean intends(Circumstance C, Literal l, Unifier un) {
+        return allIntentions(C, l, un).hasNext();
+        /*
         Trigger g = new Trigger(TEOperator.add, TEType.achieve, l);
 
         // we need to check the intention in the selected event in this cycle!!!
@@ -97,7 +104,7 @@ public class intend extends DefaultInternalAction {
                     return true;
         }
 
-        // we need to check the slected intention in this cycle too!!!
+        // we need to check the selected intention in this cycle too!!!
         if (C.getSelectedIntention() != null) {
             // logger.log(Level.SEVERE,"Int: "+g+" unif "+ts.C.SI);
             if (C.getSelectedIntention().hasTrigger(g, un))
@@ -138,6 +145,145 @@ public class intend extends DefaultInternalAction {
         }
 
         return false;
+        */
+    }
+
+    enum Step { selEvt, selInt, evt, pendEvt, pendAct, pendInt, intentions, end }
+
+    protected Iterator<Unifier> allIntentions(final Circumstance C, final Literal l, final Unifier un) {
+        final Trigger g = new Trigger(TEOperator.add, TEType.achieve, l);
+        
+        return new Iterator<Unifier>() {
+            Step curStep = Step.selEvt;
+            Unifier solution = null; // the current response (which is an unifier)
+            Iterator<Event>      evtIterator     = null;
+            Iterator<Event>      pendEvtIterator = null;
+            Iterator<ActionExec> pendActIterator = null;
+            Iterator<Intention>  pendIntIterator = null;
+            Iterator<Intention>  intInterator    = null;
+            
+            public boolean hasNext() {
+                if (solution == null) // the first call of hasNext should find the first response 
+                    find();
+                return solution != null; 
+            }
+
+            public Unifier next() {
+                if (solution == null) find();
+                Unifier b = solution;
+                find(); // find next response
+                return b;
+            }
+            public void remove() {}
+            
+            void find() {
+                switch (curStep) {
+
+                case selEvt:
+                    curStep = Step.selInt; // set next step
+                    // we need to check the intention in the selected event in this cycle!!!
+                    // (as it was already removed from E)
+                    if (C.getSelectedEvent() != null) {
+                        // logger.log(Level.SEVERE,"Int: "+g+" unif "+ts.C.SE);
+                        if (C.getSelectedEvent().getIntention() != null) {
+                            solution = un.clone();
+                            if (C.getSelectedEvent().getIntention().hasTrigger(g, solution))
+                                return;
+                        }
+                    }
+                    find();
+                    return;
+
+                case selInt:
+                    curStep = Step.evt; // set next step
+                    // we need to check the selected intention in this cycle too!!!
+                    if (C.getSelectedIntention() != null) {
+                        // logger.log(Level.SEVERE,"Int: "+g+" unif "+ts.C.SI);
+                        solution = un.clone();
+                        if (C.getSelectedIntention().hasTrigger(g, solution))
+                            return;
+                    }
+                    find();
+                    return;
+                    
+                case evt:                    
+                    if (evtIterator == null)
+                        evtIterator = C.getEvents().iterator();
+                    
+                    if (evtIterator.hasNext()) {
+                        solution = un.clone();
+                        Event e = evtIterator.next();
+                        if (e.getIntention() != null && e.getIntention().hasTrigger(g, solution))
+                            return;
+                    } 
+                    curStep = Step.pendEvt; // set next step                    
+                    find();
+                    return;
+                    
+                case pendEvt:                    
+                    if (pendEvtIterator == null)
+                        pendEvtIterator = C.getPendingEvents().values().iterator();
+                    
+                    if (pendEvtIterator.hasNext()) {
+                        solution = un.clone();
+                        Event e = pendEvtIterator.next();
+                        if (e.getIntention() != null && e.getIntention().hasTrigger(g, solution))
+                            return;
+                    }
+                    curStep = Step.pendAct; // set next step                    
+                    find();
+                    return;
+                    
+                case pendAct:                    
+                    // intention may be suspended in PA! (in the new semantics)
+                    if (C.hasPendingAction()) {
+                        if (pendActIterator == null)
+                            pendActIterator = C.getPendingActions().values().iterator();
+                        
+                        if (pendActIterator.hasNext()) {
+                            solution = un.clone();
+                            ActionExec ac = pendActIterator.next();
+                            if (ac.getIntention().hasTrigger(g, solution))
+                                return;
+                        }
+                    }
+                    curStep = Step.pendInt; // set next step                    
+                    find();
+                    return;
+
+                case pendInt:                    
+                    // intention may be suspended in PI! (in the new semantics)
+                    if (C.hasPendingIntention()) {
+                        if (pendIntIterator == null)
+                            pendIntIterator = C.getPendingIntentions().values().iterator();
+                        
+                        if (pendIntIterator.hasNext()) {
+                            solution = un.clone();
+                            Intention i = pendIntIterator.next();
+                            if (i.hasTrigger(g, solution))
+                                return;
+                        }
+                    }
+                    curStep = Step.intentions; // set next step                    
+                    find();
+                    return;
+
+                case intentions:                    
+                    if (intInterator == null)
+                        intInterator = C.getIntentions().iterator();
+                    
+                    if (intInterator.hasNext()) {
+                        solution = un.clone();
+                        Intention i = intInterator.next();
+                        if (i.hasTrigger(g, solution))
+                            return;
+                    }
+                    curStep = Step.end; // set next step                    
+                    
+                }
+                solution = null; // nothing found
+            }
+        };        
     }
     
 }

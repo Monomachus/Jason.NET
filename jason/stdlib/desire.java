@@ -35,6 +35,8 @@ import jason.asSyntax.Trigger;
 import jason.asSyntax.Trigger.TEOperator;
 import jason.asSyntax.Trigger.TEType;
 
+import java.util.Iterator;
+
 /**
   <p>Internal action: <b><code>.desire(<i>D</i>)</code></b>.
   
@@ -68,10 +70,15 @@ public class desire extends intend {
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         checkArguments(args);
-        return desires(ts.getC(),(Literal)args[0],un);
+        if (args[0].isGround())
+            return desires(ts.getC(),(Literal)args[0],un);
+        else 
+            return allDesires(ts.getC(),(Literal)args[0],un);
     }
     
     public boolean desires(Circumstance C, Literal l, Unifier un) {
+        return allDesires(C, l, un).hasNext();
+        /*
         Trigger teFromL = new Trigger(TEOperator.add, TEType.achieve, l);
 
         // we need to check the selected event in this cycle (already removed from E)
@@ -100,5 +107,90 @@ public class desire extends intend {
         }
 
         return super.intends(C, l, un); // Int subset Des (see the formal definitions)
+        */
+    }
+    
+    enum Step { selEvt, evt, useIntends, end }
+
+    protected Iterator<Unifier> allDesires(final Circumstance C, final Literal l, final Unifier un) {
+        final Trigger teFromL = new Trigger(TEOperator.add, TEType.achieve, l);
+        
+        return new Iterator<Unifier>() {
+            Step curStep = Step.selEvt;
+            Unifier solution = null; // the current response (which is an unifier)
+            Iterator<Event>      evtIterator     = null;
+            Iterator<Unifier>    intendInterator = null;
+            
+            public boolean hasNext() {
+                if (solution == null) // the first call of hasNext should find the first response 
+                    find();
+                return solution != null; 
+            }
+
+            public Unifier next() {
+                if (solution == null) find();
+                Unifier b = solution;
+                find(); // find next response
+                return b;
+            }
+            public void remove() {}
+            
+            void find() {
+                switch (curStep) {
+
+                case selEvt:
+                    curStep = Step.evt; // set next step
+                    
+                    // we need to check the selected event in this cycle (already removed from E)
+                    if (C.getSelectedEvent() != null) {
+                        Trigger   t = C.getSelectedEvent().getTrigger();
+                        Intention i = C.getSelectedEvent().getIntention(); 
+                        if (i != Intention.EmptyInt && i.size() > 0) {
+                            t = t.clone();
+                            t.apply(i.peek().getUnif());
+                        }
+                        solution = un.clone();
+                        if (solution.unifiesNoUndo(teFromL, t)) {
+                            return;
+                        }
+                    }
+                    find();
+                    return;
+
+                case evt:
+                    if (evtIterator == null)
+                        evtIterator = C.getEvents().iterator();
+                    
+                    if (evtIterator.hasNext()) {
+                        Event ei = evtIterator.next();
+                        Trigger   t = ei.getTrigger();
+                        Intention i = ei.getIntention(); 
+                        if (i != Intention.EmptyInt && i.size() > 0) {
+                            t = t.clone();
+                            t.apply(i.peek().getUnif());
+                        }
+                        solution = un.clone();
+                        if (solution.unifiesNoUndo(teFromL, t)) {
+                            return;
+                        }
+                    } 
+                    curStep = Step.useIntends; // set next step                    
+                    find();
+                    return;
+                    
+                case useIntends:                    
+                    if (intendInterator == null)
+                        intendInterator = allIntentions(C,l,un);
+                    
+                    if (intendInterator.hasNext()) {                        
+                        solution = intendInterator.next();
+                        return;
+                    }
+                    curStep = Step.end; // set next step                    
+                                        
+                }
+                solution = null; // nothing found
+            }
+        };        
     }
 }
