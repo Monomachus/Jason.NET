@@ -169,8 +169,9 @@ public class desire extends intend {
                         if (solution.unifiesNoUndo(teFromL, t)) {
                             return;
                         }
-                    } 
-                    curStep = Step.useIntends; // set next step                    
+                    } else {
+                        curStep = Step.useIntends; // set next step
+                    }
                     find();
                     return;
                     
@@ -181,8 +182,9 @@ public class desire extends intend {
                     if (intendInterator.hasNext()) {                        
                         solution = intendInterator.next();
                         return;
+                    } else {
+                        curStep = Step.end; // set next step
                     }
-                    curStep = Step.end; // set next step                    
                                         
                 }
                 solution = null; // nothing found
