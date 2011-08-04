@@ -99,19 +99,26 @@ public class mas2j implements mas2jConstants {
 
   final public void agents() throws ParseException {
                               project.initAgMap();
-    jj_consume_token(AGS);
-    jj_consume_token(39);
-    label_1:
-    while (true) {
-      agent();
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case ASID:
-        ;
-        break;
-      default:
-        jj_la1[1] = jj_gen;
-        break label_1;
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case AGS:
+      jj_consume_token(AGS);
+      jj_consume_token(39);
+      label_1:
+      while (true) {
+        agent();
+        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        case ASID:
+          ;
+          break;
+        default:
+          jj_la1[1] = jj_gen;
+          break label_1;
+        }
       }
+      break;
+    default:
+      jj_la1[2] = jj_gen;
+      ;
     }
   }
 
@@ -130,7 +137,7 @@ public class mas2j implements mas2jConstants {
       ag.asSource = fileName();
       break;
     default:
-      jj_la1[2] = jj_gen;
+      jj_la1[3] = jj_gen;
       ;
     }
     opts = ASoptions();
@@ -146,7 +153,7 @@ public class mas2j implements mas2jConstants {
         ;
         break;
       default:
-        jj_la1[3] = jj_gen;
+        jj_la1[4] = jj_gen;
         break label_2;
       }
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -173,7 +180,7 @@ public class mas2j implements mas2jConstants {
                             ag.setHost(host.image);
         break;
       default:
-        jj_la1[4] = jj_gen;
+        jj_la1[5] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -194,7 +201,7 @@ public class mas2j implements mas2jConstants {
                               path = t.image;
       break;
     default:
-      jj_la1[5] = jj_gen;
+      jj_la1[6] = jj_gen;
       ;
     }
     i = jj_consume_token(ASID);
@@ -205,7 +212,7 @@ public class mas2j implements mas2jConstants {
                               ext = "." + e.image;
       break;
     default:
-      jj_la1[6] = jj_gen;
+      jj_la1[7] = jj_gen;
       ;
     }
                               //if (!path.startsWith(File.separator)) {
@@ -225,7 +232,7 @@ public class mas2j implements mas2jConstants {
       c = jj_consume_token(ASID);
       break;
     default:
-      jj_la1[7] = jj_gen;
+      jj_la1[8] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -237,7 +244,7 @@ public class mas2j implements mas2jConstants {
         ;
         break;
       default:
-        jj_la1[8] = jj_gen;
+        jj_la1[9] = jj_gen;
         break label_3;
       }
       jj_consume_token(42);
@@ -249,7 +256,7 @@ public class mas2j implements mas2jConstants {
         c = jj_consume_token(ASID);
         break;
       default:
-        jj_la1[9] = jj_gen;
+        jj_la1[10] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -273,7 +280,7 @@ public class mas2j implements mas2jConstants {
             ;
             break;
           default:
-            jj_la1[10] = jj_gen;
+            jj_la1[11] = jj_gen;
             break label_4;
           }
           jj_consume_token(44);
@@ -282,13 +289,13 @@ public class mas2j implements mas2jConstants {
         }
         break;
       default:
-        jj_la1[11] = jj_gen;
+        jj_la1[12] = jj_gen;
         ;
       }
       jj_consume_token(45);
       break;
     default:
-      jj_la1[12] = jj_gen;
+      jj_la1[13] = jj_gen;
       ;
     }
                              {if (true) return cp;}
@@ -316,7 +323,7 @@ public class mas2j implements mas2jConstants {
                              {if (true) return s;}
       break;
     default:
-      jj_la1[13] = jj_gen;
+      jj_la1[14] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -335,7 +342,7 @@ public class mas2j implements mas2jConstants {
         ;
         break;
       default:
-        jj_la1[14] = jj_gen;
+        jj_la1[15] = jj_gen;
         break label_5;
       }
       jj_consume_token(44);
@@ -360,7 +367,7 @@ public class mas2j implements mas2jConstants {
           ;
           break;
         default:
-          jj_la1[15] = jj_gen;
+          jj_la1[16] = jj_gen;
           break label_6;
         }
         jj_consume_token(44);
@@ -369,7 +376,7 @@ public class mas2j implements mas2jConstants {
       jj_consume_token(47);
       break;
     default:
-      jj_la1[16] = jj_gen;
+      jj_la1[17] = jj_gen;
       ;
     }
                                  {if (true) return opts;}
@@ -426,14 +433,14 @@ public class mas2j implements mas2jConstants {
         oval = jj_consume_token(ID);
         break;
       default:
-        jj_la1[17] = jj_gen;
+        jj_la1[18] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
                                         opts.put(opt.image,oval.image);
       break;
     default:
-      jj_la1[18] = jj_gen;
+      jj_la1[19] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -454,12 +461,12 @@ public class mas2j implements mas2jConstants {
         host = jj_consume_token(STRING);
         break;
       default:
-        jj_la1[19] = jj_gen;
+        jj_la1[20] = jj_gen;
         ;
       }
       break;
     default:
-      jj_la1[20] = jj_gen;
+      jj_la1[21] = jj_gen;
       ;
     }
                               project.setEnvClass(envClass);
@@ -482,12 +489,12 @@ public class mas2j implements mas2jConstants {
         host = jj_consume_token(STRING);
         break;
       default:
-        jj_la1[21] = jj_gen;
+        jj_la1[22] = jj_gen;
         ;
       }
       break;
     default:
-      jj_la1[22] = jj_gen;
+      jj_la1[23] = jj_gen;
       ;
     }
                               project.setControlClass(controlClass);
@@ -512,13 +519,13 @@ public class mas2j implements mas2jConstants {
           ;
           break;
         default:
-          jj_la1[23] = jj_gen;
+          jj_la1[24] = jj_gen;
           break label_7;
         }
       }
       break;
     default:
-      jj_la1[24] = jj_gen;
+      jj_la1[25] = jj_gen;
       ;
     }
   }
@@ -539,13 +546,13 @@ public class mas2j implements mas2jConstants {
           ;
           break;
         default:
-          jj_la1[25] = jj_gen;
+          jj_la1[26] = jj_gen;
           break label_8;
         }
       }
       break;
     default:
-      jj_la1[26] = jj_gen;
+      jj_la1[27] = jj_gen;
       ;
     }
   }
@@ -568,13 +575,13 @@ public class mas2j implements mas2jConstants {
           ;
           break;
         default:
-          jj_la1[27] = jj_gen;
+          jj_la1[28] = jj_gen;
           break label_9;
         }
       }
       break;
     default:
-      jj_la1[28] = jj_gen;
+      jj_la1[29] = jj_gen;
       ;
     }
   }
@@ -584,7 +591,7 @@ public class mas2j implements mas2jConstants {
   public Token token, jj_nt;
   private int jj_ntk;
   private int jj_gen;
-  final private int[] jj_la1 = new int[29];
+  final private int[] jj_la1 = new int[30];
   static private int[] jj_la1_0;
   static private int[] jj_la1_1;
   static {
@@ -592,10 +599,10 @@ public class mas2j implements mas2jConstants {
       jj_la1_1();
    }
    private static void jj_la1_0() {
-      jj_la1_0 = new int[] {0x1000,0x20000000,0xa0000000,0x7000800,0x7000800,0x80000000,0x0,0x60000000,0x0,0x60000000,0x0,0x78000000,0x0,0x78000000,0x0,0x0,0x0,0x78000000,0x205a8000,0x800,0x200,0x800,0x400,0x10000000,0x2000,0x10000000,0x4000,0x20000000,0x200000,};
+      jj_la1_0 = new int[] {0x1000,0x20000000,0x100,0xa0000000,0x7000800,0x7000800,0x80000000,0x0,0x60000000,0x0,0x60000000,0x0,0x78000000,0x0,0x78000000,0x0,0x0,0x0,0x78000000,0x205a8000,0x800,0x200,0x800,0x400,0x10000000,0x2000,0x10000000,0x4000,0x20000000,0x200000,};
    }
    private static void jj_la1_1() {
-      jj_la1_1 = new int[] {0x0,0x0,0x0,0x100,0x100,0x0,0x400,0x0,0x400,0x0,0x1000,0x4000,0x800,0x4000,0x1000,0x1000,0x4000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,};
+      jj_la1_1 = new int[] {0x0,0x0,0x0,0x0,0x100,0x100,0x0,0x400,0x0,0x400,0x0,0x1000,0x4000,0x800,0x4000,0x1000,0x1000,0x4000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,};
    }
 
   public mas2j(java.io.InputStream stream) {
@@ -607,7 +614,7 @@ public class mas2j implements mas2jConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 29; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 30; i++) jj_la1[i] = -1;
   }
 
   public void ReInit(java.io.InputStream stream) {
@@ -619,7 +626,7 @@ public class mas2j implements mas2jConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 29; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 30; i++) jj_la1[i] = -1;
   }
 
   public mas2j(java.io.Reader stream) {
@@ -628,7 +635,7 @@ public class mas2j implements mas2jConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 29; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 30; i++) jj_la1[i] = -1;
   }
 
   public void ReInit(java.io.Reader stream) {
@@ -637,7 +644,7 @@ public class mas2j implements mas2jConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 29; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 30; i++) jj_la1[i] = -1;
   }
 
   public mas2j(mas2jTokenManager tm) {
@@ -645,7 +652,7 @@ public class mas2j implements mas2jConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 29; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 30; i++) jj_la1[i] = -1;
   }
 
   public void ReInit(mas2jTokenManager tm) {
@@ -653,7 +660,7 @@ public class mas2j implements mas2jConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 29; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 30; i++) jj_la1[i] = -1;
   }
 
   final private Token jj_consume_token(int kind) throws ParseException {
@@ -708,7 +715,7 @@ public class mas2j implements mas2jConstants {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
     }
-    for (int i = 0; i < 29; i++) {
+    for (int i = 0; i < 30; i++) {
       if (jj_la1[i] == jj_gen) {
         for (int j = 0; j < 32; j++) {
           if ((jj_la1_0[i] & (1<<j)) != 0) {

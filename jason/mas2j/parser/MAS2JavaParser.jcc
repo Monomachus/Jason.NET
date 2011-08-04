@@ -207,8 +207,9 @@ void infra() :              { ClassParameters infra; }
 
 void agents() :             { project.initAgMap(); }
 {
-  <AGS> ":"
-  ( agent() )+
+  [ <AGS> ":"
+    ( agent() )+
+  ]
 }
 
 
