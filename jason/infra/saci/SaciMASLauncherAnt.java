@@ -121,6 +121,7 @@ public class SaciMASLauncherAnt extends CentralisedMASLauncherAnt implements MAS
             writeSaciXMLScript(new PrintStream(new FileOutputStream(file)), debug);
         } catch (Exception e) {
             System.err.println("Error writing XML script!" + e);
+            e.printStackTrace();
         }
     }
 
@@ -160,6 +161,7 @@ public class SaciMASLauncherAnt extends CentralisedMASLauncherAnt implements MAS
         }
         out.println("\t/>");
 
+        
         project.fixAgentsSrc(null);
         
         // agents
@@ -241,18 +243,20 @@ public class SaciMASLauncherAnt extends CentralisedMASLauncherAnt implements MAS
             s += v + "synchronised=true";
             v = ",";
         }
-        Iterator<String> i = agp.getOptions().keySet().iterator();
-        while (i.hasNext()) {
-            String key = i.next();
-            if (!(debug && key.equals("verbose"))) {
-                if (!((forceSync || debug) && key.equals("synchronised"))) {
-                    s += v + key + "=" + changeQuotes((String) agp.getOptions().get(key));
-                    v = ",";
+        if (agp.getOptions() != null) {
+            Iterator<String> i = agp.getOptions().keySet().iterator();
+            while (i.hasNext()) {
+                String key = i.next();
+                if (!(debug && key.equals("verbose"))) {
+                    if (!((forceSync || debug) && key.equals("synchronised"))) {
+                        s += v + key + "=" + changeQuotes((String) agp.getOptions().get(key));
+                        v = ",";
+                    }
                 }
             }
-        }
-        if (s.length() > 0) {
-            s = " options " + s;
+            if (s.length() > 0) {
+                s = " options " + s;
+            }
         }
         return s;
     }
