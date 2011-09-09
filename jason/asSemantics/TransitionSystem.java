@@ -265,10 +265,12 @@ public class TransitionSystem {
                 }
                 
                 // test the case of sync ask with many receivers
-                if (send.getTerm(0).isList()) { // send to many receivers
+                Unifier un = intention.peek().getUnif();
+                Term rec = send.getTerm(0).clone();
+                rec.apply(un);
+                if (rec.isList()) { // send to many receivers
                     // put the answers in the unifier
                     VarTerm answers = new VarTerm("AnsList___"+m.getInReplyTo());
-                    Unifier un = intention.peek().getUnif();
                     ListTerm listOfAnswers = (ListTerm)un.get(answers);
                     if (listOfAnswers == null) {
                         listOfAnswers = new ListTermImpl();

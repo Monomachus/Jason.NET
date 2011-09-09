@@ -382,6 +382,7 @@ public class Agent {
             iaName = "jason.stdlib" + iaName;
         InternalAction objIA = internalActions.get(iaName);
         if (objIA == null) {
+            @SuppressWarnings("rawtypes")
             Class iaclass = Class.forName(iaName);
             try {
                 // check if the class has "create" method -- singleton implementation
