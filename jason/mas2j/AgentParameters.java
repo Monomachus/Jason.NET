@@ -7,6 +7,8 @@ import jason.bb.DefaultBeliefBase;
 import jason.runtime.Settings;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -19,14 +21,14 @@ import java.util.Map;
  * @author jomi
  */
 public class AgentParameters {
-    public String               name      = null;
-    public File                 asSource  = null;
-    public ClassParameters      agClass   = null;
-    public ClassParameters      bbClass   = null;
-    public ClassParameters      archClass = null;
-    public int                  qty       = 1;
-    private Map<String, String> options   = null;
-    private String              host      = null;
+    public String                name      = null;
+    public File                  asSource  = null;
+    public ClassParameters       agClass   = null;
+    public ClassParameters       bbClass   = null;
+    private List<ClassParameters> archClasses = new ArrayList<ClassParameters>();
+    public int                   qty       = 1;
+    private Map<String, String>  options   = null;
+    private String               host      = null;
     
     public AgentParameters() {
         setupDefault();
@@ -39,9 +41,6 @@ public class AgentParameters {
     public void setupDefault() {
         if (agClass == null) {
             agClass = new ClassParameters(jason.asSemantics.Agent.class.getName());
-        }
-        if (archClass == null) {
-            archClass = new ClassParameters(AgArch.class.getName());
         }
         if (bbClass == null) {
             bbClass = new ClassParameters(DefaultBeliefBase.class.getName());
@@ -78,12 +77,32 @@ public class AgentParameters {
     public void setAgClass(String c) {
         if (c != null) agClass = new ClassParameters(c);
     }
-    public void setArchClass(String c) {
-        if (c != null) archClass = new ClassParameters(c);        
+    
+    public void addArchClass(String... cs) {
+        for (String c: cs)
+            archClasses.add(new ClassParameters(c));        
     }
-    public void setArchClass(ClassParameters c) {
-        archClass = c;        
+    public void addArchClass(Collection<String> cs) {
+        for (String c: cs)
+            archClasses.add(new ClassParameters(c));        
     }
+    public void addArchClass(ClassParameters... cps) {
+        for (ClassParameters c: cps)
+            archClasses.add(c);        
+    }
+    public void insertArchClass(ClassParameters... cps) {
+        for (ClassParameters c: cps)
+            archClasses.add(0,c);        
+    }
+    public List<String> getAgArchClasses() {
+        List<String> all = new ArrayList<String>();
+        for (ClassParameters c: archClasses) {
+            all.add(c.getClassName());
+        }
+        return all;
+    }    
+    
+    
     public void setBB(ClassParameters c) {
         if (c != null) bbClass = c;        
     }
@@ -98,7 +117,12 @@ public class AgentParameters {
             options = new HashMap<String, String>();
         options.put(k, vl);
     }
-    
+    public String getOption(String key) {
+        if (options == null)
+            return null;
+        else
+            return options.get(key);
+    }
     public Map<String,String> getOptions() {
         return options;
     }
@@ -120,8 +144,10 @@ public class AgentParameters {
             }
             s.append("] ");
         }
-        if (archClass != null && archClass.getClassName().length() > 0 && !archClass.getClassName().equals(AgArch.class.getName())) {
-            s.append("agentArchClass "+archClass+" ");
+        for (ClassParameters c: archClasses) {
+            if (c.getClassName().length() > 0 && !c.getClassName().equals(AgArch.class.getName())) {
+                s.append("agentArchClass "+c+" ");
+            }            
         }
         if (agClass != null && agClass.getClassName().length() > 0 && !agClass.getClassName().equals(Agent.class.getName())) {
             s.append("agentClass "+agClass+" ");

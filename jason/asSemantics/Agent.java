@@ -46,6 +46,7 @@ import jason.bb.BeliefBase;
 import jason.bb.DefaultBeliefBase;
 import jason.functions.Count;
 import jason.functions.RuleToFunction;
+import jason.mas2j.ClassParameters;
 import jason.runtime.Settings;
 
 import java.io.File;
@@ -106,6 +107,33 @@ public class Agent {
     public Agent() {
         checkCustomSelectOption();
     }
+    
+    /**
+     * Setup the default agent configuration.
+     * 
+     * Creates the agent class defined by <i>agClass</i>, default is jason.asSemantics.Agent. 
+     * Creates the TS for the agent.
+     * Creates the belief base for the agent. 
+     */
+    public static Agent create(AgArch arch, String agClass, ClassParameters bbPars, String asSrc, Settings stts) throws JasonException {
+        try {
+            Agent ag = (Agent) Class.forName(agClass).newInstance();
+            
+            new TransitionSystem(ag, new Circumstance(), stts, arch);
+
+            BeliefBase bb = (BeliefBase) Class.forName(bbPars.getClassName()).newInstance();
+            ag.setBB(bb);     // the agent's BB have to be already set for the BB initialisation
+            ag.initAg();
+
+            bb.init(ag, bbPars.getParametersArray());  
+            ag.load(asSrc); // load the source code of the agent
+            return ag;
+        } catch (Exception e) {
+            throw new JasonException("as2j: error creating the customised Agent class! - ", e);
+        }
+    }
+
+
 
     /** Initialises the TS and other components of the agent */
     public void initAg() {
@@ -125,6 +153,11 @@ public class Agent {
     /** parse and load the agent code, asSrc may be null */
     public void initAg(String asSrc) throws JasonException {
         initAg();
+        load(asSrc);
+    }
+    
+    /** parse and load the agent code, asSrc may be null */
+    public void load(String asSrc) throws JasonException {
         // set the agent
         try {
             boolean parsingOk = true;
@@ -187,7 +220,8 @@ public class Agent {
      */
     public TransitionSystem initAg(AgArch arch, BeliefBase bb, String asSrc, Settings stts) throws JasonException {
         try {
-            if (bb != null) setBB(bb);
+            if (bb != null) 
+                setBB(bb);
             new TransitionSystem(this, new Circumstance(), stts, arch);
             initAg(asSrc);
             return ts;

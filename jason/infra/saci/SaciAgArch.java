@@ -25,8 +25,8 @@ package jason.infra.saci;
 
 import jason.JasonException;
 import jason.architecture.AgArch;
-import jason.architecture.AgArchInfraTier;
 import jason.asSemantics.ActionExec;
+import jason.asSemantics.Agent;
 import jason.asSemantics.TransitionSystem;
 import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Term;
@@ -59,7 +59,7 @@ import saci.MessageHandler;
  * <p> Execution sequence: initAg, run (perceive, checkMail, act),
  * stopAg.
  */
-public class SaciAgArch extends saci.Agent implements AgArchInfraTier {
+public class SaciAgArch extends saci.Agent {
 
     private static final long serialVersionUID = 1L;
 
@@ -67,9 +67,8 @@ public class SaciAgArch extends saci.Agent implements AgArchInfraTier {
     // normal mbox is used for inter-agent communication
     private MBoxSAg  mboxPercept = null;
 
-    /** the user implementation of the architecture */
-    protected AgArch userAgArch;
-
+    protected JasonBridgeArch jasonBridgeAgArch;
+    
     private Map<String,ActionExec> myPA = new HashMap<String,ActionExec>();
     
     private Logger   logger;
@@ -86,7 +85,7 @@ public class SaciAgArch extends saci.Agent implements AgArchInfraTier {
     public void initAg(String[] args) throws JasonException {
         // create a logger
         RunCentralisedMAS.setupLogger();
-        logger = Logger.getLogger(SaciAgArch.class.getName() + "." + getAgName());
+        logger = Logger.getLogger(SaciAgArch.class.getName() + "." + getName());
 
         // create the jasonId console
         if (MASConsoleGUI.hasConsole()) { // the logger created the MASConsole
@@ -96,13 +95,15 @@ public class SaciAgArch extends saci.Agent implements AgArchInfraTier {
 
         // set the agent class
         try {
+            /*
             String archClassName = null;
             if (args.length < 1) { // error
                 throw new JasonException("The Agent Architecture class name was not informed for the SaciAgArch creation!");
             } else {
                 archClassName = args[0].trim();
             }
-
+             */
+            
             String agClassName = null;
             if (args.length < 2) { // error
                 throw new JasonException("The Agent class name was not informed for the CentralisedAgArch creation!");
@@ -128,11 +129,13 @@ public class SaciAgArch extends saci.Agent implements AgArchInfraTier {
                     stts.setOptions("[" + args[5] + "]");
                 }
             }
-            userAgArch = (AgArch) Class.forName(archClassName).newInstance();
-            userAgArch.setArchInfraTier(this);
-            userAgArch.initAg(agClassName, bbPars, asSource, stts);
-            if (userAgArch.getTS().getSettings().verbose() >= 0)
-                logger.setLevel(userAgArch.getTS().getSettings().logLevel());
+            
+            jasonBridgeAgArch = new JasonBridgeArch();
+            jasonBridgeAgArch.init(agClassName, bbPars, asSource, stts);
+            
+            if (jasonBridgeAgArch.getTS().getSettings().verbose() >= 0)
+                logger.setLevel(jasonBridgeAgArch.getTS().getSettings().logLevel());
+            
         } catch (Exception e) {
             running = false;
             throw new JasonException("as2j: error creating the agent class! - " + e.getMessage());
@@ -146,14 +149,14 @@ public class SaciAgArch extends saci.Agent implements AgArchInfraTier {
             mboxPercept.init();
             mboxPercept.setMboxChangedListener(new MBoxChangedListener() {
                 public void mboxChanged() {
-                    wake();
+                    jasonBridgeAgArch.wake();
                 }
             });
 
             mboxPercept.addMessageHandler("performCycle", "tell", null, "AS-ExecControl", new MessageHandler() {
                 public boolean processMessage(saci.Message m) {
                     int cycle = Integer.parseInt(m.get("cycle").toString());
-                    userAgArch.setCycleNumber(cycle);
+                    jasonBridgeAgArch.setCycleNumber(cycle);
                     //userAgArch.getTS().receiveSyncSignal();
                     receiveSyncSignal();
                     return true; // no other message handler gives this message
@@ -169,7 +172,7 @@ public class SaciAgArch extends saci.Agent implements AgArchInfraTier {
                     r.put("ontology", m.get("ontology"));
 
                     try {
-                        Document agStateDoc = userAgArch.getTS().getAg().getAgState();
+                        Document agStateDoc = jasonBridgeAgArch.getTS().getAg().getAgState();
 
                         // serialize
                         // StringWriter so = new StringWriter();
@@ -189,7 +192,7 @@ public class SaciAgArch extends saci.Agent implements AgArchInfraTier {
 
             getMBox().setMboxChangedListener(new MBoxChangedListener() {
                 public void mboxChanged() {
-                    wake();
+                    jasonBridgeAgArch.wake();
                 }
             });
 
@@ -198,47 +201,22 @@ public class SaciAgArch extends saci.Agent implements AgArchInfraTier {
         }
     }
 
-    public String getAgName() {
-        return super.getName();
-    }
 
     public void stopAg() {
         running = false;
         new Thread() {
             public void run() {
-                userAgArch.stopAg();
+                jasonBridgeAgArch.getFirstAgArch().stop();
             }
         }.start();
         receiveSyncSignal();
-        wake(); // in case the agent is waiting messages
+        jasonBridgeAgArch.wake(); // in case the agent is waiting messages
     }
 
 
-    private Object sleepSync = new Object();
-    
-    public void sleep() {
-        try {
-            if (!userAgArch.getTS().getSettings().isSync()) {
-                logger.fine("Entering in sleep mode....");
-                synchronized (sleepSync) {
-                    sleepSync.wait(1000); // wait for messages
-                }
-            }
-        } catch (InterruptedException e) {
-        } catch (Exception e) {
-            logger.log(Level.WARNING,"Error waiting mgs", e);
-        }
-    }
-    
-    public void wake() {
-        synchronized (sleepSync) {
-            sleepSync.notifyAll(); // notify sleep method
-        }
-    }
-    
     public void run() {
         while (running) {
-            TransitionSystem ts = userAgArch.getTS();
+            TransitionSystem ts = jasonBridgeAgArch.getTS();
             while (running) {
                 if (ts.getSettings().isSync()) {
                     waitSyncSignal();
@@ -246,11 +224,11 @@ public class SaciAgArch extends saci.Agent implements AgArchInfraTier {
                     boolean isBreakPoint = false;
                     try {
                         isBreakPoint = ts.getC().getSelectedOption().getPlan().hasBreakpoint();
-                        if (logger.isLoggable(Level.FINE)) logger.fine("Informing controller that I finished a reasoning cycle "+userAgArch.getCycleNumber()+". Breakpoint is " + isBreakPoint);
+                        if (logger.isLoggable(Level.FINE)) logger.fine("Informing controller that I finished a reasoning cycle "+jasonBridgeAgArch.getCycleNumber()+". Breakpoint is " + isBreakPoint);
                     } catch (NullPointerException e) {
                         // no problem, there is no sel opt, no plan ....
                     }
-                    informCycleFinished(isBreakPoint, userAgArch.getCycleNumber());
+                    informCycleFinished(isBreakPoint, jasonBridgeAgArch.getCycleNumber());
                 } else {
                     ts.reasoningCycle();
                 }
@@ -274,84 +252,211 @@ public class SaciAgArch extends saci.Agent implements AgArchInfraTier {
     // In the case of the SACI Architecture, the results of requests
     // for action execution is also received here.
 
-    @SuppressWarnings("unchecked")
-    public List perceive() {
-        if (!running) {
-            return null;
+
+    class JasonBridgeArch extends AgArch {
+        public void init(String agClassName, ClassParameters bbPars, String asSource, Settings stts) throws JasonException {
+            Agent.create(this, agClassName, bbPars, asSource, stts);
+            insertAgArch(this);
+            // TODO: createCustomArchs(ap.getAgArchClasses());            
         }
-
-        List percepts = null;
-
-        saci.Message askMsg = new saci.Message("(ask-all :receiver environment :ontology AS-Perception :content getPercepts)");
-
-        // asks current environment state (positive percepts)
-        saci.Message m = null;
-        try {
-            m = mboxPercept.ask(askMsg);
-        } catch (Exception e) {
-            logger.log(Level.SEVERE, "Error receiving percepts.", e);
-        }
-        if (m != null) {
-            Object content = m.get("content");
-            if (content != null && content.toString().startsWith("[")) {
-                percepts = ListTermImpl.parseList(content.toString()).getAsList();
-                if (logger.isLoggable(Level.FINE)) {
-                    logger.fine("received percepts: " + percepts);
+                
+        private Object sleepSync = new Object();
+        
+        @Override
+        public void sleep() {
+            try {
+                if (!getTS().getSettings().isSync()) {
+                    logger.fine("Entering in sleep mode....");
+                    synchronized (sleepSync) {
+                        sleepSync.wait(1000); // wait for messages
+                    }
                 }
-            } else {
-                percepts = null; // used to indicate that are nothing new in
-                                 // the environment, no BUF needed
+            } catch (InterruptedException e) {
+            } catch (Exception e) {
+                logger.log(Level.WARNING,"Error waiting mgs", e);
             }
         }
+        
+        @Override
+        public void wake() {
+            synchronized (sleepSync) {
+                sleepSync.notifyAll(); // notify sleep method
+            }
+        }
+        
+        @Override
+        public String getAgName() {
+            return getName();
+        }
 
-        // check if there are feedbacks on requested action executions
-        try {
-            do {
-                m = mboxPercept.receive();
-                if (m != null) {
-                    if (m.get("ontology") != null) {
-                        if (((String) m.get("ontology")).equals("AS-Action")) {
-                            String irt = (String) m.get("in-reply-to");
-                            if (irt != null) {
-                                ActionExec a = myPA.remove(irt); //userAgArh.getTS().getC().getPendingActions().remove(irt);
-                                // was it a pending action?
-                                if (a != null) {
-                                    if (((String) m.get("content")).equals("ok")) {
-                                        a.setResult(true);
+        @SuppressWarnings({ "unchecked", "rawtypes" })
+        @Override
+        public List perceive() {
+            if (!running) {
+                return null;
+            }
+
+            List percepts = null;
+
+            saci.Message askMsg = new saci.Message("(ask-all :receiver environment :ontology AS-Perception :content getPercepts)");
+
+            // asks current environment state (positive percepts)
+            saci.Message m = null;
+            try {
+                m = mboxPercept.ask(askMsg);
+            } catch (Exception e) {
+                logger.log(Level.SEVERE, "Error receiving percepts.", e);
+            }
+            if (m != null) {
+                Object content = m.get("content");
+                if (content != null && content.toString().startsWith("[")) {
+                    percepts = ListTermImpl.parseList(content.toString()).getAsList();
+                    if (logger.isLoggable(Level.FINE)) {
+                        logger.fine("received percepts: " + percepts);
+                    }
+                } else {
+                    percepts = null; // used to indicate that are nothing new in
+                                     // the environment, no BUF needed
+                }
+            }
+
+            // check if there are feedbacks on requested action executions
+            try {
+                do {
+                    m = mboxPercept.receive();
+                    if (m != null) {
+                        if (m.get("ontology") != null) {
+                            if (((String) m.get("ontology")).equals("AS-Action")) {
+                                String irt = (String) m.get("in-reply-to");
+                                if (irt != null) {
+                                    ActionExec a = myPA.remove(irt); //userAgArh.getTS().getC().getPendingActions().remove(irt);
+                                    // was it a pending action?
+                                    if (a != null) {
+                                        if (((String) m.get("content")).equals("ok")) {
+                                            a.setResult(true);
+                                        } else {
+                                            a.setResult(false);
+                                        }
+                                        getTS().getC().addFeedbackAction(a);
                                     } else {
-                                        a.setResult(false);
+                                        logger.log(Level.SEVERE, "Error: received feedback for an Action that is not pending.");
                                     }
-                                    userAgArch.getTS().getC().addFeedbackAction(a);
                                 } else {
-                                    logger.log(Level.SEVERE, "Error: received feedback for an Action that is not pending.");
+                                    throw new JasonException("Cannot identify executed action.");
                                 }
-                            } else {
-                                throw new JasonException("Cannot identify executed action.");
                             }
                         }
                     }
+                } while (m != null);
+            } catch (Exception e) {
+                logger.log(Level.SEVERE, "Error receiving message.", e);
+            }
+            return percepts;
+        }
+
+        // this is used by the .send internal action in stdlib
+        /** the saci implementation of the sendMsg interface */
+        @Override
+        public void sendMsg(jason.asSemantics.Message m) throws Exception {
+            saci.Message msaci = jasonToKQML(m);
+            msaci.put("receiver", m.getReceiver());
+            if (m.getInReplyTo() != null) {
+                msaci.put("in-reply-to", m.getInReplyTo());
+            }
+            getMBox().sendMsg(msaci);
+        }
+
+        @Override
+        public void broadcast(jason.asSemantics.Message m) throws Exception {
+            saci.Message msaci = jasonToKQML(m);
+            getMBox().broadcast(msaci);
+        }
+
+        // Default procedure for checking messages
+        @Override
+        public void checkMail() {
+            if (!running) {
+                return;
+            }
+            if (getMBox() == null) {
+                logger.warning("I have no mail box!");
+                return;
+            }
+
+            saci.Message m = null;
+            do {
+                try {
+                    m = getMBox().receive();
+                } catch (Exception e) {
+                    logger.log(Level.SEVERE, "Error receiving message.", e);
+                }
+                if (m != null) {
+                    if (logger.isLoggable(Level.FINE)) {
+                        logger.fine("Received message: " + m + ". Content class is " + m.get("content").getClass().getName());
+                    }
+                    String ilForce = (String) m.get("performative");
+                    String sender = (String) m.get("sender");
+                    String receiver = (String) m.get("receiver");
+                    String replyWith = (String) m.get("reply-with");
+                    String irt = (String) m.get("in-reply-to");
+
+                    Object propCont = m.get("content");
+                    if (propCont != null) {
+                        /*
+                        String sPropCont = propCont.toString();
+                        if (sPropCont.startsWith("\"")) { // deal with a term enclosed by "
+                            sPropCont = sPropCont.substring(1, sPropCont.length() - 1);
+                            if (DefaultTerm.parse(sPropCont) != null) {
+                                // it was a term with "
+                                propCont = sPropCont.trim();
+                            }
+                        }
+                        */
+
+                        jason.asSemantics.Message im = new jason.asSemantics.Message(ilForce, sender, receiver, propCont, replyWith);
+                        if (irt != null) {
+                            im.setInReplyTo(irt);
+                        }
+                        getTS().getC().getMailBox().add(im);
+                    }
                 }
             } while (m != null);
-        } catch (Exception e) {
-            logger.log(Level.SEVERE, "Error receiving message.", e);
         }
-        return percepts;
-    }
 
-    // this is used by the .send internal action in stdlib
-    /** the saci implementation of the sendMsg interface */
-    public void sendMsg(jason.asSemantics.Message m) throws Exception {
-        saci.Message msaci = jasonToKQML(m);
-        msaci.put("receiver", m.getReceiver());
-        if (m.getInReplyTo() != null) {
-            msaci.put("in-reply-to", m.getInReplyTo());
+        // Default acting on the environment
+        @Override
+        public void act(ActionExec action, List<ActionExec> feedback) {
+            if (!running) return;
+            
+            TransitionSystem ts = getTS();
+            try {
+                Term acTerm = action.getActionTerm();
+                logger.fine("doing: " + acTerm);
+
+                String rw = mboxPercept.getRW();
+                saci.Message m = new saci.Message("(ask :receiver environment :ontology AS-Action :content execute)");
+                m.put("action", acTerm.toString());
+                m.put("reply-with", rw);
+                m.put("verbose", new Integer(ts.getSettings().verbose()).toString());
+
+                mboxPercept.sendMsg(m);
+
+                myPA.put(rw, action); //ts.getC().getPendingActions().put(rw, action);
+            } catch (Exception e) {
+                logger.log(Level.SEVERE, "Error sending action " + ts.getC().getAction(), e);
+            }
         }
-        getMBox().sendMsg(msaci);
-    }
 
-    public void broadcast(jason.asSemantics.Message m) throws Exception {
-        saci.Message msaci = jasonToKQML(m);
-        getMBox().broadcast(msaci);
+        @Override
+        public boolean canSleep() {
+            try {
+                return getMBox().getMessages(null, 1, 0, false).size() == 0 && isRunning();
+            } catch (Exception e) {
+                return true;
+            }
+        }
+
+        
     }
     
     private saci.Message jasonToKQML(jason.asSemantics.Message m) {
@@ -364,87 +469,6 @@ public class SaciAgArch extends saci.Agent implements AgArchInfraTier {
         msaci.put("reply-with", m.getMsgId());
         msaci.put("language", "AgentSpeak");
         return msaci;
-    }
-
-    // Default procedure for checking messages
-    public void checkMail() {
-        if (!running) {
-            return;
-        }
-        if (getMBox() == null) {
-            logger.warning("I have no mail box!");
-            return;
-        }
-
-        saci.Message m = null;
-        do {
-            try {
-                m = getMBox().receive();
-            } catch (Exception e) {
-                logger.log(Level.SEVERE, "Error receiving message.", e);
-            }
-            if (m != null) {
-                if (logger.isLoggable(Level.FINE)) {
-                    logger.fine("Received message: " + m + ". Content class is " + m.get("content").getClass().getName());
-                }
-                String ilForce = (String) m.get("performative");
-                String sender = (String) m.get("sender");
-                String receiver = (String) m.get("receiver");
-                String replyWith = (String) m.get("reply-with");
-                String irt = (String) m.get("in-reply-to");
-
-                Object propCont = m.get("content");
-                if (propCont != null) {
-                    /*
-                    String sPropCont = propCont.toString();
-                    if (sPropCont.startsWith("\"")) { // deal with a term enclosed by "
-                        sPropCont = sPropCont.substring(1, sPropCont.length() - 1);
-                        if (DefaultTerm.parse(sPropCont) != null) {
-                            // it was a term with "
-                            propCont = sPropCont.trim();
-                        }
-                    }
-                    */
-
-                    jason.asSemantics.Message im = new jason.asSemantics.Message(ilForce, sender, receiver, propCont, replyWith);
-                    if (irt != null) {
-                        im.setInReplyTo(irt);
-                    }
-                    userAgArch.getTS().getC().getMailBox().add(im);
-                }
-            }
-        } while (m != null);
-    }
-
-    // Default acting on the environment
-    public void act(ActionExec action, List<ActionExec> feedback) {
-        if (!running) return;
-        
-        TransitionSystem ts = userAgArch.getTS();
-        try {
-            Term acTerm = action.getActionTerm();
-            logger.fine("doing: " + acTerm);
-
-            String rw = mboxPercept.getRW();
-            saci.Message m = new saci.Message("(ask :receiver environment :ontology AS-Action :content execute)");
-            m.put("action", acTerm.toString());
-            m.put("reply-with", rw);
-            m.put("verbose", new Integer(ts.getSettings().verbose()).toString());
-
-            mboxPercept.sendMsg(m);
-
-            myPA.put(rw, action); //ts.getC().getPendingActions().put(rw, action);
-        } catch (Exception e) {
-            logger.log(Level.SEVERE, "Error sending action " + ts.getC().getAction(), e);
-        }
-    }
-
-    public boolean canSleep() {
-        try {
-            return getMBox().getMessages(null, 1, 0, false).size() == 0 && isRunning();
-        } catch (Exception e) {
-            return true;
-        }
     }
 
     
@@ -473,7 +497,7 @@ public class SaciAgArch extends saci.Agent implements AgArchInfraTier {
      * waiting a signal
      */
     private void receiveSyncSignal() {
-        if (userAgArch.getTS().getSettings().isSync()) {
+        if (jasonBridgeAgArch.getTS().getSettings().isSync()) {
             try {
                 synchronized (syncMonitor) {
                     while (!inWaitSyncMonitor && isRunning()) {
@@ -511,5 +535,4 @@ public class SaciAgArch extends saci.Agent implements AgArchInfraTier {
     public RuntimeServicesInfraTier getRuntimeServices() {
         return new SaciRuntimeServices(getSociety());
     }
-
 }

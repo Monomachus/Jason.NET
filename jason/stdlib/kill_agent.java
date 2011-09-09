@@ -70,6 +70,6 @@ public class kill_agent extends DefaultInternalAction {
             name = ((StringTerm)args[0]).getString();
         else
             name = args[0].toString();
-        return ts.getUserAgArch().getArchInfraTier().getRuntimeServices().killAgent(name);
+        return ts.getUserAgArch().getRuntimeServices().killAgent(name);
 	}
 }

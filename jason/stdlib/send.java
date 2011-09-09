@@ -203,7 +203,7 @@ public class send extends DefaultInternalAction {
                             intention.peek().getUnif().unifies(send.getTerm(3), timeoutAns);
                             // add the intention back in C.I
                             ts.getC().resumeIntention(intention);
-                            ts.getUserAgArch().getArchInfraTier().wake();                                
+                            ts.getUserAgArch().wake();                                
                         }
                     }
                 }, (long)((NumberTerm)tto).solve(), TimeUnit.MILLISECONDS);

@@ -26,7 +26,7 @@ package jason.infra.centralised;
 import jason.JasonException;
 import jason.ReceiverNotFoundException;
 import jason.architecture.AgArch;
-import jason.architecture.AgArchInfraTier;
+import jason.architecture.MindInspectorAgArch;
 import jason.asSemantics.ActionExec;
 import jason.asSemantics.Agent;
 import jason.asSemantics.Message;
@@ -57,14 +57,14 @@ import java.util.logging.Logger;
  * <li>stopAg.
  * </ul>
  */
-public class CentralisedAgArch implements Runnable, AgArchInfraTier {
+public class CentralisedAgArch extends AgArch implements Runnable {
 
     protected CentralisedEnvironment    infraEnv     = null;
     private CentralisedExecutionControl infraControl = null;
     private RunCentralisedMAS           masRunner    = RunCentralisedMAS.getRunner();
 
     /** The user implementation of the architecture */
-    protected AgArch        userAgArch;
+    //protected AgArch        userAgArch;
 
     private String          agName  = "";
     private boolean         running = true;
@@ -87,12 +87,20 @@ public class CentralisedAgArch implements Runnable, AgArchInfraTier {
      * jason.architecture.AgArch. The arch will create the agent that creates
      * the TS.
      */
-    public void initAg(String agArchClass, String agClass, ClassParameters bbPars, String asSrc, Settings stts, RunCentralisedMAS masRunner) throws JasonException {
+    public void createArchs(List<String> agArchClasses, String agClass, ClassParameters bbPars, String asSrc, Settings stts, RunCentralisedMAS masRunner) throws JasonException {
         try {
-            this.masRunner = masRunner; 
-            userAgArch = (AgArch) Class.forName(agArchClass).newInstance();
-            userAgArch.setArchInfraTier(this);
-            userAgArch.initAg(agClass, bbPars, asSrc, stts);
+            this.masRunner = masRunner;
+            Agent.create(this, agClass, bbPars, asSrc, stts);
+            insertAgArch(this);
+            
+            createCustomArchs(agArchClasses);
+
+            // mind inspector arch
+            if (stts.getUserParameter("mindinspector") != null) {
+                insertAgArch(new MindInspectorAgArch());
+                getFirstAgArch().init();
+            }
+            
             setLogger();
         } catch (Exception e) {
             running = false;
@@ -100,15 +108,15 @@ public class CentralisedAgArch implements Runnable, AgArchInfraTier {
         }
     }
 
-    /** init the agent based on another agent */
-    public void initAg(String agArchClass, Agent ag, RunCentralisedMAS masRunner) throws JasonException {
+    /** init the agent architecture based on another agent */
+    public void createArchs(List<String> agArchClasses, Agent ag, RunCentralisedMAS masRunner) throws JasonException {
         try {
-            this.masRunner = masRunner; 
-            userAgArch = (AgArch) Class.forName(agArchClass).newInstance();
-            userAgArch.setArchInfraTier(this);
+            this.masRunner = masRunner;
+            setTS(ag.clone(this).getTS());
+            insertAgArch(this);
 
-            userAgArch.initAg(ag);
-            
+            createCustomArchs(agArchClasses);
+
             setLogger();
         } catch (Exception e) {
             running = false;
@@ -116,10 +124,22 @@ public class CentralisedAgArch implements Runnable, AgArchInfraTier {
         }
     }
     
+    
+    public void stopAg() {
+        running = false;
+        if (myThread != null) 
+            myThread.interrupt();
+        synchronized (syncStopRun) {
+            masRunner.delAg(agName);
+        }
+        getTS().getAg().stopAg();
+        getUserAgArch().stop(); // stops all archs
+    }
+
     public void setLogger() {
         logger = Logger.getLogger(CentralisedAgArch.class.getName() + "." + getAgName());
-        if (userAgArch.getTS().getSettings().verbose() >= 0)
-            logger.setLevel(userAgArch.getTS().getSettings().logLevel());       
+        if (getTS().getSettings().verbose() >= 0)
+            logger.setLevel(getTS().getSettings().logLevel());       
     }
     
     public Logger getLogger() {
@@ -133,13 +153,9 @@ public class CentralisedAgArch implements Runnable, AgArchInfraTier {
     public String getAgName() {
         return agName;
     }
-
-    public void setUserAgArch(AgArch arch) {
-        userAgArch = arch;
-    }
     
     public AgArch getUserAgArch() {
-        return userAgArch;
+        return getFirstAgArch();
     }
 
     public void setEnvInfraTier(CentralisedEnvironment env) {
@@ -165,15 +181,6 @@ public class CentralisedAgArch implements Runnable, AgArchInfraTier {
         myThread = t;
         myThread.setName(agName);
     }
-    
-    public void stopAg() {
-        running = false;
-        if (myThread != null) myThread.interrupt();
-        synchronized (syncStopRun) {
-            masRunner.delAg(agName);
-        }
-        userAgArch.stopAg();
-    }
 
     public boolean isRunning() {
         return running;
@@ -181,7 +188,7 @@ public class CentralisedAgArch implements Runnable, AgArchInfraTier {
 
     public void run() {
         synchronized (syncStopRun) {
-            TransitionSystem ts = userAgArch.getTS();
+            TransitionSystem ts = getTS();
             while (running) {
                 if (ts.getSettings().isSync()) {
                     waitSyncSignal();
@@ -189,11 +196,11 @@ public class CentralisedAgArch implements Runnable, AgArchInfraTier {
                     boolean isBreakPoint = false;
                     try {
                         isBreakPoint = ts.getC().getSelectedOption().getPlan().hasBreakpoint();
-                        if (logger.isLoggable(Level.FINE)) logger.fine("Informing controller that I finished a reasoning cycle "+userAgArch.getCycleNumber()+". Breakpoint is " + isBreakPoint);
+                        if (logger.isLoggable(Level.FINE)) logger.fine("Informing controller that I finished a reasoning cycle "+getCycleNumber()+". Breakpoint is " + isBreakPoint);
                     } catch (NullPointerException e) {
                         // no problem, there is no sel opt, no plan ....
                     }
-                    informCycleFinished(isBreakPoint, userAgArch.getCycleNumber());
+                    informCycleFinished(isBreakPoint, getCycleNumber());
                 } else {
                     ts.reasoningCycle();
                 }
@@ -206,7 +213,7 @@ public class CentralisedAgArch implements Runnable, AgArchInfraTier {
     
     public void sleep() {
         try {
-            if (!userAgArch.getTS().getSettings().isSync()) {
+            if (!getTS().getSettings().isSync()) {
                 logger.fine("Entering in sleep mode....");
                 synchronized (sleepSync) {
                     sleepSync.wait(500); // wait for messages
@@ -268,7 +275,7 @@ public class CentralisedAgArch implements Runnable, AgArchInfraTier {
 
     // Default procedure for checking messages, move message from local mbox to C.mbox
     public void checkMail() {
-        Queue<Message> tsmb = userAgArch.getTS().getC().getMailBox();
+        Queue<Message> tsmb = getTS().getC().getMailBox();
         while (!mbox.isEmpty()) {
             Message im = mbox.poll();
             tsmb.offer(im);
@@ -285,7 +292,7 @@ public class CentralisedAgArch implements Runnable, AgArchInfraTier {
     
     /** called the the environment when the action was executed */
     public void actionExecuted(ActionExec action) {
-        userAgArch.getTS().getC().addFeedbackAction(action);
+        getTS().getC().addFeedbackAction(action);
         wake();
     }
 

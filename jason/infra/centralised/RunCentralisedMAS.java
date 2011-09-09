@@ -386,14 +386,14 @@ public class RunCentralisedMAS {
                     agArch.setEnvInfraTier(env);
                     if (isPool && cAg > 0) {
                         // creation by cloning previous agent (which is faster -- no parsing, for instance)
-                        agArch.initAg(ap.archClass.getClassName(), pag, this);
+                        agArch.createArchs(ap.getAgArchClasses(), pag, this);
                     } else {
                         // normal creation
-                        agArch.initAg(ap.archClass.getClassName(), ap.agClass.getClassName(), ap.getBBClass(), ap.asSource.toString(), ap.getAsSetts(debug, project.getControlClass() != null), this);
+                        agArch.createArchs(ap.getAgArchClasses(), ap.agClass.getClassName(), ap.getBBClass(), ap.asSource.toString(), ap.getAsSetts(debug, project.getControlClass() != null), this);
                     }
                     addAg(agArch);
                     
-                    pag = agArch.getUserAgArch().getTS().getAg();
+                    pag = agArch.getTS().getAg();
                 }
             } catch (Exception e) {
                 logger.log(Level.SEVERE, "Error creating agent " + ap.name, e);
@@ -537,7 +537,7 @@ public class RunCentralisedMAS {
         public void run() {
             if (isRunning()) { 
                 inSleep = false;
-                userAgArch.getTS().reasoningCycle();
+                getTS().reasoningCycle();
                 if (!inSleep) 
                     myAgTasks.offer(this);
             }
@@ -558,12 +558,12 @@ public class RunCentralisedMAS {
                 control = new CentralisedExecutionControl(new ClassParameters(ExecutionControlGUI.class.getName()), this);
                 for (CentralisedAgArch ag : ags.values()) {
                     ag.setControlInfraTier(control);
-                    Settings stts = ag.getUserAgArch().getTS().getSettings();
+                    Settings stts = ag.getTS().getSettings();
                     stts.setVerbose(2);
                     stts.setSync(true);
                     ag.getLogger().setLevel(Level.FINE);
-                    ag.getUserAgArch().getTS().getLogger().setLevel(Level.FINE);
-                    ag.getUserAgArch().getTS().getAg().getLogger().setLevel(Level.FINE);
+                    ag.getTS().getLogger().setLevel(Level.FINE);
+                    ag.getTS().getAg().getLogger().setLevel(Level.FINE);
                 }
             }
         } catch (Exception e) {

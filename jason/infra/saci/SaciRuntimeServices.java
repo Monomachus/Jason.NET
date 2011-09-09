@@ -9,6 +9,7 @@ import jason.runtime.RuntimeServicesInfraTier;
 import jason.runtime.Settings;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -44,14 +45,14 @@ public class SaciRuntimeServices implements RuntimeServicesInfraTier {
         }
     }
 
-    public String createAgent(String agName, String agSource, String agClass, String archClass, ClassParameters bbPars, Settings stts) throws Exception {
+    public String createAgent(String agName, String agSource, String agClass, List<String> archClasses, ClassParameters bbPars, Settings stts) throws Exception {
         try {
             logger.fine("Creating saci agent from source " + agSource);
 
             if (agClass == null)
                 agClass = Agent.class.getName();
-            if (archClass == null)
-                archClass = AgArch.class.getName();
+            //if (archClass == null)
+            //    archClass = AgArch.class.getName();
             if (stts == null)
                 stts = new Settings();
             if (bbPars == null) {
@@ -69,7 +70,7 @@ public class SaciRuntimeServices implements RuntimeServicesInfraTier {
             c1.addArg("name", agName);
             c1.addArg("society.name", socName);
             String sBBClass = bbPars.toString().replace('\"','$');
-            c1.addArg("args", archClass + " " + agClass + " '" + sBBClass + "' "+ agSource + extraOp);
+            c1.addArg("args", SaciAgArch.class.getName() + " " + agClass + " '" + sBBClass + "' "+ agSource + extraOp);
             // c1.addArg("host", "?");
             l.execCommand(c1);
             logger.fine("Agent " + agName + " created!");
@@ -83,7 +84,7 @@ public class SaciRuntimeServices implements RuntimeServicesInfraTier {
     public void startAgent(String agName) {
     }
     
-    public AgArch clone(Agent source, String archClassName, String agName) throws JasonException {
+    public AgArch clone(Agent source, List<String> archClasses, String agName) throws JasonException {
         throw new JasonException("clone for SACI is not implemented!");
     }
     

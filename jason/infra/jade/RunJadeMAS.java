@@ -31,6 +31,7 @@ import jade.wrapper.AgentController;
 import jade.wrapper.ContainerController;
 import jade.wrapper.StaleProxyException;
 import jason.JasonException;
+import jason.architecture.MindInspectorAgArch;
 import jason.asSyntax.directives.DirectiveProcessor;
 import jason.asSyntax.directives.Include;
 import jason.control.ExecutionControlGUI;
@@ -77,9 +78,11 @@ public class RunJadeMAS extends RunCentralisedMAS {
     private ArrayList<String> initArgs   = new ArrayList<String>();
     private ProfileImpl profile; // profile used to start jade container
     
-    public static void main(String[] args) {
+    public static void main(String[] args) throws JasonException {
         runner = new RunJadeMAS();
         runner.init(args);
+        runner.create();
+        runner.start();
         runner.waitEnd();
         runner.finish();
     }
@@ -97,6 +100,17 @@ public class RunJadeMAS extends RunCentralisedMAS {
         return super.init(args);
     }
 
+    @Override
+    public void create() throws JasonException {
+        if (startContainer()) {
+            if (profile.getBooleanProperty(Profile.MAIN, true)) {
+                createEnvironment();
+                createController();
+            }
+            createAgs();
+        }
+    }
+    
     @Override
     protected void createButtons() {
         createStopButton();
@@ -145,45 +159,44 @@ public class RunJadeMAS extends RunCentralisedMAS {
             return false;
         }
     }
+
+    @Override
+    public void createEnvironment() throws JasonException {
+        try {
+            // create environment
+                // the cartago + jade case
+            if (JadeAgArch.isCartagoJadeCase(getProject())) {
+                JadeAgArch.startCartagoNode(getProject().getEnvClass().getParametersArray());           
+            } else {
+                logger.fine("Creating environment " + getProject().getEnvClass());
+                envc = cc.createNewAgent(environmentName, JadeEnvironment.class.getName(), new Object[] { getProject().getEnvClass() });                        
+            }
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Error creating the environment: ", e);
+            return;
+        }
+    }
+
+    @Override
+    public void createController() throws JasonException {
+        try {
+            // create controller
+            ClassParameters controlClass = getProject().getControlClass();
+            if (isDebug() && controlClass == null) {
+                controlClass = new ClassParameters(ExecutionControlGUI.class.getName());
+            }
+            if (controlClass != null) {
+                logger.fine("Creating controller " + controlClass);
+                crtc = cc.createNewAgent(controllerName, JadeExecutionControl.class.getName(), new Object[] { controlClass });
+            }
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Error creating the controller: ", e);
+            return;
+        }
+    }
     
     @Override
     public void createAgs() throws JasonException {
-        if (!startContainer()) 
-            return;
-        
-        if (profile.getBooleanProperty(Profile.MAIN, true)) { 
-            try {
-                // create environment
-                    // the cartago + jade case
-                if (JadeAgArch.isCartagoJadeCase(getProject())) {
-                    JadeAgArch.startCartagoNode(getProject().getEnvClass().getParametersArray());           
-                } else {
-                    logger.fine("Creating environment " + getProject().getEnvClass());
-                    envc = cc.createNewAgent(environmentName, JadeEnvironment.class.getName(), new Object[] { getProject().getEnvClass() });                        
-                }
-            } catch (Exception e) {
-                logger.log(Level.SEVERE, "Error creating the environment: ", e);
-                return;
-            }
-
-            try {
-                // create controller
-                ClassParameters controlClass = getProject().getControlClass();
-                if (isDebug() && controlClass == null) {
-                    controlClass = new ClassParameters(ExecutionControlGUI.class.getName());
-                }
-                if (controlClass != null) {
-                    logger.fine("Creating controller " + controlClass);
-                    crtc = cc.createNewAgent(controllerName, JadeExecutionControl.class.getName(), new Object[] { controlClass });
-                }
-            } catch (Exception e) {
-                logger.log(Level.SEVERE, "Error creating the controller: ", e);
-                return;
-            }
-        
-        }
-        
-        // create agents
         try {
             // set the aslSrcPath in the include
             ((Include)DirectiveProcessor.getDirective("include")).setSourcePath(getProject().getSourcePaths());
@@ -197,6 +210,11 @@ public class RunJadeMAS extends RunCentralisedMAS {
                     if (ap.getHost() == null && !profile.getBooleanProperty(Profile.MAIN, true))
                         continue; // skip this agent, agents without host will be placed in the main container
     
+                    // mind inspector arch
+                    if (ap.getOption("mindinspector") != null) {
+                        ap.addArchClass(MindInspectorAgArch.class.getName());
+                    }
+
                     for (int cAg = 0; cAg < ap.qty; cAg++) {
                         String numberedAg = agName;
                         if (ap.qty > 1)
@@ -240,7 +258,6 @@ public class RunJadeMAS extends RunCentralisedMAS {
             for (AgentController ag : ags.values()) {
                 ag.start();
             }
-            
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error starting agents.", e);            
         }

@@ -147,6 +147,6 @@ public abstract class ConcurrentInternalAction implements InternalAction {
                 }
             }
         });
-        ts.getUserAgArch().getArchInfraTier().wake();        
+        ts.getUserAgArch().wake();        
     }
 }

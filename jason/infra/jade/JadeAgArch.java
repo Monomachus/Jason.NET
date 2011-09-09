@@ -11,8 +11,9 @@ import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
 import jason.architecture.AgArch;
-import jason.architecture.AgArchInfraTier;
 import jason.asSemantics.ActionExec;
+import jason.asSemantics.Agent;
+import jason.asSemantics.Message;
 import jason.asSemantics.TransitionSystem;
 import jason.asSyntax.ASSyntax;
 import jason.asSyntax.ListTermImpl;
@@ -47,15 +48,14 @@ import c4jason.CartagoEnvironment;
  * 
  * @author Jomi
  */
-public class JadeAgArch extends JadeAg implements AgArchInfraTier {
+public class JadeAgArch extends JadeAg {
 
     /** name of the "jason agent" service in DF */
     public  static String dfName = "j_agent";
     
     private static final long serialVersionUID = 1L;
    
-    /** the user customisation of the architecture */
-    protected AgArch userAgArch;
+    protected JasonBridgeArch jasonBridgeAgArch;
 
     // map of pending actions
     private Map<String,ActionExec> myPA = new HashMap<String,ActionExec>();
@@ -76,17 +76,17 @@ public class JadeAgArch extends JadeAg implements AgArchInfraTier {
     @Override
     protected void setup() {
         RunCentralisedMAS.setupLogger();
-        logger = jade.util.Logger.getMyLogger(this.getClass().getName() + "." + getAgName());
+        logger = jade.util.Logger.getMyLogger(this.getClass().getName() + "." + getLocalName());
         logger.info("starting "+getLocalName());
         try {
     
             AgentParameters ap = parseParameters();
             if (ap != null) {
-                userAgArch = (AgArch) Class.forName(ap.archClass.getClassName()).newInstance();
-                userAgArch.setArchInfraTier(this);
-                userAgArch.initAg(ap.agClass.getClassName(), ap.getBBClass(), ap.asSource.getAbsolutePath(), ap.getAsSetts(false, false));
-                if (userAgArch.getTS().getSettings().verbose() >= 0)
-                    logger.setLevel(userAgArch.getTS().getSettings().logLevel());
+                jasonBridgeAgArch = new JasonBridgeArch();
+                jasonBridgeAgArch.init(ap);
+                
+                if (jasonBridgeAgArch.getTS().getSettings().verbose() >= 0)
+                    logger.setLevel(jasonBridgeAgArch.getTS().getSettings().logLevel());
         
                 registerAgInDF();
             
@@ -164,7 +164,7 @@ public class JadeAgArch extends JadeAg implements AgArchInfraTier {
             while (i < args.length) {                
                 if (args[i].toString().equals("arch")) {
                     i++;
-                    ap.archClass = new ClassParameters(args[i].toString());
+                    ap.addArchClass(args[i].toString());
                 } else if (args[i].toString().equals("ag")) {
                     i++;
                     ap.agClass = new ClassParameters(args[i].toString());
@@ -215,7 +215,7 @@ public class JadeAgArch extends JadeAg implements AgArchInfraTier {
     }
 
     class JasonTSReasoner extends CyclicBehaviour {
-        TransitionSystem ts = userAgArch.getTS();
+        TransitionSystem ts = jasonBridgeAgArch.getTS();
         public void action() {
             if (ts.getSettings().isSync()) {
                 if (processExecutionControlOntologyMsg()) {
@@ -224,11 +224,11 @@ public class JadeAgArch extends JadeAg implements AgArchInfraTier {
                     boolean isBreakPoint = false;
                     try {
                         isBreakPoint = ts.getC().getSelectedOption().getPlan().hasBreakpoint();
-                        if (logger.isLoggable(Level.FINE)) logger.fine("Informing controller that I finished a reasoning cycle "+userAgArch.getCycleNumber()+". Breakpoint is " + isBreakPoint);
+                        if (logger.isLoggable(Level.FINE)) logger.fine("Informing controller that I finished a reasoning cycle "+jasonBridgeAgArch.getCycleNumber()+". Breakpoint is " + isBreakPoint);
                     } catch (NullPointerException e) {
                         // no problem, there is no sel opt, no plan ....
                     }
-                    informCycleFinished(isBreakPoint, userAgArch.getCycleNumber());
+                    informCycleFinished(isBreakPoint, jasonBridgeAgArch.getCycleNumber());
 
                 } else {
                     block(1000);
@@ -248,8 +248,8 @@ public class JadeAgArch extends JadeAg implements AgArchInfraTier {
     public void doDelete() {
         try {
             running = false;
-            if (userAgArch != null) {
-                userAgArch.stopAg();
+            if (jasonBridgeAgArch != null) {
+                jasonBridgeAgArch.getFirstAgArch().stop();
             }
         } catch (Exception e) {
             logger.log(Level.SEVERE,"Error in doDelete.",e);
@@ -268,67 +268,140 @@ public class JadeAgArch extends JadeAg implements AgArchInfraTier {
     // -------------
     //  
 
-    public void stopAg() {
-        doDelete();
-    }
-    
-    public void sleep() {
-        enterInSleepMode = true;
-        //tsBehaviour.block(1000);
-    }
-    
-    public void wake() {
-        tsBehaviour.restart();
-    }
-
-    public String getAgName() {
-        return getLocalName();
-    }
-
-    public boolean canSleep() {
-        return getCurQueueSize() == 0 && isRunning();
-    }
-
-    public void checkMail() {
-        ACLMessage m = null;
-        do {
-            try {
-                m = receive();
-                if (m != null) {
-                    if (logger.isLoggable(Level.FINE)) logger.fine("Received message: " + m);
-                    
-                    if (isActionFeedback(m)) {
-                        // ignore this message
-                        continue;
-                    }
-                    
-                    String ilForce   = aclToKqml(m);
-                    String sender    = m.getSender().getLocalName();
-                    String replyWith = m.getReplyWith();
-                    String irt       = m.getInReplyTo();
-
-                    // also remembers conversation ID
-                    if (replyWith != null && replyWith.length() > 0) {
-                        if (m.getConversationId() != null) {
-                            conversationIds.put(replyWith, m.getConversationId());
-                        }
-                    } else {
-                        replyWith = "noid";
-                    }
+    class JasonBridgeArch extends AgArch {
+        
+        public void init(AgentParameters ap) throws Exception {
+            Agent.create(this, ap.agClass.getClassName(), ap.getBBClass(), ap.asSource.getAbsolutePath(), ap.getAsSetts(false, false));
+            insertAgArch(this);
+            createCustomArchs(ap.getAgArchClasses());
+        }
                 
-                    Object propCont = translateContentToJason(m);
-                    if (propCont != null) {
-                        jason.asSemantics.Message im = new jason.asSemantics.Message(ilForce, sender, getLocalName(), propCont, replyWith);
-                        if (irt != null) {
-                            im.setInReplyTo(irt);
-                        }
-                        userAgArch.getTS().getC().getMailBox().add(im);
-                    }
+        @Override
+        public void sleep() {
+            enterInSleepMode = true;
+            //tsBehaviour.block(1000);
+        }
+        
+        @Override
+        public void wake() {
+            tsBehaviour.restart();
+        }
+    
+        @Override
+        public String getAgName() {
+            return getLocalName();
+        }
+    
+        @Override
+        public boolean canSleep() {
+            return getCurQueueSize() == 0 && isRunning();
+        }
+    
+        @SuppressWarnings("unchecked")
+        @Override
+        public List<Literal> perceive() {
+            if (!isRunning()) return null;
+            if (getEnvironmentAg() == null) return null;
+            
+            @SuppressWarnings("rawtypes")
+            List percepts = null;
+            try {
+                ACLMessage askMsg = new ACLMessage(ACLMessage.QUERY_REF);
+                askMsg.addReceiver(environmentAID);
+                askMsg.setOntology(JadeEnvironment.perceptionOntology);
+                askMsg.setContent("getPercepts");
+                ACLMessage r = ask(askMsg);
+                if (r != null && r.getContent().startsWith("[")) {
+                    percepts = ListTermImpl.parseList(r.getContent());
                 }
             } catch (Exception e) {
-                logger.log(Level.SEVERE, "Error receiving message.", e);
+                logger.log(Level.SEVERE, "Error in perceive.", e);
             }
-        } while (m != null);
+            
+            return percepts;
+        }
+        
+        @Override
+        public void sendMsg(Message m) throws Exception {
+            JadeAgArch.this.sendMsg(m);
+        }
+        
+        @Override
+        public void broadcast(Message m) throws Exception {
+            JadeAgArch.this.broadcast(m);
+        }
+        
+        @Override
+        public void checkMail() {
+            ACLMessage m = null;
+            do {
+                try {
+                    m = receive();
+                    if (m != null) {
+                        if (logger.isLoggable(Level.FINE)) logger.fine("Received message: " + m);
+                        
+                        if (isActionFeedback(m)) {
+                            // ignore this message
+                            continue;
+                        }
+                        
+                        String ilForce   = aclToKqml(m);
+                        String sender    = m.getSender().getLocalName();
+                        String replyWith = m.getReplyWith();
+                        String irt       = m.getInReplyTo();
+    
+                        // also remembers conversation ID
+                        if (replyWith != null && replyWith.length() > 0) {
+                            if (m.getConversationId() != null) {
+                                conversationIds.put(replyWith, m.getConversationId());
+                            }
+                        } else {
+                            replyWith = "noid";
+                        }
+                    
+                        Object propCont = translateContentToJason(m);
+                        if (propCont != null) {
+                            jason.asSemantics.Message im = new jason.asSemantics.Message(ilForce, sender, getLocalName(), propCont, replyWith);
+                            if (irt != null) {
+                                im.setInReplyTo(irt);
+                            }
+                            jasonBridgeAgArch.getTS().getC().getMailBox().add(im);
+                        }
+                    }
+                } catch (Exception e) {
+                    logger.log(Level.SEVERE, "Error receiving message.", e);
+                }
+            } while (m != null);
+        }
+
+        @Override
+        public void act(ActionExec action, List<ActionExec> feedback) {
+            if (!isRunning()) return;
+            if (getEnvironmentAg() == null) return;
+            
+            try {
+                Term acTerm = action.getActionTerm();
+                logger.fine("doing: " + acTerm);
+
+                rwid++;
+                String rw  = "id"+rwid;
+                ACLMessage m = new ACLMessage(ACLMessage.REQUEST);
+                m.addReceiver(environmentAID);
+                m.setOntology(JadeEnvironment.actionOntology);
+                m.setContent(acTerm.toString());
+                m.setReplyWith(rw);
+                myPA.put(rw, action); 
+                send(m);
+            } catch (Exception e) {
+                logger.log(Level.SEVERE, "Error sending action " + action, e);
+            }
+        }
+
+        @Override
+        public RuntimeServicesInfraTier getRuntimeServices() {
+            return new JadeRuntimeServices(getContainerController(), JadeAgArch.this);
+        }
+
     }
     
     /** returns the content of the message m and implements some pro-processing of the content, if necessary */
@@ -371,7 +444,7 @@ public class JadeAgArch extends JadeAg implements AgArchInfraTier {
                     } else {
                         a.setResult(false);
                     }
-                    userAgArch.getTS().getC().addFeedbackAction(a);
+                    jasonBridgeAgArch.getTS().getC().addFeedbackAction(a);
                 } else {
                     logger.log(Level.SEVERE, "Error: received feedback for an Action that is not pending. The message is "+m);
                 }
@@ -395,7 +468,7 @@ public class JadeAgArch extends JadeAg implements AgArchInfraTier {
             ACLMessage r = m.createReply();
             r.setPerformative(ACLMessage.INFORM);
             try {
-                Document agStateDoc = userAgArch.getTS().getAg().getAgState();
+                Document agStateDoc = jasonBridgeAgArch.getTS().getAg().getAgState();
                 r.setContentObject((Serializable)agStateDoc);
                 send(r);
             } catch (Exception e) {
@@ -407,7 +480,7 @@ public class JadeAgArch extends JadeAg implements AgArchInfraTier {
         if (m != null) {
             int cycle = Integer.parseInt(m.getUserDefinedParameter("cycle"));
             logger.fine("new cycle: "+cycle);
-            userAgArch.setCycleNumber(cycle);
+            jasonBridgeAgArch.setCycleNumber(cycle);
             return true;
         }
         return false;
@@ -417,27 +490,6 @@ public class JadeAgArch extends JadeAg implements AgArchInfraTier {
         return m.getOntology() != null && m.getOntology().equals(JadeEnvironment.perceptionOntology);
     }
 
-    @SuppressWarnings("unchecked")
-    public List<Literal> perceive() {
-        if (!isRunning()) return null;
-        if (getEnvironmentAg() == null) return null;
-        
-        List percepts = null;
-        try {
-            ACLMessage askMsg = new ACLMessage(ACLMessage.QUERY_REF);
-            askMsg.addReceiver(environmentAID);
-            askMsg.setOntology(JadeEnvironment.perceptionOntology);
-            askMsg.setContent("getPercepts");
-            ACLMessage r = ask(askMsg);
-            if (r != null && r.getContent().startsWith("[")) {
-                percepts = ListTermImpl.parseList(r.getContent());
-            }
-        } catch (Exception e) {
-            logger.log(Level.SEVERE, "Error in perceive.", e);
-        }
-        
-        return percepts;
-    }
 
     private AID getEnvironmentAg() {
         // get the name of the environment
@@ -458,32 +510,6 @@ public class JadeAgArch extends JadeAg implements AgArchInfraTier {
             }
         }
         return environmentAID;
-    }
-
-    public void act(ActionExec action, List<ActionExec> feedback) {
-        if (!isRunning()) return;
-        if (getEnvironmentAg() == null) return;
-        
-        try {
-            Term acTerm = action.getActionTerm();
-            logger.fine("doing: " + acTerm);
-
-            rwid++;
-            String rw  = "id"+rwid;
-            ACLMessage m = new ACLMessage(ACLMessage.REQUEST);
-            m.addReceiver(environmentAID);
-            m.setOntology(JadeEnvironment.actionOntology);
-            m.setContent(acTerm.toString());
-            m.setReplyWith(rw);
-            myPA.put(rw, action); 
-            send(m);
-        } catch (Exception e) {
-            logger.log(Level.SEVERE, "Error sending action " + action, e);
-        }
-    }
-
-    public RuntimeServicesInfraTier getRuntimeServices() {
-        return new JadeRuntimeServices(getContainerController(), this);
     }
 
     /** 

@@ -16,6 +16,7 @@ import jason.runtime.Settings;
 
 import java.io.File;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -33,15 +34,15 @@ public class JadeRuntimeServices implements RuntimeServicesInfraTier {
         jadeAgent = ag;
     }
     
-    public String createAgent(String agName, String agSource, String agClass, String archClass, ClassParameters bbPars, Settings stts) throws Exception {
+    public String createAgent(String agName, String agSource, String agClass, List<String> archClasses, ClassParameters bbPars, Settings stts) throws Exception {
         try {
             if (logger.isLoggable(Level.FINE)) {
-                logger.fine("Creating jade agent " + agName + "from source " + agSource + "(agClass=" + agClass + ", archClass=" + archClass + ", settings=" + stts);
+                logger.fine("Creating jade agent " + agName + "from source " + agSource + "(agClass=" + agClass + ", archClass=" + archClasses + ", settings=" + stts);
             }
     
             AgentParameters ap = new AgentParameters();
             ap.setAgClass(agClass);
-            ap.setArchClass(archClass);
+            ap.addArchClass(archClasses);
             ap.setBB(bbPars);
             ap.asSource = new File(agSource);
             
@@ -60,7 +61,7 @@ public class JadeRuntimeServices implements RuntimeServicesInfraTier {
         // nothing to do, the jade create new agent is enough
     }
 
-    public AgArch clone(jason.asSemantics.Agent source, String archClassName, String agName) throws JasonException {
+    public AgArch clone(jason.asSemantics.Agent source, List<String> archClasses, String agName) throws JasonException {
         throw new JasonException("clone for JADE is not implemented!");
     }
 

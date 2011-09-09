@@ -5,6 +5,7 @@ import jason.architecture.AgArch;
 import jason.asSemantics.Agent;
 import jason.mas2j.ClassParameters;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -27,7 +28,7 @@ public interface RuntimeServicesInfraTier {
      * 
      * Returns the name of the agent
      */
-    public String createAgent(String agName, String agSource, String agClass, String archClass, ClassParameters bbPars, Settings stts) throws Exception;
+    public String createAgent(String agName, String agSource, String agClass, List<String> archClasses, ClassParameters bbPars, Settings stts) throws Exception;
 
     /** start (e.g. create thread) the agent */
     public void startAgent(String agName);
@@ -41,7 +42,7 @@ public interface RuntimeServicesInfraTier {
      * @return the agent arch created
      * @throws JasonException
      */
-    public AgArch clone(Agent source, String archClassName, String agName) throws JasonException;
+    public AgArch clone(Agent source, List<String> archClasses, String agName) throws JasonException;
 
     /**
      * Kills the agent named <i>agName</i>. The stopAg() method, in

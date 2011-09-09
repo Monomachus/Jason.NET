@@ -194,7 +194,7 @@ public class wait extends DefaultInternalAction {
                     }
                 }
             });
-            ts.getUserAgArch().getArchInfraTier().wake();
+            ts.getUserAgArch().wake();
         }
 
         public void eventAdded(Event e) {

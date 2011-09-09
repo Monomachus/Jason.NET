@@ -128,6 +128,7 @@ public class mas2j implements mas2jConstants {
                               Token host;
                               AgentParameters ag = new AgentParameters();
                               Map opts;
+                              ClassParameters arch;
     agName = jj_consume_token(ASID);
                               ag.name = agName.image;
                               ag.asSource = new File(agName.image+".asl");
@@ -159,7 +160,8 @@ public class mas2j implements mas2jConstants {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case ASAGARCHCLASS:
         jj_consume_token(ASAGARCHCLASS);
-        ag.archClass = classDef();
+        arch = classDef();
+                             ag.insertArchClass(arch);
         break;
       case ASAGCLASS:
         jj_consume_token(ASAGCLASS);

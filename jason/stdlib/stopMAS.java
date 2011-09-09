@@ -54,7 +54,7 @@ public class stopMAS extends DefaultInternalAction {
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         checkArguments(args);
 
-        RuntimeServicesInfraTier rs = ts.getUserAgArch().getArchInfraTier().getRuntimeServices();
+        RuntimeServicesInfraTier rs = ts.getUserAgArch().getRuntimeServices();
         rs.stopMAS();
         return true;
     }

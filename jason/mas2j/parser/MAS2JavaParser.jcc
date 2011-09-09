@@ -218,6 +218,7 @@ void agent() :              { Token agName;
                               Token host; 
                               AgentParameters ag = new AgentParameters();
                               Map opts;
+                              ClassParameters arch;
                             }
 {
   agName = <ASID>           
@@ -231,7 +232,8 @@ void agent() :              { Token agName;
   opts = ASoptions()       { ag.setOptions(opts); }        
 
   (
-  <ASAGARCHCLASS> ag.archClass = classDef()
+  <ASAGARCHCLASS> arch = classDef()
+                           { ag.insertArchClass(arch); }
   |
   <ASAGCLASS> ag.agClass = classDef()
   |

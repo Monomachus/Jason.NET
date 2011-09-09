@@ -60,7 +60,7 @@ public class all_names extends DefaultInternalAction {
     @Override
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
         checkArguments(args);
-        RuntimeServicesInfraTier rs = ts.getUserAgArch().getArchInfraTier().getRuntimeServices();
+        RuntimeServicesInfraTier rs = ts.getUserAgArch().getRuntimeServices();
         ListTerm ln = new ListTermImpl();
         ListTerm tail = ln;
         for (String a: rs.getAgentsNames()) {

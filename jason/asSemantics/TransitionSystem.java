@@ -289,7 +289,7 @@ public class TransitionSystem {
                 if (! m.isReplyToSyncAsk()) { // ignore answer after the timeout
                     // generate an event
                     String sender = m.getSender();
-                    if (sender.equals(agArch.getAgName()))
+                    if (sender.equals(getUserAgArch().getAgName()))
                         sender = "self";
                     Literal received = new LiteralImpl("kqml_received").addTerms(
                             new Atom(sender),
@@ -1075,7 +1075,7 @@ public class TransitionSystem {
                    !conf.C.hasFeedbackAction() &&
                    conf.C.MB.isEmpty() && 
                    //taskForBeginOfCycle.isEmpty() &&
-                   agArch.canSleep());
+                   getUserAgArch().canSleep());
     }
 
     /** 
@@ -1095,7 +1095,7 @@ public class TransitionSystem {
     /**********************************************************************/
     public void reasoningCycle() {
         if (logger.isLoggable(Level.FINE)) logger.fine("Start new reasoning cycle");
-        agArch.reasoningCycleStarting();
+        getUserAgArch().reasoningCycleStarting();
         
         try {
             C.reset();
@@ -1109,8 +1109,8 @@ public class TransitionSystem {
             
             if (nrcslbr >= setts.nrcbp()) { 
                 nrcslbr = 0;
-                ag.buf(agArch.perceive());
-                agArch.checkMail();
+                ag.buf(getUserAgArch().perceive());
+                getUserAgArch().checkMail();
             }
             nrcslbr++; // counting number of cycles since last belief revision
 
@@ -1119,14 +1119,14 @@ public class TransitionSystem {
                     logger.fine("generating idle event");
                     C.addExternalEv(PlanLibrary.TE_IDLE);
                 } else {
-                    agArch.sleep();
+                    getUserAgArch().sleep();
                     return;
                 }
             }
             
             step = State.StartRC;
             do {
-                if (!agArch.isRunning()) return;
+                if (!getUserAgArch().isRunning()) return;
                 applySemanticRule();
             } while (step != State.StartRC);
 
@@ -1134,7 +1134,7 @@ public class TransitionSystem {
             if (action != null) {
                 C.addPendingAction(action);                
                 // We need to send a wrapper for FA to the user so that add method then calls C.addFA (which control atomic things)
-                agArch.act(action, C.getFeedbackActionsWrapper());
+                getUserAgArch().act(action, C.getFeedbackActionsWrapper());
             }
 
         } catch (Exception e) {
@@ -1161,6 +1161,9 @@ public class TransitionSystem {
         return setts;
     }
 
+    public void setAgArch(AgArch arch) {
+        agArch = arch;
+    }
     public AgArch getUserAgArch() {
         return agArch;
     }

@@ -116,17 +116,13 @@ public class StartNewAgentGUI extends BaseDialogGUI {
                     if (ap.agClass != null) {
                         agClass = ap.agClass.getClassName();
                     }
-                    String archClass = null;
-                    if (ap.archClass != null) {
-                        archClass = ap.archClass.getClassName();
-                    }
                     for (int i = 0; i < ap.qty; i++) {
                         String name = ap.name;
                         if (ap.qty > 1) {
                             name = name + (i + 1);
                         }
                         // TODO: implements bb class
-                        name = services.createAgent(name, ap.asSource.getAbsolutePath(), agClass, archClass, null, ap.getAsSetts(debug, fs));
+                        name = services.createAgent(name, ap.asSource.getAbsolutePath(), agClass, ap.getAgArchClasses(), null, ap.getAsSetts(debug, fs));
                         services.startAgent(name);
                     }
                 } catch (Exception e) {
@@ -160,7 +156,7 @@ public class StartNewAgentGUI extends BaseDialogGUI {
         }
 
         if (archClass.getText().trim().length() > 0) {
-            ap.archClass = new ClassParameters(archClass.getText().trim());
+            ap.addArchClass(archClass.getText().trim());
         }
 
         if (agClass.getText().trim().length() > 0) {

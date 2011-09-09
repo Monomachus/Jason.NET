@@ -27,11 +27,16 @@ import jason.JasonException;
 import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
-import jason.asSyntax.*;
-import jason.runtime.RuntimeServicesInfraTier;
+import jason.asSyntax.ListTerm;
+import jason.asSyntax.StringTerm;
+import jason.asSyntax.Structure;
+import jason.asSyntax.Term;
 import jason.mas2j.ClassParameters;
+import jason.runtime.RuntimeServicesInfraTier;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
   <p>Internal action: <b><code>.create_agent</code></b>.
@@ -110,7 +115,7 @@ public class create_agent extends DefaultInternalAction {
             throw new JasonException("The source file " + source + " was not found!");
         }
         String agClass = null;
-        String agArchClass = null;
+        List<String> agArchClasses = new ArrayList<String>();
         ClassParameters bbPars = null;
         if (args.length > 2) { // optional parameter
             // get the parameters
@@ -122,14 +127,14 @@ public class create_agent extends DefaultInternalAction {
                     } else if (s.getFunctor().equals("agentClass")) {
                         agClass = testString(s.getTerm(0)).toString();
                     } else if (s.getFunctor().equals("agentArchClass")) {
-                        agArchClass = testString(s.getTerm(0)).toString();
+                        agArchClasses.add(testString(s.getTerm(0)).toString());
                     }
                 }
             }
 
         }
-        RuntimeServicesInfraTier rs = ts.getUserAgArch().getArchInfraTier().getRuntimeServices();
-        name = rs.createAgent(name, fSource.getAbsolutePath(), agClass, agArchClass, bbPars, ts.getSettings());
+        RuntimeServicesInfraTier rs = ts.getUserAgArch().getRuntimeServices();
+        name = rs.createAgent(name, fSource.getAbsolutePath(), agClass, agArchClasses, bbPars, ts.getSettings());
         rs.startAgent(name);
         return true;
     }

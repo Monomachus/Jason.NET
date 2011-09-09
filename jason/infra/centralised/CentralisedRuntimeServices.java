@@ -8,6 +8,7 @@ import jason.mas2j.ClassParameters;
 import jason.runtime.RuntimeServicesInfraTier;
 import jason.runtime.Settings;
 
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -27,13 +28,13 @@ public class CentralisedRuntimeServices implements RuntimeServicesInfraTier {
         return new CentralisedAgArch();
     }
     
-    public String createAgent(String agName, String agSource, String agClass, String archClass, ClassParameters bbPars, Settings stts) throws Exception {
+    public String createAgent(String agName, String agSource, String agClass, List<String> archClasses, ClassParameters bbPars, Settings stts) throws Exception {
         if (logger.isLoggable(Level.FINE)) 
-            logger.fine("Creating centralised agent " + agName + " from source " + agSource + " (agClass=" + agClass + ", archClass=" + archClass + ", settings=" + stts);
+            logger.fine("Creating centralised agent " + agName + " from source " + agSource + " (agClass=" + agClass + ", archClass=" + archClasses + ", settings=" + stts);
 
         AgentParameters ap = new AgentParameters();
         ap.setAgClass(agClass);
-        ap.setArchClass(archClass);
+        ap.addArchClass(archClasses);
         ap.setBB(bbPars);
         
         if (stts == null) 
@@ -44,7 +45,7 @@ public class CentralisedRuntimeServices implements RuntimeServicesInfraTier {
 
         CentralisedAgArch agArch = newAgInstance();
         agArch.setAgName(agName);
-        agArch.initAg(ap.archClass.getClassName(), ap.agClass.getClassName(), ap.getBBClass(), agSource, stts, masRunner);
+        agArch.createArchs(ap.getAgArchClasses(), ap.agClass.getClassName(), ap.getBBClass(), agSource, stts, masRunner);
         agArch.setEnvInfraTier(masRunner.getEnvironmentInfraTier());
         agArch.setControlInfraTier(masRunner.getControllerInfraTier());
         masRunner.addAg(agArch);
@@ -61,7 +62,7 @@ public class CentralisedRuntimeServices implements RuntimeServicesInfraTier {
         agThread.start(); 
     }
     
-    public AgArch clone(Agent source, String archClassName, String agName) throws JasonException {
+    public AgArch clone(Agent source, List<String> archClasses, String agName) throws JasonException {
         // create a new infra arch
         CentralisedAgArch agArch = newAgInstance();
         agArch.setAgName(agName);
@@ -69,7 +70,7 @@ public class CentralisedRuntimeServices implements RuntimeServicesInfraTier {
         agArch.setControlInfraTier(masRunner.getControllerInfraTier());
         masRunner.addAg(agArch);
         
-        agArch.initAg(archClassName, source, masRunner);
+        agArch.createArchs(archClasses, source, masRunner);
 
         startAgent(agName);
         return agArch.getUserAgArch();
