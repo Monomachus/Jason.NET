@@ -51,7 +51,7 @@ import java.util.List;
  *  
  * Users can customise the architecture by overriding some this class methods.
  */
-public class AgArch {
+public class AgArch implements AgArchInfraTier {
 
     private TransitionSystem ts = null;
 
@@ -143,7 +143,7 @@ public class AgArch {
     
    
     /** returns the last arch in the chain, which is supposed to be the infra tier */ 
-    public AgArch getArchInfraTier() {
+    public AgArchInfraTier getArchInfraTier() {
         if (this.successor == null)
             return this;
         else
