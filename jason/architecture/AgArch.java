@@ -22,6 +22,7 @@
 
 package jason.architecture;
 
+import jade.util.Logger;
 import jason.JasonException;
 import jason.asSemantics.ActionExec;
 import jason.asSemantics.Message;
@@ -69,13 +70,13 @@ public class AgArch implements AgArchInfraTier {
     }
     
     /** 
-     * @deprecated for arch initialisation, you should override the init() method.
+     * @deprecated for arch initialisation you should override the init() method.
      */
     public void initAg(String agClass, ClassParameters bbPars, String asSrc, Settings stts) throws JasonException {
         //Agent.create(this, agClass, bbPars, asSrc, stts);
     }
         
-    public void init() {
+    public void init() throws Exception {
     }
     
     /**
@@ -125,9 +126,15 @@ public class AgArch implements AgArchInfraTier {
         for (String agArchClass: archs) {
             // user custom arch
             if (!agArchClass.equals(AgArch.class.getName()) && !agArchClass.equals(CentralisedAgArch.class.getName())) {
-                insertAgArch((AgArch) Class.forName(agArchClass).newInstance());
-                getFirstAgArch().initAg(null, null, null, null); // for compatibility reasons
-                getFirstAgArch().init();
+                try {
+                    AgArch a = (AgArch) Class.forName(agArchClass).newInstance();
+                    a.initAg(null, null, null, null); // for compatibility reasons
+                    a.init();
+                    insertAgArch(a);
+                } catch (Exception e) {
+                    System.out.println("Error creating custom agent aarchitecture."+e);
+                    e.printStackTrace();
+                }
             }
         }
     }

@@ -22,6 +22,7 @@
 
 package jason.architecture;
 
+import jason.JasonException;
 import jason.asSyntax.ASSyntax;
 import jason.asSyntax.NumberTerm;
 import jason.asSyntax.Structure;
