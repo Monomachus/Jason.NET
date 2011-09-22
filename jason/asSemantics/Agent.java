@@ -636,6 +636,13 @@ public class Agent {
         if (percepts == null) {
             return;
         }
+        
+        /*long startTime;
+        if (logger.isLoggable(Level.FINE)) {
+            startTime = System.nanoTime();
+        } else {
+            startTime = 0;
+        }*/       
 
         // deleting percepts in the BB that is not perceived anymore
         Iterator<Literal> perceptsInBB = getBB().getPercepts();
@@ -700,6 +707,9 @@ public class Agent {
                 logger.log(Level.SEVERE, "Error adding percetion " + lp, e);
             }
         }
+        
+        //if (logger.isLoggable(Level.FINE))                    
+        //    logger.fine("Finished BUF for "+percepts+" in "+(System.nanoTime()-startTime)+" nanoseconds");
     }
 
     /**

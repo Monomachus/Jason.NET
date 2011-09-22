@@ -22,7 +22,6 @@
 
 package jason.architecture;
 
-import jade.util.Logger;
 import jason.JasonException;
 import jason.asSemantics.ActionExec;
 import jason.asSemantics.Message;

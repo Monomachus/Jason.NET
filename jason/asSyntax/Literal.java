@@ -207,7 +207,7 @@ public abstract class Literal extends DefaultTerm implements LogicalFormula {
     public void setTerm(int i, Term t)       { logger.log(Level.SEVERE, "setTerm is not implemented in the class "+this.getClass().getSimpleName(), new Exception());  }
     
     // pred
-    public Literal setAnnots(ListTerm l)         { logger.log(Level.SEVERE, "setAnnots is not implemented in the class "+this.getClass().getSimpleName(), new Exception()); return null; }
+    public Literal setAnnots(ListTerm l)     { logger.log(Level.SEVERE, "setAnnots is not implemented in the class "+this.getClass().getSimpleName(), new Exception()); return null; }
     public boolean addAnnot(Term t)          { logger.log(Level.SEVERE, "addAnnot("+t+") is not implemented in the class "+this.getClass().getSimpleName()+" of object "+this, new Exception()); return false; }
     
     /** adds some annots and return this */
@@ -255,6 +255,14 @@ public abstract class Literal extends DefaultTerm implements LogicalFormula {
      * Returns an iterator for all unifiers that are logCons.
      */
     public Iterator<Unifier> logicalConsequence(final Agent ag, final Unifier un) {
+        /*final long startTime;
+        if (logger.isLoggable(Level.FINE)) {
+            logger.fine("Starting logicalConsequence for "+this+" unifier= "+un);
+            startTime = System.nanoTime();
+        } else {
+            startTime = 0;
+        }*/
+        
         final Iterator<Literal> il   = ag.getBB().getCandidateBeliefs(this, un);
         if (il == null) // no relevant bels
             return LogExpr.EMPTY_UNIF_LIST.iterator();
@@ -275,6 +283,8 @@ public abstract class Literal extends DefaultTerm implements LogicalFormula {
             public boolean hasNext() {
                 if (needsUpdate)
                     get();
+                //if (logger.isLoggable(Level.FINE))                    
+                //    logger.fine("hasNext logicalConsequence for "+Literal.this+" answer is "+(current != null)+" in "+(System.nanoTime()-startTime)+" ns");
                 return current != null;
             }
 
@@ -284,6 +294,8 @@ public abstract class Literal extends DefaultTerm implements LogicalFormula {
                 Unifier a = current;
                 if (current != null)
                     needsUpdate = true;
+                //if (logger.isLoggable(Level.FINE))                     
+                //    logger.fine("next logicalConsequence for "+Literal.this+" answer is "+a+" in "+(System.nanoTime()-startTime)+" ns");
                 return a;
             }
 
@@ -441,24 +453,11 @@ public abstract class Literal extends DefaultTerm implements LogicalFormula {
     	public TrueLiteral() {
     		super("true");
 		}
-
-    	/*
-    	@Override
-        public boolean canBeAddedInBB() {
-    		return false;
-    	}
-    	*/
         
     	@Override
         public Iterator<Unifier> logicalConsequence(final Agent ag, final Unifier un) {
         	return LogExpr.createUnifIterator(un);            
         }
-    	
-    	/*
-    	@Override
-    	public Literal clone() {
-    	    return this;
-    	}*/
     }
     
     @SuppressWarnings("serial")
@@ -466,23 +465,10 @@ public abstract class Literal extends DefaultTerm implements LogicalFormula {
     	public FalseLiteral() {
     		super("false");
 		}
-
-    	/*
-    	@Override
-        public boolean canBeAddedInBB() {
-    		return false;
-    	}
-    	*/
     	
         @Override
         public Iterator<Unifier> logicalConsequence(final Agent ag, final Unifier un) {
         	return LogExpr.EMPTY_UNIF_LIST.iterator();            
         }
-        
-        /*
-        @Override
-        public Literal clone() {
-            return this;
-        }*/
     }
 }

@@ -13,8 +13,6 @@ import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import c4jason.CartagoEnvironment;
-
 /**
  * Write the Ant script to run the MAS in centralised infrastructure and
  * start this script.
@@ -182,7 +180,7 @@ public class CentralisedMASLauncherAnt implements MASLauncherInfraTier {
 
         // if cartago env
         if (project.isJade() || 
-                (project.getEnvClass() != null && project.getEnvClass().getClassName().equals(CartagoEnvironment.class.getName()))) {
+                (project.getEnvClass() != null && project.getEnvClass().getClassName().equals("c4jason.CartagoEnvironment"))) {
             lib += "        <pathelement location=\""+Config.get().getJasonHome()+"/lib/cartago.jar\"/>\n";
             lib += "        <pathelement location=\""+Config.get().getJasonHome()+"/lib/c4jason.jar\"/>\n";            
         }
