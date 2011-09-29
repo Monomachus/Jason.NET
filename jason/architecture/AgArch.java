@@ -34,6 +34,7 @@ import jason.runtime.Settings;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 
 /**
  * Base agent architecture class that defines the overall agent architecture;
@@ -127,12 +128,14 @@ public class AgArch implements AgArchInfraTier {
             if (!agArchClass.equals(AgArch.class.getName()) && !agArchClass.equals(CentralisedAgArch.class.getName())) {
                 try {
                     AgArch a = (AgArch) Class.forName(agArchClass).newInstance();
+                    a.setTS(ts); // so a.init() can use TS
                     a.initAg(null, null, null, null); // for compatibility reasons
                     a.init();
-                    insertAgArch(a);
+                    insertAgArch(a);                    
                 } catch (Exception e) {
                     System.out.println("Error creating custom agent aarchitecture."+e);
                     e.printStackTrace();
+                    ts.getLogger().log(Level.SEVERE,"Error creating custom agent aarchitecture.",e);
                 }
             }
         }
