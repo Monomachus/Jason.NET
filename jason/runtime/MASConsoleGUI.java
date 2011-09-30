@@ -113,7 +113,9 @@ public class MASConsoleGUI {
 
         addButton(btClean);
 
-        frame.setBounds(200, 20, 824, 500);
+        int h = 500;
+        int w = (int)(h*1.618);
+        frame.setBounds((int)(h*0.618), 20, w, h);
     }
 
     public void setTitle(String s) {

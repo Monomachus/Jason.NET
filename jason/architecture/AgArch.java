@@ -195,6 +195,8 @@ public class AgArch implements AgArchInfraTier {
      * Executes the action <i>action</i> and, when finished, add it back in
      * <i>feedback</i> actions.
      */
+    // TODO: remove feedback parameter and use getTS().addFeedbackAction 
+    // for jason 2.0 to avoid backward compatibility problems
     public void act(ActionExec action, List<ActionExec> feedback) {
         if (successor != null)
             successor.act(action, feedback);

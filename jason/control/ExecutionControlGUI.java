@@ -267,7 +267,7 @@ public class ExecutionControlGUI extends ExecutionControl {
         frame.pack();
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         int height = (int)(screenSize.height * 0.618);
-        frame.setBounds(80, 30, (int)(height*1.2), height);
+        frame.setBounds(80, 30, (int)(height*1.618), height);
         //splitPaneVer.setDividerLocation((int)(splitPaneVer.getHeight()*0.618));
         //splitPaneVer.setDividerLocation(height - 200);
         
