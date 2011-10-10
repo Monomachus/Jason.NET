@@ -35,11 +35,18 @@ public class MASConsoleLogHandler extends StreamHandler  {
     
     public static String formaterField = MASConsoleLogHandler.class.getName()+".formatter";
     public static String levelField = MASConsoleLogHandler.class.getName()+".level";
+    public static String useColorsPropField = MASConsoleLogHandler.class.getName() + ".colors";
     
     private MASConsoleGUI fGUI;
 
     public MASConsoleLogHandler() {
-        fGUI = MASConsoleGUI.get();
+        String colors = LogManager.getLogManager().getProperty(useColorsPropField);
+        if (colors != null && colors.equals("true")) {
+            fGUI = MASConsoleColorGUI.get();
+        } else {
+            fGUI = MASConsoleGUI.get();
+        }
+
         //setFormatter(new MASConsoleLogFormatter());
         String formatter = LogManager.getLogManager().getProperty(formaterField);
         if (formatter != null) {

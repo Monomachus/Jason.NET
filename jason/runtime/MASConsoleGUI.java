@@ -47,10 +47,10 @@ import javax.swing.JTextArea;
 /** the GUI console to output log messages */
 public class MASConsoleGUI {
 
-    private static MASConsoleGUI masConsole        = null;
-    public  static String        isTabbedPropField = MASConsoleLogHandler.class.getName() + ".tabbed";
+    protected static MASConsoleGUI masConsole        = null;
+    public    static String        isTabbedPropField = MASConsoleLogHandler.class.getName() + ".tabbed";
 
-    private boolean              isTabbed          = false;
+    private boolean                isTabbed          = false;
 
     /** for singleton pattern */
     public static MASConsoleGUI get() {
@@ -64,44 +64,62 @@ public class MASConsoleGUI {
         return masConsole != null;
     }
 
-    private Map<String, JTextArea>       agsTextArea       = new HashMap<String, JTextArea>();
-    private JTabbedPane                  tabPane;
-    private JFrame              frame   = null;
-    private JTextArea           output;
-    private JPanel              pBt     = null;
-    private OutputStreamAdapter out;
-    private boolean             inPause = false;
+    protected Map<String, JTextArea>       agsTextArea       = new HashMap<String, JTextArea>();
+    protected JTabbedPane                  tabPane;
+    protected JFrame              frame   = null;
+    protected JTextArea           output;
+    protected JPanel              pBt     = null;
+    protected JPanel              pcenter;
+    protected OutputStreamAdapter out;
+    protected boolean             inPause = false;
 
-    private MASConsoleGUI(String title) {
-        String tabbed = LogManager.getLogManager().getProperty(isTabbedPropField);
-        if (tabbed != null && tabbed.equals("true")) {
-            isTabbed = true;
-        }
-
+    protected MASConsoleGUI(String title) {
+        initFrame(title);
+        initMainPanel();
+        initOutput();
+        initButtonPanel();
+    }
+    
+    protected void initFrame(String title) {
         frame = new JFrame(title);
         frame.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
                 close();
             }
         });
-
-        output = new JTextArea();
-        output.setEditable(false);
-
-        JPanel pcenter = new JPanel(new BorderLayout());
+        frame.getContentPane().setLayout(new BorderLayout());
+        int h = 500;
+        int w = (int)(h*1.618);
+        frame.setBounds((int)(h*0.618), 20, w, h);
+    }
+    
+    protected void initMainPanel() {
+        String tabbed = LogManager.getLogManager().getProperty(isTabbedPropField);
+        if (tabbed != null && tabbed.equals("true")) {
+            isTabbed = true;
+        }
+        pcenter = new JPanel(new BorderLayout());
         if (isTabbed) {
             tabPane = new JTabbedPane(JTabbedPane.LEFT);
-            tabPane.add("common", new JScrollPane(output));
             pcenter.add(BorderLayout.CENTER, tabPane);
+        }
+        frame.getContentPane().add(BorderLayout.CENTER, pcenter);        
+    }
+    
+    protected void initOutput() {
+        output = new JTextArea();
+        output.setEditable(false);        
+        if (isTabbed) {
+            tabPane.add("common", new JScrollPane(output));
         } else {
             pcenter.add(BorderLayout.CENTER, new JScrollPane(output));
         }
-
+    }
+    
+    protected void initButtonPanel() {
         pBt = new JPanel();
         pBt.setLayout(new FlowLayout(FlowLayout.CENTER));
 
-        frame.getContentPane().setLayout(new BorderLayout());
-        frame.getContentPane().add(BorderLayout.CENTER, pcenter);
         frame.getContentPane().add(BorderLayout.SOUTH, pBt);
 
         JButton btClean = new JButton("Clean", new ImageIcon(RunCentralisedMAS.class.getResource("/images/clear.gif")));
@@ -112,10 +130,6 @@ public class MASConsoleGUI {
         });
 
         addButton(btClean);
-
-        int h = 500;
-        int w = (int)(h*1.618);
-        frame.setBounds((int)(h*0.618), 20, w, h);
     }
 
     public void setTitle(String s) {
@@ -145,6 +159,9 @@ public class MASConsoleGUI {
         } catch (Exception e) { }
     }
 
+    public boolean isTabbed() {
+        return isTabbed;
+    }
     public boolean isPause() {
         return inPause;
     }

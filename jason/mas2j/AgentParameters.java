@@ -94,6 +94,7 @@ public class AgentParameters {
         for (ClassParameters c: cps)
             archClasses.add(0,c);        
     }
+    /** gets a list of all custom arch classes defined in the jason project */
     public List<String> getAgArchClasses() {
         List<String> all = new ArrayList<String>();
         for (ClassParameters c: archClasses) {
