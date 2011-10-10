@@ -121,6 +121,7 @@ public class NewProjectGUI extends NewAgentGUI {
     }
 
     protected boolean ok() {
+        System.out.println("******");
         String projDecl = getProjDecl();
         if (projDecl == null) {
             return false;
@@ -129,10 +130,12 @@ public class NewProjectGUI extends NewAgentGUI {
         File finalDir = new File(projFinalDir.getText().trim());
         try {
             if (!finalDir.exists()) {
-                finalDir.mkdirs();
+                boolean ok = finalDir.mkdirs();
+                if (!ok)
+                    JOptionPane.showMessageDialog(this, "Error creating project directory: "+finalDir);
             }
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Error creating project directory: " + e);
+            JOptionPane.showMessageDialog(this, "Error creating project directory: "+finalDir+": " + e);
             return false;
         }
 
