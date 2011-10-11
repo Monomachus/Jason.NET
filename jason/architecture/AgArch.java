@@ -257,6 +257,10 @@ public class AgArch implements AgArchInfraTier {
             successor.setCycleNumber(cycle);
     }
     
+    public void incCycleNumber() {
+        setCycleNumber(cycleNumber+1);
+    }
+    
     /** gets the current cycle number in case of running in sync execution mode */
     public int getCycleNumber() {
         return cycleNumber;

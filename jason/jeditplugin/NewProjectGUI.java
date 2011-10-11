@@ -121,7 +121,6 @@ public class NewProjectGUI extends NewAgentGUI {
     }
 
     protected boolean ok() {
-        System.out.println("******");
         String projDecl = getProjDecl();
         if (projDecl == null) {
             return false;

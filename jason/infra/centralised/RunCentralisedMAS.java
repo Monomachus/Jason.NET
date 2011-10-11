@@ -592,6 +592,15 @@ public class RunCentralisedMAS {
             }
             while (!stop.exists()) {
                 Thread.sleep(1500);
+                /*
+                boolean allSleep = true;
+                for (CentralisedAgArch ag : ags.values()) {
+                    //System.out.println(ag.getAgName()+"="+ag.canSleep());
+                    allSleep = allSleep && ag.canSleep();
+                }
+                if (allSleep)
+                    break;
+                */
             }
             if (stop.exists()) {
                 stop.delete();

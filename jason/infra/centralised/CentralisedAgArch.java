@@ -202,6 +202,7 @@ public class CentralisedAgArch extends AgArch implements Runnable {
                     }
                     informCycleFinished(isBreakPoint, getCycleNumber());
                 } else {
+                    incCycleNumber();
                     ts.reasoningCycle();
                 }
             }
