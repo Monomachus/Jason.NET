@@ -38,7 +38,7 @@ public abstract class JadeAg extends Agent {
 
     protected Logger logger = jade.util.Logger.getMyLogger(this.getClass().getName());
 
-    protected static int rwid = 0; // reply-with counter
+    private static int rwid = 0; // reply-with counter
     protected boolean running = true;
     
     protected Map<String,String> conversationIds = new HashMap<String,String>();
@@ -51,6 +51,10 @@ public abstract class JadeAg extends Agent {
     
     public boolean isRunning() {
         return running;
+    }
+    
+    public int incReplyWithId() {
+        return rwid++;
     }
     
     public void sendMsg(Message m) throws Exception {
@@ -81,10 +85,13 @@ public abstract class JadeAg extends Agent {
         });
     }
     
+    public void putConversationId(String replyWith, String mId) {
+        conversationIds.put(replyWith, mId);
+    }
+    
     protected ACLMessage ask(final ACLMessage m) {
         try {
-            rwid++;
-            String waitingRW = "id"+rwid;
+            String waitingRW = "id"+incReplyWithId();
             m.setReplyWith(waitingRW);
             send(m);                    
             ACLMessage r = blockingReceive(MessageTemplate.MatchInReplyTo(waitingRW), 5000);
