@@ -166,8 +166,12 @@ public class ArithExpr extends ArithFunctionTerm {
     @Override
     public double solve() {
         double l = ((NumberTerm)getTerm(0)).solve();
-        if (isUnary() && op == ArithmeticOp.minus) {
-            return -l;
+        if (isUnary()) {
+            if (op == ArithmeticOp.minus) {
+                return -l;
+            } else {
+                return l;
+            }
         } else {
             double r = ((NumberTerm)getTerm(1)).solve();
             return op.eval(l, r);

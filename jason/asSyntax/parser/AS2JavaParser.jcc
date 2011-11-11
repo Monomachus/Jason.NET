@@ -769,6 +769,11 @@ Object arithm_expr_simple():
                                   }
                                   return new ArithExpr(ArithmeticOp.minus, (NumberTerm)t); 
                                 }
+ | "+" t = arithm_expr_simple() { if (!(t instanceof NumberTerm)) {
+                                    throw new ParseException(getSourceRef(t)+" The argument '"+t+"' of operator '+' is not numeric or variable.");
+                                  }
+                                  return new ArithExpr(ArithmeticOp.plus, (NumberTerm)t); 
+                                }
  | "(" t = log_expr() ")"       { return t; }
  | v = var()                    { return v; }
  | t = function()               { return t; }

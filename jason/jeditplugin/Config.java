@@ -104,7 +104,7 @@ public class Config extends Properties {
         return new File(System.getProperties().get("user.home") + File.separator + ".jason/user.properties");
     }
 
-    /** Returns true if the file was loaded */
+    /** Returns true if the file is loaded correctly */
     public boolean load() {
         try {
             File f = getUserConfFile();
@@ -205,9 +205,9 @@ public class Config extends Properties {
 
     /** Set most important parameters with default values */
     public void fix() {
-        tryToFixJarFileConf(JASON_JAR, "jason.jar", 600000);
+        tryToFixJarFileConf(JASON_JAR, "jason.jar", 700000);
         tryToFixJarFileConf(SACI_JAR, "saci.jar", 300000);
-        tryToFixJarFileConf(JADE_JAR, "jade.jar", 800000);
+        tryToFixJarFileConf(JADE_JAR, "jade.jar", 2000000);
 
         // fix java home
         if (get(JAVA_HOME) == null || !checkJavaHomePath(getProperty(JAVA_HOME))) {
@@ -351,12 +351,12 @@ public class Config extends Properties {
     }
     void tryToFixJarFileConf(String jarEntry, String jarName, int minSize) {
         String jarFile = getProperty(jarEntry);
-        if (jarFile == null || !checkJar(jarFile)) {
+        if (jarFile == null || !checkJar(jarFile, minSize)) {
             System.out.println("Wrong configuration for " + jarName + ", current is " + jarFile);
 
             // try to get from classpath
             jarFile = getJavaHomePathFromClassPath(jarName);
-            if (checkJar(jarFile)) {
+            if (checkJar(jarFile, minSize)) {
                 put(jarEntry, jarFile);
                 System.out.println("found at " + jarFile);
                 return;
@@ -364,7 +364,7 @@ public class Config extends Properties {
 
             // try current dir
             jarFile = "." + File.separator + jarName;
-            if (checkJar(jarFile)) {
+            if (checkJar(jarFile, minSize)) {
                 put(jarEntry, new File(jarFile).getAbsolutePath());
                 System.out.println("found at " + jarFile);
                 return;
@@ -372,13 +372,13 @@ public class Config extends Properties {
 
             // try current dir + lib
             jarFile = ".." + File.separator + "lib" + File.separator + jarName;
-            if (checkJar(jarFile)) {
+            if (checkJar(jarFile, minSize)) {
                 put(jarEntry, new File(jarFile).getAbsolutePath());
                 System.out.println("found at " + jarFile);
                 return;
             }
             jarFile = "." + File.separator + "lib" + File.separator + jarName;
-            if (checkJar(jarFile)) {
+            if (checkJar(jarFile, minSize)) {
                 put(jarEntry, new File(jarFile).getAbsolutePath());
                 System.out.println("found at " + jarFile);
                 return;
@@ -386,7 +386,7 @@ public class Config extends Properties {
 
             // try current dir + bin
             jarFile = "." + File.separator + "bin" + File.separator + jarName;
-            if (checkJar(jarFile)) {
+            if (checkJar(jarFile, minSize)) {
                 put(jarEntry, new File(jarFile).getAbsolutePath());
                 System.out.println("found at " + jarFile);
                 return;
@@ -439,9 +439,15 @@ public class Config extends Properties {
 
     public static boolean checkJar(String jar) {
         try {
-            if (jar != null && new File(jar).exists() && jar.endsWith(".jar")) {
-                return true;
-            }
+            return jar != null && new File(jar).exists() && jar.endsWith(".jar");
+        } catch (Exception e) {
+        }
+        return false;
+    }
+
+    public static boolean checkJar(String jar, int minSize) {
+        try {
+            return checkJar(jar) && new File(jar).length() > minSize;
         } catch (Exception e) {
         }
         return false;
