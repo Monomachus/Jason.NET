@@ -602,9 +602,6 @@ public class RunCentralisedMAS {
                     break;
                 */
             }
-            if (stop.exists()) {
-                stop.delete();
-            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -643,7 +640,12 @@ public class RunCentralisedMAS {
             stopAgs();
 
             runner = null;
-
+            
+            // remove the .stop___MAS file  (note that GUI console.close(), above, creates this file)
+            File stop = new File(stopMASFileName);
+            if (stop.exists()) {
+                stop.delete();
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
