@@ -941,7 +941,7 @@ public class TransitionSystem {
 
     /** generate a failure event for an intention */
     public boolean generateGoalDeletion(Intention i, List<Term> failAnnots) throws JasonException {
-        boolean failEeventGenerated = false;
+        boolean failEventIsRelevant = false;
         IntendedMeans im = i.peek();
         if (im.isGoalAdd()) {
             // notify listener
@@ -952,14 +952,18 @@ public class TransitionSystem {
             // produce failure event
             Event failEvent = findEventForFailure(i, im.getTrigger());
             if (failEvent != null) {
-                Term bodyPart = im.getCurrentStep().getBodyTerm().clone();
-                bodyPart.apply(im.unif);
-                setDefaultFailureAnnots(failEvent, bodyPart, failAnnots);
+                failEventIsRelevant = true;
+            } else {
+                failEvent = new Event(im.getTrigger().clone(), i);
+            }
+            Term bodyPart = im.getCurrentStep().getBodyTerm().clone();
+            bodyPart.apply(im.unif);
+            setDefaultFailureAnnots(failEvent, bodyPart, failAnnots);
+            if (failEventIsRelevant) {
                 confP.C.addEvent(failEvent);
-                failEeventGenerated = true;
                 if (logger.isLoggable(Level.FINE)) logger.fine("Generating goal deletion " + failEvent.getTrigger() + " from goal: " + im.getTrigger());
             } else {
-                logger.warning("No failure event was generated for " + im.getTrigger());
+                logger.warning("No failure event was generated for " + failEvent.getTrigger());
             }
         }
         // if "discard" is set, we are deleting the whole intention!
@@ -972,7 +976,7 @@ public class TransitionSystem {
         } else {
             logger.warning("Could not finish intention: " + i);
         }
-        return failEeventGenerated;
+        return failEventIsRelevant;
     }
 
     // similar to the one above, but for an Event rather than intention
