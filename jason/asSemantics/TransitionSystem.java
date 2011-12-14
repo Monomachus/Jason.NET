@@ -943,22 +943,23 @@ public class TransitionSystem {
     public boolean generateGoalDeletion(Intention i, List<Term> failAnnots) throws JasonException {
         boolean failEventIsRelevant = false;
         IntendedMeans im = i.peek();
+        // produce failure event
+        Event failEvent = findEventForFailure(i, im.getTrigger());
+        if (failEvent != null) {
+            failEventIsRelevant = true;
+        } else {
+            failEvent = new Event(im.getTrigger().clone(), i);
+        }
+        Term bodyPart = im.getCurrentStep().getBodyTerm().clone();
+        bodyPart.apply(im.unif);
+        setDefaultFailureAnnots(failEvent, bodyPart, failAnnots);
+
         if (im.isGoalAdd()) {
             // notify listener
             if (hasGoalListener())
                 for (GoalListener gl: goalListeners)
                     gl.goalFailed(im.getTrigger());
             
-            // produce failure event
-            Event failEvent = findEventForFailure(i, im.getTrigger());
-            if (failEvent != null) {
-                failEventIsRelevant = true;
-            } else {
-                failEvent = new Event(im.getTrigger().clone(), i);
-            }
-            Term bodyPart = im.getCurrentStep().getBodyTerm().clone();
-            bodyPart.apply(im.unif);
-            setDefaultFailureAnnots(failEvent, bodyPart, failAnnots);
             if (failEventIsRelevant) {
                 confP.C.addEvent(failEvent);
                 if (logger.isLoggable(Level.FINE)) logger.fine("Generating goal deletion " + failEvent.getTrigger() + " from goal: " + im.getTrigger());
@@ -974,7 +975,7 @@ public class TransitionSystem {
             im = i.get(0);
             confP.C.addExternalEv(im.getTrigger());
         } else {
-            logger.warning("Could not finish intention: " + i);
+            logger.warning("Could not finish intention: " + i + "\tTrigger: " + failEvent.getTrigger());
         }
         return failEventIsRelevant;
     }
@@ -983,7 +984,7 @@ public class TransitionSystem {
     private boolean generateGoalDeletionFromEvent(List<Term> failAnnots) throws JasonException {
         Event ev = conf.C.SE;
         if (ev == null) {
-            logger.warning("** It was not possible to generate a goal deletion event because SE is null! " + conf.C);
+            logger.warning("** It was impossible to generate a goal deletion event because SE is null! " + conf.C);
             return false;
         }
         
