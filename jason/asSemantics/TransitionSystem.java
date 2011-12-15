@@ -253,12 +253,15 @@ public class TransitionSystem {
                 if (m.isUnTell() && send.getTerm(1).toString().equals("askOne")) {
                     content = Literal.LFalse;
                 } else if (content.isLiteral()) { // adds source in the content if possible
+                    content = ((Literal)content).forceFullLiteralImpl();
                     ((Literal)content).addSource(new Atom(m.getSender()));
                 } else if (send.getTerm(1).toString().equals("askAll") && content.isList()) { // adds source in each answer if possible
                     ListTerm tail = new ListTermImpl();
                     for (Term t: ((ListTerm)content)) {
-                        if (t.isLiteral()) 
+                        if (t.isLiteral()) {
+                            t = ((Literal)t).forceFullLiteralImpl();
                             ((Literal)t).addSource(new Atom(m.getSender()));
+                        }
                         tail.append(t);
                     }
                     content = tail;

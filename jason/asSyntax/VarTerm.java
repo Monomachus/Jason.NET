@@ -633,6 +633,14 @@ public class VarTerm extends LiteralImpl implements NumberTerm, ListTerm, String
             return false;
     }
 
+    @Override
+    public Literal forceFullLiteralImpl() {
+        if (hasValue() && getValue().isLiteral()) 
+            return ((Literal)getValue()).forceFullLiteralImpl();
+        else 
+            return super.forceFullLiteralImpl();
+    }
+
     // ----------
     // ArithmeticExpression methods overridden
     // Interface NumberTerm
