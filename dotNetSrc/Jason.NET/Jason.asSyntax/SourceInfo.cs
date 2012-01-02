@@ -64,7 +64,7 @@ namespace Jason.asSyntax
 		void ISerializable.GetObjectData(SerializationInfo info, StreamingContext context)
 		{
 			// throw new NotImplementedException();
-			return null;
+			return;
 		}
 	}
 }
